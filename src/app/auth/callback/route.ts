@@ -1,13 +1,15 @@
 /**
- * Magic-link landing (REQ-004 FR-1, FR-2): exchanges the one-time code for a
- * session cookie, then sends a user with no account to the "about your
- * business" step and everyone else to their requested same-origin page.
+ * Magic-link landing (REQ-004 FR-1, FR-2, FR-6): exchanges the one-time code
+ * for a session cookie, then sends a user with no account to the "about your
+ * business" step, a user whose account was deleted back out (signed out, to
+ * the "account deleted" page), and everyone else to their requested
+ * same-origin page.
  */
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
-import { getOwnedAccount } from "@/server/accounts/queries";
+import { getDeletedAccount, getOwnedAccount } from "@/server/accounts/queries";
 import { safeNextPath } from "@/server/auth/paths";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -38,6 +40,18 @@ export async function GET(request: NextRequest) {
   }
 
   const account = await getOwnedAccount(supabase, data.user.id);
+  if (!account) {
+    const deleted = await getDeletedAccount(data.user.id);
+    if (deleted) {
+      // Sign-in is refused for a deleted account until the purge (AC-5).
+      await supabase.auth.signOut({ scope: "local" });
+      log.info("auth.callback.deleted-account", {
+        userId: data.user.id,
+        accountId: deleted.id,
+      });
+      return NextResponse.redirect(new URL("/account/deleted", url.origin));
+    }
+  }
   const destination = account
     ? safeNextPath(parsed.data.next)
     : "/account/setup";

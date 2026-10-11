@@ -84,6 +84,20 @@ PRs: #7 (REQ-004 Session C) is accepted but conflicts with `main` in `DECISIONS.
 
 5. STOP. Append your status below.
 
+## Queue (written by PO, 12 Oct 2026, batch 8)
+
+Merges done by the PO: PR #7 (REQ-004 Session C) is on `main`. PR #8 conflicts; PR #9 stays open as the REQ-005 working PR.
+
+1. **PR #8 conflict:** on `req-004-migrate-dburl`, merge `main` in (a merge commit is fine, D-033 force-push is not required), resolve `product/requirements/REQ-004-accounts-auth-tenancy.md` keeping both sides in order, run `npm run check`, push. The PO merges.
+
+2. **REQ-005 Session B recordings** on `req-005-generator` (rebase or merge `main` first): if `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` are present in `.env.local`, record the three reference generations as replay fixtures, run the red-team fixture for real once, note model cost per full generation in Delivery evidence, and commit the fixtures. Never print the key. If absent, write "waiting for Anthropic key" and continue to item 3.
+
+3. **REQ-005 Session C** on the same branch: generation for a signed-in owner behind `GENERATION_ENABLED` with the per-account quota (FR-9, SR-6); version sets and `document_versions` with the migration; private Supabase Storage bucket in Sydney with RLS on `storage.objects` and signed short-lived download URLs (SR-4, AC-7 test in the integration suite); zip download of the latest set plus the PDF summary; the reviewer view with per-section "which answers drove this" and regenerate-one-section with diff (FR-5, AC-6); `generation_log` with the retention rule (SR-5). Fill Delivery evidence with screenshots at 360x740 and desktop and the CI link. Also write the Session D fixed extras (register tables, service agreement template body, checklists) in the house style so no `[Provider to complete]` placeholder remains where fixed text was planned.
+
+4. **REQ-013 P1** on a new branch `req-013-first-time-ux` from `main`: items FR-1 to FR-5 and the acceptance criteria in the REQ. Keep REQ-003's e2e suite green; add the accessibility-tree test. Push; fill Delivery evidence with screenshots and the screen-reader walkthrough note. The PO opens the PR.
+
+5. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)
@@ -129,3 +143,13 @@ Waiting for the PO.
 4. STOP.
 
 Waiting for the PO.
+**2026-10-12 (batch 7), Dev: all four items delivered and pushed; nothing merged, nothing force-pushed.**
+
+0. `main` pushed with the PO's batch-7 commit 7f456a0 after checking its stat (product/ only).
+1. PR #7 conflict: `req-004-accounts-rebuilt` now carries a merge of `main` (b0a4310) with `DECISIONS.md` resolved keeping both sides (D-414 to D-420 followed by D-035 and D-036). Deviation: a rebase plus `--force-with-lease` is refused by Dev's tool in this session (as in batch 5), so the conflict was resolved with a merge commit, which is a plain push and leaves PR #7 conflict-free with identical content. `npm run check` clean on the merge (25 files, 253 tests). Nothing else on that branch.
+2. REQ-005 PO decisions and evidence review on `req-005-generator` (merged with `main`, commit 270c4a6): money-and-property and the new support-planning-and-transitions procedures in the core set; feedback-and-engagement procedure narrowed; `restrictive-practices` register with `when.modulesAny: ["ibsp"]` honoured by the content schema and `deriveDocumentSet` and tested; three evidence additions; every evidence item `draft: false`, `reviewedBy: "po"`, `reviewedAt: "2026-10-12"` through `meta.evidenceReview` (schema and build script updated); dataset **1.1.0** (186 items), `SOURCES.md` changelog, `standards:verify` green, Commission text unchanged.
+3. REQ-005 Session A (commit 8625329): closed-block section schema, provider facts, catalogue access, document model with numbered sections and fixed house-style text for every outline, `docx` renderer (headings, numbered steps, tables, callouts, header and "Prepared with Readyline" footer), in-repo Flesch-Kincaid readability, terminology and claims lint wired to the house-style lists with class names exempt, house style constant pinned to the markdown, three reference cases, structure snapshots per case, docx structure checks, and the `docx-render` CI job (LibreOffice headless conversion of every skeleton, artifact upload; also on manual dispatch). Local: 71 skeleton `.docx` files across the three cases; check clean (28 files, 282 tests). LibreOffice itself is not on the dev machine; its first run is the CI job. D-506 to D-511.
+4. REQ-005 Session B preparation (commit 2cb4cfd): strict context pack with a Proxy-traced exclusion test (services note and step-5 answers never read; canary absent from pack and prompts), versioned prompts (`2026-10-12.1`) with the house style verbatim and delimited data blocks, replay-fixture harness (replay by default, record only with `GENERATION_RECORD=1` and a key, `MissingFixtureError` with the expected path), validate-retry-fallback pipeline, red-team fixture and tests, recorder test and `npm run generation:record`. **Waiting for Anthropic key:** `.env.local` has no `ANTHROPIC_API_KEY` or `ANTHROPIC_MODEL`, so no real generation was recorded and there is no cost note; stopped after the harness as instructed (D-515). Check clean (32 files, 299 tests, 1 skipped recorder). D-512 to D-515.
+5. STOP.
+
+For Haider: `ANTHROPIC_API_KEY` (console key in a workspace with a monthly spend cap) and `ANTHROPIC_MODEL` into `.env.local`; then Dev records the first fixtures. PRs still to open by the PO: `req-004-migrate-dburl` and `req-005-generator`. Waiting for the PO.

@@ -9,8 +9,8 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ-001 | Standards and registration-group mapping (`data/standards.json`) | 1 | must | in progress |
 | REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | accepted 11 Oct; merge PR #5 |
 | REQ-003 | Readiness questionnaire with save-and-resume | 2 | must | accepted 11 Oct; merge PR #6 |
-| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | accepted 11 Oct subject to CI; merge PR #7; operator steps pending |
-| REQ-005 | Document generator and `.docx` rendering, incl. AI governance docs | 3 | must | in progress (Dev response accepted 12 Oct; Sessions A–B queued) |
+| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | accepted; Session C merged (PR #7); PR #8 migrate fix pending; operator steps pending |
+| REQ-005 | Document generator and `.docx` rendering, incl. AI governance docs | 3 | must | in progress (Session A accepted; B recordings await key; C queued; PR #9) |
 | REQ-006 | Readiness checklist | 4 | must | draft |
 | REQ-007 | Payments: one-off pack and subscription, entitlements, refunds | 4 | must | draft |
 | REQ-008 | Legal and trust pages: terms, privacy, refunds, AI disclosure, data location | 4 | must | draft |
@@ -18,6 +18,7 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ-010 | Operations: backups, monitoring, incident response runbook, data export and deletion | 5 | must | draft |
 | REQ-011 | Content system and first ten SEO articles | 6 | should | draft |
 | REQ-012 | Launch readiness review (security re-test, a11y audit, claims audit, performance) | 6 | must | draft |
-| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | ready |
+| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | in progress (P1 queued batch 8) |
+| REQ-014 | Visual identity v1: tokens, serif headings, the ready-line motif, home page | 4 | should | ready |
 
 Parking lot (not scheduled): fee-free list of approved auditors (no referral fees, D-109); mid-term audit countdown emails; multi-user accounts for small organisations; de-identification helper for providers' own documents; AML/CTF variant of the engine (only if LEAP conflict is cleared).

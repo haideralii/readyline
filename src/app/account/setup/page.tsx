@@ -8,6 +8,7 @@ export const metadata: Metadata = { title: "About your business" };
 export default async function AccountSetupPage() {
   const viewer = await getViewer();
   if (!viewer) redirect("/sign-in?next=%2Faccount%2Fsetup");
+  if (viewer.deleted) redirect("/account/deleted");
   if (viewer.account) redirect("/account");
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
