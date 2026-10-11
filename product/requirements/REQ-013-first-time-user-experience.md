@@ -1,0 +1,41 @@
+# REQ-013: First-time user experience and accessibility fixes
+Status: ready
+Phase: 4 (items P1 before public launch); P2 items in Phase 6   Priority: must (P1), should (P2)   Owner: Dev
+
+## Why
+The PO walked the questionnaire on 12 Oct 2026 at phone size as a first-time, non-technical sole trader (the actual customer). The flow works and is honest, but several things would stop or confuse that person, and two are accessibility defects the automated checks (axe, Lighthouse) do not catch. These are cheap to fix now and expensive in lost sign-ups later.
+
+## Findings and requirements
+
+### P1: before public launch
+- FR-1 **Validation messages are developer text.** Submitting step 1 empty shows "Too small: expected string to have >=1 characters" and "Invalid option: expected one of 'sole-trader'|'partnership'|...". Replace every message with plain English per field ("Enter your trading name", "Choose your business structure", "Choose at least one state or territory"), via a field-to-message map, and test that no raw zod message can reach the UI (unit test over every schema error path). The ABN message is already right; copy its style.
+- FR-2 **Screen-reader names.** Registration-group checkboxes are announced as the code only ("0107"); radios are announced by value ("sole-trader", "not-sure"); the business structure, states, restrictive-practices, workforce and "already have" groups have no `fieldset`/`legend`, so the question is not announced with its options. Fix: visible label text as the accessible name (code as secondary text), `fieldset` and `legend` for every radio or checkbox group, and an e2e assertion using the accessibility tree that each control's name is its human label. Add a manual screen-reader pass (NVDA or VoiceOver) to the Definition of Done for form steps.
+- FR-3 **Supports step leads with jargon.** "Registration groups (class of support)" and "0101 Accommodation/tenancy assistance" is the first thing a support worker sees. Re-order: lead with a plain question ("What do you do for participants?") and group the 38 classes under everyday headings (personal care at home; help around the house and getting out; therapy and health; equipment and modifications; housing and living arrangements; children and families; specialist supports; business and platform services), codes shown as secondary text, audit type shown as a small tag. Add search synonyms (support worker, cleaning, community access, SIL, group home, transport, respite, cooking) to the descriptions data. Add a "Not sure? Most sole-trader support workers choose Assistance with daily personal activities and Household tasks" hint that selects both when tapped.
+- FR-4 **Restrictive practices step frightens or misleads.** The explanation is a paragraph of regulation; "Not sure" silently adds a module and two documents. Add three concrete examples in plain words (locking a cupboard or door to stop someone getting something; holding someone to stop them moving; medicine given mainly to control behaviour), a "What counts?" expander, and make "Not sure" open three yes/no helper questions that resolve to yes or no, with the assumption shown on the result page only if it still resolves to yes.
+- FR-5 **Result page overwhelms.** 24 documents in a flat list. Add a three-line summary at the top ("Your audit: certification. You will need 24 documents and 5 registers. Readyline can draft the documents and keep the registers."), a plain-words paragraph on what certification means in practice (someone visits, talks to workers and participants), and group the document list by the four headings (Running the business; Your workers; Participants and supports; Environment and safety). Keep the sources.
+
+### P2: soon after launch
+- FR-6 Number fields use `inputmode="numeric"`; sole traders get defaults (workers 1, key personnel 1, risk-assessed role yes) that they can change.
+- FR-7 Step indicator wraps to two rows on phones; replace with "Step 2 of 6: Supports" plus a progress bar, keeping the links for completed steps.
+- FR-8 Home page before launch: replace "is being built" with the value proposition, "free, about ten minutes", and trust cues (Australian-hosted, no participant data, independent of the NDIA and the Commission), plus one example result.
+- FR-9 A visible way to ask a question (contact email) in the footer and on the result page.
+- FR-10 "Key personnel" and "risk-assessed role" get one-line examples under the labels.
+
+## Acceptance criteria
+- AC-1 Submitting each step empty shows only plain-English messages; a unit test proves every schema error maps to a message.
+- AC-2 Accessibility-tree test: every radio and checkbox in the questionnaire has its human label as its accessible name and belongs to a fieldset with a legend; manual screen-reader pass recorded in evidence.
+- AC-3 Supports step shows the everyday groupings; searching "support worker", "cleaning" and "SIL" each return the expected classes; the hint selects 0107 and 0120.
+- AC-4 "Not sure" on restrictive practices opens the helper and resolves to yes or no; the result page shows the assumption only when the resolution is yes.
+- AC-5 Result page shows the summary and grouped documents; Lighthouse accessibility stays 100 and axe stays clean on both projects.
+
+## Evidence required on delivery
+Screenshots at 360x740 of every changed step; the accessibility-tree test output; a one-paragraph screen-reader walkthrough note.
+
+## Dev response
+(Dev fills in.)
+
+## Delivery evidence
+(Dev fills in.)
+
+## PO review
+(PO fills in.)
