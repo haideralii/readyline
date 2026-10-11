@@ -10,9 +10,14 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
-    // Unit and snapshot tests live beside the code they test, or under data/
-    // for the standards fixtures. Playwright specs live in e2e/ and are excluded.
-    include: ["src/**/*.test.{ts,tsx}", "data/**/*.test.ts"],
+    // Unit and snapshot tests live beside the code they test, under data/ for
+    // the standards fixtures, and under scripts/ for CI helpers. Playwright
+    // specs live in e2e/ and are excluded.
+    include: [
+      "src/**/*.test.{ts,tsx}",
+      "data/**/*.test.ts",
+      "scripts/**/*.test.ts",
+    ],
     exclude: ["e2e/**", "node_modules/**", ".next/**"],
   },
 });

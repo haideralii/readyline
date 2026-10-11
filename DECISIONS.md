@@ -386,6 +386,277 @@ hosted Supabase project through a GitHub Actions job on `main`, using the
 `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` repository secrets that
 Haider sets, not by hand from a laptop.
 
+## REQ-002: security and privacy baseline (2026-10-11, branch `req-002-security-baseline`)
+
+Decision numbers D-2xx are used on this branch so they do not collide with
+the D-1xx series on the REQ-001 branch; the PO merges both.
+
+**D-201 Hash-based CSP spike failed; nonce CSP adopted.** With Cache
+Components on, experimental SRI (`experimental.sri`) and
+`script-src 'self'`, the production home page produced 11
+`securitypolicyviolation` events on both Playwright viewports (desktop and
+360px): every inline React Server Components bootstrap script was blocked and
+the page did not hydrate, while SRI only added `integrity` to the 6 external
+chunks. Spike output is attached to the REQ-002 delivery evidence. Per the PO's
+decision, the fallback is in force: a per-request nonce issued in
+`src/proxy.ts` with `'strict-dynamic'`, no `'unsafe-inline'` for scripts.
+
+**D-202 Cache Components turned off; every HTML response is dynamic (revises
+D-003).** A nonce only works when the HTML is rendered for the request that
+carries it; a static shell has no nonce and is blocked. `cacheComponents` and
+`partialPrefetching` are removed from `next.config.ts`, and the root layout
+awaits `connection()` so no route is prerendered. Cost accepted by the PO:
+no CDN-cached HTML, per-request rendering in Sydney. Revisit if the blog
+grows (an option then is a separate static CSP for blog routes without
+inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
+ships stable support).
+
+**D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
+'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
+blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
+`base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
+Development adds `'unsafe-eval'` (React dev tooling) and `style-src
+'unsafe-inline'` plus `ws:`/`wss:` for hot reload, exactly as the Next CSP
+guide documents. `upgrade-insecure-requests` is deliberately omitted because
+CI runs the production server over plain http on localhost and the browser
+would upgrade asset requests to https and fail; HSTS and Vercel's TLS cover
+production. No external origin is allowed yet; Supabase and Stripe origins
+are added to `connect-src` (and Stripe's script origin, nonced) in their REQs
+and recorded here. Fonts are self-hosted by `next/font`, so no Google origin.
+
+**D-204 Static headers in `next.config.ts`.** `Strict-Transport-Security:
+max-age=63072000; includeSubDomains; preload` (browsers ignore it over http,
+so it is harmless locally; preload submission waits for the live domain),
+`X-Content-Type-Options: nosniff`, `Referrer-Policy:
+strict-origin-when-cross-origin`, `Permissions-Policy: camera=(),
+microphone=(), geolocation=(), payment=()`, `X-Frame-Options: DENY` as the
+legacy twin of `frame-ancestors 'none'`. `poweredByHeader` stays off.
+
+**D-205 Secrets and dependency gates.** gitleaks runs as a separate CI job via
+`gitleaks/gitleaks-action@v2` with `.gitleaks.toml` (default rules; the only
+allow-list is path-scoped to `data/sources/`). `npm audit --omit=dev
+--audit-level=high` runs before anything else in the main job. A small script
+fails CI if any `.env*` file other than `.env.example` is tracked, because
+gitleaks only inspects content. Dev-only advisories as of 2026-10-11: the
+`npm audit` report lists high-severity findings in the development toolchain
+only (`braces` and its dependants, pulled in by test and build tooling);
+production dependencies report zero. Tracked here; re-check at each phase
+gate and clear with upgrades when the toolchain allows.
+
+**D-206 Env fail-fast.** `src/lib/env.ts` holds the contract (`REQUIRED` now:
+`NEXT_PUBLIC_SITE_URL`; `REQUIRED_LATER` lists the variables each REQ will
+promote). `src/instrumentation.ts` validates at server start and exits with
+code 1 naming each missing variable and where it lives in production. CI,
+Playwright's web server and `.env.example` set the required variable.
+Consequence for Haider: `npm run dev` needs a `.env.local` copied from
+`.env.example`.
+
+**D-207 Logging and validation conventions.** `src/lib/logging` emits one JSON
+line per event through a redactor that replaces secret-named keys, omits
+free-text-named keys (register and questionnaire text could contain
+participant details) and masks emails and known token shapes in every
+string. ESLint `no-console` is an error under `src/` (tests excepted).
+`src/lib/validation` provides `parseInput`, `strictObject` and `text(max)`;
+`handlers.test.ts` fails the unit suite if any route handler or server action
+skips the layer or uses `z.object`, which is the "test instead of lint rule"
+approach FR-3 allows.
+
+**D-208 GitHub CLI is not installed on the dev machine.** Pull requests are
+opened by the PO from the pushed branch; this is noted in the REQ's delivery
+evidence rather than installing a tool mid-session.
+
+## REQ-003: readiness questionnaire (branch `req-003-questionnaire`, stacked on REQ-002)
+
+Decision numbers D-3xx on this branch.
+
+**D-301 Branch stacked on REQ-002 (D-031).** `req-003-questionnaire` was
+rebased onto `req-002-security-baseline` because the questionnaire uses the
+validation layer, logging rule and CSP from REQ-002; it is rebased onto `main`
+after REQ-002 merges. Conflicts in `.prettierignore`, `product/NEXT.md` and
+the REQ file were resolved by keeping the PO's upstream files and re-inserting
+the Dev response.
+
+**D-302 Client-held answers, one server action (PO-accepted Q3).** Routes
+`/start` and `/start/[step]`; a client provider owns the answers and a
+`DraftStore`; the local implementation stores the versioned
+`QuestionnaireDraft` in `localStorage` with every call in try/catch and
+discards drafts of another version or with unknown keys. The only server call
+is the `deriveResult` action on the result step, which re-validates against
+the dataset's classes and stores nothing. `standards.json` never reaches the
+browser; step 2 receives a 38-row shape (code, Commission name, audit type,
+Readyline description).
+
+**D-303 Gate and navigation.** A step may be opened when every earlier answer
+step holds valid saved data; otherwise the page replaces the URL with the
+first incomplete step. Focus moves to the step heading on every step change;
+the error summary receives focus when it appears; all controls have 44px
+targets.
+
+**D-304 Readyline content and conditions.** `data/readyline-content/*` is the
+PO's text keyed by dataset module id with the PO's slug kept as `poId`. The
+bracketed conditions in the PO's document-set list are modelled as `when`
+rules: "personal care groups" is the list `0104, 0107, 0115, 0138` (Readyline
+interpretation, stated in the file) and the transport procedure applies when
+0108 is selected; both rules sit under the core module as the PO listed them,
+so a verification-only provider does not receive them.
+
+**D-305 Participant-data detector.** `src/lib/privacy/participant-data.ts`
+warns (never blocks) on name-like pairs of capitalised words, dates of birth,
+nine-digit numbers starting 43, street addresses and health or diagnosis
+terms, with a list of compass, place and organisation words to keep
+"Western Sydney" and "Practice Standards" from counting as people. False
+positives are acceptable; the note it guards is never used in derivation.
+
+**D-306 Restrictive practices wording.** The practices step names the five
+regulated restrictive practices (seclusion; chemical, mechanical, physical and
+environmental restraint) as the practices the NDIS (Restrictive Practices and
+Behaviour Support) Rules 2018 regulate and links to the Commission's page. The
+category names are the Rules' own terms; the page does not quote Commission
+text beyond that. "Not sure" is treated as yes and the result says so.
+
+**D-307 Accessibility evidence method.** Lighthouse cannot reach steps behind
+the draft gate on a fresh load, so per-step evidence comes from an axe scan
+(`@axe-core/playwright`, WCAG 2.1 A and AA rules) on every step and state on
+both Playwright projects with zero serious or critical violations allowed;
+Lighthouse accessibility runs on the pages reachable without a draft
+(`/start`, `/start/business`) in mobile and desktop presets and scored 100.
+One contrast failure found by axe (future step labels in `text-zinc-400`) was
+fixed. `@axe-core/playwright` is a dev dependency.
+
+**D-308 Evidence files in the repo.** Screenshots of every step at 360x740
+and desktop are stored as JPEG (quality 40) under
+`product/evidence/req-003/` with a Lighthouse summary JSON; full Lighthouse
+reports are not committed. The capture spec runs only with `EVIDENCE=1`.
+
+## REQ-004: accounts, authentication and tenancy (branch `req-004-accounts`)
+
+Decision numbers D-4xx on this branch.
+
+**D-401 Supabase client packages (Dev, 2026-10-11).** `@supabase/supabase-js`
+and `@supabase/ssr` are the two runtime dependencies REQ-004 needs (FR-4,
+FR-8); `server-only` is added so the admin client and the SSR client cannot
+be imported into a client bundle without a build error. The publishable-key
+format is accepted: the supabase-js README uses `your-publishable-key` and the
+ssr README reads `SUPABASE_PUBLISHABLE_KEY`; the ssr type comment still says
+"anon" but the parameter is the same string. Env names follow SR-5:
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+`SUPABASE_SECRET_KEY`.
+
+**D-402 Schema and tenancy model.** `users` mirrors `auth.users` by trigger
+with a SHA-256 email hash (never the email); `accounts` (soft-delete column),
+`memberships` (owner or member), `questionnaire_drafts`, `audit_log`, and
+`auth_rate_limits` for the magic-link limiter. Clients never insert accounts
+or memberships: `create_account()` (security definer) creates both in one
+transaction and writes the audit row. `is_member()` and `is_owner()` ignore
+soft-deleted accounts, so deletion hides data immediately. `platform_admin`
+is protected by a trigger that rejects any change made through the API (any
+request carrying JWT claims), leaving SQL by an operator as the only path.
+The limiter table has no client policy at all.
+
+**D-403 Integration tests run only against a real Postgres.** The RLS suite
+(`tests/integration/rls.test.ts`, `npm run test:integration`) needs the three
+Supabase variables and skips itself otherwise, so `npm test` stays offline.
+In CI the `supabase-integration` job starts the CLI's local stack (which
+applies `supabase/migrations`), maps its exported keys onto the app's variable
+names (legacy `ANON_KEY`/`SERVICE_ROLE_KEY` or newer
+`PUBLISHABLE_KEY`/`SECRET_KEY`, whichever the CLI prints), and runs the suite.
+`supabase/config.toml` is hand-written for the local stack (Postgres 17,
+mail inbox on, Studio off, TOTP on) because the CLI is not installed on the dev
+machine.
+
+**D-404 Local verification gap (Dev, 2026-10-11).** The dev machine has no
+Docker, no Supabase CLI and no psql, and the hosted project's database
+password is not available to Dev, so the migration could not be applied or the
+RLS suite run locally. The migration is reviewed by hand and the proof is the
+CI job. To apply the migration to the hosted project Haider runs
+`npx supabase login`, `npx supabase link --project-ref dpwwzhylcyosnkmlcnnp`
+and `npx supabase db push` (or pastes the file into the SQL editor once); this
+is a Session B prerequisite.
+
+**D-405 Session B hardening (Dev, 2026-10-11, PO Session A review).**
+`supabase/migrations/20261011010000_session_b_hardening.sql` adds the
+database-side mirror of the REQ-003 `BusinessStep` schema: `trading_name`
+1 to 120 characters, `business_structure` in the six answers, every element
+of `states` in the eight codes, `abn` exactly 11 digits or null. One owner
+account per user is enforced twice: a unique partial index on
+`memberships(user_id) where role = 'owner'` and an explicit check in
+`create_account()` that raises `this user already owns an account`. The
+app's `createAccountAction` returns the existing account instead of calling
+the function twice, so the error is only reachable by calling the RPC directly.
+
+**D-406 Magic-link limiter lives in Postgres.** `auth_rate_limit_hit(key,
+limit, window)` is a `security definer` function that upserts one row per
+key in `auth_rate_limits` and returns whether the call is within the limit;
+it is revoked from `anon` and `authenticated` so only the secret-key client
+can call it. Keys are `email:<sha256 of lower-cased email>` (5 per hour) and
+`ip:<address>` (20 per hour) per the accepted Dev response; the email
+itself never reaches the table or a log. A refused request returns the same
+"if that address can sign in" message as a sent one (AC-1, AC-6). The
+per-IP key uses the first `x-forwarded-for` entry, which Vercel sets; on a
+host that does not, every request shares the `unknown` bucket and the
+per-email limit still applies. The limiter fails closed: if the function is
+missing or the database is unreachable, no link is sent and the user still
+sees the generic message, with the error logged. This is what happened in
+the local e2e run against the hosted project before any migration was
+applied (PostgREST `PGRST202`, function not found).
+
+**D-407 Session and redirects.** The magic link lands on `/auth/callback`,
+which exchanges the code for a cookie session, then sends a user with no
+account to `/account/setup` and everyone else to the `next` path. `next`
+is accepted only when it is a same-origin path (`/` prefix, no `//` or
+`/\`, no line breaks) and falls back to `/account` (SR-3). `signOut`
+clears this device's session; `signOutEverywhere` uses Supabase's global
+scope, which revokes every refresh token for the user (FR-8). Both end at `/`.
+
+**D-408 Draft storage after sign-in (REQ-003 FR-3, REQ-004 AC-3).** The
+questionnaire layout asks for the viewer once per request: with an owned
+account the provider is given `mode="server"` and uses a `DraftStore`
+wrapping the `loadServerDraft` / `saveServerDraft` / `clearServerDraft`
+actions; otherwise the local store from REQ-003 is unchanged. A draft left on
+the device is moved to the account at two points: the "about your business"
+step (which also prefills from it) and, as a fallback, the provider's first
+load in server mode when the account has no draft yet. After a successful move
+the local copy is cleared. Drafts are not merged; the account's draft wins
+when both exist.
+
+**D-409 CSP `connect-src` gains the Supabase project origin only (SR-2).**
+`buildCsp` takes the origin derived from `NEXT_PUBLIC_SUPABASE_URL` at
+request time (origin only, no path, null when unset) and appends exactly that
+host; no wildcard. Unit tests in `src/proxy.test.ts`.
+
+**D-410 Migrations reach the hosted project through CI (replaces the manual
+step in D-404).** `.github/workflows/migrate.yml` runs on a push to `main`
+that touches `supabase/migrations/**` (and by hand via
+`workflow_dispatch`), links to project `dpwwzhylcyosnkmlcnnp` and runs
+`supabase db push --include-all`. It needs the repository secrets
+`SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`; while they are absent
+the job prints a notice and ends successfully without touching the database.
+`SECURITY.md` lists every secret and where it lives. `--include-all`
+applies every local migration the remote history does not know about, which
+is the right behaviour for the first run against an empty project.
+
+**D-411 Client bundle check (AC-8).** `scripts/ci/check-client-bundle.mjs`
+runs after `next build` in CI and locally as `npm run check:bundle`; it
+scans `.next/static` for the variable name `SUPABASE_SECRET_KEY`, the
+`sb_secret_` prefix and, when set, the secret value itself.
+
+**D-412 Branch stacking.** `req-004-accounts` is now stacked on
+`req-003-questionnaire` (D-031) because Session B reuses the REQ-003
+`BusinessStep` and `QuestionnaireDraft` schemas, the form primitives and
+the `DraftStore` interface. Merge order on GitHub: REQ-002, REQ-003, REQ-004.
+
+**D-413 Still not verified locally (extends D-404).** No Docker, CLI or
+database on the dev machine, so the hardening migration, the limiter
+function and `tests/integration/session-b.test.ts` have not executed here;
+they run in the `supabase-integration` CI job on this push. The magic-link
+journey through a real inbox is not covered by an automated test yet: the
+local stack's inbox (port 54324) exists only inside that CI job, and the
+`e2e/sign-in.spec.ts` tests cover the form, the generic response and the
+signed-out redirects on both viewports.
+**D-033 (PO, 2026-10-11).** `DECISIONS.md` is excluded from Prettier like the
+other prose files. Feature branches may be squashed and force-pushed with
+`--force-with-lease` before merge; `main` is never force-pushed.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
@@ -413,3 +684,5 @@ Items asserted in code or copy that still need a primary source.
   follows that reading but tags the reason `unverified` for that combination
   (PO Session B review, note a).
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.
+- D-205: dev-only `npm audit` high advisories (test and build toolchain) are
+  tracked, not fixed; production dependencies are clean.

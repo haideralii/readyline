@@ -56,10 +56,103 @@ CI run link on the PR; screenshots of each step at 360x740 and desktop; Lighthou
 4. Estimate in sessions.
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11 on branch `req-003-questionnaire` (from `main`; REQ-003 and `product/NEXT.md` were brought across from the PO's commit on the REQ-001 branch so this branch carries the requirement it answers). Dev response and the group-description data only; no UI, per NEXT.md item 3.
+
+### Q1. `QuestionnaireAnswers` schema and step-to-field map
+
+All schemas use `strictObject` and `text(max)` from `@/lib/validation` (REQ-002). Enumerations below are the only values accepted; everything else is rejected at the boundary.
+
+```ts
+const State = z.enum(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "ACT", "NT"]);
+const Structure = z.enum(["sole-trader", "partnership", "company", "incorporated-association", "trust", "other"]);
+const YesNoUnsure = z.enum(["yes", "no", "not-sure"]);
+const GroupCode = z.string().regex(/^\d{4}$/).refine(isKnownGroup);  // checked against standards.json at parse time
+
+export const QuestionnaireAnswers = strictObject({
+  answersVersion: z.literal(1),                                   // FR-6
+  business: strictObject({
+    tradingName: text(120, 1),                                     // FR-5 free text 1 of 2
+    structure: Structure,
+    states: z.array(State).min(1).max(8),
+    abn: abn().optional(),                                         // 11 digits + ATO weighted checksum, no lookup
+  }),
+  supports: strictObject({
+    groups: z.array(GroupCode).min(1).max(38),
+    silEligibility: strictObject({ fewHoursOnly: z.boolean(), participantManagesOwnWorkers: z.boolean() }).optional(),
+    servicesNote: text(500).optional(),                            // FR-5 free text 2 of 2, carries the participant-data warning
+  }).superRefine(requireSilEligibilityWhen0138),
+  practices: strictObject({ restrictivePractices: YesNoUnsure }),
+  workforce: strictObject({
+    workerCount: z.number().int().min(1).max(500),                 // includes the owner
+    keyPersonnelCount: z.number().int().min(1).max(50),
+    hasRiskAssessedRoles: z.boolean(),
+    allRiskAssessedScreened: z.enum(["yes", "no", "not-sure", "not-applicable"]),
+  }),
+  existing: strictObject({
+    policies: YesNoUnsure, incidentRegister: YesNoUnsure, complaintsRegister: YesNoUnsure,
+    insuranceCertificate: YesNoUnsure, workerInductionRecords: YesNoUnsure,
+  }),
+});
+
+export const QuestionnaireDraft = strictObject({                   // what the DraftStore persists (FR-3, SR-4)
+  answersVersion: z.literal(1),
+  answers: QuestionnaireAnswers.partial(),                         // deep-partial per step while in progress
+  currentStep: z.enum(["business", "supports", "practices", "workforce", "existing", "result"]),
+  updatedAt: z.string().datetime(),
+});
+```
+
+Step-to-field map: (1) About the business: `business.*`. (2) Supports: `supports.groups`, `supports.silEligibility` (shown only when 0138 is selected; required then), `supports.servicesNote`; the SDA-only explanation is shown when `groups` equals `["0131"]`. (3) Practices: `practices.restrictivePractices`. (4) Workforce: `workforce.*`. (5) What you already have: `existing.*`. (6) Result: derived, never stored.
+
+Derivation adapter (`toDeriveInput`): `groups` as is; `businessStructure` passes through (the rule only distinguishes sole trader and partnership); `usesRestrictivePractices = restrictivePractices !== "no"` with a `flagged` marker when the answer was "not-sure" so the result page says "we assumed yes"; `silEligibility` passed when present. `QuestionnaireResult` = `deriveApplicability` output plus the document and register list, computed from the applicable modules' `evidence[].documentTypeId` values and the step 5 gaps.
+
+### Q2. Group descriptions
+
+Drafted all 38 in `data/registration-group-descriptions.json`: one plain sentence each, Australian English, under 170 characters, keyed by class code with the Commission's class name alongside. The file is headed by a note stating it is Readyline text, not Commission text, carries `author: "readyline"` and `status: "draft"` for the PO's review, and `data/registration-group-descriptions.test.ts` checks coverage of 0101 to 0138, sentence shape, no "client" or "patient", no prohibited claims, and (once REQ-001 merges) that names match `standards.json` exactly. The UI will load descriptions from this file and names and audit types from `standards.json`, never hard-coded.
+
+### Q3. Form state approach
+
+Recommendation: client-held answers with a server action for the result only.
+
+- A single client component owns the answers in a reducer; each step validates its slice of `QuestionnaireAnswers` on blur and on "Save and continue"; back navigation keeps state (FR-4). Steps are routes under `/start/[step]` so the browser back button, deep links and focus management behave, with the state lifted into a layout-level provider.
+- A `DraftStore` interface (`load`, `save`, `clear`) with a `localStorage` implementation now (every call wrapped in try/catch, "draft saved locally on this device" and "could not save draft" states, FR-3, AC-7) and a server implementation in REQ-004. The swap is a storage change only, as the REQ asks, because the draft shape is the versioned `QuestionnaireDraft`.
+- The result step calls one server action `deriveResult(answers)` that re-validates with the full schema (SR-1), runs `deriveApplicability` against `standards.json` on the server, and returns the result with module and standard names. Nothing is persisted (SR-3, SR-4). Keeping the dataset server-side avoids shipping a large JSON to the phone; the group list for step 2 is a small derived array (code, name, audit type, description).
+- Trade-offs: per-step server actions were rejected because without accounts there is nowhere to hold state between steps except the client anyway, and they add a round trip to every step on a slow phone; URL-encoded state was rejected because 38 codes plus text exceed sensible URL lengths and leak answers into history. Cache Components no longer applies (REQ-002 turned it off for the nonce CSP), so server actions and per-request rendering are the simple path.
+
+### Q4. Estimate
+
+Three sessions. A: answer and draft schemas, ABN checksum, derivation adapter, document-set derivation, `deriveResult` action, unit tests, descriptions loaded into the step 2 data. B: steps 1 to 5 as accessible forms with validation, DraftStore, focus management, 360px layouts. C: result page with reasons and expanders, e2e on both projects (happy path, back navigation, reload restore, storage-throws stub, ABN), Lighthouse scores, screenshots, evidence.
+
+### Dataset fields I wish existed (for the PO)
+
+A one-sentence plain-English description per module and per audit type (for the result page), and a document-set mapping that lists which documents a module requires rather than inferring it from evidence `documentTypeId`s. Both are Readyline content, not Commission text, and could live beside the group descriptions.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### Session A (2026-10-11), branch `req-003-questionnaire` stacked on `req-002-security-baseline` (D-031)
+
+PO review applied: group descriptions `status: "reviewed"` with `reviewedBy`/`reviewedAt`; `data/readyline-content/{modules,audit-types,document-sets}.json` created from the PO's text (keyed by dataset module ids, `poId` kept), each marked Readyline text and reviewed; `src/lib/questionnaire/content.test.ts` asserts every dataset module and both audit types have entries, class codes in rules are real, names match the Commission table, and no prohibited claims. `servicesNote` is stripped in `toDeriveInput` with a test that the derivation input contains neither the key nor the text.
+
+Model and server: `src/lib/questionnaire/schema.ts` (strict `QuestionnaireAnswers` and `QuestionnaireDraft`, step schemas, ABN checksum field with the plain-English message, `answersSchemaFor(knownCodes)`), `adapter.ts`, `document-set.ts` (always set plus per-module rules with the personal-care and 0108 conditions; what the provider already has mapped onto documents and registers), `result.ts` (pure `buildResult`: pathway and description, modules with standard names and counts, mid-term audit, reasons with source title and URL, documents, registers, flags for assumed restrictive practices, large provider, SIL excluded, unverified), `groups.ts` (small group shape for step 2), `src/lib/standards/dataset.ts` (server-side dataset), and the server action `src/app/start/actions.ts` `deriveResult` (`parseInput` with `strictObject`, classes validated against the dataset, nothing stored).
+
+Tests at the model level: AC-1 to AC-6 and AC-10 in `result.test.ts`; schema, ABN (AC-8 rule), draft version, unknown keys and SIL-eligibility requirement in `schema.test.ts` and `abn.test.ts`. Local: unit suite green, lint, format and typecheck clean, build ok (see Dev status in `product/NEXT.md` for counts). UI is Session B; e2e, screenshots and Lighthouse are Session C.
+
+### Session B (2026-10-11): questionnaire UI
+
+Routes `/start` (intro with resume and clear-draft controls) and `/start/[step]` for `business`, `supports`, `practices`, `workforce`, `existing`, `result`. Client provider holds answers; `DraftStore` interface with the local implementation (versioned draft, try/catch everywhere, foreign or malformed drafts discarded; AC-7). Gate: later steps and the result redirect to the first incomplete step (FR-4). Step shell: progress list with `aria-current`, "Step n of 6", heading focused on every step change (AC-11), draft status note ("Draft saved locally on this device" / "Could not save a draft on this device"). Fields: visible labels, help and error text wired with `aria-describedby`, `aria-invalid`, error summary with links that takes focus, 44px targets, 16px inputs. Steps: business (ABN checksum, AC-8 message), supports (38 groups grouped by audit type with search, Commission names and audit types from the dataset, Readyline descriptions, "mandatory from 1 July 2026" badge on 0137/0138, SIL exclusion questions when 0138 is chosen, SDA-only note when 0131 is alone, services note capped at 500 characters with the participant-data warning and a client-side detector that warns and never blocks), practices (the five regulated practices named, Commission link, "not sure" treated as yes and said so; D-306), workforce (bounds, large-provider note above 25; PO item 1), existing (five yes/no/not-sure questions). Result: pathway with the PO's description, groups in scope, modules with standard counts and an "explain this result" expander listing the standards (FR-7), mid-term audit with its reason, every reason with source title and link and an "unverified" badge where the Commission text does not settle it, documents and registers with what the provider already has, the general-information notice, change-answers and clear-draft actions. Home page links to `/start`. Commit `5acb288`.
+
+### Session C (2026-10-11): tests, accessibility, evidence
+
+**End-to-end (`e2e/questionnaire.spec.ts`, both projects):** happy path [0120] (AC-1: verification, verification module only, no mid-term, reason links to the registration-groups page, notice present, draft saved note); [0120, 0107] (AC-2: certification, core with 24 standards, no verification module, mid-term at 18 months on governance, expander lists "Person-centred supports"); back navigation keeps answers and the result and later steps are unreachable (FR-4); reload restores the step and answers and "Continue where you left off" resumes (AC-7); storage that throws still completes the flow and shows the note (AC-7); invalid ABN blocks with the inline message and clears to continue (AC-8); [0138] with an exclusion says the service is not SIL and removes the module with the reason (AC-6); "not sure" adds the implementing module and says it was assumed (AC-5); participant-data detector warns without blocking (SR-2); heading focus after each step (AC-11); no horizontal overflow at 360px (AC-9).
+
+**Accessibility:** `e2e/questionnaire-a11y.spec.ts` runs axe (WCAG 2.1 A and AA) on every step and state, both projects, zero serious or critical violations (one contrast failure found and fixed, D-307). Lighthouse 12.8.2 accessibility, Playwright's Chromium: `/start` mobile 100, `/start/business` mobile 100, `/start/business` desktop 100, no failing audits (`product/evidence/req-003/lighthouse-summary.json`). Lighthouse cannot load gated steps on a fresh page, so axe is the per-step evidence (D-307).
+
+**Screenshots (AC-9):** `product/evidence/req-003/` holds every step at 360x740 (`*-android-small.jpg`) and desktop (`*-desktop-chromium.jpg`): intro, business, supports, practices, workforce, existing, result with the core expander open. Captured by `e2e/questionnaire-screenshots.spec.ts` with `EVIDENCE=1`.
+
+**Local check outputs (production server, commit at push):** `npm run check` clean (19 files, 222 unit tests); `npm run build` ok, all routes dynamic; `npm run test:e2e` with `CI=true`: all specs on both projects passed (security headers, home, questionnaire, axe; screenshot spec skipped without `EVIDENCE`); `npm run audit:prod` 0 vulnerabilities. CI link: https://github.com/haideralii/readyline/actions (runs on `req-003-questionnaire`; the PO verifies).
+
+**Deviations and notes:** `@axe-core/playwright` added as a dev dependency (D-307). Evidence images are JPEG at quality 40 to keep the repo small (D-308). The `document-sets.json` conditions are a Readyline reading of the PO's bracketed notes (D-304). The branch is stacked on REQ-002 (D-301); after REQ-002 merges it needs a rebase onto `main` before its own PR is merged. Not merged; PO reviews the UI.
 
 ## PO review
 (PO fills in.)
@@ -100,4 +193,15 @@ CI run link on the PR; screenshots of each step at 360x740 and desktop; Lighthou
 Registers (subscription, REQ-009) are derived from the same list: incidents, complaints, worker clearances, training, policy reviews.
 
 Status set to `in progress`.
+
+**11 Oct 2026, UI review of Sessions A to C (branch `req-003-questionnaire`, b2f1ee9, PR #3): ACCEPTED with three small changes; merge after REQ-002.**
+
+Reviewed all fourteen screenshots and the evidence. The flow matches the REQ: six steps, plain English, every reason on the result page cites and links its Commission source, the general-information notice and AI disclosure are present, the local-draft note is honest, the ABN message is in plain words, and the supports step marks the two mandatory classes. CI on the branch: 222 unit tests green, Playwright green on both projects; the only red job is the inherited gitleaks finding from REQ-002, fixed in batch 5. Lighthouse 100 and axe clean per step accepted as evidence.
+
+Changes (fold into the batch-5 rebase):
+1. Result page labels: "Not asked yet" reads as a bug to a provider. Use "To prepare" for items the questionnaire did not ask about, keep "You said you do not have this yet" for the ones it did, and add a one-line legend above the list.
+2. Add a short "What happens next" block at the bottom of the result page, honest and claim-free: "Readyline will draft these documents for you and keep your registers audit-ready. Sign-in and the document pack are coming in the next releases." No email capture yet (that needs the privacy page, REQ-008).
+3. Re-capture the evidence screenshots from the production build (`next start`), not the dev server: the dev overlay badge ("N", "Rendering…") appears in several images and will confuse anyone reading the evidence later.
+
+Noted for later REQs, not for this one: the supports step is long on a phone (38 cards); when the questionnaire gets real users, consider collapsing the two audit-type groups by default with the search open. The result page is where REQ-006 and REQ-007 will place the pack and subscription offer.
 

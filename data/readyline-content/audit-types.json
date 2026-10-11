@@ -1,0 +1,17 @@
+{
+  "note": "Plain-English descriptions of the two audit pathways for the questionnaire result page. Written by the product owner for Readyline; NOT NDIS Quality and Safeguards Commission text. The Commission's own description is in data/sources/types-of-audits.txt.",
+  "author": "readyline",
+  "status": "reviewed",
+  "reviewedBy": "po",
+  "reviewedAt": "2026-10-11",
+  "items": [
+    {
+      "id": "verification",
+      "description": "A desk-based review of your documents by an approved auditor. No site visit. Typically the quicker and cheaper audit."
+    },
+    {
+      "id": "certification",
+      "description": "A full audit: document review, a site visit, and interviews with your workers and some participants. Followed by a mid-term audit about 18 months after registration."
+    }
+  ]
+}

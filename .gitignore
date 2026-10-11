@@ -45,3 +45,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 node_modules
+
+# supabase cli local artefacts
+/supabase/.branches/
+/supabase/.temp/
+
+# PO local copies of evidence images for review (not tracked)
+product/evidence-review/

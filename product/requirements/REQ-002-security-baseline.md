@@ -65,7 +65,74 @@ Recommend the official `gitleaks/gitleaks-action` on push and pull request, with
 - No `console.log` in app code today; the lint rule will be added with FR-4.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### 2026-10-11, branch `req-002-security-baseline` (from `main`)
+
+PR: not opened by Dev because the GitHub CLI is not installed on the dev machine (D-208); the branch is pushed to `origin/req-002-security-baseline` for the PO to open the draft PR "REQ-002: security baseline". CI: https://github.com/haideralii/readyline/actions (workflow `CI`, jobs `checks` and `secrets`, on the push to this branch).
+
+**Spike (PO review item 1)**
+
+Config: Cache Components on, `experimental.sri: { algorithm: "sha256" }`, CSP `script-src 'self'` with no nonce. Production build, Chromium at 1280x800 and 360x740:
+
+```
+violations: 11 x "script-src-elem blocked=inline" (both viewports)
+inlineScripts: 11   externalScripts: 7   scriptsWithIntegrity: 6   hydrated: false
+console: "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-…'), or a nonce ('nonce-...') is required…"
+```
+
+Verdict: option 2 fails; fallback implemented: nonce per request in `src/proxy.ts`, Cache Components off, root layout awaits `connection()` so every HTML response carries the nonce it was issued (D-201, D-202). A first attempt with Cache Components off but the page still statically prerendered reproduced the mismatch (cached HTML without nonces, every script blocked), which is why the layout forces per-request rendering.
+
+**Built**
+
+- FR-1: `npm audit --omit=dev --audit-level=high` step; `secrets` job with `gitleaks/gitleaks-action@v2` and `.gitleaks.toml` (default rules, allow-list scoped to `^data/sources/`); `scripts/ci/check-env-files.mjs` fails CI if any `.env*` other than `.env.example` is tracked (PO item 4).
+- FR-2: static headers in `next.config.ts`, CSP in `src/proxy.ts`; `e2e/security-headers.spec.ts` asserts every header value, a fresh nonce per request, no `'unsafe-inline'` in `script-src`, no `x-powered-by`, and zero `securitypolicyviolation` events on both Playwright projects.
+- FR-3: `src/lib/validation` (`parseInput`, `strictObject`, `text(max)`), README with the convention, `handlers.test.ts` guard that fails when a route handler or server action skips the layer or uses `z.object`.
+- FR-4: `src/lib/logging` (`redact`, `createLogger`, `log`, `newErrorId`) with tests; ESLint `no-console: error` under `src/` (tests excepted).
+- FR-5: `.env.example` rewritten with "where it lives in production" per variable; `src/lib/env.ts` contract; `src/instrumentation.ts` plus `src/lib/env-startup.ts` exit at startup naming missing variables.
+- FR-6: `SECURITY.md` with disclosure placeholder, data-location statement and the gitleaks organisation note (PO item 2).
+- FR-7: `.github/pull_request_template.md` with the security checklist.
+- SR-1: no external origins; fonts self-hosted by `next/font`; recorded in D-203. SR-2: no analytics.
+
+**Header dump (`npm run start`, GET /)**
+
+```
+Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-YzM1NjUwNjktNTc2YS00NDJkLTkzM2UtMWFjYmViNTQ2ZWM0' 'strict-dynamic'; style-src 'self' 'nonce-YzM1NjUwNjktNTc2YS00NDJkLTkzM2UtMWFjYmViNTQ2ZWM0'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+(no X-Powered-By)
+```
+
+**Acceptance criteria**
+
+- AC-1: production audit step in CI; local run `found 0 vulnerabilities`. A failing CI run on a throwaway commit (adding a package with a known high advisory) is left for the PO to trigger or witness, since it requires pushing a deliberately bad commit; the gate command and level are as specified.
+- AC-2: gitleaks job on every push with the config above. Same note as AC-1 for the throwaway demonstration; the action names the file and line in its summary.
+- AC-3: `e2e/security-headers.spec.ts` passed on `desktop-chromium` and `android-small` against the production server (`8 passed`), and against the dev server with the development CSP variant.
+- AC-4: `npx next start` with `NEXT_PUBLIC_SITE_URL` empty exits and prints: "Environment check failed; refusing to start. - NEXT_PUBLIC_SITE_URL is missing. Set it in .env.local locally; in production it lives in: Vercel project environment variables." Unit tests cover the message and the production-home text.
+- AC-5: a temporary `src/tmp-console-demo.ts` with `console.log` produced `2:3 error Unexpected console statement no-console` and a non-zero exit; file removed.
+
+**Test output (local)**
+
+```
+npm run check: lint clean, format clean, typecheck clean, 7 test files / 67 tests passed
+npm run build: compiled; routes are dynamic (ƒ), Proxy present
+npm run test:e2e (CI=true, production server): 8 passed
+npm run audit:prod: found 0 vulnerabilities
+npm run check:env-files: ok, no .env files tracked
+```
+
+**Notes for the PO**
+
+- Dev-only `npm audit` high advisories (`braces`, `micromatch`, `fast-glob`, `eslint-config-next`, `@next/eslint-plugin-next`; all development toolchain) are tracked in D-205 with the date, as requested (item 3).
+- Merging with `req-001-standards-mapping` will conflict trivially in `DECISIONS.md` (D-1xx versus D-2xx sections), `.prettierignore` (identical additions) and this file (Dev response and PO review sections); keep both.
+- Local development now needs `.env.local` with `NEXT_PUBLIC_SITE_URL`, copied from `.env.example`.
+
+**2026-10-11, after the PO's conditional acceptance:** `permissions: { contents: read, pull-requests: read }` added to the Secret scan job; branch rebased onto `main` (now containing REQ-001, PO batch 2 and queue item 0) with conflicts in `.env.example`, `.prettierignore`, `DECISIONS.md`, `package.json` and this file resolved by keeping both sides; `.env.example` keeps the Readyline brand default. Local on the rebased commit: `npm run check` clean (11 files, 157 tests), `standards:verify` ok, `npm run audit:prod` 0 vulnerabilities, `check:env-files` ok, build dynamic, e2e 8 passed on the production server. Pushed as 543a030. **Merge is pending the condition the PO named (both CI jobs green on this commit), which Dev cannot confirm from the dev machine (no GitHub CLI or API token). Haider or the PO: if the run for 543a030 is green, Dev will merge per the rule on request, or merge directly.**
+
+**2026-10-11, PO batch 3 item 1:** token-shaped fixtures in `redact.test.ts` and `logger.test.ts` are now assembled at runtime; `.gitleaksignore` lists the historical fingerprints on commit 543a030 (four found by a local gitleaks 8.30.1 scan plus the JWT one reported by CI run #12), each commented as a test fixture; `GITLEAKS_ENABLE_COMMENTS: "false"` set on the job. Local equivalents per D-028 on commit 810a170: `npm run check` clean (11 files, 157 tests), `npm run build` dynamic, `npm run test:e2e` 8 passed on the production server, `npm audit --omit=dev --audit-level=high` 0 vulnerabilities, `check:env-files` ok, `gitleaks git --config .gitleaks.toml --log-opts=ae149f7..HEAD` (gitleaks 8.30.1): 3 commits scanned, no leaks found.
 
 ## PO review
 

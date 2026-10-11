@@ -9,6 +9,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Required by src/lib/env.ts; the production value lives in Vercel.
+  NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
 jobs:
   checks:
     name: Lint, typecheck, unit, build, e2e
@@ -24,6 +28,12 @@ jobs:
 
       - run: npm ci
 
+      - name: Production dependencies have no high or critical advisories (REQ-002 AC-1)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: No .env file is committed (REQ-002)
+        run: node scripts/ci/check-env-files.mjs
+
       - run: npm run lint
 
       - run: npm run format:check
@@ -36,6 +46,8 @@ jobs:
       - run: npm test
 
       - run: npm run build
+      - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
+        run: node scripts/ci/check-client-bundle.mjs
 
       - name: Install Playwright (Chromium only)
         run: npx playwright install --with-deps chromium
@@ -52,3 +64,59 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  secrets:
+    name: Secret scan (gitleaks, REQ-002 AC-2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_SUMMARY: "true"
+          # PR comments need write permission we do not grant (D-205).
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          # Config: .gitleaks.toml (default rules; allow-list scoped to data/sources/ only).
+
+  supabase-integration:
+    name: Supabase local stack, migrations and RLS tests (REQ-004 SR-1, SR-6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start the local stack and apply supabase/migrations
+        run: supabase start -x studio,imgproxy,logflare,vector
+
+      - name: Export local stack settings under the app's variable names
+        run: |
+          supabase status -o env > /tmp/supabase.env
+          set -a; . /tmp/supabase.env; set +a
+          echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}" >> "$GITHUB_ENV"
+          echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
+
+      - name: Row-level security and tenancy tests
+        run: npm run test:integration
+
+      - name: Stop the local stack
+        if: always()
+        run: supabase stop --no-backup

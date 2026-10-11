@@ -1,0 +1,200 @@
+{
+  "note": "Plain-English descriptions written by Readyline to help a provider recognise their own supports in the questionnaire. They are NOT NDIS Quality and Safeguards Commission text and do not change which class applies; the Commission's class names and audit types in standards.json (source 'registration-groups') are authoritative. Draft until the product owner reviews them (REQ-003, question 2).",
+  "author": "readyline",
+  "status": "reviewed",
+  "reviewedBy": "po",
+  "reviewedAt": "2026-10-11",
+  "version": "0.1.0",
+  "items": [
+    {
+      "code": "0101",
+      "name": "Accommodation/tenancy assistance",
+      "description": "Helping a participant find, apply for and keep suitable housing, including support with tenancy obligations."
+    },
+    {
+      "code": "0102",
+      "name": "Assistance to access and maintain employment or higher education",
+      "description": "Supporting a participant to find, start or stay in work or higher education, including help in the workplace or place of study."
+    },
+    {
+      "code": "0103",
+      "name": "Assistive products for personal care and safety",
+      "description": "Supplying equipment that helps with personal care and safety at home, such as shower chairs, hoists or alarms."
+    },
+    {
+      "code": "0104",
+      "name": "High Intensity Daily Personal Activities",
+      "description": "Daily personal care that needs specific skills, such as complex bowel care, tube feeding, tracheostomy, ventilator, catheter or complex wound care."
+    },
+    {
+      "code": "0105",
+      "name": "Personal mobility equipment",
+      "description": "Supplying wheelchairs, walking frames, scooters and other equipment that helps a participant move about."
+    },
+    {
+      "code": "0106",
+      "name": "Assistance in coordinating or managing life stages, transitions and supports",
+      "description": "Helping a participant plan and manage life changes such as leaving school or moving home, and coordinating their supports (general support coordination)."
+    },
+    {
+      "code": "0107",
+      "name": "Assistance with daily personal activities",
+      "description": "Hands-on help with everyday personal activities such as showering, dressing, eating and getting around at home."
+    },
+    {
+      "code": "0108",
+      "name": "Assistance with travel/transport arrangements",
+      "description": "Helping a participant get to appointments, work or community activities, including driving them or arranging transport."
+    },
+    {
+      "code": "0109",
+      "name": "Vehicle modifications",
+      "description": "Modifying a vehicle so a participant can drive or travel in it, such as hand controls or hoists."
+    },
+    {
+      "code": "0110",
+      "name": "Specialist positive behaviour support",
+      "description": "Assessing behaviour and writing behaviour support plans as a specialist practitioner, including plans that contain regulated restrictive practices."
+    },
+    {
+      "code": "0111",
+      "name": "Home modifications",
+      "description": "Building changes at home such as ramps, rails and bathroom alterations so a participant can live more independently."
+    },
+    {
+      "code": "0112",
+      "name": "Assistive equipment for recreation",
+      "description": "Supplying equipment for sport, leisure and recreation adapted to a participant's needs."
+    },
+    {
+      "code": "0113",
+      "name": "Vision equipment",
+      "description": "Supplying magnifiers, screen readers and other equipment for participants who are blind or have low vision."
+    },
+    {
+      "code": "0114",
+      "name": "Community nursing care",
+      "description": "Nursing care delivered in the community by a nurse, such as wound care, continence care or medication support."
+    },
+    {
+      "code": "0115",
+      "name": "Assistance with daily life tasks in a group or shared living arrangement",
+      "description": "Help with daily tasks in a group home or shared living arrangement where participants live together with support."
+    },
+    {
+      "code": "0116",
+      "name": "Innovative community participation",
+      "description": "New or different ways of supporting participants to take part in their community, outside the usual support types."
+    },
+    {
+      "code": "0117",
+      "name": "Development of daily living and life skills",
+      "description": "Teaching skills for everyday living such as cooking, budgeting, using public transport or managing a household."
+    },
+    {
+      "code": "0118",
+      "name": "Early intervention supports for early childhood",
+      "description": "Early intervention for young children with developmental delay or disability, delivered together with their family."
+    },
+    {
+      "code": "0119",
+      "name": "Specialised hearing services",
+      "description": "Audiology and related specialised services for participants with hearing loss."
+    },
+    {
+      "code": "0120",
+      "name": "Household tasks",
+      "description": "Help with household jobs a participant cannot do themselves, such as cleaning, laundry, gardening and meal preparation."
+    },
+    {
+      "code": "0121",
+      "name": "Interpreting and translation",
+      "description": "Interpreting and translating, including Auslan, so a participant can communicate and access information."
+    },
+    {
+      "code": "0122",
+      "name": "Hearing equipment",
+      "description": "Supplying hearing aids and related devices."
+    },
+    {
+      "code": "0123",
+      "name": "Assistive products for household tasks",
+      "description": "Supplying equipment that helps with household tasks, such as adapted kitchen or cleaning aids."
+    },
+    {
+      "code": "0124",
+      "name": "Communication and information equipment",
+      "description": "Supplying communication devices and information technology adapted for a participant, such as speech-generating devices."
+    },
+    {
+      "code": "0125",
+      "name": "Participation in community, social and civic activities",
+      "description": "Supporting a participant to join in community, social, recreational or civic activities, including one-to-one community access."
+    },
+    {
+      "code": "0126",
+      "name": "Exercise physiology and personal training",
+      "description": "Exercise physiology and personal training programs designed around a participant's disability-related needs."
+    },
+    {
+      "code": "0127",
+      "name": "Management of funding for supports in participant plans",
+      "description": "Managing the funds in a participant's plan on their behalf: paying providers and keeping the records (plan management)."
+    },
+    {
+      "code": "0128",
+      "name": "Therapeutic supports",
+      "description": "Allied health therapies such as occupational therapy, physiotherapy, speech pathology, psychology and dietetics."
+    },
+    {
+      "code": "0129",
+      "name": "Specialised driver training",
+      "description": "Driving lessons and assessments adapted to a participant's disability so they can learn to drive safely."
+    },
+    {
+      "code": "0130",
+      "name": "Assistance animals",
+      "description": "Providing and training assistance animals, such as guide dogs, and supporting the participant to work with them."
+    },
+    {
+      "code": "0131",
+      "name": "Specialist disability accommodation",
+      "description": "Owning or managing purpose-built housing for participants with very high support needs, as the housing provider (not the daily support)."
+    },
+    {
+      "code": "0132",
+      "name": "Specialised support coordination",
+      "description": "Support coordination for participants in high-risk or complex situations, delivered by specialised coordinators."
+    },
+    {
+      "code": "0133",
+      "name": "Specialised supported employment",
+      "description": "Employment in a supported setting with ongoing on-the-job support, such as a supported employment enterprise."
+    },
+    {
+      "code": "0134",
+      "name": "Hearing services",
+      "description": "General hearing services, such as hearing assessments and fitting of devices."
+    },
+    {
+      "code": "0135",
+      "name": "Customised prosthetics",
+      "description": "Making and fitting custom prosthetics and orthotics for a participant."
+    },
+    {
+      "code": "0136",
+      "name": "Group and centrebased activities",
+      "description": "Group programs and centre-based activities where participants take part together, such as day programs."
+    },
+    {
+      "code": "0137",
+      "name": "Providing an NDIS digital platform service",
+      "description": "Running an online platform whose main purpose is connecting participants with the people who provide their supports, with payments processed through it."
+    },
+    {
+      "code": "0138",
+      "name": "Assistance with supported independent living",
+      "description": "Managing and delivering a package of home and living support for a participant who needs support for most or all of the day (supported independent living)."
+    }
+  ]
+}

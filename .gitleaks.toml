@@ -1,0 +1,12 @@
+# gitleaks configuration (REQ-002 FR-1, AC-2).
+# Default rules stay on. The only allow-list is path-scoped to the verbatim
+# Commission text snapshots, which can contain key-like strings; nothing
+# else is exempt, and no rule is disabled.
+title = "Readyline secret scan"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Verbatim snapshots of NDIS Commission pages and PDFs (data only, never secrets)"
+paths = ['''^data/sources/''']

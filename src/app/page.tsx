@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 
 const PLANNED = [
@@ -24,6 +25,14 @@ export default function Home() {
           NDIS Practice Standards, see what is still missing before your audit,
           and keep your registers up to date afterwards. Everything is prepared
           for your review; you decide what to adopt.
+        </p>
+        <p className="mt-6">
+          <Link
+            href="/start"
+            className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          >
+            Find out what registration needs from you
+          </Link>
         </p>
       </section>
 
