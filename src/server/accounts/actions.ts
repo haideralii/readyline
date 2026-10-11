@@ -1,14 +1,18 @@
 "use server";
 /**
- * Account creation, settings and the server-side questionnaire draft
- * (REQ-004 FR-2, FR-5; REQ-003 FR-3 storage swap). Every input is parsed with
- * the REQ-003 strict schemas; every write runs with the user's session so
- * row-level security decides what is visible.
+ * Account creation, settings, deletion and the server-side questionnaire
+ * draft (REQ-004 FR-2, FR-5, FR-6; REQ-003 FR-3 storage swap). Every input is
+ * parsed with the REQ-003 strict schemas; every write runs with the user's
+ * session so row-level security decides what is visible.
  */
+import { redirect } from "next/navigation";
 import { log } from "@/lib/logging/logger";
 import { parseInput } from "@/lib/validation";
 import { BusinessStep, QuestionnaireDraft } from "@/lib/questionnaire/schema";
+import { createEmailProvider } from "@/server/email/provider";
+import { accountDeletedEmail } from "@/server/email/templates";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { RETENTION_DAYS } from "./purge";
 import { getOwnedAccount, type Account } from "./queries";
 
 export type ActionFailure = {
@@ -107,13 +111,62 @@ export async function updateAccountAction(
       formErrors: ["We could not save your changes. Please try again."],
     };
   }
-  await supabase.from("audit_log").insert({
+  const audit = await supabase.from("audit_log").insert({
     account_id: account.id,
     actor_user_id: auth.user.id,
     action: "account.updated",
     target: account.id,
   });
+  if (audit.error)
+    log.warn("audit.write.failed", {
+      accountId: account.id,
+      code: audit.error.code,
+    });
   return { ok: true, account: update.data as Account };
+}
+
+/**
+ * Soft-deletes the owner's account (FR-6, AC-5): hidden at once, purged after
+ * RETENTION_DAYS by the cron job. Sends the confirmation, signs the user out
+ * of every device and lands on the "account deleted" page.
+ */
+export async function deleteAccountAction(): Promise<ActionFailure> {
+  const supabase = await createSupabaseServerClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return NOT_SIGNED_IN;
+  const account = await getOwnedAccount(supabase, auth.user.id);
+  if (!account) return NOT_SIGNED_IN;
+
+  const rpc = await supabase.rpc("delete_account");
+  if (rpc.error) {
+    log.warn("account.delete.failed", {
+      userId: auth.user.id,
+      accountId: account.id,
+      code: rpc.error.code,
+    });
+    return {
+      ok: false,
+      fieldErrors: {},
+      formErrors: ["We could not delete your account. Please try again."],
+    };
+  }
+  const deletedAt = new Date();
+  const purgeAfter = new Date(
+    deletedAt.getTime() + RETENTION_DAYS * 86_400_000,
+  );
+  log.info("account.deleted", { userId: auth.user.id, accountId: account.id });
+  if (auth.user.email) {
+    await createEmailProvider().send(
+      accountDeletedEmail({
+        to: auth.user.email,
+        tradingName: account.trading_name,
+        deletedAt,
+        purgeAfter,
+      }),
+    );
+  }
+  await supabase.auth.signOut({ scope: "global" });
+  redirect("/account/deleted");
 }
 
 /** Server DraftStore backing (REQ-003 FR-3): the owner's account holds one draft. */
