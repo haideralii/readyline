@@ -1,0 +1,56 @@
+/**
+ * Per-request Content Security Policy with a fresh nonce (REQ-002 FR-2, AC-3;
+ * DECISIONS D-202). Next.js reads the nonce from the request's CSP header and
+ * attaches it to every script and style it emits, so no 'unsafe-inline' is
+ * needed for scripts. Nonces require per-request rendering, which is why
+ * Cache Components is off in next.config.ts.
+ *
+ * Non-CSP headers (HSTS, nosniff, referrer, permissions, frame options) are
+ * static and live in next.config.ts `headers()`.
+ */
+import { NextResponse, type NextRequest } from "next/server";
+
+export function buildCsp(nonce: string, isDev: boolean): string {
+  return [
+    "default-src 'self'",
+    // strict-dynamic lets scripts loaded by a nonced script run without listing hosts.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // Dev tooling injects inline styles; production styles are files plus nonced inline tags.
+    `style-src 'self' ${isDev ? "'unsafe-inline'" : `'nonce-${nonce}'`}`,
+    "img-src 'self' blob: data:",
+    "font-src 'self'",
+    // HMR in development uses a websocket; Supabase and Stripe origins are added in their REQs.
+    `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
+
+export function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
+}
+
+export const config = {
+  matcher: [
+    {
+      // Everything except static assets, image optimisation and the favicon;
+      // prefetches skip the proxy too, as the Next.js CSP guide recommends.
+      source: "/((?!_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+  ],
+};

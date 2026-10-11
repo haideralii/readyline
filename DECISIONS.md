@@ -386,6 +386,85 @@ hosted Supabase project through a GitHub Actions job on `main`, using the
 `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` repository secrets that
 Haider sets, not by hand from a laptop.
 
+## REQ-002: security and privacy baseline (2026-10-11, branch `req-002-security-baseline`)
+
+Decision numbers D-2xx are used on this branch so they do not collide with
+the D-1xx series on the REQ-001 branch; the PO merges both.
+
+**D-201 Hash-based CSP spike failed; nonce CSP adopted.** With Cache
+Components on, experimental SRI (`experimental.sri`) and
+`script-src 'self'`, the production home page produced 11
+`securitypolicyviolation` events on both Playwright viewports (desktop and
+360px): every inline React Server Components bootstrap script was blocked and
+the page did not hydrate, while SRI only added `integrity` to the 6 external
+chunks. Spike output is attached to the REQ-002 delivery evidence. Per the PO's
+decision, the fallback is in force: a per-request nonce issued in
+`src/proxy.ts` with `'strict-dynamic'`, no `'unsafe-inline'` for scripts.
+
+**D-202 Cache Components turned off; every HTML response is dynamic (revises
+D-003).** A nonce only works when the HTML is rendered for the request that
+carries it; a static shell has no nonce and is blocked. `cacheComponents` and
+`partialPrefetching` are removed from `next.config.ts`, and the root layout
+awaits `connection()` so no route is prerendered. Cost accepted by the PO:
+no CDN-cached HTML, per-request rendering in Sydney. Revisit if the blog
+grows (an option then is a separate static CSP for blog routes without
+inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
+ships stable support).
+
+**D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
+'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
+blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
+`base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
+Development adds `'unsafe-eval'` (React dev tooling) and `style-src
+'unsafe-inline'` plus `ws:`/`wss:` for hot reload, exactly as the Next CSP
+guide documents. `upgrade-insecure-requests` is deliberately omitted because
+CI runs the production server over plain http on localhost and the browser
+would upgrade asset requests to https and fail; HSTS and Vercel's TLS cover
+production. No external origin is allowed yet; Supabase and Stripe origins
+are added to `connect-src` (and Stripe's script origin, nonced) in their REQs
+and recorded here. Fonts are self-hosted by `next/font`, so no Google origin.
+
+**D-204 Static headers in `next.config.ts`.** `Strict-Transport-Security:
+max-age=63072000; includeSubDomains; preload` (browsers ignore it over http,
+so it is harmless locally; preload submission waits for the live domain),
+`X-Content-Type-Options: nosniff`, `Referrer-Policy:
+strict-origin-when-cross-origin`, `Permissions-Policy: camera=(),
+microphone=(), geolocation=(), payment=()`, `X-Frame-Options: DENY` as the
+legacy twin of `frame-ancestors 'none'`. `poweredByHeader` stays off.
+
+**D-205 Secrets and dependency gates.** gitleaks runs as a separate CI job via
+`gitleaks/gitleaks-action@v2` with `.gitleaks.toml` (default rules; the only
+allow-list is path-scoped to `data/sources/`). `npm audit --omit=dev
+--audit-level=high` runs before anything else in the main job. A small script
+fails CI if any `.env*` file other than `.env.example` is tracked, because
+gitleaks only inspects content. Dev-only advisories as of 2026-10-11: the
+`npm audit` report lists high-severity findings in the development toolchain
+only (`braces` and its dependants, pulled in by test and build tooling);
+production dependencies report zero. Tracked here; re-check at each phase
+gate and clear with upgrades when the toolchain allows.
+
+**D-206 Env fail-fast.** `src/lib/env.ts` holds the contract (`REQUIRED` now:
+`NEXT_PUBLIC_SITE_URL`; `REQUIRED_LATER` lists the variables each REQ will
+promote). `src/instrumentation.ts` validates at server start and exits with
+code 1 naming each missing variable and where it lives in production. CI,
+Playwright's web server and `.env.example` set the required variable.
+Consequence for Haider: `npm run dev` needs a `.env.local` copied from
+`.env.example`.
+
+**D-207 Logging and validation conventions.** `src/lib/logging` emits one JSON
+line per event through a redactor that replaces secret-named keys, omits
+free-text-named keys (register and questionnaire text could contain
+participant details) and masks emails and known token shapes in every
+string. ESLint `no-console` is an error under `src/` (tests excepted).
+`src/lib/validation` provides `parseInput`, `strictObject` and `text(max)`;
+`handlers.test.ts` fails the unit suite if any route handler or server action
+skips the layer or uses `z.object`, which is the "test instead of lint rule"
+approach FR-3 allows.
+
+**D-208 GitHub CLI is not installed on the dev machine.** Pull requests are
+opened by the PO from the pushed branch; this is noted in the REQ's delivery
+evidence rather than installing a tool mid-session.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
@@ -413,3 +492,5 @@ Items asserted in code or copy that still need a primary source.
   follows that reading but tags the reason `unverified` for that combination
   (PO Session B review, note a).
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.
+- D-205: dev-only `npm audit` high advisories (test and build toolchain) are
+  tracked, not fixed; production dependencies are clean.

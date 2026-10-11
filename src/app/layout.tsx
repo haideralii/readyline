@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
@@ -22,7 +23,11 @@ export const metadata: Metadata = {
     "Tailored policies, a Practice Standards self-assessment and a readiness checklist for sole-trader and small NDIS providers preparing for registration. General information, prepared for your review.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Every HTML response is rendered per request so the CSP nonce issued by
+  // src/proxy.ts matches the scripts in the page (REQ-002, D-202). A static
+  // shell would carry build-time markup with no nonce and be blocked.
+  await connection();
   return (
     <html lang="en-AU" className={`${geistSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
