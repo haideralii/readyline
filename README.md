@@ -54,12 +54,21 @@ e2e/              Playwright specs
 | Phase | Scope                                     | Status      |
 | ----- | ----------------------------------------- | ----------- |
 | 0     | Scaffold, tooling, CI, decisions log      | Done        |
-| 1     | Standards mapping (`data/standards.json`) | Next        |
+| 1     | Standards mapping (`data/standards.json`) | In progress |
 | 2     | Questionnaire                             | Not started |
 | 3     | Generator                                 | Not started |
 | 4     | Readiness checklist and payments          | Not started |
 | 5     | Registers (subscription)                  | Not started |
 | 6     | Content and launch                        | Not started |
+
+## Role skills
+
+Detailed standards per role live in `.claude/skills/` and can be invoked in
+Claude Code with a slash command: `/frontend-dev`, `/backend-dev`, `/qa`,
+`/ui-ux-designer`, `/ux-researcher`, `/product-manager`, `/product-owner`,
+`/cyber-security`, and `/release-gate` (runs every role's checklist before
+anything merges or ships). Each one is tailored to this stack and to the
+constraints in CLAUDE.md sections 4 and 5.
 
 ## Non-negotiables
 

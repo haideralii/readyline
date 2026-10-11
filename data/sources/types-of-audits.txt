@@ -1,0 +1,220 @@
+On this page:
+Before you [/provider-registration/apply-registration] become a registered provider , you need to be assessed against the relevant [/rules-and-standards/ndis-practice-standards] NDIS Practice Standards . This is done through an independent quality audit conducted by an [/provider-registration/apply-registration/find-auditor] approved quality auditor .
+<h2>The value of quality audits
+Quality audits play an important role in making NDIS services safer and more effective. They:
+help ensure services across Australia meet the same standards and continue to improve
+make sure people with disability receive respectful, reliable supports that respond to their needs
+give participants and families confidence in the services they use
+reduce risks and support safer delivery by: identifying issues early
+confirming when they’re addressed
+support continuous improvement by helping providers strengthen their services over time. Audits highlight what is working well and where changes are needed.
+<h2>What to expect in a quality audit
+Depending on the supports and services you intend to provide, your quality audit may include:
+site visits where the audit team physically visit your head office and the sites where supports and services are provided
+inspection of sites, facilities equipment and services
+participant interviews
+worker interviews
+reviewing the documents and information about your business
+asking you to supply more information about your practices.
+A day in the life of a provider who's being audited
+See more
+See less
+When the NDIS auditor comes onsite to your service, the day usually starts with a short opening meeting. The auditor introduces themselves and explains their assessment. They are assessing how your organisation meets the NDIS Practice Standards. This happens under the oversight of the NDIS Quality and Safeguards Commission. They outline what they plan to review - leadership, risk systems, incident management, staff files, participant records, and interviews.
+Very quickly, the focus moves from what your policies say to what actually happens in practice. You are asked questions like:
+“How do you know participants are safe?”
+“Can you show me how incidents are managed from start to finish?”
+“How does leadership monitor risk and quality?”
+The auditor wants to see real examples - incident reports, complaints records, training logs, supervision notes - not just the policy itself. They are looking for evidence that your systems are working, not just that they exist.
+Some of your staff files are sampled. The auditor checks worker screening clearances, qualifications, induction records and evidence of ongoing training and supervision. This is usually straightforward if your records are organised and up to date.
+Participant interviews are a key part of the audit. The auditor speaks privately with a few participants. They ask simple questions such as, “Do you feel safe?”, “Do staff listen to you?”, and “Do you know how to make a complaint?” These conversations help confirm if your services feel safe and respectful to participants.
+When the auditor observes service delivery, they quietly watch how supports are provided. They are looking at how staff communicate, whether consent is sought, and whether supports match the participant’s plan. Small things matter - respect, dignity, clear explanations.
+At the end of the audit, you have a closing meeting. The auditor summarises strengths and explain any gaps identified. If a non-conformity is raised, it does not mean you’ve failed. It means something needs to be corrected or strengthened. You are given a timeframe to address any issues.
+The experience may feel detailed and sometimes confronting, but it’s structured and evidence-based. The key is being able to clearly show:
+your systems work in real life
+participants are safe, respected and receiving quality supports every day.
+<h3>Audit costs
+There is no cost to register with the NDIS Commission, but providers will need to pay for an approved quality auditor to complete an audit. The cost of an audit is dependent on the size and scale of your organisation and number of NDIS participants you support. You are encouraged to get quotes from multiple approved quality auditors and compare them.
+The NDIS Commission doesn’t set prices for audit services.
+<h2>Types of audits
+The Initial scope of audit provided by the NDIS Commission tells you the type of audit you need, but the general rules are:
+a [#paragraph-id-7678] verification audit is for low risk, low complexity supports and services
+a [#paragraph-id-7680] certification audit is for higher risk supports and services
+a [#midterm] mid-term audit is for providers who initially completed a certification audit, and is completed 18 months into your registration period
+a [#condition] condition audit can be required by the NDIS Commission during your registration period
+an [#outofcycle] out of cycle audit may be needed when you want to change the supports and services you provide during your registration period.
+The [/provider-registration/apply-registration/registration-groups-or-classes-support] registration group or support classes table has details of which audit is required for the supports and services you will provide.
+<h2>Verification audit
+<h3>When you need a verification audit
+A verification audit applies to NDIS providers who only deliver lower risk or lower complexity supports and services.
+Many providers that need a verification audit have already met requirements of professional regulation. For example, they are certified through the Australian Health Practitioner Regulation Agency (AHPRA) or other professional bodies.
+Professional regulation means a practitioner already meets set standards and their competency to practice is being monitored, for example through continuing professional development.
+See [/provider-registration/apply-registration/registration-groups-or-classes-support] registration groups or classes of support to understand which groups need a verification audit.
+<h3>How it works
+You need to engage an  [/provider-registration/apply-registration/find-auditor] approved quality auditor  to complete a desktop review of the required documentary evidence. See a list of [/rules-and-standards/ndis-practice-standards/verification-module#paragraph-id-9402] required documents in ' NDIS Practice Standards Qualification and Professional Associations Required Documentation Guide '.
+<h2>Certification audit
+<h3>When you need a certification audit
+A certification audit applies to NDIS providers who deliver one or more higher risk or more complex NDIS supports and services.
+See [/provider-registration/apply-registration/registration-groups-or-classes-support] registration groups or classes of support to understand which groups need a certification audit.
+<h3>How it works
+Find out which modules you need to complete as part of your certification audit: [#paragraph-id-7685] Registration Requirements by Supports and Services .
+There are two stages in a certification audit:
+<h4>Stage 1: Desktop audit
+The auditor will ask for information and evidence. This usually takes place off-site.
+<h4>Stage 2: Onsite audit
+The auditor will look at how you’re implementing your policies and procedures. This might include:
+viewing records
+visiting your sites and [#paragraph-id-10092] interviewing staff and participants (you’ll need to let participants know they are automatically enrolled in the audit unless they ‘opt out’)
+visiting your sites and doing observations.
+The Stage 2 onsite audit should take place in the 3 months after the Stage 1 audit is complete.
+Case study of a certification audit
+See more
+See less
+The Sunrise Community Supports (Sunrise) office knew their certification audit was approaching. The office felt a mix of nerves and determination. On the first morning, 2 auditors from an Approved Quality Auditor arrived promptly at 9:00am. After brief introductions, they explained their role within the oversight of the NDIS Quality and Safeguards Commission. They clarified that the purpose of the audit was to assess Sunrise’s conformity with the NDIS Practice Standards. Not to “catch them out”, but to verify that participants were safe and receiving quality supports. The opening meeting felt formal but respectful. The auditors outlined the schedule:
+governance interviews
+staff file sampling
+participant interviews
+observation of supports
+review of incident and complaints management systems.
+As the day unfolded, the audit became less theoretical and more real. In the boardroom, the director was asked how risks were identified and escalated, how incidents were reported, and how restrictive practices were monitored. The questions were calm but probing: “How do you know this system works in practice?” “Can you show us an example?” Policies alone were not enough; the auditors wanted evidence of implementation. Minutes of meetings, risk registers, and incident trend reports were examined carefully. It quickly became clear that an audit is about demonstration - showing not just what is written, but what is actually done.
+Later, the auditors split up. One reviewed staff files, checking NDIS worker screening clearances, qualifications, induction records, and supervision notes. The other met with participants privately. These conversations were gentle and participant-focused: “Do you feel safe?” “Do staff listen to you?” “Do you know how to make a complaint?” Staff could feel the weight of these moments - because participant voice matters deeply in an NDIS audit. Auditors will explore further if a participant is unsure of the complaints process or their rights.
+When observing service delivery, the auditors were unobtrusive but attentive. They watched how support workers interacted with participants. They noted if dignity was respected, consent was sought, and if language was empowering. Small details mattered, for example:
+knocking before entering a room
+explaining tasks before assisting
+documenting support accurately afterward.
+Practice was being tested against the NDIS Practice Standards in real time.
+On the second day, the focus shifted to incident management and behaviour support. The auditors traced a reported incident from beginning to end. They went through the initial report, internal review, actions taken, and notification obligations. They cross-checked records against policies. In behaviour support files, they looked for functional assessments, evidence of participant involvement, and proper authorisation of any restrictive practices. Where a document was missing or unclear, they did not accuse - they asked: “Can you help us understand this?” Those questions signalled potential gaps that would later be discussed.
+By the closing meeting, the atmosphere was clearer and more grounded. The auditors summarised strengths first: strong leadership oversight, committed staff, person-centred planning. Then they outlined their findings. There was a minor non-conformity relating to incomplete documentation. There was also an improvement opportunity to strengthen participant awareness of complaints. They explained what this meant, what evidence would be required, and the timeframe for corrective action. It was structured and procedural, not dramatic.
+When the auditors left, Sunrise’s team reflected on the experience. The audit had been detailed and at times confronting, but it was also structured and fair. It felt less like an interrogation. It was more like a systematic examination of how their systems truly safeguard people with disability. The biggest realisation was this: an NDIS audit isn’t about having perfect paperwork. It’s showing that participants are safe, respected, and supported in line with the NDIS Practice Standards. It was also about being prepared to show how you know that is happening every day.
+After the onsite visit, the auditor continued their work offsite by drafting the formal audit report. This report summarised the evidence gathered, findings identified, and rationale for each conclusion. These were all aligned with the NDIS Practice Standards. The completed draft was shared with Sunrise for review.
+The provider was given an opportunity to check the report for factual accuracy. Sunrise made sure the included evidence, examples, and context reflected the auditors visit. After incorporating any necessary factual corrections, the auditor finalised the report. The completed document was then formally submitted to the NDIS Commission. This submission marked the final step of the certification audit process. It allowed the NDIS Commission to review the auditor’s conclusions, make a registration decision, and maintain oversight of NDIS provider quality and safety.
+<h2>Other audit types
+<h3>Mid-term audit
+Registered providers who have completed a certification audit and are registered to provide higher risk or more complex supports are required to do a mid-term audit.
+The audit includes an assessment against:
+the NDIS Practice Standards relating to provider governance and operational management
+any other standard that was previously assessed as requiring a corrective action plan
+any extra NDIS Practice Standards the NDIS Commission requires.
+Mid-term audits do not apply to:
+an individual or partnership that only required a certification audit to provide early intervention supports for early childhood
+a provider that is only registered to provide specialist disability accommodation, or
+a transitioned provider.
+<h4>12 months after your registration date
+Prepare for your mid-term audit:
+engage an Approved Quality Auditor from the list at [/provider-registration/apply-registration/find-auditor] Find an auditor
+confirm the scope and timing of the audit with the Approved Quality Auditor
+review the NDIS Practice Standards you will be assessed on: [/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational] Core module: Provider governance and operational management
+gather the required documentation and evidence
+inform your staff and [#paragraph-id-10092] participants that auditors will be visiting your business and observing your practices.
+During the audit:
+if your auditor identifies any areas of improvement (known as major or minor non-conformities), promptly provide the information or plans they’ve requested.
+<h4>18 months after your registration date
+Finalise your mid-term audit:
+ensure your auditor submits the final report to the NDIS Commission by the deadline
+if you have any outstanding areas of improvement, address these promptly.
+<h3>Condition audit
+The NDIS Commission can require any registered provider to get audited. We can also specify the timing of an audit. See  [/provider-registration/about-registration#paragraph-id-11351] Conditions of registration.
+A condition audit may be imposed during your registration period if:
+you initially completed a provisional certification audit, or
+not all certification classes of support were witnessed at your audit, or
+you have minor non-conformities outstanding, or
+there’s a change of ownership that causes a significant change to the organisation or it’s governance, or
+the Commissioner considers it necessary.
+<h3>Out of cycle audit
+Registered providers can also organise an audit at any time to support an [/provider-registration/manage-your-registration] application to change their registration . For example, to add registration groups or expand service delivery.
+<h2>Audit outcome
+The outcome of the audit is an audit report. The audit report has a rating for how well you comply with each NDIS Practice Standard and quality indicator. The ratings are submitted to the NDIS Commission.
+The rankings are:
+3 – conforms with elements of best practice
+2 – conforms with NDIS Practice Standards
+1 – minor non-conformity
+0 – major non-conformity
+If you get a major non-conformity (0) rating in any of the areas, you have 3 months to fix the issue. Your registration won’t progress until you have addressed the major non-conformity and successfully completed the quality audit.
+If you get a minor non-conformity (1) rating in any of the areas, you have a longer time to fix the issue and you can continue with the registration process.
+More information is available in Annex B of the [https://www.legislation.gov.au/F2018N00114/2023-04-20/2023-04-20/text/original/epub/OEBPS/document_1/document_1.html#_Toc133932582] National Disability Insurance Scheme (Approved Quality Auditors Scheme) Guidelines 2018 .
+<h3>Audit report timeframe
+The audit report is submitted to the NDIS Commission:
+up to 14 days after the completion of a verification audit
+up to 28 days after the completion of a certification audit
+up to 28 days after the completion of a mid-term audit.
+<h2>Making the most of your Approved Quality Auditor
+You can get the best value from your Approved Quality Auditor by working together in an open, practical and constructive way. To support a smooth and effective audit:
+be prepared and clearly explain how your service operates
+ask questions if you’re unsure about the NDIS Practice Standards or audit process
+be open to feedback and use it to make improvements
+keep records up to date to support audit evidence and decision making
+use each audit as a learning opportunity to strengthen your service.
+Building a positive working relationship with your Approved Quality Auditor can:
+help improve audit outcomes
+support continuous improvement
+strengthen the quality and safety of supports for people with disability.
+Staying with the same Approved Quality Auditor throughout your audit cycle can be beneficial. When an auditor becomes familiar with your service, participants and ways of working, they can provide:
+more consistent audits
+clearer feedback
+better tracking of progress across audit cycles.
+<h2> Plan Management intermediary supports
+Providers delivering, or seeking to deliver, Plan Management intermediary supports   must provide this information to your auditor:
+a list of all the workers who deliver plan management services
+certified copies of each worker's qualifications and associated professional memberships, as required in the [/rules-and-standards/ndis-practice-standards/verification-module#paragraph-id-9402] NDIS Practice Standards Qualification and Professional Associations Required Documentation Guide
+[/workforce/worker-screening/worker-screening-registered-providers] worker screening clearances for each worker, because they are involved in the direct delivery of  [/workforce/worker-screening/worker-screening-registered-providers#paragraph-id-10405] specified supports or services  to a person with disability.
+<h2>How the NDIS Commission assures the quality of auditors
+Approved quality auditors are subject to the Australian Consumer Law. They are accredited by the Joint Accreditation Scheme for Australia and New Zealand (JASANZ), an internationally recognised accreditation agency that accredits auditing firms. JASANZ regulates the behaviour of auditors using the [https://www.legislation.gov.au/F2018N00114/latest/text] NDIS auditor guidelines and a [https://www.legislation.gov.au/F2018N00114/2023-04-20/2023-04-20/text/original/epub/OEBPS/document_1/document_1.html#_Toc133932581] Code of Conduct for auditors .
+The NDIS Commission meets with JASANZ and approved auditor bodies regularly to discuss audit expectations, experiences, and feedback from providers.
+<h2>Complaints about approved quality auditors
+If you are unhappy with your auditor or the way your audit was conducted, discuss your concerns directly with your auditor in the first instance.
+If you are still concerned, you can reach out to the approved quality auditor that employed or contracted the auditor. They are required to have a complaints management system to deal with your complaint. This includes talking to you about your concerns and listening to your feedback.
+If you can’t resolve the complaint with the approved quality auditor, including with their management team, you can [https://www.jasanz.org/contact-us] contact the Joint Accreditation System of Australia and New Zealand (JASANZ).
+JASANZ will want to see that you have attempted to resolve your complaint directly with the approved quality auditors.
+<h2>Participants and audits
+When you are being audited you must notify participants and provide them with opportunities to engage with auditors and talk about the quality of their supports and services. These factsheets can be given to participants to explain the audit process:
+[#paragraph-id-10171] What is an NDIS audit?
+[#paragraph-id-10172] What does an audit mean for me - For residential aged care participants
+[#paragraph-id-10173] How do you take part in an NDIS audit?
+[#paragraph-id-10174] What will NDIS auditors ask you?
+<h3>Opting out of audits
+The method of sampling used in audits is ‘opt out’ which means:
+You need to let all participants know they are automatically included in the audit process. This could involve the audit team contacting and interviewing them or having their files, records or plans reviewed.
+If a participant doesn’t want to participate, you need to: respect that decision
+document the decision
+communicate the decision to the approved quality auditor.
+More details are in the [https://www.legislation.gov.au/Details/F2023C00396] NDIS auditors guidelines in Annex B .
+A day in the life of a participant who’s involved in an audit
+See more
+See less
+Sometimes a person called an auditor may visit your provider. They work under the NDIS Quality and Safeguards Commission framework. This checks that services are safe and meet the NDIS Practice Standards.
+If an auditor visits, they might ask to speak with you. This is your choice - you do not have to talk to them if you don’t want to.
+If you do speak with them, this is your opportunity to share your experience with your provider. You can talk about what is working well and anything that worries you. The auditor may ask simple questions like:
+Do you feel safe?
+Do staff treat you with respect?
+Do staff listen to you?
+Do you know how to make a complaint?
+You can have a carer, family member, support person, or advocate with you during the conversation if that makes you feel more comfortable.
+The auditor is not there to get anyone in trouble. They are there to make sure you are safe, respected, and receiving good quality support.
+They might also quietly watch how supports are delivered to see if staff are kind, explain things clearly, and follow your plan.
+After the visit, the auditor writes a report about what they found. If something needs to improve, your provider will be asked to fix it.
+The most important thing to know is: an NDIS audit is about protecting your rights. It’s about making sure you receive safe and respectful supports.
+<h2>Resources
+<h3>Application Pack – Registration Requirements by Supports and Services
+[https://www.ndiscommission.gov.au/sites/default/files/2022-02/200312-registration-requirements-supports-and-services_0_0.pdf] pdf 515KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2022-02/200312-registration-requirements-supports-and-services_0_0.pdf] Listen to PDF
+[https://www.ndiscommission.gov.au/sites/default/files/2022-02/200312-registration-requirements-supports-and-services_0_0.docx] docx 133KB
+<h3>Quick reference guide: Principles for Audit Reports
+[https://www.ndiscommission.gov.au/sites/default/files/2022-12/Principles%20for%20Audit%20Reports.pdf] pdf 238KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2022-12/Principles%2520for%2520Audit%2520Reports.pdf] Listen to PDF
+[https://www.ndiscommission.gov.au/sites/default/files/2022-12/Principles%20for%20Audit%20Reports.docx] docx 131KB
+<h3>Factsheet: What is an NDIS audit?
+[https://www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-what-is-an-audit.pdf] pdf 489KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-what-is-an-audit.pdf] Listen to PDF
+<h3>Factsheet: What does an audit mean for me - For residential aged care participants
+[https://www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-overview-participants.pdf] pdf 458KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-overview-participants.pdf] Listen to PDF
+<h3>Factsheet: How do you take part in an NDIS audit?
+[https://www.ndiscommission.gov.au/sites/default/files/2025-01/Audit-how-to-participate.pdf] pdf 543KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2025-01/Audit-how-to-participate.pdf] Listen to PDF
+<h3>Factsheet: What will NDIS auditors ask you?
+[https://www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-what-auditors-ask.pdf] pdf 459KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-12/Audit-what-auditors-ask.pdf] Listen to PDF
+<h2>Related information
+[https://www.legislation.gov.au/F2018N00114/latest/text] NDIS (Approved Quality Auditors Scheme) Guidelines 2018
+[/provider-registration/apply-registration] Apply for registration
+[/provider-registration/about-registration] About registration
+[/rules-and-standards/ndis-practice-standards] NDIS Practice Standards

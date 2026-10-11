@@ -1,0 +1,81 @@
+On this page:
+When a provider is supporting participants who rely on high intensity daily personal activities, they need to make sure their workers have the skills and knowledge described in the [#paragraph-id-8163] high intensity support skills descriptors .
+High intensity personal daily activity supports are:
+[#bowel] complex bowel care
+[#enteral] enteral feeding and management
+[#dysphagia] severe dysphagia management
+[#tracheostomy] tracheostomy management
+[#catheter] urinary catheter management
+[#ventilator ] ventilator management
+[#injections] subcutaneous injections
+[#wound] complex wound management .
+<h2> Registration for high intensity daily personal activities
+To be registered for the class of support (registration group) 104 - high intensity daily personal activities , a provider must be assessed against the relevant NDIS Practice Standards contained in Module 1 of the [https://www.legislation.gov.au/F2018L00631/latest/text] National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 2018 (Provider Registration Rules).
+Registered NDIS providers can only provide the high intensity daily activity supports that are set out in their certificate of registration.
+<h2>Training workers
+Where relevant, workers should get training by an appropriately qualified health practitioner or a person who meets the expectations of this skills descriptor.   The skills descriptors provide further explanation of the skills and knowledge expected when supports are delivered by a competent worker who is not a qualified health or allied health practitioner.   It is not a requirement that these supports are delivered by a nurse or other health or allied health practitioner.
+<h2>High intensity personal daily activity supports
+<h3>Complex bowel care
+Outcome: Each Participant requiring complex bowel care receives appropriate support relevant (proportionate) to their individual needs.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their complex bowel care management. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant receiving complex bowel care.
+All workers working with a participant requiring complex bowel care have received training, relating specifically to each participant’s needs, type of complex bowel care and high intensity support skills descriptor for providing complex bowel care, delivered by an appropriately qualified health practitioner or person that meets the high intensity support skills descriptor for complex bowel care.
+<h3>Enteral (naso-gastric tube – jejunum or duodenum) feeding and management
+Outcome: Each participant requiring enteral feeding and management receives appropriate nutrition, fluids and medication, relevant and proportionate to their individual needs.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their enteral feeding and management. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant who has enteral feeding needs.
+All workers working with a participant who requires enteral feeding have completed training, relating specifically to each participant’s needs, type and method of enteral feeding and regime, and high intensity support skills descriptor for enteral feeding, delivered by an appropriately qualified health practitioner or person that meets the high intensity support skills descriptor for enteral feeding.
+<h3>Severe dysphagia management
+Outcome: Each participant requiring severe dysphagia management receives appropriate support that is relevant and proportionate to their individual needs and preferences.
+To achieve this outcome, the following indicators should be demonstrated:
+Providers identify each participant requiring severe dysphagia management.
+With their consent, their individual severe dysphagia management needs are assessed by appropriately qualified health practitioners, including by practitioners conducting regular and timely reviews if needs change or difficulty is observed.
+Each participant requiring severe dysphagia management is involved in the assessment and development of their severe dysphagia management plan. The plan identifies:
+a)    their individual needs and preferences (such as for food, fluids, preparation techniques and feeding equipment); and
+b)    how risks, incidents and emergencies will be managed to ensure their wellbeing and safety, including by setting out any required actions and plans for escalation.
+Appropriate policies and procedures are in place in relation to the support provided to each participant requiring severe dysphagia management, including training plans for workers supporting them.
+Each worker responsible for providing severe dysphagia management to participants has received training, relating specifically to each participant’s needs, managing any severe dysphagia related incident and the high intensity support skills descriptor for severe dysphagia management, delivered by an appropriately qualified health practitioner with expertise in severe dysphagia management.
+Training for Severe dysphagia management must only be delivered by an appropriately qualified health practitioner.
+<h3>Tracheostomy management
+Outcome: Each participant with a tracheostomy receives appropriate suctioning and management of their tracheostomy relevant and proportionate to their individual needs.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their tracheostomy suctioning and management. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant with a tracheostomy.
+All workers have completed training, relating specifically to each participant’s needs, managing any tracheostomy related incident and high intensity support skills descriptor for providing tracheostomy care (without ventilation) and supporting a person dependent on ventilation, delivered by an appropriately qualified health practitioner or person that meets the high intensity support skills descriptor for tracheostomy suctioning and management.
+<h3>Urinary catheter management (in-dwelling urinary catheter, in-out catheter, suprapubic catheter)
+Outcome: Each participant with a catheter receives appropriate catheter management relevant and proportionate to their individual needs.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for management of their catheter. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant with a catheter.
+All workers have completed training, relating specifically to each participant’s needs, type of catheter and high intensity support skills descriptor for catheter changing and management, delivered by an appropriately qualified health practitioner or a person that meets the high intensity support skills descriptor for urinary catheter changing and management.
+<h3>Ventilator management
+Outcome: Each participant requiring ventilator management receives appropriate support relevant and proportionate to their individual needs and the specific ventilator used.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their ventilator management. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant who is ventilator dependent.
+All workers have completed training, relating specifically to each participant’s ventilation needs, managing a related incident and the high intensity support skills descriptor for ventilator management, delivered by an appropriately qualified health practitioner or person who meets the high intensity support skills descriptor for ventilator management.
+<h3>Subcutaneous injections
+Outcome: Each participant requiring subcutaneous injections receives appropriate support relevant and proportionate to their individual needs and specific subcutaneous injections and medication administered.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their subcutaneous injections which includes dosage measurement and calculation. With their consent, each participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+There are documented written or phone orders by the health practitioner prescribing the medication that trained workers may administer by subcutaneous injection.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to participants requiring subcutaneous injections and related medication.
+All workers have completed training, relating specifically to the participant’s injection and medication needs and high intensity support skills descriptor for subcutaneous injections, delivered by an appropriately qualified health practitioner or person that meets the high intensity support skills descriptor for subcutaneous injections. Workers must also have a basic understanding of the participant’s related health condition.
+<h3>Complex wound management
+Outcome: Each participant requiring complex wound management receives appropriate support relevant and proportionate to their individual needs.
+To achieve this outcome, the following indicators should be demonstrated:
+Each participant is involved in the assessment and development of the plan for their complex wound management. With their consent, the participant’s health status is subject to regular and timely review by an appropriately qualified health practitioner. The plan identifies how risks, incidents and emergencies will be managed, including required actions and escalation to ensure participant wellbeing.
+Appropriate policies and procedures are in place, including a training plan for workers, that relate to the support provided to each participant requiring complex wound management.
+All workers working with a participant requiring complex wound management have received training, relating specifically to the participant’s needs that are affected by their wound management regime (for example, showering, toileting and mobility) and high intensity support skills descriptor for providing complex wound management, delivered by an appropriately qualified health practitioner or person that meets the high intensity support skills descriptor for complex wound management.
+<h2>Resources
+<h3>NDIS Practice Standards: High intensity support skills descriptors
+[https://www.ndiscommission.gov.au/sites/default/files/2024-09/High%20Intensity%20Support%20Skills%20descriptors.DOCX] DOCX 146KB
+[https://www.ndiscommission.gov.au/sites/default/files/2024-09/High%20Intensity%20support%20skills%20descriptors.pdf] pdf 420KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-09/High%2520Intensity%2520support%2520skills%2520descriptors.pdf] Listen to PDF
+<h3>High Intensity Support Skills Descriptors FAQ May 2024
+[https://www.ndiscommission.gov.au/sites/default/files/2024-09/High%20Intensity%20Support%20Skills%20Descriptors%20Extended%20Frequently%20Asked%20Questions%20May%202024.docx] docx 146KB
+<h2>Related information
+[/rules-and-standards/ndis-practice-standards] NDIS Practice Standards
+[/rules-and-standards/quality-practice] Quality practice

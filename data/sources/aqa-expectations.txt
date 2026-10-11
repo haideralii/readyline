@@ -1,0 +1,605 @@
+
+===== PAGE 1 =====
+ 
+ 
+     NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 1 
+NDIS Quality and Safeguards Commission 
+Regulatory Expectations for Approved Quality Auditors: 
+Impartiality, Independence and Conflict of Interest 
+ 
+Contents 
+1. Definitions ............................................................................................................................... 2 
+2. Executive Summary ................................................................................................................. 4 
+3. Regulatory context and drivers for reform ............................................................................. 4 
+4. Purpose .................................................................................................................................... 5 
+5. Scope and audience ................................................................................................................. 5 
+6. Regulatory framework ............................................................................................................. 5 
+7. Overview of the NDIS AQA Scheme ........................................................................................ 7 
+8. Expectations of AQAs .............................................................................................................. 7 
+Core requirement (impartiality) .............................................................................................. 7 
+Prohibited and high-risk arrangements ................................................................................... 8 
+Acceptable engagement (with controls) ................................................................................. 9 
+9. Expectations of AQA Auditors ............................................................................................... 10 
+10. Consultant conduct and implications for AQA compliance ................................................... 11 
+11. Provider conduct and implications for AQA compliance ...................................................... 11 
+12. AQA governance, oversight and transparency ...................................................................... 12 
+13. Safeguarding and public confidence ..................................................................................... 12 
+14. Appendix ................................................................................................................................ 14 
+Appendix A: AQA Compliance Checklist ................................................................................ 14 
+ 
+ 
+ 
+===== PAGE 2 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 2 
+1. Definitions 
+Table 1 – Definitions, key terms and abbreviations used in this document 
+Term or Abbreviation Description 
+AQA Approved quality auditor approved by the NDIS Commissioner under 
+section 73U of the NDIS Act 
+AQA Code of Conduct Code of Conduct for Approved Quality Auditors as set out under 
+Annex A of the AQA Guidelines 
+AQA Guidelines National Disability Insurance Scheme (Approved Quality Auditors 
+Scheme) Guidelines 2018 
+AQA Rules National Disability Insurance Scheme (Approved Quality Auditors) 
+Rules 2025 
+Auditor 
+A person employed, contracted or otherwise engaged by the approved 
+quality auditor to conduct an audit. An auditor includes an auditor-in-
+training and an audit team leader but does not include a consumer 
+technical expert 
+Certification activity 
+The independent assessment and decision-making processes an AQA 
+undertakes to determine whether an NDIS provider meets the 
+applicable NDIS Practice Standards. 
+Certification body A body that has received JASANZ accreditation towards becoming an 
+AQA. 
+Consultancy 
+Participation in 
+a) the designing, manufacturing, installing, maintaining or 
+distributing of a certified product or a product to be certified, or 
+b) the designing, implementing, operating or maintaining of a 
+certified process or a process to be certified, or 
+c) the designing, implementing, providing or maintaining of a 
+certified service or a service to be certified 
+Consumer technical 
+expert 
+A person with disability who has the training, experience or skills to 
+be involved in the audit team. 
+Impartiality 
+Presence of objectivity. 
+Notes:  
+Objectivity is understood to mean that conflicts of interest do not 
+exist or are resolved so as not to adversely influence the activities of 
+===== PAGE 3 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 3 
+ 
+  
+the body. 
+Other terms that are useful in conveying the element of impartiality 
+are independence, freedom from conflicts of interest, freedom from 
+bias, freedom from prejudice, neutrality, fairness, open-mindedness, 
+even-handedness, detachment and balance. 
+ISO 17065 
+ISO/IEC 17065:2012 - International standard for Conformity 
+assessment - Requirements for bodies certifying products, processes 
+and services. 
+JASANZ The Joint Accreditation System of Australia and New Zealand being 
+the body responsible for the accreditation of Certification Bodies 
+NDIS National Disability Insurance Scheme 
+NDIS Act National Disability Insurance Scheme Act 2013 (Cth) 
+NDIS AQA Scheme NDIS Approved Quality Auditors Scheme as set out under the AQA 
+Guidelines 
+NDIS Commission NDIS Quality and Safeguards Commission 
+NDIS Commissioner The Commissioner of the NDIS Quality and Safeguards Commission 
+referred to in section 181C of the NDIS Act 
+NDIS Practice Standards 
+Established national standards and expectations of a provider 
+relevant to the supports or services provided, as set out under the 
+Provider Registration Rules 
+NDIS Provider As defined under section 9 of the NDIS Act 
+Provider Registration 
+Rules NDIS (Provider Registration and Practice Standards) Rules 2018 
+Quality Audit 
+Audit undertaken by an approved quality auditor to assess a provider 
+against applicable NDIS Practice Standards and in accordance with 
+the AQA Guidelines 
+Registered NDIS 
+Provider A person or entity who is registered under section 73E of the NDIS Act 
+===== PAGE 4 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 4 
+2. Executive Summary 
+The NDIS Commission’s regulatory expectations for Approved Quality Auditors (AQAs) focus on 
+managing impartiality, independence and conflicts of interest within the NDIS Approved Quality 
+Auditors Scheme. These expectations clarify how AQAs are to identify, assess and manage risks to 
+impartiality arising from their activities, arrangements and relationships, including those involving 
+consultants and other third parties. 
+Certification activities must be, and be seen to be, independent of consultancy and commercial 
+influence. AQAs operate as third-party certification bodies and are required to maintain robust 
+governance, structural separation and impartiality controls to ensure certification decisions remain 
+objective, evidence-based and free from undue influence. 
+Arrangements that compromise or appear to compromise impartiality, including referral fees, 
+commission-based or success-based payments, revenue-sharing arrangements, exclusivity, or any 
+financial or other benefit linked to referrals, are incompatible with AQA obligations and must not be 
+entered into.  
+AQAs are expected to maintain effective systems to safeguard impartiality, including documented 
+impartiality risk assessments, an impartiality register, separation of evaluation and certification 
+decision-making, and transparent complaints and appeals processes. 
+Where serious or systemic risks to AQA impartiality are identified, the NDIS Commission will apply a 
+proportionate, risk-based regulatory approach. This may include regulatory action in relation to AQA 
+approval, such as imposing conditions or revoking approval, and, where relevant, action under the 
+NDIS Act in relation to NDIS provider registration to protect the integrity, credibility and public 
+confidence of NDIS certification activities. 
+3. Regulatory context and drivers for reform 
+Through regulatory intelligence, monitoring activities and sustained engagement with the AQA 
+sector over an extended period, including direct engagement with specific AQAs, the NDIS 
+Commission has identified arrangements between AQAs, AQA personnel (including auditors) and 
+consultants that are not aligned with independence and impartiality requirements. These 
+arrangements have primarily arisen in the context of financial and commercial interactions linked to 
+audit referrals, including referral fees, commissions and revenue-sharing practices. 
+The NDIS Commission has previously sought to address these risks through guidance and repeated 
+engagement aimed at clarifying regulatory expectations and reinforcing the obligation for 
+certification activities to be independent of consultancy and commercial influence. However, 
+regulatory intelligence indicates that, notwithstanding these efforts, unacceptable risks to the 
+integrity of certification activities have persisted. These risks are not limited to isolated conduct but 
+reflect systemic vulnerabilities that give rise to actual or perceived conflicts of interest, undermining 
+confidence in the objectivity, credibility and defensibility of audit outcomes. 
+In this context, the NDIS Commission considers that guidance and engagement alone are no longer 
+sufficient to mitigate these risks or safeguard the integrity of the certification function. Clearer and 
+more enforceable regulatory expectations are required to address structural and commercial drivers 
+of impartiality risk. Targeted and proportionate regulatory responses, including through the 
+imposition of conditions on AQA approval, are intended to strengthen impartiality safeguards, 
+protect the integrity of certification decisions and maintain public confidence in the operation of the 
+NDIS Approved Quality Auditors Scheme (NDIS AQA Scheme). 
+===== PAGE 5 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 5 
+4. Purpose  
+This paper sets out the NDIS Commission’s regulatory expectations for AQAs in managing 
+impartiality, independence and conflicts of interest within the NDIS AQA Scheme. It clarifies how 
+AQAs and AQA personnel (including auditors) are expected to comply with their obligations under 
+section 73U of the NDIS Act, the AQA Rules, the AQA Scheme Guidelines and the AQA Code of 
+Conduct, as informed by the impartiality and independence requirements in ISO 17065. 
+In particular, the paper explains the operation of the specific mechanisms required to safeguard 
+impartiality, including the obligation under clause 35 of the AQA Scheme Guidelines to establish and 
+maintain a documented mechanism for managing impartiality, and the related obligations in clauses 
+31 to 36 to identify, analyse, manage, document and monitor actual and perceived conflicts of 
+interest. These requirements align with ISO 17065 clauses 4.2 and 5.2, which require certification 
+bodies to identify and control risks to impartiality arising from activities, relationships and 
+commercial arrangements, and with the AQA Code of Conduct, which requires AQAs and AQA 
+personnel (including auditors) to act with integrity, objectivity and independence and not to accept 
+inducements or benefits that could influence certification activities. 
+The document is primarily directed to AQAs and AQA personnel (including auditors) and reinforces 
+mandatory governance, conduct and accreditation requirements applicable under the NDIS AQA 
+Scheme. It is also relevant to consultants and NDIS providers to the extent that their conduct or 
+arrangements may affect an AQA’s ability to comply with these obligations. The purpose of this 
+paper is to support certification activities that are independent, evidence-based and defensible, and 
+to safeguard the integrity and public confidence of the NDIS certification system. 
+5. Scope and audience  
+These expectations apply to AQAs approved under the NDIS AQA Scheme. While consultants, 
+advisory firms and NDIS providers are not themselves subject to the NDIS AQA Scheme or ISO 17065, 
+this guidance is relevant to those parties to the extent that their conduct, arrangements or practices 
+may affect an AQA’s ability to comply with its statutory, scheme and accreditation obligations. 
+Obligations relating to independence and impartiality rest solely with AQAs. However, the conduct 
+of consultants and NDIS providers may give rise to actual or perceived conflicts of interest that AQAs 
+are required to identify, assess and manage in accordance with their governance and impartiality 
+obligations. 
+6. Regulatory framework 
+Certification activities undertaken by AQAs must be, and must be seen to be, independent of 
+consultancy and commercial influence. This requirement is grounded in, and informed by, the 
+following: 
+• National Disability Insurance Scheme Act 2013 (Cth) (NDIS Act) 
+• National Disability Insurance Scheme (Approved Quality Auditors) Rules 2025 (AQA Rules) 
+• National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 
+2018 (Provider Registration Rules) 
+• National Disability Insurance Scheme Approved Quality Auditors Scheme Guidelines 2018 
+(AQA Scheme Guidelines) 
+===== PAGE 6 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 6 
+• ISO/IEC 17065:2012 Conformity assessment — Requirements for bodies certifying products, 
+processes and services (ISO 17065).  
+The regulatory framework is also informed by ongoing legislative reform, including the National 
+Disability Insurance Scheme Amendment (Integrity and Safeguarding) Act 2026, which is intended to 
+strengthen the NDIS Commission’s integrity, safeguarding and enforcement functions. 
+Statutory and scheme framework 
+Section 73U of the NDIS Act establishes the statutory powers of the NDIS Commissioner in relation 
+to the NDIS AQA Scheme, including powers to oversee, regulate and enforce compliance by AQAs. 
+These powers enable the NDIS Commission to ensure that certification activities are conducted 
+consistently with the NDIS Commission’s quality and safeguarding objectives. 
+The Provider Registration Rules, made for the purposes of the NDIS Act, set out quality audit and 
+NDIS Practice Standard requirements that are applied by AQAs when assessing the competency, 
+skills and experience of persons seeking registration as NDIS providers. The NDIS Practice Standards 
+comprise different modules, which AQAs must apply having regard to the scope of supports and 
+services a provider is delivering, or proposing to deliver, as a registered NDIS provider. 
+The AQA Rules, also made for the purposes of section 73U of the NDIS Act, set out matters to which 
+the NDIS Commissioner must have regard when making decisions to approve an AQA, impose 
+conditions on an AQA’s approval, or revoke approval. 
+The AQA Scheme Guidelines establish the NDIS AQA Scheme and prescribe mandatory 
+requirements relating to governance, impartiality, competence and accreditation. These include: 
+• the AQA Code of Conduct, which sets out requirements for AQAs and AQA personnel 
+(including auditors) to act with integrity and objectivity, and to ensure that certification 
+decisions are evidence-based and free from commercial or organisational influence; and 
+• accreditation requirements, assessed by the Joint Accreditation System of Australia and 
+New Zealand (JASANZ), including compliance with ISO 17065 and scheme-specific criteria to 
+ensure technical competence and effective impartiality systems at an organisational level. 
+ISO/IEC 17065:2012 
+ISO 17065 is the international standard specifying requirements for bodies certifying products, 
+processes and services, including requirements relating to independence, impartiality, competence, 
+governance and decision-making. Under the NDIS AQA Scheme, AQAs operate as third-party 
+certification bodies and are therefore required, as a condition of accreditation, to comply with ISO 
+17065. The standard provides the internationally recognised assurance framework against which 
+AQAs’ organisational systems, impartiality controls, certification processes and governance 
+arrangements are assessed by JASANZ. 
+Central to ISO 17065 is the requirement that certification activities are, and are seen to be, impartial 
+and free from conflicts of interest. The standard requires certification bodies to identify, analyse, 
+manage and monitor risks to impartiality arising from activities, relationships or commercial 
+arrangements, including relationships external to the organisation. These requirements underpin 
+key elements of the NDIS AQA Scheme and are reflected in the AQA Rules, the AQA Scheme 
+Guidelines including the AQA Code of Conduct. 
+===== PAGE 7 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 7 
+Collectively, these legislative, scheme and accreditation requirements inform the NDIS Commission’s 
+regulatory oversight of AQAs and establish the standards that must be met to maintain the integrity, 
+independence and public confidence of certification activities conducted under the NDIS AQA 
+Scheme. 
+7. Overview of the NDIS AQA Scheme 
+The NDIS AQA Scheme establishes the framework under which certification bodies are approved to 
+conduct independent quality audits of NDIS providers. The NDIS AQA Scheme sets out the eligibility 
+criteria, operational requirements and governance expectations that AQAs must satisfy to obtain 
+and maintain approval. It defines the standards for auditor competence, audit methodology, 
+organisational capability, and quality management systems, ensuring that certification activities are 
+delivered consistently, transparently and in alignment with nationally recognised assurance 
+practices.  
+The NDIS AQA Scheme also prescribes oversight mechanisms such as reporting obligations, 
+performance monitoring, and approval conditions, to enable the NDIS Commission to regulate AQA 
+conduct and ensure the integrity of the certification system. Through these requirements, the NDIS 
+AQA Scheme supports a national, risk-based auditing environment designed to uphold the safety, 
+rights and wellbeing of NDIS participants. 
+8. Expectations of AQAs 
+This section sets out the NDIS Commission’s regulatory expectations for AQAs in managing 
+impartiality, independence and conflicts of interest arising from arrangements with consultants, 
+including commercial referral and revenue-sharing arrangements. These expectations reflect the 
+requirement that certification activities must be, and be seen to be, independent of consultancy and 
+commercial influence.  
+Where conduct inconsistent with the expectations outlined in this section is identified, the NDIS 
+Commission will apply a proportionate, risk-based regulatory approach. This may include regulatory 
+action in relation to AQA approval, such as imposing, varying or removing conditions on approval, 
+requiring AQAs to cease or remediate particular arrangements or practices, directing corrective 
+action plans or enhanced impartiality controls, requiring additional reporting or independent review, 
+revoking approval in serious cases, banning auditors, or requiring further education, remediation or 
+corrective action by AQAs and AQA personnel (including auditors) in relation to their obligations.  
+These interventions are directed at safeguarding the integrity of certification activities, addressing 
+systemic or ongoing risks to impartiality, and maintaining public confidence in the NDIS AQA 
+Scheme. 
+Core requirement (impartiality) 
+Certification activities must be, and must be seen to be, independent of consultancy and commercial 
+influence. Any arrangement that involves the exchange of financial or other benefits for audit 
+referrals creates a significant risk of actual or perceived conflicts of interest and is incompatible with 
+the NDIS Approved Quality Auditors Scheme Guidelines including the AQA Code of Conduct, and the 
+impartiality and independence controls required under ISO 17065 (clauses 4.2 and 5.2). Such 
+===== PAGE 8 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 8 
+arrangements introduce self-interest and familiarity threats that undermine the objectivity, 
+credibility and defensibility of certification decisions.  
+Under the AQA Scheme Guidelines, AQAs are required to establish and maintain a documented 
+mechanism to safeguard impartiality and to identify, analyse, manage, document and monitor actual 
+and perceived conflicts of interest (clauses 31–36). In particular, clause 35 requires AQAs to 
+implement effective arrangements to manage impartiality risks arising from external relationships 
+and commercial arrangements, including those involving consultants and referral sources. Referral, 
+commission or benefit-based arrangements linked to audit work are incompatible with these 
+requirements because they create risks to impartiality that cannot be adequately mitigated through 
+controls or disclosures.   
+This conduct is also inconsistent with the AQA Code of Conduct (Annex A to the AQA Scheme 
+Guidelines), which requires AQA personnel (including auditors) to: 
+• act with integrity, objectivity and independence in the performance of certification activities; 
+• ensure certification decisions are evidence-based and free from commercial, organisational 
+or personal influence; and 
+• not offer, request or accept inducements, benefits or advantages that could influence, or be 
+perceived to influence, audit outcomes or certification decisions. 
+Arrangements involving financial or other benefits for referrals compromise these fundamental 
+obligations by creating incentives that may influence, or appear to influence, audit planning, auditor 
+behaviour or certification decision-making, thereby eroding confidence in the independence of the 
+NDIS certification system.  
+‘Other benefits’ may include, but is not limited to, advantages such as preferential access to clients 
+or audit work, discounted or free services, reciprocal marketing or promotion, data or intelligence 
+sharing, future work expectations or guarantees, priority scheduling, favourable commercial terms, 
+or any arrangement that could influence, or be perceived to influence, certification activities. 
+Finally, ISO 17065 requires certification bodies to maintain independence from consultancy and to 
+safeguard impartiality through a formal, organisation-wide mechanism (clauses 4.2 and 5.2). 
+Financial or benefit-based referral relationships blur the required separation between certification 
+and consultancy, heighten self-interest and familiarity threats, and undermine both the reality and 
+perception of impartiality required of AQAs operating as third-party certification bodies under the 
+NDIS AQA Scheme. 
+Prohibited and high-risk arrangements  
+The NDIS Commission considers the following arrangements to constitute a breach of AQA 
+impartiality and conduct obligations set by the AQA Code of Conduct and ISO 17065 and therefore 
+must not be entered into (AQA Code of Conduct; ISO 17065 clauses 4.2 and 5.2):  
+• Payment of referral fees by an AQAs or AQA personnel (including auditors) to a consultant, 
+or by a consultant to an AQA or AQA personnel (including auditors), in connection with audit 
+work. 
+• Revenue sharing arrangements linked in any way to audits, certifications or the acquisition 
+of audit clients. 
+===== PAGE 9 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 9 
+• Commission-based or success-based payments, including outcome contingent or 
+performance driven financial incentives. 
+• Exclusive referral partnerships or preferred supplier agreements where access to referrals is 
+conditional or commercially influenced. 
+• Any gift, hospitality, inducement or other benefit offered, requested or accepted with the 
+intention or effect of steering audit work. 
+• Lead-purchase, marketing or similar commercial arrangements where a consultant both 
+prepares a provider for audit and derives value from directing that provider to a particular 
+AQA. 
+Such arrangements introduce financial dependence, create incentives for favourable or 
+compromised outcomes, and undermine both the perception and reality of impartiality, contrary to 
+the independence and conflict of interest requirements set out in ISO 17065 (cl 4.2, 5.2). 
+Acceptable engagement (with controls)  
+AQAs remain responsible for demonstrating that any engagement or referral does not compromise, 
+or appear to compromise, impartiality. Documentation must be sufficient to evidence compliance 
+with the AQA Code of Conduct and ISO 17065 (clauses 4.2 and 5.2). 
+The NDIS Commission recognises that AQAs may: 
+• Engage in general marketing activities and attend industry forums or events, provided these 
+activities promote awareness of services without creating expectations of preferential 
+treatment or referral-based benefits. 
+• Be selected by providers following consultant recommendations where no benefit is 
+exchanged, noting that consultants may share general market knowledge, but must not be 
+incentivised to direct providers to a particular AQA. 
+• Receive referrals where no financial or other benefit is offered, requested or provided, and 
+where such referrals arise organically through market engagement rather than commercial 
+arrangements. 
+In all cases, AQAs must ensure the following controls are in place (AQA Code of Conduct; ISO 17065 
+clauses 4.2 and 5.2): 
+• No financial or commercial benefit is exchanged for audit referrals, including the absence of 
+informal, verbal or implied incentives that could influence audit selection. 
+• All consultant relationships are subject to documented impartiality risk assessments and 
+recorded in an impartiality register, ensuring transparency and enabling governance 
+oversight. 
+• Audit team allocation, review and certification decisions remain structurally independent 
+from business development functions and any consultant relationships, with clear 
+separation of duties to safeguard impartiality. 
+• Actual and perceived conflicts are identified, managed, disclosed and, where necessary, 
+avoided, including declining or reassigning work where independence may reasonably be 
+questioned. 
+===== PAGE 10 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 10 
+The following sections outline expectations for key market actors whose conduct may give rise to 
+impartiality risks for AQAs. 
+9. Expectations of AQA Auditors  
+The NDIS Commission recognises that individuals working within the NDIS market may have skills or 
+experience relevant to both auditing and consulting activities. However, where AQA personnel 
+(including auditors) engaged by an AQA, also provides consultancy services to NDIS providers, 
+significant risks to impartiality, independence and public confidence arise. 
+Under the AQA Scheme Guidelines, AQAs are required to ensure that certification activities are 
+conducted independently and to establish and maintain a documented mechanism to identify, 
+analyse, manage and monitor actual and perceived conflicts of interest (clauses 31–36). In particular, 
+clause 35 requires AQAs to have effective arrangements to manage impartiality risks arising from 
+external relationships and activities, including where auditors have other commercial interests or 
+roles. Where an auditor provides consultancy services to a provider, or has recently done so, this 
+creates self-interest, familiarity and advocacy threats that are difficult to mitigate and may 
+compromise, or appear to compromise, the auditor’s objectivity. 
+This position is reinforced by the AQA Code of Conduct (Annex A to the AQA Scheme Guidelines), 
+which requires AQAs and AQA personnel (including auditors) to: 
+• act with integrity, objectivity and independence in the performance of certification activities; 
+• ensure certification decisions are evidence-based and free from commercial, organisational 
+or personal influence; and 
+• not offer, request or accept inducements, benefits or advantages that could influence, or be 
+perceived to influence, audit outcomes or certification decisions. 
+AQA personnel (including auditors) who provide consultancy services to NDIS providers, particularly 
+where those providers may be subject to audit by the same AQA, risk contravening these obligations 
+by creating actual or perceived conflicts that undermine confidence in audit findings and 
+certification decisions. 
+In addition, ISO 17065 requires certification bodies to maintain independence from consultancy and 
+to identify and control risks to impartiality arising from activities, relationships or personnel (clauses 
+4.2 and 5.2). The standard makes clear that certification activities must be demonstrably 
+independent of consultancy functions and that risks arising from dual roles must be avoided rather 
+than managed where effective mitigation is not possible. Allowing auditors to act as consultants to 
+providers they audit, or may audit, is inconsistent with these requirements because it blurs the 
+required separation between certification and consultancy and heightens self-interest and familiarity 
+threats. 
+Accordingly, the NDIS Commission expects AQAs to prohibit AQA personnel (including auditors) from 
+providing consultancy services to prospective and/or registered NDIS providers where this would 
+create an actual or perceived conflict of interest, including where the provider is audited by the AQA 
+or is reasonably likely to seek audit services from that AQA. AQAs must have clear policies, role 
+===== PAGE 11 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 11 
+definitions and controls in place to prevent auditors from undertaking consulting activities that could 
+compromise impartiality, and must ensure such risks are identified, documented and avoided 
+through appropriate assignment, exclusion or structural separation. 
+Failure to appropriately manage or avoid these risks may result in regulatory action under section 
+73U of the NDIS Act, including the imposition of conditions on approval or other proportionate 
+compliance responses, to safeguard the integrity, credibility and public confidence of NDIS 
+certification activities. 
+10. Consultant conduct and implications for AQA compliance 
+While consultants are not directly subject to the NDIS AQA Scheme or the AQA Code of Conduct, the 
+behaviour and practices of consultants are relevant insofar as they may give rise to non-compliance 
+by AQAs with their impartiality and conduct obligations. AQAs are responsible for ensuring that their 
+arrangements, interactions and relationships with consultants do not compromise, or appear to 
+compromise, the independence of certification activities.  
+Practices by consultants such as offering, requesting or accepting referral fees, commissions or other 
+benefits linked to audit referrals, or entering into arrangements that create conflicts of interest, will 
+place AQAs in breach of their obligations under the AQA Code of Conduct and ISO 17065 particularly 
+if such practices are tolerated, facilitated or inadequately managed.  
+AQAs must therefore ensure appropriate controls, disclosures and risk assessments are in place to 
+identify, manage and avoid consultant behaviours that may adversely affect AQA compliance. 
+The NDIS Commission expects that NDIS providers engage directly with AQAs for the purpose of 
+obtaining audit quotes, agreeing audit scope and planning audit activities, and that AQAs engage 
+directly with providers to arrange, conduct and complete audits. Consultants may support providers 
+in preparing for audit but should not act as intermediaries in audit engagement, planning or delivery 
+where this would displace or obscure the direct professional relationship between the AQA and the 
+provider. 
+11. Provider conduct and implications for AQA compliance 
+While NDIS providers are not subject to the AQA Code of Conduct or ISO 17065 impartiality controls, 
+provider conduct is relevant to the extent that it may affect an AQA’s ability to comply with its 
+obligations under the NDIS AQA Scheme.  
+Providers are expected to engage AQAs directly and independently, having regard to competence 
+and impartiality, and to disclose to AQAs any consultant or advisory relationships that are relevant to 
+the AQA’s impartiality assessment, consistent with the AQA Guidelines. Failure by a provider to 
+disclose relevant relationships or arrangements may impede an AQA’s capacity to identify, assess 
+and manage actual or perceived conflicts of interest.  
+In addition, providers must ensure that all information provided in connection with registration and 
+quality audits is accurate and not misleading; providing false or misleading information is a 
+contravention of section 73D of the NDIS Act (civil penalty) and may constitute a criminal offence 
+under section 137.1 of the Criminal Code Act 1995.  
+===== PAGE 12 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 12 
+Provider practices that obscure or misrepresent consultant arrangements may therefore contribute 
+to non-compliance by AQAs with their impartiality and governance obligations. 
+Consistent with these expectations, the NDIS Commission expects that providers engage AQAs 
+directly to seek quotes, confirm audit scope and plan audits, and do not rely on consultants to 
+manage or control audit engagement or communications. Direct engagement supports 
+transparency, enables AQAs to properly assess and manage impartiality risks, and reduces the 
+likelihood of arrangements that may give rise to actual or perceived conflicts of interest. 
+12. AQA governance, oversight and transparency 
+AQAs must maintain effective governance, oversight and transparency arrangements to safeguard 
+impartiality and manage risks arising from external and commercial relationships, in accordance with 
+the AQA Code of Conduct, the AQA Rules, the AQA Scheme Guidelines and ISO 17065. 
+ISO 17065 requires certification bodies to establish and maintain a documented, organisation-wide 
+mechanism to identify, assess, manage and monitor actual and perceived conflicts of interest, 
+including those arising from commercial activities, external relationships or personnel arrangements 
+(clauses 4.2 and 5.2). These mechanisms must be supported by appropriate governance oversight, 
+including internal audits and management review processes (clauses 5.1 and 5.2). These 
+requirements are reflected in the AQA Scheme Guidelines, which require AQAs to identify, analyse, 
+manage and document impartiality risks and ensure effective governance oversight of those risks 
+(Guidelines, clauses 31–36). 
+AQAs must ensure structural separation between audit activities, audit review and certification 
+decision-making, and must maintain independent and effective complaints and appeals processes. 
+AQAs are also required to maintain appropriate records, policies and registers to support 
+transparency, accountability and regulatory assurance, consistent with ISO 17065 record-keeping 
+and process requirements (clauses 7.5–7.11, 7.6 and 8). 
+Transparency and documentation are critical to demonstrating compliance with impartiality 
+obligations. AQAs must maintain an impartiality register, record relationships with consultants and 
+referral sources, and conduct documented impartiality risk assessments for relevant engagements or 
+arrangements. Actual and perceived conflicts of interest must be identified, disclosed, managed and, 
+where necessary, avoided, in accordance with the safeguards required under ISO 17065 (clauses 4.2, 
+5.2 and 8) and the AQA Scheme Guidelines (clauses 31–36). 
+Failure to establish, maintain or operate effective governance, oversight and transparency 
+arrangements, including failures to identify, disclose or adequately manage conflicts of interest, may 
+constitute a breach of the AQA Code of Conduct and may result in regulatory action under section 
+73U of the NDIS Act. 
+13. Safeguarding and public confidence  
+NDIS certification audits operate within a safeguarding context that involves participants who may 
+be particularly vulnerable. The integrity of the certification process is therefore critical to 
+maintaining confidence that audit outcomes are reliable, credible and capable of supporting the 
+NDIS Commission’s safeguarding objectives. Public confidence depends on certification activities 
+being conducted independently, objectively and free from commercial influence. 
+===== PAGE 13 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 13 
+These expectations apply to AQAs as third-party certification bodies and require that certification 
+outcomes are not influenced, steered or compromised by referral arrangements, financial incentives 
+or other conflicts of interest. They reflect the impartiality obligations set out in the AQA Code of 
+Conduct and the independence and conflict-of-interest controls required under ISO 17065 (clauses 
+4.2 and 5.2), which together ensure that certification decisions remain objective, defensible and 
+aligned with the NDIS Commission’s safeguarding mandate. 
+  
+===== PAGE 14 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 14 
+14. Appendix  
+Appendix A: AQA Compliance Checklist  
+Mapped to the AQA Scheme Guidelines including AQA Code of Conduct and ISO 17065 
+This checklist summarises the minimum impartiality, independence and governance controls 
+expected of Approved Quality Auditors (AQAs) in relation to consultant relationships, commercial 
+referral practices and other external arrangements. These controls reflect mandatory obligations 
+under the AQA Scheme Guidelines including the AQA Code of Conduct, and the impartiality 
+requirements of ISO 17065. 
+Impartiality & Conflict-of-Interest Controls 
+☐   No referral fees, commissions or success-based remuneration in connection with audit or 
+certification work.                                                                                                                                     
+(AQA Code of Conduct; AQA Scheme Guidelines cl 31–36; ISO 17065 cl 4.2, 5.2) 
+☐   No revenue-sharing, lead-purchase, exclusivity or preferred-supplier arrangements, gifts, 
+hospitality or other financial or non-financial benefits that steer, influence or appear to 
+influence audit work.                                                                                                                                 
+(AQA Code of Conduct; AQA Scheme Guidelines cl 35; ISO 17065 cl 4.2) 
+☐   All consultant and referral-source relationships are recorded in an impartiality register, capturing 
+the nature of the relationship, associated risks and relevant controls.                                                   
+(AQA Code of Conduct; AQA Scheme Guidelines cl 31–34) 
+☐   Documented impartiality risk assessments are completed for all engagements involving 
+consultants, advisors or other external parties, including assessment of both actual and 
+perceived conflicts.                                                                                                                                                 
+(AQA Scheme Guidelines cl 31–36; ISO 17065 cl 4.2, 5.2) 
+☐   Actual and perceived conflicts of interest are identified, managed, disclosed and, where 
+necessary, avoided, including declining or reassigning work where independence may 
+reasonably be questioned.                                                                                                                                      
+(AQA Code of Conduct; AQA Scheme Guidelines cl 33–36; ISO 17065 cl 4.2) 
+Structural Independence 
+☐   Clear separation of duties between audit and evaluation activities, review functions and 
+certification decision-making. 
+(ISO 17065 cl 5.2, 7.6) 
+☐   Business development, marketing and partnership functions have no role in audit team 
+allocation, audit review or certification decisions. 
+(AQA Code of Conduct; ISO 17065 cl 4.2, 5.2) 
+Governance & Oversight 
+===== PAGE 15 =====
+ 
+ 
+ 
+    NDIS Quality and Safeguards Commission: Regulatory Expectations for Approved Quality Auditors   V1 June 2026 15 
+☐   A standing impartiality committee or equivalent mechanism with responsibility for overseeing 
+impartiality risks, including risks arising from external and commercial relationships. 
+(AQA Scheme Guidelines cl 35; ISO 17065 cl 5.2) 
+☐   Periodic internal audits and management reviews specifically addressing impartiality risks, 
+consultant relationships and control effectiveness. 
+(ISO 17065 cl 5.1, 5.2) 
+☐   Training and competence governance for audit, sales, marketing and partnership personnel on 
+impartiality obligations, conflicts of interest and prohibited arrangements. 
+(AQA Code of Conduct; ISO 17065 cl 6.1) 
+☐   Independent complaints and appeals processes, with clear escalation pathways and 
+whistleblower protections. 
+(AQA Scheme Guidelines; ISO 17065 cl 7.5–7.11) 
+Transparency & Documentation 
+☐   A public impartiality policy is maintained, current and accessible. 
+(ISO 17065 cl 4.6) 
+☐   Records of impartiality risk assessments, conflicts, committee deliberations and controls are 
+maintained and provided to the NDIS Commission on request. 
+(AQA Code of Conduct; AQA Scheme Guidelines cl 31–36; ISO 17065 cl 4.2, 8) 
+Engagement & Referrals (Permitted with Controls) 
+☐   General marketing and participation in industry events is limited to promoting awareness and 
+does not create expectations of preferential treatment or reciprocal referrals. 
+☐   Consultant recommendations may precede provider selection of an AQA only where no benefit 
+is exchanged, and no incentive exists to steer providers to a particular AQA. 
+☐   Referrals may be accepted only where no financial or other benefit is offered, requested or 
+provided, and where referrals arise organically rather than through commercial arrangements. 
+☐   In all cases, the following apply: no benefits for referrals; impartiality register entry; documented 
+risk assessment; and structural separation between audit and certification decision functions. 
+(AQA Code of Conduct; AQA Scheme Guidelines cl 31–36; ISO 17065 cl 4.2, 5.2) 
+Notifications & Change Control 
+☐   Material changes (including ownership, governance, key personnel, organisational structure or 
+external relationships) with potential implications for impartiality are identified, assessed, 
+recorded and, where required, notified to the NDIS Commission and JASANZ. 
+(AQA Scheme Guidelines; NDIS Act s 73U; ISO 17065 cl 4.2, 5.2, 7.10) 

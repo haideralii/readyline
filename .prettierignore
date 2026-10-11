@@ -6,6 +6,10 @@ playwright-report
 test-results
 package-lock.json
 next-env.d.ts
-# The founder's brief and the Next.js-managed agent file are not reformatted.
+# The founder's brief, the Next.js-managed agent file and the product owner's
+# documents are prose owned by others; they are not reformatted.
 CLAUDE.md
 AGENTS.md
+product/
+# Verbatim text snapshots of Commission sources must never be rewritten.
+data/sources/

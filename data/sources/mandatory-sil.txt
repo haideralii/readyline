@@ -1,0 +1,92 @@
+On this page:
+From 1 July 2026 some supported independent living (SIL) providers must register with the NDIS Commission. We have developed transitional arrangements for providers who are or plan to provide supported independent living.
+<h2>What is supported independent living?
+We have defined supported independent living to:
+clearly describe the role of these services
+make sure we apply the appropriate regulatory settings to providers
+help providers understand their registration requirements for the supports they provide.
+The following definition is a summary based on the draft amendments to the Provider Registration Rules. You should refer to the Provider Registration Rules once the amendments have been made to see the full definition and determine if the new requirements apply to you.
+Supported independent living will be defined as:
+Supported independent living (SIL) is a package of home and living support for people with higher support needs. A person provides  assistance with supported independent living  to a participant if:
+the person with disability requires support at all times of the day, or for most of the day
+the assistance provided helps the person with disability to live in their home as autonomously as possible and access the community, by: assisting with daily life tasks, or
+supervising daily life tasks
+the provider is managing and delivering supported independent living supports. Providers make sure the participant receives home and living support in accordance with the package of supports.
+It is not supported independent living if:
+a person only receives a few hours of support a day or week, or
+a person chooses and manages their own support workers (this includes directing, planning and rostering their own support workers).
+<h2>New registration group for supported independent living
+A new registration group will be added to registration certificates of approved providers. The new class of support is 0138 – Assistance with supported independent living .
+0138 – Assistance with supported independent living and it's definition will be included in the National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 2018.
+<h2>Registration requirements
+All registered supported independent living providers need to:
+have certification audits
+comply with the [/rules-and-standards/ndis-practice-standards#paragraph-id-7814] core module of the NDIS Practice Standards
+comply with the new [/rules-and-standards/ndis-practice-standards/sil] supplementary module for supported independent living Practice Standards
+meet all other [/provider-registration/about-registration#paragraph-id-11351] conditions of registration .
+<h2>When Supports Are Not Considered Supported Independent Living (SIL)
+The SIL definition is directed at circumstances where a provider is managing and delivering a package of supports to a participant. Arrangements that involve the participant organising, directing, or administering supports do not, of themselves, meet this definition.
+It is not considered Supported Independent Living (SIL) when:
+a person only receives a few hours of support each day or week; or
+a person chooses and manages their own support workers, including directing, planning, and rostering their own supports.
+In most circumstances, a participant or family member who is an authorised decision-maker acting on behalf of a participant that chooses and manages their own support workers would not be required to register as an NDIS SIL provider.
+Where a person chooses and manages their own support workers, including directing, planning, and rostering their own supports, the appropriate support item number should be used when billing or claiming NDIS-funded supports. A Supported Independent Living (SIL) support item number should not be used where SIL does not apply.
+The National Disability Insurance Agency (NDIA) is a separate government agency that implements the NDIS and manages service bookings, payments and access to plans.
+As we transition to mandatory registration for SIL, you may have questions about your NDIS plan. You can contact the NDIA the following ways:
+Online:  [https://www.ndis.gov.au/contact/feedback-and-enquiries/feedback-and-complaints-form] Feedback form  or live chat
+Email:  [mailto:enquiries@ndis.gov.au] enquiries@ndis.gov.au
+Phone: 1800 800 110 (NDIS National Contact Centre), Monday – Friday 8am to 8pm
+In person: by visiting an NDIS office, Local Area Coordinator (LAC) or Early childhood (EC) partner
+Mail: NDIA, GPO Box 700, Canberra ACT 2601.
+If you need an interpreter, call the Translation and Interpreting Service (TIS) on 131 450 and ask to be connected to the NDIS
+If you have hearing or speech loss, contact TTY on 1800 555 677 or the National Relay Service on 1800 555 727.
+<h3>Mandatory Registration Requirements for Other Supports and Services
+A provider may not need to be registered for SIL if the support they deliver is not considered SIL based on the definition. However, the provider must register if they are delivering other supports that can only be delivered by registered providers.
+You must be registered to provide:
+specialist disability accommodation (SDA)
+specialist behaviour support services
+supports or services to NDIS participants with NDIA-managed funding, and
+plan management services
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-SIL] supported independent living (SIL)
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital] NDIS digital platform services.
+Use or plan to use [/rules-and-standards/behaviour-support-and-restrictive-practices] regulated restrictive practices .
+[/provider-registration/about-registration/residential-aged-care-providers-and-ndis] Residential aged care providers delivering supports and services to NDIS participants
+For more information, visit the [/provider-registration/about-registration] About Registration page.
+<h2>Transition pathways for registration
+A provider's pathway to registration will depend on their current registration status and services. Choose the option that applies to you:
+<h3>I'm currently providing supported independent living (SIL) supports
+I'm a registered provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-1]
+I'm a registered provider (with registration group 0115)
+I'm an unregistered provider (including a sole trader)
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-3]
+I applied for registration before 1 July 2026
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-4]
+I'm planning to apply for registration
+<h3>
+I'm planning to provide supported independent living (SIL) supports in future
+I'm a registered provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-2]
+I'm a registered provider (without registration group 0115)
+I'm an unregistered provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-5]
+I applied for registration before 1 July
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-6]
+I'm planning to apply for registration
+I'm not currently an NDIS provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-5]
+I applied for registration before 1 July
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-sil/SIL-6]
+I'm planning to apply for registration
+To learn more about mandatory registration for supported independent living providers, see the [/about-us/ndis-commission-reform-hub#Webinar] 2026 Regulatory reform webinar series .
+I'm a sole trader, what does mandatory registration mean for me?
+See more
+See less
+If you are a sole trader delivering, managing and coordinating a participant's supports that meet the [#paragraph-id-3456510] definition of supported independent living , you are considered a supported independent living provider.
+You should refer to the NDIS provider transition pathway that is relevant to your current registration status and services.
+What happens if I choose not to apply, or I haven't applied by 1 October 2026?
+See more
+See less
+If you are currently delivering supported independent living (SIL) and chose not to apply for registration, you will need to stop providing supported independent living supports .
+Providing supported independent living without registration is a serious offence. If you deliver supported independent living on or after 1 July 2026 without being registered, you may breach the NDIS Act. The maximum penalty is 2 years’ imprisonment, a fine of 120 penalty units, or both.
+If you stop providing supported independent living, you must follow the notification and participant transition steps described at [/provider-registration/notify-us-changes-or-events/stopping-services-you-provide] Stopping the services you provide .

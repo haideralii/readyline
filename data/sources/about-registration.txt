@@ -1,0 +1,96 @@
+On this page:
+<h2>What is a registered NDIS provider?
+A registered NDIS provider has:
+applied for registration with the NDIS Commission
+been [/provider-registration/apply-registration/types-audits] audited against the relevant [/rules-and-standards/ndis-practice-standards] NDIS Practice Standards and assessed as meeting them
+undergone a suitability assessment by the NDIS Commission (of both the provider and its key personnel), and
+been issued a certificate of registration.
+These providers are generally registered for three years.
+Details of registered NDIS providers are published on the [/provider-registration/find-registered-provider] NDIS Provider Register .
+See section 73E of the [https://www.legislation.gov.au/C2013A00020/latest/text] National Disability Insurance Scheme Act 2013 for more information.
+<h2>Is registration mandatory?
+You must be registered to provide:
+specialist disability accommodation (SDA)
+specialist behaviour support services
+supports or services to NDIS participants with NDIA-managed funding, and
+plan management services
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-SIL] supported independent living (SIL)
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital] NDIS digital platform services.
+You must also get registered if you plan to use [/rules-and-standards/behaviour-support-and-restrictive-practices] regulated restrictive practices .
+Residential aged care providers that deliver supports and services to participants must be registered with the NDIS Commission and comply with relevant NDIS Practice Standards. See more information about [/provider-registration/about-registration/residential-aged-care-providers-and-ndis] residential aged care and the NDIS .
+Unregistered providers can deliver supports and services to participants, except for those listed above. Only participants who self-manage or plan-manage their NDIS funding can choose to get supports and services from unregistered providers.
+<h2>Providing NDIS supports and services under another NDIS provider’s registration or brokerage of supports that need registration
+Some providers have 'facilitation' or ‘brokerage’ arrangements for delivering supports and services. This is where an unregistered provider deliver supports under another providers registration. The unregistered provider may be an entity, sole trader or subcontracted employee or worker.
+When this happens, the registered provider:
+must be the one that claims payment for supports and services
+is responsible for all supports and services delivered under their registration, including those delivered by the contracted provider
+makes sure anyone delivering supports under their registration complies with conditions of registration, including the NDIS Code of Conduct
+takes responsibility if anyone providing supports under their registration doesn’t comply with conditions and of registration
+must make sure the facilitation or brokerage arrangements are transparent to participants, and participants know who is responsible for delivering their supports
+For information about responsibilities, compliance and audit in a subcontracting or brokerage arrangement, see [#paragraph-id-4454952] Providing NDIS supports and services under another NDIS provider’s registration .
+<h2>Conditions of registration
+The registration of a NDIS provider is subject to conditions. These conditions include:
+compliance with the applicable [/rules-and-standards/ndis-practice-standards] NDIS Practice Standards
+compliance with the [/rules-and-standards/ndis-code-conduct] NDIS Code of Conduct
+compliance with applicable state, territory and Commonwealth laws
+having effective systems and practices for [/complaints/complaints-about-supports-and-services-you-provide] managing complaints and [/rules-and-standards/reportable-incidents-and-incident-management/incident-management] managing incidents
+ensuring workers in certain roles, including key personnel, have NDIS Worker Screening clearances: [/workforce/worker-screening] NDIS Worker Screening
+[/workforce/worker-screening/worker-screening-registered-providers] Worker screening for registered providers
+meeting [/provider-registration/notify-us-changes-or-events] notification requirements
+meeting [/provider-registration/apply-registration/types-audits] quality audit requirements
+if applicable, meeting [/rules-and-standards/behaviour-support-and-restrictive-practices] behaviour support requirements , including reporting the use of regulated restrictive practices to the NDIS Commission.
+See section 73F of the [https://www.legislation.gov.au/C2013A00020/latest/text] National Disability Insurance Scheme Act 2013 for a list of all registration conditions.
+The NDIS Commission can impose additional conditions on a provider’s registration. These conditions are included on the certificate of registration and on the [/provider-registration/find-registered-provider] NDIS Provider Register .
+<h3>Additional conditions
+<h4>Personal support providers
+Additional conditions apply to registered NDIS providers who deliver personal supports to participants who live alone as part of registration group 0107 – Assistance with daily personal activities.
+If the participant gets personal support from one worker only, the provider must:
+assess the risks to the participant, and
+monitor the quality of, and participant satisfaction with, the supports.
+See [/provider-registration/about-registration/registration-conditions-personal-support-providers] Registration conditions for personal support providers (Registration group 0107) .
+<h4>Audits for new registered providers
+New registered providers may be required to complete parts of a [/provider-registration/apply-registration/types-audits] quality audit involving NDIS participant engagement. This must be completed within a certain timeframe from when the provider started delivering services to participants.
+<h2>Key personnel
+Key personnel are individuals who hold significant roles within an NDIS provider organisation. They play a crucial role in ensuring the safety and well-being of NDIS participants.
+<h3>Who are key personnel?
+People who are:
+responsible for executive decisions
+responsible for, or have authority or significant influence over, planning, directing or controlling provider activities.
+This can include the CEO, executive staff, managers and/or board members.
+See section 11A of the  [https://www.legislation.gov.au/C2013A00020] National Disability Insurance Scheme Act 2013 for the full legal definition.
+When applying to become a registered provider, NDIS providers must provide the details of all their key personnel. The NDIS Commission uses this information to assess the providers suitability to be registered, and considers whether these personnel have past convictions, enforcement actions, fraud, or any other events that might make them unsuitable.
+Registered NDIS providers need to inform the NDIS Commission about changes to their key personnel during their registration period:
+[/provider-registration/notify-us-changes-or-events#OrgChange] changes to your key personnel
+[/provider-registration/notify-us-changes-or-events#EventsSuitability] events that might impact how suitable key personnel are to make executive decisions
+<h3>Board Members
+All Board Members are considered key personnel in accordance with section 11A of the [https://www.legislation.gov.au/C2013A00020/latest/versions] National Disability Insurance Scheme Act 2013 . All key personnel are required to have a Worker Screening clearance in accordance with the [https://www.legislation.gov.au/F2018L00887/latest/text] Worker Screening Rules .
+Some Board Members, but not all, may be subject to 'worker-specific' requirements as per the [https://www.legislation.gov.au/F2018L00631/latest/text] Provider Registration and Practice Standard Rules . This may relate to inductions, competency requirements, mandatory training. This is where Board Members are also considered a person employed or otherwise engaged by a registered NDIS provider. ​
+<h2> NDIS workers on temporary visas
+NDIS providers may be able to employ workers who aren't Australian citizens and have temporary visas. Workers with temporary visas need to:
+have a visa with terms and conditions that allow them to work within the NDIS
+meet the same requirements as all other NDIS workers, such as  [https://www.ndiscommission.gov.au/workforce/worker-screening] worker screening .
+To understand a worker’s eligibility to work within the NDIS:
+The provider or worker needs to:
+confirm the type of visa they hold
+ensure the visa is valid and permits them to work in Australia
+understand the terms and conditions of that visa by looking it up in  [https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online] Visa Entitlement Verification Online (VEVO) .
+The provider then needs to make sure the terms of employment are consistent with the visa terms and conditions.
+<h3> Visa Entitlement Verification Online (VEVO)
+VEVO is operated by the Department of Home Affairs and allows visa holders and employers to check visa conditions. Organisations need to register for an account to use it.
+VEVO can be used to provide proof of a worker's visa conditions.
+[https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online] Visa Entitlement Verification Online
+For more information see:
+[https://immi.homeaffairs.gov.au/visas/working-in-australia/temporary-work-visas] Temporary work visas (Department of Home Affairs)
+[https://www.fairwork.gov.au/find-help-for/visa-holders-migrants] Visa holders and migrants (Fair Work Ombudsman)
+<h2>Resources
+<h3>Fact sheet: NDIS Commission - What does this mean for providers?
+[https://www.ndiscommission.gov.au/sites/default/files/2022-07/ndis-commission-what-does-mean-providers-v3_0.pdf] pdf 658KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2022-07/ndis-commission-what-does-mean-providers-v3_0.pdf] Listen to PDF
+<h3>Providing NDIS supports and services under another NDIS provider’s registration
+[https://www.ndiscommission.gov.au/sites/default/files/2026-07/Brokering-subcontracting-FactSheet-Word.docx] docx 142KB
+[https://www.ndiscommission.gov.au/sites/default/files/2026-07/Brokering-subcontracting-FactSheet-PDF.pdf] pdf 248KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2026-07/Brokering-subcontracting-FactSheet-PDF.pdf] Listen to PDF
+<h2>Related information
+[/provider-registration/apply-registration] Apply for registration
+[/provider-registration/apply-registration/find-auditor] Find an auditor
+[/provider-registration/find-registered-provider] Find a registered provider
