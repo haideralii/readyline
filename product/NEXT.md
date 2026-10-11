@@ -70,6 +70,20 @@ Context: PRs #2 to #4 are closed; #5, #6, #7 are open from the `*-rebuilt` branc
 
 4. STOP. Append your status below.
 
+## Queue (written by PO, 12 Oct 2026, batch 7)
+
+PRs: #7 (REQ-004 Session C) is accepted but conflicts with `main` in `DECISIONS.md`; the PO opens PRs for `req-004-migrate-dburl` and `req-005-generator`. Haider merges in the order the PO gives.
+
+1. **PR #7 conflict:** rebase `req-004-accounts-rebuilt` onto current `main`, resolve `DECISIONS.md` keeping both sides, run `npm run check`, push with `--force-with-lease` (feature branch, D-033). Nothing else on that branch.
+
+2. **REQ-005 PO decisions and evidence review, on `req-005-generator`** (rebase onto `main` first): apply the three decisions in the REQ's PO review (accept the money-and-property procedure into the core set; split out `support-planning-and-transitions-procedure`; add the `restrictive-practices` register id for REQ-009), update `document-sets.json`, `document-types.json` and their tests; apply the three evidence additions and flip all evidence items to reviewed as specified; regenerate `standards.json`, bump its version, update `SOURCES.md` changelog; `standards:verify` green.
+
+3. **REQ-005 Session A, same branch:** section JSON schema, document model, renderer with structure snapshots, fixed text for every outline per `product/domain/house-style.md`, the readability function with tests, the terminology and claims lint wired to the house-style lists, the LibreOffice CI job (AC-1 mechanics) rendering the fixed-text skeletons for the three reference cases. No model calls yet. Push; fill Delivery evidence.
+
+4. **REQ-005 Session B preparation:** context pack builder with the exclusion test (SR-3), prompt builder with versioned prompts using the house style, replay-fixture harness (no real calls in CI), red-team fixtures (SR-2). If `ANTHROPIC_API_KEY` is present in `.env.local`, record three real generations locally as the first fixtures and note model cost per full generation; if absent, write "waiting for Anthropic key" and stop after the harness. Push; fill Delivery evidence.
+
+5. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)
