@@ -30,6 +30,17 @@ async function fillRest(
   // practices
   const rp = { Yes: "yes", No: "no", "Not sure": "not-sure" }[restrictive];
   await page.locator(`#restrictivePractices-${rp}`).check();
+  if (restrictive === "Not sure") {
+    // REQ-013 FR-4: the helper resolves 'not sure'; one 'yes' keeps the assumed path.
+    await page.locator("#notSureHelper\\.locksOrBarriers-yes").check();
+    await page.locator("#notSureHelper\\.holdsOrRestraint-no").check();
+    await page.locator("#notSureHelper\\.medicationForBehaviour-no").check();
+  }
+  await fillFromWorkforce(page);
+}
+
+/** Saves the practices step and completes workforce and existing through to the result. */
+async function fillFromWorkforce(page: Page) {
   await page.getByRole("button", { name: "Save and continue" }).click();
   // workforce
   await expect(
@@ -101,6 +112,14 @@ test.describe("questionnaire", () => {
     await expect(page.getByTestId("what-next")).toContainText(
       "What happens next",
     );
+    // REQ-013 AC-5: the summary line and the grouped document list.
+    await expect(page.getByTestId("summary")).toContainText(
+      /Your audit: verification\. You will need \d+ documents and \d+ registers/,
+    );
+    await expect(
+      page.getByTestId("doc-group-running-the-business"),
+    ).toBeVisible();
+    await expect(page.getByTestId("doc-group-your-workers")).toBeVisible();
   });
 
   test("[0120, 0107] is certification with the core module and a mid-term audit (AC-2)", async ({
@@ -251,7 +270,9 @@ test.describe("questionnaire", () => {
     await page.getByRole("button", { name: "Save and continue" }).click();
     await fillRest(page, "Not sure");
     await expect(page.getByTestId("module-ibsp")).toBeVisible();
-    await expect(page.getByText("we assumed yes")).toBeVisible();
+    await expect(
+      page.getByText("helper questions pointed to yes"),
+    ).toBeVisible();
   });
 
   test("participant-data detector warns on the services note without blocking (SR-2)", async ({
@@ -306,6 +327,31 @@ test.describe("questionnaire", () => {
     await expect(page.locator("#group-0107")).toBeChecked();
     await expect(page.locator("#group-0120")).toBeChecked();
     await expect(page.getByTestId("groups-chosen")).toContainText("2 chosen");
+  });
+  test("restrictive practices 'not sure' with three 'no' answers resolves to no and shows no assumption (REQ-013 AC-4)", async ({
+    page,
+  }) => {
+    await page.goto("/start/business");
+    await fillBusiness(page);
+    await chooseGroups(page, ["0107"]);
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await page.locator("#restrictivePractices-not-sure").check();
+    await expect(page.getByTestId("not-sure-helper")).toBeVisible();
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await expect(
+      page.getByRole("alert").filter({ hasText: "Please fix" }),
+    ).toContainText("Locks or barriers");
+    await page.locator("#notSureHelper\\.locksOrBarriers-no").check();
+    await page.locator("#notSureHelper\\.holdsOrRestraint-no").check();
+    await page.locator("#notSureHelper\\.medicationForBehaviour-no").check();
+    await expect(page.getByTestId("not-sure-resolution")).toContainText(
+      "treat this as no",
+    );
+    await fillFromWorkforce(page);
+    await expect(page.getByTestId("module-ibsp")).toHaveCount(0);
+    await expect(page.getByText("helper questions pointed to yes")).toHaveCount(
+      0,
+    );
   });
   test("no horizontal overflow on any step", async ({ page }) => {
     await page.goto("/start/business");

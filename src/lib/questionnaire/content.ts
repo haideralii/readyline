@@ -10,6 +10,7 @@ import documentSetsJson from "../../../data/readyline-content/document-sets.json
 import modulesJson from "../../../data/readyline-content/modules.json";
 import groupDescriptionsJson from "../../../data/registration-group-descriptions.json";
 import groupCategoriesJson from "../../../data/readyline-content/group-categories.json";
+import documentGroupsJson from "../../../data/readyline-content/document-groups.json";
 
 const reviewed = {
   note: z.string().min(1),
@@ -101,6 +102,31 @@ export const groupDescriptionsContent = GroupDescriptionsContent.parse(
 );
 export const groupCategoriesContent =
   GroupCategoriesContent.parse(groupCategoriesJson);
+
+/** The four result-page headings for documents (REQ-013 FR-5). */
+export const DocumentGroupsContent = z.object({
+  note: z.string(),
+  author: z.literal("readyline"),
+  status: z.string(),
+  groups: z
+    .array(
+      z.object({
+        id: slug,
+        title: z.string().min(1),
+        documents: z.array(slug).min(1),
+      }),
+    )
+    .length(4),
+});
+export const documentGroupsContent =
+  DocumentGroupsContent.parse(documentGroupsJson);
+
+export function documentGroupId(documentId: string): string {
+  return (
+    documentGroupsContent.groups.find((g) => g.documents.includes(documentId))
+      ?.id ?? "other"
+  );
+}
 
 export function moduleDescription(moduleId: string): string | undefined {
   return modulesContent.items.find((m) => m.id === moduleId)?.description;

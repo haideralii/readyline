@@ -2,6 +2,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { BRAND } from "@/lib/brand";
+import {
+  documentGroupId,
+  documentGroupsContent,
+} from "@/lib/questionnaire/content";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
@@ -104,6 +108,30 @@ function ResultView({
   const r = result;
   return (
     <div className="space-y-10" data-testid="result">
+      <section
+        aria-labelledby="summary-heading"
+        className="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
+        data-testid="summary"
+      >
+        <h2 id="summary-heading" className="sr-only">
+          In short
+        </h2>
+        <p className="text-lg leading-8">
+          Your audit:{" "}
+          <strong>
+            {r.pathway === "verification" ? "verification" : "certification"}
+          </strong>
+          . You will need <strong>{r.documents.length} documents</strong> and{" "}
+          <strong>{r.registers.length} registers</strong>. {BRAND} can draft the
+          documents and keep the registers.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          {r.pathway === "verification"
+            ? "In practice: an auditor reviews your documents at their desk. Nobody visits, and nobody needs to speak to the people you support."
+            : "In practice: an auditor visits your business, talks to your workers and to some of the people you support, and reads your documents and registers."}
+        </p>
+      </section>
+
       <section aria-labelledby="pathway-heading">
         <h2 id="pathway-heading" className="text-xl font-semibold">
           Your audit:{" "}
@@ -129,9 +157,11 @@ function ResultView({
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
           <p className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
-            You were not sure about restrictive practices, so we assumed yes. If
-            you do not use them, change that answer and the implementing
-            behaviour support plans module drops out.
+            You were not sure about restrictive practices, and at least one of
+            your answers to the three helper questions pointed to yes, so we
+            included the implementing behaviour support plans module. If that is
+            wrong, change the answer on the restrictive practices step and the
+            module drops out.
           </p>
         ) : null}
         {r.flags.largeProvider ? (
@@ -230,19 +260,32 @@ function ResultView({
           labels come from your answers in the last step; &ldquo;To
           prepare&rdquo; means the questionnaire did not ask about that item.
         </p>
-        <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
-          {r.documents.map((d) => (
-            <li
-              key={d.id}
-              className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <span className="text-base">{d.title}</span>
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                {HAVE_LABEL[d.have]}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {documentGroupsContent.groups
+          .map((g) => ({
+            ...g,
+            items: r.documents.filter((d) => documentGroupId(d.id) === g.id),
+          }))
+          .filter((g) => g.items.length > 0)
+          .map((g) => (
+            <div key={g.id} className="mt-4" data-testid={`doc-group-${g.id}`}>
+              <h3 className="text-base font-semibold">
+                {g.title} ({g.items.length})
+              </h3>
+              <ul className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
+                {g.items.map((d) => (
+                  <li
+                    key={d.id}
+                    className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span className="text-base">{d.title}</span>
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                      {HAVE_LABEL[d.have]}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}{" "}
       </section>
 
       <section aria-labelledby="registers-heading">

@@ -60,6 +60,13 @@ test("every questionnaire step has no serious or critical accessibility violatio
   ).toBeVisible();
   summary.practices = await scan(page, "practices");
   await page.locator("#restrictivePractices-not-sure").check();
+  summary["practices-helper"] = await scan(
+    page,
+    "practices (not-sure helper open)",
+  );
+  await page.locator("#notSureHelper\\.locksOrBarriers-yes").check();
+  await page.locator("#notSureHelper\\.holdsOrRestraint-no").check();
+  await page.locator("#notSureHelper\\.medicationForBehaviour-no").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   await expect(
