@@ -768,6 +768,54 @@ tailored sections too thin; Haiku is reserved for cheap side tasks. Monthly
 spend cap set in the Anthropic console before the key is created. Revisit
 with measured token counts from the first recordings (REQ-005 Session B).
 
+## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
+
+Decision numbers D-13xx on this branch.
+
+**D-1301 Validation messages live in the schemas (Dev, 2026-10-12, FR-1).**
+Every field of the five step schemas carries its own plain-English message
+through zod's `error` option (type, enum, min, max and integer paths), so the
+server action, the client form and any future API all say the same thing
+and no field-to-message map can drift from the schema. `text()` takes a
+required message and defaults its type message to "Enter text only".
+`messages.test.ts` drives every step through empty, wrong-type and
+out-of-range inputs and rejects anything shaped like zod's defaults.
+
+**D-1302 Accessible names from visible labels (FR-2).** Radios and
+checkboxes use `aria-labelledby` pointing at the label span only, with the
+class code and help text in `aria-describedby`; every group is a fieldset
+with a legend. A Playwright test walks every control on every step, reads
+the computed name and legend, and fails on an empty name, a raw value or a
+leading class code; it cross-checks one control per step with Playwright's
+own accessible-name computation and writes the records to
+`product/evidence/req-013` under `EVIDENCE=1`. The manual screen-reader
+pass is added to the definition of done; Dev has no screen reader on this
+machine, so that pass is owed by Haider and recorded as such.
+
+**D-1303 Everyday groupings and synonyms are Readyline data (FR-3).**
+`data/readyline-content/group-categories.json` maps the 38 classes to
+eight everyday headings (a test proves each class appears exactly once) and
+carries the question and the two-class hint; `synonyms` arrays were added
+to `registration-group-descriptions.json` with their own draft status so
+the PO's reviewed descriptions stay untouched. Search matches code, name,
+description and synonyms. The Commission's names, codes and audit types
+stay authoritative; the audit type is shown as a "desk audit" or "site
+audit" tag on each row instead of two long lists.
+
+**D-1304 The not-sure helper resolves in the schema (FR-4).** "Not sure"
+stays a valid answer (old drafts keep working and resolve to yes with the
+assumption shown, as before). A new optional `notSureHelper` with three
+booleans is required by the form when "not sure" is chosen;
+`resolveRestrictivePractices` turns the three answers into yes (any yes)
+or no (all no) and the assumption flag is set only when the resolution is
+yes. The adapter and result tests cover both paths; the result page wording
+now explains that the helper answers pointed to yes.
+
+**D-1305 Result-page grouping is Readyline data (FR-5).**
+`document-groups.json` assigns every document id to one of the four
+headings (test: all ids exactly once). The summary line counts documents
+and registers from the derived result and the "in practice" sentence per
+pathway is plain, claim-free copy.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
