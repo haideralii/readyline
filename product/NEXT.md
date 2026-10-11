@@ -84,6 +84,20 @@ PRs: #7 (REQ-004 Session C) is accepted but conflicts with `main` in `DECISIONS.
 
 5. STOP. Append your status below.
 
+## Queue (written by PO, 12 Oct 2026, batch 8)
+
+Merges done by the PO: PR #7 (REQ-004 Session C) is on `main`. PR #8 conflicts; PR #9 stays open as the REQ-005 working PR.
+
+1. **PR #8 conflict:** on `req-004-migrate-dburl`, merge `main` in (a merge commit is fine, D-033 force-push is not required), resolve `product/requirements/REQ-004-accounts-auth-tenancy.md` keeping both sides in order, run `npm run check`, push. The PO merges.
+
+2. **REQ-005 Session B recordings** on `req-005-generator` (rebase or merge `main` first): if `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` are present in `.env.local`, record the three reference generations as replay fixtures, run the red-team fixture for real once, note model cost per full generation in Delivery evidence, and commit the fixtures. Never print the key. If absent, write "waiting for Anthropic key" and continue to item 3.
+
+3. **REQ-005 Session C** on the same branch: generation for a signed-in owner behind `GENERATION_ENABLED` with the per-account quota (FR-9, SR-6); version sets and `document_versions` with the migration; private Supabase Storage bucket in Sydney with RLS on `storage.objects` and signed short-lived download URLs (SR-4, AC-7 test in the integration suite); zip download of the latest set plus the PDF summary; the reviewer view with per-section "which answers drove this" and regenerate-one-section with diff (FR-5, AC-6); `generation_log` with the retention rule (SR-5). Fill Delivery evidence with screenshots at 360x740 and desktop and the CI link. Also write the Session D fixed extras (register tables, service agreement template body, checklists) in the house style so no `[Provider to complete]` placeholder remains where fixed text was planned.
+
+4. **REQ-013 P1** on a new branch `req-013-first-time-ux` from `main`: items FR-1 to FR-5 and the acceptance criteria in the REQ. Keep REQ-003's e2e suite green; add the accessibility-tree test. Push; fill Delivery evidence with screenshots and the screen-reader walkthrough note. The PO opens the PR.
+
+5. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)
