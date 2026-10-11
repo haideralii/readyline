@@ -10,7 +10,11 @@
  */
 import { NextResponse, type NextRequest } from "next/server";
 
-export function buildCsp(nonce: string, isDev: boolean): string {
+export function buildCsp(
+  nonce: string,
+  isDev: boolean,
+  supabaseOrigin: string | null = supabaseOriginFromEnv(),
+): string {
   return [
     "default-src 'self'",
     // strict-dynamic lets scripts loaded by a nonced script run without listing hosts.
@@ -20,12 +24,23 @@ export function buildCsp(nonce: string, isDev: boolean): string {
     "img-src 'self' blob: data:",
     "font-src 'self'",
     // HMR in development uses a websocket; Supabase and Stripe origins are added in their REQs.
-    `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+    `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin}` : ""}${isDev ? " ws: wss:" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
   ].join("; ");
+}
+
+/** The Supabase project origin for connect-src (REQ-004 SR-2), or null when not configured. */
+export function supabaseOriginFromEnv(): string | null {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return null;
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
 }
 
 export function proxy(request: NextRequest) {

@@ -573,6 +573,86 @@ CI job. To apply the migration to the hosted project Haider runs
 and `npx supabase db push` (or pastes the file into the SQL editor once); this
 is a Session B prerequisite.
 
+**D-405 Session B hardening (Dev, 2026-10-11, PO Session A review).**
+`supabase/migrations/20261011010000_session_b_hardening.sql` adds the
+database-side mirror of the REQ-003 `BusinessStep` schema: `trading_name`
+1 to 120 characters, `business_structure` in the six answers, every element
+of `states` in the eight codes, `abn` exactly 11 digits or null. One owner
+account per user is enforced twice: a unique partial index on
+`memberships(user_id) where role = 'owner'` and an explicit check in
+`create_account()` that raises `this user already owns an account`. The
+app's `createAccountAction` returns the existing account instead of calling
+the function twice, so the error is only reachable by calling the RPC directly.
+
+**D-406 Magic-link limiter lives in Postgres.** `auth_rate_limit_hit(key,
+limit, window)` is a `security definer` function that upserts one row per
+key in `auth_rate_limits` and returns whether the call is within the limit;
+it is revoked from `anon` and `authenticated` so only the secret-key client
+can call it. Keys are `email:<sha256 of lower-cased email>` (5 per hour) and
+`ip:<address>` (20 per hour) per the accepted Dev response; the email
+itself never reaches the table or a log. A refused request returns the same
+"if that address can sign in" message as a sent one (AC-1, AC-6). The
+per-IP key uses the first `x-forwarded-for` entry, which Vercel sets; on a
+host that does not, every request shares the `unknown` bucket and the
+per-email limit still applies. The limiter fails closed: if the function is
+missing or the database is unreachable, no link is sent and the user still
+sees the generic message, with the error logged. This is what happened in
+the local e2e run against the hosted project before any migration was
+applied (PostgREST `PGRST202`, function not found).
+
+**D-407 Session and redirects.** The magic link lands on `/auth/callback`,
+which exchanges the code for a cookie session, then sends a user with no
+account to `/account/setup` and everyone else to the `next` path. `next`
+is accepted only when it is a same-origin path (`/` prefix, no `//` or
+`/\`, no line breaks) and falls back to `/account` (SR-3). `signOut`
+clears this device's session; `signOutEverywhere` uses Supabase's global
+scope, which revokes every refresh token for the user (FR-8). Both end at `/`.
+
+**D-408 Draft storage after sign-in (REQ-003 FR-3, REQ-004 AC-3).** The
+questionnaire layout asks for the viewer once per request: with an owned
+account the provider is given `mode="server"` and uses a `DraftStore`
+wrapping the `loadServerDraft` / `saveServerDraft` / `clearServerDraft`
+actions; otherwise the local store from REQ-003 is unchanged. A draft left on
+the device is moved to the account at two points: the "about your business"
+step (which also prefills from it) and, as a fallback, the provider's first
+load in server mode when the account has no draft yet. After a successful move
+the local copy is cleared. Drafts are not merged; the account's draft wins
+when both exist.
+
+**D-409 CSP `connect-src` gains the Supabase project origin only (SR-2).**
+`buildCsp` takes the origin derived from `NEXT_PUBLIC_SUPABASE_URL` at
+request time (origin only, no path, null when unset) and appends exactly that
+host; no wildcard. Unit tests in `src/proxy.test.ts`.
+
+**D-410 Migrations reach the hosted project through CI (replaces the manual
+step in D-404).** `.github/workflows/migrate.yml` runs on a push to `main`
+that touches `supabase/migrations/**` (and by hand via
+`workflow_dispatch`), links to project `dpwwzhylcyosnkmlcnnp` and runs
+`supabase db push --include-all`. It needs the repository secrets
+`SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`; while they are absent
+the job prints a notice and ends successfully without touching the database.
+`SECURITY.md` lists every secret and where it lives. `--include-all`
+applies every local migration the remote history does not know about, which
+is the right behaviour for the first run against an empty project.
+
+**D-411 Client bundle check (AC-8).** `scripts/ci/check-client-bundle.mjs`
+runs after `next build` in CI and locally as `npm run check:bundle`; it
+scans `.next/static` for the variable name `SUPABASE_SECRET_KEY`, the
+`sb_secret_` prefix and, when set, the secret value itself.
+
+**D-412 Branch stacking.** `req-004-accounts` is now stacked on
+`req-003-questionnaire` (D-031) because Session B reuses the REQ-003
+`BusinessStep` and `QuestionnaireDraft` schemas, the form primitives and
+the `DraftStore` interface. Merge order on GitHub: REQ-002, REQ-003, REQ-004.
+
+**D-413 Still not verified locally (extends D-404).** No Docker, CLI or
+database on the dev machine, so the hardening migration, the limiter
+function and `tests/integration/session-b.test.ts` have not executed here;
+they run in the `supabase-integration` CI job on this push. The magic-link
+journey through a real inbox is not covered by an automated test yet: the
+local stack's inbox (port 54324) exists only inside that CI job, and the
+`e2e/sign-in.spec.ts` tests cover the form, the generic response and the
+signed-out redirects on both viewports.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

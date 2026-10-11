@@ -21,6 +21,7 @@ import {
   type DraftStore,
 } from "@/lib/questionnaire/draft-store";
 import type { GroupOption } from "@/lib/questionnaire/groups";
+import { createServerDraftStore } from "./server-draft-store";
 import {
   ANSWERS_VERSION,
   type AnswerStepId,
@@ -51,14 +52,20 @@ const Ctx = createContext<QuestionnaireContext | null>(null);
 export function QuestionnaireProvider({
   groups,
   store,
+  mode = "local",
   children,
 }: {
   groups: GroupOption[];
   store?: DraftStore;
+  /** Signed-in owners keep the draft on the server (REQ-004); otherwise on this device. */
+  mode?: "local" | "server";
   children: ReactNode;
 }) {
   const storeRef = useRef<DraftStore>(
-    store ?? createLocalDraftStore(browserStorage),
+    store ??
+      (mode === "server"
+        ? createServerDraftStore()
+        : createLocalDraftStore(browserStorage)),
   );
   const [ready, setReady] = useState(false);
   const [answers, setAnswers] = useState<Answers>({});
@@ -67,8 +74,19 @@ export function QuestionnaireProvider({
 
   useEffect(() => {
     let cancelled = false;
+    const migrateLocal = async () => {
+      // AC-3: a draft started on this device moves to the account on first sign-in.
+      if (mode !== "server") return null;
+      const local = createLocalDraftStore(browserStorage);
+      const draft = await local.load().catch(() => null);
+      if (!draft) return null;
+      await storeRef.current.save(draft);
+      await local.clear().catch(() => undefined);
+      return draft;
+    };
     storeRef.current
       .load()
+      .then(async (draft) => draft ?? (await migrateLocal()))
       .then((draft) => {
         if (cancelled) return;
         if (draft) {
@@ -86,7 +104,7 @@ export function QuestionnaireProvider({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [mode]);
 
   const persist = useCallback(async (nextAnswers: Answers, step: StepId) => {
     const draft: QuestionnaireDraft = {

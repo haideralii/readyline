@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "check:bundle": "node scripts/ci/check-client-bundle.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

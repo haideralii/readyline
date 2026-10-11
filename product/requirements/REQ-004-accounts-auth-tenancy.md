@@ -142,6 +142,39 @@ Gate: `.env.local` contains `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PU
 
 **Local outputs:** see the Dev status in `product/NEXT.md` for the `npm run check` and `npm run build` results on this commit.
 
+### Session B (2026-10-11), branch `req-004-accounts` (now stacked on `req-003-questionnaire` at b2f1ee9, D-412)
+
+Gate unchanged: the three Supabase variables are present in `.env.local`; values never printed. The branch was rebased from REQ-002 onto REQ-003 because Session B reuses the questionnaire schemas, form primitives and `DraftStore` interface; Session A's two commits are unchanged in content. Merge order on GitHub: PR #2 (REQ-002), then REQ-003, then PR #4.
+
+**PO Session A review items**
+
+1. Database constraints mirroring the zod schema: `supabase/migrations/20261011010000_session_b_hardening.sql` adds checks for `trading_name` length 1 to 120, `business_structure` in the six answers, `states` elements in the eight codes, `abn` 11 digits or null (D-405). Covered by `tests/integration/session-b.test.ts` ("database constraints reject values the zod schema would reject").
+2. One owner account per user: unique partial index `memberships_one_owner_per_user` plus an explicit raise in `create_account()` (D-405). Covered by the same suite ("create_account works once per user and refuses a second owner account").
+3. PR #4 CI link: Dev cannot read GitHub Actions from this machine (no token; unauthenticated API returns 404), so the link is not attached here. The run to look at is the `supabase-integration` job on the latest push of `req-004-accounts`; it is the first execution of both the Session A RLS suite and the Session B suite.
+
+**Built**
+
+- Sign-in (FR-1, AC-1, AC-6): `/sign-in` page and form; `requestMagicLink` server action validates `{email, next}` strictly, runs the per-email and per-IP limiter (`auth_rate_limit_hit` in Postgres, D-406), calls `signInWithOtp` with a same-origin redirect, and returns the same generic message whether the address is known, unknown or limited. Logs carry only the SHA-256 of the lower-cased email.
+- Callback and session (FR-8, SR-3): `/auth/callback` exchanges the code, sends users without an account to `/account/setup` and others to a validated same-origin `next` path (`safeNextPath`, unit-tested in `src/server/auth/paths.test.ts`); `signOut` (this device) and `signOutEverywhere` (global scope) on the account page (D-407).
+- Account creation (FR-2, AC-3): `/account/setup` "About your business" prefilled from the local questionnaire draft, `createAccountAction` through `create_account()`; after creation the local draft is saved to the account with `saveServerDraft`, the local copy is cleared and the user resumes at the first incomplete step.
+- Server `DraftStore` (REQ-003 FR-3 storage swap): `/start` layout picks `mode="server"` for a signed-in owner; the provider wraps `loadServerDraft` / `saveServerDraft` / `clearServerDraft` and migrates a leftover local draft on first load (D-408). Questionnaire UI unchanged.
+- Settings (FR-5): `/account` edits trading name, structure, states and ABN through `updateAccountAction` (owner-only by RLS, audit row written). Header shows "Sign in" or "Account" from the session.
+- CSP (SR-2): `connect-src` gains exactly the Supabase project origin derived from `NEXT_PUBLIC_SUPABASE_URL` (D-409); `src/proxy.test.ts`.
+- AC-8: `scripts/ci/check-client-bundle.mjs` scans `.next/static` after the build in CI and as `npm run check:bundle` (D-411). Local result on this build: 21 client files scanned, no secret material.
+- Migration deploy: `.github/workflows/migrate.yml` (push to `main` touching `supabase/migrations/**`, or by hand); project `dpwwzhylcyosnkmlcnnp`; needs `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` as repository secrets and skips with a notice until they exist (D-410). `SECURITY.md` now has a table of every secret, who uses it and where it lives.
+- Tests: `tests/integration/session-b.test.ts` (limiter 5 allowed then refused, limiter unreachable with the publishable key, second account refused, four constraint violations, draft round trip); `e2e/sign-in.spec.ts` (form validation and generic response, signed-out redirects for `/account` and `/account/setup`, header link) on both viewports; unit tests for `safeNextPath`, `clientIp` and the CSP origin.
+
+**Local outputs on this commit**
+
+- `npm run check`: lint clean, Prettier clean, typecheck clean, 22 unit files / 244 tests passed.
+- `npm run build`: success; all routes dynamic (`/`, `/account`, `/account/setup`, `/auth/callback`, `/sign-in`, `/start`, `/start/[step]`).
+- `npm run check:bundle`: 21 files scanned, no hits.
+- Playwright in CI mode (production server, one worker): 38 passed, 2 skipped (screenshot captures), both projects. Note: with the default parallel dev-server run on this machine the desktop project timed out on `page.goto` during cold compiles; the production-server run is the one that matches CI.
+- During the e2e run the sign-in action reached the hosted project and logged `PGRST202` (function `auth_rate_limit_hit` not found): no migration has been applied there yet, so the limiter failed closed and no email was sent (D-406). Sign-in on the hosted project starts working once `migrate.yml` has run with the two secrets.
+
+**Not verified locally (D-413):** the two migrations, the limiter function and both integration suites have not executed on this machine (no Docker, CLI or database); the `supabase-integration` job on this push is their first run. The end-to-end magic-link journey through a real inbox has no automated test yet.
+
+**For Haider:** add the GitHub repository secrets `SUPABASE_ACCESS_TOKEN` (Supabase dashboard, Account, Access tokens) and `SUPABASE_DB_PASSWORD` (project settings, Database). After the REQ-004 merge the migration workflow applies both migrations; until then the account pages cannot create an account against the hosted project.
 ## PO review
 
 **11 Oct 2026, Dev response review (on `req-004-accounts`, 2c5f6de): ACCEPTED; build approved once Haider's Supabase project exists.** Decisions: own per-email and per-IP limiter in front of Supabase (accepted, with the hashed-email key); Vercel Cron purge route protected by `CRON_SECRET` (accepted); Supabase CLI local stack in CI with the integration project (accepted; if it exceeds the 20-minute budget, split into its own job). Haider will supply, by name: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; `CRON_SECRET` is generated by Dev. The REQ-003 build does not depend on these; REQ-004 Session A may start as soon as `.env.local` has them. Status: `in progress` once the build starts.

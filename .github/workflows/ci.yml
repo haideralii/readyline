@@ -46,6 +46,8 @@ jobs:
       - run: npm test
 
       - run: npm run build
+      - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
+        run: node scripts/ci/check-client-bundle.mjs
 
       - name: Install Playwright (Chromium only)
         run: npx playwright install --with-deps chromium
