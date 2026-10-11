@@ -1,12 +1,13 @@
 /**
- * Product name placeholder. The final name is chosen by Haider after checking
- * the ASIC business name register and IP Australia's trade mark search.
- * It must not contain "NDIS" (CLAUDE.md section 4.1).
+ * Product name. "Readyline" was chosen by Haider on 2026-10-11 after ASIC,
+ * IP Australia and auDA checks (DECISIONS D-020, D-027). It must not contain
+ * "NDIS" (CLAUDE.md section 4.1). `NEXT_PUBLIC_BRAND_NAME` remains an
+ * override for previews or a future rename.
  */
-export const BRAND_PLACEHOLDER = "{{BRAND}}";
+export const BRAND_DEFAULT = "Readyline";
 
 export const BRAND =
-  process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || BRAND_PLACEHOLDER;
+  process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || BRAND_DEFAULT;
 
 /**
  * Plain-language statement required on the site footer and in every generated
