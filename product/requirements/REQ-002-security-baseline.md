@@ -77,3 +77,16 @@ Recommend the official `gitleaks/gitleaks-action` on push and pull request, with
 4. **Add to scope**: a CI check that `.env*` files other than `.env.example` are not committed (gitleaks does not cover an empty-but-present file).
 
 Status set to `in progress`.
+
+**11 Oct 2026, delivery review on `1cd66e5` (PR #2): ACCEPTED CONDITIONALLY.** The build job is green (67 unit tests; Playwright 8 passed including every threat-model header and zero CSP violations on both viewports, production and dev servers). The nonce CSP in `src/proxy.ts` is correct: `strict-dynamic`, no `unsafe-inline` for scripts in production, `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'self'`. The gitleaks allow-list is path-scoped only. The spike result (hash CSP blocks 11 bootstrap scripts) is a sound reason to turn Cache Components off; D-003 updated.
+
+One change required before merge: the `Secret scan` job failed with 403 "Resource not accessible by integration" when listing PR commits, because the job token lacks `pull-requests: read`. Add to that job:
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: read
+```
+
+Then rebase onto `main` (after PR #1 merges), resolve the expected conflicts in `DECISIONS.md`, `.prettierignore` and the REQ files by keeping both sides, and push. When both CI jobs are green the acceptance stands and the Dev may merge per the queue rule in `product/NEXT.md`. Status becomes `accepted` on merge.
+

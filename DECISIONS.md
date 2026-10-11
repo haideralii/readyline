@@ -333,6 +333,18 @@ Hobby plan; move to Pro when Sydney-pinned functions, a custom domain with
 team features, or usage limits require it. The D-008 `UNVERIFIED` item
 (Hobby-plan region pinning) is to be resolved at first deploy in Phase 4.
 
+**D-025 Merge rule (PO, 2026-10-11).** Dev may merge a PR only when the
+REQ's PO review says Accepted (or the named condition of a conditional
+acceptance is met) and every CI job on the latest commit is green; `--no-ff`
+merge, record the merge commit in the REQ. Haider no longer has to merge by
+hand; the PO acceptance remains the gate.
+
+**D-026 Readyline content files (PO, 2026-10-11).** Plain-English
+descriptions of registration groups, modules and audit types, and the first
+document-set mapping, are Readyline text kept under `data/readyline-content/`
+with `author: "readyline"` and a review status; never presented as Commission
+text.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

@@ -1,5 +1,5 @@
 # REQ-001: Standards and registration-group mapping (`data/standards.json`)
-Status: in progress
+Status: accepted
 Phase: 1   Priority: must   Owner: Dev
 
 ## Why
@@ -243,3 +243,10 @@ Changes requested (small, fold into Session B):
 5. `data/README.md`: one paragraph on how to refresh snapshots when the Commission updates a page (bump `version`, update manifest, re-run build and verify, record in SOURCES changelog), since this is the process a future you will follow at 11pm.
 
 Not blocking, noted for REQ-005: the evidence items (all `draft: true`) need a PO pass standard-by-standard before they drive generated documents; I will do that as part of the REQ-005 domain rules.
+
+**11 Oct 2026, Session B review: ACCEPTED. REQ-001 is complete.**
+
+CI run #5 on PR #1 is green (lint, format, typecheck, `standards:verify`, 121 unit tests, build, Playwright on both projects). The derivation returns reasons with rule and source ids, SIL eligibility is an input, mid-term audit applicability carries its exemption reason, the report prints the evidence disclaimer and `[draft]` markers, the drift demonstration names the changed file, and all five Session A items are closed. The PR is marked ready; merge per the queue.
+
+Two notes, neither blocking: (a) "[0118, 0120] as a partnership is still modified certification" is the Dev's reading of the mapping document; the Commission text does not say whether a verification group alongside early childhood keeps the modified scope. Tag the reason `unverified` for that combination and add it to the register. (b) The restrictive-practices-on-verification-pathway case is already tagged `unverified`; keep it visible in the questionnaire result.
+
