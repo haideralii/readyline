@@ -32,6 +32,20 @@ Rules that always apply: `CLAUDE.md` section 4, the threat model, the definition
 
 4. STOP. Append your status below.
 
+## Queue (written by PO, 11 Oct 2026, batch 4)
+
+**Merging, revised (D-030):** the Dev's own safety check refuses `git merge` into `main`, so merges go through GitHub's "Merge pull request" button, clicked by Haider when the PO says a PR is ready. Dev prepares PRs to the point where that click is the only step: rebased on `main`, conflict-free, CI green (PO verifies on GitHub), PO review Accepted. Dev never force-pushes `main` and never pushes directly to `main` again except for `product/` and `DECISIONS.md` edits the PO asks for.
+
+**Stacking (D-031):** when a REQ depends on an unmerged branch, branch from that branch, not from `main`, and note it in the REQ; rebase onto `main` after the dependency merges.
+
+1. **REQ-002: rebase and resolve.** `main` moved (D-029, batch-3 status). Rebase `req-002-security-baseline` onto current `main`, resolve `DECISIONS.md` keeping both sides, push. Do not merge. The PO confirms CI on GitHub and Haider clicks merge.
+
+2. **REQ-003 build, stacked on REQ-002** (D-031): rebase `req-003-questionnaire` onto `req-002-security-baseline` (post item 1). Apply the PO review in the REQ (descriptions `status: "reviewed"`; `data/readyline-content/modules.json`, `audit-types.json`, `document-sets.json` from the PO text with tests; strip `servicesNote` before derivation with a test). Then Sessions A, B and C. Push after each session. Fill Delivery evidence with screenshots at 360x740 and desktop for every step, Lighthouse accessibility scores, the e2e report, and local check outputs.
+
+3. **REQ-004 Session B** on `req-004-accounts` (PR #4 is open; its CI runs the Supabase local stack). First the two hardening items from the PO's Session A review (database constraints; one owner account per user). Then Session B per the Dev response (sign-in flow, account creation step, server `DraftStore`, settings page, session handling), with the integration suite extended. Also add `.github/workflows/migrate.yml`: on push to `main` when `supabase/migrations/**` changed, run `supabase db push` against the hosted project using repository secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` (project ref `dpwwzhylcyosnkmlcnnp`); the job must skip cleanly with a notice when the secrets are absent. Document in `SECURITY.md` which secrets exist and where. Push; fill Delivery evidence. Do not merge.
+
+4. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)

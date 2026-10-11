@@ -373,6 +373,19 @@ ap-southeast-2 (Oceania, Sydney), Free plan, "automatically expose new
 tables" off, automatic RLS on, GitHub integration not connected. New API key
 format (publishable and secret keys); env names in REQ-004 SR-5.
 
+**D-030 Merges via GitHub (PO, 2026-10-11).** The Dev's safety check refuses
+local merges into `main`; merges are done with GitHub's merge button by
+Haider when the PO confirms CI green and the REQ is Accepted. D-025 and D-028
+are narrowed accordingly: Dev prepares, PO verifies, Haider clicks.
+
+**D-031 Stacked branches (PO, 2026-10-11).** A REQ that depends on an
+unmerged branch is branched from it and rebased after the dependency merges.
+
+**D-032 Hosted migrations by workflow (PO, 2026-10-11).** Migrations reach the
+hosted Supabase project through a GitHub Actions job on `main`, using the
+`SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` repository secrets that
+Haider sets, not by hand from a laptop.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
