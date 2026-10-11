@@ -159,6 +159,21 @@ Decisions applied: `participant-money-and-property-procedure` and the new `suppo
 **Local outputs:** `npm run check` clean (28 files, 282 tests), typecheck clean, Prettier clean. No model calls exist yet.
 
 
+### Session B preparation (2026-10-12), same branch
+
+**Waiting for Anthropic key.** `.env.local` has neither `ANTHROPIC_API_KEY` nor `ANTHROPIC_MODEL` (presence checked by name, values never read), so no real generation was recorded and there is no cost note yet (D-515). Everything up to the harness is delivered:
+
+- `context-pack.ts`: strict `ContextPack` (facts, document, section, standards verbatim, register titles) and `buildContextPack` (D-512). Exclusion test (SR-3): Proxy-traced access shows `supports.servicesNote` and the step-5 answers are never read; a canary in the services note is absent from the pack and both prompts; the schema rejects a `participants` key and an extra fact.
+- `prompts.ts`: `PROMPT_VERSION` 2026-10-12.1; system prompt = house style verbatim + output contract; user prompt with delimited, length-capped FACTS, STANDARDS and REGISTERS blocks; `requestHash` over canonical JSON (D-512, D-502).
+- `model-client.ts`: `ReplayClient`, `RecordingClient`, `FakeClient`, `AnthropicClient` (lazy SDK import, record mode only), `createModelClient` defaulting to replay (D-513). Tests: missing fixture throws with the expected path; record then replay round-trips through a temp directory; mode selection needs both the flag and a key.
+- `generate-section.ts`: parse, validate, section-id check, lint gate, one retry with the problems, fallback with the "Review and complete" marker, readability on accepted prose (D-514). Tests cover accept, claim-then-accept on retry, double failure to fallback, and schema paths in messages.
+- Red-team fixture `fixtures/red-team/injected-trading-name.json` and `red-team.test.ts` (SR-2, AC-4): same structure as the clean case, injected text only inside FACTS, fake participant details never in any prompt, an obeying reply rejected and replaced by the fallback.
+- `record-fixtures.test.ts` + `npm run generation:record`: skipped without `GENERATION_RECORD=1`, the key and the model id; records the governance policy's tailored sections for the three cases and prints token totals. `fixtures/generation/README.md` documents the layout. `.env.example` gains `GENERATION_ENABLED` and `GENERATION_RECORD`.
+- Dependency: `@anthropic-ai/sdk` 0.133.0.
+
+**Local outputs:** generator folder 48 tests passed, 1 skipped (the recorder); `npm run check` clean (counts in the batch-7 Dev status); no network call is possible in CI because the key is absent and the client defaults to replay.
+
+**Haider:** supply `ANTHROPIC_API_KEY` (console key in a workspace with a monthly spend cap) and `ANTHROPIC_MODEL` into `.env.local`; Dev then runs the recorder, commits the first fixtures and writes the cost note.
 ## PO review
 (PO fills in.)
 

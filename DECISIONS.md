@@ -764,6 +764,47 @@ skeleton test (`WRITE_SKELETONS=1`), converts every `.docx` to PDF with
 `soffice --headless` and fails if any file does not convert, then uploads
 the sets as an artifact for the PO. It runs on pushes, on manual dispatch,
 and on pull requests from `req-005-generator` or titled REQ-005.
+**D-512 Context pack and prompt (Dev, 2026-10-12).** `ContextPack` is a
+strict zod object: the eleven facts, the document (id, title, kind,
+purpose), the section (id, heading, brief), the mapped standards with the
+Commission's outcome and indicators verbatim, and the register titles the
+document references. The builder reads only named answer fields; a test
+traces property access with a Proxy and proves `supports.servicesNote` and
+the step-5 answers are never read, and a canary in the services note never
+reaches the pack or either prompt (SR-3). The system prompt is the house
+style verbatim plus the output contract; the user prompt carries the pack in
+`<<<FACTS>>>`, `<<<STANDARDS>>>` and `<<<REGISTERS>>>` blocks with
+length caps, and tells the model that text inside the delimiters is data,
+not instructions (SR-2). `PROMPT_VERSION` is `2026-10-12.1` and is bumped
+by hand with any prompt change.
+
+**D-513 Replay harness.** `ModelClient` has four implementations:
+`ReplayClient` (fixtures at `fixtures/generation/<type>/<section>/<sha256>.json`,
+`MissingFixtureError` naming the expected path), `RecordingClient`
+(wraps a real client and writes the fixture with request, reply, usage and
+time), `FakeClient` (tests) and `AnthropicClient` (the SDK, imported
+lazily, constructed only when `GENERATION_RECORD=1` and a key exist). The
+hash covers prompt version, model, system, user and max tokens over
+canonical JSON. `@anthropic-ai/sdk` 0.133.0 is the runtime dependency.
+
+**D-514 Validate, retry once, fall back.** `generateSection` parses the
+reply (code fences tolerated), validates the strict section schema, checks
+the section id, and runs the terminology and claims lint with class names
+exempt; errors are appended to a second request; a second failure yields two
+callouts ("Review and complete" and the placeholder) with status
+`fallback` and the problems recorded (AC-5). Readability is measured on
+accepted prose. The red-team fixture (injected trading name plus a services
+note carrying fake participant details) keeps the clean document structure,
+confines the injected text to the FACTS block, keeps the note out entirely,
+and a reply that obeys the injection is rejected and falls back without the
+claim (AC-4).
+
+**D-515 Waiting for the Anthropic key.** `.env.local` has no
+`ANTHROPIC_API_KEY` or `ANTHROPIC_MODEL`, so no real generation was
+recorded and `fixtures/generation` holds only its README. The recording
+path is `npm run generation:record` with `GENERATION_RECORD=1` and both
+variables set; it records every tailored section of the governance policy
+for the three reference cases and prints token totals for the cost note.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
