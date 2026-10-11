@@ -194,6 +194,11 @@ Decisions applied: `participant-money-and-property-procedure` and the new `suppo
 **Local outputs:** `npm run check` clean; `npm run build` ok with the four new routes; bundle check 28 files clean; Playwright 50 passed, 2 skipped.
 
 **Not delivered in this session, and why:** screenshots at 360x740 and desktop of the documents pages need a signed-in session against a database with this migration applied; the hosted project has no migrations yet (PR #8 pending) and the dev machine has no local stack, so only the signed-out states could be captured, which show the sign-in page. The CI link cannot be read from this machine. Both are owed on the next session once PR #8 is merged and the migrations have run.
+### Batch 9 items 3 and 4 (2026-10-12)
+
+**Item 3, owed Session C evidence.** CI for f9d89fa: the PO reports all four jobs green; the runs are listed at https://github.com/haideralii/readyline/actions?query=branch%3Areq-005-generator (Dev cannot read Actions from this machine, so the run id is not pasted). Screenshots of the documents pages: a local `supabase start` stack needs Docker, which the dev machine does not have, and the hosted project now carries the three REQ-004 migrations but a session there needs a magic-link email delivered to Dev, which is not possible here. So a signed-in session against the hosted project is needed and this item stops here, as the queue allows; the coming-soon state renders as soon as any signed-in owner opens `/documents`.
+
+**Item 4, Session B recordings.** Waiting for key: `.env.local` has neither `ANTHROPIC_API_KEY` nor `ANTHROPIC_MODEL` (checked by name).
 ## PO review
 (PO fills in.)
 
