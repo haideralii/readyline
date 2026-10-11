@@ -176,6 +176,8 @@ For Haider: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` into `.env.local`; merge P
 
 3. **REQ-005 Session C owed evidence**: now that the hosted database has the three migrations and `/documents` exists on `req-005-generator`, capture the documents-page screenshots (coming-soon state is enough while `GENERATION_ENABLED` is off) at 360x740 and desktop against a local `supabase start` stack, and paste the CI link for f9d89fa into Delivery evidence. If a signed-in session against the hosted project is needed instead, say so and stop that item.
 
+**Anthropic key rule (D-039, applies from now on):** the key in `.env.local` has a $5 cap and is for PO-approved recordings only. Dev may call the Anthropic API only when a queue item says "record", only for the cases that item names, once per case; never in CI, never in a loop or retry beyond the pipeline's single validate-retry, never from tests (replay fixtures only, D-512), never to "try" prompts. Before recording, print the estimated token count; after recording, write the real tokens and dollars into Delivery evidence. If any item would need more than three model calls in total, stop and ask the PO.
+
 4. **REQ-005 Session B recordings**: only if `.env.local` now has `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (check by name). Record the three reference cases, commit the fixtures, and write the cost note (input and output tokens and dollars per case). If the key is still absent, write "waiting for key" and move on.
 
 5. STOP. Append your status below.

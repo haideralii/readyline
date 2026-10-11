@@ -802,3 +802,9 @@ Items asserted in code or copy that still need a primary source.
   anonymously and shared runners hit the rate limit. Re-run succeeded and applied
   the three migrations on `main`. Decision: pin the CLI version in every workflow
   and pass the job token to the action; `latest` is not used in CI.
+- D-039 (PO, 2026-10-12): Anthropic key budget. Haider's personal console key,
+  $5 prepaid with a $5 monthly cap, model `claude-sonnet-5-5`. Dev calls the
+  API only for recordings that a queue item names, one call per case, never
+  from CI, tests or exploratory runs; real token and dollar counts go into
+  Delivery evidence after every recording. The cap is the hard stop; the PO
+  raises it only after seeing the first cost note.
