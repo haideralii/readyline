@@ -291,11 +291,20 @@ files). REQ-002 may run in parallel with REQ-001. Derivation signature
 extended with SIL exclusion input and rule reasons; AC-8 to AC-10 added to
 REQ-001.
 
+**D-023 Supabase confirmed (Haider, 2026-10-11).** Supabase in ap-southeast-2
+(Sydney) for Postgres and Auth, per D-007. Phase 2 may provision the project.
+Free tier to start; upgrade when row count or auth volume requires it.
+
+**D-024 Vercel Hobby plan to start (Haider, 2026-10-11).** Deploy on the free
+Hobby plan; move to Pro when Sydney-pinned functions, a custom domain with
+team features, or usage limits require it. The D-008 `UNVERIFIED` item
+(Hobby-plan region pinning) is to be resolved at first deploy in Phase 4.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
-2. Confirm Supabase over Neon (D-007) before Phase 2 provisions a project.
-3. Vercel plan, which decides whether Sydney region pinning is available (D-008).
+2. ~~Confirm Supabase over Neon~~ Resolved: Supabase (D-023).
+3. ~~Vercel plan~~ Resolved: Hobby to start (D-024); verify region pinning at first deploy.
 4. Legal entity line for the footer and documents once the ABN exists.
 5. Email provider for Phase 5 reminders (D-013).
 
