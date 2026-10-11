@@ -36,6 +36,10 @@ Phase: n   Priority: must | should | could   Owner: Dev
 ## PO review
 ```
 
+## The work queue (`product/NEXT.md`)
+
+To reduce hand-offs, the PO keeps an ordered queue in `product/NEXT.md`. Haider starts a Cursor session with "Work through product/NEXT.md in order, pushing after each item, until it says STOP." Dev works the queue, pushes each item to its branch (CI runs on the PR), fills in the REQ evidence, and appends a status at the bottom of `NEXT.md`. The PO then reviews everything in one batch, writes the next queue, and Haider says "go" again. Only the PO edits the queue; Dev edits only the "Dev status" section.
+
 ## Communication rules
 
 - Dev never guesses regulatory content; anything not from a primary source is tagged `UNVERIFIED` and listed in the REQ.
