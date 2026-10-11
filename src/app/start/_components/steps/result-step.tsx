@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { BRAND } from "@/lib/brand";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
@@ -11,7 +12,7 @@ const HAVE_LABEL: Record<string, string> = {
   yes: "You said you have this",
   no: "You said you do not have this yet",
   "not-sure": "You were not sure",
-  unknown: "Not asked yet",
+  unknown: "To prepare",
 };
 
 type Fetch = {
@@ -221,9 +222,13 @@ function ResultView({
         <h2 id="documents-heading" className="text-xl font-semibold">
           Documents you will need ({r.documents.length})
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          A first-pass list from the modules above. Items marked from what you
-          told us in the last step.
+        <p
+          className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          data-testid="have-legend"
+        >
+          A first-pass list from the modules above. &ldquo;You said&rdquo;
+          labels come from your answers in the last step; &ldquo;To
+          prepare&rdquo; means the questionnaire did not ask about that item.
         </p>
         <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
           {r.documents.map((d) => (
@@ -244,6 +249,9 @@ function ResultView({
         <h2 id="registers-heading" className="text-xl font-semibold">
           Registers to keep after registration
         </h2>
+        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          Same labels as the documents list.
+        </p>
         <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
           {r.registers.map((x) => (
             <li
@@ -265,6 +273,21 @@ function ResultView({
       >
         {r.notice}
       </p>
+
+      <section
+        aria-labelledby="next-heading"
+        className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+        data-testid="what-next"
+      >
+        <h2 id="next-heading" className="text-xl font-semibold">
+          What happens next
+        </h2>
+        <p className="mt-2 leading-7">
+          {BRAND} will draft these documents for you and keep your registers
+          audit-ready. Sign-in and the document pack are coming in the next
+          releases.
+        </p>
+      </section>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
