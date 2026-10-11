@@ -3,6 +3,12 @@
  * Form primitives for the questionnaire. Every control has a visible label,
  * optional help text and an inline error, all wired with aria-describedby;
  * touch targets are at least 44px (frontend-dev skill, AC-9, AC-11).
+ *
+ * REQ-013 FR-2: every radio and checkbox takes its accessible name from its
+ * visible label text only (aria-labelledby), with help text and secondary
+ * text (such as a class code) in aria-describedby, and every group is a
+ * fieldset with a legend, so a screen reader announces the question and then
+ * the human label of each option.
  */
 import { useEffect, useRef, type ReactNode } from "react";
 
@@ -66,7 +72,7 @@ export function TextInput(props: {
   describedBy?: string;
   invalid: boolean;
   autoComplete?: string;
-  inputMode?: "text" | "numeric";
+  inputMode?: "text" | "numeric" | "search";
   maxLength?: number;
 }) {
   const { onChange, describedBy, invalid, ...rest } = props;
@@ -154,6 +160,78 @@ export type Option<V extends string> = {
   help?: string;
 };
 
+/** A radio or checkbox row: the visible label is the accessible name; help is a description. */
+export function ChoiceRow({
+  id,
+  type,
+  name,
+  value,
+  checked,
+  onChange,
+  label,
+  help,
+  secondary,
+  tag,
+}: {
+  id: string;
+  type: "radio" | "checkbox";
+  name: string;
+  value: string;
+  checked: boolean;
+  onChange: () => void;
+  label: ReactNode;
+  help?: ReactNode;
+  /** Secondary text shown before the label, such as a class code; part of the description, not the name. */
+  secondary?: ReactNode;
+  tag?: ReactNode;
+}) {
+  const labelId = `${id}-label`;
+  const helpId = help ? `${id}-help` : undefined;
+  const secondaryId = secondary ? `${id}-secondary` : undefined;
+  const describedBy =
+    [secondaryId, helpId].filter(Boolean).join(" ") || undefined;
+  return (
+    <label
+      htmlFor={id}
+      className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
+    >
+      <input
+        type={type}
+        id={id}
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onChange}
+        aria-labelledby={labelId}
+        aria-describedby={describedBy}
+        className="mt-1 h-5 w-5 shrink-0"
+      />
+      <span className="min-w-0">
+        <span className="block text-base">
+          {secondary ? (
+            <span
+              id={secondaryId}
+              className="mr-2 font-mono text-sm text-zinc-500 dark:text-zinc-400"
+            >
+              {secondary}
+            </span>
+          ) : null}
+          <span id={labelId}>{label}</span>
+          {tag}
+        </span>
+        {help ? (
+          <span
+            id={helpId}
+            className="block text-sm text-zinc-600 dark:text-zinc-400"
+          >
+            {help}
+          </span>
+        ) : null}
+      </span>
+    </label>
+  );
+}
+
 export function RadioGroup<V extends string>({
   name,
   legend,
@@ -191,34 +269,19 @@ export function RadioGroup<V extends string>({
         </p>
       ) : null}
       <div className="mt-2 flex flex-col gap-2" id={name}>
-        {options.map((o) => {
-          const id = `${name}-${o.value}`;
-          return (
-            <label
-              key={o.value}
-              htmlFor={id}
-              className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
-            >
-              <input
-                type="radio"
-                id={id}
-                name={name}
-                value={o.value}
-                checked={value === o.value}
-                onChange={() => onChange(o.value)}
-                className="mt-1 h-5 w-5 shrink-0"
-              />
-              <span>
-                <span className="block text-base">{o.label}</span>
-                {o.help ? (
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">
-                    {o.help}
-                  </span>
-                ) : null}
-              </span>
-            </label>
-          );
-        })}
+        {options.map((o) => (
+          <ChoiceRow
+            key={o.value}
+            id={`${name}-${o.value}`}
+            type="radio"
+            name={name}
+            value={o.value}
+            checked={value === o.value}
+            onChange={() => onChange(o.value)}
+            label={o.label}
+            help={o.help}
+          />
+        ))}
       </div>
       {errors.length ? (
         <p
@@ -287,9 +350,12 @@ export function CheckboxGroup<V extends string>({
                 value={o.value}
                 checked={values.includes(o.value)}
                 onChange={() => toggle(o.value)}
+                aria-labelledby={`${id}-label`}
                 className="h-5 w-5 shrink-0"
               />
-              <span className="text-base">{o.label}</span>
+              <span id={`${id}-label`} className="text-base">
+                {o.label}
+              </span>
             </label>
           );
         })}

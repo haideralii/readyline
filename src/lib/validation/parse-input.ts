@@ -16,12 +16,12 @@ import { z } from "zod";
 export const strictObject = z.strictObject;
 
 /** Trimmed free text with a hard length cap; control characters are rejected. */
-export function text(max: number, min = 0) {
+export function text(max: number, min = 0, requiredMessage?: string) {
   return z
-    .string()
+    .string({ error: requiredMessage ?? "Enter text only" })
     .trim()
-    .min(min)
-    .max(max)
+    .min(min, requiredMessage)
+    .max(max, `Use ${max} characters or fewer`)
     .refine((s) => !/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(s), {
       message: "Control characters are not allowed",
     });

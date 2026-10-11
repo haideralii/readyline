@@ -6,6 +6,7 @@ import { SIL_CODE, SupportsStep } from "@/lib/questionnaire/schema";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { parseInput } from "@/lib/validation";
 import {
+  ChoiceRow,
   ErrorSummary,
   Field,
   ParticipantDataWarning,
@@ -109,44 +110,28 @@ export function SupportsStepForm() {
     router.push(stepHref("practices"));
   }
 
-  const renderGroup = (g: (typeof groups)[number]) => {
-    const id = `group-${g.code}`;
-    return (
-      <li key={g.code}>
-        <label
-          htmlFor={id}
-          className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
-        >
-          <input
-            type="checkbox"
-            id={id}
-            name="groups"
-            value={g.code}
-            checked={selected.includes(g.code)}
-            onChange={() => toggle(g.code)}
-            className="mt-1 h-5 w-5 shrink-0"
-          />
-          <span>
-            <span className="block text-base">
-              <span className="font-mono text-sm text-zinc-500 dark:text-zinc-400">
-                {g.code}
-              </span>{" "}
-              {g.name}
-              {g.mandatoryFrom ? (
-                <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-                  registration mandatory from 1 July 2026
-                </span>
-              ) : null}
+  const renderGroup = (g: (typeof groups)[number]) => (
+    <li key={g.code}>
+      <ChoiceRow
+        id={`group-${g.code}`}
+        type="checkbox"
+        name="groups"
+        value={g.code}
+        checked={selected.includes(g.code)}
+        onChange={() => toggle(g.code)}
+        label={g.name}
+        secondary={g.code}
+        help={g.description}
+        tag={
+          g.mandatoryFrom ? (
+            <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+              registration mandatory from 1 July 2026
             </span>
-            <span className="block text-sm text-zinc-600 dark:text-zinc-400">
-              {g.description}
-            </span>
-          </span>
-        </label>
-      </li>
-    );
-  };
-
+          ) : null
+        }
+      />
+    </li>
+  );
   const groupsErrors = errorsFor(errors, "groups");
 
   return (
