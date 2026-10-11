@@ -8,6 +8,8 @@ Rules that always apply: `CLAUDE.md` section 4, the threat model, the definition
 
 ## Queue (written by PO, 11 Oct 2026, batch 2)
 
+0. **Brand name: Readyline** (D-020), on `req-001-standards-mapping` before item 1. Make `Readyline` the default in `src/lib/brand.ts` with `NEXT_PUBLIC_BRAND_NAME` kept as an override; update the brand tests (including `isBrandNameAllowed("Readyline")`); set the value in `.env.example`; replace the literal `{{BRAND}}` in `data/standards.meta.json` / the generated `evidenceDisclaimer` and anywhere else it is stored, so the dataset and the report print "Readyline" (prefer substituting the brand constant at render time where the text is rendered by the app; regenerate the dataset where it is stored). Add the `<title>` and footer wording "Readyline" with the descriptive NDIS line unchanged. Record as D-027.
+
 1. **Merge PR #1** (REQ-001, accepted). Apply the two non-blocking notes from the PO's Session B review first (tag the [0118 + verification group] partnership case `unverified`; keep the restrictive-practices note visible) in one small commit, confirm CI green, then merge per the merge rule.
 
 2. **REQ-002 fix and merge** on `req-002-security-baseline`: add `permissions: { contents: read, pull-requests: read }` to the Secret scan job; rebase onto the new `main`; resolve conflicts keeping both sides; push; when both jobs are green, merge per the merge rule (the PO's conditional acceptance names exactly this condition).
