@@ -657,6 +657,13 @@ signed-out redirects on both viewports.
 other prose files. Feature branches may be squashed and force-pushed with
 `--force-with-lease` before merge; `main` is never force-pushed.
 
+**D-034 Repository secrets set (Haider, 2026-10-11).** `SUPABASE_ACCESS_TOKEN`
+(scoped token: Readyline org, project read, database migrations read-write,
+nothing else; expires 2027-01-09, rotate before then) and
+`SUPABASE_DB_PASSWORD` (reset on 2026-10-11) exist as GitHub Actions
+repository secrets for `migrate.yml`. Values live only in GitHub and
+Haider's password manager.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
