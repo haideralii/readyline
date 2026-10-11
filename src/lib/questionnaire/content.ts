@@ -9,6 +9,7 @@ import auditTypesJson from "../../../data/readyline-content/audit-types.json";
 import documentSetsJson from "../../../data/readyline-content/document-sets.json";
 import modulesJson from "../../../data/readyline-content/modules.json";
 import groupDescriptionsJson from "../../../data/registration-group-descriptions.json";
+import groupCategoriesJson from "../../../data/readyline-content/group-categories.json";
 
 const reviewed = {
   note: z.string().min(1),
@@ -66,9 +67,30 @@ export const GroupDescriptionsContent = z.object({
         code,
         name: z.string().min(1),
         description: z.string().min(20),
+        /** Everyday search words (REQ-013 FR-3); Readyline text, never change the class. */
+        synonyms: z.array(z.string().min(1)).optional(),
       }),
     )
     .length(38),
+});
+
+/** Everyday groupings of the classes for the supports step (REQ-013 FR-3). */
+export const GroupCategoriesContent = z.object({
+  note: z.string(),
+  author: z.literal("readyline"),
+  status: z.string(),
+  question: z.string().min(1),
+  hint: z.object({ text: z.string().min(1), selects: z.array(code).min(1) }),
+  categories: z
+    .array(
+      z.object({
+        id: slug,
+        title: z.string().min(1),
+        description: z.string().min(1),
+        codes: z.array(code).min(1),
+      }),
+    )
+    .min(1),
 });
 
 export const modulesContent = ModulesContent.parse(modulesJson);
@@ -77,6 +99,8 @@ export const documentSetsContent = DocumentSetsContent.parse(documentSetsJson);
 export const groupDescriptionsContent = GroupDescriptionsContent.parse(
   groupDescriptionsJson,
 );
+export const groupCategoriesContent =
+  GroupCategoriesContent.parse(groupCategoriesJson);
 
 export function moduleDescription(moduleId: string): string | undefined {
   return modulesContent.items.find((m) => m.id === moduleId)?.description;
@@ -86,6 +110,17 @@ export function auditTypeDescription(
   id: "verification" | "certification",
 ): string {
   return auditTypesContent.items.find((a) => a.id === id)!.description;
+}
+
+export function groupSynonyms(code: string): string[] {
+  return (
+    groupDescriptionsContent.items.find((g) => g.code === code)?.synonyms ?? []
+  );
+}
+
+export function groupCategoryId(code: string): string | undefined {
+  return groupCategoriesContent.categories.find((c) => c.codes.includes(code))
+    ?.id;
 }
 
 export function groupDescription(code: string): string | undefined {

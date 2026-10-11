@@ -282,6 +282,31 @@ test.describe("questionnaire", () => {
     ).toBeFocused();
   });
 
+  test("supports step: everyday groupings, synonym search and the two-class hint (REQ-013 AC-3)", async ({
+    page,
+  }) => {
+    await page.goto("/start/business");
+    await fillBusiness(page);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "The supports you deliver" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("category-personal-care")).toBeVisible();
+    await expect(page.getByTestId("category-housing")).toBeVisible();
+    const search = page.getByLabel(/Search by what you do/);
+    await search.fill("support worker");
+    await expect(page.locator("#group-0107")).toBeVisible();
+    await expect(page.locator("#group-0101")).toHaveCount(0);
+    await search.fill("cleaning");
+    await expect(page.locator("#group-0120")).toBeVisible();
+    await expect(page.locator("#group-0107")).toHaveCount(0);
+    await search.fill("SIL");
+    await expect(page.locator("#group-0138")).toBeVisible();
+    await search.fill("");
+    await page.getByRole("button", { name: "Choose those two for me" }).click();
+    await expect(page.locator("#group-0107")).toBeChecked();
+    await expect(page.locator("#group-0120")).toBeChecked();
+    await expect(page.getByTestId("groups-chosen")).toContainText("2 chosen");
+  });
   test("no horizontal overflow on any step", async ({ page }) => {
     await page.goto("/start/business");
     await fillBusiness(page);
