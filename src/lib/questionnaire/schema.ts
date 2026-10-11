@@ -122,10 +122,45 @@ export const SupportsStep = strictObject({
   }
 });
 
+/**
+ * REQ-013 FR-4: when a provider is not sure, three plain yes/no questions
+ * resolve the answer. Present only with "not-sure"; any "yes" resolves to
+ * yes (and the result says so), all "no" resolves to no.
+ */
+export const NotSureHelper = strictObject({
+  locksOrBarriers: z.boolean({ error: "Choose yes or no" }),
+  holdsOrRestraint: z.boolean({ error: "Choose yes or no" }),
+  medicationForBehaviour: z.boolean({ error: "Choose yes or no" }),
+});
+export type NotSureHelper = z.infer<typeof NotSureHelper>;
+
+export function resolveRestrictivePractices(
+  answer: YesNoUnsure,
+  helper?: NotSureHelper,
+): { uses: boolean; assumed: boolean } {
+  if (answer === "yes") return { uses: true, assumed: false };
+  if (answer === "no") return { uses: false, assumed: false };
+  if (!helper) return { uses: true, assumed: true };
+  const uses =
+    helper.locksOrBarriers ||
+    helper.holdsOrRestraint ||
+    helper.medicationForBehaviour;
+  return { uses, assumed: uses };
+}
+
 export const PracticesStep = strictObject({
   restrictivePractices: z.enum(YesNoUnsure.options, {
     error: "Choose yes, no or not sure",
   }),
+  notSureHelper: NotSureHelper.optional(),
+}).superRefine((v, ctx) => {
+  if (v.notSureHelper && v.restrictivePractices !== "not-sure") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["notSureHelper"],
+      message: "The three helper questions apply only when you are not sure",
+    });
+  }
 });
 
 export const WorkforceStep = strictObject({
