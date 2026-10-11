@@ -27,7 +27,7 @@ Out: payments, registers, documents, multi-member invitations (model it, do not 
 - SR-2 CSP `connect-src` extended only to the Supabase project origin; recorded in `DECISIONS.md`.
 - SR-3 Rate limiting on the magic-link endpoint and on export; limits recorded.
 - SR-4 Logs never contain emails in clear (hash) or draft contents.
-- SR-5 Secrets only in environment; `.env.example` documents `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server only) with where each lives in production.
+- SR-5 Secrets only in environment; `.env.example` documents `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the new `sb_publishable_…` key) and `SUPABASE_SECRET_KEY` (the new `sb_secret_…` key, server only) with where each lives in production. *(PO, 11 Oct 2026)* The project was created with Supabase's new API key format; use the publishable and secret keys, not the legacy anon and service_role keys, and confirm `@supabase/ssr` accepts the publishable key. Project ref `dpwwzhylcyosnkmlcnnp`, region ap-southeast-2 (confirmed on the dashboard).
 - SR-6 Migrations are files in the repo (`supabase/migrations`), applied by CI to a disposable test database for the RLS tests; never hand-edited in the dashboard.
 
 ## Data

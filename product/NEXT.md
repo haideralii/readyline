@@ -28,7 +28,7 @@ Rules that always apply: `CLAUDE.md` section 4, the threat model, the definition
 
 2. **REQ-003 build** on `req-003-questionnaire` (unblocked by item 1): rebase onto `main`; apply the PO review in the REQ (descriptions `status: "reviewed"`; create `data/readyline-content/modules.json`, `audit-types.json`, `document-sets.json` from the PO text with tests; strip `servicesNote` before derivation with a test). Then Sessions A, B and C. Push after each session. Fill Delivery evidence with screenshots at 360x740 and desktop for every step, Lighthouse accessibility scores, the e2e report, and the local check outputs. Do not merge; the PO reviews UI.
 
-3. **REQ-004 Session A** on `req-004-accounts`, only if `.env.local` already contains the three Supabase values (check for presence, never print them). If absent, write "waiting for Supabase values" under this item and skip. Session A per the Dev response: Supabase wiring, migrations, RLS policies, the integration test project, CI job layout. Push; fill Delivery evidence. Do not merge.
+3. **REQ-004 Session A** on `req-004-accounts`, only if `.env.local` already contains the three Supabase values `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` (new key format, see REQ-004 SR-5; check for presence, never print them). If absent, write "waiting for Supabase values" under this item and skip. Session A per the Dev response: Supabase wiring, migrations, RLS policies, the integration test project, CI job layout. Push; fill Delivery evidence. Do not merge.
 
 4. STOP. Append your status below.
 

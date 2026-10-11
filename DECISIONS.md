@@ -367,6 +367,12 @@ build, e2e, audit, gitleaks) and recording the output in Delivery evidence;
 the PO verifies the GitHub run afterwards and a red run is fixed forward as
 the first item of the next batch.
 
+**D-029 Supabase project created (Haider, 2026-10-11).** Organisation
+"Readyline", project `readyline`, ref `dpwwzhylcyosnkmlcnnp`, region
+ap-southeast-2 (Oceania, Sydney), Free plan, "automatically expose new
+tables" off, automatic RLS on, GitHub integration not connected. New API key
+format (publishable and secret keys); env names in REQ-004 SR-5.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
