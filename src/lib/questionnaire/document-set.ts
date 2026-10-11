@@ -79,16 +79,20 @@ export function deriveDocumentSet(
     if (item) item.have = existing[field];
   }
 
-  const registers: RegisterItem[] = c.registers.map((r) => {
-    const field = (
-      Object.entries(EXISTING_TO_REGISTER) as [keyof ExistingStep, string][]
-    ).find(([, id]) => id === r.id)?.[0];
-    return {
-      id: r.id,
-      title: r.title,
-      have: field ? existing[field] : "unknown",
-    };
-  });
+  const registers: RegisterItem[] = c.registers
+    .filter(
+      (r) => !r.when || r.when.modulesAny.some((m) => moduleIds.includes(m)),
+    )
+    .map((r) => {
+      const field = (
+        Object.entries(EXISTING_TO_REGISTER) as [keyof ExistingStep, string][]
+      ).find(([, id]) => id === r.id)?.[0];
+      return {
+        id: r.id,
+        title: r.title,
+        have: field ? existing[field] : "unknown",
+      };
+    });
 
   return { documents: [...byId.values()], registers };
 }

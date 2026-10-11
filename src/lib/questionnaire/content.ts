@@ -55,7 +55,16 @@ export const DocumentSetsContent = z.object({
   personalCareGroups: z.array(code).min(1),
   always: z.array(slug).min(1),
   byModule: z.record(slug, z.array(DocumentRule)),
-  registers: z.array(z.object({ id: slug, title: z.string().min(1) })).min(1),
+  registers: z
+    .array(
+      z.object({
+        id: slug,
+        title: z.string().min(1),
+        /** Present only for registers that apply when one of these modules is in scope (PO batch 7). */
+        when: z.object({ modulesAny: z.array(slug).min(1) }).optional(),
+      }),
+    )
+    .min(1),
 });
 
 export const GroupDescriptionsContent = z.object({

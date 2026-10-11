@@ -92,6 +92,12 @@ export const EvidenceKind = z.enum([
 export const EvidenceItem = z.object({
   /** True until the PO has reviewed the item (REQ-001 FR-4). */
   draft: z.boolean().default(true),
+  /** Who reviewed the item and when (REQ-005 PO review); absent while draft. */
+  reviewedBy: z.string().min(1).optional(),
+  reviewedAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   kind: EvidenceKind,
   title: z.string().min(1),
   note: z.string().optional(),

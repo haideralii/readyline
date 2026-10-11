@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "version": "1.0.0",
-  "generatedAt": "2026-10-11",
+  "version": "1.1.0",
+  "generatedAt": "2026-10-12",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
   "sources": [
     {
@@ -461,20 +461,26 @@
       "sourceLocator": "heading \"Person-centred supports\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Participant rights and person-centred supports policy",
           "note": "How legal and human rights are upheld in everyday practice and how communication is tailored to each participant.",
           "documentTypeId": "policy.participant-rights"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Communication preferences and support network recorded in each participant's support plan",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Induction and training records covering participant rights and the NDIS Code of Conduct",
           "sourceId": "types-of-audits"
@@ -499,13 +505,17 @@
       "sourceLocator": "heading \"Individual values and beliefs\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Cultural safety, diversity and inclusion policy",
           "documentTypeId": "policy.participant-rights"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Participant culture, values and beliefs recorded at intake and reflected in the support plan"
         }
@@ -530,19 +540,25 @@
       "sourceLocator": "heading \"Privacy and dignity\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Privacy, dignity and confidentiality policy and procedure",
           "documentTypeId": "policy.privacy-and-dignity"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "form",
           "title": "Consent to collect and use personal information, including audio or visual recording",
           "documentTypeId": "form.consent"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Evidence the confidentiality policy was explained in the participant's preferred communication mode"
         }
@@ -569,18 +585,24 @@
       "sourceLocator": "heading \"Independence and informed choice\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Choice and control and dignity of risk policy",
           "documentTypeId": "policy.choice-and-control"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Dignity of risk discussions and decisions documented in the support plan"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Advocacy information given to each participant and any advocate involvement recorded"
         }
@@ -605,20 +627,26 @@
       "sourceLocator": "heading \"Violence, abuse, neglect, exploitation and discrimination\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Safeguarding policy: preventing and responding to violence, abuse, neglect, exploitation and discrimination",
           "documentTypeId": "policy.safeguarding"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Incident register showing allegations acted on, reviews and preventive actions",
           "documentTypeId": "register.incidents",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on recognising and responding to abuse and neglect, and on advocacy access"
         }
@@ -648,24 +676,32 @@
       "sourceLocator": "heading \"Governance and operational management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Governance policy: structure, responsibilities, delegations and conflict of interest",
           "documentTypeId": "policy.governance"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Governing body or owner meeting minutes showing oversight of quality and safeguarding",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Business plan referencing legislative requirements and organisational risks; evidence of input from people with disability"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Documented delegation for absences and a register of declared conflicts of interest"
         }
@@ -693,25 +729,33 @@
       "sourceLocator": "heading \"Risk management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Risk management policy and procedure covering the eight listed areas",
           "documentTypeId": "policy.risk-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Risk register with ratings, treatments and review dates",
           "documentTypeId": "register.risk",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "insurance",
           "title": "Current certificates of currency: professional indemnity, public liability and personal accident"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Infection prevention and outbreak measures within the risk system, where relevant",
           "documentTypeId": "policy.infection-control"
@@ -737,18 +781,24 @@
       "sourceLocator": "heading \"Quality management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Quality management and continuous improvement policy",
           "documentTypeId": "policy.quality-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Internal audit program proportionate to the provider's size"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Continuous improvement register linking feedback, incident trends and audit findings to actions"
         }
@@ -774,19 +824,25 @@
       "sourceLocator": "heading \"Information management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Information management, records and privacy policy",
           "documentTypeId": "policy.information-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "form",
           "title": "Consent and disclosure form explaining purpose, storage, access, correction and withdrawal",
           "documentTypeId": "form.consent"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Evidence of secure storage, access controls, retention and disposal practices"
         }
@@ -812,25 +868,33 @@
       "sourceLocator": "heading \"Feedback and complaints management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Feedback and complaints management policy and procedure, aligned to the Complaints Management and Resolution Rules 2018",
           "documentTypeId": "policy.feedback-and-complaints"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Complaints register with acknowledgement, actions, outcomes and improvements",
           "documentTypeId": "register.complaints",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Participant-facing information on how to complain, including to the Commission and advocates"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on complaints handling"
         }
@@ -856,20 +920,26 @@
       "sourceLocator": "heading \"Incident management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Incident management and reportable incidents policy and procedure, aligned to the Incident Management and Reportable Incidents Rules 2018",
           "documentTypeId": "policy.incident-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Incident register showing reporting, response, review and learning",
           "documentTypeId": "register.incidents",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on incident management and reportable incident obligations"
         }
@@ -901,33 +971,51 @@
       "sourceLocator": "heading \"Human resource management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Human resources policy: recruitment, screening, induction, training, supervision and performance",
           "documentTypeId": "policy.human-resources"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Worker files sampled by auditors: identity, right to work, worker screening clearance, qualifications, induction, NDIS worker orientation module, supervision notes",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Training register including infection prevention and control refresher training",
           "documentTypeId": "register.training"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Worker screening clearance register with expiry dates",
           "documentTypeId": "register.worker-clearances"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Emergency workforce plan identifying workers with relevant capabilities and how a workforce is sourced in a disruption"
+        },
+        {
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
+          "kind": "record",
+          "title": "Signed NDIS Code of Conduct acknowledgement for every worker",
+          "documentTypeId": "form.code-of-conduct"
         }
       ],
       "verification": {
@@ -952,18 +1040,24 @@
       "sourceLocator": "heading \"Continuity of supports\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Continuity of supports policy and procedure, including cover for worker absence and a sole trader's own absence",
           "documentTypeId": "policy.continuity-of-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Participant preferences documented and provided to workers before supports start"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Records of alternative arrangements explained and agreed when interruptions were unavoidable"
         }
@@ -994,18 +1088,24 @@
       "sourceLocator": "heading \"Emergency and disaster management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Emergency and disaster management plan covering preparation, changes to supports, rapid adaptation and communication",
           "documentTypeId": "plan.emergency-and-disaster"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Evidence of consultation with participants and their support networks, testing of the plan and periodic review"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on implementing the plan"
         }
@@ -1030,13 +1130,17 @@
       "sourceLocator": "heading \"Access to supports\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Access to supports policy: eligibility, entry criteria, costs and withdrawal of supports",
           "documentTypeId": "policy.access-to-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Participant-facing information on available supports and any costs, in accessible formats"
         }
@@ -1068,19 +1172,25 @@
       "sourceLocator": "heading \"Support planning\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Support planning and risk assessment procedure",
           "documentTypeId": "policy.support-planning"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "form",
           "title": "Support plan template with risk assessment, preventative health, emergency responses and annual review date",
           "documentTypeId": "form.support-plan"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Completed support plans with participant involvement, consent to share, and reviews within twelve months",
           "sourceId": "types-of-audits"
@@ -1108,19 +1218,25 @@
       "sourceLocator": "heading \"Service agreements with participants\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Service agreements procedure",
           "documentTypeId": "policy.service-agreements"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "agreement",
           "title": "Service agreement template in plain language, including emergency and disaster arrangements and any SIL-in-SDA arrangements",
           "documentTypeId": "form.service-agreement"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Signed agreements provided to participants, or a record of why a copy was not provided"
         }
@@ -1146,18 +1262,24 @@
       "sourceLocator": "heading \"Responsive support provision\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Responsive support provision policy: least intrusive options, evidence-informed practice, collaboration with other providers",
           "documentTypeId": "policy.responsive-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Records of participant involvement in worker selection, including preferred gender for personal care"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Training records for workers supporting participants with specific monitored needs"
         }
@@ -1182,13 +1304,17 @@
       "sourceLocator": "heading \"Transitions to or from a provider\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Transitions to and from the provider procedure, including temporary transitions such as hospitalisation",
           "documentTypeId": "policy.transitions"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Transition plans and risk assessments for participants who entered or exited"
         }
@@ -1221,24 +1347,32 @@
       "sourceLocator": "heading \"Safe environment\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Safe environment, worker identification and infection prevention and control policy",
           "documentTypeId": "policy.safe-environment"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Participant-specific medical emergency protocols and escalation arrangements"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records: medical emergencies, hand hygiene, respiratory hygiene, PPE, with refresher dates",
           "documentTypeId": "register.training"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Evidence PPE is available and environmental cleaning is routine in provider-controlled settings"
         }
@@ -1263,13 +1397,17 @@
       "sourceLocator": "heading \"Participant money and property\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Participant money and property policy and procedure",
           "documentTypeId": "policy.participant-money-and-property"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Consent and transaction records where the provider handled a participant's money or property"
         }
@@ -1294,18 +1432,24 @@
       "sourceLocator": "heading \"Management of medication\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Medication management policy and procedure",
           "documentTypeId": "policy.medication-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Medication charts identifying participant, medication and dosage; secure storage evidence"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Medication administration competency and incident-response training records"
         }
@@ -1336,18 +1480,24 @@
       "sourceLocator": "heading \"Mealtime management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Mealtime management policy and procedure, including texture-modified foods and fluids",
           "documentTypeId": "policy.mealtime-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Mealtime management plans from qualified health practitioners, reviewed at least annually, accessible to workers"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records in safe meal preparation and responding to choking or coughing"
         }
@@ -1373,18 +1523,24 @@
       "sourceLocator": "heading \"Management of waste\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Waste, infectious and hazardous substances policy and procedure, including used PPE",
           "documentTypeId": "policy.waste-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Emergency plan for clinical waste or hazardous substance incidents"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on safe handling and PPE"
         }
@@ -1408,18 +1564,24 @@
       "sourceLocator": "heading \"Complex bowel care\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant complex bowel care plan with risk, incident and emergency escalation, reviewed by a qualified health practitioner"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for complex bowel care",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records delivered by a qualified health practitioner or a person meeting the skills descriptor"
         }
@@ -1443,18 +1605,24 @@
       "sourceLocator": "heading \"Enteral (naso-gastric tube – jejunum or duodenum) feeding and management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant enteral feeding and management plan with risk, incident and emergency escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for enteral feeding",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records covering the feeding method and regime"
         }
@@ -1481,18 +1649,24 @@
       "sourceLocator": "heading \"Severe dysphagia management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Severe dysphagia management plan from a qualified health practitioner covering needs, preferences, risks and escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for severe dysphagia",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Training records showing delivery by a qualified health practitioner with dysphagia expertise"
         }
@@ -1516,18 +1690,24 @@
       "sourceLocator": "heading \"Tracheostomy management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant tracheostomy suctioning and management plan with risk, incident and emergency escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for tracheostomy care",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records including supporting a person dependent on ventilation"
         }
@@ -1551,18 +1731,24 @@
       "sourceLocator": "heading \"Urinary catheter management (in-dwelling urinary catheter, in-out catheter, suprapubic catheter)\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant catheter management plan with risk, incident and emergency escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for catheter management",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records for the catheter type in use"
         }
@@ -1586,18 +1772,24 @@
       "sourceLocator": "heading \"Ventilator management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant ventilator management plan specific to the ventilator used, with escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for ventilator management",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records for ventilation needs and incidents"
         }
@@ -1622,23 +1814,31 @@
       "sourceLocator": "heading \"Subcutaneous injections\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant subcutaneous injection plan including dosage measurement and calculation, with escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Documented written or phone orders from the prescribing health practitioner"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for subcutaneous injections",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records including the related health condition"
         }
@@ -1662,18 +1862,24 @@
       "sourceLocator": "heading \"Complex wound management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "plan",
           "title": "Participant complex wound management plan with risk, incident and emergency escalation"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "High intensity supports policy and procedure with a worker training plan for complex wound management",
           "documentTypeId": "policy.high-intensity-supports"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Participant-specific training records covering daily activities affected by the wound regime"
         }
@@ -1699,13 +1905,17 @@
       "sourceLocator": "heading \"Behaviour support in the NDIS\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Behaviour support policy committing to reducing and eliminating restrictive practices",
           "documentTypeId": "policy.behaviour-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Practitioner suitability assessments, professional development and clinical supervision records"
         }
@@ -1734,13 +1944,17 @@
       "sourceLocator": "heading \"Restrictive practices\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Restrictive practices policy covering Commonwealth rules and state or territory authorisation processes",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Behaviour support plans showing engagement with participants and implementing providers, authorisation evidence and reduction strategies"
         }
@@ -1767,13 +1981,17 @@
       "sourceLocator": "heading \"Functional behaviour assessments and behaviour support plans\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Functional behaviour assessment and behaviour support plan development procedure",
           "documentTypeId": "policy.behaviour-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Assessments, plans provided to implementing providers, and lodgement with the Commissioner where a regulated restrictive practice is included"
         }
@@ -1801,13 +2019,17 @@
       "sourceLocator": "heading \"Supporting the implementation of the behaviour support plan\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Implementation support procedure: instructions, training, coaching and oversight of restrictive practice training",
           "documentTypeId": "policy.behaviour-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Training, coaching and advice records for implementing providers and support networks"
         }
@@ -1834,13 +2056,17 @@
       "sourceLocator": "heading \"Behaviour support plan monitoring and review\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Plan monitoring and review procedure with at least twelve-monthly review",
           "documentTypeId": "policy.behaviour-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Data review records, plan modifications, Commissioner notifications and review dates"
         }
@@ -1863,13 +2089,17 @@
       "sourceLocator": "heading \"Reportable incidents involving the use of a restrictive practice\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Reportable incident support procedure for emergency or unauthorised restrictive practice use",
           "documentTypeId": "policy.incident-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Incident reviews showing participant and stakeholder involvement",
           "documentTypeId": "register.incidents"
@@ -1893,13 +2123,17 @@
       "sourceLocator": "heading \"Interim behaviour support plans\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Interim behaviour support plan procedure for immediate needs",
           "documentTypeId": "policy.behaviour-support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Interim plans with risk evaluation and implementation guidance records"
         }
@@ -1923,13 +2157,17 @@
       "sourceLocator": "heading \"Behaviour support in the NDIS\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Behaviour support and restrictive practices policy committing to reduction and elimination",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records on legislative frameworks and evidence-informed behaviour support"
         }
@@ -1955,18 +2193,24 @@
       "sourceLocator": "heading \"Regulated restrictive practices\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Regulated restrictive practices policy and procedure including authorisation steps for the state or territory",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Authorisation evidence, behaviour support plans and records showing practices used only as the plan allows"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker skills maintenance records for restrictive practice use"
         }
@@ -1991,13 +2235,17 @@
       "sourceLocator": "heading \"Supporting the assessment and development of behaviour support plans\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Procedure for supporting functional behavioural assessment and plan development",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Collaboration records with the specialist behaviour support provider and responsibility allocations"
         }
@@ -2025,18 +2273,24 @@
       "sourceLocator": "heading \"Behaviour support plan implementation\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Behaviour support plan implementation policy and procedure",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records in plan strategies and safe use of restrictive practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Supervision and performance records showing strategies implemented as written"
         }
@@ -2060,13 +2314,17 @@
       "sourceLocator": "heading \"Monitoring and reporting the use of regulated restrictive practices\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Restrictive practice use register supporting monthly online reporting to the Commission",
           "documentTypeId": "register.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Data analysis and feedback records used to reduce and eliminate practices"
         }
@@ -2091,13 +2349,17 @@
       "sourceLocator": "heading \"Behaviour support plan review\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Plan monitoring and review contribution procedure",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Data collection, team meeting and review records"
         }
@@ -2125,13 +2387,17 @@
       "sourceLocator": "heading \"Reportable incidents involving the use of a restrictive practice\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Unauthorised restrictive practice response procedure: medical review, mainstream collaboration, Commission notification, debriefing",
           "documentTypeId": "policy.incident-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Incident register with debrief outcomes and support adjustments",
           "documentTypeId": "register.incidents"
@@ -2156,13 +2422,17 @@
       "sourceLocator": "heading \"Interim behaviour support plans\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Interim behaviour support plan collaboration procedure",
           "documentTypeId": "policy.restrictive-practices"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records in implementing interim plans"
         }
@@ -2188,13 +2458,17 @@
       "sourceLocator": "heading \"The child\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Child safety and rights policy including mandatory reporting under state or territory law",
           "documentTypeId": "policy.child-safety"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Risk management practices for children and continuity arrangements agreed with families"
         }
@@ -2223,13 +2497,17 @@
       "sourceLocator": "heading \"The family\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Family-centred practice policy",
           "documentTypeId": "policy.early-childhood-practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Support plans showing family choice, strengths, cultural responsiveness and everyday routines"
         }
@@ -2254,13 +2532,17 @@
       "sourceLocator": "heading \"Inclusion\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Natural environments and inclusion practice procedure",
           "documentTypeId": "policy.early-childhood-practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Assessments focused on everyday routines and community links"
         }
@@ -2285,13 +2567,17 @@
       "sourceLocator": "heading \"Collaboration\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Key worker and team-around-the-child collaboration procedure",
           "documentTypeId": "policy.early-childhood-practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Consent to share, collaboration and transition planning records"
         }
@@ -2317,13 +2603,17 @@
       "sourceLocator": "heading \"Capacity building\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Capacity building and coaching approach",
           "documentTypeId": "policy.early-childhood-practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Coaching records and feedback from families used to improve delivery"
         }
@@ -2347,13 +2637,17 @@
       "sourceLocator": "heading \"Evidence-informed practice\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Evidence-informed practice and professional development policy",
           "documentTypeId": "policy.early-childhood-practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Professional development and self-assessment records"
         }
@@ -2380,13 +2674,17 @@
       "sourceLocator": "heading \"Outcome-based approach\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "form",
           "title": "Support plan template with functional outcomes and measurement",
           "documentTypeId": "form.support-plan"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Plans provided to families in accessible formats; outcome reports families understand"
         }
@@ -2413,13 +2711,17 @@
       "sourceLocator": "heading \"Specialised support coordination\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Specialised support coordination policy and procedure for high-risk and complex situations",
           "documentTypeId": "policy.support-coordination"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Risk evaluations, crisis prevention planning, provider engagement and monitoring records"
         }
@@ -2444,13 +2746,17 @@
       "sourceLocator": "heading \"Management of a participant’s NDIS supports\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Procedure for arranging supports as directed by the participant and building their capacity",
           "documentTypeId": "policy.support-coordination"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Records of support options provided in accessible formats and budget use as the participant directed"
         }
@@ -2475,13 +2781,17 @@
       "sourceLocator": "heading \"Conflict of interest\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Conflict of interest policy explained to each participant",
           "documentTypeId": "policy.conflict-of-interest"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Declared interests and documented referrals to and from other providers"
         }
@@ -2505,13 +2815,17 @@
       "sourceLocator": "heading \"Rights and responsibilities\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "SDA participant rights policy including reasonable adjustments to dwellings",
           "documentTypeId": "policy.participant-rights"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Agreements and communications provided in the participant's preferred mode"
         }
@@ -2536,13 +2850,17 @@
       "sourceLocator": "heading \"Conflict of interest\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Conflict of interest policy for SDA, available to participants",
           "documentTypeId": "policy.conflict-of-interest"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "agreement",
           "title": "Separate service agreements where SDA and other supports are delivered to the same participant"
         }
@@ -2569,13 +2887,17 @@
       "sourceLocator": "heading \"Service agreements with participants\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "agreement",
           "title": "SDA service or tenancy agreement template meeting the SDA Conditions Rules 2018 and tenancy law, covering the listed matters",
           "documentTypeId": "policy.sda-tenancy"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Signed agreements, dwelling safety information and records where a copy was not provided"
         }
@@ -2599,13 +2921,17 @@
       "sourceLocator": "heading \"Enrolment of SDA properties\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "procedure",
           "title": "Dwelling enrolment and ongoing compliance procedure",
           "documentTypeId": "policy.sda-tenancy"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Enrolment records, building compliance and maintenance records"
         }
@@ -2636,18 +2962,24 @@
       "sourceLocator": "heading \"Tenancy management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Tenancy management policy including vacancies, notices and SIL provider arrangements",
           "documentTypeId": "policy.sda-tenancy"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "agreement",
           "title": "Documented arrangements with each participant and each SIL provider covering the listed matters"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Complaints and incident registers meeting the 2018 Rules",
           "documentTypeId": "register.complaints"
@@ -2680,18 +3012,24 @@
       "sourceLocator": "PDF, \"SIL Practice Standards: Supported Decision-Making\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Supported decision-making policy and procedure covering points (a) to (f) of indicator 4",
           "documentTypeId": "policy.supported-decision-making"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Initial and refresher supported decision-making training records for relevant workers"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Accessible information given to participants about will and preferences, and dignity of risk decisions recorded"
         }
@@ -2726,18 +3064,24 @@
       "sourceLocator": "PDF, \"SIL Practice Standards: Safeguarding\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "SIL safeguarding policy and procedure: dignity of risk, worker responsibilities, conflict and bullying between co-tenants",
           "documentTypeId": "policy.sil-safeguarding"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Worker training records in de-escalation, trauma-informed practice and positive behaviour support"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Safeguarding approaches agreed with participants and review records"
         }
@@ -2770,18 +3114,24 @@
       "sourceLocator": "PDF, \"SIL Practice Standards: Practice Governance\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "SIL practice governance policy: vision and values for the home, worker development, co-tenant matching, emergency oversight",
           "documentTypeId": "policy.sil-practice-governance"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "Competency assessments in person-centred, trauma-informed, active support and supported decision-making practice"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Consultation records before new tenants are placed and rehearsed emergency arrangements"
         }
@@ -2814,19 +3164,25 @@
       "sourceLocator": "PDF, \"SIL Practice Standards: Agreements about tenancy, housing and support arrangements\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "agreement",
           "title": "Separate SIL service agreement and tenancy agreement templates covering the listed matters",
           "documentTypeId": "policy.sil-tenancy-and-service-agreements"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Conflict of interest and raising-concerns policies for providers delivering both SIL and tenancy",
           "documentTypeId": "policy.conflict-of-interest"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Records that participants were supported to understand the agreements and referred to advocacy or legal help"
         }
@@ -2852,16 +3208,36 @@
       "sourceLocator": "heading \"Human resource management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "record",
           "title": "Worker records: identity, right to work, pre-employment checks, qualifications and experience",
           "sourceId": "types-of-audits"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "training",
           "title": "NDIS worker orientation module completion, professional development, infection control and PPE training records",
           "documentTypeId": "register.training"
+        },
+        {
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
+          "kind": "register",
+          "title": "Worker screening clearance register with expiry dates",
+          "documentTypeId": "register.worker-clearances"
+        },
+        {
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
+          "kind": "record",
+          "title": "Signed NDIS Code of Conduct acknowledgement for every worker",
+          "documentTypeId": "form.code-of-conduct"
         }
       ],
       "verification": {
@@ -2881,13 +3257,17 @@
       "sourceLocator": "heading \"Incident management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Incident management policy and procedure proportionate to a small provider, aligned to the 2018 Rules",
           "documentTypeId": "policy.incident-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Incident register",
           "documentTypeId": "register.incidents"
@@ -2910,13 +3290,17 @@
       "sourceLocator": "heading \"Complaints management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Complaints management and resolution policy and procedure aligned to the 2018 Rules",
           "documentTypeId": "policy.feedback-and-complaints"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Complaints register",
           "documentTypeId": "register.complaints"
@@ -2943,19 +3327,25 @@
       "sourceLocator": "heading \"Risk management\"",
       "evidence": [
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "policy",
           "title": "Risk management policy and procedure including emergency and disaster planning and infection control",
           "documentTypeId": "policy.risk-management"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "register",
           "title": "Risk register with dated reviews, including participant reliance and disruption impact",
           "documentTypeId": "register.risk"
         },
         {
-          "draft": true,
+          "draft": false,
+          "reviewedBy": "po",
+          "reviewedAt": "2026-10-12",
           "kind": "insurance",
           "title": "Current certificates of currency: professional indemnity, public liability and personal accident"
         }

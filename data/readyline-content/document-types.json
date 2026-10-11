@@ -1,5 +1,5 @@
 {
-  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording.",
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -668,7 +668,7 @@
         "verification.human-resource-management",
         "core.rights.violence-abuse-neglect-exploitation-and-discrimination"
       ],
-      "evidenceAliases": ["policy.human-resources"],
+      "evidenceAliases": ["policy.human-resources", "form.code-of-conduct"],
       "registers": ["training"],
       "extraSections": []
     },
@@ -822,19 +822,30 @@
     },
     {
       "id": "feedback-and-participant-engagement-procedure",
-      "title": "Participant engagement, support planning and transitions procedure",
+      "title": "Feedback and participant engagement procedure",
       "kind": "procedure",
       "outline": "procedure",
-      "purpose": "Explains how participants are involved in planning and reviewing their supports, how responsive, least-intrusive support is provided, and how transitions into or out of the provider are managed.",
+      "purpose": "Explains how participants are asked for feedback, how it is recorded and acted on, and how supports are provided responsively, in the least intrusive way and with other providers where needed.",
       "standards": [
         "core.governance.feedback-and-complaints-management",
+        "core.provision.responsive-support-provision"
+      ],
+      "evidenceAliases": ["policy.responsive-support"],
+      "registers": [],
+      "extraSections": []
+    },
+    {
+      "id": "support-planning-and-transitions-procedure",
+      "title": "Support planning and transitions procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how each participant's support plan is developed with them, including risk assessment and review, and how transitions into or out of the provider, including temporary ones such as hospital stays, are planned and handled.",
+      "standards": [
         "core.provision.support-planning",
-        "core.provision.responsive-support-provision",
         "core.provision.transitions-to-or-from-a-provider"
       ],
       "evidenceAliases": [
         "policy.support-planning",
-        "policy.responsive-support",
         "policy.transitions",
         "form.support-plan"
       ],
@@ -844,7 +855,13 @@
           "id": "support-plan-template",
           "heading": "Support plan template",
           "mode": "fixed",
-          "brief": "Template with risk assessment, preventative health, emergency responses and annual review date; placeholders only."
+          "brief": "Template with risk assessment, preventative health, emergency responses and annual review date; placeholders only, no participant details."
+        },
+        {
+          "id": "transition-checklist",
+          "heading": "Transition checklist",
+          "mode": "fixed",
+          "brief": "Checklist for planned and unplanned transitions, including handover of records with consent."
         }
       ]
     },
@@ -976,8 +993,7 @@
         "policy.restrictive-practices",
         "register.restrictive-practices"
       ],
-      "registers": ["incidents"],
-      "proposedRegisters": ["restrictive-practices"],
+      "registers": ["incidents", "restrictive-practices"],
       "extraSections": [
         {
           "id": "state-authorisation",
@@ -1186,7 +1202,8 @@
         "complaints",
         "worker-clearances",
         "training",
-        "policy-reviews"
+        "policy-reviews",
+        "restrictive-practices"
       ],
       "extraSections": []
     },
@@ -1195,8 +1212,6 @@
       "title": "Participant money and property procedure",
       "kind": "procedure",
       "outline": "procedure",
-      "proposed": true,
-      "proposalNote": "Not in document-sets.json. The core standard 'Participant money and property' has no document in the PO's set; proposed for the core module. PO decides.",
       "purpose": "Sets out how workers handle a participant's money or property only when asked, with records and safeguards.",
       "standards": ["core.environment.participant-money-and-property"],
       "evidenceAliases": ["policy.participant-money-and-property"],

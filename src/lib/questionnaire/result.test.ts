@@ -203,6 +203,31 @@ describe("buildResult", () => {
     expect(r.registers.find((x) => x.id === "incidents")?.have).toBe("no");
   });
 
+  it("the restrictive practice use register appears only when the implementing module is in scope (PO batch 7)", () => {
+    const plain = build({ supports: { groups: ["0120", "0107"] } });
+    expect(plain.registers.map((x) => x.id)).not.toContain(
+      "restrictive-practices",
+    );
+    const withPractices = build({
+      supports: { groups: ["0120", "0107"] },
+      practices: { restrictivePractices: "yes" },
+    });
+    expect(withPractices.modules.map((m) => m.id)).toContain("ibsp");
+    expect(withPractices.registers.map((x) => x.id)).toContain(
+      "restrictive-practices",
+    );
+    expect(
+      withPractices.documents.some(
+        (d) => d.id === "support-planning-and-transitions-procedure",
+      ),
+    ).toBe(true);
+    expect(
+      withPractices.documents.some(
+        (d) => d.id === "participant-money-and-property-procedure",
+      ),
+    ).toBe(true);
+  });
+
   it("flags large providers above the threshold and 0108 adds the transport procedure", () => {
     const r = build({
       supports: { groups: ["0108"] },
