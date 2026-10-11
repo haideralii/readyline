@@ -129,7 +129,14 @@ Three sessions. A: answer and draft schemas, ABN checksum, derivation adapter, d
 A one-sentence plain-English description per module and per audit type (for the result page), and a document-set mapping that lists which documents a module requires rather than inferring it from evidence `documentTypeId`s. Both are Readyline content, not Commission text, and could live beside the group descriptions.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### Session A (2026-10-11), branch `req-003-questionnaire` stacked on `req-002-security-baseline` (D-031)
+
+PO review applied: group descriptions `status: "reviewed"` with `reviewedBy`/`reviewedAt`; `data/readyline-content/{modules,audit-types,document-sets}.json` created from the PO's text (keyed by dataset module ids, `poId` kept), each marked Readyline text and reviewed; `src/lib/questionnaire/content.test.ts` asserts every dataset module and both audit types have entries, class codes in rules are real, names match the Commission table, and no prohibited claims. `servicesNote` is stripped in `toDeriveInput` with a test that the derivation input contains neither the key nor the text.
+
+Model and server: `src/lib/questionnaire/schema.ts` (strict `QuestionnaireAnswers` and `QuestionnaireDraft`, step schemas, ABN checksum field with the plain-English message, `answersSchemaFor(knownCodes)`), `adapter.ts`, `document-set.ts` (always set plus per-module rules with the personal-care and 0108 conditions; what the provider already has mapped onto documents and registers), `result.ts` (pure `buildResult`: pathway and description, modules with standard names and counts, mid-term audit, reasons with source title and URL, documents, registers, flags for assumed restrictive practices, large provider, SIL excluded, unverified), `groups.ts` (small group shape for step 2), `src/lib/standards/dataset.ts` (server-side dataset), and the server action `src/app/start/actions.ts` `deriveResult` (`parseInput` with `strictObject`, classes validated against the dataset, nothing stored).
+
+Tests at the model level: AC-1 to AC-6 and AC-10 in `result.test.ts`; schema, ABN (AC-8 rule), draft version, unknown keys and SIL-eligibility requirement in `schema.test.ts` and `abn.test.ts`. Local: unit suite green, lint, format and typecheck clean, build ok (see Dev status in `product/NEXT.md` for counts). UI is Session B; e2e, screenshots and Lighthouse are Session C.
 
 ## PO review
 (PO fills in.)

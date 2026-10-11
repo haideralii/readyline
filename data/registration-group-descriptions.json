@@ -1,7 +1,9 @@
 {
   "note": "Plain-English descriptions written by Readyline to help a provider recognise their own supports in the questionnaire. They are NOT NDIS Quality and Safeguards Commission text and do not change which class applies; the Commission's class names and audit types in standards.json (source 'registration-groups') are authoritative. Draft until the product owner reviews them (REQ-003, question 2).",
   "author": "readyline",
-  "status": "draft",
+  "status": "reviewed",
+  "reviewedBy": "po",
+  "reviewedAt": "2026-10-11",
   "version": "0.1.0",
   "items": [
     {

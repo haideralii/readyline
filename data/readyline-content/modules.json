@@ -1,0 +1,54 @@
+{
+  "note": "Plain-English, one-sentence descriptions of each Practice Standards module for the questionnaire result page. Written by the product owner for Readyline; NOT NDIS Quality and Safeguards Commission text. Module ids match data/standards.json; poId is the slug used in the PO's review text.",
+  "author": "readyline",
+  "status": "reviewed",
+  "reviewedBy": "po",
+  "reviewedAt": "2026-10-11",
+  "items": [
+    {
+      "id": "core",
+      "poId": "core",
+      "description": "The standards every registered provider is audited against: participants' rights, how your business is run, how supports are delivered, and the environments you deliver them in."
+    },
+    {
+      "id": "verification",
+      "poId": "verification",
+      "description": "A smaller set of four standards (people, incidents, complaints, risk) checked by a document review for lower-risk supports."
+    },
+    {
+      "id": "hidpa",
+      "poId": "high-intensity",
+      "description": "Extra standards for daily personal care that needs specific clinical skills, such as complex bowel care, tube feeding or ventilation."
+    },
+    {
+      "id": "sbs",
+      "poId": "specialist-behaviour-support",
+      "description": "Standards for practitioners who assess behaviour and write behaviour support plans."
+    },
+    {
+      "id": "ibsp",
+      "poId": "implementing-behaviour-support-plans",
+      "description": "Standards for providers whose workers carry out behaviour support plans, including any regulated restrictive practices."
+    },
+    {
+      "id": "ec",
+      "poId": "early-childhood",
+      "description": "Standards for early intervention with young children and their families."
+    },
+    {
+      "id": "ssc",
+      "poId": "specialised-support-coordination",
+      "description": "Standards for support coordination in complex or high-risk situations."
+    },
+    {
+      "id": "sda",
+      "poId": "sda",
+      "description": "Standards for owning or managing specialist disability accommodation as the housing provider."
+    },
+    {
+      "id": "sil",
+      "poId": "sil",
+      "description": "Standards, from 1 July 2026, for managing and delivering supported independent living packages: decision-making, safeguarding, practice governance and tenancy arrangements."
+    }
+  ]
+}
