@@ -759,6 +759,15 @@ needs. Rather than widen the token, `migrate.yml` pushes over a direct
 database URL (session pooler, port 5432, user `postgres.<ref>`) using only
 `SUPABASE_DB_PASSWORD`; the access token stays for future CLI use.
 
+**D-037 Drafting model: `claude-sonnet-5-5` (PO with Haider, 2026-10-12).**
+Prices checked 12 Oct 2026: Sonnet 5.5 $2/$10 per MTok in/out, Opus 5.5 $4/$20,
+Haiku 5.5 from $0.10/$0.50, Fable 5.1 $10/$50. Estimated full document set:
+about 100 calls, roughly 250k input and 50k output tokens, about $1 on Sonnet.
+Opus is the fallback if the PO's review of the first real sets finds the
+tailored sections too thin; Haiku is reserved for cheap side tasks. Monthly
+spend cap set in the Anthropic console before the key is created. Revisit
+with measured token counts from the first recordings (REQ-005 Session B).
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
