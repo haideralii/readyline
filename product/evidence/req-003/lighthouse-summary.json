@@ -1,0 +1,35 @@
+[
+    {
+        "report":  "lighthouse-start-business-desktop",
+        "url":  "http://localhost:3000/start/business",
+        "formFactor":  "desktop",
+        "lighthouseVersion":  "12.8.2",
+        "fetchTime":  "2026-10-11T08:35:38.714Z",
+        "accessibilityScore":  100,
+        "failingAudits":  [
+
+                          ]
+    },
+    {
+        "report":  "lighthouse-start-business-mobile",
+        "url":  "http://localhost:3000/start/business",
+        "formFactor":  "mobile",
+        "lighthouseVersion":  "12.8.2",
+        "fetchTime":  "2026-10-11T08:34:52.571Z",
+        "accessibilityScore":  100,
+        "failingAudits":  [
+
+                          ]
+    },
+    {
+        "report":  "lighthouse-start-mobile",
+        "url":  "http://localhost:3000/start",
+        "formFactor":  "mobile",
+        "lighthouseVersion":  "12.8.2",
+        "fetchTime":  "2026-10-11T08:34:32.821Z",
+        "accessibilityScore":  100,
+        "failingAudits":  [
+
+                          ]
+    }
+]

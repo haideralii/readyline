@@ -50,7 +50,7 @@ export function StepShell({
                     className={
                       current
                         ? "inline-flex min-h-11 items-center rounded px-1 font-semibold text-zinc-900 dark:text-zinc-50"
-                        : "inline-flex min-h-11 items-center rounded px-1 text-zinc-400 dark:text-zinc-500"
+                        : "inline-flex min-h-11 items-center rounded px-1 text-zinc-600 dark:text-zinc-400"
                     }
                   >
                     {label}

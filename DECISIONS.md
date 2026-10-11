@@ -465,6 +465,69 @@ approach FR-3 allows.
 opened by the PO from the pushed branch; this is noted in the REQ's delivery
 evidence rather than installing a tool mid-session.
 
+## REQ-003: readiness questionnaire (branch `req-003-questionnaire`, stacked on REQ-002)
+
+Decision numbers D-3xx on this branch.
+
+**D-301 Branch stacked on REQ-002 (D-031).** `req-003-questionnaire` was
+rebased onto `req-002-security-baseline` because the questionnaire uses the
+validation layer, logging rule and CSP from REQ-002; it is rebased onto `main`
+after REQ-002 merges. Conflicts in `.prettierignore`, `product/NEXT.md` and
+the REQ file were resolved by keeping the PO's upstream files and re-inserting
+the Dev response.
+
+**D-302 Client-held answers, one server action (PO-accepted Q3).** Routes
+`/start` and `/start/[step]`; a client provider owns the answers and a
+`DraftStore`; the local implementation stores the versioned
+`QuestionnaireDraft` in `localStorage` with every call in try/catch and
+discards drafts of another version or with unknown keys. The only server call
+is the `deriveResult` action on the result step, which re-validates against
+the dataset's classes and stores nothing. `standards.json` never reaches the
+browser; step 2 receives a 38-row shape (code, Commission name, audit type,
+Readyline description).
+
+**D-303 Gate and navigation.** A step may be opened when every earlier answer
+step holds valid saved data; otherwise the page replaces the URL with the
+first incomplete step. Focus moves to the step heading on every step change;
+the error summary receives focus when it appears; all controls have 44px
+targets.
+
+**D-304 Readyline content and conditions.** `data/readyline-content/*` is the
+PO's text keyed by dataset module id with the PO's slug kept as `poId`. The
+bracketed conditions in the PO's document-set list are modelled as `when`
+rules: "personal care groups" is the list `0104, 0107, 0115, 0138` (Readyline
+interpretation, stated in the file) and the transport procedure applies when
+0108 is selected; both rules sit under the core module as the PO listed them,
+so a verification-only provider does not receive them.
+
+**D-305 Participant-data detector.** `src/lib/privacy/participant-data.ts`
+warns (never blocks) on name-like pairs of capitalised words, dates of birth,
+nine-digit numbers starting 43, street addresses and health or diagnosis
+terms, with a list of compass, place and organisation words to keep
+"Western Sydney" and "Practice Standards" from counting as people. False
+positives are acceptable; the note it guards is never used in derivation.
+
+**D-306 Restrictive practices wording.** The practices step names the five
+regulated restrictive practices (seclusion; chemical, mechanical, physical and
+environmental restraint) as the practices the NDIS (Restrictive Practices and
+Behaviour Support) Rules 2018 regulate and links to the Commission's page. The
+category names are the Rules' own terms; the page does not quote Commission
+text beyond that. "Not sure" is treated as yes and the result says so.
+
+**D-307 Accessibility evidence method.** Lighthouse cannot reach steps behind
+the draft gate on a fresh load, so per-step evidence comes from an axe scan
+(`@axe-core/playwright`, WCAG 2.1 A and AA rules) on every step and state on
+both Playwright projects with zero serious or critical violations allowed;
+Lighthouse accessibility runs on the pages reachable without a draft
+(`/start`, `/start/business`) in mobile and desktop presets and scored 100.
+One contrast failure found by axe (future step labels in `text-zinc-400`) was
+fixed. `@axe-core/playwright` is a dev dependency.
+
+**D-308 Evidence files in the repo.** Screenshots of every step at 360x740
+and desktop are stored as JPEG (quality 40) under
+`product/evidence/req-003/` with a Lighthouse summary JSON; full Lighthouse
+reports are not committed. The capture spec runs only with `EVIDENCE=1`.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
