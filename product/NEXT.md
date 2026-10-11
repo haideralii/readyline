@@ -70,6 +70,20 @@ Context: PRs #2 to #4 are closed; #5, #6, #7 are open from the `*-rebuilt` branc
 
 4. STOP. Append your status below.
 
+## Queue (written by PO, 12 Oct 2026, batch 7)
+
+PRs: #7 (REQ-004 Session C) is accepted but conflicts with `main` in `DECISIONS.md`; the PO opens PRs for `req-004-migrate-dburl` and `req-005-generator`. Haider merges in the order the PO gives.
+
+1. **PR #7 conflict:** rebase `req-004-accounts-rebuilt` onto current `main`, resolve `DECISIONS.md` keeping both sides, run `npm run check`, push with `--force-with-lease` (feature branch, D-033). Nothing else on that branch.
+
+2. **REQ-005 PO decisions and evidence review, on `req-005-generator`** (rebase onto `main` first): apply the three decisions in the REQ's PO review (accept the money-and-property procedure into the core set; split out `support-planning-and-transitions-procedure`; add the `restrictive-practices` register id for REQ-009), update `document-sets.json`, `document-types.json` and their tests; apply the three evidence additions and flip all evidence items to reviewed as specified; regenerate `standards.json`, bump its version, update `SOURCES.md` changelog; `standards:verify` green.
+
+3. **REQ-005 Session A, same branch:** section JSON schema, document model, renderer with structure snapshots, fixed text for every outline per `product/domain/house-style.md`, the readability function with tests, the terminology and claims lint wired to the house-style lists, the LibreOffice CI job (AC-1 mechanics) rendering the fixed-text skeletons for the three reference cases. No model calls yet. Push; fill Delivery evidence.
+
+4. **REQ-005 Session B preparation:** context pack builder with the exclusion test (SR-3), prompt builder with versioned prompts using the house style, replay-fixture harness (no real calls in CI), red-team fixtures (SR-2). If `ANTHROPIC_API_KEY` is present in `.env.local`, record three real generations locally as the first fixtures and note model cost per full generation; if absent, write "waiting for Anthropic key" and stop after the harness. Push; fill Delivery evidence.
+
+5. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)
@@ -103,6 +117,15 @@ then delete the `-rebuilt` branches, or simply open PRs from the `-rebuilt` name
 1. REQ-002 (`req-002-security-baseline-rebuilt` at c352398, one commit on `main`): `logger.test.ts` and `redact.test.ts` already assemble fixtures at runtime (regex scan of `main` clean); `.gitleaksignore` reduced to a comment; `DECISIONS.md` in `.prettierignore` (D-033) and Prettier run on it (no change needed); evidence note. Local: check clean (244 tests); gitleaks over `main..HEAD`: 1 commit, no leaks. Not merged.
 2. REQ-003 (`req-003-questionnaire-rebuilt` at 7d02102): "To prepare" label with a legend above the documents list and a short one above the registers; "What happens next" block with the PO's wording; all fourteen screenshots re-captured from `next start` (no dev badge). Note: the header on that page already shows "Sign in" because `main` carries REQ-004, so the "sign-in is coming" sentence will want trimming once REQ-004 is accepted. Local: check clean (244 tests), build ok, questionnaire and axe specs in CI mode 24 passed, screenshots 2 passed. Not merged.
 3. REQ-004 Session C (`req-004-accounts-rebuilt` at 1afa395): export zip (owner session, 5 per hour, D-417); soft delete through `delete_account()` with confirm form, deleted page, sign-in refused at the callback (D-415); purge as `runPurge()` behind `GET /api/jobs/purge` with `CRON_SECRET` and a daily Vercel cron (D-416); `/admin` and `/admin/mfa` with 404 for non-admins and TOTP via server actions, audited (D-418); email provider interface with log-only implementation and tested templates (D-419); member audit-insert policy fixing a silent Session B failure (D-420); `CRON_SECRET` in env docs; `fflate` added. Tests: 253 unit, integration suite `session-c` (AC-4, AC-5, AC-7), e2e admin spec. Local: check clean, build ok, bundle check clean, admin/sign-in/headers/home specs 22 passed in CI mode, gitleaks over the three rebuilt commits clean. **Haider:** generate `CRON_SECRET` (`openssl rand -hex 32`) in Vercel, enable TOTP in the hosted Auth settings, and set `platform_admin = true` on your user by SQL once; the integration suites' first run is the `supabase-integration` job on these pushes. Not merged.
+4. STOP.
+
+Waiting for the PO.
+**2026-10-11 (batch 6), Dev: all three items delivered and pushed; nothing merged, nothing rebuilt or force-pushed.**
+
+0. `main` pushed with the PO's batch-6 commit 47b15cb after checking its stat (product/ and DECISIONS.md only).
+1. `migrate.yml` over a database URL (D-036): branch `req-004-migrate-dburl` from `main`, commit d13a07f. `supabase link` removed; the job builds `DB_URL` from `SUPABASE_DB_PASSWORD` (URL-encoded with Python's `urllib.parse.quote`), the project ref and `aws-0-ap-southeast-2.pooler.supabase.com:5432`, masks the raw password, the encoded password and the URL with `::add-mask::`, passes it only through `GITHUB_ENV`, and runs `supabase db push --include-all --db-url` then `supabase migration list --db-url`. Secrets gate, skip notice and `workflow_dispatch` kept; nothing echoes the URL. PR note in REQ-004 Delivery evidence. Open the PR from `req-004-migrate-dburl`; after merge, a manual dispatch applies the three migrations.
+2. `supabase/ops/grant-platform-admin.sql`: same branch, commit e7aa846. One `update` keyed on the SHA-256 of the lower-cased `:email` placeholder (same expression as the auth trigger) plus a check `select`; header explains the once-only operator run in the SQL editor after first sign-in, why the API path is blocked, and that TOTP must be on first. Noted in REQ-004 evidence.
+3. REQ-005 Dev response: branch `req-005-generator` from `main`, commit 5359f04. Five answers (closed block schema with a 20-line sample and rendered text; fixtures keyed by SHA-256 of prompt version, model and canonical request with replay-only CI; in-repo Flesch-Kincaid, warn above 9.0 and fail above 11.0 per tailored section; LibreOffice headless as a separate CI job, 60 to 90 s install; four sessions), values by name (`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `GENERATION_ENABLED`), and the Session A catalogue `data/readyline-content/document-types.json`: 39 entries (37 ids from `document-sets.json`, the self-assessment, one proposed addition), each with standards ids, `evidenceAliases` into the `standards.json` evidence scheme, registers, a named outline with fixed and tailored sections, and extra sections; `document-types.test.ts` checks coverage, real ids, one tailored section each, no prohibited claims and full evidence coverage. Three PO decisions flagged in the response (proposed money-and-property procedure; support planning and transitions folded into the engagement procedure; a restrictive practice use register for REQ-009). D-501 to D-505. Local: check clean (23 files, 250 tests). Not built; waits on the PO's catalogue and evidence-item review and the house-style note.
 4. STOP.
 
 Waiting for the PO.
