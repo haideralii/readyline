@@ -36,7 +36,8 @@ describe("logger", () => {
       email: "x@y.com",
       signature: "t=1,v1=abc",
       notes: "participant said",
-      token: "sk_live_abcdefghijklmnop",
+      // Assembled at runtime so no secret-shaped literal is committed.
+      token: ["sk", "live", "abcdefghijklmnop"].join("_"),
     });
     expect(lines[0].record).toMatchObject({
       email: EMAIL_MASK,

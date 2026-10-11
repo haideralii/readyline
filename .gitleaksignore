@@ -1,0 +1,15 @@
+# Historical findings that are test fixtures, not secrets (REQ-002, PO batch 3 item 1).
+# Commit 543a030 is the rebased REQ-002 commit; the fixtures were token-shaped
+# literals in redactor tests and have since been rewritten to be assembled at
+# runtime. Each line is a gitleaks fingerprint: commit:file:rule:line.
+
+# Stripe-shaped fixture in the logger test (fake key passed to the redactor)
+543a0302962e3e0cd706d0d580bc22b0235676f4:src/lib/logging/logger.test.ts:stripe-access-token:39
+# Stripe-shaped fixture in the redactor test table
+543a0302962e3e0cd706d0d580bc22b0235676f4:src/lib/logging/redact.test.ts:stripe-access-token:7
+# Stripe-shaped fixture nested in an array in the redactor test
+543a0302962e3e0cd706d0d580bc22b0235676f4:src/lib/logging/redact.test.ts:stripe-access-token:77
+# AWS-shaped fixture in the redactor test table
+543a0302962e3e0cd706d0d580bc22b0235676f4:src/lib/logging/redact.test.ts:aws-access-token:14
+# JWT-shaped fixture in the redactor test table (reported by CI run #12)
+543a0302962e3e0cd706d0d580bc22b0235676f4:src/lib/logging/redact.test.ts:jwt:17

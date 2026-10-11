@@ -79,4 +79,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_SUMMARY: "true"
+          # PR comments need write permission we do not grant (D-205).
+          GITLEAKS_ENABLE_COMMENTS: "false"
           # Config: .gitleaks.toml (default rules; allow-list scoped to data/sources/ only).
