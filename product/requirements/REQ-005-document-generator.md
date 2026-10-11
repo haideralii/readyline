@@ -64,7 +64,83 @@ CI link; the three reference document sets as artifacts (PO reads them end to en
 5. Estimate in sessions; and the exact values Haider must supply (names only): expected `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11 on branch `req-005-generator` (from `main`). Dev response and the Session A catalogue draft only; no generation code.
+
+### Q1. Section schema and renderer
+
+**Section schema.** Every tailored section is one JSON object validated with zod (`strictObject`, unknown keys rejected) before anything is rendered. Blocks are a closed set; there is no free HTML or Markdown, so the model cannot change document structure, inject links or styling, or smuggle text into headings.
+
+```ts
+// src/lib/generator/section-schema.ts (proposed)
+const Inline = z.string().trim().min(1).max(600);            // one sentence or short paragraph, no line breaks
+const Block = z.discriminatedUnion("type", [
+  strictObject({ type: z.literal("paragraph"), text: Inline }),
+  strictObject({ type: z.literal("bullets"), items: z.array(Inline).min(1).max(12) }),
+  strictObject({ type: z.literal("steps"), items: z.array(Inline).min(1).max(15) }),   // rendered numbered
+  strictObject({
+    type: z.literal("table"),
+    columns: z.array(z.string().max(40)).min(2).max(4),
+    rows: z.array(z.array(Inline)).min(1).max(20),            // every row must match columns.length (refine)
+  }),
+  strictObject({ type: z.literal("callout"), text: Inline }), // "review and complete" markers and provider notes
+]);
+export const TailoredSection = strictObject({
+  sectionId: z.string(),                                      // must equal the requested section id (refine)
+  blocks: z.array(Block).min(1).max(12),
+  usedFacts: z.array(z.enum(FACT_KEYS)).min(1),               // which context-pack fields the text relies on (FR-5)
+});
+```
+
+The prompt asks for exactly this shape and nothing else; the reply is parsed with `JSON.parse` then `TailoredSection.safeParse`. A failed parse is retried once with the zod issues appended; a second failure renders the outline's fixed fallback text plus a `callout` "Review and complete this section" (FR-2, AC-5).
+
+**Renderer.** The `docx` package, one deterministic function `renderDocument(doc: DocumentModel): Document` where `DocumentModel` is the fixed outline with each section resolved to blocks (fixed sections are pre-authored block arrays in the same schema, so there is one renderer path). Mapping: `paragraph` to `Paragraph` with the body style; `bullets` to a bulleted numbering reference; `steps` to a decimal numbering reference restarted per section; `table` to `Table` with a header row and fixed column widths; `callout` to a shaded single-cell table. Headings use Word's built-in Heading 1 and 2 styles with automatic numbering so the document outline works in Word and LibreOffice. The header carries the trading name and document title; the footer carries "Prepared with Readyline", version, page x of y. A document-control table and the notice section come from fixed blocks (FR-3). Snapshot tests serialise the `DocumentModel` (not the binary), which keeps diffs readable when a prompt or outline changes.
+
+Sample of one tailored section (`purpose` of the governance policy) as the model returns it, then as rendered text:
+
+```json
+{ "sectionId": "purpose", "usedFacts": ["tradingName", "structure", "states"],
+  "blocks": [
+    { "type": "paragraph", "text": "This policy explains how Sunrise Supports, a sole trader delivering supports in New South Wales, is run and who is accountable for decisions about participants, workers and money." },
+    { "type": "paragraph", "text": "It supports the Governance and operational management standard and is read with the risk management and quality management policies." } ] }
+```
+
+```text
+1  Purpose
+This policy explains how Sunrise Supports, a sole trader delivering supports in New South Wales, is run and who is
+accountable for decisions about participants, workers and money.
+It supports the Governance and operational management standard and is read with the risk management and quality
+management policies.
+```
+
+### Q2. Recorded fixtures for CI
+
+Key every model call by `sha256(promptVersion + "\n" + model + "\n" + canonicalJson(request))` where `request` is the exact messages array sent (system and user), so any change to the prompt text, the outline brief, the standard text included, the context pack or the model id produces a new key. Fixtures live in `fixtures/generation/<documentTypeId>/<sectionId>/<key>.json` holding the request hash, the raw reply and the validated section. In CI the client runs in `replay` mode: a missing fixture fails the test with the key and the request summary, which is the signal that a prompt changed and needs re-recording; no network call is possible (`ANTHROPIC_API_KEY` is absent in CI). Locally `npm run generation:record` runs the three reference questionnaires in `record` mode and writes fixtures; the diff of the validated sections is reviewed like code (CLAUDE.md 6, "diffable"). `promptVersion` is a string constant per document type bumped by hand and recorded in `generation_log`; a test asserts every fixture's `promptVersion` matches the current constant so stale fixtures cannot linger. Model cost in CI: zero. The nightly real run is a separate `workflow_dispatch`/schedule job gated on the key being present, uploading the `.docx` set as artifacts for the PO.
+
+### Q3. Readability
+
+Recommend an in-repo Flesch-Kincaid grade implementation (sentence split, word count, syllable estimate with the usual English heuristics and Australian spellings), about 60 lines with unit tests against a few known passages, rather than a dependency: the libraries on npm (`text-readability`, `readability-scores`) are unmaintained, small, and we need the same deterministic numbers in tests and in the reviewer view. Threshold: FR-8 says Year 8; recommend **warn above grade 9.0 per tailored section, fail the CI quality gate above 11.0**, measured on the section's paragraph and bullet text only (tables and headings excluded, which otherwise distort the score). Policy language has unavoidable long terms ("restrictive practice", "Commission"), so the grade is reported per section in the reviewer view with the three worst sections highlighted, and the house style prompt (PO content item 3) asks for short sentences and one idea per sentence, which is what moves the score.
+
+### Q4. LibreOffice in CI
+
+Feasible. `ubuntu-latest` installs `libreoffice-writer` with apt in roughly 60 to 90 seconds (about 300 MB); `soffice --headless --convert-to pdf --outdir out/ *.docx` converts the three reference sets (about 35 documents each) in under two minutes total, and a non-zero exit or a missing PDF fails AC-1. The step runs in a separate job so the main job keeps its current timing, and only on pull requests that touch `src/lib/generator/**` or `fixtures/generation/**` plus the nightly run. The same step gives us the PDF readiness summary pipeline for free if we choose to render the summary as `.docx` first; otherwise the summary is rendered server-side with a small PDF library (decision deferred to Session C).
+
+### Q5. Estimate and values Haider must supply
+
+Four sessions. **A:** catalogue (this response's `document-types.json`, PO-reviewed), section schema, document model, renderer with structure snapshots, fixed text for every outline, readability function, terminology lint. **B:** context pack with the exclusion test (SR-3), prompt builder with delimiting and red-team fixtures (SR-2, AC-4), fixture-replay client, claims gate, fallback path (AC-5), generation log and quota (FR-9, AC-8), `GENERATION_ENABLED` flag (AC-10). **C:** storage bucket with RLS and signed URLs (SR-4, AC-7), version sets (FR-6), the generate and download routes, reviewer view with per-section regeneration and diff (FR-5, AC-6), e2e on both projects. **D:** self-assessment document (FR-4, AC-2), PDF summary, LibreOffice CI job (AC-1), the three reference sets as artifacts, readability and cost evidence.
+
+Values Haider supplies, by name only, into `.env.local` and the Vercel project (server only, never `NEXT_PUBLIC_`):
+
+- `ANTHROPIC_API_KEY` (Anthropic console; create a key in a workspace with a monthly spend cap, SR-1)
+- `ANTHROPIC_MODEL` (Dev proposes the current Sonnet-class model id for drafting; recorded in `DECISIONS.md` when set)
+- `GENERATION_ENABLED` (`true` or `false`; Dev sets it, listed so it is in the same place)
+
+### Catalogue draft for review (Session A content)
+
+`data/readyline-content/document-types.json`: 39 entries: one per distinct id in `document-sets.json` (37), the Practice Standards self-assessment, and one proposed addition marked `proposed: true` (participant money and property procedure, because that core standard has no document in the set). Each entry has title, purpose, mapped standards ids, `evidenceAliases` into the `documentTypeId` scheme that `standards.json` evidence items use (the two id schemes are reconciled through that field), registers referenced, an outline (policy, procedure, plan, template, acknowledgement, framework, self-assessment) with each section marked fixed or tailored, and document-specific extra sections. `data/readyline-content/document-types.test.ts` checks coverage, real ids, one tailored section per document, no prohibited claims, and that every evidence `documentTypeId` in `standards.json` is carried by at least one document (true once the proposed addition is counted).
+
+Three things for the PO in that file: (1) the proposed addition; (2) `feedback-and-participant-engagement-procedure` is drafted to carry support planning and transitions as well, since the set has no separate document for those two core standards; rename or split as you prefer; (3) the restrictive practice use register is referenced by the SBS/IBSP procedure but is not in the registers list; proposed as a sixth register for REQ-009.
+
 
 ## Delivery evidence
 (Dev fills in.)

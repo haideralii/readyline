@@ -1,0 +1,1207 @@
+{
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording.",
+  "author": "readyline",
+  "status": "draft",
+  "draftedBy": "dev",
+  "draftedAt": "2026-10-11",
+  "defaults": {
+    "reviewCycleMonths": 12,
+    "fixedFront": ["document-control"],
+    "fixedBack": [
+      "records-and-evidence",
+      "related-documents",
+      "review",
+      "notice"
+    ]
+  },
+  "sectionModes": {
+    "fixed": "Rendered from template text only; the model never sees or writes it.",
+    "tailored": "Drafted by the model from the context pack for that section, validated against the section schema, then rendered. Falls back to the template text with a 'review and complete' marker after two failed validations (FR-2)."
+  },
+  "outlines": {
+    "policy": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "Trading name, ABN if given, version, generated and review-due dates, approver line."
+      },
+      {
+        "id": "purpose",
+        "heading": "Purpose",
+        "mode": "tailored",
+        "brief": "Two or three sentences naming the provider and what this policy commits to."
+      },
+      {
+        "id": "scope",
+        "heading": "Scope",
+        "mode": "tailored",
+        "brief": "Who and what it covers: the supports delivered, states, workers and key personnel from the questionnaire."
+      },
+      {
+        "id": "definitions",
+        "heading": "Definitions",
+        "mode": "fixed",
+        "brief": "Participant, worker, key personnel, provider, the Commission; plain-English definitions."
+      },
+      {
+        "id": "policy-statement",
+        "heading": "Policy statement",
+        "mode": "tailored",
+        "brief": "The commitments, each tied to the quality indicators listed for this document, in the provider's voice."
+      },
+      {
+        "id": "how-we-do-this",
+        "heading": "How we put this into practice",
+        "mode": "tailored",
+        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers)."
+      },
+      {
+        "id": "responsibilities",
+        "heading": "Responsibilities",
+        "mode": "tailored",
+        "brief": "Table of role and responsibility; roles come from the business structure and worker count."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records and evidence to retain",
+        "mode": "fixed",
+        "brief": "The evidence items from the standards this document evidences."
+      },
+      {
+        "id": "related-documents",
+        "heading": "Related documents and registers",
+        "mode": "fixed",
+        "brief": "Links to the registers and other documents in the set."
+      },
+      {
+        "id": "review",
+        "heading": "Review",
+        "mode": "fixed",
+        "brief": "Review cycle, trigger events (incident, complaint, change in the rules), who reviews."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "General-information and AI-drafting notice (CLAUDE.md 4.2, 4.3)."
+      }
+    ],
+    "procedure": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies."
+      },
+      {
+        "id": "purpose",
+        "heading": "Purpose",
+        "mode": "tailored",
+        "brief": "What the procedure achieves and which policy it supports."
+      },
+      {
+        "id": "when-this-applies",
+        "heading": "When this procedure applies",
+        "mode": "tailored",
+        "brief": "Triggers and situations, specific to the supports delivered."
+      },
+      {
+        "id": "steps",
+        "heading": "Steps",
+        "mode": "tailored",
+        "brief": "Numbered steps with who does what and by when; timeframes as a table where the rules set them."
+      },
+      {
+        "id": "responsibilities",
+        "heading": "Responsibilities",
+        "mode": "tailored",
+        "brief": "Role and responsibility table."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records and evidence to retain",
+        "mode": "fixed",
+        "brief": "Evidence items from the mapped standards."
+      },
+      {
+        "id": "related-documents",
+        "heading": "Related documents and registers",
+        "mode": "fixed",
+        "brief": "Links within the set."
+      },
+      {
+        "id": "review",
+        "heading": "Review",
+        "mode": "fixed",
+        "brief": "Cycle and triggers."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice."
+      }
+    ],
+    "plan": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies."
+      },
+      {
+        "id": "purpose",
+        "heading": "Purpose",
+        "mode": "tailored",
+        "brief": "What the plan prepares the provider for."
+      },
+      {
+        "id": "context",
+        "heading": "Our services and where we deliver them",
+        "mode": "tailored",
+        "brief": "Supports, states and settings from the questionnaire; no participant details."
+      },
+      {
+        "id": "risks-and-scenarios",
+        "heading": "Scenarios we plan for",
+        "mode": "tailored",
+        "brief": "Scenario table relevant to the supports and states."
+      },
+      {
+        "id": "actions",
+        "heading": "What we will do",
+        "mode": "tailored",
+        "brief": "Before, during and after; roles; communication."
+      },
+      {
+        "id": "responsibilities",
+        "heading": "Responsibilities",
+        "mode": "tailored",
+        "brief": "Role table."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records and evidence to retain",
+        "mode": "fixed",
+        "brief": "Evidence items."
+      },
+      {
+        "id": "related-documents",
+        "heading": "Related documents and registers",
+        "mode": "fixed",
+        "brief": "Links."
+      },
+      {
+        "id": "review",
+        "heading": "Review and testing",
+        "mode": "fixed",
+        "brief": "Cycle, plus a yearly walk-through."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice."
+      }
+    ],
+    "template": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies."
+      },
+      {
+        "id": "how-to-use",
+        "heading": "How to use this template",
+        "mode": "fixed",
+        "brief": "Fill-in guidance for the provider; placeholders in square brackets."
+      },
+      {
+        "id": "parties",
+        "heading": "Parties",
+        "mode": "tailored",
+        "brief": "Provider details prefilled; participant side left as placeholders (no participant data)."
+      },
+      {
+        "id": "body",
+        "heading": "Agreement terms",
+        "mode": "tailored",
+        "brief": "Clauses required by the mapped standards, in plain English, adjusted to the supports delivered."
+      },
+      {
+        "id": "signatures",
+        "heading": "Signatures",
+        "mode": "fixed",
+        "brief": "Signature block with placeholders."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records to keep",
+        "mode": "fixed",
+        "brief": "Evidence items."
+      },
+      {
+        "id": "review",
+        "heading": "Review",
+        "mode": "fixed",
+        "brief": "Cycle."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice, including that it is not legal advice and a lawyer should review agreement terms."
+      }
+    ],
+    "acknowledgement": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies."
+      },
+      {
+        "id": "introduction",
+        "heading": "Why we ask you to sign this",
+        "mode": "tailored",
+        "brief": "Provider-voiced introduction naming the business."
+      },
+      {
+        "id": "code-text",
+        "heading": "The NDIS Code of Conduct",
+        "mode": "fixed",
+        "brief": "Reference to the Code and where to read it; obligations summarised in plain words with the source cited."
+      },
+      {
+        "id": "our-expectations",
+        "heading": "What this means in our work",
+        "mode": "tailored",
+        "brief": "Examples tied to the supports delivered."
+      },
+      {
+        "id": "acknowledgement",
+        "heading": "Acknowledgement",
+        "mode": "fixed",
+        "brief": "Signature block for the worker or key person."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records to keep",
+        "mode": "fixed",
+        "brief": "Evidence items."
+      },
+      {
+        "id": "review",
+        "heading": "Review",
+        "mode": "fixed",
+        "brief": "Cycle."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice."
+      }
+    ],
+    "framework": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies."
+      },
+      {
+        "id": "purpose",
+        "heading": "Purpose",
+        "mode": "tailored",
+        "brief": "What the framework governs."
+      },
+      {
+        "id": "principles",
+        "heading": "Principles",
+        "mode": "tailored",
+        "brief": "Principles tied to the mapped indicators."
+      },
+      {
+        "id": "structure",
+        "heading": "Structure and oversight",
+        "mode": "tailored",
+        "brief": "Who oversees practice, how often, with what information; sized to the business."
+      },
+      {
+        "id": "processes",
+        "heading": "Processes",
+        "mode": "tailored",
+        "brief": "The named processes the indicators require, each with owner and cycle."
+      },
+      {
+        "id": "responsibilities",
+        "heading": "Responsibilities",
+        "mode": "tailored",
+        "brief": "Role table."
+      },
+      {
+        "id": "records-and-evidence",
+        "heading": "Records and evidence to retain",
+        "mode": "fixed",
+        "brief": "Evidence items."
+      },
+      {
+        "id": "related-documents",
+        "heading": "Related documents and registers",
+        "mode": "fixed",
+        "brief": "Links."
+      },
+      {
+        "id": "review",
+        "heading": "Review",
+        "mode": "fixed",
+        "brief": "Cycle."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice."
+      }
+    ],
+    "self-assessment": [
+      {
+        "id": "document-control",
+        "heading": "Document control",
+        "mode": "fixed",
+        "brief": "As for policies, plus the audit pathway and modules from the questionnaire result."
+      },
+      {
+        "id": "how-to-use",
+        "heading": "How to use this self-assessment",
+        "mode": "fixed",
+        "brief": "Explains the columns and that the provider completes the status column before the audit."
+      },
+      {
+        "id": "summary",
+        "heading": "Our registration scope",
+        "mode": "tailored",
+        "brief": "Groups, pathway, modules and mid-term audit from the derived result, in sentences."
+      },
+      {
+        "id": "standards-table",
+        "heading": "Standards and how we meet them",
+        "mode": "tailored",
+        "brief": "One row per applicable standard: outcome and indicators verbatim (fixed cells), 'how we meet this' (tailored cell), evidence to retain (fixed, from reviewed evidence items), status (blank for the provider)."
+      },
+      {
+        "id": "gaps",
+        "heading": "Items to prepare before the audit",
+        "mode": "fixed",
+        "brief": "The readiness checklist items from the result page."
+      },
+      {
+        "id": "notice",
+        "heading": "About this document",
+        "mode": "fixed",
+        "brief": "Notice."
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": "governance-policy",
+      "title": "Governance policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Sets out how the business is governed: who decides what, how conflicts of interest are handled, how the provider meets its registration conditions and how performance and risk are overseen.",
+      "standards": [
+        "core.governance.governance-and-operational-management",
+        "core.governance.quality-management"
+      ],
+      "evidenceAliases": ["policy.governance"],
+      "registers": ["policy-reviews"],
+      "extraSections": [
+        {
+          "id": "structure-and-delegations",
+          "heading": "Our structure and delegations",
+          "mode": "tailored",
+          "brief": "Describes the legal structure from the questionnaire (sole trader through to company), key personnel and who holds each delegation."
+        }
+      ]
+    },
+    {
+      "id": "risk-management-policy-and-register",
+      "title": "Risk management policy and register",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how risks to participants, workers and the business are identified, rated, treated and reviewed, and provides the register that records them.",
+      "standards": [
+        "core.governance.risk-management",
+        "verification.risk-management"
+      ],
+      "evidenceAliases": ["policy.risk-management", "register.risk"],
+      "registers": ["incidents", "complaints"],
+      "extraSections": [
+        {
+          "id": "risk-areas",
+          "heading": "Risk areas we manage",
+          "mode": "tailored",
+          "brief": "The risk areas the standard lists, each with a sentence on how it shows up for the supports delivered."
+        },
+        {
+          "id": "risk-register",
+          "heading": "Risk register",
+          "mode": "fixed",
+          "brief": "Blank register table: risk, rating, treatment, owner, review date; sample rows marked as examples."
+        }
+      ]
+    },
+    {
+      "id": "continuity-of-supports-plan",
+      "title": "Continuity of supports plan",
+      "kind": "plan",
+      "outline": "plan",
+      "purpose": "Shows how supports keep going when a worker is unavailable, when the provider is unavailable, or when the business changes or closes.",
+      "standards": ["core.governance.continuity-of-supports"],
+      "evidenceAliases": ["policy.continuity-of-supports"],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "sole-trader-cover",
+          "heading": "Cover for the provider's own absence",
+          "mode": "tailored",
+          "brief": "Present when the structure is sole trader or workers are fewer than three; names the arrangement type without naming people."
+        }
+      ]
+    },
+    {
+      "id": "conflict-of-interest-policy",
+      "title": "Conflict of interest policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how actual, potential and perceived conflicts of interest are identified, declared, recorded and managed so participants' choices are not steered.",
+      "standards": [
+        "core.governance.governance-and-operational-management",
+        "core.rights.independence-and-informed-choice"
+      ],
+      "evidenceAliases": ["policy.conflict-of-interest"],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "declarations",
+          "heading": "Declaring a conflict",
+          "mode": "fixed",
+          "brief": "Declaration form and register table."
+        }
+      ]
+    },
+    {
+      "id": "privacy-and-information-management-policy",
+      "title": "Privacy and information management policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how personal information is collected with consent, stored, used, shared and disposed of, and how participants' privacy and dignity are protected during supports.",
+      "standards": [
+        "core.rights.privacy-and-dignity",
+        "core.governance.information-management"
+      ],
+      "evidenceAliases": [
+        "policy.privacy-and-dignity",
+        "policy.information-management",
+        "form.consent"
+      ],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "consent-form",
+          "heading": "Consent form",
+          "mode": "fixed",
+          "brief": "Consent to collect and use personal information, including audio or visual recording; placeholders only."
+        }
+      ]
+    },
+    {
+      "id": "records-management-policy",
+      "title": "Records management policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Sets out what records are kept, where, for how long, who can see them and how they are destroyed, including the records the Commission expects a registered provider to hold.",
+      "standards": ["core.governance.information-management"],
+      "evidenceAliases": ["policy.information-management"],
+      "registers": ["policy-reviews"],
+      "extraSections": [
+        {
+          "id": "retention-schedule",
+          "heading": "Retention schedule",
+          "mode": "tailored",
+          "brief": "Table of record type and retention period, adjusted to the supports and states; cites the source for each period or marks it for the provider to confirm."
+        }
+      ]
+    },
+    {
+      "id": "complaints-management-policy-and-register",
+      "title": "Complaints management policy, procedure and register",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how feedback and complaints are welcomed, acknowledged, resolved, recorded and used to improve, in line with the Commission's complaints rules, and provides the register.",
+      "standards": [
+        "core.governance.feedback-and-complaints-management",
+        "verification.complaints-management"
+      ],
+      "evidenceAliases": [
+        "policy.feedback-and-complaints",
+        "register.complaints"
+      ],
+      "registers": ["complaints"],
+      "extraSections": [
+        {
+          "id": "procedure",
+          "heading": "Complaints procedure",
+          "mode": "tailored",
+          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission."
+        },
+        {
+          "id": "register",
+          "heading": "Complaints register",
+          "mode": "fixed",
+          "brief": "Register columns: reference code, date, summary, actions, outcome, improvement; warning not to record participant health details."
+        }
+      ]
+    },
+    {
+      "id": "incident-management-policy-and-register",
+      "title": "Incident management policy, procedure and register",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how incidents are prevented, responded to, recorded, investigated and reported, including reportable incidents to the Commission within the required timeframes, and provides the register.",
+      "standards": [
+        "core.governance.incident-management",
+        "verification.incident-management"
+      ],
+      "evidenceAliases": ["policy.incident-management", "register.incidents"],
+      "registers": ["incidents"],
+      "extraSections": [
+        {
+          "id": "reportable-incidents",
+          "heading": "Reportable incidents",
+          "mode": "fixed",
+          "brief": "The reportable incident categories and notification timeframes with the Commission source cited; no paraphrase."
+        },
+        {
+          "id": "procedure",
+          "heading": "Incident procedure",
+          "mode": "tailored",
+          "brief": "Numbered steps sized to the business."
+        },
+        {
+          "id": "register",
+          "heading": "Incident register",
+          "mode": "fixed",
+          "brief": "Register columns with reference codes; participant privacy warning."
+        }
+      ]
+    },
+    {
+      "id": "worker-screening-and-recruitment-procedure",
+      "title": "Worker screening and recruitment procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out how workers and key personnel are recruited, checked and cleared, including NDIS worker screening for risk-assessed roles and the register of clearances and expiry dates.",
+      "standards": [
+        "core.governance.human-resource-management",
+        "verification.human-resource-management"
+      ],
+      "evidenceAliases": [
+        "policy.human-resources",
+        "register.worker-clearances"
+      ],
+      "registers": ["worker-clearances"],
+      "extraSections": [
+        {
+          "id": "risk-assessed-roles",
+          "heading": "Our risk-assessed roles",
+          "mode": "tailored",
+          "brief": "Lists the roles from the workforce answers and whether each is risk-assessed; sole-trader wording when there are no workers."
+        },
+        {
+          "id": "clearance-register",
+          "heading": "Worker screening clearance register",
+          "mode": "fixed",
+          "brief": "Columns: role, clearance type, number, expiry, next check."
+        }
+      ]
+    },
+    {
+      "id": "induction-and-training-procedure-and-register",
+      "title": "Induction and training procedure and register",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how workers are inducted, trained, supervised and kept current, and provides the training register.",
+      "standards": [
+        "core.governance.human-resource-management",
+        "verification.human-resource-management"
+      ],
+      "evidenceAliases": ["policy.human-resources", "register.training"],
+      "registers": ["training"],
+      "extraSections": [
+        {
+          "id": "training-matrix",
+          "heading": "Training we require",
+          "mode": "tailored",
+          "brief": "Table of training by role, including anything the chosen modules require (high intensity skills, behaviour support, infection control)."
+        },
+        {
+          "id": "training-register",
+          "heading": "Training register",
+          "mode": "fixed",
+          "brief": "Register columns."
+        }
+      ]
+    },
+    {
+      "id": "code-of-conduct-acknowledgement",
+      "title": "NDIS Code of Conduct acknowledgement",
+      "kind": "acknowledgement",
+      "outline": "acknowledgement",
+      "purpose": "Records that each worker and key person has read the NDIS Code of Conduct and understands what it means in this business.",
+      "standards": [
+        "core.governance.human-resource-management",
+        "verification.human-resource-management",
+        "core.rights.violence-abuse-neglect-exploitation-and-discrimination"
+      ],
+      "evidenceAliases": ["policy.human-resources"],
+      "registers": ["training"],
+      "extraSections": []
+    },
+    {
+      "id": "service-agreement-template",
+      "title": "Service agreement template",
+      "kind": "template",
+      "outline": "template",
+      "purpose": "A plain-language service agreement the provider completes with each participant, covering the supports, costs, how to raise concerns, and what happens in an emergency.",
+      "standards": [
+        "core.provision.service-agreements-with-participants",
+        "core.provision.access-to-supports"
+      ],
+      "evidenceAliases": [
+        "form.service-agreement",
+        "policy.service-agreements",
+        "policy.access-to-supports"
+      ],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "easy-read-summary",
+          "heading": "Easy-read summary",
+          "mode": "tailored",
+          "brief": "One-page summary of the agreement in short sentences, prefilled with the provider's supports; participant placeholders only."
+        }
+      ]
+    },
+    {
+      "id": "participant-rights-and-choice-policy",
+      "title": "Participant rights, choice and control policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Commits the provider to person-centred supports, respect for each participant's values and beliefs, and support for informed choice and dignity of risk.",
+      "standards": [
+        "core.rights.person-centred-supports",
+        "core.rights.individual-values-and-beliefs",
+        "core.rights.independence-and-informed-choice"
+      ],
+      "evidenceAliases": [
+        "policy.participant-rights",
+        "policy.choice-and-control"
+      ],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "communication",
+          "heading": "How we communicate and record preferences",
+          "mode": "tailored",
+          "brief": "Describes how communication needs and support networks are recorded in support plans, by reference code only."
+        }
+      ]
+    },
+    {
+      "id": "safeguarding-policy",
+      "title": "Safeguarding policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how the provider prevents, recognises and responds to violence, abuse, neglect, exploitation and discrimination, and how workers and participants can raise concerns safely.",
+      "standards": [
+        "core.rights.violence-abuse-neglect-exploitation-and-discrimination"
+      ],
+      "evidenceAliases": ["policy.safeguarding"],
+      "registers": ["incidents"],
+      "extraSections": [
+        {
+          "id": "responding",
+          "heading": "Responding to an allegation",
+          "mode": "tailored",
+          "brief": "Steps that link to the incident procedure and the reportable incident timeframes."
+        }
+      ]
+    },
+    {
+      "id": "emergency-and-disaster-management-plan",
+      "title": "Emergency and disaster management plan",
+      "kind": "plan",
+      "outline": "plan",
+      "purpose": "Prepares the provider to keep participants safe and supports going through emergencies and disasters, including how supports change and how everyone is kept informed.",
+      "standards": ["core.governance.emergency-and-disaster-management"],
+      "evidenceAliases": ["plan.emergency-and-disaster"],
+      "registers": ["policy-reviews"],
+      "extraSections": []
+    },
+    {
+      "id": "ai-use-and-governance-policy",
+      "title": "AI use and governance policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Sets out which digital and AI tools the provider allows, for what, with what safeguards, and how human review and participant consent apply, consistent with the Commission's published position on AI.",
+      "standards": [
+        "core.governance.governance-and-operational-management",
+        "core.governance.information-management",
+        "core.rights.privacy-and-dignity"
+      ],
+      "evidenceAliases": [],
+      "registers": ["policy-reviews"],
+      "extraSections": [
+        {
+          "id": "approved-tools",
+          "heading": "Approved tools and uses",
+          "mode": "tailored",
+          "brief": "Table of tool category, allowed use, not allowed, and who approves; seeded from the 'existing systems' answers."
+        },
+        {
+          "id": "participant-information",
+          "heading": "Participant information and AI",
+          "mode": "fixed",
+          "brief": "Rule: no participant personal, health or disability information goes into an AI tool unless de-identified and consented; cites the Commission position statement."
+        }
+      ]
+    },
+    {
+      "id": "ai-and-digital-data-handling-procedure",
+      "title": "AI and digital data handling procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Step-by-step rules for de-identifying information before any AI or digital tool, recording consent, reviewing outputs and reporting mistakes.",
+      "standards": [
+        "core.governance.information-management",
+        "core.rights.privacy-and-dignity"
+      ],
+      "evidenceAliases": [],
+      "registers": ["incidents"],
+      "extraSections": [
+        {
+          "id": "de-identification",
+          "heading": "De-identification checklist",
+          "mode": "fixed",
+          "brief": "Checklist of identifiers to remove and the reference-code convention."
+        }
+      ]
+    },
+    {
+      "id": "quality-management-and-continuous-improvement",
+      "title": "Quality management and continuous improvement policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Explains how the provider checks its own quality, acts on feedback, complaints, incidents and audit findings, and keeps a record of improvements.",
+      "standards": ["core.governance.quality-management"],
+      "evidenceAliases": ["policy.quality-management"],
+      "registers": ["complaints", "incidents", "policy-reviews"],
+      "extraSections": [
+        {
+          "id": "improvement-register",
+          "heading": "Continuous improvement register",
+          "mode": "fixed",
+          "brief": "Columns: source, improvement, owner, due, done."
+        }
+      ]
+    },
+    {
+      "id": "feedback-and-participant-engagement-procedure",
+      "title": "Participant engagement, support planning and transitions procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how participants are involved in planning and reviewing their supports, how responsive, least-intrusive support is provided, and how transitions into or out of the provider are managed.",
+      "standards": [
+        "core.governance.feedback-and-complaints-management",
+        "core.provision.support-planning",
+        "core.provision.responsive-support-provision",
+        "core.provision.transitions-to-or-from-a-provider"
+      ],
+      "evidenceAliases": [
+        "policy.support-planning",
+        "policy.responsive-support",
+        "policy.transitions",
+        "form.support-plan"
+      ],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "support-plan-template",
+          "heading": "Support plan template",
+          "mode": "fixed",
+          "brief": "Template with risk assessment, preventative health, emergency responses and annual review date; placeholders only."
+        }
+      ]
+    },
+    {
+      "id": "medication-management-procedure",
+      "title": "Medication management procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out how workers support participants with medication safely, including records, storage, errors and training.",
+      "standards": ["core.environment.management-of-medication"],
+      "evidenceAliases": ["policy.medication-management"],
+      "registers": ["incidents", "training"],
+      "extraSections": []
+    },
+    {
+      "id": "mealtime-management-procedure",
+      "title": "Mealtime management procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out how mealtime needs, including texture-modified food and fluids, are assessed, planned, delivered and reviewed safely.",
+      "standards": ["core.environment.mealtime-management"],
+      "evidenceAliases": ["policy.mealtime-management"],
+      "registers": ["incidents", "training"],
+      "extraSections": []
+    },
+    {
+      "id": "waste-and-infection-control-procedure",
+      "title": "Safe environment, infection control and waste procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how support environments are kept safe, how workers identify themselves, how infection is prevented and how waste, including infectious and hazardous waste, is handled.",
+      "standards": [
+        "core.environment.safe-environment",
+        "core.environment.management-of-waste"
+      ],
+      "evidenceAliases": [
+        "policy.safe-environment",
+        "policy.infection-control",
+        "policy.waste-management"
+      ],
+      "registers": ["incidents", "training"],
+      "extraSections": [
+        {
+          "id": "settings",
+          "heading": "The settings we work in",
+          "mode": "tailored",
+          "brief": "Home, community, centre or vehicle, from the supports answers, each with the main hazards."
+        }
+      ]
+    },
+    {
+      "id": "transport-safety-procedure",
+      "title": "Transport safety procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out vehicle, driver and participant safety rules for transport supports.",
+      "standards": ["core.environment.safe-environment"],
+      "evidenceAliases": ["policy.safe-environment"],
+      "registers": ["incidents"],
+      "extraSections": []
+    },
+    {
+      "id": "high-intensity-skills-descriptors-and-training-register",
+      "title": "High intensity supports policy and training register",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Commits the provider to delivering high intensity daily personal activities only through workers trained and assessed against the Commission's skills descriptors, and records that training.",
+      "standards": [
+        "hidpa.complex-bowel-care",
+        "hidpa.enteral-feeding-and-management",
+        "hidpa.severe-dysphagia-management",
+        "hidpa.tracheostomy-management",
+        "hidpa.urinary-catheter-management",
+        "hidpa.ventilator-management",
+        "hidpa.subcutaneous-injections",
+        "hidpa.complex-wound-management"
+      ],
+      "evidenceAliases": ["policy.high-intensity-supports"],
+      "registers": ["training"],
+      "extraSections": [
+        {
+          "id": "supports-we-deliver",
+          "heading": "High intensity supports we deliver",
+          "mode": "tailored",
+          "brief": "Which of the eight activities apply, from the supports answers; the rest are marked not delivered."
+        },
+        {
+          "id": "training-register",
+          "heading": "High intensity training and competency register",
+          "mode": "fixed",
+          "brief": "Columns per activity: worker role, training, assessor, date, review."
+        }
+      ]
+    },
+    {
+      "id": "clinical-oversight-procedure",
+      "title": "Clinical oversight procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how health practitioner input, support plans and worker competence are arranged and reviewed for each high intensity support.",
+      "standards": [
+        "hidpa.complex-bowel-care",
+        "hidpa.enteral-feeding-and-management",
+        "hidpa.severe-dysphagia-management",
+        "hidpa.tracheostomy-management",
+        "hidpa.urinary-catheter-management",
+        "hidpa.ventilator-management",
+        "hidpa.subcutaneous-injections",
+        "hidpa.complex-wound-management"
+      ],
+      "evidenceAliases": ["policy.high-intensity-supports"],
+      "registers": ["incidents", "training"],
+      "extraSections": []
+    },
+    {
+      "id": "restrictive-practice-authorisation-and-reporting-procedure",
+      "title": "Restrictive practice authorisation and reporting procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out how regulated restrictive practices are authorised under the relevant state or territory process, used only as described in a behaviour support plan, recorded, reported to the Commission and reduced over time.",
+      "standards": [
+        "sbs.restrictive-practices",
+        "sbs.reportable-incidents-involving-the-use-of-a-restrictive-practice",
+        "ibsp.regulated-restrictive-practices",
+        "ibsp.monitoring-and-reporting-the-use-of-regulated-restrictive-practices",
+        "ibsp.reportable-incidents-involving-the-use-of-a-restrictive-practice"
+      ],
+      "evidenceAliases": [
+        "policy.restrictive-practices",
+        "register.restrictive-practices"
+      ],
+      "registers": ["incidents"],
+      "proposedRegisters": ["restrictive-practices"],
+      "extraSections": [
+        {
+          "id": "state-authorisation",
+          "heading": "Authorisation in the states where we work",
+          "mode": "tailored",
+          "brief": "One paragraph per state from the questionnaire, naming the authorisation body and marking anything not confirmed from a primary source."
+        },
+        {
+          "id": "use-register",
+          "heading": "Restrictive practice use register",
+          "mode": "fixed",
+          "brief": "Columns supporting monthly reporting; reference codes only."
+        }
+      ]
+    },
+    {
+      "id": "behaviour-support-plan-implementation-procedure",
+      "title": "Behaviour support plan implementation procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how behaviour support plans, including interim plans, are obtained, understood by workers, put into practice, monitored and reviewed with the practitioner.",
+      "standards": [
+        "sbs.behaviour-support-in-the-ndis",
+        "sbs.functional-behaviour-assessments-and-behaviour-support-plans",
+        "sbs.supporting-the-implementation-of-the-behaviour-support-plan",
+        "sbs.behaviour-support-plan-monitoring-and-review",
+        "sbs.interim-behaviour-support-plans",
+        "ibsp.behaviour-support-in-the-ndis",
+        "ibsp.supporting-the-assessment-and-development-of-behaviour-support-plans",
+        "ibsp.behaviour-support-plan-implementation",
+        "ibsp.behaviour-support-plan-review",
+        "ibsp.interim-behaviour-support-plans"
+      ],
+      "evidenceAliases": ["policy.behaviour-support"],
+      "registers": ["incidents", "training"],
+      "extraSections": [
+        {
+          "id": "our-role",
+          "heading": "Our role: practitioner or implementing provider",
+          "mode": "tailored",
+          "brief": "States which of the two modules applies from the result and adjusts the steps accordingly."
+        }
+      ]
+    },
+    {
+      "id": "family-centred-practice-procedure",
+      "title": "Family-centred early childhood practice procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how early childhood supports are delivered with families, in natural settings, collaboratively, using evidence and measured by outcomes.",
+      "standards": [
+        "ec.the-family",
+        "ec.inclusion",
+        "ec.collaboration",
+        "ec.capacity-building",
+        "ec.evidence-informed-practice",
+        "ec.outcome-based-approach"
+      ],
+      "evidenceAliases": ["policy.early-childhood-practice"],
+      "registers": ["training"],
+      "extraSections": []
+    },
+    {
+      "id": "child-safe-practices-policy",
+      "title": "Child safe practices policy",
+      "kind": "policy",
+      "outline": "policy",
+      "purpose": "Commits the provider to the rights and safety of each child, including mandatory reporting under the law of each state where it works.",
+      "standards": ["ec.the-child"],
+      "evidenceAliases": ["policy.child-safety"],
+      "registers": ["incidents", "worker-clearances"],
+      "extraSections": [
+        {
+          "id": "state-reporting",
+          "heading": "Mandatory reporting where we work",
+          "mode": "tailored",
+          "brief": "One paragraph per state from the questionnaire naming the reporting scheme, marked unverified where not confirmed from a primary source."
+        }
+      ]
+    },
+    {
+      "id": "conflict-of-interest-in-coordination-procedure",
+      "title": "Conflict of interest in support coordination procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how conflicts between coordinating a participant's supports and delivering them are avoided, declared and managed, and how a participant's supports are managed in their interest.",
+      "standards": [
+        "ssc.conflict-of-interest",
+        "ssc.management-of-a-participants-ndis-supports"
+      ],
+      "evidenceAliases": ["policy.support-coordination"],
+      "registers": [],
+      "extraSections": []
+    },
+    {
+      "id": "complex-support-escalation-procedure",
+      "title": "Complex support escalation procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Sets out how high-risk and complex situations are recognised, escalated, coordinated with other services and reviewed.",
+      "standards": ["ssc.specialised-support-coordination"],
+      "evidenceAliases": ["policy.support-coordination"],
+      "registers": ["incidents"],
+      "extraSections": []
+    },
+    {
+      "id": "dwelling-enrolment-and-maintenance-procedure",
+      "title": "SDA dwelling enrolment and maintenance procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how dwellings are enrolled and kept compliant with the SDA rules, and how residents' rights and responsibilities are upheld.",
+      "standards": [
+        "sda.enrolment-of-sda-properties",
+        "sda.rights-and-responsibilities"
+      ],
+      "evidenceAliases": [],
+      "registers": ["incidents"],
+      "extraSections": []
+    },
+    {
+      "id": "tenancy-rights-and-dispute-procedure",
+      "title": "SDA tenancy, agreements and dispute procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains tenancy management, the service and tenancy agreement, conflict of interest between housing and supports, and how disputes are handled.",
+      "standards": [
+        "sda.tenancy-management",
+        "sda.service-agreements-with-participants",
+        "sda.conflict-of-interest"
+      ],
+      "evidenceAliases": ["policy.sda-tenancy"],
+      "registers": ["complaints"],
+      "extraSections": [
+        {
+          "id": "agreement-template",
+          "heading": "SDA service and tenancy agreement template",
+          "mode": "fixed",
+          "brief": "Template placeholders; marked for legal review."
+        }
+      ]
+    },
+    {
+      "id": "supported-decision-making-procedure",
+      "title": "Supported decision-making procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how participants in supported independent living are supported to make their own decisions, including about their home and daily life.",
+      "standards": ["sil.supported-decision-making"],
+      "evidenceAliases": ["policy.supported-decision-making"],
+      "registers": [],
+      "extraSections": []
+    },
+    {
+      "id": "sil-safeguarding-and-roster-oversight-procedure",
+      "title": "SIL safeguarding and roster oversight procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains dignity of risk, worker responsibilities in the home, oversight of rosters and sleepovers, and how conflict or bullying between co-tenants is prevented and handled.",
+      "standards": ["sil.safeguarding"],
+      "evidenceAliases": ["policy.sil-safeguarding"],
+      "registers": ["incidents", "worker-clearances"],
+      "extraSections": []
+    },
+    {
+      "id": "practice-governance-framework",
+      "title": "SIL practice governance framework",
+      "kind": "framework",
+      "outline": "framework",
+      "purpose": "Sets the vision and values for each home, how worker practice is developed and supervised, how co-tenants are matched and how emergencies in the home are overseen.",
+      "standards": ["sil.practice-governance"],
+      "evidenceAliases": ["policy.sil-practice-governance"],
+      "registers": ["training", "incidents"],
+      "extraSections": []
+    },
+    {
+      "id": "tenancy-housing-and-support-agreements-procedure",
+      "title": "SIL tenancy, housing and support agreements procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "purpose": "Explains how separate agreements for supports and for tenancy or housing are made, explained and reviewed with each participant.",
+      "standards": [
+        "sil.agreements-about-tenancy-housing-and-support-arrangements"
+      ],
+      "evidenceAliases": ["policy.sil-tenancy-and-service-agreements"],
+      "registers": [],
+      "extraSections": [
+        {
+          "id": "agreement-templates",
+          "heading": "Agreement templates",
+          "mode": "fixed",
+          "brief": "Separate SIL service agreement and tenancy agreement templates; placeholders; marked for legal review."
+        }
+      ]
+    },
+    {
+      "id": "practice-standards-self-assessment",
+      "title": "Practice Standards self-assessment",
+      "kind": "self-assessment",
+      "outline": "self-assessment",
+      "purpose": "One row per applicable standard with the Commission's outcome and indicators, how the provider meets them, the evidence to retain and a status column the provider completes before the audit.",
+      "standardsSelection": "all-applicable",
+      "standards": [],
+      "evidenceAliases": [],
+      "registers": [
+        "incidents",
+        "complaints",
+        "worker-clearances",
+        "training",
+        "policy-reviews"
+      ],
+      "extraSections": []
+    },
+    {
+      "id": "participant-money-and-property-procedure",
+      "title": "Participant money and property procedure",
+      "kind": "procedure",
+      "outline": "procedure",
+      "proposed": true,
+      "proposalNote": "Not in document-sets.json. The core standard 'Participant money and property' has no document in the PO's set; proposed for the core module. PO decides.",
+      "purpose": "Sets out how workers handle a participant's money or property only when asked, with records and safeguards.",
+      "standards": ["core.environment.participant-money-and-property"],
+      "evidenceAliases": ["policy.participant-money-and-property"],
+      "registers": ["incidents"],
+      "extraSections": []
+    }
+  ]
+}

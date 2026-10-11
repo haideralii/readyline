@@ -680,6 +680,39 @@ needs. Rather than widen the token, `migrate.yml` pushes over a direct
 database URL (session pooler, port 5432, user `postgres.<ref>`) using only
 `SUPABASE_DB_PASSWORD`; the access token stays for future CLI use.
 
+## REQ-005: document generator (branch `req-005-generator`, Dev response stage)
+
+Decision numbers D-5xx on this branch.
+
+**D-501 Closed block schema for model output (Dev, 2026-10-11).** Tailored
+sections are JSON with five block types (paragraph, bullets, steps, table,
+callout) validated by zod `strictObject` before rendering; no HTML or
+Markdown from the model. One renderer path handles fixed and tailored
+sections because fixed text is authored in the same block schema. Snapshot
+tests serialise the document model, not the `.docx` binary.
+
+**D-502 Fixture replay keyed by request hash.** Model calls in CI replay
+fixtures keyed by SHA-256 of prompt version, model id and the canonical
+request; a missing fixture fails the test, so a prompt change is visible as a
+diff of re-recorded sections. CI never holds `ANTHROPIC_API_KEY`.
+
+**D-503 Readability measured in-repo.** Flesch-Kincaid grade implemented in
+the repo with tests rather than an unmaintained dependency; warn above 9.0
+per tailored section, fail the quality gate above 11.0; tables and headings
+excluded from the measure.
+
+**D-504 LibreOffice conversion as a separate CI job.** AC-1 is proven by
+converting every rendered `.docx` to PDF with headless LibreOffice in a job
+that runs only when generator code or fixtures change, and nightly.
+
+**D-505 Catalogue reconciles two document-id schemes.** `document-sets.json`
+(PO ids such as `governance-policy`) and the evidence items in
+`standards.json` (`policy.governance`) are joined through
+`evidenceAliases` in `document-types.json`; neither file is renamed. Gaps
+found while drafting (participant money and property; support planning and
+transitions; a restrictive practice use register) are flagged for the PO in
+the REQ-005 Dev response rather than silently added.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
