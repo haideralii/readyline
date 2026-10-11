@@ -20,6 +20,18 @@ Rules that always apply: `CLAUDE.md` section 4, the threat model, the definition
 
 5. STOP. Append your status below.
 
+## Queue (written by PO, 11 Oct 2026, batch 3)
+
+**Merge-rule clarification (D-028):** when Dev cannot read CI status (no `gh`, private repo), the "every CI job green" condition may be met by running the identical checks locally and recording the output in Delivery evidence: `npm run check`, `npm run build`, `npm run test:e2e`, `npm audit --omit=dev --audit-level=high`, and a local gitleaks run (`gitleaks git --config .gitleaks.toml` with the pinned binary; see item 1). The PO verifies the GitHub run afterwards; if it is red, fixing it forward is the first item of the next batch.
+
+1. **REQ-002: gitleaks findings, then merge** on `req-002-security-baseline`. The scan now runs (permissions fix confirmed in run #12) and reports five token-shaped strings in `src/lib/logging/redact.test.ts` (Stripe, AWS, JWT fixtures). Rewrite those fixtures so no literal token-shaped string is committed: build them at runtime (prefix plus generated body), keep the redactor assertions. Add a `.gitleaksignore` with the five historical fingerprints from run #12, each with a one-line comment saying they are test fixtures, since the earlier commit stays in the branch history. Set `GITLEAKS_ENABLE_COMMENTS: "false"` on the job (PR comments need write permission we do not grant). Push; run the local equivalents per D-028, including gitleaks on the branch commits; then merge per the merge rule and record the merge commit.
+
+2. **REQ-003 build** on `req-003-questionnaire` (unblocked by item 1): rebase onto `main`; apply the PO review in the REQ (descriptions `status: "reviewed"`; create `data/readyline-content/modules.json`, `audit-types.json`, `document-sets.json` from the PO text with tests; strip `servicesNote` before derivation with a test). Then Sessions A, B and C. Push after each session. Fill Delivery evidence with screenshots at 360x740 and desktop for every step, Lighthouse accessibility scores, the e2e report, and the local check outputs. Do not merge; the PO reviews UI.
+
+3. **REQ-004 Session A** on `req-004-accounts`, only if `.env.local` already contains the three Supabase values (check for presence, never print them). If absent, write "waiting for Supabase values" under this item and skip. Session A per the Dev response: Supabase wiring, migrations, RLS policies, the integration test project, CI job layout. Push; fill Delivery evidence. Do not merge.
+
+4. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)

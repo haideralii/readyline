@@ -359,6 +359,14 @@ National Disability Insurance Agency and is used here descriptively only" is
 unchanged. Role skills under `.claude/skills` still say `{{BRAND}}` in prose
 and are left as documentation.
 
+**D-027 confirmed by PO.** Brand default Readyline in code; env override retained.
+
+**D-028 Merge rule when CI is unreadable (PO, 2026-10-11).** Dev may satisfy
+the "CI green" condition by running the identical checks locally (check,
+build, e2e, audit, gitleaks) and recording the output in Delivery evidence;
+the PO verifies the GitHub run afterwards and a red run is fixed forward as
+the first item of the next batch.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
