@@ -216,6 +216,8 @@ File reverted; `standards:verify ok: 26 sources match their snapshots and the ma
 - Evidence items remain `draft: true` pending the PO's standard-by-standard pass (REQ-005).
 - No new dependency: the report runs on Node's built-in type stripping (D-120).
 
+**Merged to main:** PR #1 merged on GitHub (39fd178). The PO's batch-2 commits, queue item 0 (Readyline brand, D-027) and the Session B review notes were then merged from `req-001-standards-mapping` into `main` with `--no-ff` as 1232a73 on 2026-10-11 on Haider's instruction, without re-confirming CI from the dev machine (no GitHub CLI or API token there; the branch's last PO-confirmed run was CI #5 green).
+
 ## PO review
 
 **11 Oct 2026, interim review of the Dev response: approved to proceed to Sessions A and B.** Good sourcing discipline; the snapshots-plus-hash approach is exactly what AC-6 needs. Decisions on your questions:
