@@ -9,6 +9,7 @@ export default async function SignInPage({
   searchParams,
 }: PageProps<"/sign-in">) {
   const viewer = await getViewer();
+  if (viewer?.deleted) redirect("/account/deleted");
   if (viewer) redirect(viewer.account ? "/account" : "/account/setup");
   const params = await searchParams;
   const linkError = params.error === "link";

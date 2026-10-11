@@ -95,6 +95,12 @@ test.describe("questionnaire", () => {
     await expect(page.getByTestId("draft-status")).toContainText(
       "Draft saved locally on this device",
     );
+    // PO batch 5: legend and labels, and the claim-free "what happens next" block.
+    await expect(page.getByTestId("have-legend")).toContainText("To prepare");
+    await expect(page.getByText("Not asked yet")).toHaveCount(0);
+    await expect(page.getByTestId("what-next")).toContainText(
+      "What happens next",
+    );
   });
 
   test("[0120, 0107] is certification with the core module and a mid-term audit (AC-2)", async ({
