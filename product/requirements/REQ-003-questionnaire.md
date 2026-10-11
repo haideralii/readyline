@@ -214,3 +214,5 @@ Changes (fold into the batch-5 rebase):
 
 Noted for later REQs, not for this one: the supports step is long on a phone (38 cards); when the questionnaire gets real users, consider collapsing the two audit-type groups by default with the search open. The result page is where REQ-006 and REQ-007 will place the pack and subscription offer.
 
+**11 Oct 2026, final: ACCEPTED on PR #6 (`req-003-questionnaire-rebuilt`, 7d02102).** The three UI items ("To prepare" labels with legend, "What happens next" block, screenshots from the production build) are delivered. Merge after #5 when CI is green. Status: accepted.
+

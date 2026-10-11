@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
+'nonce-â€¦' 'strict-dynamic'`, `style-src 'self' 'nonce-â€¦'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -743,6 +743,22 @@ adds `audit_log_insert_member` (`is_member(account_id)` and
 `actor_user_id = auth.uid()`), and the actions now log a warning when an
 audit write fails. The integration suite proves a member cannot write a row
 as someone else or for another account.
+**D-035 Incident: PO commit swept the working tree (2026-10-11).** The PO's
+batch-5 commit `afeab24` on `main` was made after a `git checkout main` that
+could not remove branch files (deletes are blocked in the connected folder),
+and `git add -A` captured REQ-002, REQ-003 and REQ-004 code at their Session B
+state. CI on `main` passed on that state (runs 24 and 25), so nothing broken
+reached `main`; Dev rebuilt the three branches as deltas on top (`*-rebuilt`).
+Cause: PO git hygiene. Fix: rules in `product/README.md`; the PO stages
+explicit paths only and never checks out branches in the shared tree. PRs #2
+to #4 closed; #5 to #7 opened from the rebuilt branches.
+
+**D-036 Migration deploy without `supabase link` (PO, 2026-10-11).** The
+scoped access token lacks `api_gateway_keys_read`, which `supabase link`
+needs. Rather than widen the token, `migrate.yml` pushes over a direct
+database URL (session pooler, port 5432, user `postgres.<ref>`) using only
+`SUPABASE_DB_PASSWORD`; the access token stays for future CLI use.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

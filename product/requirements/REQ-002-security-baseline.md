@@ -165,3 +165,5 @@ permissions:
 
 Then rebase onto `main` (after PR #1 merges), resolve the expected conflicts in `DECISIONS.md`, `.prettierignore` and the REQ files by keeping both sides, and push. When both CI jobs are green the acceptance stands and the Dev may merge per the queue rule in `product/NEXT.md`. Status becomes `accepted` on merge.
 
+**11 Oct 2026, final: ACCEPTED on PR #5 (`req-002-security-baseline-rebuilt`, c352398).** The baseline code is already on `main` (D-035) and green there; PR #5 carries the last cleanups (empty `.gitleaksignore`, `DECISIONS.md` ignored by Prettier). Merge when CI on #5 is green. Status: accepted.
+

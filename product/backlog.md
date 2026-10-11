@@ -7,10 +7,10 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ | Title | Phase | Priority | Status |
 |-----|-------|-------|----------|--------|
 | REQ-001 | Standards and registration-group mapping (`data/standards.json`) | 1 | must | in progress |
-| REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | accepted conditionally 11 Oct (PR #2; gitleaks permissions fix, then merge) |
-| REQ-003 | Readiness questionnaire with save-and-resume | 2 | must | in progress (Dev response accepted; build Sessions A–C approved, PR #3) |
-| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | ready (Dev response first) |
-| REQ-005 | Document generator and `.docx` rendering, incl. AI governance docs | 3 | must | draft |
+| REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | accepted 11 Oct; merge PR #5 |
+| REQ-003 | Readiness questionnaire with save-and-resume | 2 | must | accepted 11 Oct; merge PR #6 |
+| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | accepted 11 Oct subject to CI; merge PR #7; operator steps pending |
+| REQ-005 | Document generator and `.docx` rendering, incl. AI governance docs | 3 | must | in progress (Dev response accepted 12 Oct; Sessions A–B queued) |
 | REQ-006 | Readiness checklist | 4 | must | draft |
 | REQ-007 | Payments: one-off pack and subscription, entitlements, refunds | 4 | must | draft |
 | REQ-008 | Legal and trust pages: terms, privacy, refunds, AI disclosure, data location | 4 | must | draft |
