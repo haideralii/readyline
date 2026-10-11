@@ -56,7 +56,72 @@ CI link with the RLS suite visible; migration files; a screenshot of the Supabas
 4. Estimate in sessions, and exactly which values Haider must supply from the Supabase dashboard (names only, never values in chat).
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11 on branch `req-004-accounts` (from `main`). Dev response only; nothing provisioned, no code.
+
+### Q1. Supabase CLI local stack in GitHub Actions
+
+Feasible inside the 20-minute budget. The Supabase CLI runs the full stack (Postgres, Auth, Storage, the local mail inbox) in Docker, which the `ubuntu-latest` runner already has. Cold start is dominated by pulling images (roughly 3 to 5 minutes the first time; GitHub's runner image caches nothing between runs, so plan for the cold number), then `supabase db reset` applies `supabase/migrations/*` in seconds.
+
+Proposed job layout, a third job beside `checks` and `secrets` so the existing lint-to-e2e path stays fast:
+
+```
+jobs:
+  supabase-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - checkout; setup-node (cache npm); npm ci
+      - uses: supabase/setup-cli@v1          # pins a CLI version
+      - run: supabase start -x studio,imgproxy,logflare,vector   # keep db, auth, storage, mail inbox
+      - run: supabase status -o env >> $GITHUB_ENV              # exports API URL, anon and service-role keys for the local stack
+      - run: npm run test:integration        # vitest project "integration": RLS cross-tenant, export, deletion + purge, rate limits
+      - run: npm run build && npm run test:e2e -- --grep @auth   # sign-in and draft migration on both Playwright projects, magic-link email read from the local inbox API
+      - if: always() -> supabase stop; upload Playwright report on failure
+```
+
+Trade-offs: the local stack's keys are throwaway and printed only into the job environment, never into logs; the integration tests run against a real Postgres with the real RLS engine, which is the point of SR-1 and AC-2. If image pulls ever push the job past budget, the fallback is a dedicated Supabase "test" project in Sydney with its own keys as repository secrets and `supabase db reset --linked` per run; slower to set up, no Docker.
+
+### Q2. Magic-link rate limiting
+
+Recommendation: our own limiter in front of Supabase, with Supabase's built-in limits kept as the backstop.
+
+- Ours, in the sign-in server action before `signInWithOtp` is called: 5 requests per email per rolling hour and 20 per IP per rolling hour, exactly the REQ numbers. Keyed by SHA-256 of the lower-cased email (so the limiter table never holds emails in clear, SR-4) and by the client IP from the platform header. Stored in a small `auth_rate_limits` table (`key`, `window_start`, `count`) updated by a Postgres function in one statement, so two concurrent requests cannot both pass. The response is the same generic "If that address is registered you will receive a link" whether the email exists, is unknown, or was rate limited (AC-1, AC-6); the limited case simply does not call Supabase.
+- Supabase's built-in: the project-level email send limit (configurable per hour once custom SMTP is set; the default SMTP allows only a handful of emails per hour and is for development only) and the per-IP OTP limits on the Auth endpoints. These stay on as a second layer. Consequence recorded against D-013: a transactional email provider with custom SMTP is required before any real sign-in traffic, so REQ-009's provider decision is pulled forward to REQ-004's build.
+
+Why not built-in only: its limits are per project and per IP, not per email, and the numbers are not ours to set precisely; the REQ's acceptance criteria name per-email counts.
+
+### Q3. Purge job
+
+Options:
+
+1. **Vercel Cron hitting a route handler (recommended).** A daily `GET /api/jobs/purge` protected by the `CRON_SECRET` header Vercel sends, using the service-role client in a server-only module to delete rows for accounts soft-deleted more than 30 days ago, delete their storage objects through the Storage API, write an `audit_log` row, and send the confirmation email. Idempotent (re-running finds nothing to do) and unit-testable by calling the handler with a fake clock. Trade-off: on the Hobby plan cron runs once a day within an hour window, which is fine for a 30-day purge; it couples the job to Vercel, which already hosts the app.
+2. **pg_cron inside Supabase.** Runs without any external trigger, but deleting storage objects by SQL does not remove the files, so it would need pg_net calling an Edge Function; two moving parts and harder to test locally.
+3. **GitHub Actions schedule.** Keeps production secrets in a third place and runs from outside the production boundary; rejected.
+
+Manual run for AC-5 testing: the same handler accepts a `dryRun` flag and is invoked directly in the integration test with the clock advanced.
+
+### Q4. Estimate and values Haider must supply
+
+Three sessions. A: Supabase wiring (`@supabase/supabase-js` and `@supabase/ssr`, two runtime dependencies justified by REQ-004 FR-8), migrations for `users`, `accounts`, `memberships`, `questionnaire_drafts`, `audit_log` with RLS, the CI stack job and the cross-tenant test. B: magic-link sign-in with our limiter, account bootstrap, local-draft migration (AC-3), account settings. C: export, soft delete and purge, admin flag with MFA, e2e on both projects, evidence.
+
+Values to copy from the Supabase dashboard into `.env.local` (names only; production copies go into Vercel project environment variables, server-only ones never prefixed `NEXT_PUBLIC_`):
+
+- `NEXT_PUBLIC_SUPABASE_URL` (Project Settings, API, Project URL)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings, API, anon public key)
+- `SUPABASE_SERVICE_ROLE_KEY` (Project Settings, API, service_role key; server only)
+- `SUPABASE_PROJECT_REF` (Project Settings, General, Reference ID; used by the CLI to link, not by the app)
+- `SUPABASE_DB_PASSWORD` (set when the project is created; used only by `supabase db push` from the dev machine, never by the app or CI)
+- `SUPABASE_ACCESS_TOKEN` (Account, Access Tokens; a repository secret for CI only if we ever push migrations from CI)
+- `CRON_SECRET` (not from Supabase; generated by us and set in Vercel for the purge route)
+
+Dashboard settings Haider will be asked to make at build time, not now: region `ap-southeast-2` (screenshot for evidence), Site URL and redirect URLs for the magic link, MFA (TOTP) enabled, custom SMTP once the email provider is chosen.
+
+### Notes
+
+- SR-2: `connect-src` gains the Supabase project origin only; recorded in `DECISIONS.md` when wired.
+- AC-8 (service-role key absent from the client bundle): a build-time test will grep `.next/static` for the key prefix and for the variable name; the key itself lives only in `src/server/**` modules marked `server-only`.
+- The `DraftStore` server implementation and the "about your business" step reuse the REQ-003 schemas unchanged.
 
 ## Delivery evidence
 (Dev fills in.)
