@@ -130,6 +130,8 @@ npm run check:env-files: ok, no .env files tracked
 - Merging with `req-001-standards-mapping` will conflict trivially in `DECISIONS.md` (D-1xx versus D-2xx sections), `.prettierignore` (identical additions) and this file (Dev response and PO review sections); keep both.
 - Local development now needs `.env.local` with `NEXT_PUBLIC_SITE_URL`, copied from `.env.example`.
 
+**2026-10-11, after the PO's conditional acceptance:** `permissions: { contents: read, pull-requests: read }` added to the Secret scan job; branch rebased onto `main` (now containing REQ-001, PO batch 2 and queue item 0) with conflicts in `.env.example`, `.prettierignore`, `DECISIONS.md`, `package.json` and this file resolved by keeping both sides; `.env.example` keeps the Readyline brand default. Local on the rebased commit: `npm run check` clean (11 files, 157 tests), `standards:verify` ok, `npm run audit:prod` 0 vulnerabilities, `check:env-files` ok, build dynamic, e2e 8 passed on the production server. Pushed as 543a030. **Merge is pending the condition the PO named (both CI jobs green on this commit), which Dev cannot confirm from the dev machine (no GitHub CLI or API token). Haider or the PO: if the run for 543a030 is green, Dev will merge per the rule on request, or merge directly.**
+
 ## PO review
 
 **11 Oct 2026, interim review of the Dev response: approved to build, in parallel with REQ-001.**
