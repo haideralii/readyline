@@ -1,0 +1,20 @@
+import Link from "next/link";
+import { BRAND } from "@/lib/brand";
+
+export function SiteHeader() {
+  return (
+    <header className="border-b border-zinc-200 dark:border-zinc-800">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
+        <Link
+          href="/"
+          className="text-lg font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          {BRAND}
+        </Link>
+        <span className="rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+          In development
+        </span>
+      </div>
+    </header>
+  );
+}

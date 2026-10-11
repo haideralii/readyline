@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+coverage
+playwright-report
+test-results
+package-lock.json
+next-env.d.ts
+# The founder's brief and the Next.js-managed agent file are not reformatted.
+CLAUDE.md
+AGENTS.md

@@ -1,0 +1,8 @@
+# Keep LF everywhere so Prettier, .editorconfig and Git agree across Windows and CI.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
+*.docx binary
+*.pdf binary

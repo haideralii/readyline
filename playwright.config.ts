@@ -1,0 +1,41 @@
+import { defineConfig, devices } from "@playwright/test";
+
+const PORT = Number(process.env.PORT ?? 3000);
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
+const isCI = Boolean(process.env.CI);
+
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: true,
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 1 : undefined,
+  reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
+  use: {
+    baseURL,
+    trace: "on-first-retry",
+  },
+  projects: [
+    {
+      name: "desktop-chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      // Budget Android phone: 360px-wide viewport, touch, mobile Chrome UA.
+      // Many providers fill the questionnaire on a phone like this.
+      name: "android-small",
+      use: {
+        ...devices["Galaxy S9+"],
+        viewport: { width: 360, height: 740 },
+      },
+    },
+  ],
+  webServer: {
+    // CI runs the production build (npm run build happens in the workflow first).
+    // Locally, reuse an already-running dev server if there is one.
+    command: isCI ? "npm run start" : "npm run dev",
+    url: baseURL,
+    reuseExistingServer: !isCI,
+    timeout: 120_000,
+  },
+});
