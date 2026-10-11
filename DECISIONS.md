@@ -664,6 +664,85 @@ nothing else; expires 2027-01-09, rotate before then) and
 repository secrets for `migrate.yml`. Values live only in GitHub and
 Haider's password manager.
 
+**D-414 Batch 5 happened on a `main` that already carried the branches (Dev, 2026-10-11).**
+The PO's batch-5 commit afeab24 captured the whole shared working tree, so
+`main` holds the REQ-002, REQ-003 and REQ-004 code at the REQ-004 Session B
+state (plus the PO's documents). Dev pushed that `main` before noticing
+(fast-forward, D-030 allows pushing the PO's product edits). Rebasing the
+three branches onto it conflicted in every file, so each was rebuilt as the
+branch below it plus only its batch-5 work, under new names because the
+force-push of the old names is refused by Dev's tool in this session:
+`req-002-security-baseline-rebuilt` (main + cleanups),
+`req-003-questionnaire-rebuilt` (+ PO UI items),
+`req-004-accounts-rebuilt` (+ Session C). The old branches and PRs #2 to #4
+are unchanged on GitHub; Haider or the PO replaces them (commands in the
+batch-5 Dev status). The PR diffs are now small, which is the true review
+scope since the rest is already on `main`. Consequence to note: CI on
+`main` is red on Prettier for `DECISIONS.md` until PR #2 merges, and
+`migrate.yml` ran on that push; the hosted project still answered
+`PGRST202` for `auth_rate_limit_hit` during the local e2e run afterwards,
+so either the run failed or the secrets were not yet in place; the PO checks
+the Actions log.
+
+**D-415 Deletion is a security-definer function; sign-in to a deleted
+account is refused at the callback.** `delete_account()` soft-deletes the
+caller's live owned account and writes the audit row in one transaction;
+`is_member`/`is_owner` then return false so every policy hides the rows
+at once. Because RLS hides the deleted row from its owner too, the "account
+deleted" state is read with the service key (`getDeletedAccount`, three
+fields only). The magic-link callback signs such a user out and shows the
+deleted page; the account pages redirect there. The owner's membership row
+stays until the purge, so the one-owner cap keeps the user from creating a
+replacement account during the retention window (FR-6 "sign-in blocked").
+
+**D-416 Purge job: Vercel Cron, 30 days, idempotent, storage by prefix.**
+`vercel.json` schedules `GET /api/jobs/purge` daily at 16:00 UTC (early
+morning in Sydney). The route answers 404 unless the `Authorization: Bearer`
+header equals `CRON_SECRET` (constant-time compare; unset secret means
+nobody); `?dryRun=1` reports without deleting. `runPurge()` is a plain
+function taking the admin client, an email provider and a clock, so the
+integration test runs it with the clock advanced 31 days (AC-5). It deletes
+the account row (cascades memberships and drafts; audit rows keep a null
+account id), removes storage objects under the prefix `<accountId>/` in
+every bucket (none exist yet; the convention binds later REQs), sends the
+"permanently removed" email, deletes the auth user when they hold no other
+membership, and writes `account.purged`.
+
+**D-417 Export is built with the owner's session and zipped in memory.**
+`buildAccountExport` reads account, memberships, draft and audit rows with
+the user's client, so RLS is the proof that nothing from another account can
+be included (AC-4). `fflate` (0.8.3, no dependencies) writes the zip; the
+archive holds `account.json` and a README stating the no-participant-data
+rule. Exports are limited to 5 per account per hour through the same limiter
+function as magic links (SR-3) and logged as `account.exported`.
+
+**D-418 Admin role: TOTP through server actions, 404 for everyone else.**
+`requireAdmin()` reads `users.platform_admin` with the user's own session
+(the self-select policy), then the assurance level and verified TOTP factors;
+`resolveAdminAccess` (pure, unit-tested) yields not-found, enrol, verify or
+ok. Non-admins and anonymous visitors get Next's 404 so the routes do not
+exist for them (AC-7). Enrolment and verification call Supabase MFA from
+server actions with the cookie-bound client, so the aal2 session lands in the
+cookies and the browser never talks to Supabase; the QR SVG from the enrol
+response is rendered once. Admin page views and every MFA step are written to
+`audit_log` with the service key (`actor_user_id` set, `account_id`
+null). TOTP must be enabled in the hosted project's Auth settings (Haider;
+the local stack has it on in `supabase/config.toml`).
+
+**D-419 Confirmation emails behind an interface; nothing is sent yet.**
+`EmailProvider` with one implementation, `LogOnlyEmailProvider`, which
+records the message and logs a hashed recipient. `accountDeletedEmail` and
+`accountPurgedEmail` are pure templates tested for Australian dates, the
+general-information line and the claims rules. Choosing the provider remains
+D-013; when it lands, `createEmailProvider()` is the only place to change.
+
+**D-420 Members may write their own audit rows.** Session B inserted
+`account.updated` rows with the user's client, but `audit_log` had no
+insert policy, so those writes were silently rejected. The Session C migration
+adds `audit_log_insert_member` (`is_member(account_id)` and
+`actor_user_id = auth.uid()`), and the actions now log a warning when an
+audit write fails. The integration suite proves a member cannot write a row
+as someone else or for another account.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

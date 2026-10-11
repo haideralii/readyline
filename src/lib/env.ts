@@ -30,13 +30,18 @@ export const REQUIRED_LATER: ReadonlyArray<{
     productionHome: "Vercel project environment variables",
   },
   {
-    name: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    name: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
     from: "REQ-004",
     productionHome: "Vercel project environment variables",
   },
   {
-    name: "SUPABASE_SERVICE_ROLE_KEY",
+    name: "SUPABASE_SECRET_KEY",
     from: "REQ-004",
+    productionHome: "Vercel project environment variables (server only)",
+  },
+  {
+    name: "CRON_SECRET",
+    from: "REQ-004 Session C (purge job)",
     productionHome: "Vercel project environment variables (server only)",
   },
   {

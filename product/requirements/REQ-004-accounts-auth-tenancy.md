@@ -175,6 +175,29 @@ Gate unchanged: the three Supabase variables are present in `.env.local`; values
 **Not verified locally (D-413):** the two migrations, the limiter function and both integration suites have not executed on this machine (no Docker, CLI or database); the `supabase-integration` job on this push is their first run. The end-to-end magic-link journey through a real inbox has no automated test yet.
 
 **For Haider:** add the GitHub repository secrets `SUPABASE_ACCESS_TOKEN` (Supabase dashboard, Account, Access tokens) and `SUPABASE_DB_PASSWORD` (project settings, Database). After the REQ-004 merge the migration workflow applies both migrations; until then the account pages cannot create an account against the hosted project.
+### Session C (2026-10-11), branch `req-004-accounts-rebuilt` (on `req-003-questionnaire-rebuilt`; D-414)
+
+Branch rebuilt: `main` already holds Sessions A and B through the PO's batch-5 commit afeab24, so this branch is the rebuilt REQ-003 head plus one Session C commit. Old head 9452905 stays on GitHub as `req-004-accounts` until replaced (commands in the batch-5 Dev status).
+
+**Built**
+
+- Export (FR-6, AC-4): `GET /account/export` returns a zip (`account.json` with account, memberships, questionnaire draft and audit log; README with the no-participant-data rule), built with the owner's session so RLS bounds the content, limited to 5 per account per hour, logged as `account.exported` (D-417). Link on the account page.
+- Deletion (FR-6, AC-5): `delete_account()` (security definer) soft-deletes and writes `account.deleted`; the account page has a confirm-then-delete form; the action sends the confirmation email, signs out everywhere and lands on `/account/deleted`. The callback refuses sign-in for a deleted account and the account pages redirect to the deleted page (D-415).
+- Purge (FR-6, AC-5): `runPurge()` with injected admin client, email provider and clock; `GET /api/jobs/purge` behind `CRON_SECRET` (404 otherwise, `?dryRun=1`), scheduled daily by `vercel.json`; removes rows, storage objects by account prefix and the auth user when orphaned, sends the "permanently removed" email, writes `account.purged` (D-416).
+- Admin (FR-7, AC-7): `/admin` (counts and the last 25 audit rows, read with the service key after the gate) and `/admin/mfa` (TOTP enrol with QR, or verify); `requireAdmin()` gives 404 to non-admins and anonymous visitors and sends admins without an aal2 session to the MFA step; every view and MFA step is audited (D-418). `platform_admin` stays SQL-only (Session A trigger).
+- Emails (FR-6): `EmailProvider` interface with the log-only implementation and two tested templates (D-419). No provider chosen (D-013); nothing is sent.
+- Audit writes by members now allowed by policy (D-420); the Session B `account.updated` write was silently rejected before.
+- Env: `CRON_SECRET` in `.env.example` and `REQUIRED_LATER`; the Supabase names in `REQUIRED_LATER` corrected to the SR-5 names. `fflate` added (D-417).
+
+**Tests**
+
+- Unit (new): `resolveAdminAccess` (four states), `isAuthorisedCronRequest` (exact bearer, unset or short secret), email templates (dates, general-information line, claims). Total 253.
+- Integration (`tests/integration/session-c.test.ts`, runs in the `supabase-integration` job): member-scoped audit inserts; export contains every row for A and nothing of B, and B cannot export A (AC-4); ordinary users are not admins (AC-7); `delete_account` hides the account at once, a second call fails, the purge does nothing before 30 days, dry run lists without deleting, the real run removes the account and the auth user and sends the email, a second run is a no-op and A is untouched (AC-5).
+- End-to-end (`e2e/admin.spec.ts`, both projects): `/admin` and `/admin/mfa` are 404 anonymously, the purge route is 404 without the secret, export redirects to sign-in, the deleted page renders.
+
+**Local outputs on this commit:** `npm run check` clean (25 files, 253 tests); `npm run build` ok, new routes `/account/deleted`, `/account/export`, `/admin`, `/admin/mfa`, `/api/jobs/purge`; bundle check 26 files clean; Playwright in CI mode: admin, sign-in, security headers and home specs 22 passed on both projects (questionnaire and axe specs passed on the REQ-003 commit below this one).
+
+**Not verified locally (D-413 still applies):** the Session C migration, `delete_account()`, the purge and the export integration suite run first in the `supabase-integration` job on this push. The TOTP flow cannot be exercised without a platform admin (set by SQL on the hosted project) and TOTP enabled in Auth settings; Haider: enable TOTP, run `update public.users set platform_admin = true where id = '<your user id>'` in the SQL editor once, then open `/admin`. The hosted project still returned `PGRST202` for the limiter function during this run, so the migrations are not applied there yet; please check the `migrate.yml` run on `main`.
 ## PO review
 
 **11 Oct 2026, Dev response review (on `req-004-accounts`, 2c5f6de): ACCEPTED; build approved once Haider's Supabase project exists.** Decisions: own per-email and per-IP limiter in front of Supabase (accepted, with the hashed-email key); Vercel Cron purge route protected by `CRON_SECRET` (accepted); Supabase CLI local stack in CI with the integration project (accepted; if it exceeds the 20-minute budget, split into its own job). Haider will supply, by name: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`; `CRON_SECRET` is generated by Dev. The REQ-003 build does not depend on these; REQ-004 Session A may start as soon as `.env.local` has them. Status: `in progress` once the build starts.
