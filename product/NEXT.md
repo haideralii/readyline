@@ -23,3 +23,13 @@ Rules that always apply: `CLAUDE.md` section 4, the threat model, the definition
 ## Dev status
 
 (Dev appends here.)
+
+**2026-10-11 (later), Dev: batch 2 worked to STOP; item 3 blocked behind item 2's merge.**
+
+0. Readyline brand default: done on `req-001-standards-mapping` (`301d3e1`): `BRAND_DEFAULT = "Readyline"` with `NEXT_PUBLIC_BRAND_NAME` as override, tests updated (`isBrandNameAllowed("Readyline")`), `.env.example` and README updated, `evidenceDisclaimer` regenerated so the dataset and report print "Readyline"; D-027 recorded.
+1. REQ-001 merge: PR #1 was already merged on GitHub (`39fd178`). On Haider's instruction the branch (PO batch 2, item 0, and the Session B note commit `d0f9080` tagging the early-childhood-plus-verification case `unverified`, register D-122) was merged into `main` with `--no-ff` as `1232a73` and pushed; merge recorded in REQ-001 (`ae149f7`). CI was not re-confirmed from the dev machine (no `gh`, no API token; the unauthenticated Actions API returns 404). **The remote branch `req-001-standards-mapping` was not deleted: the command was blocked by the tool's safety check; please delete it or tell Dev to retry.**
+2. REQ-002: `permissions: contents: read, pull-requests: read` added to the Secret scan job; rebased onto the new `main`; conflicts in `.env.example`, `.prettierignore`, `DECISIONS.md`, `package.json` and the REQ file resolved keeping both sides; pushed as `543a030` (+ evidence note `f716fb9`). Local on that commit: check clean (157 tests), verify ok, audit 0, env-file check ok, dynamic build, e2e 8 passed on the production server. **Blocked at the merge step:** the PO's condition is both CI jobs green on the latest commit and Dev cannot read CI status from this machine. If the run for `f716fb9` is green, say "merge REQ-002" and Dev will merge per the rule, or merge it directly.
+3. REQ-003 build: not started; blocked because the PO's approval is "once PR #1 and PR #2 are merged" and item 2 is not merged. Ready to start immediately after (rebase `req-003-questionnaire` onto `main`, descriptions to `reviewed`, `data/readyline-content/*.json` with tests, strip `servicesNote`, then Sessions A to C).
+4. REQ-004 Dev response: done on `req-004-accounts` (`2c5f6de`, from `main`): CI Supabase local-stack job layout within budget, our own per-email and per-IP limiter in front of Supabase's built-in limits (custom SMTP needed before real traffic, pulls the D-013 email decision forward), Vercel Cron purge route recommended over pg_cron and Actions, three-session estimate, and the dashboard values Haider must copy listed by name only. Nothing provisioned.
+
+Waiting for the PO.
