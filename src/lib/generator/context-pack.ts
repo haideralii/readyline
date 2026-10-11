@@ -11,7 +11,7 @@ import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
 import { strictObject } from "@/lib/validation";
 import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
-import { buildProviderFacts, FACT_KEYS } from "./facts";
+import { buildProviderFacts, FACT_KEYS, type ProviderFacts } from "./facts";
 import { HOUSE_STYLE_VERSION } from "./house-style";
 import { standardsForType } from "./document-model";
 
@@ -68,6 +68,39 @@ export type ContextPack = z.infer<typeof ContextPack>;
 
 /** The fact keys, exported so tests can prove the pack's vocabulary matches. */
 export const CONTEXT_FACT_KEYS = FACT_KEYS;
+
+/** Same pack from already-built facts (regeneration of a stored version). */
+export function buildContextPackFromFacts(input: {
+  facts: ProviderFacts;
+  result: QuestionnaireResult;
+  dataset: StandardsDataset;
+  type: DocumentTypeSpec;
+  section: SectionSpec;
+}): ContextPack {
+  const { facts, result, dataset, type, section } = input;
+  const wantedRegisters = new Set(type.registers);
+  return ContextPack.parse({
+    promptVersion: PROMPT_VERSION,
+    houseStyleVersion: HOUSE_STYLE_VERSION,
+    facts,
+    document: {
+      id: type.id,
+      title: type.title,
+      kind: type.kind,
+      purpose: type.purpose,
+    },
+    section: { id: section.id, heading: section.heading, brief: section.brief },
+    standards: standardsForType(type, dataset, result).map((s) => ({
+      id: s.id,
+      name: s.name,
+      outcome: s.outcome,
+      indicators: s.indicators,
+    })),
+    registers: result.registers
+      .filter((r) => wantedRegisters.has(r.id))
+      .map((r) => r.title),
+  });
+}
 
 export function buildContextPack(input: {
   answers: QuestionnaireAnswers;

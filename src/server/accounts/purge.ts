@@ -135,3 +135,55 @@ async function removeStorageObjects(
   }
   return removed;
 }
+
+/** Retention for generated artefacts (REQ-005 SR-5, FR-6): logs after 2 years; superseded sets after 12 months. */
+export const GENERATION_LOG_RETENTION_DAYS = 730;
+export const SUPERSEDED_SET_RETENTION_DAYS = 365;
+
+export async function purgeGenerationArtifacts(input: {
+  admin: SupabaseClient;
+  now?: Date;
+  dryRun?: boolean;
+}): Promise<{ logsRemoved: number; setsRemoved: number }> {
+  const now = input.now ?? new Date();
+  const dryRun = input.dryRun ?? false;
+  const logCutoff = new Date(
+    now.getTime() - GENERATION_LOG_RETENTION_DAYS * 86_400_000,
+  ).toISOString();
+  const setCutoff = new Date(
+    now.getTime() - SUPERSEDED_SET_RETENTION_DAYS * 86_400_000,
+  ).toISOString();
+  let logsRemoved = 0;
+  let setsRemoved = 0;
+  const oldLogs = await input.admin
+    .from("generation_log")
+    .select("id")
+    .lt("created_at", logCutoff);
+  logsRemoved = oldLogs.data?.length ?? 0;
+  if (!dryRun && logsRemoved > 0)
+    await input.admin
+      .from("generation_log")
+      .delete()
+      .lt("created_at", logCutoff);
+  // A set is superseded when a newer set exists for the same account.
+  const sets = await input.admin
+    .from("version_sets")
+    .select("id, account_id, storage_prefix, created_at")
+    .lt("created_at", setCutoff)
+    .order("created_at", { ascending: false });
+  for (const set of sets.data ?? []) {
+    const newer = await input.admin
+      .from("version_sets")
+      .select("id")
+      .eq("account_id", set.account_id)
+      .gt("created_at", set.created_at)
+      .limit(1);
+    if ((newer.data ?? []).length === 0) continue;
+    setsRemoved++;
+    if (dryRun) continue;
+    await removeStorageObjects(input.admin, set.storage_prefix);
+    await input.admin.from("version_sets").delete().eq("id", set.id);
+  }
+  log.info("generation.purge", { dryRun, logsRemoved, setsRemoved });
+  return { logsRemoved, setsRemoved };
+}

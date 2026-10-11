@@ -389,8 +389,14 @@
       {
         "id": "standards-table",
         "heading": "Standards and how we meet them",
+        "mode": "fixed",
+        "brief": "One row per applicable standard: the Commission's outcome verbatim, the evidence to retain (from the reviewed evidence items), and a status column the provider completes. Chunked into tables of 20 rows."
+      },
+      {
+        "id": "how-we-meet",
+        "heading": "How we meet these standards",
         "mode": "tailored",
-        "brief": "One row per applicable standard: outcome and indicators verbatim (fixed cells), 'how we meet this' (tailored cell), evidence to retain (fixed, from reviewed evidence items), status (blank for the provider)."
+        "brief": "For each module in scope, a short paragraph in the provider's voice on how the standards are met in practice, naming the documents and registers in the set; no claims of compliance."
       },
       {
         "id": "gaps",

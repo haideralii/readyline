@@ -475,6 +475,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Declaring a conflict",
         "id": "declarations",
@@ -606,7 +607,8 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "table",
+          "paragraph",
         ],
         "heading": "Consent form",
         "id": "consent-form",
@@ -1013,7 +1015,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "table",
+          "paragraph",
         ],
         "heading": "Reportable incidents",
         "id": "reportable-incidents",
@@ -1279,7 +1281,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "paragraph",
           "table",
         ],
         "heading": "Training register",
@@ -1990,7 +1991,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "paragraph",
         ],
         "heading": "Participant information and AI",
         "id": "participant-information",
@@ -2102,8 +2103,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "paragraph",
-          "callout",
+          "bullets",
         ],
         "heading": "De-identification checklist",
         "id": "de-identification",
@@ -2235,7 +2235,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "paragraph",
           "table",
         ],
         "heading": "Continuous improvement register",
@@ -2868,7 +2867,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "table",
         ],
         "heading": "Support plan template",
         "id": "support-plan-template",
@@ -2878,8 +2877,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "paragraph",
-          "callout",
+          "bullets",
         ],
         "heading": "Transition checklist",
         "id": "transition-checklist",
@@ -3206,12 +3204,24 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
+          "table",
         ],
         "heading": "Standards and how we meet them",
         "id": "standards-table",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "3",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "callout",
+        ],
+        "heading": "How we meet these standards",
+        "id": "how-we-meet",
+        "mode": "tailored",
+        "number": "4",
         "status": "placeholder",
       },
       {
@@ -3222,7 +3232,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Items to prepare before the audit",
         "id": "gaps",
         "mode": "fixed",
-        "number": "4",
+        "number": "5",
         "status": "fixed",
       },
       {
@@ -3718,6 +3728,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Declaring a conflict",
         "id": "declarations",
@@ -3849,7 +3860,8 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "table",
+          "paragraph",
         ],
         "heading": "Consent form",
         "id": "consent-form",
@@ -4256,7 +4268,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "table",
+          "paragraph",
         ],
         "heading": "Reportable incidents",
         "id": "reportable-incidents",
@@ -4522,7 +4534,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "paragraph",
           "table",
         ],
         "heading": "Training register",
@@ -5233,7 +5244,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "paragraph",
         ],
         "heading": "Participant information and AI",
         "id": "participant-information",
@@ -5345,8 +5356,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "paragraph",
-          "callout",
+          "bullets",
         ],
         "heading": "De-identification checklist",
         "id": "de-identification",
@@ -5478,7 +5488,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "paragraph",
           "table",
         ],
         "heading": "Continuous improvement register",
@@ -6213,7 +6222,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "table",
         ],
         "heading": "Support plan template",
         "id": "support-plan-template",
@@ -6223,8 +6232,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "paragraph",
-          "callout",
+          "bullets",
         ],
         "heading": "Transition checklist",
         "id": "transition-checklist",
@@ -6316,12 +6324,24 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
+          "table",
         ],
         "heading": "Standards and how we meet them",
         "id": "standards-table",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "3",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "callout",
+        ],
+        "heading": "How we meet these standards",
+        "id": "how-we-meet",
+        "mode": "tailored",
+        "number": "4",
         "status": "placeholder",
       },
       {
@@ -6332,7 +6352,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "heading": "Items to prepare before the audit",
         "id": "gaps",
         "mode": "fixed",
-        "number": "4",
+        "number": "5",
         "status": "fixed",
       },
       {
@@ -6828,6 +6848,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Declaring a conflict",
         "id": "declarations",
@@ -6959,7 +6980,8 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "table",
+          "paragraph",
         ],
         "heading": "Consent form",
         "id": "consent-form",
@@ -7366,7 +7388,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "table",
+          "paragraph",
         ],
         "heading": "Reportable incidents",
         "id": "reportable-incidents",
@@ -7632,7 +7654,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
           "table",
         ],
         "heading": "Training register",
@@ -8343,7 +8364,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "callout",
+          "paragraph",
         ],
         "heading": "Participant information and AI",
         "id": "participant-information",
@@ -8455,8 +8476,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "callout",
+          "bullets",
         ],
         "heading": "De-identification checklist",
         "id": "de-identification",
@@ -8549,12 +8569,23 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Standards and how we meet them",
         "id": "standards-table",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "3",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "callout",
+        ],
+        "heading": "How we meet these standards",
+        "id": "how-we-meet",
+        "mode": "tailored",
+        "number": "4",
         "status": "placeholder",
       },
       {
@@ -8565,7 +8596,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "heading": "Items to prepare before the audit",
         "id": "gaps",
         "mode": "fixed",
-        "number": "4",
+        "number": "5",
         "status": "fixed",
       },
       {

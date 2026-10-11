@@ -10,6 +10,7 @@ import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
 import { describeProvider, type ProviderFacts } from "./facts";
 import type { StandardSummary } from "./document-model";
 import type { Block } from "./section-schema";
+import { fixedExtra } from "./fixed-extras";
 
 export type FixedContext = {
   type: DocumentTypeSpec;
@@ -211,29 +212,37 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
           ].slice(0, 12),
         },
       ];
-    case "standards-table":
-      return [
+    case "standards-table": {
+      // The Commission's outcome stays verbatim (CLAUDE.md 4.6); tables hold at most 20 rows (D-501).
+      const rows = ctx.standards.map((s) => [
+        s.name,
+        s.outcome,
+        uniqueTitles(s.evidence).slice(0, 3).join("; ") ||
+          "[Provider to complete]",
+        "[Not started / In progress / Met]",
+      ]);
+      const blocks: Block[] = [
         {
+          type: "paragraph",
+          text: `This self-assessment covers the ${ctx.standards.length} standards that apply to ${f.tradingName}. The outcome column is the Commission's own wording.`,
+        },
+      ];
+      for (let i = 0; i < rows.length; i += 20) {
+        blocks.push({
           type: "table",
           columns: [
             "Standard",
-            "How we meet this",
+            "Outcome (Commission text)",
             "Evidence we keep",
             "Status",
           ],
-          rows: ctx.standards
-            .slice(0, 20)
-            .map((s) => [
-              s.name,
-              "[Provider to complete]",
-              uniqueTitles(s.evidence).slice(0, 3).join("; ") ||
-                "[Provider to complete]",
-              "[Not started / In progress / Met]",
-            ]),
-        },
-      ];
+          rows: rows.slice(i, i + 20),
+        });
+      }
+      return blocks;
+    }
     default:
-      return extraFixedBlocks(spec, ctx);
+      return fixedExtra(spec.id, ctx) ?? extraFixedBlocks(spec, ctx);
   }
 }
 

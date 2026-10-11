@@ -893,6 +893,65 @@ tailored sections too thin; Haiku is reserved for cheap side tasks. Monthly
 spend cap set in the Anthropic console before the key is created. Revisit
 with measured token counts from the first recordings (REQ-005 Session B).
 
+**D-516 Session C persistence and tenancy (Dev, 2026-10-12).** Three tables
+(`version_sets`, `document_versions` with the resolved model as JSON,
+`generation_log` with counts only) and a per-account daily quota
+(`accounts.generation_daily_limit`, default 5, raisable by an operator;
+`generation_quota_hit()` counts in one statement on the Sydney date).
+Members read through RLS; every write goes through `SupabaseGenerationStore`
+with the service key after the server action has checked the session and
+ownership, so no client insert policy exists. The runner takes the store and
+the model client as interfaces and is unit-tested end to end with an
+in-memory store and a fake model.
+
+**D-517 Private bucket, account-prefixed paths, two locks.** The
+`documents` bucket is private with a 25 MB object limit and four allowed
+media types; objects live at `<account_id>/<version_set_id>/<file>`. A
+member may read their own prefix (policy on `storage.objects` using
+`is_member`); nobody writes through the API. The download route checks
+the session, that the set belongs to the account and that the object path is
+inside the account (`isOwnedPath`) before asking for a 5-minute signed URL;
+anything else is 404 (AC-7). The integration suite proves another tenant can
+neither sign nor download the object and that clients cannot upload.
+
+**D-518 What a set contains.** One `.docx` per document in the derived set
+plus the Practice Standards self-assessment, a PDF readiness summary
+rendered with `pdf-lib` (pathway, modules, documents with drafting status,
+registers, notices), a README and `set.zip` holding all of them. The
+self-assessment's standards table is fixed text with the Commission's
+outcome verbatim, chunked into tables of 20 rows; "how we meet these
+standards" is a separate tailored section, so the model never rewrites
+Commission text. Regenerating a section renders a new `.docx` as the next
+document version (`<type>.v<n>.docx`) and the download route always serves
+the latest version; the zip and summary are from the original generation.
+
+**D-519 Reviewer view.** Each section shows its mode and status, the
+questionnaire answers it used (fact keys mapped to step and question labels)
+and, after a regeneration, a line diff against the previous version computed
+with an in-repo longest-common-subsequence (no dependency). Only tailored
+sections can be regenerated; each regeneration counts against the daily
+quota.
+
+**D-520 Fixed extras written; two UNVERIFIED avoidances.** All
+document-specific fixed sections now have house-style text (registers,
+forms, checklists, agreement outlines). Two places deliberately avoid
+restating regulatory detail: the reportable-incident section names the Rules
+and tells the provider to keep the Commission's current list and timeframes
+with the procedure, and the retention schedule leaves the periods for the
+provider to confirm, because neither the Incident Management Rules text nor
+retention periods are among the fetched sources (CLAUDE.md 4.6).
+
+**D-521 Retention extension to the purge job.** `purgeGenerationArtifacts`
+removes `generation_log` rows older than two years and superseded version
+sets (a newer set exists for the account) older than twelve months, objects
+first, then rows by cascade; it runs inside the daily purge route and
+supports dry run.
+
+**D-522 Still waiting for the Anthropic key.** `.env.local` has no
+`ANTHROPIC_API_KEY` or `ANTHROPIC_MODEL` at the end of batch 8, so the
+client defaults to replay, no fixture exists, and a real generation would
+mark every tailored section "Review and complete" (AC-5 path). The model id
+defaults to `claude-sonnet-5-5` per D-037.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

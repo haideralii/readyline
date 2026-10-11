@@ -116,7 +116,14 @@ export async function generateSection(input: {
             ...base,
             user: `${base.user}\n\nYour previous reply was rejected for these reasons; fix them and reply again with the JSON object only:\n- ${problems.join("\n- ")}`,
           };
-    const reply = await client.complete(request, labels);
+    let reply;
+    try {
+      reply = await client.complete(request, labels);
+    } catch (e) {
+      // A missing fixture or a model error counts as a failed attempt (AC-5).
+      problems.push(e instanceof Error ? e.message : String(e));
+      continue;
+    }
     usage = reply.usage;
     const v = validateReply(reply.text, pack, allowed);
     if (v.ok) {

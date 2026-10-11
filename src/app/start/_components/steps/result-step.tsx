@@ -285,7 +285,11 @@ function ResultView({
         <p className="mt-2 leading-7">
           {BRAND} will draft these documents for you and keep your registers
           audit-ready. Sign-in and the document pack are coming in the next
-          releases.
+          releases.{" "}
+          <Link href="/documents" className="underline underline-offset-2">
+            Go to your documents
+          </Link>
+          .
         </p>
       </section>
 
