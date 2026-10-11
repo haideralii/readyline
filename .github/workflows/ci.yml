@@ -30,6 +30,9 @@ jobs:
 
       - run: npm run typecheck
 
+      - name: Standards data matches its Commission source snapshots
+        run: npm run standards:verify
+
       - run: npm test
 
       - run: npm run build

@@ -119,7 +119,39 @@ Contradictions with the primer, for the PO: 0125 participation in community, 011
 Two sessions after this one. Session A: populate every standard verbatim (23 core, 4 verification, 4 SIL, 6 legacy supplementary modules), all 38 groups, `data/SOURCES.md`, completeness and mapping tests. Session B: `deriveApplicability`, `standards:report` and `standards:verify` scripts, remaining tests, delivery evidence. Fetching the two legislation instruments to close the 0137 and 0138 items happens in session A.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### Session A (2026-10-11): dataset built; derivation and report scripts follow in Session B
+
+**Built**
+
+- `data/standards.json` (generated): 26 sources, 9 modules, 70 standards (core 24, high intensity 8, specialist behaviour support 7, implementing behaviour support plans 8, early childhood 7, specialised support coordination 3, SDA 5, SIL 4, verification 4), 38 registration classes, rules block including the SIL definition and exclusions.
+- `data/standards.meta.json` (hand-maintained inputs), `scripts/standards/build.mjs` (parser and builder), `scripts/standards/verify.mjs` (hash and source checks), `data/SOURCES.md` (generated: source table with hashes, UNVERIFIED items, changelog).
+- Schema additions: `version` (semver), `note` on standards, `draft` on evidence, `coreExemptWhenSoleSourceId`, `registrationPeriodSourceId`, `silDefinition` with `applicationDeadline`; publisher may be the Federal Register of Legislation.
+- New snapshots: Commission "About registration" (registration period) and the legislation register landing page (compilation F2026C00527, table of contents).
+
+**PO review items addressed**
+
+1. Indicator ids are `<standardId>#<index>`; a test asserts each standard's indicator order matches its snapshot, so an index cannot silently change.
+2. `rules.silDefinition` carries the Commission's SIL definition and the two exclusions verbatim plus the 1 October 2026 application deadline, ready for the derivation input and REQ-003.
+5. D-104 closed: both 0137 and 0138 are `verified` from the Commission's transition pages (DECISIONS D-112). The Rules' full text could not be captured (script-rendered); its table of contents was.
+6. AC-8: every rule has a source id and `checkIntegrity` fails if any is unknown. AC-9: `npm run standards:verify` fails on hash drift, missing snapshots, manifest mismatch, verified records without a source, or placeholder text; it runs in CI before the unit tests.
+
+**Test output (local, 2026-10-11)**
+
+```
+standards:verify ok: 26 sources match their snapshots and the manifest
+Test Files  3 passed (3)   Tests  56 passed (56)
+npm run lint: clean   npm run typecheck: clean   npm run format:check: clean
+```
+
+Tests covering the acceptance criteria so far: AC-1 (`every standard has verbatim text, a source and at least one evidence item`, `every source hash matches the snapshot on disk and the manifest`), AC-5 (`every supplementary module is brought in by a group or by the restrictive-practices rule`, `every core division has at least one standard with at least one indicator`), AC-4 data (`the two mandatory classes carry the 1 July 2026 commencement and SIL carries the application cut-off`), AC-8 (`every rule names a source that exists`), AC-9 (`standards:verify`). AC-2, AC-3, AC-7 and AC-10 need `deriveApplicability` and the report script (Session B). AC-6 is met by `standards:verify`; a drift demonstration will be attached in Session B.
+
+**Deviations and notes for the PO**
+
+- Core module has 24 standards, not the 23 stated in the Dev response (emergency and disaster management was missed in the count).
+- The severe dysphagia training restriction on the Commission's web page is not in the Version 4 PDF; stored as `note`, not an indicator (D-115).
+- `FR-5` report script and `AC-6` drift demonstration: Session B.
+- Evidence items are a first pass and all `draft: true` (FR-4).
 
 ## PO review
 

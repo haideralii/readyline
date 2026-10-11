@@ -38,7 +38,10 @@ export const Verification = z
 export const Source = z.object({
   id: slug,
   title: z.string().min(1),
-  publisher: z.literal("NDIS Quality and Safeguards Commission"),
+  publisher: z.enum([
+    "NDIS Quality and Safeguards Commission",
+    "Federal Register of Legislation",
+  ]),
   url: z.string().url(),
   /** The Commission's own label, e.g. "Version 4, November 2021". Null if the page shows none. */
   versionLabel: z.string().nullable(),
@@ -117,6 +120,11 @@ export const Standard = z.object({
   /** SIL module only. */
   intent: z.string().optional(),
   expectationStatements: ExpectationStatements.optional(),
+  /**
+   * Guidance the Commission prints with the standard that is not itself a
+   * quality indicator (for example a training restriction). Verbatim.
+   */
+  note: z.string().optional(),
   sourceId: slug,
   /** Where in the source: page anchor, heading, or "PDF p.12". */
   sourceLocator: z.string().min(1),
@@ -162,8 +170,9 @@ export const Rules = z.object({
   /** Module added when the provider uses restrictive practices in any support. */
   restrictivePracticesModuleId: slug,
   restrictivePracticesSourceId: slug,
-  /** Group codes that do NOT bring in the core module when they are the only certification group. */
+  /** Group codes that do NOT bring in the core module when they are the only group selected. */
   coreExemptWhenSole: z.array(z.string().regex(/^\d{4}$/)),
+  coreExemptWhenSoleSourceId: slug,
   /**
    * Individuals or partnerships whose only certification group is early
    * childhood: core module limited to the listed standard id(s).
@@ -175,7 +184,20 @@ export const Rules = z.object({
     sourceId: slug,
   }),
   registrationPeriodYears: z.number().int().positive(),
+  registrationPeriodSourceId: slug,
   midTermAudit: MidTermAuditRule,
+  /**
+   * The Commission's definition of assistance with supported independent living
+   * (class 0138), verbatim, so the questionnaire can ask the exclusion questions
+   * before 0138 is included (PO review of REQ-001, item 2).
+   */
+  silDefinition: z.object({
+    appliesWhen: z.array(z.string().min(1)).min(1),
+    notSilWhen: z.array(z.string().min(1)).min(1),
+    /** Date by which providers already delivering SIL must have applied, per the Commission's transition page. */
+    applicationDeadline: isoDate,
+    sourceId: slug,
+  }),
   /** Audit report ratings as published, highest first. */
   ratings: z.array(
     z.object({ value: z.number().int(), label: z.string().min(1) }),
@@ -312,6 +334,23 @@ export function checkIntegrity(d: StandardsDataset): string[] {
   const r = d.rules;
   needSource(r.mixedAuditSourceId, "rules.mixedAudit");
   needSource(r.restrictivePracticesSourceId, "rules.restrictivePractices");
+  needSource(r.coreExemptWhenSoleSourceId, "rules.coreExemptWhenSole");
+  needSource(r.registrationPeriodSourceId, "rules.registrationPeriod");
+  needSource(r.silDefinition.sourceId, "rules.silDefinition");
+  r.coreExemptWhenSole.forEach((code) => {
+    if (!d.registrationGroups.some((g) => g.code === code)) {
+      problems.push(`rules.coreExemptWhenSole: unknown group "${code}"`);
+    }
+  });
+  if (
+    !d.registrationGroups.some(
+      (g) => g.code === r.modifiedCertification.groupCode,
+    )
+  ) {
+    problems.push(
+      `rules.modifiedCertification: unknown group "${r.modifiedCertification.groupCode}"`,
+    );
+  }
   needSource(r.modifiedCertification.sourceId, "rules.modifiedCertification");
   needSource(r.midTermAudit.sourceId, "rules.midTermAudit");
   needSource(r.ratingsSourceId, "rules.ratings");

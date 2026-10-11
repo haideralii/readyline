@@ -1,0 +1,1850 @@
+{
+  "$comment": "Hand-maintained inputs for scripts/standards/build.mjs. Outcome and indicator text is NOT here; it is parsed from data/sources. Evidence items are Readyline guidance (draft until the PO reviews them), not Commission text.",
+  "version": "1.0.0",
+  "generatedAt": "2026-10-11",
+  "checkedAt": "2026-10-11",
+  "evidenceDisclaimer": "Evidence items are {{BRAND}} guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-10-11",
+      "note": "First full dataset: core module (23 standards), six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11."
+    }
+  ],
+  "sources": [
+    {
+      "id": "practice-standards-hub",
+      "title": "NDIS Practice Standards (online version, hub page)",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/practice-standards-hub.txt"
+    },
+    {
+      "id": "ps-qi-v4",
+      "title": "NDIS Practice Standards and Quality Indicators (consolidated PDF)",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2024-10/ndis-practice-standards-and-quality-indicators.pdf",
+      "versionLabel": "Version 4, November 2021",
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/ps-qi-v4.txt"
+    },
+    {
+      "id": "core-rights",
+      "title": "Core module: Rights and responsibilities",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-rights-and-responsibilities",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/core-rights.txt"
+    },
+    {
+      "id": "core-governance",
+      "title": "Core module: Provider governance and operational management",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/core-governance.txt"
+    },
+    {
+      "id": "core-provision",
+      "title": "Core module: Provision of supports",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provision-supports",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/core-provision.txt"
+    },
+    {
+      "id": "core-environment",
+      "title": "Core module: Provision of supports environments",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provision-supports-environment",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/core-environment.txt"
+    },
+    {
+      "id": "supp-hidpa",
+      "title": "Supplementary module: High intensity daily personal activities",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-high-intensity-daily-personal",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-hidpa.txt"
+    },
+    {
+      "id": "supp-sbs",
+      "title": "Supplementary module: Specialist behaviour support",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-behaviour-support",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-sbs.txt"
+    },
+    {
+      "id": "supp-ibsp",
+      "title": "Supplementary module: Implementing behaviour support plans",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-implementing-behaviour-support",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-ibsp.txt"
+    },
+    {
+      "id": "supp-ec",
+      "title": "Supplementary module: Early childhood supports",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-early-childhood-supports",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-ec.txt"
+    },
+    {
+      "id": "supp-ssc",
+      "title": "Supplementary module: Specialised support coordination",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-support-coordination",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-ssc.txt"
+    },
+    {
+      "id": "supp-sda",
+      "title": "Supplementary module: Specialist disability accommodation",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-disability",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/supp-sda.txt"
+    },
+    {
+      "id": "verification",
+      "title": "Verification module",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/verification-module",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/verification.txt"
+    },
+    {
+      "id": "sil-module",
+      "title": "Supplementary module: Supported independent living (hub page)",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil",
+      "versionLabel": null,
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/sil-module.txt"
+    },
+    {
+      "id": "sil-ps",
+      "title": "Supported independent living Practice Standards and Quality Indicators (PDF)",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-06/SIL-Practice-Standards-PDF.pdf",
+      "versionLabel": "June 2026",
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/sil-ps.txt"
+    },
+    {
+      "id": "sil-evidence-guide",
+      "title": "SIL Practice Standards: Evidence Guide for Providers and Workers (PDF)",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-06/SIL-PS-Guide-Provider-Worker-PDF.pdf",
+      "versionLabel": "June 2026",
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/sil-evidence-guide.txt"
+    },
+    {
+      "id": "registration-groups",
+      "title": "Registration groups or classes of support (audit type table)",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/registration-groups-or-classes-support",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/registration-groups.txt"
+    },
+    {
+      "id": "registration-requirements",
+      "title": "Application Pack: Registration Requirements by Supports and Services (PDF)",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2022-02/200312-registration-requirements-supports-and-services_0_0.pdf",
+      "versionLabel": "Document reference 200312; predates classes 0137 and 0138",
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/registration-requirements.txt"
+    },
+    {
+      "id": "types-of-audits",
+      "title": "Types of audits",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/types-of-audits.txt"
+    },
+    {
+      "id": "about-registration",
+      "title": "About registration",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/about-registration",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/about-registration.txt"
+    },
+    {
+      "id": "mandatory-registration",
+      "title": "Mandatory registration (reform hub)",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration",
+      "versionLabel": null,
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/mandatory-registration.txt"
+    },
+    {
+      "id": "mandatory-sil",
+      "title": "Mandatory registration and transitional pathways for supported independent living",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-SIL",
+      "versionLabel": null,
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/mandatory-sil.txt"
+    },
+    {
+      "id": "mandatory-digital",
+      "title": "Mandatory registration and transitional pathways for NDIS digital platforms",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital",
+      "versionLabel": null,
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/mandatory-digital.txt"
+    },
+    {
+      "id": "ps-reform",
+      "title": "NDIS Practice Standards reform",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/ndis-practice-standards-reform",
+      "versionLabel": null,
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/ps-reform.txt"
+    },
+    {
+      "id": "legislation-rules-toc",
+      "title": "NDIS (Provider Registration and Practice Standards) Rules 2018, compilation F2026C00527 (table of contents)",
+      "publisher": "Federal Register of Legislation",
+      "url": "https://www.legislation.gov.au/F2018L00631/latest/text",
+      "versionLabel": "Compilation No. 6, 1 July 2026 (F2026C00527)",
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/legislation-rules-toc.txt"
+    },
+    {
+      "id": "aqa-expectations",
+      "title": "Regulatory Expectations for Approved Quality Auditors: Impartiality, Independence and Conflict of Interest (PDF)",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-07/Regulatory-Expectations-AQAs-PDF.pdf",
+      "versionLabel": "V1, June 2026",
+      "effectiveFrom": null,
+      "fetchedAt": "2026-10-11",
+      "snapshotPath": "data/sources/aqa-expectations.txt"
+    }
+  ],
+  "modules": [
+    {
+      "id": "core",
+      "kind": "core",
+      "name": "Core module",
+      "divisions": [
+        {
+          "id": "rights",
+          "name": "Rights and responsibilities",
+          "sourceId": "core-rights"
+        },
+        {
+          "id": "governance",
+          "name": "Provider governance and operational management",
+          "sourceId": "core-governance"
+        },
+        {
+          "id": "provision",
+          "name": "Provision of supports",
+          "sourceId": "core-provision"
+        },
+        {
+          "id": "environment",
+          "name": "Provision of supports environments",
+          "sourceId": "core-environment"
+        }
+      ],
+      "appliesTo": "a core module that applies to all registered NDIS providers delivering higher-risk supports and services",
+      "effectiveFrom": null,
+      "sourceIds": [
+        "practice-standards-hub",
+        "ps-qi-v4",
+        "legislation-rules-toc"
+      ],
+      "pages": [
+        {
+          "sourceId": "core-rights",
+          "divisionId": "rights",
+          "parser": "commission-page",
+          "expectCount": 5
+        },
+        {
+          "sourceId": "core-governance",
+          "divisionId": "governance",
+          "parser": "commission-page",
+          "expectCount": 9
+        },
+        {
+          "sourceId": "core-provision",
+          "divisionId": "provision",
+          "parser": "commission-page",
+          "expectCount": 5
+        },
+        {
+          "sourceId": "core-environment",
+          "divisionId": "environment",
+          "parser": "commission-page",
+          "expectCount": 5
+        }
+      ]
+    },
+    {
+      "id": "hidpa",
+      "kind": "supplementary",
+      "name": "High intensity daily personal activities module",
+      "appliesTo": "When a provider is supporting participants who rely on high intensity daily personal activities, they need to make sure their workers have the skills and knowledge described in the high intensity support skills descriptors. To be registered for the class of support (registration group) 104 - high intensity daily personal activities, a provider must be assessed against the relevant NDIS Practice Standards contained in Module 1 of the National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 2018.",
+      "effectiveFrom": null,
+      "sourceIds": ["supp-hidpa", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        {
+          "sourceId": "supp-hidpa",
+          "parser": "commission-page",
+          "expectCount": 8
+        }
+      ]
+    },
+    {
+      "id": "sbs",
+      "kind": "supplementary",
+      "name": "Specialist behaviour support module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide specialist behaviour support to NDIS participants.",
+      "effectiveFrom": null,
+      "sourceIds": ["supp-sbs", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        {
+          "sourceId": "supp-sbs",
+          "parser": "commission-page",
+          "expectCount": 7
+        }
+      ]
+    },
+    {
+      "id": "ibsp",
+      "kind": "supplementary",
+      "name": "Implementing behaviour support plans module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide specialist behaviour support to NDIS participants. They also apply to providers using restrictive practices in the delivery of any NDIS supports and services.",
+      "effectiveFrom": null,
+      "sourceIds": [
+        "supp-ibsp",
+        "ps-qi-v4",
+        "registration-requirements",
+        "legislation-rules-toc"
+      ],
+      "pages": [
+        {
+          "sourceId": "supp-ibsp",
+          "parser": "commission-page",
+          "expectCount": 8
+        }
+      ]
+    },
+    {
+      "id": "ec",
+      "kind": "supplementary",
+      "name": "Early childhood supports module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide early childhood supports to NDIS participants.",
+      "effectiveFrom": null,
+      "sourceIds": ["supp-ec", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        { "sourceId": "supp-ec", "parser": "commission-page", "expectCount": 7 }
+      ]
+    },
+    {
+      "id": "ssc",
+      "kind": "supplementary",
+      "name": "Specialised support coordination module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide specialist support co-ordination to NDIS participants.",
+      "effectiveFrom": null,
+      "sourceIds": ["supp-ssc", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        {
+          "sourceId": "supp-ssc",
+          "parser": "commission-page",
+          "expectCount": 3
+        }
+      ]
+    },
+    {
+      "id": "sda",
+      "kind": "supplementary",
+      "name": "Specialist disability accommodation module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide specialist disability accommodation to NDIS participants.",
+      "effectiveFrom": null,
+      "sourceIds": ["supp-sda", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        {
+          "sourceId": "supp-sda",
+          "parser": "commission-page",
+          "expectCount": 5
+        }
+      ]
+    },
+    {
+      "id": "sil",
+      "kind": "supplementary",
+      "name": "Supported independent living (SIL) module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are registered to provide Supported Independent Living to NDIS participants.",
+      "effectiveFrom": "2026-07-01",
+      "sourceIds": [
+        "sil-module",
+        "sil-ps",
+        "mandatory-sil",
+        "legislation-rules-toc"
+      ],
+      "pages": [{ "sourceId": "sil-ps", "parser": "sil-pdf", "expectCount": 4 }]
+    },
+    {
+      "id": "verification",
+      "kind": "verification",
+      "name": "Verification module",
+      "appliesTo": "These NDIS Practice Standards apply to NDIS providers who are delivering lower risk/lower complexity supports and services.",
+      "effectiveFrom": null,
+      "sourceIds": ["verification", "ps-qi-v4", "legislation-rules-toc"],
+      "pages": [
+        {
+          "sourceId": "verification",
+          "parser": "commission-page",
+          "expectCount": 4
+        }
+      ]
+    }
+  ],
+  "idOverrides": {},
+  "nameOverrides": {
+    "sil.supported-decision-making": "Supported decision-making",
+    "sil.practice-governance": "Practice governance"
+  },
+  "indicatorToNote": {
+    "hidpa.severe-dysphagia-management": "^Training for Severe dysphagia management must only be delivered"
+  },
+  "evidence": {
+    "core.rights.person-centred-supports": [
+      {
+        "kind": "policy",
+        "title": "Participant rights and person-centred supports policy",
+        "note": "How legal and human rights are upheld in everyday practice and how communication is tailored to each participant.",
+        "documentTypeId": "policy.participant-rights"
+      },
+      {
+        "kind": "record",
+        "title": "Communication preferences and support network recorded in each participant's support plan",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "training",
+        "title": "Induction and training records covering participant rights and the NDIS Code of Conduct",
+        "sourceId": "types-of-audits"
+      }
+    ],
+    "core.rights.individual-values-and-beliefs": [
+      {
+        "kind": "policy",
+        "title": "Cultural safety, diversity and inclusion policy",
+        "documentTypeId": "policy.participant-rights"
+      },
+      {
+        "kind": "record",
+        "title": "Participant culture, values and beliefs recorded at intake and reflected in the support plan"
+      }
+    ],
+    "core.rights.privacy-and-dignity": [
+      {
+        "kind": "policy",
+        "title": "Privacy, dignity and confidentiality policy and procedure",
+        "documentTypeId": "policy.privacy-and-dignity"
+      },
+      {
+        "kind": "form",
+        "title": "Consent to collect and use personal information, including audio or visual recording",
+        "documentTypeId": "form.consent"
+      },
+      {
+        "kind": "record",
+        "title": "Evidence the confidentiality policy was explained in the participant's preferred communication mode"
+      }
+    ],
+    "core.rights.independence-and-informed-choice": [
+      {
+        "kind": "policy",
+        "title": "Choice and control and dignity of risk policy",
+        "documentTypeId": "policy.choice-and-control"
+      },
+      {
+        "kind": "record",
+        "title": "Dignity of risk discussions and decisions documented in the support plan"
+      },
+      {
+        "kind": "record",
+        "title": "Advocacy information given to each participant and any advocate involvement recorded"
+      }
+    ],
+    "core.rights.violence-abuse-neglect-exploitation-and-discrimination": [
+      {
+        "kind": "policy",
+        "title": "Safeguarding policy: preventing and responding to violence, abuse, neglect, exploitation and discrimination",
+        "documentTypeId": "policy.safeguarding"
+      },
+      {
+        "kind": "register",
+        "title": "Incident register showing allegations acted on, reviews and preventive actions",
+        "documentTypeId": "register.incidents",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on recognising and responding to abuse and neglect, and on advocacy access"
+      }
+    ],
+    "core.governance.governance-and-operational-management": [
+      {
+        "kind": "policy",
+        "title": "Governance policy: structure, responsibilities, delegations and conflict of interest",
+        "documentTypeId": "policy.governance"
+      },
+      {
+        "kind": "record",
+        "title": "Governing body or owner meeting minutes showing oversight of quality and safeguarding",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "record",
+        "title": "Business plan referencing legislative requirements and organisational risks; evidence of input from people with disability"
+      },
+      {
+        "kind": "record",
+        "title": "Documented delegation for absences and a register of declared conflicts of interest"
+      }
+    ],
+    "core.governance.risk-management": [
+      {
+        "kind": "policy",
+        "title": "Risk management policy and procedure covering the eight listed areas",
+        "documentTypeId": "policy.risk-management"
+      },
+      {
+        "kind": "register",
+        "title": "Risk register with ratings, treatments and review dates",
+        "documentTypeId": "register.risk",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "insurance",
+        "title": "Current certificates of currency: professional indemnity, public liability and personal accident"
+      },
+      {
+        "kind": "plan",
+        "title": "Infection prevention and outbreak measures within the risk system, where relevant",
+        "documentTypeId": "policy.infection-control"
+      }
+    ],
+    "core.governance.quality-management": [
+      {
+        "kind": "policy",
+        "title": "Quality management and continuous improvement policy",
+        "documentTypeId": "policy.quality-management"
+      },
+      {
+        "kind": "plan",
+        "title": "Internal audit program proportionate to the provider's size"
+      },
+      {
+        "kind": "register",
+        "title": "Continuous improvement register linking feedback, incident trends and audit findings to actions"
+      }
+    ],
+    "core.governance.information-management": [
+      {
+        "kind": "policy",
+        "title": "Information management, records and privacy policy",
+        "documentTypeId": "policy.information-management"
+      },
+      {
+        "kind": "form",
+        "title": "Consent and disclosure form explaining purpose, storage, access, correction and withdrawal",
+        "documentTypeId": "form.consent"
+      },
+      {
+        "kind": "record",
+        "title": "Evidence of secure storage, access controls, retention and disposal practices"
+      }
+    ],
+    "core.governance.feedback-and-complaints-management": [
+      {
+        "kind": "policy",
+        "title": "Feedback and complaints management policy and procedure, aligned to the Complaints Management and Resolution Rules 2018",
+        "documentTypeId": "policy.feedback-and-complaints"
+      },
+      {
+        "kind": "register",
+        "title": "Complaints register with acknowledgement, actions, outcomes and improvements",
+        "documentTypeId": "register.complaints",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "record",
+        "title": "Participant-facing information on how to complain, including to the Commission and advocates"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on complaints handling"
+      }
+    ],
+    "core.governance.incident-management": [
+      {
+        "kind": "policy",
+        "title": "Incident management and reportable incidents policy and procedure, aligned to the Incident Management and Reportable Incidents Rules 2018",
+        "documentTypeId": "policy.incident-management"
+      },
+      {
+        "kind": "register",
+        "title": "Incident register showing reporting, response, review and learning",
+        "documentTypeId": "register.incidents",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on incident management and reportable incident obligations"
+      }
+    ],
+    "core.governance.human-resource-management": [
+      {
+        "kind": "policy",
+        "title": "Human resources policy: recruitment, screening, induction, training, supervision and performance",
+        "documentTypeId": "policy.human-resources"
+      },
+      {
+        "kind": "record",
+        "title": "Worker files sampled by auditors: identity, right to work, worker screening clearance, qualifications, induction, NDIS worker orientation module, supervision notes",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "register",
+        "title": "Training register including infection prevention and control refresher training",
+        "documentTypeId": "register.training"
+      },
+      {
+        "kind": "register",
+        "title": "Worker screening clearance register with expiry dates",
+        "documentTypeId": "register.worker-clearances"
+      },
+      {
+        "kind": "plan",
+        "title": "Emergency workforce plan identifying workers with relevant capabilities and how a workforce is sourced in a disruption"
+      }
+    ],
+    "core.governance.continuity-of-supports": [
+      {
+        "kind": "policy",
+        "title": "Continuity of supports policy and procedure, including cover for worker absence and a sole trader's own absence",
+        "documentTypeId": "policy.continuity-of-supports"
+      },
+      {
+        "kind": "record",
+        "title": "Participant preferences documented and provided to workers before supports start"
+      },
+      {
+        "kind": "record",
+        "title": "Records of alternative arrangements explained and agreed when interruptions were unavoidable"
+      }
+    ],
+    "core.governance.emergency-and-disaster-management": [
+      {
+        "kind": "plan",
+        "title": "Emergency and disaster management plan covering preparation, changes to supports, rapid adaptation and communication",
+        "documentTypeId": "plan.emergency-and-disaster"
+      },
+      {
+        "kind": "record",
+        "title": "Evidence of consultation with participants and their support networks, testing of the plan and periodic review"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on implementing the plan"
+      }
+    ],
+    "core.provision.access-to-supports": [
+      {
+        "kind": "policy",
+        "title": "Access to supports policy: eligibility, entry criteria, costs and withdrawal of supports",
+        "documentTypeId": "policy.access-to-supports"
+      },
+      {
+        "kind": "record",
+        "title": "Participant-facing information on available supports and any costs, in accessible formats"
+      }
+    ],
+    "core.provision.support-planning": [
+      {
+        "kind": "policy",
+        "title": "Support planning and risk assessment procedure",
+        "documentTypeId": "policy.support-planning"
+      },
+      {
+        "kind": "form",
+        "title": "Support plan template with risk assessment, preventative health, emergency responses and annual review date",
+        "documentTypeId": "form.support-plan"
+      },
+      {
+        "kind": "record",
+        "title": "Completed support plans with participant involvement, consent to share, and reviews within twelve months",
+        "sourceId": "types-of-audits"
+      }
+    ],
+    "core.provision.service-agreements-with-participants": [
+      {
+        "kind": "policy",
+        "title": "Service agreements procedure",
+        "documentTypeId": "policy.service-agreements"
+      },
+      {
+        "kind": "agreement",
+        "title": "Service agreement template in plain language, including emergency and disaster arrangements and any SIL-in-SDA arrangements",
+        "documentTypeId": "form.service-agreement"
+      },
+      {
+        "kind": "record",
+        "title": "Signed agreements provided to participants, or a record of why a copy was not provided"
+      }
+    ],
+    "core.provision.responsive-support-provision": [
+      {
+        "kind": "policy",
+        "title": "Responsive support provision policy: least intrusive options, evidence-informed practice, collaboration with other providers",
+        "documentTypeId": "policy.responsive-support"
+      },
+      {
+        "kind": "record",
+        "title": "Records of participant involvement in worker selection, including preferred gender for personal care"
+      },
+      {
+        "kind": "training",
+        "title": "Training records for workers supporting participants with specific monitored needs"
+      }
+    ],
+    "core.provision.transitions-to-or-from-a-provider": [
+      {
+        "kind": "policy",
+        "title": "Transitions to and from the provider procedure, including temporary transitions such as hospitalisation",
+        "documentTypeId": "policy.transitions"
+      },
+      {
+        "kind": "record",
+        "title": "Transition plans and risk assessments for participants who entered or exited"
+      }
+    ],
+    "core.environment.safe-environment": [
+      {
+        "kind": "policy",
+        "title": "Safe environment, worker identification and infection prevention and control policy",
+        "documentTypeId": "policy.safe-environment"
+      },
+      {
+        "kind": "record",
+        "title": "Participant-specific medical emergency protocols and escalation arrangements"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records: medical emergencies, hand hygiene, respiratory hygiene, PPE, with refresher dates",
+        "documentTypeId": "register.training"
+      },
+      {
+        "kind": "record",
+        "title": "Evidence PPE is available and environmental cleaning is routine in provider-controlled settings"
+      }
+    ],
+    "core.environment.participant-money-and-property": [
+      {
+        "kind": "policy",
+        "title": "Participant money and property policy and procedure",
+        "documentTypeId": "policy.participant-money-and-property"
+      },
+      {
+        "kind": "record",
+        "title": "Consent and transaction records where the provider handled a participant's money or property"
+      }
+    ],
+    "core.environment.management-of-medication": [
+      {
+        "kind": "policy",
+        "title": "Medication management policy and procedure",
+        "documentTypeId": "policy.medication-management"
+      },
+      {
+        "kind": "record",
+        "title": "Medication charts identifying participant, medication and dosage; secure storage evidence"
+      },
+      {
+        "kind": "training",
+        "title": "Medication administration competency and incident-response training records"
+      }
+    ],
+    "core.environment.mealtime-management": [
+      {
+        "kind": "policy",
+        "title": "Mealtime management policy and procedure, including texture-modified foods and fluids",
+        "documentTypeId": "policy.mealtime-management"
+      },
+      {
+        "kind": "record",
+        "title": "Mealtime management plans from qualified health practitioners, reviewed at least annually, accessible to workers"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records in safe meal preparation and responding to choking or coughing"
+      }
+    ],
+    "core.environment.management-of-waste": [
+      {
+        "kind": "policy",
+        "title": "Waste, infectious and hazardous substances policy and procedure, including used PPE",
+        "documentTypeId": "policy.waste-management"
+      },
+      {
+        "kind": "plan",
+        "title": "Emergency plan for clinical waste or hazardous substance incidents"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on safe handling and PPE"
+      }
+    ],
+    "hidpa.complex-bowel-care": [
+      {
+        "kind": "plan",
+        "title": "Participant complex bowel care plan with risk, incident and emergency escalation, reviewed by a qualified health practitioner"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for complex bowel care",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records delivered by a qualified health practitioner or a person meeting the skills descriptor"
+      }
+    ],
+    "hidpa.enteral-feeding-and-management": [
+      {
+        "kind": "plan",
+        "title": "Participant enteral feeding and management plan with risk, incident and emergency escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for enteral feeding",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records covering the feeding method and regime"
+      }
+    ],
+    "hidpa.severe-dysphagia-management": [
+      {
+        "kind": "plan",
+        "title": "Severe dysphagia management plan from a qualified health practitioner covering needs, preferences, risks and escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for severe dysphagia",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Training records showing delivery by a qualified health practitioner with dysphagia expertise"
+      }
+    ],
+    "hidpa.tracheostomy-management": [
+      {
+        "kind": "plan",
+        "title": "Participant tracheostomy suctioning and management plan with risk, incident and emergency escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for tracheostomy care",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records including supporting a person dependent on ventilation"
+      }
+    ],
+    "hidpa.urinary-catheter-management": [
+      {
+        "kind": "plan",
+        "title": "Participant catheter management plan with risk, incident and emergency escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for catheter management",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records for the catheter type in use"
+      }
+    ],
+    "hidpa.ventilator-management": [
+      {
+        "kind": "plan",
+        "title": "Participant ventilator management plan specific to the ventilator used, with escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for ventilator management",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records for ventilation needs and incidents"
+      }
+    ],
+    "hidpa.subcutaneous-injections": [
+      {
+        "kind": "plan",
+        "title": "Participant subcutaneous injection plan including dosage measurement and calculation, with escalation"
+      },
+      {
+        "kind": "record",
+        "title": "Documented written or phone orders from the prescribing health practitioner"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for subcutaneous injections",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records including the related health condition"
+      }
+    ],
+    "hidpa.complex-wound-management": [
+      {
+        "kind": "plan",
+        "title": "Participant complex wound management plan with risk, incident and emergency escalation"
+      },
+      {
+        "kind": "policy",
+        "title": "High intensity supports policy and procedure with a worker training plan for complex wound management",
+        "documentTypeId": "policy.high-intensity-supports"
+      },
+      {
+        "kind": "training",
+        "title": "Participant-specific training records covering daily activities affected by the wound regime"
+      }
+    ],
+    "sbs.behaviour-support-in-the-ndis": [
+      {
+        "kind": "policy",
+        "title": "Behaviour support policy committing to reducing and eliminating restrictive practices",
+        "documentTypeId": "policy.behaviour-support"
+      },
+      {
+        "kind": "record",
+        "title": "Practitioner suitability assessments, professional development and clinical supervision records"
+      }
+    ],
+    "sbs.restrictive-practices": [
+      {
+        "kind": "policy",
+        "title": "Restrictive practices policy covering Commonwealth rules and state or territory authorisation processes",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "record",
+        "title": "Behaviour support plans showing engagement with participants and implementing providers, authorisation evidence and reduction strategies"
+      }
+    ],
+    "sbs.functional-behaviour-assessments-and-behaviour-support-plans": [
+      {
+        "kind": "procedure",
+        "title": "Functional behaviour assessment and behaviour support plan development procedure",
+        "documentTypeId": "policy.behaviour-support"
+      },
+      {
+        "kind": "record",
+        "title": "Assessments, plans provided to implementing providers, and lodgement with the Commissioner where a regulated restrictive practice is included"
+      }
+    ],
+    "sbs.supporting-the-implementation-of-the-behaviour-support-plan": [
+      {
+        "kind": "procedure",
+        "title": "Implementation support procedure: instructions, training, coaching and oversight of restrictive practice training",
+        "documentTypeId": "policy.behaviour-support"
+      },
+      {
+        "kind": "record",
+        "title": "Training, coaching and advice records for implementing providers and support networks"
+      }
+    ],
+    "sbs.behaviour-support-plan-monitoring-and-review": [
+      {
+        "kind": "procedure",
+        "title": "Plan monitoring and review procedure with at least twelve-monthly review",
+        "documentTypeId": "policy.behaviour-support"
+      },
+      {
+        "kind": "record",
+        "title": "Data review records, plan modifications, Commissioner notifications and review dates"
+      }
+    ],
+    "sbs.reportable-incidents-involving-the-use-of-a-restrictive-practice": [
+      {
+        "kind": "procedure",
+        "title": "Reportable incident support procedure for emergency or unauthorised restrictive practice use",
+        "documentTypeId": "policy.incident-management"
+      },
+      {
+        "kind": "register",
+        "title": "Incident reviews showing participant and stakeholder involvement",
+        "documentTypeId": "register.incidents"
+      }
+    ],
+    "sbs.interim-behaviour-support-plans": [
+      {
+        "kind": "procedure",
+        "title": "Interim behaviour support plan procedure for immediate needs",
+        "documentTypeId": "policy.behaviour-support"
+      },
+      {
+        "kind": "record",
+        "title": "Interim plans with risk evaluation and implementation guidance records"
+      }
+    ],
+    "ibsp.behaviour-support-in-the-ndis": [
+      {
+        "kind": "policy",
+        "title": "Behaviour support and restrictive practices policy committing to reduction and elimination",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records on legislative frameworks and evidence-informed behaviour support"
+      }
+    ],
+    "ibsp.regulated-restrictive-practices": [
+      {
+        "kind": "policy",
+        "title": "Regulated restrictive practices policy and procedure including authorisation steps for the state or territory",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "record",
+        "title": "Authorisation evidence, behaviour support plans and records showing practices used only as the plan allows"
+      },
+      {
+        "kind": "training",
+        "title": "Worker skills maintenance records for restrictive practice use"
+      }
+    ],
+    "ibsp.supporting-the-assessment-and-development-of-behaviour-support-plans": [
+      {
+        "kind": "procedure",
+        "title": "Procedure for supporting functional behavioural assessment and plan development",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "record",
+        "title": "Collaboration records with the specialist behaviour support provider and responsibility allocations"
+      }
+    ],
+    "ibsp.behaviour-support-plan-implementation": [
+      {
+        "kind": "policy",
+        "title": "Behaviour support plan implementation policy and procedure",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records in plan strategies and safe use of restrictive practices"
+      },
+      {
+        "kind": "record",
+        "title": "Supervision and performance records showing strategies implemented as written"
+      }
+    ],
+    "ibsp.monitoring-and-reporting-the-use-of-regulated-restrictive-practices": [
+      {
+        "kind": "register",
+        "title": "Restrictive practice use register supporting monthly online reporting to the Commission",
+        "documentTypeId": "register.restrictive-practices"
+      },
+      {
+        "kind": "record",
+        "title": "Data analysis and feedback records used to reduce and eliminate practices"
+      }
+    ],
+    "ibsp.behaviour-support-plan-review": [
+      {
+        "kind": "procedure",
+        "title": "Plan monitoring and review contribution procedure",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "record",
+        "title": "Data collection, team meeting and review records"
+      }
+    ],
+    "ibsp.reportable-incidents-involving-the-use-of-a-restrictive-practice": [
+      {
+        "kind": "procedure",
+        "title": "Unauthorised restrictive practice response procedure: medical review, mainstream collaboration, Commission notification, debriefing",
+        "documentTypeId": "policy.incident-management"
+      },
+      {
+        "kind": "register",
+        "title": "Incident register with debrief outcomes and support adjustments",
+        "documentTypeId": "register.incidents"
+      }
+    ],
+    "ibsp.interim-behaviour-support-plans": [
+      {
+        "kind": "procedure",
+        "title": "Interim behaviour support plan collaboration procedure",
+        "documentTypeId": "policy.restrictive-practices"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records in implementing interim plans"
+      }
+    ],
+    "ec.the-child": [
+      {
+        "kind": "policy",
+        "title": "Child safety and rights policy including mandatory reporting under state or territory law",
+        "documentTypeId": "policy.child-safety"
+      },
+      {
+        "kind": "record",
+        "title": "Risk management practices for children and continuity arrangements agreed with families"
+      }
+    ],
+    "ec.the-family": [
+      {
+        "kind": "policy",
+        "title": "Family-centred practice policy",
+        "documentTypeId": "policy.early-childhood-practice"
+      },
+      {
+        "kind": "record",
+        "title": "Support plans showing family choice, strengths, cultural responsiveness and everyday routines"
+      }
+    ],
+    "ec.inclusion": [
+      {
+        "kind": "procedure",
+        "title": "Natural environments and inclusion practice procedure",
+        "documentTypeId": "policy.early-childhood-practice"
+      },
+      {
+        "kind": "record",
+        "title": "Assessments focused on everyday routines and community links"
+      }
+    ],
+    "ec.collaboration": [
+      {
+        "kind": "procedure",
+        "title": "Key worker and team-around-the-child collaboration procedure",
+        "documentTypeId": "policy.early-childhood-practice"
+      },
+      {
+        "kind": "record",
+        "title": "Consent to share, collaboration and transition planning records"
+      }
+    ],
+    "ec.capacity-building": [
+      {
+        "kind": "procedure",
+        "title": "Capacity building and coaching approach",
+        "documentTypeId": "policy.early-childhood-practice"
+      },
+      {
+        "kind": "record",
+        "title": "Coaching records and feedback from families used to improve delivery"
+      }
+    ],
+    "ec.evidence-informed-practice": [
+      {
+        "kind": "policy",
+        "title": "Evidence-informed practice and professional development policy",
+        "documentTypeId": "policy.early-childhood-practice"
+      },
+      {
+        "kind": "training",
+        "title": "Professional development and self-assessment records"
+      }
+    ],
+    "ec.outcome-based-approach": [
+      {
+        "kind": "form",
+        "title": "Support plan template with functional outcomes and measurement",
+        "documentTypeId": "form.support-plan"
+      },
+      {
+        "kind": "record",
+        "title": "Plans provided to families in accessible formats; outcome reports families understand"
+      }
+    ],
+    "ssc.specialised-support-coordination": [
+      {
+        "kind": "policy",
+        "title": "Specialised support coordination policy and procedure for high-risk and complex situations",
+        "documentTypeId": "policy.support-coordination"
+      },
+      {
+        "kind": "record",
+        "title": "Risk evaluations, crisis prevention planning, provider engagement and monitoring records"
+      }
+    ],
+    "ssc.management-of-a-participants-ndis-supports": [
+      {
+        "kind": "procedure",
+        "title": "Procedure for arranging supports as directed by the participant and building their capacity",
+        "documentTypeId": "policy.support-coordination"
+      },
+      {
+        "kind": "record",
+        "title": "Records of support options provided in accessible formats and budget use as the participant directed"
+      }
+    ],
+    "ssc.conflict-of-interest": [
+      {
+        "kind": "policy",
+        "title": "Conflict of interest policy explained to each participant",
+        "documentTypeId": "policy.conflict-of-interest"
+      },
+      {
+        "kind": "record",
+        "title": "Declared interests and documented referrals to and from other providers"
+      }
+    ],
+    "sda.rights-and-responsibilities": [
+      {
+        "kind": "policy",
+        "title": "SDA participant rights policy including reasonable adjustments to dwellings",
+        "documentTypeId": "policy.participant-rights"
+      },
+      {
+        "kind": "record",
+        "title": "Agreements and communications provided in the participant's preferred mode"
+      }
+    ],
+    "sda.conflict-of-interest": [
+      {
+        "kind": "policy",
+        "title": "Conflict of interest policy for SDA, available to participants",
+        "documentTypeId": "policy.conflict-of-interest"
+      },
+      {
+        "kind": "agreement",
+        "title": "Separate service agreements where SDA and other supports are delivered to the same participant"
+      }
+    ],
+    "sda.service-agreements-with-participants": [
+      {
+        "kind": "agreement",
+        "title": "SDA service or tenancy agreement template meeting the SDA Conditions Rules 2018 and tenancy law, covering the listed matters",
+        "documentTypeId": "policy.sda-tenancy"
+      },
+      {
+        "kind": "record",
+        "title": "Signed agreements, dwelling safety information and records where a copy was not provided"
+      }
+    ],
+    "sda.enrolment-of-sda-properties": [
+      {
+        "kind": "procedure",
+        "title": "Dwelling enrolment and ongoing compliance procedure",
+        "documentTypeId": "policy.sda-tenancy"
+      },
+      {
+        "kind": "record",
+        "title": "Enrolment records, building compliance and maintenance records"
+      }
+    ],
+    "sda.tenancy-management": [
+      {
+        "kind": "policy",
+        "title": "Tenancy management policy including vacancies, notices and SIL provider arrangements",
+        "documentTypeId": "policy.sda-tenancy"
+      },
+      {
+        "kind": "agreement",
+        "title": "Documented arrangements with each participant and each SIL provider covering the listed matters"
+      },
+      {
+        "kind": "register",
+        "title": "Complaints and incident registers meeting the 2018 Rules",
+        "documentTypeId": "register.complaints"
+      }
+    ],
+    "sil.supported-decision-making": [
+      {
+        "kind": "policy",
+        "title": "Supported decision-making policy and procedure covering points (a) to (f) of indicator 4",
+        "documentTypeId": "policy.supported-decision-making"
+      },
+      {
+        "kind": "training",
+        "title": "Initial and refresher supported decision-making training records for relevant workers"
+      },
+      {
+        "kind": "record",
+        "title": "Accessible information given to participants about will and preferences, and dignity of risk decisions recorded"
+      }
+    ],
+    "sil.safeguarding": [
+      {
+        "kind": "policy",
+        "title": "SIL safeguarding policy and procedure: dignity of risk, worker responsibilities, conflict and bullying between co-tenants",
+        "documentTypeId": "policy.sil-safeguarding"
+      },
+      {
+        "kind": "training",
+        "title": "Worker training records in de-escalation, trauma-informed practice and positive behaviour support"
+      },
+      {
+        "kind": "record",
+        "title": "Safeguarding approaches agreed with participants and review records"
+      }
+    ],
+    "sil.practice-governance": [
+      {
+        "kind": "policy",
+        "title": "SIL practice governance policy: vision and values for the home, worker development, co-tenant matching, emergency oversight",
+        "documentTypeId": "policy.sil-practice-governance"
+      },
+      {
+        "kind": "training",
+        "title": "Competency assessments in person-centred, trauma-informed, active support and supported decision-making practice"
+      },
+      {
+        "kind": "record",
+        "title": "Consultation records before new tenants are placed and rehearsed emergency arrangements"
+      }
+    ],
+    "sil.agreements-about-tenancy-housing-and-support-arrangements": [
+      {
+        "kind": "agreement",
+        "title": "Separate SIL service agreement and tenancy agreement templates covering the listed matters",
+        "documentTypeId": "policy.sil-tenancy-and-service-agreements"
+      },
+      {
+        "kind": "policy",
+        "title": "Conflict of interest and raising-concerns policies for providers delivering both SIL and tenancy",
+        "documentTypeId": "policy.conflict-of-interest"
+      },
+      {
+        "kind": "record",
+        "title": "Records that participants were supported to understand the agreements and referred to advocacy or legal help"
+      }
+    ],
+    "verification.human-resource-management": [
+      {
+        "kind": "record",
+        "title": "Worker records: identity, right to work, pre-employment checks, qualifications and experience",
+        "sourceId": "types-of-audits"
+      },
+      {
+        "kind": "training",
+        "title": "NDIS worker orientation module completion, professional development, infection control and PPE training records",
+        "documentTypeId": "register.training"
+      }
+    ],
+    "verification.incident-management": [
+      {
+        "kind": "policy",
+        "title": "Incident management policy and procedure proportionate to a small provider, aligned to the 2018 Rules",
+        "documentTypeId": "policy.incident-management"
+      },
+      {
+        "kind": "register",
+        "title": "Incident register",
+        "documentTypeId": "register.incidents"
+      }
+    ],
+    "verification.complaints-management": [
+      {
+        "kind": "policy",
+        "title": "Complaints management and resolution policy and procedure aligned to the 2018 Rules",
+        "documentTypeId": "policy.feedback-and-complaints"
+      },
+      {
+        "kind": "register",
+        "title": "Complaints register",
+        "documentTypeId": "register.complaints"
+      }
+    ],
+    "verification.risk-management": [
+      {
+        "kind": "policy",
+        "title": "Risk management policy and procedure including emergency and disaster planning and infection control",
+        "documentTypeId": "policy.risk-management"
+      },
+      {
+        "kind": "register",
+        "title": "Risk register with dated reviews, including participant reliance and disruption impact",
+        "documentTypeId": "register.risk"
+      },
+      {
+        "kind": "insurance",
+        "title": "Current certificates of currency: professional indemnity, public liability and personal accident"
+      }
+    ]
+  },
+  "registrationGroups": [
+    {
+      "code": "0101",
+      "name": "Accommodation/tenancy assistance",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0102",
+      "name": "Assistance to access and maintain employment or higher education",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0103",
+      "name": "Assistive products for personal care and safety",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0104",
+      "name": "High Intensity Daily Personal Activities",
+      "auditType": "certification",
+      "moduleIds": ["hidpa"],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "Workers are assessed against the high intensity support skills descriptors. Only the high intensity activities listed on the certificate of registration may be provided.",
+      "sourceIds": [
+        "registration-groups",
+        "registration-requirements",
+        "supp-hidpa"
+      ]
+    },
+    {
+      "code": "0105",
+      "name": "Personal mobility equipment",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0106",
+      "name": "Assistance in coordinating or managing life stages, transitions and supports",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0107",
+      "name": "Assistance with daily personal activities",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0108",
+      "name": "Assistance with travel/transport arrangements",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0109",
+      "name": "Vehicle modifications",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0110",
+      "name": "Specialist positive behaviour support",
+      "auditType": "certification",
+      "moduleIds": ["sbs"],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "Registration is required to provide specialist behaviour support services.",
+      "sourceIds": [
+        "registration-groups",
+        "registration-requirements",
+        "mandatory-sil"
+      ]
+    },
+    {
+      "code": "0111",
+      "name": "Home modifications",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0112",
+      "name": "Assistive equipment for recreation",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0113",
+      "name": "Vision equipment",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0114",
+      "name": "Community nursing care",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0115",
+      "name": "Assistance with daily life tasks in a group or shared living arrangement",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "Providers registered for 0115 who deliver supported independent living have a dedicated transition pathway to class 0138 on the Commission's SIL transition page.",
+      "sourceIds": [
+        "registration-groups",
+        "registration-requirements",
+        "mandatory-sil"
+      ]
+    },
+    {
+      "code": "0116",
+      "name": "Innovative community participation",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0117",
+      "name": "Development of daily living and life skills",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "The Registration Requirements PDF lists this class as 'Development of daily care and life skills'; the audit-type table's name is used here.",
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0118",
+      "name": "Early intervention supports for early childhood",
+      "auditType": "certification",
+      "moduleIds": ["ec"],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "An individual or partnership whose only certification class is early childhood is assessed under modified certification: the core module's freedom from violence, abuse, neglect, exploitation or discrimination outcome only, plus the early childhood module (rules.modifiedCertification).",
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0119",
+      "name": "Specialised hearing services",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0120",
+      "name": "Household tasks",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0121",
+      "name": "Interpreting and translation",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0122",
+      "name": "Hearing equipment",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0123",
+      "name": "Assistive products for household tasks",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0124",
+      "name": "Communication and information equipment",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0125",
+      "name": "Participation in community, social and civic activities",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0126",
+      "name": "Exercise physiology and personal training",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0127",
+      "name": "Management of funding for supports in participant plans",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "notes": "Plan management providers must give the auditor a list of workers delivering plan management, certified copies of their qualifications and professional memberships per the Qualification and Professional Associations Required Documentation Guide, and worker screening clearances for each worker. Registration is required to provide plan management services.",
+      "sourceIds": [
+        "registration-groups",
+        "registration-requirements",
+        "types-of-audits",
+        "mandatory-sil"
+      ]
+    },
+    {
+      "code": "0128",
+      "name": "Therapeutic supports",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0129",
+      "name": "Specialised driver training",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0130",
+      "name": "Assistance animals",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0131",
+      "name": "Specialist disability accommodation",
+      "auditType": "certification",
+      "moduleIds": ["sda"],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "SDA alone is assessed against the SDA module without the core module; SDA with any other class adds the core module (rules.coreExemptWhenSole). Registration is required to provide SDA.",
+      "sourceIds": [
+        "registration-groups",
+        "registration-requirements",
+        "mandatory-sil"
+      ]
+    },
+    {
+      "code": "0132",
+      "name": "Specialised support coordination",
+      "auditType": "certification",
+      "moduleIds": ["ssc"],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0133",
+      "name": "Specialised supported employment",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0134",
+      "name": "Hearing services",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0135",
+      "name": "Customised prosthetics",
+      "auditType": "verification",
+      "moduleIds": ["verification"],
+      "requiresCore": false,
+      "mandatoryFrom": null,
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0136",
+      "name": "Group and centrebased activities",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": null,
+      "notes": "Spelled 'Group and centre-based activities' in the Registration Requirements PDF; the audit-type table's spelling is used here.",
+      "sourceIds": ["registration-groups", "registration-requirements"]
+    },
+    {
+      "code": "0137",
+      "name": "Providing an NDIS digital platform service",
+      "auditType": "certification",
+      "moduleIds": [],
+      "requiresCore": true,
+      "mandatoryFrom": "2026-07-01",
+      "notes": "Mandatory registration from 1 July 2026. Registered NDIS digital platform providers need a certification audit, the core module and specific conditions of registration for NDIS digital platforms (section 13D of the Provider Registration Rules). The platform definition is summarised in the Commission's transition page; the Rules hold the full definition.",
+      "sourceIds": [
+        "registration-groups",
+        "mandatory-registration",
+        "mandatory-digital",
+        "legislation-rules-toc"
+      ]
+    },
+    {
+      "code": "0138",
+      "name": "Assistance with supported independent living",
+      "auditType": "certification",
+      "moduleIds": ["sil"],
+      "requiresCore": true,
+      "mandatoryFrom": "2026-07-01",
+      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL who have not applied for registration by 1 October 2026 must stop providing SIL supports. Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
+      "sourceIds": [
+        "registration-groups",
+        "mandatory-registration",
+        "mandatory-sil",
+        "sil-ps",
+        "legislation-rules-toc"
+      ]
+    }
+  ],
+  "rules": {
+    "mixedAuditResolvesTo": "certification",
+    "mixedAuditSourceId": "registration-groups",
+    "restrictivePracticesModuleId": "ibsp",
+    "restrictivePracticesSourceId": "registration-requirements",
+    "coreExemptWhenSole": ["0131"],
+    "coreExemptWhenSoleSourceId": "registration-requirements",
+    "modifiedCertification": {
+      "groupCode": "0118",
+      "businessStructures": ["sole-trader", "partnership"],
+      "coreStandardIds": [
+        "core.rights.violence-abuse-neglect-exploitation-and-discrimination"
+      ],
+      "sourceId": "registration-requirements"
+    },
+    "registrationPeriodYears": 3,
+    "registrationPeriodSourceId": "about-registration",
+    "midTermAudit": {
+      "monthsAfterRegistration": 18,
+      "prepareFromMonth": 12,
+      "assessedDivisionIds": ["governance"],
+      "exemptions": [
+        "an individual or partnership that only required a certification audit to provide early intervention supports for early childhood",
+        "a provider that is only registered to provide specialist disability accommodation",
+        "a transitioned provider"
+      ],
+      "sourceId": "types-of-audits"
+    },
+    "ratings": [
+      { "value": 3, "label": "conforms with elements of best practice" },
+      { "value": 2, "label": "conforms with NDIS Practice Standards" },
+      { "value": 1, "label": "minor non-conformity" },
+      { "value": 0, "label": "major non-conformity" }
+    ],
+    "ratingsSourceId": "types-of-audits",
+    "silDefinition": {
+      "appliesWhen": [
+        "the person with disability requires support at all times of the day, or for most of the day",
+        "the assistance provided helps the person with disability to live in their home as autonomously as possible and access the community, by: assisting with daily life tasks, or supervising daily life tasks",
+        "the provider is managing and delivering supported independent living supports. Providers make sure the participant receives home and living support in accordance with the package of supports."
+      ],
+      "notSilWhen": [
+        "a person only receives a few hours of support a day or week, or",
+        "a person chooses and manages their own support workers (this includes directing, planning and rostering their own support workers)."
+      ],
+      "applicationDeadline": "2026-10-01",
+      "sourceId": "mandatory-sil"
+    }
+  }
+}

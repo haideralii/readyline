@@ -149,7 +149,7 @@ Services" (reference 200312, 2020). It predates 0137 and 0138.
 inferred from the Commission's statement that its SIL audit pilot tested the
 supported decision-making standard "alongside the Core Module". Both are
 flagged in the data and must be confirmed against the Provider Registration
-Rules amendment before launch.
+Rules amendment before launch. Resolved on 2026-10-11, see D-112.
 
 **D-105 Edge rules captured from the mapping document.** SDA-only providers
 are assessed against the SDA module without the core module; SDA plus any
@@ -179,8 +179,8 @@ and rules. Every record has a `verification` block; unverified records must
 carry a note or the schema rejects them. `checkIntegrity()` enforces cross
 references and the invariants the brief asks for (every group maps to at
 least one module; verification groups map to the verification module only).
-`data/standards.example.json` holds a small verified sample to review the
-shape before the full dataset is populated.
+A small example dataset was used for the PO's shape review and then removed
+once the full `data/standards.json` was built (D-113).
 
 **D-108 Evidence guidance is ours, labelled as such.** The dataset carries an
 `evidenceDisclaimer` shown wherever evidence items appear. Items cite the
@@ -208,11 +208,67 @@ so snapshots can be refreshed in CI.
 certification. Reported in the REQ-001 Dev response so the primer can be
 updated.
 
-Next session: populate `data/standards.json` in full from the snapshots
-(all 23 core, 4 verification, 4 SIL and the six legacy supplementary modules'
-standards, all 38 groups), write the mapping and pathway unit tests, then the
-derivation function (groups plus answers to modules, audit pathway, mid-term
-applicability).
+### REQ-001 Session A (2026-10-11)
+
+**D-112 D-104 resolved from the Commission's own transition pages.** The
+"Mandatory registration and transitional pathways" pages state that
+registered SIL providers need certification audits, the core module and the
+SIL supplementary module, and that registered NDIS digital platform providers
+need certification audits, the core module and specific conditions of
+registration (section 13D of the Rules). Both classes are now `verified`
+with those pages as sources. The Federal Register of Legislation renders the
+Rules text by script, so only the landing page (compilation F2026C00527,
+No. 6, 1 July 2026, with its table of contents listing Schedule 7A Module 5A
+SIL and Schedule 8 Module 6 Verification) was captured as a source. The full
+instrument remains the authoritative text and should be read before launch.
+
+**D-113 The dataset is built, not typed.** `scripts/standards/build.mjs`
+parses outcomes and quality indicators straight out of the snapshots in
+`data/sources/` (Commission HTML reduced to text; the SIL PDF with its numbered
+indicators) and merges them with the hand-maintained
+`data/standards.meta.json` (sources, modules, groups, rules, draft evidence).
+Multi-line indicators are joined when the previous line ends in a colon,
+semicolon, "and" or "or", or the next line starts with a lettered sub-point;
+the output was spot-checked against the pages. A test asserts that each
+standard's indicator order matches the snapshot, which is the PO's stable-index
+rule. `standards:verify` re-hashes every snapshot against `standards.json` and
+`manifest.json` and runs in CI.
+
+**D-114 Counts.** The core module has 24 standards (5 rights, 9 governance
+including emergency and disaster management, 5 provision, 5 environment), not
+23 as written in the Dev response. Totals: 70 standards across 9 modules, 38
+registration classes.
+
+**D-115 One web-page line treated as a note, not an indicator.** The high
+intensity page's severe dysphagia section ends with "Training for Severe
+dysphagia management must only be delivered by an appropriately qualified
+health practitioner." That sentence is not in the Version 4 PDF, so it is
+stored verbatim in the standard's `note` field rather than as a sixth
+indicator.
+
+**D-116 Registration period sourced.** The Commission's "About registration"
+page says providers "are generally registered for three years"; it is now a
+source and `rules.registrationPeriodSourceId` points at it, replacing the
+CLAUDE.md-only basis noted in D-106.
+
+**D-117 Names and spellings follow the audit-type table.** Where the
+Registration Requirements PDF spells a class differently (0117 "daily care",
+0136 "centre-based"), the group record uses the table's wording and carries a
+note. Module and standard names follow the Commission's web pages; the Rules'
+table of contents uses slightly different titles for some standards (for
+example "Freedom from violence, abuse, neglect, exploitation or
+discrimination", "Complaints management and resolution", "Service
+agreements"). Ids derive from the web names.
+
+**D-118 Evidence guidance is a first pass.** Every standard carries two to
+five draft evidence items (`draft: true`) with planned document-type ids for
+Phase 3. The PO reviews them under REQ-001 FR-4; they are not Commission text
+and the dataset says so.
+
+Session B: `deriveApplicability(groups, { businessStructure,
+usesRestrictivePractices, silExclusions })` returning modules, pathway and the
+rules that fired; `standards:report` CLI; delivery evidence for AC-1 to
+AC-10.
 
 ## Product-owner decisions (2026-10-11)
 
@@ -248,6 +304,8 @@ REQ-001.
 Items asserted in code or copy that still need a primary source.
 
 - D-008: Vercel Hobby plan function-region pinning.
-- D-104: modules applying to class 0137 (digital platforms).
-- D-104: core module applying to class 0138 (SIL) alongside the SIL module.
+- ~~D-104: modules applying to class 0137 (digital platforms).~~ Resolved (D-112).
+- ~~D-104: core module applying to class 0138 (SIL) alongside the SIL module.~~ Resolved (D-112).
+- D-112: the full text of the Provider Registration and Practice Standards
+  Rules (F2026C00527) has not been read; only its table of contents was captured.
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.

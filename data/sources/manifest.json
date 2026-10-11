@@ -224,6 +224,22 @@
       "fetchedAt": "2026-10-11",
       "bytes": 43562,
       "sha256": "928ea9dbe4912327c644fd07b5899a67c2d5cfe3561b02de9b2c0d74ceaae956"
+    },
+    {
+      "id": "legislation-rules-toc",
+      "url": "https://www.legislation.gov.au/F2018L00631/latest/text",
+      "snapshotPath": "data/sources/legislation-rules-toc.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 9042,
+      "sha256": "bd73d0de586d98a34a6739053c0beedaa784bb18a321591a6317fda2f4963aa0",
+      "note": "Federal Register of Legislation landing page: compilation id, date and table of contents only. The instrument text is rendered by script and was not captured."
+    },
+    {
+      "id": "about-registration",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/about-registration",
+      "snapshotPath": "data/sources/about-registration.txt",
+      "fetchedAt": "2026-10-11",
+      "sha256": "8cafdea92593d70238f538b881117919e0082031b0aa59f11f5061a6c9d53f64"
     }
   ]
 }
