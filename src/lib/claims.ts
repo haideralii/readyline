@@ -64,7 +64,7 @@ export const PROHIBITED_CLAIM_RULES: readonly Rule[] = [
   {
     id: "self-described-registered-provider",
     pattern:
-      /(?:\bwe|\bour\s+(?:company|business|service)|\{\{BRAND\}\})\s+(?:is|are)\s+(?:an?\s+)?(?:ndis[\s-]?)?registered\s+provider/gi,
+      /(?:\bwe|\bour\s+(?:company|business|service)|Readyline)\s+(?:is|are)\s+(?:an?\s+)?(?:ndis[\s-]?)?registered\s+provider/gi,
     why: "We are not a registered provider and must not say so.",
   },
 ];
@@ -102,6 +102,5 @@ export function assertNoProhibitedClaims(text: string, label = "text"): void {
  * trading, domain or product name. The placeholder is always allowed.
  */
 export function isBrandNameAllowed(name: string): boolean {
-  if (name === "{{BRAND}}") return true;
   return !/ndis/i.test(name);
 }

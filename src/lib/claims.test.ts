@@ -21,7 +21,7 @@ describe("findProhibitedClaims", () => {
     ["I heart NDIS", "i-heart-ndis"],
     ["We are a registered provider", "self-described-registered-provider"],
     [
-      "{{BRAND}} is an NDIS registered provider",
+      "Readyline is an NDIS registered provider",
       "self-described-registered-provider",
     ],
   ])("flags %j as %s", (text, rule) => {
@@ -67,8 +67,8 @@ describe("assertNoProhibitedClaims", () => {
 });
 
 describe("brand and site notices", () => {
-  it("uses the placeholder until a name is chosen", () => {
-    expect(BRAND).toBe("{{BRAND}}");
+  it("defaults to Readyline when no override is set", () => {
+    expect(BRAND).toBe("Readyline");
   });
 
   it("general information notice says what it must and nothing prohibited", () => {
@@ -87,7 +87,7 @@ describe("brand and site notices", () => {
 });
 
 describe("isBrandNameAllowed", () => {
-  it.each(["{{BRAND}}", "Readiness Desk", "Provider Prep"])(
+  it.each(["Readyline", "Readiness Desk", "Provider Prep"])(
     "allows %j",
     (name) => expect(isBrandNameAllowed(name)).toBe(true),
   );

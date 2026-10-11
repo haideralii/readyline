@@ -1,5 +1,5 @@
 # REQ-003: Readiness questionnaire with save-and-resume
-Status: ready (Dev response and a non-persistent prototype only; persistence waits for REQ-004)
+Status: in progress (build approved 11 Oct 2026; persistence waits for REQ-004)
 Phase: 2   Priority: must   Owner: Dev
 
 ## Why
@@ -63,3 +63,41 @@ CI run link on the PR; screenshots of each step at 360x740 and desktop; Lighthou
 
 ## PO review
 (PO fills in.)
+
+**11 Oct 2026, Dev response review: ACCEPTED; build approved for Sessions A to C once PR #1 and PR #2 are merged.**
+
+1. Schema and step map accepted as proposed. Two additions: `workforce.workerCount` max 500 is fine but show a "we focus on providers with up to 10 workers" note above 25 (positioning, not a block); the `servicesNote` must never be sent to `deriveResult` (strip it in the adapter, test it).
+2. **Group descriptions: all 38 reviewed and approved as written.** Set `status: "reviewed"` and `reviewedBy: "po"`, `reviewedAt: "2026-10-11"`. No wording changes.
+3. Form-state approach accepted: client-held answers, routes per step, one server action for the result, `DraftStore` interface with the local implementation now. Keep `standards.json` server-side as proposed.
+4. Estimate accepted (three sessions).
+5. On the "dataset fields I wish existed": agreed, and here is the content. Create `data/readyline-content/` with these files, each headed by the same not-Commission-text note, `author: "readyline"`, `status: "reviewed"`:
+
+`modules.json` (one sentence each, for the result page):
+- core: "The standards every registered provider is audited against: participants' rights, how your business is run, how supports are delivered, and the environments you deliver them in."
+- verification: "A smaller set of four standards (people, incidents, complaints, risk) checked by a document review for lower-risk supports."
+- high-intensity: "Extra standards for daily personal care that needs specific clinical skills, such as complex bowel care, tube feeding or ventilation."
+- specialist-behaviour-support: "Standards for practitioners who assess behaviour and write behaviour support plans."
+- implementing-behaviour-support-plans: "Standards for providers whose workers carry out behaviour support plans, including any regulated restrictive practices."
+- early-childhood: "Standards for early intervention with young children and their families."
+- specialised-support-coordination: "Standards for support coordination in complex or high-risk situations."
+- sda: "Standards for owning or managing specialist disability accommodation as the housing provider."
+- sil: "Standards, from 1 July 2026, for managing and delivering supported independent living packages: decision-making, safeguarding, practice governance and tenancy arrangements."
+
+`audit-types.json`:
+- verification: "A desk-based review of your documents by an approved auditor. No site visit. Typically the quicker and cheaper audit."
+- certification: "A full audit: document review, a site visit, and interviews with your workers and some participants. Followed by a mid-term audit about 18 months after registration."
+
+`document-sets.json` (first pass, PO content; module id to document type ids; REQ-005 refines):
+- always (any registration): governance-policy, risk-management-policy-and-register, continuity-of-supports-plan, conflict-of-interest-policy, privacy-and-information-management-policy, records-management-policy, complaints-management-policy-and-register, incident-management-policy-and-register, worker-screening-and-recruitment-procedure, induction-and-training-procedure-and-register, code-of-conduct-acknowledgement, service-agreement-template, participant-rights-and-choice-policy, safeguarding-policy, emergency-and-disaster-management-plan, ai-use-and-governance-policy, ai-and-digital-data-handling-procedure
+- verification: (the always set only)
+- core: adds quality-management-and-continuous-improvement, feedback-and-participant-engagement-procedure, medication-management-procedure (if personal care groups), mealtime-management-procedure (if personal care groups), waste-and-infection-control-procedure, transport-safety-procedure (if 0108)
+- high-intensity: adds high-intensity-skills-descriptors-and-training-register, clinical-oversight-procedure
+- specialist-behaviour-support and implementing-behaviour-support-plans: add restrictive-practice-authorisation-and-reporting-procedure, behaviour-support-plan-implementation-procedure
+- early-childhood: adds family-centred-practice-procedure, child-safe-practices-policy
+- specialised-support-coordination: adds conflict-of-interest-in-coordination-procedure, complex-support-escalation-procedure
+- sda: adds dwelling-enrolment-and-maintenance-procedure, tenancy-rights-and-dispute-procedure
+- sil: adds supported-decision-making-procedure, sil-safeguarding-and-roster-oversight-procedure, practice-governance-framework, tenancy-housing-and-support-agreements-procedure
+Registers (subscription, REQ-009) are derived from the same list: incidents, complaints, worker clearances, training, policy reviews.
+
+Status set to `in progress`.
+

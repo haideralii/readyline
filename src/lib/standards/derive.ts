@@ -237,7 +237,8 @@ export function deriveApplicability(
         effect: "limit-core",
         target: "core",
         sourceId: mc.sourceId,
-        text: `An individual or partnership whose only certification class is ${label(ecGroup)} is assessed under modified certification: the core module is limited to the freedom from violence, abuse, neglect, exploitation or discrimination outcome, plus the early childhood supports module.`,
+        text: `An individual or partnership whose only certification class is ${label(ecGroup)} is assessed under modified certification: the core module is limited to the freedom from violence, abuse, neglect, exploitation or discrimination outcome, plus the early childhood supports module.${verificationGroups.length > 0 ? ' The Commission\'s mapping document lists this case as early childhood "and any other verification registration"; whether a verification class alongside early childhood keeps the modified scope is not stated, so treat this as unconfirmed and check the scope of audit with the Commission or your auditor.' : ""}`,
+        ...(verificationGroups.length > 0 ? { unverified: true } : {}),
       });
       for (const id of ecGroup.moduleIds) {
         reasons.push({

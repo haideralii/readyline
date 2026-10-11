@@ -333,6 +333,32 @@ Hobby plan; move to Pro when Sydney-pinned functions, a custom domain with
 team features, or usage limits require it. The D-008 `UNVERIFIED` item
 (Hobby-plan region pinning) is to be resolved at first deploy in Phase 4.
 
+**D-025 Merge rule (PO, 2026-10-11).** Dev may merge a PR only when the
+REQ's PO review says Accepted (or the named condition of a conditional
+acceptance is met) and every CI job on the latest commit is green; `--no-ff`
+merge, record the merge commit in the REQ. Haider no longer has to merge by
+hand; the PO acceptance remains the gate.
+
+**D-026 Readyline content files (PO, 2026-10-11).** Plain-English
+descriptions of registration groups, modules and audit types, and the first
+document-set mapping, are Readyline text kept under `data/readyline-content/`
+with `author: "readyline"` and a review status; never presented as Commission
+text.
+
+**D-027 Readyline is the default brand in code and data (Dev, 2026-10-11,
+queue item 0).** `src/lib/brand.ts` exports `BRAND_DEFAULT = "Readyline"`;
+`NEXT_PUBLIC_BRAND_NAME` stays as an override and `.env.example` now shows
+`Readyline`. The `{{BRAND}}` placeholder is retired from code, tests and the
+prohibited-claims rule (the self-description rule now matches "Readyline is a
+registered provider"). Where text is rendered by the app (title, header,
+footer, notices) the constant is substituted at render time; where text is
+stored, the `evidenceDisclaimer` in `data/standards.meta.json` was changed to
+"Readyline guidance" and the dataset regenerated, so the report prints
+Readyline. The descriptive line "NDIS is a registered trade mark of the
+National Disability Insurance Agency and is used here descriptively only" is
+unchanged. Role skills under `.claude/skills` still say `{{BRAND}}` in prose
+and are left as documentation.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
@@ -353,4 +379,10 @@ Items asserted in code or copy that still need a primary source.
 - D-119: whether using regulated restrictive practices changes a verification
   audit into a certification audit. The derivation keeps the pathway and flags
   the reason as unverified.
+- D-122: whether an individual or partnership with early childhood (0118) plus
+  one or more verification classes keeps the modified-certification scope. The
+  Commission's mapping document lists "early childhood and any other
+  verification registration" under modified certification; the derivation
+  follows that reading but tags the reason `unverified` for that combination
+  (PO Session B review, note a).
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.

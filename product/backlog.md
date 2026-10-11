@@ -7,9 +7,9 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ | Title | Phase | Priority | Status |
 |-----|-------|-------|----------|--------|
 | REQ-001 | Standards and registration-group mapping (`data/standards.json`) | 1 | must | in progress |
-| REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | in progress (approved 11 Oct; may run in parallel) |
-| REQ-003 | Readiness questionnaire with save-and-resume (must capture business structure, restrictive practices, SIL exclusion questions, SDA-only) | 2 | must | ready (Dev response + prototype only until Phase 1 accepted) |
-| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | draft |
+| REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | accepted conditionally 11 Oct (PR #2; gitleaks permissions fix, then merge) |
+| REQ-003 | Readiness questionnaire with save-and-resume | 2 | must | in progress (Dev response accepted; build Sessions A–C approved, PR #3) |
+| REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | ready (Dev response first) |
 | REQ-005 | Document generator and `.docx` rendering, incl. AI governance docs | 3 | must | draft |
 | REQ-006 | Readiness checklist | 4 | must | draft |
 | REQ-007 | Payments: one-off pack and subscription, entitlements, refunds | 4 | must | draft |

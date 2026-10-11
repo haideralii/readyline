@@ -124,6 +124,10 @@ describe("AC-10: SDA-only and modified certification", () => {
     const r = derive(["0118", "0120"], { businessStructure: "partnership" });
     expect(r.modifiedCertification).toBe(true);
     expect(r.modules).toEqual(["core", "ec"]);
+    // PO Session B review note (a): the Commission text does not settle this combination.
+    const reason = r.reasons.find((x) => x.rule === "modified-certification")!;
+    expect(reason.unverified).toBe(true);
+    expect(reason.text).toMatch(/unconfirmed/);
   });
 
   it("[0118] as a company is full certification", () => {

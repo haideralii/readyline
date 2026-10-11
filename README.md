@@ -1,4 +1,4 @@
-# {{BRAND}}: registration-readiness for small NDIS providers
+# Readyline: registration-readiness for small NDIS providers
 
 Self-serve web app that helps sole-trader and small NDIS providers prepare for
 mandatory provider registration: a guided questionnaire, tailored policies and
