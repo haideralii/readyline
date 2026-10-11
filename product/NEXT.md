@@ -163,3 +163,19 @@ For Haider: `ANTHROPIC_API_KEY` (console key in a workspace with a monthly spend
 5. STOP.
 
 For Haider: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` into `.env.local`; merge PR #8 then dispatch `migrate.yml` so the four migrations reach the hosted project (the documents bucket and quota function are in the newest one). Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 9)
+
+**PO actions done this batch:** PR #8 merged into `main` (all three CI jobs green on 2062f6a). `migrate.yml` dispatched on `main`: first attempt failed in `supabase/setup-cli@v1` with "Failed to resolve latest Supabase CLI release: rate limit exceeded" (anonymous GitHub API call from a shared runner); the re-run succeeded and applied `20261011000000_init_accounts.sql`, `20261011010000_session_b_hardening.sql` and `20261011020000_session_c_delete_export_admin.sql` to the hosted project (run 38181942981, attempt 2). The fourth migration (Session C of REQ-005) is on `req-005-generator` and reaches the hosted project after PR #9 merges. `REQ-013` file restored on local `main` (04fefdc; the dev rebase in batch 8 dropped PO commit 4a4a938). PR #9 CI: all four jobs green on f9d89fa.
+
+0. **Push `main`** with the PO's batch-9 commits after checking the stat (product/ and DECISIONS.md only). `product/requirements/REQ-013-first-time-user-experience.md` must be on `origin/main` after this.
+
+1. **D-038 migrate.yml CLI pin** (small, on a branch `ops-pin-supabase-cli` from `main`): replace `version: latest` in `supabase/setup-cli@v1` with a pinned CLI version (the one `npx supabase --version` reports locally, or the version the CI integration job already uses) so the action downloads directly instead of asking the GitHub API for "latest"; add `GITHUB_TOKEN: ${{ github.token }}` to the step's `env` if the action honours it. Same pin in `ci.yml` if it also uses `latest`. Open the PR; the PO merges.
+
+2. **REQ-013 P1** on `req-013-first-time-ux` from `main`: FR-1 to FR-5 as written in the file, with the evidence listed under "Evidence required on delivery". Session order: FR-1 and FR-2 first (accessibility defects), then FR-3, FR-4, FR-5. Push after each session. Do not merge; the PO reviews UI.
+
+3. **REQ-005 Session C owed evidence**: now that the hosted database has the three migrations and `/documents` exists on `req-005-generator`, capture the documents-page screenshots (coming-soon state is enough while `GENERATION_ENABLED` is off) at 360x740 and desktop against a local `supabase start` stack, and paste the CI link for f9d89fa into Delivery evidence. If a signed-in session against the hosted project is needed instead, say so and stop that item.
+
+4. **REQ-005 Session B recordings**: only if `.env.local` now has `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (check by name). Record the three reference cases, commit the fixtures, and write the cost note (input and output tokens and dollars per case). If the key is still absent, write "waiting for key" and move on.
+
+5. STOP. Append your status below.

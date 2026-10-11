@@ -797,3 +797,8 @@ Items asserted in code or copy that still need a primary source.
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.
 - D-205: dev-only `npm audit` high advisories (test and build toolchain) are
   tracked, not fixed; production dependencies are clean.
+- D-038 (PO, 2026-10-12): `migrate.yml` run 3 failed before touching the database
+  because `supabase/setup-cli@v1` with `version: latest` calls the GitHub API
+  anonymously and shared runners hit the rate limit. Re-run succeeded and applied
+  the three migrations on `main`. Decision: pin the CLI version in every workflow
+  and pass the job token to the action; `latest` is not used in CI.
