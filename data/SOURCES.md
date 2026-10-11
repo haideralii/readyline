@@ -33,10 +33,24 @@ Dataset version **1.0.0**, generated 2026-10-11. Every outcome and quality indic
 | `legislation-rules-toc`     | NDIS (Provider Registration and Practice Standards) Rules 2018, compilation F2026C00527 (table of contents)      | Compilation No. 6, 1 July 2026 (F2026C00527)              | 2026-07-01     | 2026-10-11 | [link](https://www.legislation.gov.au/F2018L00631/latest/text)                                                                             | `bd73d0de586d`   |
 | `aqa-expectations`          | Regulatory Expectations for Approved Quality Auditors: Impartiality, Independence and Conflict of Interest (PDF) | V1, June 2026                                             |                | 2026-10-11 | [link](https://www.ndiscommission.gov.au/sites/default/files/2026-07/Regulatory-Expectations-AQAs-PDF.pdf)                                 | `928ea9dbe491`   |
 
+## Contents
+
+9 modules, 70 standards, 38 registration classes.
+
+- `core` Core module: 24 standards
+- `hidpa` High intensity daily personal activities module: 8 standards
+- `sbs` Specialist behaviour support module: 7 standards
+- `ibsp` Implementing behaviour support plans module: 8 standards
+- `ec` Early childhood supports module: 7 standards
+- `ssc` Specialised support coordination module: 3 standards
+- `sda` Specialist disability accommodation module: 5 standards
+- `sil` Supported independent living (SIL) module: 4 standards
+- `verification` Verification module: 4 standards
+
 ## UNVERIFIED items
 
 - none
 
 ## Changelog
 
-- **1.0.0** (2026-10-11): First full dataset: core module (23 standards), six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11.
+- **1.0.0** (2026-10-11): First full dataset: core module, the six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11.

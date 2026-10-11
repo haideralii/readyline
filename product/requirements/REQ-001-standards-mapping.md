@@ -153,6 +153,69 @@ Tests covering the acceptance criteria so far: AC-1 (`every standard has verbati
 - `FR-5` report script and `AC-6` drift demonstration: Session B.
 - Evidence items are a first pass and all `draft: true` (FR-4).
 
+### Session B (2026-10-11): derivation, report, drift demonstration, review items
+
+PR: https://github.com/haideralii/readyline/pull/1 (branch `req-001-standards-mapping`). CI: https://github.com/haideralii/readyline/actions (the run for the Session B push is the latest on that branch; the workflow runs lint, format check, typecheck, `standards:verify`, unit tests, build and Playwright on both projects).
+
+**Built**
+
+- `src/lib/standards/derive.ts`: `deriveApplicability(dataset, { groups, businessStructure, usesRestrictivePractices, silEligibility })` returning `groups` (after SIL exclusion), `pathway`, `modifiedCertification`, `modules` (dataset order), `coreStandardIds` (null unless limited), `midTermAudit { applies, exemptReason?, monthsAfterRegistration, prepareFromMonth, assessedDivisionIds, sourceId }` and `reasons[] { rule, effect, target?, sourceId, text, unverified? }`; plus `applicableStandards(dataset, result)`. Decision D-119 lists the rule order.
+- `scripts/standards/report.ts` (`npm run standards:report -- <codes> [--structure=…] [--restrictive] [--sil-few-hours] [--sil-self-managed] [--no-evidence]`): prints inputs, pathway, modules with standard counts, outcomes to self-assess, mid-term audit, the reasons with source ids, UNVERIFIED flags, the `evidenceDisclaimer`, and every evidence item prefixed `[draft]` until reviewed. Exit code 2 on a derivation error (for example 0138 with an exclusion and no other class).
+- `data/SOURCES.md` now has a generated Contents section; `data/sources.test.ts` asserts it agrees with the dataset (review item 1, AC-7). `data/README.md` has the snapshot refresh procedure (review item 5).
+
+**PO Session A review items**
+
+1. Changelog count: number removed from the changelog note; counts generated and tested.
+2. `silEligibility` input, `reasons[]` with rule and source ids, `midTermAudit { applies, exemptReason? }`: delivered, see `derive.test.ts` ("SIL eligibility", "AC-10", "AC-3").
+3. Report prints the evidence disclaimer and `[draft]` markers: see outputs below.
+4. AC-6 drift demonstration: below.
+5. `data/README.md` refresh paragraph: added.
+
+**Test output (local, 2026-10-11)**
+
+```
+npm run check: lint clean, format clean, typecheck clean
+Test Files  5 passed (5)   Tests  121 passed (121)
+standards:verify ok: 26 sources match their snapshots and the manifest
+npm run build: compiled, 2 static routes
+```
+
+AC mapping: AC-1 `data/standards.test.ts` (verbatim text, source, evidence; hashes); AC-2 `derive.test.ts` "AC-2: every registration group on its own" (38 cases, pathway equals the table's audit type, every reason has a known source); AC-3 `derive.test.ts` "[0120] alone…", "[0120, 0107]…"; AC-4 `data/standards.test.ts` mandatory classes and the 1 October 2026 cut-off; AC-5 `data/standards.test.ts` supplementary modules referenced and core divisions populated; AC-6 `standards:verify` plus the demonstration below; AC-7 `data/sources.test.ts` and the DECISIONS.md UNVERIFIED register; AC-8 `data/standards.test.ts` "every rule names a source that exists"; AC-9 `standards:verify` (hash drift, manifest mismatch, missing snapshot, verified without source, placeholder text); AC-10 `derive.test.ts` "[0131] alone…", "[0118] as a sole trader…".
+
+**Report outputs (`--no-evidence` shown for brevity; the full runs include the disclaimer and `[draft]` evidence)**
+
+`[0120]`: pathway verification; modules: verification (4 standards); outcomes 4; mid-term does not apply; reasons: verification-pathway (registration-groups), verification-module (registration-requirements), mid-term-audit (types-of-audits).
+
+`[0120, 0107]`: pathway certification; modules: core (24); outcomes 24; mid-term applies at 18 months (prepare from 12), governance division; reasons: mixed-audit (registration-groups), core-module (registration-requirements), mid-term-audit.
+
+`[0138]` with both exclusions answered no: pathway certification; modules: core (24), sil (4); outcomes 28; mid-term applies; reasons: sil-definition info (mandatory-sil), certification-pathway, core-module, group-module (mandatory-sil), mid-term-audit. With `--sil-few-hours` and no other class: exit 2, "Class 0138 was excluded by the SIL definition and no other group was selected."
+
+`[0131]` (AC-10): pathway certification; modules: sda (5) only, no core; mid-term does not apply (SDA only); reasons include sda-only (registration-requirements).
+
+`[0118] --structure=sole-trader` (AC-10): pathway certification (modified certification); modules: core limited to `core.rights.violence-abuse-neglect-exploitation-and-discrimination` (1 standard), ec (7); outcomes 8; mid-term does not apply (individual or partnership, early childhood only).
+
+Every run ends with the evidence section headed by: "Evidence items are {{BRAND}} guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit." and "Items marked [draft] have not yet been reviewed by the product owner."
+
+**AC-6 drift demonstration**
+
+One word changed in `data/sources/verification.txt` ("Appropriate insurance is in place" to "is NOT in place"), then:
+
+```
+standards:verify found 2 problem(s):
+  - source verification: snapshot data/sources/verification.txt changed (recorded 842f6704079e, now 29526a258dcd)
+  - source verification: manifest hash for data/sources/verification.txt differs from the file
+exit code: 1
+```
+
+File reverted; `standards:verify ok: 26 sources match their snapshots and the manifest`. The same check runs in CI before the unit tests.
+
+**UNVERIFIED and notes**
+
+- Whether restrictive practice use changes a verification audit into certification: not stated in the material held; the derivation keeps the pathway and emits an `unverified` reason (D-119, register updated).
+- Transitioned-provider mid-term exemption is not an input; the reason text names it.
+- Evidence items remain `draft: true` pending the PO's standard-by-standard pass (REQ-005).
+- No new dependency: the report runs on Node's built-in type stripping (D-120).
+
 ## PO review
 
 **11 Oct 2026, interim review of the Dev response: approved to proceed to Sessions A and B.** Good sourcing discipline; the snapshots-plus-hash approach is exactly what AC-6 needs. Decisions on your questions:

@@ -8,7 +8,7 @@
     {
       "version": "1.0.0",
       "date": "2026-10-11",
-      "note": "First full dataset: core module (23 standards), six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11."
+      "note": "First full dataset: core module, the six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11."
     }
   ],
   "sources": [

@@ -265,10 +265,43 @@ five draft evidence items (`draft: true`) with planned document-type ids for
 Phase 3. The PO reviews them under REQ-001 FR-4; they are not Commission text
 and the dataset says so.
 
-Session B: `deriveApplicability(groups, { businessStructure,
-usesRestrictivePractices, silExclusions })` returning modules, pathway and the
-rules that fired; `standards:report` CLI; delivery evidence for AC-1 to
-AC-10.
+### REQ-001 Session B (2026-10-11)
+
+**D-119 Derivation semantics.** `deriveApplicability(dataset, { groups,
+businessStructure, usesRestrictivePractices, silEligibility })` in
+`src/lib/standards/derive.ts` applies the rules in this order: SIL definition
+(0138 is dropped when either Commission exclusion is answered yes; the
+answers are required whenever 0138 is selected), pathway (any certification
+class makes the whole registration certification), modules (verification
+module only on the verification pathway; otherwise the core module unless the
+sole class is SDA, plus each class's supplementary modules; individuals and
+partnerships whose only certification class is early childhood get the
+modified certification with the core limited to the freedom from violence
+outcome), restrictive practices (adds the implementing behaviour support
+plans module on either pathway), then the mid-term audit with the D-106
+exemptions. Every step appends a reason with the rule id, the Commission
+source id and plain-English text, so the questionnaire can show its working.
+Whether restrictive practice use turns a verification audit into a
+certification audit is not stated in the material held; the function keeps
+the pathway and emits an `unverified` reason (added to the register).
+Transitioned-provider status is not an input; the mid-term reason text notes
+the exemption.
+
+**D-120 Report script runs on Node's built-in type stripping.** To avoid a
+new dependency, `scripts/standards/report.ts` runs with
+`node --experimental-strip-types` and imports the TypeScript modules with
+explicit `.ts` extensions (`allowImportingTsExtensions` is now on in
+`tsconfig.json`, harmless under `noEmit`). Only erasable syntax may be used
+in modules that the script imports: no `enum`, no `namespace`, no parameter
+properties. The first run failed on a parameter property in
+`DerivationError` and it was rewritten as a plain field. Requires Node 22.6
+or later; CI uses the current Node 22 line.
+
+**D-121 Counts are generated.** The changelog note in `standards.meta.json`
+no longer carries a standards count (it said 23 while the dataset said 24).
+`SOURCES.md` now has a generated "Contents" section computed from the
+dataset, and `data/sources.test.ts` asserts the counts, the source hashes and
+the UNVERIFIED section agree with `standards.json` (AC-7).
 
 ## Product-owner decisions (2026-10-11)
 
@@ -317,4 +350,7 @@ Items asserted in code or copy that still need a primary source.
 - ~~D-104: core module applying to class 0138 (SIL) alongside the SIL module.~~ Resolved (D-112).
 - D-112: the full text of the Provider Registration and Practice Standards
   Rules (F2026C00527) has not been read; only its table of contents was captured.
+- D-119: whether using regulated restrictive practices changes a verification
+  audit into a certification audit. The derivation keeps the pathway and flags
+  the reason as unverified.
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.
