@@ -58,6 +58,18 @@ Why the three PR runs are red (PO read the logs): (a) the `.gitleaksignore` fing
 
 4. STOP. Append your status below.
 
+## Queue (written by PO, 11 Oct 2026, batch 6)
+
+Context: PRs #2 to #4 are closed; #5, #6, #7 are open from the `*-rebuilt` branches and are the ones that merge (Haider clicks, in that order, when the PO confirms CI). The old `req-00x` branches can be deleted by Haider later. Do not rebuild or force-push anything this batch.
+
+1. **`migrate.yml`: push over a database URL, no `supabase link`** (D-036), on a new branch `req-004-migrate-dburl` from `main`. Replace the link step with `supabase db push --include-all --db-url "$DB_URL"` where `DB_URL` is built in the job from `SUPABASE_DB_PASSWORD` (URL-encoded) and the project ref using the Supabase session pooler for ap-southeast-2 (`postgresql://postgres.<ref>:<password>@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres`); keep the secrets gate and the skip notice; add `workflow_dispatch` so the PO can trigger it by hand. Never echo the URL. Mask the password with `::add-mask::`. Open the PR note in Delivery evidence of REQ-004.
+
+2. **Operator script for the admin grant:** add `supabase/ops/grant-platform-admin.sql` with a parameterised statement that sets `platform_admin = true` for the user whose `email_hash` matches a lower-cased email (compute the SHA-256 in the SQL from a placeholder `:email`), with a comment explaining it is run once by the operator in the SQL editor after first sign-in. Same branch as item 1.
+
+3. **REQ-005 Dev response only** on branch `req-005-generator` from `main`: answer the five questions; draft `data/readyline-content/document-types.json` outlines for PO review (Session A content, no generation code yet). List, by name only, the env values Haider must supply.
+
+4. STOP. Append your status below.
+
 ## Dev status
 
 (Dev appends here.)

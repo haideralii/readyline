@@ -40,6 +40,10 @@ Phase: n   Priority: must | should | could   Owner: Dev
 
 To reduce hand-offs, the PO keeps an ordered queue in `product/NEXT.md`. Haider starts a Cursor session with "Work through product/NEXT.md in order, pushing after each item, until it says STOP." Dev works the queue, pushes each item to its branch (CI runs on the PR), fills in the REQ evidence, and appends a status at the bottom of `NEXT.md`. The PO then reviews everything in one batch, writes the next queue, and Haider says "go" again. Only the PO edits the queue; Dev edits only the "Dev status" section.
 
+## PO git hygiene (after the batch-5 incident, D-035)
+
+The working tree is shared with Dev and the PO's shell cannot delete files, so a branch checkout can leave another branch's files on disk. Rules for the PO: never run `git checkout` of a branch in the shared tree (read other branches with `git show <branch>:<path>`); never `git add -A`; stage only explicit paths under `product/`, `DECISIONS.md`, `CLAUDE.md`, `.gitignore`; run `git status --short` before every commit and abort if anything outside those paths is staged or modified.
+
 ## Communication rules
 
 - Dev never guesses regulatory content; anything not from a primary source is tagged `UNVERIFIED` and listed in the REQ.
