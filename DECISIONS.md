@@ -528,6 +528,51 @@ and desktop are stored as JPEG (quality 40) under
 `product/evidence/req-003/` with a Lighthouse summary JSON; full Lighthouse
 reports are not committed. The capture spec runs only with `EVIDENCE=1`.
 
+## REQ-004: accounts, authentication and tenancy (branch `req-004-accounts`)
+
+Decision numbers D-4xx on this branch.
+
+**D-401 Supabase client packages (Dev, 2026-10-11).** `@supabase/supabase-js`
+and `@supabase/ssr` are the two runtime dependencies REQ-004 needs (FR-4,
+FR-8); `server-only` is added so the admin client and the SSR client cannot
+be imported into a client bundle without a build error. The publishable-key
+format is accepted: the supabase-js README uses `your-publishable-key` and the
+ssr README reads `SUPABASE_PUBLISHABLE_KEY`; the ssr type comment still says
+"anon" but the parameter is the same string. Env names follow SR-5:
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+`SUPABASE_SECRET_KEY`.
+
+**D-402 Schema and tenancy model.** `users` mirrors `auth.users` by trigger
+with a SHA-256 email hash (never the email); `accounts` (soft-delete column),
+`memberships` (owner or member), `questionnaire_drafts`, `audit_log`, and
+`auth_rate_limits` for the magic-link limiter. Clients never insert accounts
+or memberships: `create_account()` (security definer) creates both in one
+transaction and writes the audit row. `is_member()` and `is_owner()` ignore
+soft-deleted accounts, so deletion hides data immediately. `platform_admin`
+is protected by a trigger that rejects any change made through the API (any
+request carrying JWT claims), leaving SQL by an operator as the only path.
+The limiter table has no client policy at all.
+
+**D-403 Integration tests run only against a real Postgres.** The RLS suite
+(`tests/integration/rls.test.ts`, `npm run test:integration`) needs the three
+Supabase variables and skips itself otherwise, so `npm test` stays offline.
+In CI the `supabase-integration` job starts the CLI's local stack (which
+applies `supabase/migrations`), maps its exported keys onto the app's variable
+names (legacy `ANON_KEY`/`SERVICE_ROLE_KEY` or newer
+`PUBLISHABLE_KEY`/`SECRET_KEY`, whichever the CLI prints), and runs the suite.
+`supabase/config.toml` is hand-written for the local stack (Postgres 17,
+mail inbox on, Studio off, TOTP on) because the CLI is not installed on the dev
+machine.
+
+**D-404 Local verification gap (Dev, 2026-10-11).** The dev machine has no
+Docker, no Supabase CLI and no psql, and the hosted project's database
+password is not available to Dev, so the migration could not be applied or the
+RLS suite run locally. The migration is reviewed by hand and the proof is the
+CI job. To apply the migration to the hosted project Haider runs
+`npx supabase login`, `npx supabase link --project-ref dpwwzhylcyosnkmlcnnp`
+and `npx supabase db push` (or pastes the file into the SQL editor once); this
+is a Session B prerequisite.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

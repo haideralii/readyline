@@ -124,7 +124,23 @@ Dashboard settings Haider will be asked to make at build time, not now: region `
 - The `DraftStore` server implementation and the "about your business" step reuse the REQ-003 schemas unchanged.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### Session A (2026-10-11), branch `req-004-accounts` (rebased on `main` at 7f68349)
+
+Gate: `.env.local` contains `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` (presence checked, values never printed). Nothing was provisioned by Dev.
+
+**Built**
+
+- `supabase/migrations/20261011000000_init_accounts.sql`: `users` (auth mirror by trigger, email hash only, `platform_admin` guarded by trigger), `accounts` (soft delete), `memberships`, `questionnaire_drafts`, `audit_log`, `auth_rate_limits`; `is_member()`, `is_owner()`, `create_account()`; RLS enabled on every table with policies as listed in D-402; grants so clients can only call `create_account` and cannot touch the limiter table.
+- `supabase/config.toml` for the CLI local stack (D-403).
+- `src/server/supabase/{env,server,admin}.ts`: SR-5 variable names, SSR client bound to session cookies (HttpOnly, Secure in production, SameSite=Lax), admin client with the secret key, both `server-only`; unit tests for the env contract.
+- `tests/integration/rls.test.ts` and `vitest.integration.config.mts` (`npm run test:integration`): two tenants created through the admin API and `create_account()`; asserts each sees only its own account, membership and draft; reads of the other's rows by id return nothing; updates and deletes of the other's rows write nothing; direct inserts into `accounts` and `memberships` fail; a client cannot set `platform_admin`; the limiter table is unreachable with the publishable key; a soft-deleted account disappears from its own members.
+- CI job `supabase-integration` (D-403). `.env.example` documents the three variables and where they live in production; `.gitignore` excludes CLI artefacts.
+- Dependencies: `@supabase/supabase-js`, `@supabase/ssr`, `server-only` (D-401).
+
+**Not verified locally (D-404):** no Docker, CLI or database password on the dev machine, so the migration has not been applied anywhere yet and the RLS suite has not executed; it skips itself without the stack. The CI run on this push is the first execution. Haider: please apply the migration to the hosted project (`npx supabase login`, `npx supabase link --project-ref dpwwzhylcyosnkmlcnnp`, `npx supabase db push`) and attach a screenshot of the project region; both are needed before Session B.
+
+**Local outputs:** see the Dev status in `product/NEXT.md` for the `npm run check` and `npm run build` results on this commit.
 
 ## PO review
 
