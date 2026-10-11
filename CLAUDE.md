@@ -1,6 +1,8 @@
 # Build brief: NDIS provider registration-readiness product
 
-You are the lead engineer and product partner on this project. Read this whole brief before writing any code. Treat it as the project's standing context; if the repo has a `CLAUDE.md`, copy this file there.
+You are the lead engineer and product partner on this project. Read this whole brief before writing any code. It is the repo's standing context. `DECISIONS.md` records every assumption made during the build.
+
+**Brief version 2 (11 Oct 2026):** added section 3a (market, competitors, AI landscape), made the subscription the primary product, added the AI governance documents and de-identification guardrails, and expanded the privacy positioning and reference links. Changes since v1 are the paragraphs marked *(v2)*.
 
 ## 1. Who you are working with
 
@@ -36,7 +38,7 @@ A self-serve web app that:
 
 1. Runs a guided questionnaire (support types delivered, registration groups, number of workers, states/territories, whether SIL/personal care/behaviour support is involved, business structure, existing systems).
 2. Determines which Practice Standards modules and which audit pathway (verification vs certification) apply.
-3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary).
+3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary). *(v2)* The set always includes an **AI use and governance policy** and a **data-handling procedure for AI and digital tools** (de-identification before any AI use, approved tools, participant consent, human review), because the Commission's February 2026 position statement and sector guidance now expect providers to have these.
 4. Shows a readiness checklist: which documents, registers, clearances and insurances are still missing.
 5. Sells a monthly "audit-ready" subscription: incident register, complaints register, worker screening expiry tracker, policy review reminders, mid-term audit countdown.
 
@@ -46,7 +48,23 @@ Pricing (initial, adjust after launch):
 - Audit-ready subscription: $29–$49/month (Stripe subscription), optional
 - No interest, no late fees, no buy-now-pay-later. Non-payment pauses the service; it never accrues penalties.
 
+*(v2)* **The subscription is the primary product, not an add-on.** A one-off document generator is easy to copy and its margin will compress toward zero as general-purpose AI improves and as the Commission publishes more free material. The durable value is the ongoing system of record (registers, expiries, review cycles, mid-term audit prep) and the curated, versioned standards mapping that is kept current. Design every flow so the document pack leads naturally into the subscription, and measure subscription conversion from day one. If customers buy the pack but do not subscribe, that is the signal to go deeper into workflow, not to add more document types.
+
 Distribution is SEO content answering the exact questions providers search for, plus honest participation in provider Facebook groups. Later, disclosed referral arrangements with approved auditors. The app itself must therefore ship with a content/blog system or at least a static content pipeline.
+
+## 3a. Market, competitors and AI landscape *(v2, researched 11 Oct 2026)*
+
+What exists today, so the product is positioned against reality rather than a blank market:
+
+- **NDISCompliant** (Axior Labs, sole trader, Bendigo; founded Jan 2025). Closest competitor: AI-generated policies, procedures, risk registers and training matrices mapped to the Practice Standards, gap analysis, regulatory-change monitoring. Priced at $149 / $349 / $699 per month. Verified Stripe revenue about $45k lifetime and roughly $1.1k in the last 30 days with no active subscriptions showing; domain rating 11. Read as: demand confirmed, but monthly pricing too high for sole traders and almost no distribution. We price lower, lead with the one-off pack, and invest in SEO and community from the start.
+- **Cenaris** (launched Aug 2026). "Live audit readiness score" platform grounded in an organisation's own documents, aimed at NDIS and healthcare organisations with compliance teams. Enterprise-flavoured; not competing for the 1–10 staff provider.
+- **Care-management platforms** (ShiftCare, Carelogic and similar) and allied-health tools (Everbility) now offer AI progress notes and reports. That is care-delivery documentation, not registration compliance; do not build it.
+- **Consultants and template shops** ($500–$5,000 packs, $2,500–$7,000 engagements), many now labelled "AI".
+- **The regulator uses AI too.** The Commission's Feb 2026 AI transparency statement says it uses Copilot for drafting and, from late Feb 2026, large language models to tag and theme complaints, reportable incidents and audit reports, with humans making all decisions. Implication: identical cookie-cutter policy packs across many providers are easier to detect; tailoring from the questionnaire is a quality requirement, and generated documents must read as the provider's own.
+- **The regulator's stance on providers using AI:** not endorsed, not banned. Providers may use AI if legal obligations are met; entering participant information into tools like ChatGPT without safeguards may breach the privacy provision of the NDIS Code of Conduct; information must be de-identified first. Sector bodies report widespread "shadow AI" (workers pasting notes into ChatGPT, uploading assessment PDFs, transcription in meetings) and are telling providers to adopt an AI governance policy now.
+- **Government planning is becoming algorithmic** (Framework Planning / I-CAN from mid-2026), which is contentious and keeps AI in the sector's news. Not our product area; relevant only as SEO context.
+
+Positioning that follows from this: cheapest credible path for the smallest providers; Australian-hosted, no participant data, de-identification built in (a selling point on the pricing page, not just a footnote); tailored, not templated; and the subscription as the real product.
 
 ## 4. Hard constraints (read carefully, these are legal and ethical)
 
@@ -67,6 +85,8 @@ We are not and will never be an Approved Quality Auditor. The Commission expects
 
 ### 4.5 Privacy
 Collect only the provider's business information. **Never collect NDIS participants' personal, health or disability information**: this is sensitive information under the Privacy Act and removes the small-business exemption. Registers (incidents, complaints) must be designed so that participant identifiers are optional free-text the provider controls, with a clear warning not to enter health details; prefer reference codes. Store data in an Australian region. Provide data export and account deletion.
+
+*(v2)* De-identification guardrails, aligned with the Commission's Feb 2026 position statement: every free-text field that could receive participant details carries an inline warning and a reference-code pattern; a lightweight client-side detector flags likely names, dates of birth, NDIS numbers and addresses before submit (warn, do not block); nothing typed into registers is ever sent to the AI model, only questionnaire answers about the business are. State the data location and the no-participant-data rule plainly on the pricing page and in the generated AI policy.
 
 ### 4.6 Accuracy of the standards
 Do not invent or paraphrase Practice Standards from memory. Fetch the current **NDIS Practice Standards and Quality Indicators** and the **Registration Groups / Audit requirements** from the NDIS Quality and Safeguards Commission website (ndiscommission.gov.au) and build the mapping from the published text, with the source URL and version date stored alongside each standard. Flag anything you could not verify from source.
@@ -114,15 +134,18 @@ Data model (first pass):
 
 **Phase 2 – Questionnaire.** Multi-step form with save-and-resume. Output: an `assessment` record and a derived list of applicable modules, documents and audit pathway. Playwright test covering the full path on desktop and a small Android viewport.
 
-**Phase 3 – Generator.** Prompt templates per document type, JSON-schema-validated outputs, deterministic rendering to `.docx`. Include the "general information, not legal advice" statement in every document. Snapshot-test document structure. Add a reviewer view showing which questionnaire answers drove each tailored section.
+**Phase 3 – Generator.** Prompt templates per document type, JSON-schema-validated outputs, deterministic rendering to `.docx`. Include the "general information, not legal advice" statement in every document. Snapshot-test document structure. Add a reviewer view showing which questionnaire answers drove each tailored section. *(v2)* Include the AI use and governance policy and the AI/digital data-handling procedure in the core set for every provider. Add a "tailoring score" check: documents must contain provider-specific content (name, supports, states, structure) in defined sections, and a test fails if two different questionnaires produce byte-identical policies.
 
-**Phase 4 – Readiness checklist and payments.** Checklist UI, Stripe Checkout, webhook-driven entitlements, download page, refund-terms page, pricing page with honest wording per section 4.3. End-to-end test with Stripe test mode.
+**Phase 4 – Readiness checklist and payments.** Checklist UI, Stripe Checkout, webhook-driven entitlements, download page, refund-terms page, pricing page with honest wording per section 4.3. End-to-end test with Stripe test mode. *(v2)* The pricing page presents the subscription as the main offer with the pack as the entry step; it states Australian hosting and the no-participant-data rule; and the post-purchase flow lands in the readiness checklist with the registers visible (locked until subscribed) rather than on a bare download page.
 
 **Phase 5 – Registers (subscription).** Incident, complaint, worker-clearance-expiry and policy-review registers with reminders by email. Stripe Billing subscription. Participant-privacy guardrails per 4.5.
 
 **Phase 6 – Content and launch.** MDX blog, first ten SEO articles targeting real provider questions (registration cost, verification vs certification, which policies are needed, SIL mandatory registration, worker screening, mid-term audit), sitemap, basic analytics without third-party ad trackers.
 
 ## 8. Working rules
+
+*(v2.1)* **This project is run by a product owner.** The `product/` folder is the operating system: `product/README.md` (roles and the delivery loop), `product/backlog.md`, `product/requirements/REQ-*.md` (what to build, with acceptance criteria and evidence required), `product/domain/` (NDIS registration primer), `product/security/threat-model.md` (controls you must meet) and `product/qa/` (definition of done, review checklist). You are the Dev / solution architect. Work only from a REQ whose status is `ready` or `in progress`, answer its questions under **Dev response** before coding, and deliver with **Delivery evidence**. The PO accepts work; you do not mark a REQ done. The build plan in section 7 remains the phase map; the REQs are the detailed instructions.
+
 
 - Before each phase, restate the plan in a few lines and list open questions; then proceed with sensible defaults and record them in `DECISIONS.md`.
 - Never invent regulatory content. If a fact about the standards, audit process or fees cannot be verified from the Commission's site, mark it `UNVERIFIED` in code comments and in `DECISIONS.md`.
@@ -139,5 +162,11 @@ Data model (first pass):
 - Mandatory registration overview (third-party summary, verify against Commission): https://providerscout.com.au/for-providers/registration/
 - 2026 cost benchmarks (third-party, verify): https://www.providerplus.com.au/post/how-much-does-ndis-provider-registration-cost-in-2026
 - Law Society of NSW, unqualified legal practice fact sheet: https://www.lawsociety.com.au/sites/default/files/2018-05/LS1138_LPUL-fact-sheet_2018_Unqualified-practice%20%28002%29.pdf
+- *(v2)* Commission position statement, use of AI in behaviour support plans (Feb 2026): https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf
+- *(v2)* Commission AI transparency statement (Feb 2026): https://ndiscommission.gov.au/about-us/corporate-reports/ai-statement
+- *(v2)* DSC, an AI framework for NDIS providers (Nov 2025): https://teamdsc.com.au/resources/an-ai-framework-for-ndis-providers
+- *(v2)* Collab Edge, AI and NDIS documentation: safe, risky, what works (2026): https://www.collabedgesolutions.com.au/resources/articles/ndis-ai-documentation-safe-risky-what-works-2026
+- *(v2)* Competitor: NDISCompliant revenue and pricing (TrustMRR): https://trustmrr.com/startup/ndiscompliant
+- *(v2)* Competitor: Cenaris launch (Aug 2026): https://newshub.medianet.com.au/2026/08/how-australian-tech-startup-cenaris-is-transforming-compliance-for-ndis-and-healthcare-providers-with-ai/165471/
 
-Start with Phase 0 now. Then, in the same session if there is room, begin Phase 1 by fetching the Practice Standards and proposing the `standards.json` schema for review before populating it.
+Phase 0 is complete (see `DECISIONS.md`). Next: read `product/README.md`, then `product/requirements/REQ-001-standards-mapping.md` and `REQ-002-security-baseline.md`. Answer their **Questions for Dev** under **Dev response** first (sources, schema sample, estimate), then build. Record in `DECISIONS.md` that brief v2 and the `product/` operating model were adopted.
