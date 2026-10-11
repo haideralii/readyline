@@ -56,7 +56,77 @@ CI run link on the PR; screenshots of each step at 360x740 and desktop; Lighthou
 4. Estimate in sessions.
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11 on branch `req-003-questionnaire` (from `main`; REQ-003 and `product/NEXT.md` were brought across from the PO's commit on the REQ-001 branch so this branch carries the requirement it answers). Dev response and the group-description data only; no UI, per NEXT.md item 3.
+
+### Q1. `QuestionnaireAnswers` schema and step-to-field map
+
+All schemas use `strictObject` and `text(max)` from `@/lib/validation` (REQ-002). Enumerations below are the only values accepted; everything else is rejected at the boundary.
+
+```ts
+const State = z.enum(["NSW", "VIC", "QLD", "SA", "WA", "TAS", "ACT", "NT"]);
+const Structure = z.enum(["sole-trader", "partnership", "company", "incorporated-association", "trust", "other"]);
+const YesNoUnsure = z.enum(["yes", "no", "not-sure"]);
+const GroupCode = z.string().regex(/^\d{4}$/).refine(isKnownGroup);  // checked against standards.json at parse time
+
+export const QuestionnaireAnswers = strictObject({
+  answersVersion: z.literal(1),                                   // FR-6
+  business: strictObject({
+    tradingName: text(120, 1),                                     // FR-5 free text 1 of 2
+    structure: Structure,
+    states: z.array(State).min(1).max(8),
+    abn: abn().optional(),                                         // 11 digits + ATO weighted checksum, no lookup
+  }),
+  supports: strictObject({
+    groups: z.array(GroupCode).min(1).max(38),
+    silEligibility: strictObject({ fewHoursOnly: z.boolean(), participantManagesOwnWorkers: z.boolean() }).optional(),
+    servicesNote: text(500).optional(),                            // FR-5 free text 2 of 2, carries the participant-data warning
+  }).superRefine(requireSilEligibilityWhen0138),
+  practices: strictObject({ restrictivePractices: YesNoUnsure }),
+  workforce: strictObject({
+    workerCount: z.number().int().min(1).max(500),                 // includes the owner
+    keyPersonnelCount: z.number().int().min(1).max(50),
+    hasRiskAssessedRoles: z.boolean(),
+    allRiskAssessedScreened: z.enum(["yes", "no", "not-sure", "not-applicable"]),
+  }),
+  existing: strictObject({
+    policies: YesNoUnsure, incidentRegister: YesNoUnsure, complaintsRegister: YesNoUnsure,
+    insuranceCertificate: YesNoUnsure, workerInductionRecords: YesNoUnsure,
+  }),
+});
+
+export const QuestionnaireDraft = strictObject({                   // what the DraftStore persists (FR-3, SR-4)
+  answersVersion: z.literal(1),
+  answers: QuestionnaireAnswers.partial(),                         // deep-partial per step while in progress
+  currentStep: z.enum(["business", "supports", "practices", "workforce", "existing", "result"]),
+  updatedAt: z.string().datetime(),
+});
+```
+
+Step-to-field map: (1) About the business: `business.*`. (2) Supports: `supports.groups`, `supports.silEligibility` (shown only when 0138 is selected; required then), `supports.servicesNote`; the SDA-only explanation is shown when `groups` equals `["0131"]`. (3) Practices: `practices.restrictivePractices`. (4) Workforce: `workforce.*`. (5) What you already have: `existing.*`. (6) Result: derived, never stored.
+
+Derivation adapter (`toDeriveInput`): `groups` as is; `businessStructure` passes through (the rule only distinguishes sole trader and partnership); `usesRestrictivePractices = restrictivePractices !== "no"` with a `flagged` marker when the answer was "not-sure" so the result page says "we assumed yes"; `silEligibility` passed when present. `QuestionnaireResult` = `deriveApplicability` output plus the document and register list, computed from the applicable modules' `evidence[].documentTypeId` values and the step 5 gaps.
+
+### Q2. Group descriptions
+
+Drafted all 38 in `data/registration-group-descriptions.json`: one plain sentence each, Australian English, under 170 characters, keyed by class code with the Commission's class name alongside. The file is headed by a note stating it is Readyline text, not Commission text, carries `author: "readyline"` and `status: "draft"` for the PO's review, and `data/registration-group-descriptions.test.ts` checks coverage of 0101 to 0138, sentence shape, no "client" or "patient", no prohibited claims, and (once REQ-001 merges) that names match `standards.json` exactly. The UI will load descriptions from this file and names and audit types from `standards.json`, never hard-coded.
+
+### Q3. Form state approach
+
+Recommendation: client-held answers with a server action for the result only.
+
+- A single client component owns the answers in a reducer; each step validates its slice of `QuestionnaireAnswers` on blur and on "Save and continue"; back navigation keeps state (FR-4). Steps are routes under `/start/[step]` so the browser back button, deep links and focus management behave, with the state lifted into a layout-level provider.
+- A `DraftStore` interface (`load`, `save`, `clear`) with a `localStorage` implementation now (every call wrapped in try/catch, "draft saved locally on this device" and "could not save draft" states, FR-3, AC-7) and a server implementation in REQ-004. The swap is a storage change only, as the REQ asks, because the draft shape is the versioned `QuestionnaireDraft`.
+- The result step calls one server action `deriveResult(answers)` that re-validates with the full schema (SR-1), runs `deriveApplicability` against `standards.json` on the server, and returns the result with module and standard names. Nothing is persisted (SR-3, SR-4). Keeping the dataset server-side avoids shipping a large JSON to the phone; the group list for step 2 is a small derived array (code, name, audit type, description).
+- Trade-offs: per-step server actions were rejected because without accounts there is nowhere to hold state between steps except the client anyway, and they add a round trip to every step on a slow phone; URL-encoded state was rejected because 38 codes plus text exceed sensible URL lengths and leak answers into history. Cache Components no longer applies (REQ-002 turned it off for the nonce CSP), so server actions and per-request rendering are the simple path.
+
+### Q4. Estimate
+
+Three sessions. A: answer and draft schemas, ABN checksum, derivation adapter, document-set derivation, `deriveResult` action, unit tests, descriptions loaded into the step 2 data. B: steps 1 to 5 as accessible forms with validation, DraftStore, focus management, 360px layouts. C: result page with reasons and expanders, e2e on both projects (happy path, back navigation, reload restore, storage-throws stub, ABN), Lighthouse scores, screenshots, evidence.
+
+### Dataset fields I wish existed (for the PO)
+
+A one-sentence plain-English description per module and per audit type (for the result page), and a document-set mapping that lists which documents a module requires rather than inferring it from evidence `documentTypeId`s. Both are Readyline content, not Commission text, and could live beside the group descriptions.
 
 ## Delivery evidence
 (Dev fills in.)
