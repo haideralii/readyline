@@ -1,0 +1,35 @@
+On this page:
+NDIS digital platforms are an innovative and flexible way for participants to access NDIS supports and services. From 1 July 2026, NDIS digital platform providers will need to register with the NDIS Commission.
+We have developed transitional arrangements for providers who are or plan to operate an NDIS digital platform.
+<h2>What are NDIS digital platforms?
+We have defined NDIS digital platforms to:
+clearly describe the role of these services
+make sure we apply the appropriate regulatory settings to providers
+help providers understand their registration requirements for the supports they provide.
+The following definition is a summary based on the draft amendments to the Provider Registration Rules. You should refer to the Provider Registration Rules once the amendments have been made to see the full definitions and determine if the new requirements apply to you.
+An NDIS digital platform is an online application, website or system where:
+The NDIS digital platform acts as an intermediary for participants seeking to access NDIS supports with people providing supports to participants.
+Payments for these supports are processed through the NDIS digital platform using NDIS amount from participants plans.
+An online application, website or system is only classified as an NDIS digital platform if its  main purpose is connecting a participant’s NDIS supports from a participant’s plan.
+<h2>New registration group for NDIS digital platforms
+A new class of support will be added to registration certificates of approved providers. The new class of support is 0137 – Providing a NDIS digital platform service .
+0137 – Providing a NDIS digital platform service and it's definition will be included in the National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 2018.
+<h2>Registration requirements
+All registered NDIS digital platforms providers need to:
+have certification audits
+comply with the core module of the NDIS Practice Standards
+meet all other [/provider-registration/about-registration#paragraph-id-11351] conditions of registration
+comply with specific conditions of registration for NDIS digital platforms. See [#paragraph-id-3667779] Important steps unregistered NDIS digital platform providers can take to get ready for NDIS registration .
+<h2>NDIS digital platform provider transition pathways for registration
+A provider's pathway to registration will depend on their current registration status and services. Choose the option that applies to you:
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital/digital-1]
+I'm a registered provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital/digital-2]
+I'm an unregistered provider
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital/digital-3]
+I'm not currently an NDIS provider
+To learn more about mandatory registration for for NDIS digital platforms, see the [/about-us/ndis-commission-reform-hub#Webinar] 2026 Regulatory reform webinar series .
+<h2>Resources
+<h3>Important steps unregistered NDIS digital platform providers can take to get ready for NDIS registration
+[https://www.ndiscommission.gov.au/sites/default/files/2026-05/MR-unreg-digital-conditions-PDF.pdf] pdf 259KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2026-05/MR-unreg-digital-conditions-PDF.pdf] Listen to PDF

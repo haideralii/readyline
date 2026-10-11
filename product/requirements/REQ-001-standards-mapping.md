@@ -1,5 +1,5 @@
 # REQ-001: Standards and registration-group mapping (`data/standards.json`)
-Status: ready
+Status: in progress
 Phase: 1   Priority: must   Owner: Dev
 
 ## Why
@@ -49,7 +49,74 @@ Test output; `data/SOURCES.md`; the report for three example group sets ([0120],
 4. Estimate in sessions.
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11 on branch `req-001-standards-mapping`. Sources were fetched and snapshotted the same day (`data/sources/`, hashed in `manifest.json`); the schema and a verified sample are in the repo for PO review before the full dataset is populated. Decisions D-101 to D-111 in `DECISIONS.md` carry the detail.
+
+### Q1. Authoritative sources (all on ndiscommission.gov.au, fetched 2026-10-11)
+
+(a) Practice Standards and Quality Indicators
+
+- Online version, hub page: `/rules-and-standards/ndis-practice-standards`. No date shown. Links the consolidated PDF.
+- Consolidated PDF "NDIS Practice Standards and Quality Indicators", **Version 4, November 2021** (file uploaded 2024-10): `/sites/default/files/2024-10/ndis-practice-standards-and-quality-indicators.pdf`. 45 pages. Still the current legacy text.
+- One page per module: four core-module pages, six supplementary-module pages, the verification-module page. Same text as the PDF, no dates shown.
+- **SIL module (new):** `/rules-and-standards/ndis-practice-standards/sil` plus four sub-pages; PDF `/sites/default/files/2026-06/SIL-Practice-Standards-PDF.pdf` (June 2026, applies from 1 July 2026); Evidence Guide for Providers and Workers PDF (June 2026).
+- Practice Standards reform page: confirms the wider review is still at consultation and no other new instrument exists.
+
+(b) Registration groups and audit requirements
+
+- Registration groups table: `/provider-registration/apply-registration/registration-groups-or-classes-support`. 38 classes 0101 to 0138 with audit type, plus the mixed-application rule. No date shown.
+- "Registration Requirements by Supports and Services" PDF (reference 200312, uploaded 2022-02): the only Commission document mapping classes to modules. Predates 0137 and 0138.
+- Types of audits page: `/provider-registration/apply-registration/types-audits`. Audit types, mid-term audit rule and exemptions, ratings 3/2/1/0, report timeframes, "no cost to register, auditor sets price".
+
+(c) Mandatory registration
+
+- `/about-us/ndis-commission-reform-hub/mandatory-registration` and its SIL and digital-platform transition sub-pages. 1 July 2026 commencement, class definitions, support coordination paused.
+- Regulatory Expectations for Approved Quality Auditors, V1 June 2026 (auditor independence; referral fees prohibited).
+
+Not yet fetched, needed to close two `UNVERIFIED` items: the Provider Registration and Practice Standards Rules 2018 as amended (legislation.gov.au F2018L00631) and the Quality Indicators Guidelines 2018 as amended, to confirm which modules apply to 0137 and whether the core module applies to 0138 alongside SIL.
+
+Access note: every page is server-rendered HTML with no search or JS wall, but the site times out for the hosted fetch tool. Direct download with a browser user agent works; HTML was reduced to main-content text, PDFs extracted with pypdf.
+
+### Q2. Proposed shape
+
+`src/lib/standards/schema.ts` (zod) and `data/standards.example.json` (verified sample: one core standard, one verification standard, the SIL supported decision-making standard with intent and expectation statements, five registration groups including 0137 and 0138, and the rules block). Shape in brief:
+
+```
+{ schemaVersion: 1, version: "0.1.0", generatedAt, evidenceDisclaimer,
+  sources[]:  { id, title, publisher, url, versionLabel, effectiveFrom, fetchedAt, snapshotPath, sha256 }
+  modules[]:  { id, kind: core|supplementary|verification, name, divisions[] (core only), appliesTo, effectiveFrom, sourceIds[], verification }
+  standards[]:{ id "core.rights.person-centred-supports", moduleId, divisionId?, name,
+                outcome (verbatim), indicators[] (verbatim, in order), intent?, expectationStatements? (SIL),
+                sourceId, sourceLocator, evidence[]: { draft, kind, title, note?, documentTypeId?, sourceId? }, verification }
+  registrationGroups[]: { code "0107", name, auditType, moduleIds[] (own supplementary modules), requiresCore, mandatoryFrom, notes?, sourceIds[], verification }
+  rules: { mixedAuditResolvesTo, restrictivePracticesModuleId, coreExemptWhenSole[], modifiedCertification{}, registrationPeriodYears, midTermAudit{}, ratings[] }  // each with a sourceId
+  verification (on every record): { status: verified|unverified, note (required when unverified), checkedAt } }
+```
+
+Differences from FR-1, with reasons:
+
+- Quality indicators are an ordered `string[]` on the standard rather than separate entities. The Commission does not number them on the web pages, so an indicator id would be ours; `<standardId>#<index>` is derivable when the self-assessment needs one. Happy to split them out if the PO prefers explicit ids.
+- Evidence expectations hang off the standard, not the indicator, with a `draft` flag (default true) per FR-4. Indicator-level evidence can be added later with an `indicatorIndexes` field without breaking the shape.
+- `riskTier` is expressed as `auditType` because that is the word the Commission's table uses.
+- `requiresCore` plus `rules` replace a flat `modules[]` per group so the SDA-only and modified-certification cases are data, not code.
+- Source integrity: FR-6 and AC-6 are met by `sources[].sha256` matching `data/sources/manifest.json`; a `standards:verify` script will re-hash and fail on drift.
+
+### Q3. Pathway or modules depending on more than the group
+
+Yes, four cases, all from the Commission's mapping document and modelled in `rules`:
+
+1. **SDA (0131) alone**: SDA module only, no core module. SDA with any other group: core plus SDA. Needs the full group set, not one group at a time.
+2. **Early childhood (0118) delivered by an individual or partnership** with no other certification group: "modified certification", core module limited to the freedom from violence, abuse, neglect, exploitation and discrimination outcome plus the early childhood module. Needs business structure from the questionnaire.
+3. **Restrictive practices used in any support**: implementing behaviour support plans module is added regardless of groups. Needs a questionnaire answer.
+4. **Whether 0138 applies at all** depends on the service pattern (support most of the day, provider manages and delivers the package) rather than only on what the provider calls it; the questionnaire must ask the Commission's two exclusion questions. Also 0127 plan management is verification but carries extra worker evidence requirements.
+
+So the derivation signature becomes `deriveApplicability(groups[], { businessStructure, usesRestrictivePractices })`. Pathway itself (verification vs certification) depends only on the group set.
+
+Contradictions with the primer, for the PO: 0125 participation in community, 0117 development of daily living and life skills, and 0106 life stage transitions are all **certification** in the Commission's table, not lower-risk as the primer's seed list suggests. 0115 is certification as the primer says. There is no "platform" supplementary module; 0137 maps to certification with modules unstated (`UNVERIFIED`).
+
+### Q4. Estimate
+
+Two sessions after this one. Session A: populate every standard verbatim (23 core, 4 verification, 4 SIL, 6 legacy supplementary modules), all 38 groups, `data/SOURCES.md`, completeness and mapping tests. Session B: `deriveApplicability`, `standards:report` and `standards:verify` scripts, remaining tests, delivery evidence. Fetching the two legislation instruments to close the 0137 and 0138 items happens in session A.
 
 ## Delivery evidence
 (Dev fills in.)

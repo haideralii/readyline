@@ -1,0 +1,65 @@
+On this page:
+This is an online version of the NDIS Practice Standards.
+You can also download a copy:
+[#paragraph-id-9473] NDIS Practice Standards and Quality Indicators
+[/rules-and-standards/ndis-practice-standards/sil#paragraph-id-4192185] Supported independent living Practice Standards and Quality Indicators .
+The NDIS Practice Standards specify the quality standards that need to be met by registered NDIS providers delivering supports and services to NDIS participants.
+The Standards also raise participants’ awareness of what quality service provision they should expect from registered providers.
+The Standards are broken down into modules that include:
+a core module that applies to all registered NDIS providers delivering higher-risk supports and services
+supplementary modules that apply depending on the types of NDIS supports and services being delivered
+a verification module that applies to all registered NDIS providers delivering lower-risk supports and services.
+Each module has:
+outcomes : high-level and participant-focused
+quality indicators : that auditors use to assess compliance with the NDIS Practice Standards and indicate how providers may show compliance.
+Core module
+This covers:
+[/rules-and-standards/ndis-practice-standards/core-module-rights-and-responsibilities] rights and responsibility for participants
+[/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational] provider governance and operational management
+[/rules-and-standards/ndis-practice-standards/core-module-provision-supports] provision of supports
+[/rules-and-standards/ndis-practice-standards/core-module-provision-supports-environment] provision of supports environments .
+Supplementary modules
+Modules required depending on the types of NDIS supports and services being delivered:
+[/rules-and-standards/ndis-practice-standards/supplementary-module-high-intensity-daily-personal] high intensity daily personal activities
+[/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-behaviour-support] specialist behaviour support
+[/rules-and-standards/ndis-practice-standards/supplementary-module-implementing-behaviour-support] implementing behaviour support plans
+[/rules-and-standards/ndis-practice-standards/supplementary-module-early-childhood-supports] early childhood supports
+[/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-support-coordination] specialised support co-ordination
+[/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-disability] specialist disability accommodation
+[/rules-and-standards/ndis-practice-standards/sil] supported independent living .
+Verification module
+These NDIS Practice Standards apply to NDIS providers who are delivering lower risk/lower complexity supports and services. This module covers:
+human resource management
+risk management
+complaints management and resolution
+incident management.
+Go to [/rules-and-standards/ndis-practice-standards/verification-module] Verification module .
+Definitions
+Act means the National Disability Insurance Scheme Act 2013.
+behaviour support plan means:
+(a) a comprehensive behaviour support plan; or
+(b) an interim behaviour support plan.
+dignity of risk means the right of the individual to choose to take some risk in engaging in life experiences.
+functional behavioural assessment means the process for determining and understanding the function or purpose behind a person’s behaviour, and may involve the collection of data, observations, and information to develop an understanding of the relationship of events and circumstances that trigger and maintain the behaviour.
+high intensity support skills descriptor , for an activity, means the descriptor for the activity described in the [/rules-and-standards/ndis-practice-standards/supplementary-module-high-intensity-daily-personal#paragraph-id-8163] NDIS Practice Standards: skills descriptors .
+NDIS Practice Standards Rules means the National Disability Insurance Scheme (Provider Registration and Practice Standards) Rules 2018.
+NDIS behaviour support practitioner means a person the Commissioner considers is suitable to undertake behaviour support assessments (including functional behavioural assessments) and to develop behaviour support plans that may contain the use of restrictive practices.
+key worker means a person who is chosen by the family of a child receiving early childhood early intervention supports to work with them to coordinate information, services and supports for the child.
+positive behaviour support capability framework refers to [/rules-and-standards/behaviour-support-and-restrictive-practices/positive-behaviour-support] The Positive Behaviour Support Framework .
+PPE is short for personal protective equipment.
+service agreement means a written agreement between the provider and the participant on the supports to be provided and the conditions surrounding those supports.
+specialist behaviour support provider means a registered NDIS provider whose registration includes the provision of specialist behaviour support services.
+support network means family, friends, carers and other people who have a supportive relationship with a participant.
+support plan means a document developed in response to a request for supports by the Participant and an appropriately skilled professional within the provider organisation prior to the commencement of supports.
+Resources
+NDIS Practice Standards and Quality Indicators
+[https://www.ndiscommission.gov.au/sites/default/files/2024-10/ndis-practice-standards-and-quality-indicators.pdf] pdf 962KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-10/ndis-practice-standards-and-quality-indicators.pdf] Listen to PDF
+Fact sheet: NDIS Practice Standards and Quality Indicators
+[https://www.ndiscommission.gov.au/sites/default/files/2024-09/factsheet-practice-standards-amendments-nov-21final_0.docx] docx 138KB
+[https://www.ndiscommission.gov.au/sites/default/files/2024-09/factsheet-practice-standards-amendments-nov-21final_0.pdf] pdf 688KB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-09/factsheet-practice-standards-amendments-nov-21final_0.pdf] Listen to PDF
+Related information
+[/provider-registration/apply-registration/types-audits] Types of audits
+[/provider-registration/about-registration] About registration
+[/provider-registration/apply-registration] How to apply

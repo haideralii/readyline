@@ -54,7 +54,7 @@ e2e/              Playwright specs
 | Phase | Scope                                     | Status      |
 | ----- | ----------------------------------------- | ----------- |
 | 0     | Scaffold, tooling, CI, decisions log      | Done        |
-| 1     | Standards mapping (`data/standards.json`) | Next        |
+| 1     | Standards mapping (`data/standards.json`) | In progress |
 | 2     | Questionnaire                             | Not started |
 | 3     | Generator                                 | Not started |
 | 4     | Readiness checklist and payments          | Not started |

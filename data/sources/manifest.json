@@ -1,0 +1,229 @@
+{
+  "note": "Text extracted on 2026-10-11 from the NDIS Quality and Safeguards Commission website (HTML main content with tags stripped; PDFs via pypdf). Kept so standards.json can be diffed against its source. Re-fetch and compare before each release.",
+  "items": [
+    {
+      "id": "practice-standards-hub",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards",
+      "snapshotPath": "data/sources/practice-standards-hub.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 6562,
+      "sha256": "e9244ff5f1ab471afd63ff96a0610dce9b4741bd016b1951f2126c98a779e0e1"
+    },
+    {
+      "id": "core-rights",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-rights-and-responsibilities",
+      "snapshotPath": "data/sources/core-rights.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 4750,
+      "sha256": "f9b3373c110679d52c70197188b2aaa4266ca0298c98fb9a65d778fe2ad60957"
+    },
+    {
+      "id": "core-governance",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational",
+      "snapshotPath": "data/sources/core-governance.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 13965,
+      "sha256": "14c86c72008b1a29e618765030c2eddcc316c905bfcc51f5d522892d177b357c"
+    },
+    {
+      "id": "core-provision",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provision-supports",
+      "snapshotPath": "data/sources/core-provision.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 8338,
+      "sha256": "b45de78089a2ef6468fe1c034153e0cf3e548e16908a8d70cc3ecf70ff8b7a04"
+    },
+    {
+      "id": "core-environment",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provision-supports-environment",
+      "snapshotPath": "data/sources/core-environment.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 8793,
+      "sha256": "703b3b95a32047371035d0d9beb58497bd514a6bec877583878a117d436334d8"
+    },
+    {
+      "id": "supp-hidpa",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-high-intensity-daily-personal",
+      "snapshotPath": "data/sources/supp-hidpa.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 13664,
+      "sha256": "956eff297f6cd58e4d2422ed0e7a047dba65b6646c4c038df24471a15b0ddf0a"
+    },
+    {
+      "id": "supp-sbs",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-behaviour-support",
+      "snapshotPath": "data/sources/supp-sbs.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 11628,
+      "sha256": "3828ec5945acd3db6dc5517d456d2ebd7e06b2d1b7e2c2ba749620c5b7af8044"
+    },
+    {
+      "id": "supp-ibsp",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-implementing-behaviour-support",
+      "snapshotPath": "data/sources/supp-ibsp.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 10156,
+      "sha256": "cc9babbcd4e1442798d4558581a6671fe9bfe59628e07e619809ebe5194d9e76"
+    },
+    {
+      "id": "supp-ec",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-early-childhood-supports",
+      "snapshotPath": "data/sources/supp-ec.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 7274,
+      "sha256": "50f478539fd1fbf6bc21deb02e3d391fc98b2946bfa5127228b900091921ed6d"
+    },
+    {
+      "id": "supp-ssc",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-support-coordination",
+      "snapshotPath": "data/sources/supp-ssc.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 4055,
+      "sha256": "4029085254f0202b643576ac3e054047c7bea516b6d4ef0ccb84b0eee92e4aa3"
+    },
+    {
+      "id": "supp-sda",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-specialist-disability",
+      "snapshotPath": "data/sources/supp-sda.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 11396,
+      "sha256": "be7c512a17445fafb27d59af5bdb6b8eab4fdce5bf237170729eb8b507d7f9e9"
+    },
+    {
+      "id": "verification",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/verification-module",
+      "snapshotPath": "data/sources/verification.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 4294,
+      "sha256": "842f6704079ea7cc156eaaf60f0132063730f378a48cf22650f5c13ad80d8e5a"
+    },
+    {
+      "id": "sil-module",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil",
+      "snapshotPath": "data/sources/sil-module.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 6069,
+      "sha256": "b0b0b3837952b4a44bf282714270592180be3709446cc6f905021b128995f0c3"
+    },
+    {
+      "id": "sil-sdm",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil/supported-decision-making",
+      "snapshotPath": "data/sources/sil-sdm.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 8047,
+      "sha256": "7bc93d481cfa7a9c56757894ce6bdc91a7cd3788b270861730f1368c83c50d17"
+    },
+    {
+      "id": "sil-safeguarding",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil/safeguarding",
+      "snapshotPath": "data/sources/sil-safeguarding.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 9998,
+      "sha256": "79598d63c144ee6bc6f54a9d79087ad1d67f3ea355cffea0411edcb5f6e5d1f8"
+    },
+    {
+      "id": "sil-governance",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil/practice-governance",
+      "snapshotPath": "data/sources/sil-governance.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 8126,
+      "sha256": "ccdf53012a9114105ce22ea2972ed174cdff885f06056d89380e0503e2b05093"
+    },
+    {
+      "id": "sil-tenancy",
+      "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/sil/tenancy-housing",
+      "snapshotPath": "data/sources/sil-tenancy.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 11983,
+      "sha256": "f5c93774afc1046d93b90a204ac22b0edf7d147ade578ddf3c7beeeb71c10e72"
+    },
+    {
+      "id": "registration-groups",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/registration-groups-or-classes-support",
+      "snapshotPath": "data/sources/registration-groups.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 2569,
+      "sha256": "219d811bb96ab938653fbe8952f95f64d780085eaf2fe601f54a6edc8b187c88"
+    },
+    {
+      "id": "types-of-audits",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits",
+      "snapshotPath": "data/sources/types-of-audits.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 25644,
+      "sha256": "dbb06a26acca16b555252225bb447ef2c0d1de833abbb7bce374eb7d79bf8128"
+    },
+    {
+      "id": "mandatory-registration",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration",
+      "snapshotPath": "data/sources/mandatory-registration.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 9012,
+      "sha256": "6cbb81c4a382bca4af5f0216b3901f755385b9cf09cc538d5a2ca077f20d0cbd"
+    },
+    {
+      "id": "mandatory-sil",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-SIL",
+      "snapshotPath": "data/sources/mandatory-sil.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 9054,
+      "sha256": "5bbf9f36a9a9710a6af0b1b5036c6891e5097d0d943a942b0c82e91d9247a864"
+    },
+    {
+      "id": "mandatory-digital",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital",
+      "snapshotPath": "data/sources/mandatory-digital.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 3511,
+      "sha256": "971229d37823da573e57f876c41851f04d4bbfbc2ae34d2d39486061962b97ea"
+    },
+    {
+      "id": "ps-reform",
+      "url": "https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/ndis-practice-standards-reform",
+      "snapshotPath": "data/sources/ps-reform.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 5298,
+      "sha256": "0e1d03990dd27e904051df5ebbb0f2c59d7775b79375caca6c3e0b664130ad9d"
+    },
+    {
+      "id": "ps-qi-v4",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2024-10/ndis-practice-standards-and-quality-indicators.pdf",
+      "snapshotPath": "data/sources/ps-qi-v4.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 112286,
+      "sha256": "a12b063d34fbeed86b9403e9a8fae33aaf78fe7e3662dae2decd3e64688b3ccc"
+    },
+    {
+      "id": "sil-ps",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-06/SIL-Practice-Standards-PDF.pdf",
+      "snapshotPath": "data/sources/sil-ps.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 21809,
+      "sha256": "2cf16eb364665092481c86407d590272a8a2688c23d996678156bde2cd57750d"
+    },
+    {
+      "id": "sil-evidence-guide",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-06/SIL-PS-Guide-Provider-Worker-PDF.pdf",
+      "snapshotPath": "data/sources/sil-evidence-guide.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 7233,
+      "sha256": "88c1522a08e382e81138137399d99805866bb8b000ae01d94bdaee523a8c824a"
+    },
+    {
+      "id": "registration-requirements",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2022-02/200312-registration-requirements-supports-and-services_0_0.pdf",
+      "snapshotPath": "data/sources/registration-requirements.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 5992,
+      "sha256": "aa3314029fe3d909d482a64885a026d558457b6628cc23fcd40cbb3a4fbaeecb"
+    },
+    {
+      "id": "aqa-expectations",
+      "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-07/Regulatory-Expectations-AQAs-PDF.pdf",
+      "snapshotPath": "data/sources/aqa-expectations.txt",
+      "fetchedAt": "2026-10-11",
+      "bytes": 43562,
+      "sha256": "928ea9dbe4912327c644fd07b5899a67c2d5cfe3561b02de9b2c0d74ceaae956"
+    }
+  ]
+}

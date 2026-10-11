@@ -4,7 +4,7 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 
 | REQ | Title | Phase | Priority | Status |
 |-----|-------|-------|----------|--------|
-| REQ-001 | Standards and registration-group mapping (`data/standards.json`) | 1 | must | ready |
+| REQ-001 | Standards and registration-group mapping (`data/standards.json`) | 1 | must | in progress |
 | REQ-002 | Security and privacy baseline (applies from now on) | 1 | must | ready |
 | REQ-003 | Readiness questionnaire with save-and-resume | 2 | must | draft |
 | REQ-004 | Accounts, auth and tenancy (Supabase, RLS) | 2 | must | draft |

@@ -1,0 +1,85 @@
+On this page:
+From July 1 2026 supported independent living (SIL) and NDIS digital platform providers will need to register with the NDIS Quality and Safeguards Commission (NDIS Commission). Reviews have identified increased risks to participant safety and quality of care associated with these services.
+Support coordination services were also identified as an area for mandatory registration, but reform in this area is paused.
+What is mandatory registration?
+Mandatory registration means a provider must be registered with the NDIS Commission to deliver specific services and supports in the NDIS market.
+Provider registration helps the NDIS Commission to:
+identify quality and safety issues
+respond to compliance matters early
+reduce risks to NDIS participants and the NDIS.
+We have developed this [/about-us/ndis-commission-reform-hub#paragraph-id-3504828] Easy Read style Fact Sheet to help people understand the proposed changes to the Provider Registration Rules.
+Why introduce mandatory registration?
+People with disability are at higher risk when they access services with low regulation and oversight. Mandatory registration is one of the changes we're making to improve the safety and quality of NDIS supports and services.
+Registration improves supports for NDIS participants by making sure providers:
+show how they meet the [/rules-and-standards/ndis-practice-standards] NDIS Practice Standards
+follow extra regulatory requirements
+have clear expectations for competence, capability and consistency
+provide greater transparency about who's delivering services
+are more accountable for the quality of supports and services.
+Mandatory registration for supported independent living (SIL) and NDIS digital platforms
+We recognise supported independent living and NDIS digital platforms are higher‑risk areas. These risks have also been identified by participants, supporters and advocates.
+In December 2025 the Minister for the NDIS announced that SIL and platform providers must register with the NDIS Commission from 1 July 2026. They need to meet the same standards and requirements as other registered providers:
+independent audits
+worker screening
+managing incidents
+other [/provider-registration/about-registration#paragraph-id-11351] conditions of registration .
+How will supported independent living and NDIS digital platforms be defined from 1 July?
+The following definitions are a summary and based on the amendments to the Provider Registration Rules. You should refer to the [https://www.legislation.gov.au/F2018L00631/latest/text] Provider Registration Rules to see the full definitions and determine if the new requirements apply to you.
+To allow for mandatory registration of SIL and NDIS digital platforms, 2 new classes of support and their definitions have been added to the Provider Registration Rules. They are:
+0137 - Providing an NDIS digital platform service
+0138 - Assistance with supported independent living.
+Supporting independent living (SIL) is defined as:
+SIL is a package of home and living support for people with higher support needs. A person provides assistance with supported independent living (SIL) to a participant if:
+the person with disability requires support at all times of the day, or for most of the day.
+the assistance provided helps the person with disability to live in their home as autonomously as possible and access the community, by: assisting with daily life tasks, or
+supervising daily life tasks
+the provider is managing and delivering supported independent living supports. Providers make sure the participant receives home and living support in accordance with the package of supports.
+It is not SIL if:
+a person only receives a few hours of support a day or week, or
+a person chooses and manages their own support workers (this includes directing, planning and rostering their own support workers).
+NDIS Digital Platforms is defined as:
+an online application, website or system where: the NDIS digital platform acts as an intermediary for participants seeking to access NDIS supports with people providing supports to participants
+payments for these supports are processed through the NDIS digital platform using NDIS amount from participants plans.
+an online application, website or system is only classified as an NDIS digital platform if its main purpose is connecting participant's NDIS supports from a participant's plan.
+We have developed this [https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub#paragraph-id-3504828] Changes to NDIS Provider Rules – Easy Read style Fact Sheet to help people understand the proposed changes to the Provider Registration Rules.
+Transition to become a registered provider
+We have created transitional arrangements to guide providers to become registered. They include information, registration requirements, timelines and staged processes. These pathways will:
+reduce disruption to the NDIS market
+make sure participants continue to receive supports.
+For more information on ransitional arrangements, see:
+[/about-us/ndis-commission-reform-hub#paragraph-id-4171510] Explanatory document
+[https://www.legislation.gov.au/F2018L00631/latest/text] Provider registration rules
+[/about-us/ndis-commission-reform-hub#Webinar] .2026 regulatory reform webinar series
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-SIL]
+Mandatory registration and transitional pathways for supported independent living (SIL)
+[/about-us/ndis-commission-reform-hub/mandatory-registration/mandatory-registration-digital]
+Mandatory registration and transitional pathways for NDIS digital platforms
+Background information about the mandatory registration decision is available at [/node/1297#SIL] supported independent living and [/node/1297#digital] NDIS digital platforms .
+Mandatory registration for support coordination
+Mandatory registration of support coordination has been paused while we consider further reform.
+The NDIS Commission would like to thank those who participated in consultations. Your feedback, insights and ideas will help us regulate NDIS providers.
+Registered and unregistered NDIS providers still need to follow the [/rules-and-standards/ndis-code-conduct] NDIS Code of Conduct . They still need to deliver safe and high quality supports to NDIS participants.
+Supporting documents:
+Supported Coordination 'What we heard' report – [#paragraph-id-107371] Standard Version | [#paragraph-id-107372] Easy Read
+Consultation Paper SIL-Support Coordination Mandatory Registration – [#paragraph-id-10027] Standard Version | [#paragraph-id-10028] Easy Read
+Mandatory registration frequently asked questions
+Many questions about mandatory registration are answered in the [/about-us/ndis-commission-reform-hub/about-reform-program#paragraph-id-2032364] frequently asked questions .
+Resources
+Supported Independent Living (SIL) and Support Coordination (SC) 'What we heard' report - Standard version
+[https://www.ndiscommission.gov.au/sites/default/files/2025-07/SIL-SC%20Insights%20Report%20Standard%20Version.docx] docx 10MB
+Easy Read: Supported Independent Living (SIL) and Support Coordination (SC) 'What we heard' Report
+[https://www.ndiscommission.gov.au/sites/default/files/2025-07/SIL-SC%20Insights%20Report%20Easy%20Read.pdf] pdf 4MB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2025-07/SIL-SC%2520Insights%2520Report%2520Easy%2520Read.pdf] Listen to PDF
+Supported independent living (SIL) and Support Coordination (SC) supplementary data
+[https://www.ndiscommission.gov.au/sites/default/files/2025-07/SIL-SC%20Data%20Supplement.xlsx] xlsx 45KB
+Consultation Paper SIL-Support Coordination Mandatory Registration - Standard version
+[https://www.ndiscommission.gov.au/sites/default/files/2024-11/SIL%20SC%20Mandatory%20Registration%20-%20Consultation%20Paper%20-%20November%202024.docx] docx 10MB
+[https://www.ndiscommission.gov.au/sites/default/files/2024-11/SIL%20SC%20Mandatory%20Registration%20-%20Consultation%20Paper%20-%20November%202024.pdf] pdf 2MB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-11/SIL%2520SC%2520Mandatory%2520Registration%2520-%2520Consultation%2520Paper%2520-%2520November%25202024.pdf] Listen to PDF
+Easy Read: Consultation Paper SIL-Support Coordination Mandatory Registration
+[https://www.ndiscommission.gov.au/sites/default/files/2024-11/SIL%20SC%20Mandatory%20Registration%20Easy%20Read.pdf] pdf 3MB
+[http://docreader.readspeaker.com/docreader?cid=cizey&lang=en&url=https%3A//www.ndiscommission.gov.au/sites/default/files/2024-11/SIL%2520SC%2520Mandatory%2520Registration%2520Easy%2520Read.pdf] Listen to PDF
+[https://ndiscommission.easyread.com.au/registration-of-platform-providers/] Easy Read: Online version
+Related information
+[/provider-registration/about-registration] About registration
+[/provider-registration/apply-registration] Apply for registration

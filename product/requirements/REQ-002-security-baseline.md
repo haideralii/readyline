@@ -42,7 +42,27 @@ CI logs for the failing and passing cases; the header test output; `SECURITY.md`
 2. gitleaks via a GitHub Action versus a repo script: recommendation and why.
 
 ## Dev response
-(Dev fills in.)
+
+Written 2026-10-11. Not yet started; answers below so the PO can settle the two choices before the build session.
+
+### Q1. Nonce-based CSP with Next 16 Cache Components
+
+There is a direct conflict. The Next 16.4 bundled guide states that nonces require dynamic rendering of every page and that Partial Prerendering (which Cache Components turns on) "is incompatible with nonce-based CSP since static shell scripts won't have access to the nonce". Three options:
+
+1. **Nonce CSP via `proxy.ts`, every HTML route rendered per request (recommended for the app, see trade-off).** Strict `script-src 'self' 'nonce-…' 'strict-dynamic'`, no `unsafe-inline`. Cost: no static shell or CDN-cached HTML for marketing and blog pages; each request renders on the server in Sydney. For this product's traffic that is acceptable, and authenticated routes are dynamic anyway because they read the session cookie. To do it cleanly we turn `cacheComponents`/`partialPrefetching` off (one line, recorded against D-003) rather than sprinkling `await connection()` everywhere.
+2. **Keep Cache Components, strict CSP without nonces using the experimental SRI (hash) support.** Keeps static shells and CDN caching. Risk: the feature is marked experimental, and I have not yet confirmed that Next's inline RSC bootstrap scripts pass a `script-src 'self'` policy without a nonce. Proposal: a one-hour time-boxed spike at the start of the REQ-002 session; if the home page renders with zero `securitypolicyviolation` events in Playwright, adopt it; otherwise fall back to option 1.
+3. **Keep Cache Components with `'unsafe-inline'` in `script-src`.** Rejected: not a strict CSP, fails the threat model.
+
+Recommendation: spike option 2, fall back to option 1. Either way the other headers (HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`) go in `next.config.ts` `headers()` and are asserted by a Playwright test on `/`. Google Fonts is the only external origin today (Geist via `next/font`, which self-hosts the files at build time, so no runtime external origin is needed; will confirm in the header test).
+
+### Q2. gitleaks: GitHub Action versus repo script
+
+Recommend the official `gitleaks/gitleaks-action` on push and pull request, with a `.gitleaks.toml` that allow-lists `data/sources/` (verbatim Commission text can contain strings that look like keys). Reason: maintained rule set, scans full history, zero code to own. Caveat: the action is free for personal GitHub accounts but needs a licence key for organisation-owned repos; the repo is personal today. If it moves to an organisation under the Pty Ltd, switch to the `trufflehog` OSS action or run the gitleaks binary directly in the workflow (still free, no licence check). A repo regex script is the fallback only if the Action cannot run.
+
+### Evidence already available
+
+- `npm audit --omit=dev --audit-level=high` on the current lockfile: 0 vulnerabilities. The high advisories npm prints at install time are in dev-only tooling (`braces` via the test toolchain); they will be tracked but do not fail the production gate.
+- No `console.log` in app code today; the lint rule will be added with FR-4.
 
 ## Delivery evidence
 (Dev fills in.)
