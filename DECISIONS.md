@@ -713,6 +713,57 @@ found while drafting (participant money and property; support planning and
 transitions; a restrictive practice use register) are flagged for the PO in
 the REQ-005 Dev response rather than silently added.
 
+**D-506 Session A document model (Dev, 2026-10-12).** `buildSkeleton` turns
+a catalogue entry plus the provider facts into numbered sections: fixed
+sections resolved from `fixed-text.ts`, tailored sections left as a
+"[Provider to complete]" callout with status `placeholder`. Document
+control and the notice are unnumbered front and back matter; every other
+section is numbered in order, so headings read "1 Purpose" as the house
+style asks. Document-specific extra sections are inserted before the fixed
+back matter (records, related documents, review, notice) so the notice is
+always last. Structure snapshots record ids, numbers, modes, statuses and
+block types only, which keeps them readable (3 cases, about 185 KB).
+
+**D-507 Fixed text is lint-clean by test.** Every fixed section of every
+skeleton passes the terminology and claims lint with the Commission's class
+names as the only allowed exceptions. Two phrasings had to change for this:
+the document-control row is "Approval" rather than "Approved by", and the
+worker definition says "people we employ" rather than "employees". The
+Code of Conduct section summarises the Code's elements in plain words and
+says the Commission's published text applies; no deep link is given because
+the Code page is not among the fetched sources.
+
+**D-508 Readability without the "-le" rule.** The Flesch-Kincaid syllable
+heuristic counts vowel groups after stripping a silent "e"; the common
+"-le adds a syllable" rule double-counts here (table, people) and was
+dropped. Tests pin the known words and the two thresholds from the house
+style (warn above 9, fail above 11), measured on paragraphs, bullets and
+steps only.
+
+**D-509 Provider facts are the whole context vocabulary (SR-3).** The
+`ProviderFacts` type has eleven keys (trading name, formatted ABN,
+structure, state names, support types, pathway, module names, worker count
+band, key personnel count, risk-assessed roles, restrictive practices) and
+`FACT_KEYS` is also the enum behind `usedFacts`. A test builds the facts
+from answers carrying a canary `servicesNote` and asserts the canary and
+the step-5 answers never appear. Worker counts are banded (sole, 2 to 5,
+6 to 10, 11 to 25, 26 or more) so the prompt never carries an exact
+headcount.
+
+**D-510 Reference cases live in the repo.** `fixtures/reference-cases`
+holds three fictional questionnaires (sole trader verification in NSW;
+company certification with personal care, transport and verification classes
+in NSW and QLD; company with restrictive practices in VIC, bringing in the
+implementing behaviour support plans module). They are the input for the
+structure snapshots, the LibreOffice job and, later, the recorded model
+fixtures.
+
+**D-511 LibreOffice job scope.** The `docx-render` CI job installs
+`libreoffice-writer` with apt, writes the skeleton sets through the
+skeleton test (`WRITE_SKELETONS=1`), converts every `.docx` to PDF with
+`soffice --headless` and fails if any file does not convert, then uploads
+the sets as an artifact for the PO. It runs on pushes, on manual dispatch,
+and on pull requests from `req-005-generator` or titled REQ-005.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

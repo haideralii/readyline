@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -120,3 +121,54 @@ jobs:
       - name: Stop the local stack
         if: always()
         run: supabase stop --no-backup
+  docx-render:
+    name: Render skeleton .docx sets and convert with LibreOffice (REQ-005 AC-1 mechanics, D-504)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.title, 'REQ-005') ||
+      github.event.pull_request.head.ref == 'req-005-generator'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install LibreOffice Writer (headless)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends libreoffice-writer
+
+      - name: Render the three reference skeleton sets to out/skeletons
+        run: npm run generator:skeletons
+        env:
+          WRITE_SKELETONS: "1"
+
+      - name: Convert every .docx to PDF with LibreOffice; fail if any file does not convert
+        run: |
+          set -euo pipefail
+          total=0; converted=0
+          for dir in out/skeletons/*/; do
+            mkdir -p "$dir/pdf"
+            for f in "$dir"*.docx; do
+              total=$((total+1))
+              soffice --headless --convert-to pdf --outdir "$dir/pdf" "$f" > /dev/null
+              base="$(basename "${f%.docx}")"
+              if [ -s "$dir/pdf/$base.pdf" ]; then converted=$((converted+1)); else echo "::error::$f did not convert"; fi
+            done
+          done
+          echo "converted $converted of $total documents"
+          [ "$total" -gt 0 ] && [ "$converted" -eq "$total" ]
+
+      - name: Upload the skeleton sets for the PO
+        uses: actions/upload-artifact@v4
+        with:
+          name: skeleton-document-sets
+          path: out/skeletons/
+          retention-days: 14

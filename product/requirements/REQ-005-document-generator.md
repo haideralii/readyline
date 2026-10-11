@@ -143,7 +143,21 @@ Three things for the PO in that file: (1) the proposed addition; (2) `feedback-a
 
 
 ## Delivery evidence
-(Dev fills in.)
+
+### PO batch 7 item 2 (2026-10-12), branch `req-005-generator` (merged with `main` at 7f456a0), commit 270c4a6
+
+Decisions applied: `participant-money-and-property-procedure` and the new `support-planning-and-transitions-procedure` are in the core list of `document-sets.json`; `feedback-and-participant-engagement-procedure` now carries only the feedback and responsive-support standards; the `restrictive-practices` register is in the registers list with `when: { modulesAny: ["ibsp"] }`, the content schema and `deriveDocumentSet` honour it, and `result.test.ts` proves it appears only with the implementing module. Evidence: the three additions are in `standards.meta.json`; `meta.evidenceReview` marks every item `draft: false`, `reviewedBy: "po"`, `reviewedAt: "2026-10-12"` (schema fields added; later additions opt back into draft); dataset rebuilt as **1.1.0** (186 items, 0 draft), `SOURCES.md` changelog updated, `standards:verify` green, Commission text untouched.
+
+### Session A (2026-10-12), same branch
+
+**Built (`src/lib/generator/`):** `section-schema.ts` (closed block set, strict objects, `usedFacts` from `FACT_KEYS`; D-501); `facts.ts` (the eleven provider facts, banded worker count, formatted ABN; D-509); `catalogue.ts` (typed, validated access to `document-types.json`, extras inserted before the back matter); `document-model.ts` (`buildSkeleton`, numbering, `modelStructure` for snapshots; D-506); `fixed-text.ts` (fixed text for every outline section in the house style: document control, definitions, records and evidence from the reviewed evidence items, related documents, review with a responsibilities table, notice with the general-information statement and AI disclosure, how-to-use, signatures, Code of Conduct summary, acknowledgement, self-assessment table and gaps; document-specific extras get a register table or a placeholder until Session D; D-507); `render-docx.ts` (`docx` 9.10: title, Heading 1 per section, bullets and restarted numbered steps, bordered tables with header rows, shaded callouts, header with provider and title, footer "Prepared with Readyline", version and page x of y); `readability.ts` (Flesch-Kincaid grade, thresholds from the house style; D-508); `lint.ts` (terminology, plain words, exclamation marks, "please", spelling, compliance claims, plus the CLAUDE.md claim rules; class names exempt); `house-style.ts` (the PO's note verbatim, test-pinned to the markdown); `reference-cases.ts` with `fixtures/reference-cases/*.json` (D-510). Dependencies: `docx` 9.10.0, `fflate` 0.8.3 (also on the REQ-004 branch).
+
+**Tests (31 in the generator folder; 282 in the unit suite):** schema accepts the block set and rejects unknown keys, block types, empty lists, line breaks, ragged tables and unknown fact keys; readability known words, sentence counting, an "ok" passage and a "fail" passage; lint passes house-style prose, flags the participant and worker words, Latinate words, American spelling, exclamation marks, "please", compliance claims and prohibited claims, and exempts class names; house style constant equals the markdown; skeletons for the three reference cases: every document plus the self-assessment resolves (18, 26 and 27 documents), notice last, numbering contiguous, **structure snapshot** per case, provider name and notice present in fixed text, **no lint errors in any fixed section**, every `.docx` has one Heading 1 per section, the provider name in the body and the footer text; facts exclude the canary `servicesNote` and the step-5 answers; the first sections of two cases differ.
+
+**LibreOffice (AC-1 mechanics; D-511):** CI job `docx-render` installs `libreoffice-writer`, writes the sets with `npm run generator:skeletons` under `WRITE_SKELETONS=1`, converts every file to PDF and fails on any miss, uploads `out/skeletons/` as an artifact. Local: 71 `.docx` files written (244, 351 and 365 KB per case). Not run locally: LibreOffice is not installed on the dev machine; the first conversion run is the CI job on this push.
+
+**Local outputs:** `npm run check` clean (28 files, 282 tests), typecheck clean, Prettier clean. No model calls exist yet.
+
 
 ## PO review
 (PO fills in.)
