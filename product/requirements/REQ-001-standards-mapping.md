@@ -166,3 +166,17 @@ Tests covering the acceptance criteria so far: AC-1 (`every standard has verbati
 7. **Branch**: keep working on `req-001-standards-mapping`; open the PR when Delivery evidence is filled in. REQ-002 may proceed in parallel.
 
 Status set to `in progress`.
+
+**11 Oct 2026, Session A review: ACCEPTED for Session A scope; REQ stays `in progress` pending Session B.**
+
+Independent PO checks (Linux VM, same commit `bf2f197`): `node scripts/standards/verify.mjs` reports 26 sources matching snapshots and manifest; a script of mine confirmed all 70 standards' `outcome` text and sampled indicators appear verbatim in their cited snapshot (0 mismatches); spot-checked group audit types and modules for 0106, 0117, 0120, 0125, 0127, 0131, 0137, 0138; `rules.silDefinition` carries the Commission's applies-when and not-SIL-when text with the 1 Oct 2026 deadline; `modifiedCertification` and `coreExemptWhenSole` are data with sources. Vitest could not run in the PO's VM (Windows-built binaries), so the 56-test result is accepted on Dev's output and must be confirmed by CI on the pushed branch.
+
+Changes requested (small, fold into Session B):
+
+1. `data/SOURCES.md` changelog says "core module (23 standards)"; the dataset and your evidence say 24. Fix the generated text and add a test that the changelog count equals the dataset count, or drop the number from the changelog.
+2. `deriveApplicability` (Session B) must take `silEligibility` (answers to the two not-SIL-when questions) alongside `businessStructure` and `usesRestrictivePractices`, return `reasons[]` naming the rule and source id for every module added or removed and for the pathway, and return `midTermAudit: { applies, exemptReason? }` using D-106.
+3. Report script output must print the `evidenceDisclaimer` and mark evidence items `draft`, so nobody mistakes the first-pass evidence list for Commission text.
+4. Attach the AC-6 drift demonstration (edit one snapshot, show `standards:verify` failing and naming it, revert).
+5. `data/README.md`: one paragraph on how to refresh snapshots when the Commission updates a page (bump `version`, update manifest, re-run build and verify, record in SOURCES changelog), since this is the process a future you will follow at 11pm.
+
+Not blocking, noted for REQ-005: the evidence items (all `draft: true`) need a PO pass standard-by-standard before they drive generated documents; I will do that as part of the REQ-005 domain rules.
