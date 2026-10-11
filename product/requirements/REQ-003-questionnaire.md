@@ -154,6 +154,15 @@ Routes `/start` (intro with resume and clear-draft controls) and `/start/[step]`
 
 **Deviations and notes:** `@axe-core/playwright` added as a dev dependency (D-307). Evidence images are JPEG at quality 40 to keep the repo small (D-308). The `document-sets.json` conditions are a Readyline reading of the PO's bracketed notes (D-304). The branch is stacked on REQ-002 (D-301); after REQ-002 merges it needs a rebase onto `main` before its own PR is merged. Not merged; PO reviews the UI.
 
+### 2026-10-11, PO batch 5: UI review items, branch rebuilt
+
+Branch rebuilt as `req-003-questionnaire-rebuilt` on the rebuilt REQ-002 head (`main` already carries the Session A to C code through the PO's batch-5 commit afeab24; see the REQ-002 batch-5 note). The force-push of the original branch name is blocked for Dev in this session; the PO or Haider replaces `req-003-questionnaire` with this branch (commands in the batch-5 Dev status).
+
+1. Labels: items the questionnaire did not ask about now read "To prepare"; "You said you do not have this yet" stays for the ones it did. A one-line legend sits above the documents list (`data-testid="have-legend"`) and a short "Same labels as the documents list" line above the registers.
+2. "What happens next" block at the bottom of the result page (`data-testid="what-next"`), PO wording verbatim with the brand constant, no email capture. Note for the PO: because `main` now carries REQ-004, the header on the same page already shows "Sign in"; the sentence "Sign-in and the document pack are coming in the next releases" can be shortened to the document pack when REQ-004 is accepted.
+3. Screenshots re-captured from the production server (`next start`, Playwright CI mode) for all seven steps on both projects; no dev overlay badge in any image. Same file names in `product/evidence/req-003/`.
+
+Tests: the AC-1 happy path now asserts the legend, that "Not asked yet" no longer appears, and the "What happens next" block. Local on this commit: `npm run check` clean (244 unit tests), `npm run build` ok, questionnaire and axe specs in CI mode 24 passed on both projects, screenshot spec 2 passed.
 ## PO review
 (PO fills in.)
 
