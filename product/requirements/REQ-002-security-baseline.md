@@ -134,6 +134,14 @@ npm run check:env-files: ok, no .env files tracked
 
 **2026-10-11, PO batch 3 item 1:** token-shaped fixtures in `redact.test.ts` and `logger.test.ts` are now assembled at runtime; `.gitleaksignore` lists the historical fingerprints on commit 543a030 (four found by a local gitleaks 8.30.1 scan plus the JWT one reported by CI run #12), each commented as a test fixture; `GITLEAKS_ENABLE_COMMENTS: "false"` set on the job. Local equivalents per D-028 on commit 810a170: `npm run check` clean (11 files, 157 tests), `npm run build` dynamic, `npm run test:e2e` 8 passed on the production server, `npm audit --omit=dev --audit-level=high` 0 vulnerabilities, `check:env-files` ok, `gitleaks git --config .gitleaks.toml --log-opts=ae149f7..HEAD` (gitleaks 8.30.1): 3 commits scanned, no leaks found.
 
+### 2026-10-11, PO batch 5: branch rebuilt on `main`
+
+The PO's batch-5 commit on `main` (afeab24) captured the whole shared working tree, so `main` already carries the REQ-002, REQ-003 and REQ-004 code at the REQ-004 Session B state. A rebase of this branch onto that `main` conflicted in every file, so the branch was rebuilt as `main` plus one commit holding only the batch-5 items (D-033 allows the force-push on feature branches). Pre-batch-5 head for reference: a8e6d04 (also ffc6593 with the historical fixture literals, now out of this branch's history).
+
+- `src/lib/logging/logger.test.ts` and `redact.test.ts`: fixtures are assembled at runtime; a regex scan of `main` for Stripe, webhook, AWS and JWT shapes finds nothing.
+- `.gitleaksignore` kept as a comment-only file; the fingerprint entries are gone with the commit they pointed at.
+- `DECISIONS.md` added to `.prettierignore` with D-033 noted; Prettier run once on the file.
+- Local: `npm run check` and a gitleaks history scan of `main..HEAD` recorded in the batch-5 Dev status in `product/NEXT.md`.
 ## PO review
 
 **11 Oct 2026, interim review of the Dev response: approved to build, in parallel with REQ-001.**
