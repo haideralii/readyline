@@ -6,7 +6,7 @@ Written by the PO from sector knowledge and the research in `CLAUDE.md`. It is a
 
 - **NDIA** (National Disability Insurance Agency): runs the scheme, funds participants, owns the NDIS trade mark. Not the regulator of providers.
 - **NDIS Quality and Safeguards Commission**: regulates providers, registers them, sets the Practice Standards, runs complaints, reportable incidents, worker screening policy, restrictive practice oversight, and approves the auditors.
-- **Approved Quality Auditors (AQAs)**: independent bodies that audit providers against the Practice Standards. Providers choose and pay them. AQAs are expected not to consult to providers they audit.
+- **Approved Quality Auditors (AQAs)**: independent bodies that audit providers against the Practice Standards. Providers choose and pay them. AQAs are expected not to consult to providers they audit, and referral fees, commissions, success-based payments and revenue sharing linked to audit referrals are incompatible with their obligations (Regulatory Expectations V1, June 2026; D-109). We therefore never take or pay anything for an audit referral.
 - **Participants**: people with NDIS plans. Our product never holds their data.
 - **Providers**: from a sole-trader support worker to large organisations. Our customer is the small end: 1 to 10 workers.
 
@@ -17,17 +17,23 @@ Written by the PO from sector knowledge and the research in `CLAUDE.md`. It is a
 3. Complete the **self-assessment** against the applicable Practice Standards; the portal produces an **audit scope document** that the provider gives to AQAs for quotes.
 4. Engage an AQA. **Verification audit** (desktop document review) for lower-risk groups; **certification audit** (document review plus site visit, interviews with workers and participants) if any group is higher-risk. If any one group needs certification, the whole registration does.
 5. Audit outcome goes to the Commission; the Commission decides, may attach conditions.
-6. Registration lasts **three years**; certified providers have a **mid-term audit** at roughly 18 months; renewal audit before expiry.
+6. Registration lasts **three years**; certified providers have a **mid-term audit** 18 months after registration (prepare from month 12), assessed against the governance and operational management part of the core module plus any standard previously under a corrective action; exempt: individual or partnership early-childhood-only, SDA-only, transitioned providers. Audit ratings are 3, 2, 1, 0. The Commission does not set audit prices (D-106). Renewal audit before expiry.
 7. Ongoing obligations: incident management and reportable incidents, complaints management, worker screening, Code of Conduct, record keeping, notifying the Commission of changes, annual declarations. `UNVERIFIED`: current annual declaration requirements.
 
 ## Practice Standards structure (to be confirmed and sourced in REQ-001)
 
 - **Core module**, four divisions: Rights and Responsibilities for Participants; Governance and Operational Management; Provision of Supports; Provision of Supports Environment. Each division contains outcomes, each outcome has quality indicators.
-- **Supplementary modules** apply by registration group: High Intensity Daily Personal Activities; Specialist Behaviour Support; Implementing Behaviour Support Plans; Early Childhood Supports; Specialised Support Coordination; Specialist Disability Accommodation. `UNVERIFIED`: whether additional modules (e.g. for platform providers or SIL) exist in 2026.
-- **Verification module**: a reduced set of requirements for lower-risk registration groups (roughly: HR management, incident management, complaints management, risk management). `UNVERIFIED`: exact content.
+- **Supplementary modules** apply by registration group: High Intensity Daily Personal Activities; Specialist Behaviour Support; Implementing Behaviour Support Plans; Early Childhood Supports; Specialised Support Coordination; Specialist Disability Accommodation; and, from 1 July 2026, **Supported Independent Living** (four standards: supported decision-making, safeguarding, practice governance, agreements about tenancy, housing and support; published June 2026 with an evidence guide). Confirmed 11 Oct 2026 (D-101, D-102). No platform module exists.
+- **Verification module**: four standards for lower-risk registration groups: human resource management, incident management, complaints management, risk management. Confirmed 11 Oct 2026 (D-102).
 - Quality indicators are what auditors test; the self-assessment asks for evidence per indicator.
 
-## Registration groups (seed list, all `UNVERIFIED` until sourced)
+## Registration groups (corrected 11 Oct 2026 from the Commission's table, see `data/sources/registration-groups.txt` and D-103 to D-105)
+
+Dev's sourcing showed the original seed list was wrong in three places: **0125 Participation in Community, 0117 Development of Daily Living and Life Skills and 0106 Assist Life Stage Transition are all certification**, not lower-risk. The Commission lists 38 classes (0101 to 0138) with an audit type each; mixed verification and certification groups resolve to certification. There is no "platform" supplementary module; 0137 is certification with its modules still `UNVERIFIED` (D-104). Four cases depend on more than the group list and must be questionnaire inputs: SDA-only providers (SDA module without core); individual or partnership early-childhood-only providers ("modified certification"); any use of restrictive practices (adds the implementing behaviour support plans module); and whether a provider's service pattern actually falls within 0138 SIL (the Commission's two exclusion questions). 0127 plan management is verification but carries extra worker evidence requirements.
+
+Historical seed list kept below for context only; `data/standards.json` is the source of truth.
+
+### Original seed list (superseded)
 
 Lower-risk, typically verification: 0120 Household Tasks; 0108 Assist Travel/Transport; 0125 Participation in Community, Social and Civic Activities (check); 0117 Development of Daily Living and Life Skills (check); 0106 Assist Life Stage, Transition (check).
 Higher-risk, certification: 0107 Assist Personal Activities; 0115 Daily Tasks/Shared Living; 0104 High Intensity Daily Personal Activities; 0110 Specialist Behaviour Support; 0118 Early Intervention Supports for Early Childhood; 0131 Specialist Disability Accommodation; 0132 Specialised Support Coordination; 0133 Specialised Supported Employment.

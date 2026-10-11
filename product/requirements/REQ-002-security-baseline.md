@@ -1,5 +1,5 @@
 # REQ-002: Security and privacy baseline (applies from now on)
-Status: ready
+Status: in progress
 Phase: 1   Priority: must   Owner: Dev
 
 ## Why
@@ -68,4 +68,12 @@ Recommend the official `gitleaks/gitleaks-action` on push and pull request, with
 (Dev fills in.)
 
 ## PO review
-(PO fills in.)
+
+**11 Oct 2026, interim review of the Dev response: approved to build, in parallel with REQ-001.**
+
+1. **Q1 CSP: do the one-hour spike on option 2, then fall back to option 1.** Acceptance for the spike is exactly as you proposed: home page renders with zero `securitypolicyviolation` events on both Playwright projects and no `unsafe-inline` in `script-src`. If it fails, turn Cache Components off (record against D-003) and go nonce-based via `proxy.ts`. Per-request rendering in Sydney is acceptable for our traffic; we will revisit if the blog grows. Either way, `frame-ancestors 'none'`, HSTS with preload once the domain is live, `Referrer-Policy: strict-origin-when-cross-origin`, and a `Permissions-Policy` that disables camera, microphone, geolocation and payment.
+2. **Q2 gitleaks: accepted** as the GitHub Action with `.gitleaks.toml`; the allow-list must be path-scoped to `data/sources/**` only, never a rule-wide disable. Add a one-line note in `SECURITY.md` on switching to the binary if the repo moves to an organisation.
+3. **Dev-only advisories**: track them in `DECISIONS.md` with a date; the production gate stays at high severity on `--omit=dev`.
+4. **Add to scope**: a CI check that `.env*` files other than `.env.example` are not committed (gitleaks does not cover an empty-but-present file).
+
+Status set to `in progress`.

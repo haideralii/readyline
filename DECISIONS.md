@@ -214,9 +214,30 @@ standards, all 38 groups), write the mapping and pathway unit tests, then the
 derivation function (groups plus answers to modules, audit pathway, mid-term
 applicability).
 
+## Product-owner decisions (2026-10-11)
+
+**D-020 Brand: Readyline.** Chosen by Haider on 2026-10-11 after the PO
+checked auDA WHOIS (readyline.com.au and readyline.au unregistered), ASIC
+Connect (business name shown as available; unrelated Readyline Developments
+Pty Ltd and a former name exist), and IP Australia (one live READYLINE mark,
+classes 7 and 12, mining machinery; none in 9, 35, 42). readyline.com is held
+by a third party. Haider will register the ABN, business name and both .au
+domains; `NEXT_PUBLIC_BRAND_NAME=Readyline` once done. Future company name
+should not be the bare "Readyline Pty Ltd".
+
+**D-021 No paid auditor referrals.** Following D-109, CLAUDE.md sections 3,
+4.4 and 5 and the backlog parking lot were changed: the product never takes or
+pays a fee, commission or revenue share connected to an audit referral or
+outcome. A fee-free, labelled list of approved auditors remains possible.
+
+**D-022 REQ-001 and REQ-002 approved to proceed** (see PO reviews in the REQ
+files). REQ-002 may run in parallel with REQ-001. Derivation signature
+extended with SIL exclusion input and rule reasons; AC-8 to AC-10 added to
+REQ-001.
+
 ## Open questions for Haider
 
-1. Brand name (after ASIC and IP Australia checks). Until then `{{BRAND}}`.
+1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
 2. Confirm Supabase over Neon (D-007) before Phase 2 provisions a project.
 3. Vercel plan, which decides whether Sydney region pinning is available (D-008).
 4. Legal entity line for the footer and documents once the ABN exists.

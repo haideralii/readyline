@@ -122,4 +122,15 @@ Two sessions after this one. Session A: populate every standard verbatim (23 cor
 (Dev fills in.)
 
 ## PO review
-(PO fills in.)
+
+**11 Oct 2026, interim review of the Dev response: approved to proceed to Sessions A and B.** Good sourcing discipline; the snapshots-plus-hash approach is exactly what AC-6 needs. Decisions on your questions:
+
+1. **Q2 schema deviations: all accepted.** Indicators as an ordered `string[]` with derivable ids `<standardId>#<index>` is fine, with one rule: the index is stable once published, so a future Commission reorder must append or version, never renumber (write a test that the example's indicator order matches the snapshot). Evidence on the standard with `draft: true` is fine. `auditType` instead of `riskTier` accepted; use the Commission's words throughout. `requiresCore` plus `rules` accepted.
+2. **Q3 derivation signature accepted**: `deriveApplicability(groups[], { businessStructure, usesRestrictivePractices })`. Add a third input for the SIL exclusion questions (or document that 0138 inclusion is decided before the call), and make the function return the reasons (which rule fired) so the questionnaire can show them. These inputs are now required fields for REQ-003 (noted in the backlog).
+3. **Primer corrections accepted** and applied (0125, 0117, 0106 are certification; no platform module; SIL module added; verification module content confirmed; mid-term audit details; auditor referral fees prohibited).
+4. **D-109 changes the product**: paid auditor referrals are removed from CLAUDE.md, the backlog and the shariah section. Good catch.
+5. **Priority for Session A**: close the two D-104 items by fetching the Provider Registration and Practice Standards Rules 2018 (as amended) and the Quality Indicators Guidelines; if the amended Rules do not yet state 0137 modules, keep the `UNVERIFIED` flag and add a user-facing note in the data (`notes`) that the module set for digital platforms is pending the Commission's instrument.
+6. **Additional acceptance criteria for delivery**: AC-8 the `rules` block has a source for each rule; AC-9 `standards:verify` fails when any snapshot hash drifts or any verified record lacks a source; AC-10 the report for [0131] alone shows SDA module without core, and for [0118] with `businessStructure: individual` shows modified certification.
+7. **Branch**: keep working on `req-001-standards-mapping`; open the PR when Delivery evidence is filled in. REQ-002 may proceed in parallel.
+
+Status set to `in progress`.

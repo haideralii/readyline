@@ -2,7 +2,7 @@
 
 You are the lead engineer and product partner on this project. Read this whole brief before writing any code. It is the repo's standing context. `DECISIONS.md` records every assumption made during the build.
 
-**Brief version 2 (11 Oct 2026):** added section 3a (market, competitors, AI landscape), made the subscription the primary product, added the AI governance documents and de-identification guardrails, and expanded the privacy positioning and reference links. Changes since v1 are the paragraphs marked *(v2)*.
+**Brief version 2.2 (11 Oct 2026):** brand set to Readyline; paid auditor referrals removed (D-109). **Version 2 (11 Oct 2026):** added section 3a (market, competitors, AI landscape), made the subscription the primary product, added the AI governance documents and de-identification guardrails, and expanded the privacy positioning and reference links. Changes since v1 are the paragraphs marked *(v2)*.
 
 ## 1. Who you are working with
 
@@ -50,7 +50,7 @@ Pricing (initial, adjust after launch):
 
 *(v2)* **The subscription is the primary product, not an add-on.** A one-off document generator is easy to copy and its margin will compress toward zero as general-purpose AI improves and as the Commission publishes more free material. The durable value is the ongoing system of record (registers, expiries, review cycles, mid-term audit prep) and the curated, versioned standards mapping that is kept current. Design every flow so the document pack leads naturally into the subscription, and measure subscription conversion from day one. If customers buy the pack but do not subscribe, that is the signal to go deeper into workflow, not to add more document types.
 
-Distribution is SEO content answering the exact questions providers search for, plus honest participation in provider Facebook groups. Later, disclosed referral arrangements with approved auditors. The app itself must therefore ship with a content/blog system or at least a static content pipeline.
+Distribution is SEO content answering the exact questions providers search for, plus honest participation in provider Facebook groups. *(v2.2)* No paid auditor referrals, ever: the Commission's Regulatory Expectations for Approved Quality Auditors (V1, June 2026) say referral fees, commissions, success-based payments and revenue sharing linked to audit referrals are incompatible with auditor obligations (DECISIONS D-109). At most, a fee-free, clearly labelled list of approved auditors. The app itself must therefore ship with a content/blog system or at least a static content pipeline.
 
 ## 3a. Market, competitors and AI landscape *(v2, researched 11 Oct 2026)*
 
@@ -71,7 +71,7 @@ Positioning that follows from this: cheapest credible path for the smallest prov
 ### 4.1 The NDIS trade mark
 "NDIS" is a registered trade mark of the National Disability Insurance Agency (NDIA). The NDIA's guidelines say it must not appear in a business name, trading name, domain name or product/service name, and the logo must never be used by third parties. Descriptive use is allowed ("documents aligned to the NDIS Practice Standards").
 
-- The product/brand name is a placeholder: `{{BRAND}}`. Do not propose names containing "NDIS". Haider will pick the name after checking ASIC's business name register and IP Australia's trade mark search.
+- *(v2.2)* **The brand is Readyline.** Chosen 11 Oct 2026 after checks: readyline.com.au and readyline.au unregistered (auDA WHOIS); ASIC business name "Readyline" shown as available (two unrelated Victorian companies carry the word: Readyline Developments Pty Ltd, and a former name); IP Australia shows one live READYLINE mark in classes 7 and 12 (mining machinery, Joy Global), none in 9, 35 or 42; readyline.com is held by a third party since 1999. Haider registers the ABN, business name and domains; until `NEXT_PUBLIC_BRAND_NAME=Readyline` is set the code falls back to `{{BRAND}}`. Never use "NDIS" in the name, domain or product names. Company name later: "Readyline Technologies Pty Ltd" or similar, not "Readyline Pty Ltd".
 - Never use the NDIS logo, the "I heart NDIS" marks, the words "NDIS approved", "official", "registered provider", or anything implying a relationship with the NDIA or the NDIS Quality and Safeguards Commission.
 
 ### 4.2 Not legal advice
@@ -81,7 +81,7 @@ We provide compliance information and document-generation tools, not legal advic
 Never generate or display claims like "guaranteed registration", "audit-proof", "approved by auditors", "100% pass rate". Use wording like "aligned to the NDIS Practice Standards, prepared for your review". Refund terms are clear and visible before purchase. Disclose that AI drafts the first version of documents and that the provider is responsible for reviewing and adopting them.
 
 ### 4.4 Auditor independence
-We are not and will never be an Approved Quality Auditor. The Commission expects auditors to be prohibited from consulting to providers they audit. If a referral arrangement with an auditor exists later, it is disclosed to the user in full, and we never act as an intermediary in the audit itself.
+We are not and will never be an Approved Quality Auditor. The Commission expects auditors to be prohibited from consulting to providers they audit. *(v2.2)* We never take or pay any fee, commission or revenue share connected to an audit referral or outcome (prohibited on the auditor side by the Commission's June 2026 expectations, D-109). Any list of auditors we show is fee-free and says so. We never act as an intermediary in the audit itself.
 
 ### 4.5 Privacy
 Collect only the provider's business information. **Never collect NDIS participants' personal, health or disability information**: this is sensitive information under the Privacy Act and removes the small-business exemption. Registers (incidents, complaints) must be designed so that participant identifiers are optional free-text the provider controls, with a clear warning not to enter health details; prefer reference codes. Store data in an Australian region. Provide data export and account deletion.
@@ -97,7 +97,7 @@ Customers can be anyone; the constraint is on how money is earned. Build these i
 
 - Fixed, clearly disclosed prices; defined scope; no hidden fees (no gharar).
 - No interest in any form: no late-fee interest, no interest-based payment plans, no BNPL integrations. Stripe's per-transaction processing fee is a service charge and is acceptable.
-- No undisclosed commissions or kickbacks; any referral fee is shown to the user.
+- No commissions or kickbacks of any kind connected to audits; no undisclosed commissions anywhere else.
 - No deceptive marketing, no fake reviews or testimonials, no dark patterns (no pre-ticked upsells, easy cancellation).
 - Transparent about AI use.
 - Nothing in the product facilitates haram activity (not an issue in this domain, but keep ad networks and affiliate programs out).
@@ -152,7 +152,7 @@ Data model (first pass):
 - Keep the UI plain, fast and accessible (WCAG 2.1 AA); many users are on phones.
 - Write tests for anything deterministic before the implementation. Keep the generator outputs diffable so changes to prompts can be reviewed like code.
 - Do not add features outside this brief without asking.
-- Use `{{BRAND}}` everywhere the product name would appear until Haider supplies the final name.
+- Import the brand constant from `src/lib/brand.ts` everywhere the product name appears; the value is Readyline via `NEXT_PUBLIC_BRAND_NAME`, never hard-coded.
 
 ## 9. Reference links (for fetching source material)
 
