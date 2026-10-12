@@ -436,3 +436,21 @@ Waiting for the PO.
 **Addendum to batch 18 (PO, 12 Oct 2026), insert as item 1a before the REQ-007 work:** REQ-004 follow-up FR-9 (any-device magic link; see the REQ-004 file) on `req-004-magic-link-any-device` from `main`, one session: token-hash callback with the legacy code path kept 24 hours, the two screen changes, the cross-context e2e, the template file for Haider, D-5xx entry. Push; the PO opens the PR. The REQ-007 items follow on their own branch as written.
 
 **Addendum 2 to batch 18 (PO, 12 Oct 2026), item 1b after 1a:** REQ-004 FR-10, account read-back fails on the hosted project after a successful `create_account` ("We could not load your new account"): `getOwnedAccount` swallows the PostgREST error. Log the error code and message (no email) in `getOwnedAccount`, reproduce against the hosted schema (the account and owner membership exist; the `memberships` → `accounts!inner` embed is the suspect), fix, and add an integration test that creates an account through the RPC as an authenticated user and reads it back through the same query. Same branch as 1a. The hosted project now has one platform admin (set by the PO in the SQL editor) and one test account owned by a second user.
+
+## Queue (written by PO, 12 Oct 2026, batch 19)
+
+**PO actions this batch:** PRs #14 (REQ-004 FR-9/10) and #15 (REQ-007 A/B) opened and accepted on content. PR #14 CI is red; PR #15 shows merge conflicts and CI did not run. Supabase custom SMTP (Resend) and the any-device magic-link template are live on the hosted project. Stripe: a test-mode account "Readyline" exists with product "Readyline document pack", price AUD 399 one-off (`price_1UPhHyREtDbh9NYJbeT5b4wM`); `.env.local` has `STRIPE_SECRET_KEY` (test), `STRIPE_PRICE_PACK`, `PACK_PRICE_AUD_CENTS=39900`, `GST_LINE`, `SUBSCRIPTION_PRICE_AUD_CENTS=3900`; `STRIPE_WEBHOOK_SECRET` is empty (see item 3). This PO commit is on `req-007-payments`; cherry-pick to `main`.
+
+0. **Push `main`** with the PO's batch-19 commit.
+
+1. **PR #14 red, fix on `req-004-magic-link-any-device`:** (a) gitleaks flags four fixture values in `src/server/auth/callback.test.ts` (generic-api-key, lines 12, 20, 44, 59): build them at runtime as the REQ-002 rule requires, never literal; (b) e2e `magic-link-any-device.spec.ts` "a bad or reused link": in CI the callback with a bad token hash never redirects to `/sign-in?error=link` (page stays on `/auth/callback?token_hash=000…`); make the callback redirect on any verify failure including a missing Supabase environment, and make the test independent of a live Supabase; (c) the Supabase job: the log shows Docker `toomanyrequests` pulls; re-run after (a) and (b) and confirm the RLS step itself passes, otherwise fix what it reports. Push; the PO merges when green.
+
+2. **PR #15 conflicts, on `req-007-payments`:** merge `main` keeping both sides of prose files (the PO's addenda commits exist on both sides); `npm run check`; push so CI runs. The PO merges after #14.
+
+3. **REQ-007 Session C without the webhook secret** (same branch, after item 2): `/documents` purchase states (Buy, Preparing, ready), generation on entitlement through the queued job and cron route, download page with receipt link and refund mailto, Stripe hosts in the CSP on purchase routes only, the fake-Stripe e2e on both viewports, screenshots. The real Stripe hop (Checkout page, webhook delivery) is deferred to the first Vercel deploy, when a dashboard webhook endpoint gives a permanent signing secret; note that in Delivery evidence instead of running `stripe listen`.
+
+4. **REQ-006 Dev response only**: read `product/requirements/REQ-006-readiness-checklist.md`, answer the design questions, propose sessions. No build.
+
+5. **Status.**
+
+6. STOP.
