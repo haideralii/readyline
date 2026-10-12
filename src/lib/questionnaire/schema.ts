@@ -71,32 +71,36 @@ export const ABN_MESSAGE =
 export const AbnField = z.preprocess(
   (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
   z
-    .string()
+    .string({ error: ABN_MESSAGE })
     .transform((v) => normaliseAbn(v))
     .refine((v) => isValidAbn(v), { message: ABN_MESSAGE })
     .optional(),
 );
 
 export const BusinessStep = strictObject({
-  tradingName: text(120, 1),
-  structure: BusinessStructureAnswer,
+  tradingName: text(120, 1, "Enter your trading name"),
+  structure: z.enum(BusinessStructureAnswer.options, {
+    error: "Choose your business structure",
+  }),
   states: z
-    .array(State)
+    .array(z.enum(State.options, { error: "Choose states from the list" }), {
+      error: "Choose at least one state or territory",
+    })
     .min(1, "Choose at least one state or territory")
     .max(8),
   abn: AbnField,
 });
 
 export const SilEligibilityAnswer = strictObject({
-  fewHoursOnly: z.boolean(),
-  participantManagesOwnWorkers: z.boolean(),
+  fewHoursOnly: z.boolean({ error: "Choose yes or no" }),
+  participantManagesOwnWorkers: z.boolean({ error: "Choose yes or no" }),
 });
 
 export const SIL_CODE = "0138";
 
 export const SupportsStep = strictObject({
   groups: z
-    .array(GroupCode)
+    .array(GroupCode, { error: "Choose at least one registration group" })
     .min(1, "Choose at least one registration group")
     .max(38),
   silEligibility: SilEligibilityAnswer.optional(),
@@ -118,23 +122,73 @@ export const SupportsStep = strictObject({
   }
 });
 
+/**
+ * REQ-013 FR-4: when a provider is not sure, three plain yes/no questions
+ * resolve the answer. Present only with "not-sure"; any "yes" resolves to
+ * yes (and the result says so), all "no" resolves to no.
+ */
+export const NotSureHelper = strictObject({
+  locksOrBarriers: z.boolean({ error: "Choose yes or no" }),
+  holdsOrRestraint: z.boolean({ error: "Choose yes or no" }),
+  medicationForBehaviour: z.boolean({ error: "Choose yes or no" }),
+});
+export type NotSureHelper = z.infer<typeof NotSureHelper>;
+
+export function resolveRestrictivePractices(
+  answer: YesNoUnsure,
+  helper?: NotSureHelper,
+): { uses: boolean; assumed: boolean } {
+  if (answer === "yes") return { uses: true, assumed: false };
+  if (answer === "no") return { uses: false, assumed: false };
+  if (!helper) return { uses: true, assumed: true };
+  const uses =
+    helper.locksOrBarriers ||
+    helper.holdsOrRestraint ||
+    helper.medicationForBehaviour;
+  return { uses, assumed: uses };
+}
+
 export const PracticesStep = strictObject({
-  restrictivePractices: YesNoUnsure,
+  restrictivePractices: z.enum(YesNoUnsure.options, {
+    error: "Choose yes, no or not sure",
+  }),
+  notSureHelper: NotSureHelper.optional(),
+}).superRefine((v, ctx) => {
+  if (v.notSureHelper && v.restrictivePractices !== "not-sure") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["notSureHelper"],
+      message: "The three helper questions apply only when you are not sure",
+    });
+  }
 });
 
 export const WorkforceStep = strictObject({
-  workerCount: z.number().int().min(1, "Count yourself as a worker").max(500),
-  keyPersonnelCount: z.number().int().min(1).max(50),
-  hasRiskAssessedRoles: z.boolean(),
-  allRiskAssessedScreened: ScreeningAnswer,
+  workerCount: z
+    .number({ error: "Enter the number of workers, counting yourself" })
+    .int("Enter a whole number of workers")
+    .min(1, "Count yourself as a worker")
+    .max(500, "Enter 500 or fewer workers"),
+  keyPersonnelCount: z
+    .number({ error: "Enter the number of key personnel" })
+    .int("Enter a whole number of key personnel")
+    .min(1, "Enter at least 1 key person")
+    .max(50, "Enter 50 or fewer key personnel"),
+  hasRiskAssessedRoles: z.boolean({ error: "Choose yes or no" }),
+  allRiskAssessedScreened: z.enum(ScreeningAnswer.options, {
+    error: "Choose an answer about worker screening",
+  }),
 });
 
+const HaveAnswer = z.enum(YesNoUnsure.options, {
+  error: "Choose yes, no or not sure",
+});
 export const ExistingStep = strictObject({
-  policies: YesNoUnsure,
-  incidentRegister: YesNoUnsure,
-  complaintsRegister: YesNoUnsure,
-  insuranceCertificate: YesNoUnsure,
-  workerInductionRecords: YesNoUnsure,
+  policies: HaveAnswer,
+  incidentRegister: HaveAnswer,
+  complaintsRegister: HaveAnswer,
+  insuranceCertificate: HaveAnswer,
+  workerInductionRecords: HaveAnswer,
 });
 
 export const STEP_SCHEMAS = {

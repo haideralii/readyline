@@ -1,0 +1,582 @@
+{
+  "project": "desktop-chromium",
+  "controls": 72,
+  "records": [
+    {
+      "step": "supports",
+      "id": "group-0107",
+      "type": "checkbox",
+      "value": "0107",
+      "name": "Assistance with daily personal activities",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0104",
+      "type": "checkbox",
+      "value": "0104",
+      "name": "High Intensity Daily Personal Activities",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0114",
+      "type": "checkbox",
+      "value": "0114",
+      "name": "Community nursing care",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0120",
+      "type": "checkbox",
+      "value": "0120",
+      "name": "Household tasks",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0108",
+      "type": "checkbox",
+      "value": "0108",
+      "name": "Assistance with travel/transport arrangements",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0117",
+      "type": "checkbox",
+      "value": "0117",
+      "name": "Development of daily living and life skills",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0125",
+      "type": "checkbox",
+      "value": "0125",
+      "name": "Participation in community, social and civic activities",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0136",
+      "type": "checkbox",
+      "value": "0136",
+      "name": "Group and centrebased activities",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0116",
+      "type": "checkbox",
+      "value": "0116",
+      "name": "Innovative community participation",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0128",
+      "type": "checkbox",
+      "value": "0128",
+      "name": "Therapeutic supports",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0126",
+      "type": "checkbox",
+      "value": "0126",
+      "name": "Exercise physiology and personal training",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0119",
+      "type": "checkbox",
+      "value": "0119",
+      "name": "Specialised hearing services",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0134",
+      "type": "checkbox",
+      "value": "0134",
+      "name": "Hearing services",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0121",
+      "type": "checkbox",
+      "value": "0121",
+      "name": "Interpreting and translation",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0103",
+      "type": "checkbox",
+      "value": "0103",
+      "name": "Assistive products for personal care and safety",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0105",
+      "type": "checkbox",
+      "value": "0105",
+      "name": "Personal mobility equipment",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0109",
+      "type": "checkbox",
+      "value": "0109",
+      "name": "Vehicle modifications",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0111",
+      "type": "checkbox",
+      "value": "0111",
+      "name": "Home modifications",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0112",
+      "type": "checkbox",
+      "value": "0112",
+      "name": "Assistive equipment for recreation",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0113",
+      "type": "checkbox",
+      "value": "0113",
+      "name": "Vision equipment",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0122",
+      "type": "checkbox",
+      "value": "0122",
+      "name": "Hearing equipment",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0123",
+      "type": "checkbox",
+      "value": "0123",
+      "name": "Assistive products for household tasks",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0124",
+      "type": "checkbox",
+      "value": "0124",
+      "name": "Communication and information equipment",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0135",
+      "type": "checkbox",
+      "value": "0135",
+      "name": "Customised prosthetics",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0130",
+      "type": "checkbox",
+      "value": "0130",
+      "name": "Assistance animals",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0101",
+      "type": "checkbox",
+      "value": "0101",
+      "name": "Accommodation/tenancy assistance",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0115",
+      "type": "checkbox",
+      "value": "0115",
+      "name": "Assistance with daily life tasks in a group or shared living arrangement",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0138",
+      "type": "checkbox",
+      "value": "0138",
+      "name": "Assistance with supported independent living",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0131",
+      "type": "checkbox",
+      "value": "0131",
+      "name": "Specialist disability accommodation",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0118",
+      "type": "checkbox",
+      "value": "0118",
+      "name": "Early intervention supports for early childhood",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0110",
+      "type": "checkbox",
+      "value": "0110",
+      "name": "Specialist positive behaviour support",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0132",
+      "type": "checkbox",
+      "value": "0132",
+      "name": "Specialised support coordination",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0106",
+      "type": "checkbox",
+      "value": "0106",
+      "name": "Assistance in coordinating or managing life stages, transitions and supports",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0129",
+      "type": "checkbox",
+      "value": "0129",
+      "name": "Specialised driver training",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0127",
+      "type": "checkbox",
+      "value": "0127",
+      "name": "Management of funding for supports in participant plans",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0102",
+      "type": "checkbox",
+      "value": "0102",
+      "name": "Assistance to access and maintain employment or higher education",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0133",
+      "type": "checkbox",
+      "value": "0133",
+      "name": "Specialised supported employment",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "group-0137",
+      "type": "checkbox",
+      "value": "0137",
+      "name": "Providing an NDIS digital platform service",
+      "legend": "What do you do for participants?"
+    },
+    {
+      "step": "supports",
+      "id": "silEligibility.fewHoursOnly-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Does the person only receive a few hours of support a day or week?"
+    },
+    {
+      "step": "supports",
+      "id": "silEligibility.fewHoursOnly-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Does the person only receive a few hours of support a day or week?"
+    },
+    {
+      "step": "supports",
+      "id": "silEligibility.participantManagesOwnWorkers-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Does the person choose and manage their own support workers (including directing, planning and rostering them)?"
+    },
+    {
+      "step": "supports",
+      "id": "silEligibility.participantManagesOwnWorkers-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Does the person choose and manage their own support workers (including directing, planning and rostering them)?"
+    },
+    {
+      "step": "practices",
+      "id": "restrictivePractices-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you use, or plan to use, any of these with a participant?"
+    },
+    {
+      "step": "practices",
+      "id": "restrictivePractices-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you use, or plan to use, any of these with a participant?"
+    },
+    {
+      "step": "practices",
+      "id": "restrictivePractices-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you use, or plan to use, any of these with a participant?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.locksOrBarriers-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you ever lock a cupboard, fridge, door or gate so a person cannot get to something or somewhere, or keep a person alone in a room they cannot leave?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.locksOrBarriers-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you ever lock a cupboard, fridge, door or gate so a person cannot get to something or somewhere, or keep a person alone in a room they cannot leave?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.holdsOrRestraint-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you ever hold a person, or use a belt, strap or similar, to stop them moving?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.holdsOrRestraint-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you ever hold a person, or use a belt, strap or similar, to stop them moving?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.medicationForBehaviour-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Does a person you support take medicine mainly to control their behaviour, rather than for a health condition?"
+    },
+    {
+      "step": "practices",
+      "id": "notSureHelper.medicationForBehaviour-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Does a person you support take medicine mainly to control their behaviour, rather than for a health condition?"
+    },
+    {
+      "step": "workforce",
+      "id": "hasRiskAssessedRoles-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Does anyone work in a risk-assessed role?"
+    },
+    {
+      "step": "workforce",
+      "id": "hasRiskAssessedRoles-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Does anyone work in a risk-assessed role?"
+    },
+    {
+      "step": "workforce",
+      "id": "allRiskAssessedScreened-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes, all of them",
+      "legend": "Do all workers in risk-assessed roles hold a current NDIS Worker Screening clearance?"
+    },
+    {
+      "step": "workforce",
+      "id": "allRiskAssessedScreened-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No, not yet",
+      "legend": "Do all workers in risk-assessed roles hold a current NDIS Worker Screening clearance?"
+    },
+    {
+      "step": "workforce",
+      "id": "allRiskAssessedScreened-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do all workers in risk-assessed roles hold a current NDIS Worker Screening clearance?"
+    },
+    {
+      "step": "workforce",
+      "id": "allRiskAssessedScreened-not-applicable",
+      "type": "radio",
+      "value": "not-applicable",
+      "name": "Not applicable (no risk-assessed roles)",
+      "legend": "Do all workers in risk-assessed roles hold a current NDIS Worker Screening clearance?"
+    },
+    {
+      "step": "existing",
+      "id": "policies-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you have: written policies and procedures?"
+    },
+    {
+      "step": "existing",
+      "id": "policies-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you have: written policies and procedures?"
+    },
+    {
+      "step": "existing",
+      "id": "policies-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you have: written policies and procedures?"
+    },
+    {
+      "step": "existing",
+      "id": "incidentRegister-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you have: an incident register?"
+    },
+    {
+      "step": "existing",
+      "id": "incidentRegister-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you have: an incident register?"
+    },
+    {
+      "step": "existing",
+      "id": "incidentRegister-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you have: an incident register?"
+    },
+    {
+      "step": "existing",
+      "id": "complaintsRegister-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you have: a complaints register?"
+    },
+    {
+      "step": "existing",
+      "id": "complaintsRegister-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you have: a complaints register?"
+    },
+    {
+      "step": "existing",
+      "id": "complaintsRegister-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you have: a complaints register?"
+    },
+    {
+      "step": "existing",
+      "id": "insuranceCertificate-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you have: current insurance certificates?"
+    },
+    {
+      "step": "existing",
+      "id": "insuranceCertificate-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you have: current insurance certificates?"
+    },
+    {
+      "step": "existing",
+      "id": "insuranceCertificate-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you have: current insurance certificates?"
+    },
+    {
+      "step": "existing",
+      "id": "workerInductionRecords-yes",
+      "type": "radio",
+      "value": "yes",
+      "name": "Yes",
+      "legend": "Do you have: worker induction and training records?"
+    },
+    {
+      "step": "existing",
+      "id": "workerInductionRecords-no",
+      "type": "radio",
+      "value": "no",
+      "name": "No",
+      "legend": "Do you have: worker induction and training records?"
+    },
+    {
+      "step": "existing",
+      "id": "workerInductionRecords-not-sure",
+      "type": "radio",
+      "value": "not-sure",
+      "name": "Not sure",
+      "legend": "Do you have: worker induction and training records?"
+    }
+  ]
+}

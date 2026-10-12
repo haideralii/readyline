@@ -9,192 +9,388 @@
     {
       "code": "0101",
       "name": "Accommodation/tenancy assistance",
-      "description": "Helping a participant find, apply for and keep suitable housing, including support with tenancy obligations."
+      "description": "Helping a participant find, apply for and keep suitable housing, including support with tenancy obligations.",
+      "synonyms": ["housing", "tenancy", "rent", "finding a home"]
     },
     {
       "code": "0102",
       "name": "Assistance to access and maintain employment or higher education",
-      "description": "Supporting a participant to find, start or stay in work or higher education, including help in the workplace or place of study."
+      "description": "Supporting a participant to find, start or stay in work or higher education, including help in the workplace or place of study.",
+      "synonyms": [
+        "work",
+        "job",
+        "employment support",
+        "study",
+        "university",
+        "TAFE"
+      ]
     },
     {
       "code": "0103",
       "name": "Assistive products for personal care and safety",
-      "description": "Supplying equipment that helps with personal care and safety at home, such as shower chairs, hoists or alarms."
+      "description": "Supplying equipment that helps with personal care and safety at home, such as shower chairs, hoists or alarms.",
+      "synonyms": [
+        "shower chair",
+        "hoist",
+        "alarm",
+        "continence products",
+        "equipment"
+      ]
     },
     {
       "code": "0104",
       "name": "High Intensity Daily Personal Activities",
-      "description": "Daily personal care that needs specific skills, such as complex bowel care, tube feeding, tracheostomy, ventilator, catheter or complex wound care."
+      "description": "Daily personal care that needs specific skills, such as complex bowel care, tube feeding, tracheostomy, ventilator, catheter or complex wound care.",
+      "synonyms": [
+        "high intensity",
+        "complex care",
+        "PEG",
+        "tube feeding",
+        "bowel care",
+        "ventilator",
+        "catheter"
+      ]
     },
     {
       "code": "0105",
       "name": "Personal mobility equipment",
-      "description": "Supplying wheelchairs, walking frames, scooters and other equipment that helps a participant move about."
+      "description": "Supplying wheelchairs, walking frames, scooters and other equipment that helps a participant move about.",
+      "synonyms": ["wheelchair", "walker", "mobility scooter", "equipment"]
     },
     {
       "code": "0106",
       "name": "Assistance in coordinating or managing life stages, transitions and supports",
-      "description": "Helping a participant plan and manage life changes such as leaving school or moving home, and coordinating their supports (general support coordination)."
+      "description": "Helping a participant plan and manage life changes such as leaving school or moving home, and coordinating their supports (general support coordination).",
+      "synonyms": [
+        "life stages",
+        "transition",
+        "coordination",
+        "support coordination",
+        "planning"
+      ]
     },
     {
       "code": "0107",
       "name": "Assistance with daily personal activities",
-      "description": "Hands-on help with everyday personal activities such as showering, dressing, eating and getting around at home."
+      "description": "Hands-on help with everyday personal activities such as showering, dressing, eating and getting around at home.",
+      "synonyms": [
+        "support worker",
+        "personal care",
+        "showering",
+        "dressing",
+        "daily living",
+        "carer",
+        "in-home support",
+        "respite"
+      ]
     },
     {
       "code": "0108",
       "name": "Assistance with travel/transport arrangements",
-      "description": "Helping a participant get to appointments, work or community activities, including driving them or arranging transport."
+      "description": "Helping a participant get to appointments, work or community activities, including driving them or arranging transport.",
+      "synonyms": [
+        "transport",
+        "driving",
+        "taxi",
+        "getting to appointments",
+        "car"
+      ]
     },
     {
       "code": "0109",
       "name": "Vehicle modifications",
-      "description": "Modifying a vehicle so a participant can drive or travel in it, such as hand controls or hoists."
+      "description": "Modifying a vehicle so a participant can drive or travel in it, such as hand controls or hoists.",
+      "synonyms": [
+        "vehicle modifications",
+        "car modifications",
+        "hand controls"
+      ]
     },
     {
       "code": "0110",
       "name": "Specialist positive behaviour support",
-      "description": "Assessing behaviour and writing behaviour support plans as a specialist practitioner, including plans that contain regulated restrictive practices."
+      "description": "Assessing behaviour and writing behaviour support plans as a specialist practitioner, including plans that contain regulated restrictive practices.",
+      "synonyms": [
+        "behaviour support",
+        "positive behaviour",
+        "behaviour support plan",
+        "restrictive practices"
+      ]
     },
     {
       "code": "0111",
       "name": "Home modifications",
-      "description": "Building changes at home such as ramps, rails and bathroom alterations so a participant can live more independently."
+      "description": "Building changes at home such as ramps, rails and bathroom alterations so a participant can live more independently.",
+      "synonyms": [
+        "home modifications",
+        "ramps",
+        "rails",
+        "bathroom modifications",
+        "builder"
+      ]
     },
     {
       "code": "0112",
       "name": "Assistive equipment for recreation",
-      "description": "Supplying equipment for sport, leisure and recreation adapted to a participant's needs."
+      "description": "Supplying equipment for sport, leisure and recreation adapted to a participant's needs.",
+      "synonyms": ["recreation equipment", "sports equipment", "bike"]
     },
     {
       "code": "0113",
       "name": "Vision equipment",
-      "description": "Supplying magnifiers, screen readers and other equipment for participants who are blind or have low vision."
+      "description": "Supplying magnifiers, screen readers and other equipment for participants who are blind or have low vision.",
+      "synonyms": ["vision", "low vision", "blind", "magnifier"]
     },
     {
       "code": "0114",
       "name": "Community nursing care",
-      "description": "Nursing care delivered in the community by a nurse, such as wound care, continence care or medication support."
+      "description": "Nursing care delivered in the community by a nurse, such as wound care, continence care or medication support.",
+      "synonyms": [
+        "nursing",
+        "nurse",
+        "wound care",
+        "medication",
+        "community nursing"
+      ]
     },
     {
       "code": "0115",
       "name": "Assistance with daily life tasks in a group or shared living arrangement",
-      "description": "Help with daily tasks in a group home or shared living arrangement where participants live together with support."
+      "description": "Help with daily tasks in a group home or shared living arrangement where participants live together with support.",
+      "synonyms": [
+        "group home",
+        "shared living",
+        "SIL",
+        "house",
+        "roster",
+        "sleepover"
+      ]
     },
     {
       "code": "0116",
       "name": "Innovative community participation",
-      "description": "New or different ways of supporting participants to take part in their community, outside the usual support types."
+      "description": "New or different ways of supporting participants to take part in their community, outside the usual support types.",
+      "synonyms": [
+        "community participation",
+        "innovative",
+        "programs",
+        "activities"
+      ]
     },
     {
       "code": "0117",
       "name": "Development of daily living and life skills",
-      "description": "Teaching skills for everyday living such as cooking, budgeting, using public transport or managing a household."
+      "description": "Teaching skills for everyday living such as cooking, budgeting, using public transport or managing a household.",
+      "synonyms": [
+        "life skills",
+        "cooking",
+        "budgeting",
+        "daily living skills",
+        "independence skills",
+        "training"
+      ]
     },
     {
       "code": "0118",
       "name": "Early intervention supports for early childhood",
-      "description": "Early intervention for young children with developmental delay or disability, delivered together with their family."
+      "description": "Early intervention for young children with developmental delay or disability, delivered together with their family.",
+      "synonyms": [
+        "early childhood",
+        "children",
+        "kids",
+        "toddler",
+        "early intervention",
+        "families"
+      ]
     },
     {
       "code": "0119",
       "name": "Specialised hearing services",
-      "description": "Audiology and related specialised services for participants with hearing loss."
+      "description": "Audiology and related specialised services for participants with hearing loss.",
+      "synonyms": ["hearing", "audiology", "specialised hearing"]
     },
     {
       "code": "0120",
       "name": "Household tasks",
-      "description": "Help with household jobs a participant cannot do themselves, such as cleaning, laundry, gardening and meal preparation."
+      "description": "Help with household jobs a participant cannot do themselves, such as cleaning, laundry, gardening and meal preparation.",
+      "synonyms": [
+        "cleaning",
+        "household tasks",
+        "house cleaning",
+        "laundry",
+        "gardening",
+        "meal preparation",
+        "cooking",
+        "domestic assistance",
+        "support worker"
+      ]
     },
     {
       "code": "0121",
       "name": "Interpreting and translation",
-      "description": "Interpreting and translating, including Auslan, so a participant can communicate and access information."
+      "description": "Interpreting and translating, including Auslan, so a participant can communicate and access information.",
+      "synonyms": ["interpreter", "translation", "Auslan", "language"]
     },
     {
       "code": "0122",
       "name": "Hearing equipment",
-      "description": "Supplying hearing aids and related devices."
+      "description": "Supplying hearing aids and related devices.",
+      "synonyms": ["hearing aids", "hearing equipment"]
     },
     {
       "code": "0123",
       "name": "Assistive products for household tasks",
-      "description": "Supplying equipment that helps with household tasks, such as adapted kitchen or cleaning aids."
+      "description": "Supplying equipment that helps with household tasks, such as adapted kitchen or cleaning aids.",
+      "synonyms": ["household equipment", "kitchen aids", "assistive products"]
     },
     {
       "code": "0124",
       "name": "Communication and information equipment",
-      "description": "Supplying communication devices and information technology adapted for a participant, such as speech-generating devices."
+      "description": "Supplying communication devices and information technology adapted for a participant, such as speech-generating devices.",
+      "synonyms": [
+        "communication device",
+        "AAC",
+        "speech device",
+        "computer",
+        "tablet"
+      ]
     },
     {
       "code": "0125",
       "name": "Participation in community, social and civic activities",
-      "description": "Supporting a participant to join in community, social, recreational or civic activities, including one-to-one community access."
+      "description": "Supporting a participant to join in community, social, recreational or civic activities, including one-to-one community access.",
+      "synonyms": [
+        "community access",
+        "social",
+        "outings",
+        "community participation",
+        "support worker",
+        "activities"
+      ]
     },
     {
       "code": "0126",
       "name": "Exercise physiology and personal training",
-      "description": "Exercise physiology and personal training programs designed around a participant's disability-related needs."
+      "description": "Exercise physiology and personal training programs designed around a participant's disability-related needs.",
+      "synonyms": ["exercise physiology", "personal training", "gym", "fitness"]
     },
     {
       "code": "0127",
       "name": "Management of funding for supports in participant plans",
-      "description": "Managing the funds in a participant's plan on their behalf: paying providers and keeping the records (plan management)."
+      "description": "Managing the funds in a participant's plan on their behalf: paying providers and keeping the records (plan management).",
+      "synonyms": ["plan management", "plan manager", "invoices", "funding"]
     },
     {
       "code": "0128",
       "name": "Therapeutic supports",
-      "description": "Allied health therapies such as occupational therapy, physiotherapy, speech pathology, psychology and dietetics."
+      "description": "Allied health therapies such as occupational therapy, physiotherapy, speech pathology, psychology and dietetics.",
+      "synonyms": [
+        "therapy",
+        "occupational therapy",
+        "OT",
+        "physio",
+        "physiotherapy",
+        "speech pathology",
+        "psychology",
+        "allied health",
+        "counselling"
+      ]
     },
     {
       "code": "0129",
       "name": "Specialised driver training",
-      "description": "Driving lessons and assessments adapted to a participant's disability so they can learn to drive safely."
+      "description": "Driving lessons and assessments adapted to a participant's disability so they can learn to drive safely.",
+      "synonyms": ["driver training", "driving lessons", "learning to drive"]
     },
     {
       "code": "0130",
       "name": "Assistance animals",
-      "description": "Providing and training assistance animals, such as guide dogs, and supporting the participant to work with them."
+      "description": "Providing and training assistance animals, such as guide dogs, and supporting the participant to work with them.",
+      "synonyms": ["assistance animal", "assistance dog", "guide dog"]
     },
     {
       "code": "0131",
       "name": "Specialist disability accommodation",
-      "description": "Owning or managing purpose-built housing for participants with very high support needs, as the housing provider (not the daily support)."
+      "description": "Owning or managing purpose-built housing for participants with very high support needs, as the housing provider (not the daily support).",
+      "synonyms": [
+        "SDA",
+        "specialist disability accommodation",
+        "housing provider",
+        "dwelling"
+      ]
     },
     {
       "code": "0132",
       "name": "Specialised support coordination",
-      "description": "Support coordination for participants in high-risk or complex situations, delivered by specialised coordinators."
+      "description": "Support coordination for participants in high-risk or complex situations, delivered by specialised coordinators.",
+      "synonyms": [
+        "support coordination",
+        "specialised support coordination",
+        "complex needs",
+        "coordinator"
+      ]
     },
     {
       "code": "0133",
       "name": "Specialised supported employment",
-      "description": "Employment in a supported setting with ongoing on-the-job support, such as a supported employment enterprise."
+      "description": "Employment in a supported setting with ongoing on-the-job support, such as a supported employment enterprise.",
+      "synonyms": [
+        "supported employment",
+        "ADE",
+        "disability enterprise",
+        "work"
+      ]
     },
     {
       "code": "0134",
       "name": "Hearing services",
-      "description": "General hearing services, such as hearing assessments and fitting of devices."
+      "description": "General hearing services, such as hearing assessments and fitting of devices.",
+      "synonyms": ["hearing services", "hearing"]
     },
     {
       "code": "0135",
       "name": "Customised prosthetics",
-      "description": "Making and fitting custom prosthetics and orthotics for a participant."
+      "description": "Making and fitting custom prosthetics and orthotics for a participant.",
+      "synonyms": ["prosthetics", "prosthesis", "orthotics", "limb"]
     },
     {
       "code": "0136",
       "name": "Group and centrebased activities",
-      "description": "Group programs and centre-based activities where participants take part together, such as day programs."
+      "description": "Group programs and centre-based activities where participants take part together, such as day programs.",
+      "synonyms": [
+        "group activities",
+        "centre based",
+        "day program",
+        "day centre",
+        "respite"
+      ]
     },
     {
       "code": "0137",
       "name": "Providing an NDIS digital platform service",
-      "description": "Running an online platform whose main purpose is connecting participants with the people who provide their supports, with payments processed through it."
+      "description": "Running an online platform whose main purpose is connecting participants with the people who provide their supports, with payments processed through it.",
+      "synonyms": [
+        "platform",
+        "app",
+        "marketplace",
+        "digital platform",
+        "connecting workers"
+      ]
     },
     {
       "code": "0138",
       "name": "Assistance with supported independent living",
-      "description": "Managing and delivering a package of home and living support for a participant who needs support for most or all of the day (supported independent living)."
+      "description": "Managing and delivering a package of home and living support for a participant who needs support for most or all of the day (supported independent living).",
+      "synonyms": [
+        "SIL",
+        "supported independent living",
+        "group home",
+        "24 hour support",
+        "shared home",
+        "roster of care"
+      ]
     }
-  ]
+  ],
+  "synonymsNote": "synonyms are search words Readyline added on 12 Oct 2026 (REQ-013 FR-3) so a provider can find a class by everyday language; they are Readyline text, status draft until the product owner reviews them, and never change which class applies.",
+  "synonymsStatus": "draft"
 }
