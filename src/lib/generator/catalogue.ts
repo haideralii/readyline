@@ -36,6 +36,8 @@ export const DocumentTypeSpec = z.object({
   evidenceAliases: z.array(slug),
   registers: z.array(slug),
   reviewCycleMonths: z.number().int().positive().optional(),
+  /** Register review cycle for this document (R-8); defaults to the catalogue default. */
+  registerReviewMonths: z.number().int().positive().optional(),
   extraSections: z.array(SectionSpec),
   /** Outline sections this document does not use (for example a split steps section, D-041). */
   omitSections: z.array(slug).optional(),
@@ -48,7 +50,10 @@ const Catalogue = z.object({
   author: z.literal("readyline"),
   status: z.string(),
   defaults: z
-    .object({ reviewCycleMonths: z.number().int().positive() })
+    .object({
+      reviewCycleMonths: z.number().int().positive(),
+      registerReviewMonths: z.number().int().positive(),
+    })
     .passthrough(),
   outlines: z.record(z.string(), z.array(SectionSpec).min(1)),
   items: z.array(DocumentTypeSpec).min(1),
@@ -102,4 +107,19 @@ export function sectionsFor(type: DocumentTypeSpec): SectionSpec[] {
 
 export function reviewCycleMonths(type: DocumentTypeSpec): number {
   return type.reviewCycleMonths ?? catalogue.defaults.reviewCycleMonths;
+}
+
+export function registerReviewMonths(type: DocumentTypeSpec): number {
+  return type.registerReviewMonths ?? catalogue.defaults.registerReviewMonths;
+}
+
+/** The review cycles the model must use (D-042). */
+export function reviewCyclesFor(type: DocumentTypeSpec): {
+  policyMonths: number;
+  registerMonths: number;
+} {
+  return {
+    policyMonths: reviewCycleMonths(type),
+    registerMonths: registerReviewMonths(type),
+  };
 }

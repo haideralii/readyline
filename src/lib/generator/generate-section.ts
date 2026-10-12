@@ -8,7 +8,13 @@
  * truncation, falls back to the fixed placeholder with a visible "Review and
  * complete" marker. Nothing here touches the network directly.
  */
-import { lintErrors, lintText, lintTimeframes, type LintFinding } from "./lint";
+import {
+  lintErrors,
+  lintReviewCycles,
+  lintText,
+  lintTimeframes,
+  type LintFinding,
+} from "./lint";
 import type { ContextPack } from "./context-pack";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
@@ -124,6 +130,19 @@ export function validateReply(
       ok: false,
       problems: [
         `restates a statutory timeframe ("${timeframes[0].match}"): refer to ${target} instead of restating the timeframe`,
+      ],
+    };
+  }
+  // R-8: review cycles are facts from the pack, never the model's choice.
+  const cycles = lintReviewCycles(
+    blocksToText(result.data.blocks),
+    pack.reviewCycles,
+  );
+  if (cycles.length) {
+    return {
+      ok: false,
+      problems: [
+        `states a review cycle ("${cycles[0].match}"): ${cycles[0].why}`,
       ],
     };
   }

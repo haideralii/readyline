@@ -995,8 +995,29 @@ fixtures keep their keys. The rule moves into the system prompt at the next
 `PROMPT_VERSION` bump, when every fixture is re-recorded anyway. Catalogue
 gains `omitSections` and `insertAfter` so one document can replace a
 shared outline section with anchored sub-sections (the behaviour-support
-steps). Batch-12 recordings: 8 calls, about `.13`; every section passed,
+steps). Batch-12 recordings: 8 calls, about $0.13; every section passed,
 the `purpose` section after its one readability retry.
+
+**D-527 Review cycles are facts in the pack, stated through the briefs, and
+linted by subject (Dev, 2026-10-12, R-8, D-042).** The catalogue defaults
+carry `reviewCycleMonths` (12) and `registerReviewMonths` (3), overridable
+per document type; the context pack has a required `reviewCycles` object
+and the briefs of the sections that state cycles (`how-we-do-this`,
+`responsibilities`) end with a marker the pack fills in ("policy review
+every 12 months; register review every 3 months. Use them and never choose
+a cycle"), following the D-526 pattern so the system prompt and the other
+fixtures keep their keys. The lint reads every "every N months/weeks/years"
+(digits or words, "every month" as one) and decides by subject: a sentence
+naming the register must use the register cycle, one naming the policy,
+procedure, plan, framework or document must use the policy cycle, one
+naming both must fit both, and a sentence naming neither may use either
+pack value. In a table, cells are joined by " | " in the flattened text and a
+cycle cell with no subject of its own ("At least every 12 months") takes
+the row's subject. A hit is a validation problem with the retry instruction
+"use the review cycles given ...; never choose your own"; one retry, then
+fallback. Reporting cadences ("steps 1 and 2 apply every month") are
+flagged too, by the PO's wording; the lint is deliberately strict and the
+reviewer sees the fallback callout rather than a silent cycle.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

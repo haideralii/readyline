@@ -73,7 +73,7 @@ export function blocksToText(blocks: readonly Block[]): string {
         lines.push(...b.items);
         break;
       case "table":
-        lines.push(b.columns.join(" "), ...b.rows.map((r) => r.join(" ")));
+        lines.push(b.columns.join(" | "), ...b.rows.map((r) => r.join(" | ")));
         break;
     }
   }

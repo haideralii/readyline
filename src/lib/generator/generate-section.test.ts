@@ -297,6 +297,61 @@ describe("validate, retry, fall back (AC-5)", () => {
       /refer to the fixed section that holds the rule/,
     );
   });
+  it("R-8: the pack carries the review cycles, the brief states them, and a wrong cycle retries with the instruction", async () => {
+    const incident = documentTypeById(
+      "incident-management-policy-and-register",
+    )!;
+    const howWe = sectionsFor(incident).find((s) => s.id === "how-we-do-this")!;
+    const incidentPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section: howWe,
+    });
+    expect(incidentPack.reviewCycles).toEqual({
+      policyMonths: 12,
+      registerMonths: 3,
+    });
+    expect(incidentPack.section.brief).toContain(
+      "policy review every 12 months; register review every 3 months",
+    );
+    expect(buildModelRequest(incidentPack, "m").user).toContain(
+      "register review every 3 months",
+    );
+    const wrong = JSON.stringify({
+      sectionId: "how-we-do-this",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "steps",
+          items: ["We review the incident register every 12 months."],
+        },
+      ],
+    });
+    const right = JSON.stringify({
+      sectionId: "how-we-do-this",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "steps",
+          items: ["We review the incident register every 3 months."],
+        },
+      ],
+    });
+    const client = new FakeClient([wrong, right]);
+    const out = await generateSection({
+      pack: incidentPack,
+      client,
+      model: "m",
+      allowedPhrases: classNames,
+    });
+    expect(out.status).toBe("generated");
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toMatch(
+      /^states a review cycle \("every 12 months"\): use the review cycles given: policy review every 12 months, register review every 3 months/,
+    );
+  });
   it("validateReply rejects schema violations with readable paths", () => {
     const v = validateReply(
       JSON.stringify({

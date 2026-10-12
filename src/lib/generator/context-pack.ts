@@ -14,6 +14,7 @@ import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
 import { buildProviderFacts, FACT_KEYS, type ProviderFacts } from "./facts";
 import { HOUSE_STYLE_VERSION } from "./house-style";
 import { rulesSectionFor, standardsForType } from "./document-model";
+import { reviewCyclesFor } from "./catalogue";
 
 export const PROMPT_VERSION = "2026-10-12.1";
 
@@ -69,7 +70,23 @@ export const ContextPack = strictObject({
     number: z.string(),
     heading: z.string().min(1),
   }).optional(),
+  /** Review cycles are provider facts the model must use, never choose (R-8, D-042). */
+  reviewCycles: strictObject({
+    policyMonths: z.number().int().positive(),
+    registerMonths: z.number().int().positive(),
+  }),
 });
+
+/** Fills the [review cycles] marker a brief may carry with the document's fixed cycles. */
+export function briefWithCycles(
+  brief: string,
+  cycles: { policyMonths: number; registerMonths: number },
+): string {
+  return brief.replace(
+    "[review cycles]",
+    `policy review every ${cycles.policyMonths} months; register review every ${cycles.registerMonths} months`,
+  );
+}
 export type ContextPack = z.infer<typeof ContextPack>;
 
 /** The fact keys, exported so tests can prove the pack's vocabulary matches. */
@@ -95,7 +112,11 @@ export function buildContextPackFromFacts(input: {
       kind: type.kind,
       purpose: type.purpose,
     },
-    section: { id: section.id, heading: section.heading, brief: section.brief },
+    section: {
+      id: section.id,
+      heading: section.heading,
+      brief: briefWithCycles(section.brief, reviewCyclesFor(type)),
+    },
     standards: standardsForType(type, dataset, result).map((s) => ({
       id: s.id,
       name: s.name,
@@ -106,6 +127,7 @@ export function buildContextPackFromFacts(input: {
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
+    reviewCycles: reviewCyclesFor(type),
   });
 }
 
@@ -129,7 +151,11 @@ export function buildContextPack(input: {
       kind: type.kind,
       purpose: type.purpose,
     },
-    section: { id: section.id, heading: section.heading, brief: section.brief },
+    section: {
+      id: section.id,
+      heading: section.heading,
+      brief: briefWithCycles(section.brief, reviewCyclesFor(type)),
+    },
     standards: standardsForType(type, dataset, result).map((s) => ({
       id: s.id,
       name: s.name,
@@ -140,6 +166,7 @@ export function buildContextPack(input: {
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
+    reviewCycles: reviewCyclesFor(type),
   };
   // Parsing our own object guarantees the strict shape even if a caller passes extras later.
   return ContextPack.parse(pack);

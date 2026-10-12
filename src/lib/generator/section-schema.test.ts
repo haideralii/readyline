@@ -69,7 +69,7 @@ describe("TailoredSection schema (REQ-005 FR-2, D-501)", () => {
 
   it("flattens blocks to text and prose", () => {
     const blocks = TailoredSection.parse(valid).blocks;
-    expect(blocksToText(blocks)).toContain("Role Does what When");
+    expect(blocksToText(blocks)).toContain("Role | Does what | When");
     expect(blocksToProse(blocks)).not.toContain("Role");
     expect(blocksToProse(blocks)).toContain("Record the decision.");
   });

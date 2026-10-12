@@ -3,7 +3,10 @@
  * AC-2, AC-3, AC-5, AC-6, SR-5). No network, no database.
  */
 import { strFromU8, unzipSync } from "fflate";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Whole-set runs render dozens of documents through every gate; give them room.
+vi.setConfig({ testTimeout: 60_000 });
 import { FakeClient } from "@/lib/generator/model-client";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";

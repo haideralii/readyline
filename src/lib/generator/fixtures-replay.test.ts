@@ -20,7 +20,7 @@ import {
   type Fixture,
 } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
-import { lintTimeframes } from "./lint";
+import { lintReviewCycles, lintTimeframes } from "./lint";
 import { TailoredSection, blocksToProse, blocksToText } from "./section-schema";
 import { readability } from "./readability";
 
@@ -155,5 +155,45 @@ describe("recorded fixtures replay through the current gate", () => {
         ).toBe(true);
       }
     }
+  });
+  it("R-8: lists which recorded replies state a review cycle that is not a document fact", () => {
+    const cycles = { policyMonths: 12, registerMonths: 3 };
+    const results: Record<string, string[]> = {};
+    for (const typeId of readdirSync(DEFAULT_FIXTURES_DIR)) {
+      const typeDir = join(DEFAULT_FIXTURES_DIR, typeId);
+      if (typeId.endsWith(".json") || typeId.endsWith(".md")) continue;
+      for (const sectionId of readdirSync(typeDir)) {
+        for (const file of readdirSync(join(typeDir, sectionId))) {
+          const fx = JSON.parse(
+            readFileSync(join(typeDir, sectionId, file), "utf8"),
+          ) as Fixture;
+          let blocks: unknown;
+          try {
+            blocks = (JSON.parse(fx.reply) as { blocks: unknown }).blocks;
+          } catch {
+            continue;
+          }
+          const parsed = TailoredSection.shape.blocks.safeParse(blocks);
+          if (!parsed.success) continue;
+          const hits = lintReviewCycles(blocksToText(parsed.data), cycles).map(
+            (h) => h.match,
+          );
+          if (hits.length)
+            results[`${typeId}/${sectionId}/${file.slice(0, 8)}`] = hits;
+        }
+      }
+    }
+    // Expected after batch 12 (PO review): sections 5 and 6 of the sole-trader incident policy give the register a 12-month cycle.
+    const sections = [
+      ...new Set(
+        Object.keys(results).map((k) => k.split("/").slice(0, 2).join("/")),
+      ),
+    ].sort();
+    // The behaviour-support monitoring sub-section says monthly reporting applies "every month": a reporting cadence the lint cannot tell from a review cycle; listed for the PO (batch 13 evidence).
+    expect(sections).toEqual([
+      "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review",
+      "incident-management-policy-and-register/how-we-do-this",
+      "incident-management-policy-and-register/responsibilities",
+    ]);
   });
 });

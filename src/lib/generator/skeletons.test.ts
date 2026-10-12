@@ -124,7 +124,7 @@ describe.each(cases.map((c) => [c.id] as const))(
             2,
           ),
         );
-    });
+    }, 60_000);
   },
 );
 

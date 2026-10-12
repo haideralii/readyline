@@ -1,5 +1,5 @@
 {
-  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps.",
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps. Batch 13 (D-042, R-8): review cycles (policy 12 months, register 3 months by default) are provider facts; briefs of the sections that state cycles carry the marker [review cycles] that the context pack fills in.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -12,7 +12,8 @@
       "related-documents",
       "review",
       "notice"
-    ]
+    ],
+    "registerReviewMonths": 3
   },
   "sectionModes": {
     "fixed": "Rendered from template text only; the model never sees or writes it.",
@@ -54,13 +55,13 @@
         "id": "how-we-do-this",
         "heading": "How we put this into practice",
         "mode": "tailored",
-        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers). Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers). Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Table of role and responsibility; roles come from the business structure and worker count. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Table of role and responsibility; roles come from the business structure and worker count. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -116,7 +117,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role and responsibility table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Role and responsibility table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -178,7 +179,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -340,7 +341,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",

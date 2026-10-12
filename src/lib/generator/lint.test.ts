@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { lintErrors, lintText, lintTimeframes } from "./lint";
+import { lintErrors, lintReviewCycles, lintText, lintTimeframes } from "./lint";
 
 describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
   it("passes house-style prose", () => {
@@ -66,5 +66,37 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
       ),
     ).toEqual([]);
     expect(lintTimeframes("We review this every 12 months.")).toEqual([]);
+  });
+  it("R-8: review cycles must match the document's facts, by subject", () => {
+    const cycles = { policyMonths: 12, registerMonths: 3 };
+    expect(
+      lintReviewCycles(
+        "We review this policy every 12 months. We check the register every 3 months.",
+        cycles,
+      ),
+    ).toEqual([]);
+    const wrong = lintReviewCycles(
+      "We review the register every 12 months. We review this procedure every six months. We look at it every year.",
+      cycles,
+    );
+    expect(wrong.map((f) => f.match)).toEqual([
+      "every 12 months",
+      "every six months",
+    ]);
+    expect(wrong[0].why).toMatch(/register review every 3 months/);
+    expect(lintReviewCycles("We meet every week.", cycles)).toHaveLength(1);
+    // A table row is one statement: the register cell sets the subject for the cycle cell.
+    expect(
+      lintReviewCycles(
+        "Role | Does what | When\nOwner | Reviews the register for patterns. Updates this policy. | At least every 12 months\nOwner | Checks the register | every 3 months",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["every 12 months"]);
+    expect(
+      lintReviewCycles(
+        "Every year we check the register and every month we file.",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["Every year", "every month"]);
   });
 });

@@ -198,3 +198,99 @@ export function lintTimeframes(text: string): LintFinding[] {
   }
   return kept;
 }
+
+/**
+ * R-8 / D-042: review cycles are provider facts. Any "every N months/weeks/
+ * years" in tailored text must be one of the document's cycles; a sentence
+ * about a register must use the register cycle, one about the policy,
+ * procedure, plan or document must use the policy cycle.
+ */
+export type ReviewCycles = { policyMonths: number; registerMonths: number };
+
+const WORD_NUMBERS: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+  eleven: 11,
+  twelve: 12,
+};
+
+function monthsOf(count: string, unit: string): number | null {
+  const n = /^\d+$/.test(count)
+    ? Number(count)
+    : (WORD_NUMBERS[count.toLowerCase()] ?? (count === "" ? 1 : null));
+  if (n === null) return null;
+  if (/^year/.test(unit)) return n * 12;
+  if (/^month/.test(unit)) return n;
+  if (/^week/.test(unit)) return Math.round((n * 7) / 30.4);
+  return null;
+}
+
+/** The text between the nearest boundary characters around a match. */
+function unitAround(
+  text: string,
+  index: number,
+  length: number,
+  boundary: RegExp,
+): string {
+  let start = index;
+  while (start > 0 && !boundary.test(text[start - 1])) start--;
+  let end = index + length;
+  while (end < text.length && !boundary.test(text[end])) end++;
+  return text.slice(start, end);
+}
+
+export function lintReviewCycles(
+  text: string,
+  cycles: ReviewCycles,
+): LintFinding[] {
+  const findings: LintFinding[] = [];
+  const re =
+    /\bevery\s+(?:(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+)?(months?|weeks?|years?)\b/gi;
+  for (const m of text.matchAll(re)) {
+    const months = monthsOf(m[1] ?? "", m[2]);
+    if (months === null) continue;
+    const at = m.index ?? 0;
+    // The unit is the sentence. In a table row (cells joined by " | " in
+    // blocksToText) a cycle cell such as "At least every 12 months" has no
+    // subject of its own, so the whole row gives the subject.
+    const subjectOf = (s: string) => ({
+      register: /\bregister/i.test(s),
+      policy:
+        /\b(?:polic(?:y|ies)|procedure|plan|framework|this document)\b/i.test(
+          s,
+        ),
+    });
+    const line = unitAround(text, at, m[0].length, /\n/);
+    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(
+      unitAround(text, at, m[0].length, /[.\n]/),
+    );
+    if (!aboutRegister && !aboutPolicy && line.includes(" | "))
+      ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(line));
+    // Every subject the sentence names must fit the cycle; with no subject any pack value will do.
+    const ok =
+      (!aboutRegister || months === cycles.registerMonths) &&
+      (!aboutPolicy || months === cycles.policyMonths) &&
+      (aboutRegister ||
+        aboutPolicy ||
+        months === cycles.policyMonths ||
+        months === cycles.registerMonths);
+    if (!ok) {
+      findings.push({
+        rule: "review-cycle",
+        severity: "error",
+        match: m[0],
+        index: m.index ?? 0,
+        why: `use the review cycles given: policy review every ${cycles.policyMonths} months, register review every ${cycles.registerMonths} months; never choose your own`,
+      });
+    }
+  }
+  return findings;
+}
