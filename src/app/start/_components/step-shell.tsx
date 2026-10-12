@@ -41,7 +41,7 @@ export function StepShell({
       />
       {completed.length > 0 ? (
         <nav aria-label="Completed steps" className="mt-2 text-sm">
-          <span className="text-zinc-600 dark:text-zinc-400">Change: </span>
+          <span className="text-zinc-600 dark:text-zinc-400">Back to: </span>
           <ul className="inline">
             {completed.map((id, i) => (
               <li key={id} className="inline">

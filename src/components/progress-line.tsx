@@ -7,6 +7,17 @@
  * animates once on load; the stylesheet disables it under
  * prefers-reduced-motion.
  */
+/**
+ * How much of the line is filled on step `current` of `total` (REQ-014 R-2):
+ * the share of steps reached, so step 2 of 6 shows a third and the last step
+ * shows the whole line. Never below 4% so the start of the line is visible.
+ */
+export function progressPercent(current: number, total: number): number {
+  const n = Math.max(total, 1);
+  const c = Math.min(Math.max(current, 1), n);
+  return Math.max(Math.round((c / n) * 100), 4);
+}
+
 export function ProgressLine({
   current,
   total,
@@ -20,7 +31,7 @@ export function ProgressLine({
   label: string;
   id?: string;
 }) {
-  const percent = Math.round(((current - 1) / Math.max(total - 1, 1)) * 100);
+  const percent = progressPercent(current, total);
   return (
     <div data-testid="progress-line">
       <div
@@ -52,7 +63,7 @@ export function ProgressLine({
           <rect
             x="0"
             y="0"
-            width={Math.max(percent, 4)}
+            width={percent}
             height="6"
             rx="3"
             className="ready-line-fill fill-ochre"

@@ -11,7 +11,8 @@ export const HOME_COPY = {
   eyebrow: "For sole traders and small providers",
   headline: "Get ready for NDIS provider registration without a consultant",
   lead: `Answer a few questions about the supports you deliver and your workers. ${BRAND} tells you which Practice Standards modules apply, which audit you face and what documents and registers you need, with the Commission's own text behind every answer. Then it drafts the documents for your review.`,
-  cta: "Find out what registration needs from you",
+  // REQ-014 R-1: short enough for one line on a 360 px phone.
+  cta: "See what registration needs",
   ctaNote: "Free, about ten minutes, no account needed.",
   trustHeading: "What you can count on",
   trust: [

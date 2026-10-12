@@ -119,6 +119,8 @@ test.describe("REQ-014 visual identity", () => {
       "Step 2 of 6: Supports",
     );
     await expect(fill).toHaveCSS("fill", "rgb(180, 70, 31)");
+    // R-2: step 2 of 6 fills about a third of the line.
+    await expect(fill).toHaveAttribute("width", "33");
     const animated = await fill.evaluate(
       (el) => getComputedStyle(el).animationDuration,
     );
