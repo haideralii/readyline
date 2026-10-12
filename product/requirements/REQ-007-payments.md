@@ -50,7 +50,51 @@ Screenshots of pricing, purchase, preparing and download states at both viewport
 A: migration, entitlement model, RLS tests. B: Checkout creation, webhook, idempotency tests. C: pricing and download pages, generation trigger, e2e in test mode.
 
 ## Dev response
-(Dev fills in.)
+
+**2026-10-12 (batch 18, item 1; branch `req-007-payments` from `main` c5f130f).** Answers to the design questions, then the values Haider sets, then sessions.
+
+### Q1. Stripe SDK and the Checkout API shape
+
+`stripe` 23.0.0 (current latest), pinned exactly in `package.json`; the client is built once per request in server code only (`src/server/payments/stripe.ts`, `server-only`), with `typescript: true`, `maxNetworkRetries: 2` and the API version the SDK's types target. One-time payment through hosted Checkout (a redirect, no embedded form, so no Stripe script on our pages):
+
+- `mode: "payment"`, `line_items: [{ price: STRIPE_PRICE_PACK, quantity: 1 }]` (an AUD Price created once in the dashboard), `payment_method_types: ["card"]` and nothing under `payment_method_options` (no instalments; AC-3 asserts both on the params builder).
+- `customer_email` prefilled from the account, `client_reference_id` = account id, `metadata` and `payment_intent_data.metadata` both `{ account_id, assessment_id, pack_version }`, so the refund path (which sees the charge and payment intent, not the session) still knows the account.
+- `success_url` `/documents?purchase=success&session_id={CHECKOUT_SESSION_ID}`, `cancel_url` the page the customer came from (allow-listed to `/pricing` and `/start/result`), `allow_promotion_codes: false`, `automatic_tax` off (the GST position is our `GST_LINE` text), `locale: "en-AU"`-equivalent via `"auto"`.
+- The amount shown on our pages is `PACK_PRICE_AUD_CENTS`; with a live key, `instrumentation.ts` retrieves `STRIPE_PRICE_PACK` once at start and refuses to serve if `unit_amount` or `currency` differ (AC-6). With a test key it logs the comparison instead.
+
+### Q2. The raw body in the App Router
+
+Route handler `src/app/api/stripe/webhook/route.ts` with `export const runtime = "nodejs"` and `dynamic = "force-dynamic"`. The handler reads `await request.text()` (never `json()`), takes the `stripe-signature` header, and calls `stripe.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET)` (SDK constant-time compare, 300-second tolerance). Missing header or a failed check returns 400 with no body detail; the App Router hands route handlers the unparsed stream, so no body-parser configuration is needed. The CSP proxy's matcher only adds headers to the response and does not touch the body. The route uses the admin client (service role) and nothing else reads the raw payload; logs carry the event id and type only (SR-6).
+
+### Q3. Idempotency storage
+
+One SQL function does the whole write atomically: `apply_stripe_event(p_event_id, p_type, p_session_id, p_payment_intent_id, p_account_id, p_assessment_id, p_amount_cents, p_currency, p_pack_version)` returning `granted`, `duplicate`, `revoked`, `refunded_before_completion` or `ignored`. It inserts the event id into `stripe_events` first (`on conflict do nothing`; no row inserted means `duplicate` and the function stops), then applies the event: `checkout.session.completed` / `async_payment_succeeded` upserts `purchases` on `stripe_checkout_session_id` (unique) and inserts the `pack` entitlement unless a purchase with the same payment intent is already `refunded`; `charge.refunded` marks the purchase by payment intent `refunded` (or inserts a refunded shell with a null session id when the refund arrives first) and revokes the entitlement whose `source_purchase_id` it is. The webhook returns 200 only after the function returns. The same state machine exists as a pure TypeScript reducer (`src/lib/payments/entitlement.ts`) for unit tests and the fake store, and the SQL function gets its own integration cases (CI's Supabase job) for the replayed, out-of-order and refund paths. `stripe_events` holds the id, type and time only, never the payload.
+
+### Q4. Generation on entitlement, and surfacing failure
+
+A webhook must answer in seconds and a sole-trader set takes about eight minutes, so `granted` enqueues a `generation_jobs` row (purchase id, account id, assessment id, status `queued`, attempts, next document index) and the job runs out of band. A cron route `/api/jobs/generate` (CRON_SECRET, like the purge job; Vercel Cron every minute) takes the oldest runnable job and generates document by document, stopping after about 45 seconds so it fits any function time limit; the REQ-005 runner already writes each `document_versions` row as it finishes, so a job resumes at its next document index. The webhook also schedules one tick straight after its response (`after()` from `next/server`), so the first documents start without waiting for the cron. `/documents` reads the job and shows "Preparing your documents (usually under 10 minutes)" with a count; when the set is `ready` the customer gets the "your documents are ready" email through the REQ-004 provider (log-only in dev). If a tick fails after the pipeline's own retry, the job's `attempts` increments with `last_error`; after three attempts the job is `failed`, `log.error("payments.generation.failed", { purchaseId, jobId })` fires (the Sentry hook when REQ-010 lands), the customer keeps seeing "We are preparing your documents and will email you", and `supabase/ops/refund.md` gains the operator steps (re-queue, or refund). A completed job never runs twice: the entitlement row carries the version set id once generated.
+
+### Q5. How the e2e drives Stripe test mode in CI
+
+Stripe's hosted Checkout is a cross-origin page whose markup changes, and driving it in CI would also put the secret key in CI. Proposal: a `STRIPE_FAKE=1` mode, honoured only outside production, where the Stripe client is an in-process fake whose `checkout.sessions.create` returns a page on our own origin (`/dev/stripe-checkout/<id>`, mounted only under the flag) with "Pay" and "Cancel" buttons; "Pay" posts a `checkout.session.completed` event to our real webhook route, signed with `stripe.webhooks.generateTestHeaderString` and the test webhook secret, so the signature check, the SQL function, the job and the download page all run as in production, and the generator runs with the replay client (recorded fixtures, no spend). That is AC-1 on both viewports in CI. The real Stripe hop (checkout.stripe.com with card 4242, `stripe listen` forwarding to localhost, one refund from the dashboard) stays a manual test Haider runs with the Stripe CLI once before launch and after any change to the Checkout params, recorded in the evidence as event and session ids. The `["card"]` rule is a unit test on the params builder (AC-3) and is also visible in the manual run's session.
+
+### Values Haider must set (names only)
+
+- `STRIPE_SECRET_KEY` (test key first; server only; Vercel project variables and `.env.local`)
+- `STRIPE_WEBHOOK_SECRET` (from the dashboard endpoint for production; from `stripe listen` for local testing)
+- `STRIPE_PRICE_PACK` (the AUD Price id; `.env.example` renames the earlier `STRIPE_PRICE_DOCUMENT_SET` placeholder to this)
+- `PACK_PRICE_AUD_CENTS` (display amount; must equal the Price's `unit_amount`, checked at start with a live key)
+- `GST_LINE` (the plain sentence shown next to the price, for example "No GST while Readyline is not registered for GST.")
+- Already set: `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET` (the generate job reuses it).
+- Q6 for the PO: the subscription is shown "coming" with "its price". No subscription price is in config today; I propose `SUBSCRIPTION_PRICE_AUD_CENTS` as a display-only value and, until it is set, the line "Audit-ready subscription: coming" without a number rather than an invented one.
+
+### Sessions
+
+- **A (no Stripe account):** migration `purchases`, `entitlements`, `stripe_events`, `generation_jobs` with RLS (owners read, no client writes) and the cross-tenant integration test; the entitlement reducer with unit tests; pricing config; `/pricing` signed out with the refund promise read from `product/legal/refunds.md` (test asserts identity), the AI disclosure, the not-legal-advice line, links to terms and privacy, and the claims lint over every string; screenshots at both viewports.
+- **B (offline):** the webhook route with `constructEvent` against a test secret and unit tests (valid, replayed, tampered, refund, out of order) over a fake store; the `apply_stripe_event` migration and its integration cases; the Checkout params builder with the `["card"]` test; the create-checkout server action behind a 5-per-hour rate limit with the Stripe client injected; CSP `frame-src` and `form-action` for `checkout.stripe.com` only on the redirect.
+- **C (needs the test key):** the real client and the price check; the generation job, cron route and `after()` kick; `/documents` states (buy, preparing, ready, refunded) and receipts; the fake-mode e2e on both viewports; the ops refund doc; the manual Stripe CLI run recorded as evidence.
+
+Three sessions; A and B need no Stripe account.
 
 ## Delivery evidence
 (Dev fills in.)
