@@ -1316,6 +1316,48 @@ unchanged); the site footer shows the statement, the AI disclosure and the
 trust line "Hosted in Australia. Independent of the NDIA and the NDIS Quality
 and Safeguards Commission.", so independence appears once on the page.
 
+## REQ-007: payments (branch `req-007-payments`)
+
+Decision numbers D-7xx on this branch.
+
+**D-701 Payment tables are written only with the secret key (Dev,
+2026-10-12, FR-4, SR-2).** Migration `20261012030000_payments.sql` creates
+`purchases` (session id and payment intent id both unique and nullable, so a
+refund that arrives first can be recorded as a refunded shell), `entitlements`
+(kind, assessment id, source purchase, version set once generated, revoked
+at), `stripe_events` (id, type, time; never a payload) and `generation_jobs`
+(the out-of-band generation queue). Owners read purchases and entitlements,
+members read job status, no client may insert, update or delete any of them,
+and the event ledger has no client access at all. The webhook and the job
+runner write through the admin client, as the purge job does.
+
+**D-702 The entitlement state machine is a pure reducer first (Dev,
+2026-10-12, FR-3, SR-2).** `src/lib/payments/entitlement.ts` applies one
+Stripe event to a ledger and names the outcome (granted, duplicate, ignored,
+revoked, refunded before completion, refund recorded, already paid,
+invalid). It is the specification the SQL function `apply_stripe_event`
+(Session B) implements atomically, the fake store the webhook tests use, and
+the place the out-of-order rules live: a replayed id changes nothing, a
+second completion for a known session grants nothing, a refund before the
+completion leaves a refunded purchase that the later completion fills in
+without granting.
+
+**D-703 Pricing copy lives in one file and the refund promise is read from
+refunds.md (Dev, 2026-10-12, FR-1, AC-4).** `src/lib/payments/copy.ts`
+holds every string the pricing page shows and a unit test runs the
+prohibited-claims lint over all of them plus the refund promise; the
+promise itself is the "Our promise" and "The document pack" paragraphs of
+`product/legal/refunds.md`, read at render time, with a test that asserts
+identity with the file. The REQ's sample wording "does not guarantee
+registration" cannot be used as written because the claims lint bans the
+phrase even negated, so the page says "Buying the pack does not mean you
+will be registered. The auditor and the Commission decide that." The price
+and the GST sentence come from `PACK_PRICE_AUD_CENTS` and `GST_LINE`; when
+unset the page says so rather than inventing a number, and the subscription
+is "coming" without a price until `SUBSCRIPTION_PRICE_AUD_CENTS` is set
+(Dev response Q6). The Buy control in Session A is a sign-in link; Session C
+replaces it with the Checkout action.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

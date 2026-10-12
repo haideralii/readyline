@@ -97,7 +97,17 @@ Stripe's hosted Checkout is a cross-origin page whose markup changes, and drivin
 Three sessions; A and B need no Stripe account.
 
 ## Delivery evidence
-(Dev fills in.)
+
+### Session A (2026-10-12, batch 18 item 2), branch `req-007-payments`
+
+- **Migration `20261012030000_payments.sql`** (D-701): `purchases` (session id and payment intent id unique and nullable, status paid/refunded, receipt URL), `entitlements` (kind pack/subscription, assessment id, source purchase, version set once generated, revoked at), `stripe_events` (id, type, received at; no payload), `generation_jobs` (queue for FR-5, with attempts, next document index, next run time). RLS: owners read purchases and entitlements, members read job status, no client insert/update/delete on any of them, no client access to `stripe_events`. Applies on merge through the migrate workflow.
+- **Cross-tenant integration test** `tests/integration/payments-rls.test.ts` (AC-5): the owner reads their rows; another account and an anonymous client read nothing from the three tables; no client reads the event ledger; the owner's insert and update attempts fail or change nothing, and a delete deletes nothing. Runs in CI's Supabase job (no local stack on the Dev machine).
+- **Entitlement model** `src/lib/payments/entitlement.ts` (D-702): the pure reducer and `hasActivePack`; six unit tests cover grant, replayed and duplicate-session events, refund and double refund, refund before completion, ignored and malformed events, and immutability.
+- **Pricing config and copy** (D-703): `readPricing` reads `PACK_PRICE_AUD_CENTS`, `GST_LINE` and `SUBSCRIPTION_PRICE_AUD_CENTS` (invalid or unset is null, never a guess); `formatAud`; `PRICING_COPY` with every page string and a unit test that runs the prohibited-claims lint over all of them plus the refund promise, checks the AI disclosure and not-legal-advice lines are present, and that no urgency or "from" pricing wording appears. `refundPromise()` reads the "Our promise" and "The document pack" paragraphs of `product/legal/refunds.md` at render time; the test re-parses the file and asserts identity.
+- **`/pricing`**: works signed out; price and GST line from config (or an honest "not set" line); "What you get" lists the core set, or the signed-in owner's own set when their questionnaire is complete; "What it is not"; the refund promise; the AI disclosure; the not-legal-advice line; the subscription as "coming" (price only when configured); links to Terms, Privacy and the Refunds page; "Sign in to buy" (Session C swaps in the Checkout action). No checkbox, no countdown, no scarcity.
+- **e2e** `e2e/pricing.spec.ts` on both projects: price "AUD 399" and the GST line (the Playwright server sets the two display values), refund promise, AI disclosure, notice, subscription line, the three legal links, the sign-in link, the document list, no urgency text, no checkbox, no horizontal overflow, axe clean. 2 passed. Screenshots at both viewports in `product/evidence/req-007/pricing-<project>.jpg`.
+- **Config**: `.env.example` renames the earlier `STRIPE_PRICE_DOCUMENT_SET` placeholder to `STRIPE_PRICE_PACK` and adds `PACK_PRICE_AUD_CENTS`, `GST_LINE` and `SUBSCRIPTION_PRICE_AUD_CENTS`; `REQUIRED_LATER` lists `STRIPE_PRICE_PACK` and `PACK_PRICE_AUD_CENTS`.
+- Stopped before anything that needs a Stripe key: no Stripe dependency is installed yet (Session B adds the SDK for `constructEvent`).
 
 ## PO review
 (PO fills in.)

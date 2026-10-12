@@ -38,6 +38,13 @@ export default defineConfig({
     reuseExistingServer: !isCI,
     timeout: 120_000,
     // The server refuses to start without the required variables (src/lib/env.ts).
-    env: { NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? baseURL },
+    env: {
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? baseURL,
+      // REQ-007: display pricing for the pricing-page spec; real values live in Vercel.
+      PACK_PRICE_AUD_CENTS: process.env.PACK_PRICE_AUD_CENTS ?? "39900",
+      GST_LINE:
+        process.env.GST_LINE ??
+        "No GST while Readyline is not registered for GST.",
+    },
   },
 });
