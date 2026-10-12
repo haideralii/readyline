@@ -189,3 +189,17 @@ For Haider: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` into `.env.local`; merge P
 5. STOP.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 10)
+
+**PO actions this batch:** PR #10 opened from `ops-pin-supabase-cli`; the PO merges it when green. REQ-013 P1 reviewed from the screenshots: accepted conditionally with four fixes R-1 to R-4 (in the REQ's PO review). `.env.local` has had `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` since before batch 9 finished (the Dev check ran earlier); D-039 applies.
+
+0. **Push `main`** with the PO's batch-10 commit after checking the stat (product/, DECISIONS.md, .gitignore only). Note: the PO review for REQ-013 is on `main`'s copy of the REQ file; merge `main` into `req-013-first-time-ux` before item 1 so the branch carries it.
+
+1. **REQ-013 R-1 to R-4** on `req-013-first-time-ux`: order within groups from the data with a test; name before code; non-wrapping audit tag; seclusion in helper question 1. Re-capture only the affected screenshots. `npm run check`, build, Playwright CI mode. Push. Do not merge; the PO checks the two screenshots and merges.
+
+2. **REQ-005 Session B recordings** (D-039 applies: three model calls in total, one per reference case; nothing else). Check `.env.local` by name again; it is there. Before the first call, print the estimated input tokens per case. Record the three cases with `npm run generation:record`, commit the fixtures on `req-005-generator`, and write the cost note into Delivery evidence: input tokens, output tokens, dollars per case, and whether validation passed first time or used the retry. If any call fails validation twice, stop that case and report; do not re-record.
+
+3. **REQ-005 PO content review pack**: for the sole-trader reference case only, export the recorded set's rendered `.docx` files for the incident management policy, the complaints procedure and the self-assessment into `product/evidence/req-005/sole-trader/` (these three only; the rest stay in the CI artifact), so the PO can read real tailored text. Note which tailored sections came from which answers.
+
+4. STOP. Append your status below.
