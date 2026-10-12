@@ -5,7 +5,11 @@
  */
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
-import { getGroupOptions, matchesGroupQuery } from "@/lib/questionnaire/groups";
+import {
+  getGroupOptions,
+  groupsInCategory,
+  matchesGroupQuery,
+} from "@/lib/questionnaire/groups";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import categories from "./group-categories.json";
 import descriptions from "../registration-group-descriptions.json";
@@ -40,6 +44,15 @@ describe("group categories and synonyms (REQ-013 FR-3)", () => {
     expect(find("sil")).toContain("0138");
     expect(find("zzzz")).toEqual([]);
     expect(find("")).toHaveLength(38);
+  });
+
+  it("R-1: a heading renders its classes in the data's order, 0107 first under personal care", () => {
+    const options = getGroupOptions(dataset);
+    const personalCare = groupsInCategory(options, "personal-care");
+    expect(personalCare[0]?.code).toBe("0107");
+    expect(personalCare.map((g) => g.code)).toEqual(
+      categories.categories.find((c) => c.id === "personal-care")!.codes,
+    );
   });
 
   it("contains no prohibited claim", () => {

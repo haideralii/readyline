@@ -5,6 +5,7 @@ import {
   getGroupCategories,
   GROUP_HINT,
   GROUP_QUESTION,
+  groupsInCategory,
   matchesGroupQuery,
   type GroupOption,
 } from "@/lib/questionnaire/groups";
@@ -45,7 +46,7 @@ const CATEGORIES = getGroupCategories();
 
 function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
   return (
-    <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+    <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
       {auditType === "verification" ? "desk audit" : "site audit"}
     </span>
   );
@@ -78,13 +79,10 @@ export function SupportsStepForm() {
     () => groups.filter((g) => matchesGroupQuery(g, query)),
     [groups, query],
   );
+  // R-1: within a heading, the data's order (most common first), not code order.
   const byCategory = useMemo(() => {
     const map = new Map<string, GroupOption[]>();
-    for (const g of filtered) {
-      const list = map.get(g.categoryId) ?? [];
-      list.push(g);
-      map.set(g.categoryId, list);
-    }
+    for (const c of CATEGORIES) map.set(c.id, groupsInCategory(filtered, c.id));
     return map;
   }, [filtered]);
   const silChosen = selected.includes(SIL_CODE);
@@ -149,7 +147,7 @@ export function SupportsStepForm() {
           <>
             <AuditTag auditType={g.auditType} />
             {g.mandatoryFrom ? (
-              <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+              <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
                 registration mandatory from 1 July 2026
               </span>
             ) : null}

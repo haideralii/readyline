@@ -17,6 +17,7 @@ import {
   type FieldErrors,
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
+import { EXAMPLES, HELPER } from "./practices-copy";
 
 const LABELS = {
   restrictivePractices: "Restrictive practices",
@@ -44,31 +45,6 @@ type YesNo = "yes" | "no";
 const YES_NO: { value: YesNo; label: string }[] = [
   { value: "yes", label: "Yes" },
   { value: "no", label: "No" },
-];
-
-const HELPER: {
-  key: keyof NotSureHelper;
-  legend: string;
-  help: string;
-}[] = [
-  {
-    key: "locksOrBarriers",
-    legend:
-      "Do you ever lock a cupboard, fridge, door or gate so a person cannot get to something or somewhere?",
-    help: "For example locking the kitchen at night, or a gate they cannot open.",
-  },
-  {
-    key: "holdsOrRestraint",
-    legend:
-      "Do you ever hold a person, or use a belt, strap or similar, to stop them moving?",
-    help: "For example holding someone's arms during a care task, or a lap belt they cannot undo.",
-  },
-  {
-    key: "medicationForBehaviour",
-    legend:
-      "Does a person you support take medicine mainly to control their behaviour, rather than for a health condition?",
-    help: "If you are not sure why a medicine is given, their doctor or behaviour support practitioner can tell you.",
-  },
 ];
 
 export function PracticesStepForm() {
@@ -137,12 +113,9 @@ export function PracticesStepForm() {
         extra rules. In plain words, they include:
       </p>
       <ul className="mb-4 list-disc space-y-1 pl-5 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-        <li>
-          locking a cupboard, door or gate to stop someone getting something or
-          going somewhere
-        </li>
-        <li>holding someone, or using a belt or strap, to stop them moving</li>
-        <li>medicine given mainly to control behaviour</li>
+        {EXAMPLES.map((example) => (
+          <li key={example}>{example}</li>
+        ))}
       </ul>
       <details className="mb-6 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">

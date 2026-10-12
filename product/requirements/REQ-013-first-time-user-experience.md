@@ -64,6 +64,14 @@ Written 2026-10-12 on branch `req-013-first-time-ux` (from `main` at aa52c8a), a
 **Local outputs:** `npm run check` clean (28 files, 266 tests); `npm run build` ok; Playwright CI mode: questionnaire 26, axe 2, accessibility tree 2, screenshots 2 passed on both projects. Not merged; the PO reviews the UI. CI link: the PO verifies on GitHub (Dev cannot read Actions).
 
 
+### R-1 to R-4 (2026-10-12), same branch, after merging `main` (bcb7877)
+
+- R-1: `groupsInCategory` renders each heading in the order `group-categories.json` gives (`categoryIndex` on every option); unit test asserts 0107 is first under "Personal care at home" and the whole heading matches the data; e2e asserts the first checkbox under that heading is "Assistance with daily personal activities".
+- R-2: `ChoiceRow` now puts the class name first and the code after it in muted small text on the same line (wrapping under the name on narrow screens); the accessible name is unchanged (label only).
+- R-3: both tags are `whitespace-nowrap` inside a wrapping flex row, so "desk audit" never splits; on long names at 360 px the tag drops whole to the next line.
+- R-4: helper question 1 now reads "...or keep a person alone in a room they cannot leave?" with the example "shutting someone in their room until they calm down", and the first plain example on the step says the same. Copy moved to `practices-copy.ts` with a unit test that the three questions cover seclusion, chemical, mechanical, physical and environmental and that the questions themselves stay in plain words.
+
+Re-captured only the affected screenshots (`2-supports-*` and `3-practices-*` on both viewports); `1-business-*` and `6-result-*` are byte-identical to the P1 capture. Accessibility-tree records refreshed (order changed with R-1; names unchanged). Local: `npm run check` clean (29 files, 270 tests), build ok, Playwright CI mode: questionnaire, axe and accessibility-tree specs 29 passed on both projects (one axe scan of the empty business step on android-small needed Playwright's automatic retry; the retry passed and the scan is clean on desktop, so it reads as a timing flake rather than a defect; noted for watching).
 ## PO review
 **12 Oct 2026, P1 review (branch `req-013-first-time-ux` at 62dec64): ACCEPTED CONDITIONALLY.** Screenshots at 360x740 reviewed for every changed step; the five P1 items are built as specified and the accessibility-tree evidence is what AC-2 asked for. The approach decisions D-1301 to D-1305 are accepted. Merge after the four fixes below land on the branch and CI is green; none needs a new session.
 

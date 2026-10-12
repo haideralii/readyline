@@ -20,6 +20,8 @@ export type GroupOption = {
   mandatoryFrom: string | null;
   synonyms: string[];
   categoryId: string;
+  /** Position within its category as the data lists it (REQ-013 R-1): most common first. */
+  categoryIndex: number;
 };
 
 export type GroupCategory = {
@@ -38,8 +40,28 @@ export function getGroupOptions(dataset: StandardsDataset): GroupOption[] {
       mandatoryFrom: g.mandatoryFrom,
       synonyms: groupSynonyms(g.code),
       categoryId: groupCategoryId(g.code) ?? "other",
+      categoryIndex: groupCategoryIndex(g.code),
     }))
     .sort((a, b) => a.code.localeCompare(b.code));
+}
+
+/** The order the data gives within a category; unknown codes go last. */
+export function groupCategoryIndex(code: string): number {
+  for (const c of groupCategoriesContent.categories) {
+    const i = c.codes.indexOf(code);
+    if (i >= 0) return i;
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
+
+/** Options of one category in the data's order, not code order (R-1). */
+export function groupsInCategory(
+  options: readonly GroupOption[],
+  categoryId: string,
+): GroupOption[] {
+  return options
+    .filter((g) => g.categoryId === categoryId)
+    .sort((a, b) => a.categoryIndex - b.categoryIndex);
 }
 
 export function getGroupCategories(): GroupCategory[] {

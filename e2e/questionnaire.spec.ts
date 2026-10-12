@@ -313,6 +313,10 @@ test.describe("questionnaire", () => {
     ).toBeVisible();
     await expect(page.getByTestId("category-personal-care")).toBeVisible();
     await expect(page.getByTestId("category-housing")).toBeVisible();
+    // R-1: data order within a heading; 0107 is the first row under personal care.
+    await expect(
+      page.getByTestId("category-personal-care").getByRole("checkbox").first(),
+    ).toHaveAccessibleName("Assistance with daily personal activities");
     const search = page.getByLabel(/Search by what you do/);
     await search.fill("support worker");
     await expect(page.locator("#group-0107")).toBeVisible();

@@ -181,7 +181,7 @@ export function ChoiceRow({
   onChange: () => void;
   label: ReactNode;
   help?: ReactNode;
-  /** Secondary text shown before the label, such as a class code; part of the description, not the name. */
+  /** Secondary text shown after the label, such as a class code; part of the description, not the name. */
   secondary?: ReactNode;
   tag?: ReactNode;
 }) {
@@ -207,16 +207,17 @@ export function ChoiceRow({
         className="mt-1 h-5 w-5 shrink-0"
       />
       <span className="min-w-0">
-        <span className="block text-base">
+        {/* R-2: the name leads; the code follows in muted text. R-3: tags never split, they wrap as a unit. */}
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
+          <span id={labelId}>{label}</span>
           {secondary ? (
             <span
               id={secondaryId}
-              className="mr-2 font-mono text-sm text-zinc-500 dark:text-zinc-400"
+              className="font-mono text-sm text-zinc-500 dark:text-zinc-400"
             >
               {secondary}
             </span>
           ) : null}
-          <span id={labelId}>{label}</span>
           {tag}
         </span>
         {help ? (
