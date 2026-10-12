@@ -84,7 +84,16 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
       "every six months",
     ]);
     expect(wrong[0].why).toMatch(/register review every 3 months/);
-    expect(lintReviewCycles("We meet every week.", cycles)).toHaveLength(1);
+    expect(
+      lintReviewCycles("We check our records every week.", cycles),
+    ).toHaveLength(1);
+    // D-043: cadences without review wording are not review cycles (R-7 covers statutory ones).
+    expect(
+      lintReviewCycles(
+        "We meet every week. Because we use regulated restrictive practices, steps 1 and 2 apply every month. We send the report every month.",
+        cycles,
+      ),
+    ).toEqual([]);
     // A table row is one statement: the register cell sets the subject for the cycle cell.
     expect(
       lintReviewCycles(

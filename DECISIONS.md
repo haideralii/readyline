@@ -1029,6 +1029,20 @@ $0.025 per call at most); the recorder's rule that a truncation stops the rest
 of the case becomes per document, since the self-assessment sections were
 skipped for a truncation in a different document. Not implemented until the
 PO approves; the six unrecorded sections of item 3 wait on it.
+
+**D-529 R-8 narrowed to review wording; D-043 implemented (Dev,
+2026-10-12).** `maxTokensFor("policy-statement")` is 2,500 (D-043); the
+fixture key still excludes the cap, so passing fixtures keep their keys and
+the recorder re-records only a fixture that was cut at a lower cap. The
+recorder's stop-after-truncation set is keyed by case and document type, so a
+truncation in one document no longer skips another document of the same
+reference case. The review-cycle lint only examines a sentence (or a table
+row) that contains review wording: review, reviews, reviewed, reviewing,
+check, checks, checked, checking, look at, looks at, looked at, looking at.
+"Steps 1 and 2 apply every month" and "we send the report every month" are
+cadences, not review cycles, and fall to R-7 (which requires them to refer to
+the fixed section that sets them). "Update" and "revise" are deliberately not
+review wording: "we update the Commission every month" is a reporting cadence.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

@@ -200,12 +200,17 @@ export function lintTimeframes(text: string): LintFinding[] {
 }
 
 /**
- * R-8 / D-042: review cycles are provider facts. Any "every N months/weeks/
- * years" in tailored text must be one of the document's cycles; a sentence
- * about a register must use the register cycle, one about the policy,
- * procedure, plan or document must use the policy cycle.
+ * R-8 / D-042 / D-043: review cycles are provider facts. Any "every N months/
+ * weeks/years" in a sentence with review wording (review, check, look at)
+ * must be one of the document's cycles; a sentence about a register must use
+ * the register cycle, one about the policy, procedure, plan or document must
+ * use the policy cycle. Cadences without review wording (a statutory monthly
+ * report, for example) are R-7's domain and are not checked here.
  */
 export type ReviewCycles = { policyMonths: number; registerMonths: number };
+
+const REVIEW_WORDING =
+  /\b(?:review(?:s|ed|ing)?|check(?:s|ed|ing)?|look(?:s|ed|ing)?\s+at)\b/i;
 
 const WORD_NUMBERS: Record<string, number> = {
   one: 1,
@@ -269,10 +274,12 @@ export function lintReviewCycles(
         ),
     });
     const line = unitAround(text, at, m[0].length, /\n/);
-    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(
-      unitAround(text, at, m[0].length, /[.\n]/),
-    );
-    if (!aboutRegister && !aboutPolicy && line.includes(" | "))
+    const sentence = unitAround(text, at, m[0].length, /[.\n]/);
+    const isRow = line.includes(" | ");
+    // D-043: only review wording is a review cycle (the row counts for a table).
+    if (!REVIEW_WORDING.test(isRow ? line : sentence)) continue;
+    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(sentence);
+    if (!aboutRegister && !aboutPolicy && isRow)
       ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(line));
     // Every subject the sentence names must fit the cycle; with no subject any pack value will do.
     const ok =

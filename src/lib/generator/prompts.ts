@@ -88,11 +88,15 @@ export function buildUserPrompt(pack: ContextPack): string {
 /** Output caps per section type (D-040): long procedures get room; everything else is short. */
 export function maxTokensFor(sectionId: string): number {
   // D-040 plus D-041: step lists (steps, split steps sub-sections, *procedure extras) and how-we-do-this get 4,000.
-  return sectionId.startsWith("steps") ||
+  // D-043: policy statements (a commitment per quality indicator) get 2,500.
+  if (
+    sectionId.startsWith("steps") ||
     sectionId === "how-we-do-this" ||
     sectionId.endsWith("procedure")
-    ? 4000
-    : 1500;
+  )
+    return 4000;
+  if (sectionId === "policy-statement") return 2500;
+  return 1500;
 }
 
 export function buildModelRequest(

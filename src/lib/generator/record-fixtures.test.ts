@@ -190,12 +190,12 @@ describe.skipIf(!enabled)(
       const report = readReport();
       const rows: ReportRow[] = [];
       let batchDollars = 0;
-      // A truncation stops the rest of that case (queue item 3); other cases continue.
-      const stoppedCases = new Set<string>();
+      // A truncation stops the rest of that document (D-043); other documents and cases continue.
+      const stoppedDocuments = new Set<string>();
       for (const p of pending) {
-        if (stoppedCases.has(p.caseId)) {
+        if (stoppedDocuments.has(`${p.caseId}/${p.typeId}`)) {
           process.stdout.write(
-            `SKIPPED after a truncation in this case: ${p.caseId}/${p.sectionId}\n`,
+            `SKIPPED after a truncation in this document: ${p.caseId}/${p.typeId}/${p.sectionId}\n`,
           );
           continue;
         }
@@ -241,9 +241,9 @@ describe.skipIf(!enabled)(
         );
         report.recordings.push(row);
         if (out.truncatedAtTokens !== null) {
-          stoppedCases.add(p.caseId);
+          stoppedDocuments.add(`${p.caseId}/${p.typeId}`);
           process.stdout.write(
-            `STOP: ${p.caseId}/${p.sectionId} truncated at ${out.truncatedAtTokens} output tokens (cap ${p.request.maxTokens}).\n`,
+            `STOP: ${p.caseId}/${p.typeId}/${p.sectionId} truncated at ${out.truncatedAtTokens} output tokens (cap ${p.request.maxTokens}).\n`,
           );
         }
       }

@@ -183,17 +183,37 @@ describe("recorded fixtures replay through the current gate", () => {
         }
       }
     }
-    // Expected after batch 12 (PO review): sections 5 and 6 of the sole-trader incident policy give the register a 12-month cycle.
+    // Only the batch-11 and batch-12 recordings of sections 5 and 6 of the sole-trader incident policy (orphaned by the R-8 brief, kept as history) give the register a 12-month cycle; their batch-13 re-recordings pass.
     const sections = [
       ...new Set(
         Object.keys(results).map((k) => k.split("/").slice(0, 2).join("/")),
       ),
     ].sort();
-    // The behaviour-support monitoring sub-section says monthly reporting applies "every month": a reporting cadence the lint cannot tell from a review cycle; listed for the PO (batch 13 evidence).
     expect(sections).toEqual([
-      "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review",
       "incident-management-policy-and-register/how-we-do-this",
       "incident-management-policy-and-register/responsibilities",
     ]);
+  });
+
+  it("D-043: the behaviour-support monitoring sub-section's monthly reporting cadence is not a review cycle", () => {
+    const dir = join(
+      DEFAULT_FIXTURES_DIR,
+      "behaviour-support-plan-implementation-procedure",
+      "steps-monitoring-reporting-and-review",
+    );
+    const fixtures = readdirSync(dir).map(
+      (f) => JSON.parse(readFileSync(join(dir, f), "utf8")) as Fixture,
+    );
+    expect(fixtures.length).toBeGreaterThan(0);
+    for (const fx of fixtures) {
+      const blocks = TailoredSection.shape.blocks.parse(
+        (JSON.parse(fx.reply) as { blocks: unknown }).blocks,
+      );
+      const text = blocksToText(blocks);
+      expect(text).toMatch(/every month/i);
+      expect(
+        lintReviewCycles(text, { policyMonths: 12, registerMonths: 3 }),
+      ).toEqual([]);
+    }
   });
 });

@@ -219,6 +219,18 @@ describe("validate, retry, fall back (AC-5)", () => {
     });
     expect(buildModelRequest(stepsPack, "m").maxTokens).toBe(4000);
     expect(buildModelRequest(pack, "m").maxTokens).toBe(1500);
+    // D-043: the policy statement carries a commitment per quality indicator, so it gets 2,500.
+    const statementSection = sectionsFor(type).find(
+      (s) => s.id === "policy-statement",
+    )!;
+    const statementPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type,
+      section: statementSection,
+    });
+    expect(buildModelRequest(statementPack, "m").maxTokens).toBe(2500);
     expect(requestHash(buildModelRequest(pack, "m", 2000))).toBe(
       requestHash(buildModelRequest(pack, "m", 1500)),
     );
