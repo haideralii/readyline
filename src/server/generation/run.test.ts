@@ -254,6 +254,8 @@ describe("generateDocumentSet", () => {
         [
           "account_id",
           "attempts",
+          "cache_creation_input_tokens",
+          "cache_read_input_tokens",
           "document_type_id",
           "input_tokens",
           "model",

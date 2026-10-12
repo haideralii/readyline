@@ -16,7 +16,10 @@ export type ModelRequest = {
   promptVersion: string;
   model: string;
   system: string;
+  /** The whole user message, which the fixture key hashes. */
   user: string;
+  /** The same text as two content blocks: the cached per-document block and the section block (D-046). */
+  blocks: PromptBlocks;
   maxTokens: number;
 };
 
@@ -43,14 +46,22 @@ function block(name: string, body: string): string {
 }
 
 function cap(s: string, max: number): string {
-  return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+  return s.length > max ? `${s.slice(0, max - 1)}â€¦` : s;
 }
 
 export function buildSystemPrompt(): string {
   return `${HOUSE_STYLE.trim()}\n${OUTPUT_CONTRACT.trim()}\n`;
 }
 
-export function buildUserPrompt(pack: ContextPack): string {
+/**
+ * D-046: the user prompt is two content blocks. The first is stable for a
+ * document and case (purpose, facts, standards, registers, outline) and is
+ * cached across that document's sections; the second names the section. The
+ * hash still covers the joined text, so a change to either block re-keys.
+ */
+export type PromptBlocks = { document: string; section: string };
+
+export function buildPromptBlocks(pack: ContextPack): PromptBlocks {
   const f = pack.facts;
   const facts = [
     `tradingName: ${cap(f.tradingName, 120)}`,
@@ -78,22 +89,29 @@ export function buildUserPrompt(pack: ContextPack): string {
   // can only be made by the number and title in the outline, never from the house
   // style's generic structure.
   const outline = pack.outline
-    .map(
-      (o) =>
-        `${o.number} ${o.heading}${o.id === pack.section.id ? " (this section)" : ""}`,
-    )
+    .map((o) => `${o.number} ${o.heading}`)
     .join("\n");
-  return [
-    `Write the section "${pack.section.heading}" (section id: ${pack.section.id}) of the document "${pack.document.title}" (${pack.document.kind}).`,
+  const document = [
+    `Document: "${pack.document.title}" (${pack.document.kind}).`,
     `Document purpose: ${pack.document.purpose}`,
-    `Section brief: ${pack.section.brief}`,
     block("FACTS", facts),
     block("STANDARDS", standards || "none"),
     block("REGISTERS", registers),
     block("OUTLINE", outline),
     `The OUTLINE block is this document's numbered structure and overrides the generic structure in the house style. Refer to another section only by its number and title exactly as the outline gives them (for example "see section ${pack.outline[0].number} ${pack.outline[0].heading}"); never refer to a section that is not in the outline.`,
+  ].join("\n\n");
+  const own = pack.outline.find((o) => o.id === pack.section.id);
+  const section = [
+    `Write the section "${pack.section.heading}" (section id: ${pack.section.id}) of this document${own ? `; it is section ${own.number} ${own.heading} in the outline` : ""}.`,
+    `Section brief: ${pack.section.brief}`,
     `Reply with the JSON object only. sectionId must be "${pack.section.id}".`,
   ].join("\n\n");
+  return { document, section };
+}
+
+export function buildUserPrompt(pack: ContextPack): string {
+  const blocks = buildPromptBlocks(pack);
+  return `${blocks.document}\n\n${blocks.section}`;
 }
 
 /** Output caps per section type (D-040): long procedures get room; everything else is short. */
@@ -115,11 +133,13 @@ export function buildModelRequest(
   model: string,
   maxTokens = maxTokensFor(pack.section.id),
 ): ModelRequest {
+  const blocks = buildPromptBlocks(pack);
   return {
     promptVersion: PROMPT_VERSION,
     model,
     system: buildSystemPrompt(),
-    user: buildUserPrompt(pack),
+    user: `${blocks.document}\n\n${blocks.section}`,
+    blocks,
     maxTokens,
   };
 }

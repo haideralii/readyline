@@ -48,6 +48,9 @@ export type GenerationLogRow = {
   attempts: number;
   input_tokens: number | null;
   output_tokens: number | null;
+  /** Prompt-cache writes and reads for the last call of the section (D-046). */
+  cache_creation_input_tokens: number | null;
+  cache_read_input_tokens: number | null;
 };
 
 export interface GenerationStore {

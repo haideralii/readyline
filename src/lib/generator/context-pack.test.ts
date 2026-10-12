@@ -187,11 +187,34 @@ describe("context pack (REQ-005 SR-2, SR-3)", () => {
       "12 Review",
     ]);
     const user = buildUserPrompt(pack);
-    expect(user).toContain(
-      "<<<OUTLINE>>>\n1 Purpose\n2 Scope (this section)\n3 Definitions",
-    );
+    expect(user).toContain("<<<OUTLINE>>>\n1 Purpose\n2 Scope\n3 Definitions");
     expect(user).toContain('(for example "see section 1 Purpose")');
     expect(user).toMatch(/never refer to a section that is not in the outline/);
+    // D-046: the document block (stable for the document) comes first and the
+    // section block last, so the outline and facts can be cached across sections.
+    const request = buildModelRequest(pack, "m");
+    expect(request.user).toBe(
+      `${request.blocks.document}\n\n${request.blocks.section}`,
+    );
+    expect(request.blocks.document).toContain("<<<OUTLINE>>>");
+    expect(request.blocks.document).not.toMatch(
+      /Write the section|Section brief/,
+    );
+    expect(request.blocks.section).toContain(
+      'Write the section "Scope" (section id: scope) of this document; it is section 2 Scope in the outline.',
+    );
+    expect(request.blocks.section).toContain("Section brief:");
+    const otherSection = sectionsFor(incident).find((s) => s.id === "purpose")!;
+    const otherPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section: otherSection,
+    });
+    expect(buildModelRequest(otherPack, "m").blocks.document).toBe(
+      request.blocks.document,
+    );
   });
 
   it("hashes the exact request so any prompt or model change makes a new key", () => {

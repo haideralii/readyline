@@ -163,6 +163,10 @@ export function validateReply(
   return { ok: true, section: result.data, findings, readability: score };
 }
 
+function rejection(problems: readonly string[]): string {
+  return `Your previous reply was rejected for these reasons; fix them and reply again with the JSON object only:\n- ${problems.join("\n- ")}`;
+}
+
 export async function generateSection(input: {
   pack: ContextPack;
   client: ModelClient;
@@ -190,7 +194,12 @@ export async function generateSection(input: {
         ? base
         : {
             ...base,
-            user: `${base.user}\n\nYour previous reply was rejected for these reasons; fix them and reply again with the JSON object only:\n- ${problems.join("\n- ")}`,
+            user: `${base.user}\n\n${rejection(problems)}`,
+            // D-046: the document block stays cached; the rejection joins the section block.
+            blocks: {
+              document: base.blocks.document,
+              section: `${base.blocks.section}\n\n${rejection(problems)}`,
+            },
           };
     let reply;
     try {

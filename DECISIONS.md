@@ -1137,6 +1137,62 @@ records-and-evidence section carries the same sentence plus a record-keeping
 sentence instead of the provider-to-complete placeholder. Fixed text is not
 in the prompt, so no fixture key moved (the replay suite passes unchanged);
 the structure snapshots changed for every document (one paragraph added).
+
+**D-535 Prompt caching re-keys the fixtures once; the recorder prices cache
+tokens and can record another model (Dev, 2026-10-12, D-046).** The request
+now carries its user text as two content blocks: a per-document block
+(document title and purpose, FACTS, STANDARDS, REGISTERS, OUTLINE and the
+outline rule, identical for every section of a document in a case) and a
+section block (the section line naming its outline number, the brief and the
+reply line). The client sends the system prompt and the document block with
+`cache_control: {type: "ephemeral"}` and the section block last; a retry
+appends the rejection to the section block, so the cached prefix survives.
+The PO asked for fixture keys to stay unchanged, but a per-document cache
+needs the section-specific text moved to the end of the user message, which
+changes the hashed text; `PROMPT_VERSION` is 2026-10-12.3 and every fixture
+was re-keyed, so the fourteen sole-trader sections recorded in batch 15 are
+recorded again inside item 3 (about $0.15 at cached rates). Caching only the
+system prompt would have kept the keys but saved less than half as much.
+Usage records `cacheCreationInputTokens` and `cacheReadInputTokens` beside
+the API's uncached `inputTokens`; the generation log gains the two columns
+(migration `20261012010000_generation_log_cache_tokens.sql`). The recorder
+prices a call at cache write 1.25x and cache read 0.1x of the input rate and
+also reports the uncached figure; Haiku 5.5 is priced at $1 in / $5 out per
+million as an UNVERIFIED Dev assumption for the comparison. The recorder's
+approved list is now derived from the sole-trader case (every tailored
+section of its 18 documents, 90 in all) plus the three behaviour-support
+sub-sections; `GENERATION_MODEL_OVERRIDE=<model>` records into
+`fixtures/generation-<model>/` with its own report and only the three
+review-pack documents, and `REVIEW_PACK_MODEL=<model>` renders those from that
+directory into `product/evidence/req-005/sole-trader-<family>/`. Production
+never reads a model-keyed directory.
+
+**D-536 Two more lint false positives from the full-set recording (Dev,
+2026-10-12).** (1) "Policy review register" is the register where reviews
+are recorded; a row such as "Reviews this policy and records the review in
+the Policy review register | Every 12 months" names both subjects by
+accident. The R-8 subject rule was rebuilt: the unit is the sentence (cut
+at a cell boundary in a row); a mention's subject is what the unit names
+between the previous mention and this one after the last ";", "," or ":",
+else what follows it up to the next mention ("every 12 months for the plan;
+every 3 months for the register"), else the object of the review verbs in
+the sentence and then in the row, where an object ends at a recording verb
+("reviews this policy and updates the register" reviews the policy) and
+"Policy review register" reads as a register. Three sections fell back on
+the old rule (records management responsibilities, emergency plan
+responsibilities, AI policy how-we-do-this); their recorded replies were
+correct and pass on replay. A String.match on a global regex (no index) was
+found and fixed on the way. (2) The R-9 cross-reference run stopped at a
+colon or comma, so "section 5 Steps: monitoring, reporting and review"
+matched only "Steps" and was rejected; the run now keeps colons and commas
+and the heading test requires a word boundary. One behaviour-support
+sub-section fell back on it and passes on replay. Only two of the six
+fallbacks were the model's: the continuity plan's sole-trader cover
+("Within 1 business day", the provider's own promise, caught by the R-7
+business-day rule, then grade 11.7) and the privacy purpose (grades 14.5 and
+12.4); both were recorded again. R-7 is left as the PO wrote it; whether a
+provider's own service timeframe in a continuity plan should pass is for the
+PO.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

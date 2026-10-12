@@ -349,6 +349,39 @@ Three of the four fallbacks were correct text rejected by two lint defects: the 
 ### Batch 16 (2026-10-12): D-045 basis, D-046 caching, the full sole-trader set, the Haiku comparison
 
 **D-045 basis, no model calls (item 1, D-534).** Every catalogue item now has `basis` and, for the twelve the PO assigned, a `basisReason` (schema-enforced: a non-standard basis needs a reason). The document-control section carries a "Why this document" paragraph under its table: for a document with standards in scope, "Why this document: it supports the NDIS Practice Standards [names] for [provider]."; otherwise "Verification providers are not audited against this document under the NDIS Practice Standards. We keep it because [reason]." The records-and-evidence section uses the same sentence plus "We keep the records this document names, with the dates they were made, so an auditor can see it in use." in place of the placeholder. Test (every reference case): each document's control section carries one of the two sentences, no evidence section has a callout, and a kept-because document repeats the sentence in its evidence section. Fixed text only: the replay suite passes without a key change (confirmed); the three structure snapshots changed by one paragraph per document.
+
+**D-046 prompt caching, no model calls (item 2, D-535).** The request's user text is now two content blocks: a per-document block (document title and purpose, FACTS, STANDARDS, REGISTERS, OUTLINE and the outline rule) and a section block (the section line with its outline number, the brief, the reply line). The client sends the system prompt and the document block with `cache_control: {type: "ephemeral"}` and the section block last; a retry appends the rejection to the section block so the cached prefix survives. **Fixture keys could not stay unchanged:** the queue asked for that, but caching a per-document block needs the section-specific text moved to the end of the user message, which changes the hashed text; caching only the system prompt would have kept the keys and saved less than half as much. `PROMPT_VERSION` is 2026-10-12.3 and the fourteen batch-15 sections were recorded again inside item 3 (about $0.15 at cached rates). Usage carries `cacheCreationInputTokens` and `cacheReadInputTokens` beside the API's uncached `inputTokens`; fixtures store them; the generation log gains the two columns (migration `20261012010000_generation_log_cache_tokens.sql`, to apply on merge); the recorder prices cache writes at 1.25x and reads at 0.1x of the input rate and reports the uncached figure beside it. Unit tests: the two blocks join to the hashed text, the document block is identical across a document's sections and carries no section text, the client sends the breakpoints, the pricing arithmetic.
+
+**Full sole-trader set (item 3), D-039 to D-046, thinking off, caching on.** 90 sections of 18 documents plus the three behaviour-support sub-sections, one recorder pass each (built-in retry), then the two genuine failures once more. Per document (last-call tokens, retries counted at twice the last call):
+
+| Document | Sections | First time | Retry | Fallback | Grades | Cache reads | Cached $ | Uncached $ |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| incident management policy | 6 | 4 | 2 | 0 | 5.5 to 10.7 | 10,675 | 0.054 | 0.080 |
+| complaints management policy | 6 | 3 | 3 | 0 | 5.9 to 9.3 | 12,275 | 0.065 | 0.098 |
+| self-assessment | 2 | 2 | 0 | 0 | 10.1 to 10.3 | 4,321 | 0.018 | 0.025 |
+| governance policy | 6 | 6 | 0 | 0 | 6.0 to 10.7 | 11,220 | 0.037 | 0.057 |
+| risk management policy | 6 | 6 | 0 | 0 | 5.7 to 8.5 | 12,530 | 0.044 | 0.066 |
+| continuity of supports plan | 6 | 3 | 3 | 0 | 6.1 to 10.1 | 11,190 | 0.068 | 0.098 |
+| conflict of interest policy | 5 | 3 | 2 | 0 | 6.2 to 10.6 | 9,239 | 0.046 | 0.070 |
+| privacy and information management policy | 5 | 4 | 0 | 1 | 7.6 to 10.6 | 9,695 | 0.030 | 0.051 |
+| records management policy | 6 | 3 | 2 | 1 | 6.9 to 9.1 | 11,652 | 0.051 | 0.082 |
+| worker screening and recruitment procedure | 5 | 3 | 2 | 0 | 7.1 to 8.7 | 10,399 | 0.051 | 0.077 |
+| induction and training procedure | 5 | 4 | 1 | 0 | 8.0 to 10.5 | 10,207 | 0.044 | 0.066 |
+| code of conduct acknowledgement | 2 | 2 | 0 | 0 | 6.7 to 7.3 | 3,666 | 0.017 | 0.023 |
+| service agreement template | 3 | 2 | 1 | 0 | 4.7 to 7.3 | 5,291 | 0.034 | 0.047 |
+| participant rights and choice policy | 6 | 6 | 0 | 0 | 6.8 to 10.0 | 11,200 | 0.039 | 0.059 |
+| safeguarding policy | 6 | 4 | 2 | 0 | 5.8 to 8.8 | 11,724 | 0.048 | 0.076 |
+| emergency and disaster management plan | 5 | 4 | 0 | 1 | 7.5 to 10.7 | 9,235 | 0.043 | 0.063 |
+| AI use and governance policy | 6 | 4 | 1 | 1 | 6.9 to 9.4 | 11,300 | 0.051 | 0.079 |
+| AI and digital data-handling procedure | 4 | 1 | 3 | 0 | 7.3 to 10.3 | 7,732 | 0.047 | 0.071 |
+| behaviour-support case: BSP implementation procedure | 3 | 2 | 0 | 1 | 9.1 to 9.6 | 8,497 | 0.045 | 0.066 |
+| **Total** | 93 | 66 | 22 | 5 | | 182,048 | **0.831** | 1.253 |
+
+Token totals across the 93 last calls: 14,750 uncached input, 12,409 cache writes, 182,048 cache reads, 54,877 output; **cache hit rate 87%** of input tokens. **The sole-trader set (90 sections) cost about $0.79 at cached rates, $1.19 uncached**, plus about $0.02 for the four first-run fixtures that were removed and recorded again: **item 3 about $0.85**, under the $1.60 ceiling. The recorder's five "fallback" rows are what the gate said at recording time; after the lint fixes below, four of those recorded replies pass on replay (the text was right, the lint was wrong), so **the review pack shows 89 of 90 sole-trader sections as real model text and one fallback**: the privacy policy's purpose, which scored 14.5, 12.4, 15.3 and 11.9 over two recorder passes (two sentences naming the Privacy Act and personal information; the under-15-words brief did not save it). Left for the PO: accept the fallback marker, or let purpose sections warn rather than fail above 11.
+
+**Lint defects found by the volume (D-536).** (1) "Policy review register" names where reviews are recorded, so rows like "Reviews this policy and records the review in the Policy review register | Every 12 months" named both subjects; the R-8 subject rule was rebuilt (span before the mention, then after it, then the objects of the review verbs with recording verbs cut off) with eleven new unit cases, including "Every 12 months for the plan; every 3 months for the register". (2) The R-9 cross-reference run stopped at a colon, so "section 5 Steps: monitoring, reporting and review" was rejected; colons and commas now stay in the run and the heading test requires a word boundary. Replay listings re-pinned: R-7 lists seven first replies the gate refused (two batch-11, five batch-16: "within 5 business days", "Within 1 business day", "within 2 days"), R-8 six, R-9 unchanged (the behaviour-support first replies now pass), R-10 all eighteen sole-trader documents with core standards removed. One R-7 case is for the PO: the continuity plan's "Within 1 business day of being told" is the provider's own promise for its backup contact, not a statutory timeframe, and the rule as written rejects it.
+
+**Review pack.** `product/evidence/req-005/sole-trader/` now holds all 18 `.docx` files and a `sections.md` covering every document (89 model-text sections, 1 fallback), each section with the answers it used and its readability grade.
 ## PO review
 (PO fills in.)
 

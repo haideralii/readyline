@@ -14,7 +14,14 @@ import type {
 } from "@anthropic-ai/sdk/resources/messages";
 import { requestHash, type ModelRequest } from "./prompts";
 
-export type ModelUsage = { inputTokens: number; outputTokens: number };
+export type ModelUsage = {
+  /** Uncached input tokens, as the API counts them. */
+  inputTokens: number;
+  outputTokens: number;
+  /** Prompt-cache writes and reads (D-046); absent in fixtures recorded before caching. */
+  cacheCreationInputTokens?: number;
+  cacheReadInputTokens?: number;
+};
 export type StopReason = "end_turn" | "max_tokens" | "other" | null;
 export type ModelReply = {
   text: string;
@@ -209,11 +216,32 @@ export class AnthropicClient implements ModelClient {
   ) {}
   async complete(request: ModelRequest): Promise<ModelReply> {
     const create = this.create ?? (await this.sdkCreate());
+    // D-046: the system prompt and the per-document block are cache breakpoints
+    // (ephemeral, five minutes); the section block comes last so a document's
+    // sections share the cached prefix.
     const message = await create({
       model: request.model,
       max_tokens: request.maxTokens,
-      system: request.system,
-      messages: [{ role: "user", content: request.user }],
+      system: [
+        {
+          type: "text",
+          text: request.system,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: request.blocks.document,
+              cache_control: { type: "ephemeral" },
+            },
+            { type: "text", text: request.blocks.section },
+          ],
+        },
+      ],
       // D-530: non-text blocks count against max_tokens and are not kept, so
       // thinking is switched off. The API rejects {type: "disabled"} for this
       // model family and names "between_tools" as the off setting (we use no
@@ -235,6 +263,9 @@ export class AnthropicClient implements ModelClient {
       usage: {
         inputTokens: message.usage.input_tokens,
         outputTokens: message.usage.output_tokens,
+        cacheCreationInputTokens:
+          message.usage.cache_creation_input_tokens ?? 0,
+        cacheReadInputTokens: message.usage.cache_read_input_tokens ?? 0,
       },
       stopReason,
       contentTypes: message.content.map((c) => c.type),

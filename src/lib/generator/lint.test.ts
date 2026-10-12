@@ -144,6 +144,89 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
     ).toEqual(["every 3 months"]);
   });
 
+  it("R-8: the register named 'Policy review register' is where a review is recorded, not a subject (batch 16 false positive)", () => {
+    const cycles = { policyMonths: 12, registerMonths: 3 };
+    expect(
+      lintReviewCycles(
+        "Role | Does what | When\nOwner | Reviews this policy and records the review in the Policy review register. | Every 12 months\nOwner | Checks that each register is complete. Records the check in the Policy review register. | Every 3 months",
+        cycles,
+      ),
+    ).toEqual([]);
+    expect(
+      lintReviewCycles(
+        "We review this policy every 12 months. We review the policy review register every 3 months and update the list of approved tools.",
+        cycles,
+      ),
+    ).toEqual([]);
+    expect(
+      lintReviewCycles(
+        "What | How often | Where recorded\nThis policy | Every 12 months (policy review) | Policy review register\nApproved tools | Every 3 months (register review) | Policy review register",
+        cycles,
+      ),
+    ).toEqual([]);
+    expect(
+      lintReviewCycles(
+        "Owner | Reviews this policy and the incident register. | Every 12 months",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["Every 12 months"]);
+    // Updating the register where the review is recorded is not reviewing the register.
+    expect(
+      lintReviewCycles(
+        "Owner | Reviews this policy and updates the Policy review register. | Every 12 months.\nOwner | Reviews the register for patterns and updates this policy. | Every 3 months.",
+        cycles,
+      ),
+    ).toEqual([]);
+    // The subject can follow the mention, and a cell can hold a cycle per subject.
+    expect(
+      lintReviewCycles(
+        "Owner as plan reviewer | Reviews this plan every 12 months. Reviews the policy review register every 3 months. | Every 12 months for the plan; every 3 months for the register\nOwner | Reviews this policy every 12 months. Reviews the register every 3 months. | Every 12 months for the policy. Every 3 months for the register",
+        cycles,
+      ),
+    ).toEqual([]);
+    expect(
+      lintReviewCycles(
+        "Owner, reviewing the register | Reads the register and closes old entries. | At the register review cycle: every 3 months\nOwner, reviewing the policy | Checks this policy still fits. | At the policy review cycle: every 12 months",
+        cycles,
+      ),
+    ).toEqual([]);
+    // A register reviewed on the policy's cycle is still wrong.
+    expect(
+      lintReviewCycles(
+        "Review the register of tools | Owner | Every 12 months",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["Every 12 months"]);
+    expect(
+      lintReviewCycles(
+        "We review this plan every 12 months and the registers listed in section 8 every 3 months. Every 12 months for this plan. Every 3 months for registers.",
+        cycles,
+      ),
+    ).toEqual([]);
+  });
+
+  it("R-9: headings with a colon or a comma after the reference still match (batch 16 false positive)", () => {
+    const outline = [
+      { number: "3", heading: "Steps: getting and understanding the plan" },
+      { number: "5", heading: "Steps: monitoring, reporting and review" },
+      { number: "7", heading: "Reportable incidents" },
+    ];
+    expect(
+      lintCrossReferences(
+        "Report the use as set out in section 5 Steps: monitoring, reporting and review. See section 7 Reportable incidents, and tell the practitioner. Section 3 Steps: getting and understanding the plan explains the checks.",
+        outline,
+      ),
+    ).toEqual([]);
+    expect(
+      lintCrossReferences(
+        "See section 3 Steps: monitoring, reporting and review.",
+        outline,
+      ).map((f) => f.why)[0],
+    ).toMatch(
+      /section 3 is Steps: getting and understanding the plan; Steps: monitoring, reporting and review is section 5/,
+    );
+  });
+
   it("terminology: 'carers' meaning family carers is not a worker synonym (D-532 proposal)", () => {
     expect(
       lintText(

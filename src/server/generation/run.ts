@@ -128,6 +128,8 @@ async function fillTailoredSections(input: {
       attempts: out.attempts,
       input_tokens: out.usage?.inputTokens ?? null,
       output_tokens: out.usage?.outputTokens ?? null,
+      cache_creation_input_tokens: out.usage?.cacheCreationInputTokens ?? null,
+      cache_read_input_tokens: out.usage?.cacheReadInputTokens ?? null,
     });
     sections.push({
       ...section,

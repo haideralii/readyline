@@ -20,8 +20,8 @@ import {
 } from "./document-model";
 import { reviewCyclesFor } from "./catalogue";
 
-/** .2 (batch 15, D-531): the user prompt carries the document outline (R-9). */
-export const PROMPT_VERSION = "2026-10-12.2";
+/** .2 (batch 15, D-531): the user prompt carries the document outline (R-9). .3 (batch 16, D-046): document block first, section block last, for caching. */
+export const PROMPT_VERSION = "2026-10-12.3";
 
 const FactsSchema = strictObject({
   tradingName: z.string().min(1).max(120),

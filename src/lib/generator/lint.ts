@@ -274,7 +274,7 @@ export function lintCrossReferences(
   const list = outline.map((o) => `${o.number} ${o.heading}`).join(", ");
   const advice = `Refer to sections by the number and title in the outline (${list})`;
   // "section N" and whatever follows it on the same line up to the next boundary.
-  const re = /\bsections?[ \t]+(\d+)\b([^.,;:()|\n]*)/gi;
+  const re = /\bsections?[ \t]+(\d+)\b([^.;()|\n]*)/gi;
   for (const m of text.matchAll(re)) {
     const number = m[1];
     const rest = m[2].replace(/^[ \t]+/, "");
@@ -318,7 +318,7 @@ export function lintCrossReferences(
 function startsWithHeading(rest: string, heading: string): boolean {
   const r = rest.toLowerCase();
   const h = heading.toLowerCase();
-  return r === h || r.startsWith(`${h} `);
+  return r === h || (r.startsWith(h) && !/[a-z0-9]/.test(r.charAt(h.length)));
 }
 
 /** The text between the nearest boundary characters around a match. */
@@ -335,6 +335,46 @@ function unitAround(
   return text.slice(start, end);
 }
 
+type Subjects = { register: boolean; policy: boolean };
+
+/** "Policy review register" is a register (the one that records reviews), not the policy. */
+function subjectsOf(raw: string): Subjects {
+  const s = raw.replace(/\bpolicy[ \t]+review[ \t]+registers?\b/gi, "register");
+  return {
+    register: /\bregister/i.test(s),
+    policy:
+      /\b(?:polic(?:y|ies)|procedure|plan|framework|this document)\b/i.test(s),
+  };
+}
+
+function hasSubject(s: Subjects): boolean {
+  return s.register || s.policy;
+}
+
+/** The subjects named right after each review verb ("reviews this policy and ...", "looks at the register"). */
+function reviewObjects(raw: string): Subjects {
+  // The register's own name holds the word "review"; read it as "register" first.
+  const text = raw.replace(
+    /\bpolicy[ \t]+review[ \t]+registers?\b/gi,
+    "register",
+  );
+  const out = { register: false, policy: false };
+  const re =
+    /(?<!\b(?:the|a|an|each|this|that|its|our|every|next|at)\s)\b(?:review(?:s|ed|ing)?|check(?:s|ed|ing)?|look(?:s|ed|ing)?\s+at)\s+((?:\s*[\w'-]+){0,6})/gi;
+  for (const m of text.matchAll(re)) {
+    // The object ends where a recording verb starts: "reviews this policy and
+    // updates the register" reviews the policy only.
+    const object = m[1].replace(
+      /\b(?:records?|updates?|enters?|logs?|writes?|keeps?|files?|stores?|notes?)\b[\s\S]*$/i,
+      "",
+    );
+    const s = subjectsOf(object);
+    out.register ||= s.register;
+    out.policy ||= s.policy;
+  }
+  return out;
+}
+
 export function lintReviewCycles(
   text: string,
   cycles: ReviewCycles,
@@ -346,39 +386,35 @@ export function lintReviewCycles(
     const months = monthsOf(m[1] ?? "", m[2]);
     if (months === null) continue;
     const at = m.index ?? 0;
-    // The unit is the sentence. In a table row (cells joined by " | " in
-    // blocksToText) a cycle cell such as "At least every 12 months" has no
-    // subject of its own, so the whole row gives the subject.
-    const subjectOf = (s: string) => ({
-      register: /\bregister/i.test(s),
-      policy:
-        /\b(?:polic(?:y|ies)|procedure|plan|framework|this document)\b/i.test(
-          s,
-        ),
-    });
     const line = unitAround(text, at, m[0].length, /\n/);
     const sentence = unitAround(text, at, m[0].length, /[.\n]/);
     const isRow = line.includes(" | ");
     // D-043: only review wording is a review cycle (the row counts for a table).
     if (!REVIEW_WORDING.test(isRow ? line : sentence)) continue;
-    // A sentence or row can give each subject its own cycle ("this policy every
-    // 12 months and the register every 3 months"; "Policy every 12 months;
-    // register every 3 months" in a cell): the subject of a mention is what the
-    // sentence (or the cell, in a row) names between the previous mention and
-    // this one; when that span names nothing, the sentence, then the row, decide.
-    const unit = isRow ? unitAround(text, at, m[0].length, /[|\n]/) : sentence;
+    // The unit is the sentence, cut at a cell boundary in a table row. The
+    // subject of a mention is what the unit names between the previous mention
+    // and this one (after the last ";", "," or ":"), else what follows it up to
+    // the next mention ("every 12 months for the plan"), else the object of the
+    // review verbs in the sentence, then in the row. With no subject anywhere,
+    // either pack value will do.
+    const unit = unitAround(text, at, m[0].length, isRow ? /[.|\n]/ : /[.\n]/);
     const unitStart = text.indexOf(unit, Math.max(0, at - unit.length));
-    const before = text.slice(Math.max(unitStart, 0), at);
+    const offset = Math.max(0, at - unitStart);
+    const before = unit.slice(0, offset);
+    const after = unit.slice(offset + m[0].length);
     const prior = [...before.matchAll(re)].pop();
-    const span = prior
-      ? before.slice((prior.index ?? 0) + prior[0].length)
-      : before;
-    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(span);
-    if (!aboutRegister && !aboutPolicy)
-      ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(sentence));
-    if (!aboutRegister && !aboutPolicy && isRow)
-      ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(line));
-    // Every subject the sentence names must fit the cycle; with no subject any pack value will do.
+    const spanBefore = (
+      prior ? before.slice((prior.index ?? 0) + prior[0].length) : before
+    ).replace(/^[\s\S]*[;,:]/, "");
+    // A non-global clone: String.match with a /g regex gives no index.
+    const next = new RegExp(re.source, "i").exec(after);
+    const spanAfter = next ? after.slice(0, next.index) : after;
+    let subjects = subjectsOf(spanBefore);
+    if (!hasSubject(subjects)) subjects = subjectsOf(spanAfter);
+    if (!hasSubject(subjects)) subjects = reviewObjects(sentence);
+    if (!hasSubject(subjects) && isRow) subjects = reviewObjects(line);
+    const { register: aboutRegister, policy: aboutPolicy } = subjects;
+    // Every subject named must fit the cycle; with no subject any pack value will do.
     const ok =
       (!aboutRegister || months === cycles.registerMonths) &&
       (!aboutPolicy || months === cycles.policyMonths) &&
