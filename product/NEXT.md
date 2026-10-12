@@ -492,3 +492,21 @@ All eight items worked; no model call and no Stripe call was made (cost table: n
 2. **Vercel Hobby runs cron jobs at most daily** (D-707): the generation job is carried by the webhook's `after()` run and the route's self-kick; the daily cron is only a backstop. On a Pro plan set `/api/jobs/generate` to every minute in `vercel.json`.
 3. **PRs to open (PO):** `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (stacked on P2). Merge order that avoids conflicts: #14, #15, then REQ-006, REQ-013 P2, REQ-014.
 4. **Before the first real sale** (`supabase/ops/refund.md`): `GENERATION_LIVE=1`, the dashboard webhook secret, one test-mode purchase and refund recorded in REQ-007's evidence.
+
+## Queue (written by PO, 13 Oct 2026, batch 20)
+
+**PO review of the overnight batch:** all six items accepted (REQ-004 FR-9/10, REQ-007 Session C, REQ-006, REQ-013 P2, REQ-014 with R-1 to R-3; D-052, D-053). PR #14 is still red after 4ae771b: see the overnight note above (the grants migration references payments tables; the secret scan sees the original commit). The PO opens the remaining PRs after the branches below are pushed and merges in the dev's order: #14, #15, REQ-006, REQ-013 P2, REQ-014.
+
+0. **Push `main`** with the PO's batch-20 commit.
+
+1. **PR #14 green** on `req-004-magic-link-any-device`: remove the grants on `purchases`, `entitlements` and `generation_jobs` from `20261012060000_authenticated_table_grants.sql` (add them to the payments migration on `req-007-payments` instead); squash the branch to one commit so gitleaks sees only runtime-built fixtures; `--force-with-lease` (D-033); push. Confirm all four jobs green.
+
+2. **PR #15 after #14**: merge `main` once #14 is in (the PO will tell you by a line in this file if you are mid-batch; otherwise merge `main` as it stands and resolve), add the payments-table grants for both roles to the payments migration, push.
+
+3. **REQ-014 R-1 to R-3** on `req-014-visual-identity` (CTA wording, progress-bar fill, "Back to:" label); re-capture the home and supports screenshots; push.
+
+4. **Rebase order**: `req-006-checklist` is from `main` and needs nothing; `req-013-p2` from `main`; `req-014-visual-identity` stays stacked on `req-013-p2`. Do not rebase unless a PR shows conflicts.
+
+5. **Status.**
+
+6. STOP.
