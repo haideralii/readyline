@@ -318,6 +318,33 @@ Two requests with `thinking: {type: "disabled"}` were rejected by the API (HTTP 
 | Outline block (every section's user prompt changes) | every fixture is re-keyed, including the ones that pass both lints, so the three sole-trader documents (14 sections) are re-recorded in item 2 and the behaviour-support sub-sections wait for the full-set batch (`GENERATION_RECORD_CASE=verification-sole-trader` limits the run) |
 
 **A consequence of R-10 the PO should weigh.** The skeleton snapshot for the sole-trader case changed in eleven documents whose listed standards are all core-module ones (governance policy, continuity of supports plan, conflict of interest policy, privacy and information management policy, records management policy, service agreement template, participant rights and choice policy, safeguarding policy, emergency and disaster management plan, AI use and governance policy, AI and digital data-handling procedure): their fixed "Records and evidence to retain" text, which lists evidence per standard, now renders the provider-to-complete placeholder instead, because a verification provider is not audited against those standards. The documents still ship and the tailored sections still receive the facts; they just cite no standard. If the PO would rather these documents cite the core standards as good practice for a verification provider, the filter can take a per-document `standardsSelection: "listed"` escape; not done without a decision.
+
+**Re-recording the three documents (item 2), three runs, 20 billed calls over 14 sections, thinking off, about $0.28:**
+
+Run 1, all 14 sections (upper bound about $0.21, retry first calls counted at the last call's size):
+
+| Section | Cap | In | Out | Dollars | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| incident / purpose | 1,500 | 2,278 | 111 | 0.006 (x2) | fell back: grade 22, then 11.4 on the retry |
+| incident / scope | 1,500 | 2,219 | 575 | 0.010 | first time, grade 9.3 |
+| incident / policy statement | 2,500 | 2,303 | 656 | 0.011 (x2) | fell back: "policy and our register every 12 months" (right to reject), then a correct sentence rejected by a lint false positive (D-532) plus "complies with the Rules" |
+| incident / how we put this into practice | 4,000 | 2,324 | 901 | 0.014 | first time, grade 6.3 |
+| incident / responsibilities | 1,500 | 2,316 | 674 | 0.011 | first time, grade 7.2 |
+| incident / incident procedure | 4,000 | 2,257 | 839 | 0.013 | first time, grade 6.0 |
+| complaints / purpose | 1,500 | 2,305 | 143 | 0.006 (x2) | grade 15.2, then 9.7 on the retry |
+| complaints / scope | 1,500 | 2,297 | 495 | 0.010 (x2) | "carers" (families and carers), then 8.0 on the retry |
+| complaints / policy statement | 2,500 | 2,302 | 721 | 0.012 (x2) | fell back: "families and carers" twice (lint false positive, D-532) |
+| complaints / how we put this into practice | 4,000 | 2,349 | 739 | 0.012 | first time, grade 6.3 |
+| complaints / responsibilities | 1,500 | 2,420 | 653 | 0.011 (x2) | fell back: "Policy every 12 months; register every 3 months" twice, correct text rejected (D-532) |
+| complaints / complaints procedure | 4,000 | 2,299 | 1,161 | 0.016 | first time, grade 6.9 |
+| self-assessment / our registration scope | 1,500 | 2,929 | 400 | 0.010 | first time, grade 8.8 |
+| self-assessment / how we meet these standards | 1,500 | 2,961 | 851 | 0.014 | first time, grade 9.3 |
+
+Three of the four fallbacks were correct text rejected by two lint defects: the R-8 subject rule took the whole sentence or row as the subject of every cycle mention, so a sentence giving the policy and the register their own cycles could never pass; and "families and carers" (the Commission's phrase for a participant's own carers) tripped the worker-synonym rule. Both fixed with unit tests (D-532; the carer exception is narrow and for the PO to confirm). The failed fixtures were removed and the four sections recorded again (run 2, about $0.05): incident policy statement passed on its retry (grade 9.5; the first reply had the register at 12 months), complaints policy statement (9.5) and responsibilities (7.9) first time, incident purpose fell back again (15.7, then 12.0). Its cause is the brief: a two-sentence section is graded on two sentences and the standard's name makes them long (D-533), so the purpose brief now asks for sentences under 15 words; the two recorded purpose sections were re-keyed and recorded (run 3, about $0.01): incident 10.7 and complaints 9.4, first time.
+
+**Review pack.** `sections.md` shows the three documents complete again: incident (grades 6.0 to 10.7), complaints (6.3 to 9.5), self-assessment (8.8, 9.3); no fallback marker; every cross-reference passed the outline lint at generation time (the replay listing for R-9 holds only the orphaned batch-12 and behaviour-support fixtures).
+
+**Measured cost per complete document with thinking off (last-call tokens, retries counted twice):** incident policy about $0.07 (six sections, one retry), complaints policy about $0.07 (six sections, one retry), self-assessment about $0.02 (two sections). About $0.011 per section that passes first time, $0.02 with a retry; input is 2,200 to 3,000 tokens per call with the outline block.
 ## PO review
 (PO fills in.)
 

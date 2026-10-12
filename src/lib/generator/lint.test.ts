@@ -115,6 +115,49 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
     ).toEqual(["Every year", "every month"]);
   });
 
+  it("R-8: a sentence or row that gives each subject its own cycle passes (batch 15 false positive)", () => {
+    const cycles = { policyMonths: 12, registerMonths: 3 };
+    expect(
+      lintReviewCycles(
+        "We review this policy every 12 months and the incident register every 3 months. We update our practice when the review shows something needs to change.",
+        cycles,
+      ),
+    ).toEqual([]);
+    expect(
+      lintReviewCycles(
+        "Role | Does what | When\nOwner | Reviews this policy and the complaints register. See section 11 Review. | Policy every 12 months; register every 3 months",
+        cycles,
+      ),
+    ).toEqual([]);
+    // One cycle for both subjects is still wrong, whichever order they come in.
+    expect(
+      lintReviewCycles(
+        "We review this policy and our register every 12 months.",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["every 12 months"]);
+    expect(
+      lintReviewCycles(
+        "We review the register every 3 months and this policy every 3 months.",
+        cycles,
+      ).map((f) => f.match),
+    ).toEqual(["every 3 months"]);
+  });
+
+  it("terminology: 'carers' meaning family carers is not a worker synonym (D-532 proposal)", () => {
+    expect(
+      lintText(
+        "We welcome complaints from participants, their families and carers, and advocates. Family carers and unpaid carers can complain for a participant.",
+      ),
+    ).toEqual([]);
+    expect(
+      lintText("Our carers record each shift.").map((f) => f.rule),
+    ).toEqual(["term-worker"]);
+    expect(
+      lintText("A carer completes the register.").map((f) => f.rule),
+    ).toEqual(["term-worker"]);
+  });
+
   it("R-9: cross-references must name a section of this document's outline", () => {
     const outline = [
       { number: "1", heading: "Purpose" },

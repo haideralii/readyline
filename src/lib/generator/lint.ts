@@ -123,6 +123,14 @@ export function lintText(
         AMERICAN_ALLOW.has(m[0].toLowerCase())
       )
         continue;
+      // D-532 (proposed): "carers" next to families, family or unpaid means the
+      // participant's own carers, the Commission's phrase, not a worker role.
+      if (
+        rule.id === "term-worker" &&
+        /^carers?$/i.test(m[0]) &&
+        isFamilyCarer(scrubbed, m.index ?? 0, m[0].length)
+      )
+        continue;
       findings.push({
         rule: rule.id,
         severity: rule.severity,
@@ -142,6 +150,16 @@ export function lintText(
     });
   }
   return findings.sort((a, b) => a.index - b.index);
+}
+
+function isFamilyCarer(text: string, index: number, length: number): boolean {
+  const before = text.slice(Math.max(0, index - 40), index);
+  const after = text.slice(index + length, index + length + 20);
+  return (
+    /\b(?:families?|family|unpaid|informal)\s+(?:and\s+|members\s+and\s+)?$/i.test(
+      before,
+    ) || /^\s+and\s+famil(?:y|ies)\b/i.test(after)
+  );
 }
 
 export function lintErrors(findings: readonly LintFinding[]): LintFinding[] {
@@ -343,7 +361,21 @@ export function lintReviewCycles(
     const isRow = line.includes(" | ");
     // D-043: only review wording is a review cycle (the row counts for a table).
     if (!REVIEW_WORDING.test(isRow ? line : sentence)) continue;
-    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(sentence);
+    // A sentence or row can give each subject its own cycle ("this policy every
+    // 12 months and the register every 3 months"; "Policy every 12 months;
+    // register every 3 months" in a cell): the subject of a mention is what the
+    // sentence (or the cell, in a row) names between the previous mention and
+    // this one; when that span names nothing, the sentence, then the row, decide.
+    const unit = isRow ? unitAround(text, at, m[0].length, /[|\n]/) : sentence;
+    const unitStart = text.indexOf(unit, Math.max(0, at - unit.length));
+    const before = text.slice(Math.max(unitStart, 0), at);
+    const prior = [...before.matchAll(re)].pop();
+    const span = prior
+      ? before.slice((prior.index ?? 0) + prior[0].length)
+      : before;
+    let { register: aboutRegister, policy: aboutPolicy } = subjectOf(span);
+    if (!aboutRegister && !aboutPolicy)
+      ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(sentence));
     if (!aboutRegister && !aboutPolicy && isRow)
       ({ register: aboutRegister, policy: aboutPolicy } = subjectOf(line));
     // Every subject the sentence names must fit the cycle; with no subject any pack value will do.

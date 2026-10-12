@@ -66,7 +66,10 @@ describe("recorded fixtures replay through the current gate", () => {
       "policy-statement",
     );
     expect(out.status).toBe("generated");
-    expect(out.attempts).toBe(1);
+    // Batch 15: the first reply gave the register a 12-month cycle and R-8
+    // rejected it; the recorded retry passes, so the replay takes two attempts.
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toMatch(/states a review cycle/);
     expect(out.readability?.grade).toBeLessThanOrEqual(11);
   });
 
@@ -190,8 +193,12 @@ describe("recorded fixtures replay through the current gate", () => {
         Object.keys(results).map((k) => k.split("/").slice(0, 2).join("/")),
       ),
     ].sort();
+    // Batch 15 adds the rejected first reply of the policy statement ("this
+    // policy and our register every 12 months"), kept because its retry fixture
+    // is what the replay passes through.
     expect(sections).toEqual([
       "incident-management-policy-and-register/how-we-do-this",
+      "incident-management-policy-and-register/policy-statement",
       "incident-management-policy-and-register/responsibilities",
     ]);
   });

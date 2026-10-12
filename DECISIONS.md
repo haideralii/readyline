@@ -1093,6 +1093,32 @@ nothing). Every existing fixture is orphaned by the outline block; the
 three sole-trader documents are re-recorded in this batch, the
 behaviour-support sub-sections wait for the full-set batch
 (`GENERATION_RECORD_CASE` limits a recording run to one case).
+
+**D-532 Two lint false positives found by the batch-15 re-recording (Dev,
+2026-10-12; the second for PO confirmation).** (1) The R-8 lint rejected
+"We review this policy every 12 months and the incident register every 3
+months" and the cell "Policy every 12 months; register every 3 months",
+both correct, because it took the subject of every cycle mention from the
+whole sentence or row. The subject is now what the sentence (the cell, in a
+row) names between the previous cycle mention and this one, falling back to
+the sentence and then the row when that span names nothing; one cycle for
+both subjects is still rejected. Two sections fell back on this alone and
+were re-recorded. (2) The terminology lint flagged "participants, their
+families and carers" as the banned worker synonym "carer". That phrase is
+the Commission's own and means the participant's family carers, so
+"carer(s)" is now allowed when preceded by "families and", "family",
+"unpaid" or "informal", or followed by "and families"; "our carers" and "a
+carer completes the register" are still rejected. The house style itself is
+unchanged; the PO may fold the exception into it or strike it.
+
+**D-533 Purpose briefs ask for sentences under 15 words (Dev, 2026-10-12).**
+A purpose section is two sentences, so its reading grade rests on two
+sentences alone and the standard's name makes each one long: the incident
+purpose scored 16.5, 22 and 15.7 on first replies across batches and 11.4
+and 12.0 on retries. The brief now reads "Two short sentences, each under
+15 words: ..."; both recorded purpose sections then passed first time
+(grades 10.7 and 9.4). This re-keyed only the purpose sections, two of them
+recorded.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

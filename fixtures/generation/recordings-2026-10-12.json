@@ -202,24 +202,129 @@
       "sectionId": "how-we-meet",
       "cap": 1500,
       "estimatedInputTokens": 2075
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1560
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1551
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1552
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1640
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1638
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1585
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1569
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1571
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1579
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1658
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1657
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1618
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "summary",
+      "cap": 1500,
+      "estimatedInputTokens": 2178
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2206
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1560
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1551
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1579
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1657
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1556
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1575
     }
   ],
   "recordings": [
-    {
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "incident-management-policy-and-register",
-      "sectionId": "policy-statement",
-      "model": "claude-sonnet-5-5",
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "problems": [],
-      "readabilityGrade": 8.5,
-      "inputTokensLastCall": 2325,
-      "outputTokensLastCall": 1397,
-      "estimatedDollarsLastCall": 0.0186,
-      "requestHash": "b0f2c03e9653cbc0b20aaba22f1a8a344215fe8993b6dbb3726a2692ba158541"
-    },
     {
       "caseId": "certification-personal-care",
       "documentTypeId": "governance-policy",
@@ -255,65 +360,6 @@
       "estimatedDollarsLastCall": 0.0513,
       "requestHash": "a1adc76ca50f431677688a9820bb4b99b518805c31adc1ae7cfc8c48e3fa1092",
       "recordedAt": "2026-10-12T00:32:59.042Z"
-    },
-    {
-      "batch": 11,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "incident-management-policy-and-register",
-      "sectionId": "scope",
-      "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "truncatedAtTokens": null,
-      "problems": [],
-      "readabilityGrade": 8.6,
-      "inputTokensLastCall": 2320,
-      "outputTokensLastCall": 673,
-      "estimatedDollarsLastCall": 0.0114,
-      "requestHash": "467e7b24a2549a170489dafd3c653ba392405ed4dafe2003e4a48b66ee242533",
-      "recordedAt": "2026-10-12T00:33:11.739Z"
-    },
-    {
-      "batch": 12,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "incident-management-policy-and-register",
-      "sectionId": "purpose",
-      "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "generated",
-      "attempts": 2,
-      "validationPassedFirstTime": false,
-      "truncatedAtTokens": null,
-      "problems": [
-        "readability grade 16.5 is above 11: shorten sentences to under 20 words and use common words"
-      ],
-      "readabilityGrade": 10.3,
-      "inputTokensLastCall": 2381,
-      "outputTokensLastCall": 110,
-      "estimatedDollarsLastCall": 0.0059,
-      "requestHash": "d4a6446d7af4a23ab58ce65a1634d29075f93946ce157f5d875cb419351731c3",
-      "recordedAt": "2026-10-12T00:48:46.348Z"
-    },
-    {
-      "batch": 12,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "incident-management-policy-and-register",
-      "sectionId": "procedure",
-      "model": "claude-sonnet-5-5",
-      "cap": 4000,
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "truncatedAtTokens": null,
-      "problems": [],
-      "readabilityGrade": 5.5,
-      "inputTokensLastCall": 2364,
-      "outputTokensLastCall": 1098,
-      "estimatedDollarsLastCall": 0.0157,
-      "requestHash": "873bc68606bfafbe19fb7608bfa013e49713ebeb128089b4bcef93d15c5b8d10",
-      "recordedAt": "2026-10-12T00:49:22.699Z"
     },
     {
       "batch": 12,
@@ -376,6 +422,25 @@
       "batch": 12,
       "caseId": "verification-sole-trader",
       "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "scope",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.3,
+      "inputTokensLastCall": 2219,
+      "outputTokensLastCall": 575,
+      "estimatedDollarsLastCall": 0.0102,
+      "requestHash": "c13aad78f658e4521723731d60f09c18da28cd518d74d2797008f5485fd618c8",
+      "recordedAt": "2026-10-12T02:37:45.288Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
       "sectionId": "how-we-do-this",
       "model": "claude-sonnet-5-5",
       "cap": 4000,
@@ -384,12 +449,12 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 5.4,
-      "inputTokensLastCall": 2432,
-      "outputTokensLastCall": 1828,
-      "estimatedDollarsLastCall": 0.0231,
-      "requestHash": "f49f898a15dc99298aa161b89076876293c6f23e06a03564e9015fce85008fc5",
-      "recordedAt": "2026-10-12T01:37:09.466Z"
+      "readabilityGrade": 6.3,
+      "inputTokensLastCall": 2324,
+      "outputTokensLastCall": 901,
+      "estimatedDollarsLastCall": 0.0137,
+      "requestHash": "bfbaa822fe4829c75af691b8fed6ca0d3acbb1019f96c0f181f82ceb2cf937d8",
+      "recordedAt": "2026-10-12T02:37:53.679Z"
     },
     {
       "batch": 12,
@@ -403,33 +468,31 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 6.4,
-      "inputTokensLastCall": 2424,
-      "outputTokensLastCall": 1216,
-      "estimatedDollarsLastCall": 0.017,
-      "requestHash": "91bfa9343fd4ecd312cff5ee06f225c9eb5d364f0c1d5ae43cee679978393a61",
-      "recordedAt": "2026-10-12T01:37:20.530Z"
+      "readabilityGrade": 7.2,
+      "inputTokensLastCall": 2316,
+      "outputTokensLastCall": 674,
+      "estimatedDollarsLastCall": 0.0114,
+      "requestHash": "a71d15f039e5cf7d58a689e832ceeb4494d7b5b2b5d9af9be2ef88c07d1143f4",
+      "recordedAt": "2026-10-12T02:37:59.637Z"
     },
     {
-      "batch": 13,
+      "batch": 12,
       "caseId": "verification-sole-trader",
-      "documentTypeId": "complaints-management-policy-and-register",
-      "sectionId": "purpose",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "procedure",
       "model": "claude-sonnet-5-5",
-      "cap": 1500,
+      "cap": 4000,
       "status": "generated",
-      "attempts": 2,
-      "validationPassedFirstTime": false,
+      "attempts": 1,
+      "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
-      "problems": [
-        "readability grade 12.6 is above 11: shorten sentences to under 20 words and use common words"
-      ],
-      "readabilityGrade": 9.4,
-      "inputTokensLastCall": 2497,
-      "outputTokensLastCall": 461,
-      "estimatedDollarsLastCall": 0.0096,
-      "requestHash": "75e081953e469aa200a0fa86418afc39415f80564787bbd19f3144738d690d3e",
-      "recordedAt": "2026-10-12T01:38:56.932Z"
+      "problems": [],
+      "readabilityGrade": 6,
+      "inputTokensLastCall": 2257,
+      "outputTokensLastCall": 839,
+      "estimatedDollarsLastCall": 0.0129,
+      "requestHash": "34168c3e4352e06a3eab41968727fb8a4424cfa54b801447bafc3285b7540c1e",
+      "recordedAt": "2026-10-12T02:38:07.010Z"
     },
     {
       "batch": 13,
@@ -443,12 +506,109 @@
       "validationPassedFirstTime": false,
       "truncatedAtTokens": null,
       "problems": ["term-worker: \"carers\" (Use 'worker'.)"],
-      "readabilityGrade": 7.8,
-      "inputTokensLastCall": 2489,
-      "outputTokensLastCall": 1116,
-      "estimatedDollarsLastCall": 0.0161,
-      "requestHash": "f3ae42b14b4d53d01ec3a7582bae14007797a481b804908f1c6464ae62ee92dd",
-      "recordedAt": "2026-10-12T01:39:18.746Z"
+      "readabilityGrade": 8,
+      "inputTokensLastCall": 2297,
+      "outputTokensLastCall": 495,
+      "estimatedDollarsLastCall": 0.0095,
+      "requestHash": "aa7da53ce6ae81189f85b201c18697cb9bf5097e12af465dcbd153c5ff8abd45",
+      "recordedAt": "2026-10-12T02:38:19.525Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 6.3,
+      "inputTokensLastCall": 2349,
+      "outputTokensLastCall": 739,
+      "estimatedDollarsLastCall": 0.0121,
+      "requestHash": "210e7b7742b2b04ba104f3bbd2779836b7a5b265a683c164752f78fbb6a03505",
+      "recordedAt": "2026-10-12T02:38:38.095Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "procedure",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 6.9,
+      "inputTokensLastCall": 2299,
+      "outputTokensLastCall": 1161,
+      "estimatedDollarsLastCall": 0.0162,
+      "requestHash": "9a50f485b62ce8eb9d51335c61064125da8a4f3ba95a391c4338d068ce7b4662",
+      "recordedAt": "2026-10-12T02:39:01.586Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "summary",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 8.8,
+      "inputTokensLastCall": 2929,
+      "outputTokensLastCall": 400,
+      "estimatedDollarsLastCall": 0.0099,
+      "requestHash": "27e7d0521cd6f852b1c43736aa8fb713cf224bb53688159e20ec54accbfc7e60",
+      "recordedAt": "2026-10-12T02:39:05.297Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "how-we-meet",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.3,
+      "inputTokensLastCall": 2961,
+      "outputTokensLastCall": 851,
+      "estimatedDollarsLastCall": 0.0144,
+      "requestHash": "7bfef8452181ec269dfbcaa12638ef54deff409832e25cd273420b68bde6a1cd",
+      "recordedAt": "2026-10-12T02:39:12.063Z"
+    },
+    {
+      "batch": 10,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "model": "claude-sonnet-5-5",
+      "cap": 2500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "states a review cycle (\"every 12 months\"): use the review cycles given: policy review every 12 months, register review every 3 months; never choose your own"
+      ],
+      "readabilityGrade": 9.5,
+      "inputTokensLastCall": 2303,
+      "outputTokensLastCall": 477,
+      "estimatedDollarsLastCall": 0.0094,
+      "requestHash": "9b6c340aea7ac7877a7530cdfe931a265ab07ad025b63841c18b933e6834a07b",
+      "recordedAt": "2026-10-12T02:42:28.077Z"
     },
     {
       "batch": 13,
@@ -463,30 +623,11 @@
       "truncatedAtTokens": null,
       "problems": [],
       "readabilityGrade": 9.5,
-      "inputTokensLastCall": 2441,
-      "outputTokensLastCall": 1892,
-      "estimatedDollarsLastCall": 0.0238,
-      "requestHash": "bfc627cad75343ee11371e9cebdf5a01b061b393e5bc88848301d4f00be98f82",
-      "recordedAt": "2026-10-12T01:53:22.614Z"
-    },
-    {
-      "batch": 13,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "complaints-management-policy-and-register",
-      "sectionId": "how-we-do-this",
-      "model": "claude-sonnet-5-5",
-      "cap": 4000,
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "truncatedAtTokens": null,
-      "problems": [],
-      "readabilityGrade": 5.8,
-      "inputTokensLastCall": 2548,
-      "outputTokensLastCall": 2459,
-      "estimatedDollarsLastCall": 0.0297,
-      "requestHash": "3ab2ba0416662f6716ba875367a97c284d8bd22629415b208d54930f6505b13d",
-      "recordedAt": "2026-10-12T01:53:43.507Z"
+      "inputTokensLastCall": 2249,
+      "outputTokensLastCall": 547,
+      "estimatedDollarsLastCall": 0.01,
+      "requestHash": "2107729c5d46b80ed5df072ab4e0b76dace469100d35098791a317049b4951fa",
+      "recordedAt": "2026-10-12T02:42:36.445Z"
     },
     {
       "batch": 13,
@@ -500,37 +641,37 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 6.5,
-      "inputTokensLastCall": 2540,
-      "outputTokensLastCall": 1462,
-      "estimatedDollarsLastCall": 0.0197,
-      "requestHash": "01708a9fcce310e9e73c5f8346ef864574cc4be599902e80b34638078778cf7b",
-      "recordedAt": "2026-10-12T01:53:56.073Z"
+      "readabilityGrade": 7.9,
+      "inputTokensLastCall": 2341,
+      "outputTokensLastCall": 694,
+      "estimatedDollarsLastCall": 0.0116,
+      "requestHash": "043f23d356d8666272ea3c7c0809a440f199e49f70f5fbbb6493621efdf36b5d",
+      "recordedAt": "2026-10-12T02:42:42.555Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 10.7,
+      "inputTokensLastCall": 2223,
+      "outputTokensLastCall": 96,
+      "estimatedDollarsLastCall": 0.0054,
+      "requestHash": "f932c2171c9e5a61bde73d968ac554a0f3d884ca5c682de0e9e5913651f4deb5",
+      "recordedAt": "2026-10-12T02:43:31.571Z"
     },
     {
       "batch": 13,
       "caseId": "verification-sole-trader",
       "documentTypeId": "complaints-management-policy-and-register",
-      "sectionId": "procedure",
-      "model": "claude-sonnet-5-5",
-      "cap": 4000,
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "truncatedAtTokens": null,
-      "problems": [],
-      "readabilityGrade": 5.8,
-      "inputTokensLastCall": 2497,
-      "outputTokensLastCall": 2119,
-      "estimatedDollarsLastCall": 0.0262,
-      "requestHash": "914db10036839d9a0ae6a9ab891c3d95a68b2abda05a50ac1e4f33f271fac8fd",
-      "recordedAt": "2026-10-12T01:54:14.834Z"
-    },
-    {
-      "batch": 13,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "practice-standards-self-assessment",
-      "sectionId": "summary",
+      "sectionId": "purpose",
       "model": "claude-sonnet-5-5",
       "cap": 1500,
       "status": "generated",
@@ -538,31 +679,12 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 8.3,
-      "inputTokensLastCall": 2755,
-      "outputTokensLastCall": 1228,
-      "estimatedDollarsLastCall": 0.0178,
-      "requestHash": "c0c35699c5ce7f359567a4b04413d50bb1be22358c5e57d60f0d1787cd872edb",
-      "recordedAt": "2026-10-12T01:54:25.404Z"
-    },
-    {
-      "batch": 13,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "practice-standards-self-assessment",
-      "sectionId": "how-we-meet",
-      "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "generated",
-      "attempts": 1,
-      "validationPassedFirstTime": true,
-      "truncatedAtTokens": null,
-      "problems": [],
-      "readabilityGrade": 10,
-      "inputTokensLastCall": 2786,
-      "outputTokensLastCall": 721,
-      "estimatedDollarsLastCall": 0.0128,
-      "requestHash": "a8d008af9f1ecc1fecd8d8213cbb95daf04d638181901281afdb96f990210bbb",
-      "recordedAt": "2026-10-12T02:00:33.922Z"
+      "readabilityGrade": 9.4,
+      "inputTokensLastCall": 2248,
+      "outputTokensLastCall": 108,
+      "estimatedDollarsLastCall": 0.0056,
+      "requestHash": "68cdec57935d7531ece92a0ef51ca5c12084241892283725673601e538ed15ba",
+      "recordedAt": "2026-10-12T02:43:33.539Z"
     }
   ]
 }
