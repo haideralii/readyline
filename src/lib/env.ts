@@ -55,6 +55,11 @@ export const REQUIRED_LATER: ReadonlyArray<{
     productionHome: "Vercel project environment variables (server only)",
   },
   {
+    name: "CONTACT_EMAIL",
+    from: "REQ-008 (footer Contact link; public once set)",
+    productionHome: "Vercel project environment variables",
+  },
+  {
     name: "STRIPE_SECRET_KEY",
     from: "REQ-007",
     productionHome: "Vercel project environment variables (server only)",

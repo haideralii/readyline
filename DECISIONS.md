@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦'`, `img-src 'self'
+'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -1258,6 +1258,57 @@ no-standard policies, purpose of the two plans and the AI procedure) which
 item 3 records; the privacy purpose and the continuity sole-trader cover
 need no call, since their recorded first replies now pass (short section at
 15.3 warns; "within 1 business day" has no statutory anchor).
+## REQ-008: legal and trust pages (branch `req-008-legal-pages`)
+
+Decision numbers D-8xx on this branch.
+
+**D-801 Markdown pages without a YAML library (Dev, 2026-10-12, FR-1).**
+`src/lib/legal/pages.ts` reads `product/legal/<slug>.md` on the server,
+parses the front matter with a 20-line `key: value` parser (the Dev response
+named `gray-matter`, but installing it brought four moderate npm advisories
+through its YAML dependency for a file format that needs only scalar
+strings, so it was removed the same session), validates it with zod
+(`updated` as YYYY-MM-DD, `owner: po`), drops the `# Title` line and numbers
+`##`/`###` headings from structure (D-043). Rendering is `react-markdown`
+10.1 with `remark-gfm` 4.0 and a component map (no raw HTML, headings get
+ids from their text). Five explicit routes under `src/app/(legal)/` rather
+than one `[slug]` catch-all, so no route shadows the rest of the site. The
+"Last updated" line and the draft note come from the front matter; the note
+disappears when the PO removes the `status: draft ...` line.
+
+**D-802 A quoted phrase is a mention, not a claim (Dev, 2026-10-12, AC-2).**
+The AI page says drafts must avoid claims such as "guaranteed" or
+"audit-proof". The prohibited-claims lint would flag the quoted words, so
+the legal-copy test removes double-quoted spans of up to 80 characters before
+linting. The generator's lint over model text is unchanged: a policy has no
+business quoting banned claims.
+
+**D-803 Readability lives in `src/lib/text` on this branch (Dev,
+2026-10-12).** The Flesch-Kincaid module and its tests from REQ-005 are copied
+verbatim from `req-005-generator` (PR #9, unmerged) to `src/lib/text/`, so
+this branch stands alone. When both are on `main`, the generator imports from
+`src/lib/text` and its copy is deleted (one follow-up commit). The legal-copy
+test warns above grade 9 for refunds and ai, 11 for terms, privacy and about,
+and never fails on readability (FR-1).
+
+**D-804 Footer config names and behaviour (Dev, 2026-10-12, FR-2).**
+`CONTACT_EMAIL` and `BUSINESS_ABN` are read in the footer (a server
+component) through `src/lib/legal/config.ts`, never inlined into the client
+bundle. No Contact link until `CONTACT_EMAIL` holds an address; the ABN line
+only when `BUSINESS_ABN` is 11 digits, shown in the usual 2-3-3-3 groups.
+Both are listed in `.env.example`, and `CONTACT_EMAIL` in `REQUIRED_LATER`.
+The no-third-party test allows only the app host and the Supabase project
+host; Stripe hosts are added per purchase route by REQ-007.
+
+**D-805 Footer states independence once (Dev, 2026-10-12, PO review of
+REQ-008; branch `req-008-footer-dedupe`).** `GENERAL_INFORMATION_NOTICE` is
+now the general-information statement (three sentences) followed by the
+independence statement, as two exported constants. Generated documents keep
+the full notice (CLAUDE.md 4.2 and the house style's fixed text are
+unchanged); the site footer shows the statement, the AI disclosure and the
+trust line "Hosted in Australia. Independent of the NDIA and the NDIS Quality
+and Safeguards Commission.", so independence appears once on the page.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.
