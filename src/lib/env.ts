@@ -86,6 +86,45 @@ export const REQUIRED_LATER: ReadonlyArray<{
   },
 ];
 
+/**
+ * Variables a production deployment cannot run without (REQ-010 FR-2). The
+ * boot check and the prebuild script require them when the deployment is
+ * Vercel's production environment; previews, CI's `next start` and local
+ * runs keep the short `REQUIRED` list so a page can be tried without every
+ * account.
+ */
+export const PRODUCTION_REQUIRED: ReadonlyArray<{
+  name: string;
+  productionHome: string;
+}> = [
+  ...REQUIRED,
+  ...REQUIRED_LATER.filter((v) =>
+    [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      "SUPABASE_SECRET_KEY",
+      "CRON_SECRET",
+      "ANTHROPIC_API_KEY",
+      "CONTACT_EMAIL",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "STRIPE_PRICE_PACK",
+      "PACK_PRICE_AUD_CENTS",
+    ].includes(v.name),
+  ),
+  {
+    name: "GST_LINE",
+    productionHome: "Vercel project environment variables",
+  },
+];
+
+/** True on the Vercel production deployment only (previews and local runs are not). */
+export function isProductionDeployment(
+  source: Record<string, string | undefined> = process.env,
+): boolean {
+  return source.VERCEL_ENV?.trim() === "production";
+}
+
 const schema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -99,12 +138,14 @@ export type Env = z.infer<typeof schema>;
 export type EnvResult =
   { ok: true; env: Env } | { ok: false; problems: string[] };
 
-/** Validates a source such as `process.env` without throwing. */
+/** Validates a source such as `process.env` without throwing; `production` widens the required list (REQ-010 FR-2). */
 export function validateEnv(
   source: Record<string, string | undefined> = process.env,
+  options: { production?: boolean } = {},
 ): EnvResult {
   const problems: string[] = [];
-  for (const v of REQUIRED) {
+  const required = options.production ? PRODUCTION_REQUIRED : REQUIRED;
+  for (const v of required) {
     const value = source[v.name];
     if (value === undefined || value.trim() === "") {
       problems.push(
@@ -137,8 +178,9 @@ export class EnvError extends Error {
 /** Throws an EnvError naming every missing or invalid variable. */
 export function assertEnv(
   source: Record<string, string | undefined> = process.env,
+  options: { production?: boolean } = {},
 ): Env {
-  const result = validateEnv(source);
+  const result = validateEnv(source, options);
   if (!result.ok) throw new EnvError(result.problems);
   return result.env;
 }

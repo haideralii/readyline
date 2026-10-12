@@ -10,6 +10,7 @@ import { createModelClient } from "@/lib/generator/model-client";
 import { log } from "@/lib/logging/logger";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { createEmailProvider } from "@/server/email/provider";
+import { mayRunScheduledJobs } from "@/server/jobs/cron-auth";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { runGenerationTicks, type TickReport } from "./job";
 import { SupabaseJobBackend } from "./job-backend";
@@ -66,6 +67,11 @@ export async function kickGenerationRoute(): Promise<void> {
 
 /** The webhook's after() hook and the job route share this: work now, then hand on if there is more. */
 export async function continueGeneration(budgetMs: number): Promise<void> {
+  // REQ-010 FR-6: a preview deployment never generates against the shared database.
+  if (!mayRunScheduledJobs()) {
+    log.info("payments.generation.skipped", { reason: "not-production" });
+    return;
+  }
   try {
     const { reports, more } = await runQueuedGeneration(budgetMs);
     log.info("payments.generation.tick", {

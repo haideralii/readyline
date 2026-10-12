@@ -9,7 +9,10 @@ import { NextResponse, after } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
-import { isAuthorisedCronRequest } from "@/server/jobs/cron-auth";
+import {
+  isAuthorisedCronRequest,
+  mayRunScheduledJobs,
+} from "@/server/jobs/cron-auth";
 import {
   kickGenerationRoute,
   runQueuedGeneration,
@@ -34,6 +37,9 @@ export async function GET(request: Request) {
   ) {
     return new NextResponse("Not found", { status: 404 });
   }
+  // REQ-010 FR-6: a preview deployment never generates against the shared database.
+  if (!mayRunScheduledJobs())
+    return NextResponse.json({ skipped: "not the production deployment" });
   const query = parseInput(
     Query,
     Object.fromEntries(new URL(request.url).searchParams.entries()),

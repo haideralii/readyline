@@ -1732,6 +1732,39 @@ list had no dark error colour; chosen to meet AA and recorded for review.
 Dark primary buttons use dark-paper text on dark ochre (5.5:1), the same
 `var(--paper)` token as light mode, so one rule serves both themes.
 
+## REQ-010: operations, part 1 (branch `req-010-deploy`)
+
+**D-1001 Production is `VERCEL_ENV === "production"`, and the env check
+runs twice (Dev, 2026-10-13, FR-2, AC-2).** `NODE_ENV=production` is not a
+signal: CI's `next start` and every preview build use it. On the production
+deployment the full `PRODUCTION_REQUIRED` list is enforced by a `prebuild`
+script (so the build itself fails, naming the variables) and again by the
+boot check in `instrumentation.ts`; everywhere else only
+`NEXT_PUBLIC_SITE_URL` is required, so previews and local builds keep
+working without every account. The prebuild script loads `.env*` through
+`@next/env` so a local build sees `.env.local`, and never prints a value.
+
+**D-1002 Two generation switches, both documented (FR-2).**
+`GENERATION_ENABLED` is the free-button flag from REQ-005 and stays `false`
+for the trial; `GENERATION_LIVE=1` (D-708) is what makes a paid pack call
+the model for real. The REQ's wording ("the switch to turn the model on")
+maps to `GENERATION_LIVE`; the runbook and `.env.example` say so.
+
+**D-1003 `.env.example` is enforced by a scan, not a list (FR-3).** A unit
+test walks `src/` and `scripts/` for every `process.env.X`, `env.X` and
+`source.X` read plus the name tables, and fails on any name the example
+does not carry (platform variables excepted). One-directional on purpose:
+the example may carry future names (`EMAIL_*`, `SENTRY_*`) marked "not
+read by the code yet".
+
+**D-1004 Health is memory-limited and database-free; scheduled work is
+production-only (FR-4, FR-6).** `/api/health` rate-limits in memory per
+address (60 a minute) because the route must not touch the database, so
+the limit is per instance and best-effort. `mayRunScheduledJobs()` lets the
+purge route, the generate route and the webhook's post-response generation
+run only on the Vercel production deployment (or off Vercel entirely), so a
+preview never purges or generates against the shared hosted database.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

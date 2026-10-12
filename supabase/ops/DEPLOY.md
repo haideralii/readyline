@@ -1,0 +1,182 @@
+# Deploy runbook: first deploy to Vercel (REQ-010 part 1)
+
+For Haider, on personal accounts only (CLAUDE.md section 4; D-053: Vercel
+Hobby for the private trial). Every step says where a value comes from.
+**No value is written in this file, ever.** The PO reads this first; the
+smoke test at the end tells you the deploy worked.
+
+**You already have these in `.env.local` (copy them across by name, same
+values):** `NEXT_PUBLIC_SITE_URL` (change to the production domain),
+`NEXT_PUBLIC_BRAND_NAME`, `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`,
+`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `STRIPE_SECRET_KEY`,
+`STRIPE_PRICE_PACK`, `PACK_PRICE_AUD_CENTS`, `GST_LINE`,
+`SUBSCRIPTION_PRICE_AUD_CENTS`. **Still to create:** `CRON_SECRET`,
+`CONTACT_EMAIL`, `STRIPE_WEBHOOK_SECRET` (step 7), `GENERATION_LIVE=1`.
+Your `.env.local` also holds four names the code no longer reads
+(`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_PRICE_DOCUMENT_SET`,
+`STRIPE_PRICE_SUBSCRIPTION_MONTHLY`, and the empty `EMAIL_*`/`SENTRY_*`
+pairs are for later); leave them out of Vercel.
+
+## What the deploy expects
+
+| Thing        | Version                                 | Where it is pinned                    |
+| ------------ | --------------------------------------- | ------------------------------------- |
+| Node         | 22 (LTS)                                | `.nvmrc`; set the same in Vercel      |
+| Next.js      | 16.4.0                                  | `package.json` (exact)                |
+| Supabase CLI | 2.120.0                                 | CI (`supabase/setup-cli`); migrations |
+| Region       | Sydney, `syd1`                          | Vercel project settings (step 2)      |
+| Build        | `npm run build` (runs `prebuild` first) | `package.json`                        |
+
+The `prebuild` step runs `scripts/ops/check-env.ts` with Node's
+`--experimental-strip-types` flag (Node 22.6 or later). On the production
+deployment it refuses to build when a required variable is missing and
+prints the names; previews and local builds only need
+`NEXT_PUBLIC_SITE_URL`. The same check runs again when the server starts.
+
+## 1. Create the Vercel project
+
+1. Sign in to Vercel with your personal GitHub account and choose **Add
+   New → Project**.
+2. Import `haideralii/readyline`. Framework preset: Next.js (detected).
+   Root directory: the repository root. Leave the build command as
+   `npm run build` and the output as detected.
+3. Do **not** deploy yet: open **Environment Variables** on the same screen
+   (or the project's Settings → Environment Variables after creation) and
+   add the variables in step 3 first. If Vercel deploys before they exist,
+   the production build fails on purpose with the missing names; that is
+   the check working, not a broken repo.
+
+## 2. Project settings
+
+1. Settings → General → **Node.js Version**: 22.x.
+2. Settings → Functions → **Function Region**: Sydney (`syd1`).
+3. Settings → Git: production branch `main`. Previews for pull requests can
+   stay on; they never run the scheduled jobs or generation (REQ-010 FR-6)
+   and only need `NEXT_PUBLIC_SITE_URL`.
+4. Settings → Domains: add your domain when you have it; until then the
+   `*.vercel.app` address is the production domain. Whatever it is, that
+   is `<domain>` below.
+
+## 3. Environment variables
+
+Add each one under Settings → Environment Variables. **Environment:
+Production only** for everything marked server-only; tick "Preview" only
+for `NEXT_PUBLIC_SITE_URL` (and `NEXT_PUBLIC_BRAND_NAME` if you set it).
+Leave **"Expose to the browser" / "Sensitive"** as Vercel suggests: every
+name without the `NEXT_PUBLIC_` prefix is server-only and must stay
+unexposed.
+
+| Name                                   | Where the value comes from                                                                                                                           | Exposure    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `NEXT_PUBLIC_SITE_URL`                 | `https://<domain>` with no trailing slash                                                                                                            | public      |
+| `NEXT_PUBLIC_BRAND_NAME`               | `Readyline` (optional; the code defaults to it)                                                                                                      | public      |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase dashboard → Project Settings → API → Project URL                                                                                            | public      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase dashboard → Project Settings → API Keys → publishable key                                                                                   | public      |
+| `SUPABASE_SECRET_KEY`                  | Supabase dashboard → Project Settings → API Keys → secret key                                                                                        | server-only |
+| `CRON_SECRET`                          | Generate one: `openssl rand -hex 32` (or any 64 random hex characters). Vercel Cron sends it; the routes check it.                                   | server-only |
+| `ANTHROPIC_API_KEY`                    | Anthropic console → API keys (set a monthly spend cap on the key)                                                                                    | server-only |
+| `ANTHROPIC_MODEL`                      | `claude-sonnet-5-5` (D-048); optional, the code defaults to it                                                                                       | server-only |
+| `GENERATION_LIVE`                      | `1` for the trial: real model calls for paid packs (D-708). Without it a purchase cannot be fulfilled.                                               | server-only |
+| `GENERATION_ENABLED`                   | `false` (keeps the free "Generate" button hidden; the paid path does not need it)                                                                    | server-only |
+| `CONTACT_EMAIL`                        | The address you answer from; shown in the footer and used for refund requests                                                                        | server-only |
+| `BUSINESS_ABN`                         | Optional, 11 digits; shown in the footer once set                                                                                                    | server-only |
+| `STRIPE_SECRET_KEY`                    | Stripe dashboard (test mode for the trial) → Developers → API keys → a restricted key with Checkout Sessions write, PaymentIntents read, Prices read | server-only |
+| `STRIPE_PRICE_PACK`                    | Stripe dashboard → Product catalogue → "Readyline document pack" → the AUD 399 Price id (`price_…`)                                                  | server-only |
+| `PACK_PRICE_AUD_CENTS`                 | `39900` (must equal the Price's amount; a live key refuses to start on a mismatch)                                                                   | server-only |
+| `GST_LINE`                             | The sentence beside the price, for example `No GST while Readyline is not registered for GST.`                                                       | server-only |
+| `SUBSCRIPTION_PRICE_AUD_CENTS`         | `3900` (display only, "coming soon")                                                                                                                 | server-only |
+| `STRIPE_WEBHOOK_SECRET`                | Step 7 below (needs the domain first). Add a placeholder now so the first build passes, then replace it.                                             | server-only |
+
+Never set `STRIPE_FAKE`, `GENERATION_RECORD` or `EMAIL_*`/`SENTRY_*` in
+Vercel for this deploy.
+
+## 4. First deploy
+
+1. Deploy (or push to `main`). Watch the build log for `check-env ok
+(production list; values not shown)` near the start; a failure here
+   lists the missing names.
+2. When the deployment is live, open `https://<domain>/api/health`. You
+   should see `{"ok":true,"version":"0.1.0+<sha>","region":"syd1",...}`.
+3. Open the home page and the pricing page.
+
+## 5. Supabase: Site URL and redirect URLs
+
+Supabase dashboard → Authentication → URL Configuration.
+
+1. **Site URL**: `https://<domain>`.
+2. **Redirect URLs**, add both:
+   - `https://<domain>/auth/callback`
+   - `https://*-haideralii.vercel.app/auth/callback` (the Vercel preview
+     pattern; use the pattern Vercel shows for your account if different).
+3. Keep `http://localhost:3000/auth/callback` for now; the PO removes it
+   after the first successful hosted sign-in (REQ-010 SR-2).
+4. The magic-link email template is already the any-device one
+   (`supabase/ops/magic-link-template.html`); nothing to change.
+
+## 6. Database migrations
+
+`migrate.yml` applies `supabase/migrations/**` to the hosted project on
+every merge to `main`, so by the time the deploy is live the tables and
+grants exist. If a merge happened while the workflow was broken, run it by
+hand from GitHub → Actions → "migrate" → Run workflow, then check
+`https://<domain>/api/health` still answers.
+
+## 7. Stripe webhook
+
+Stripe dashboard (test mode) → Developers → Webhooks → **Add endpoint**.
+
+1. Endpoint URL: `https://<domain>/api/stripe/webhook`.
+2. Events: `checkout.session.completed`,
+   `checkout.session.async_payment_succeeded`, `charge.refunded`.
+3. After creating it, reveal the **Signing secret** (`whsec_…`) and paste it
+   into Vercel as `STRIPE_WEBHOOK_SECRET` (Production), replacing the
+   placeholder. **Redeploy** (Deployments → the latest → Redeploy) so the
+   running app picks it up.
+4. Test it: in the endpoint page use **Send test event** →
+   `checkout.session.completed`. The app answers 200 with
+   `{"ok":true,"outcome":"invalid"}` (a test event carries no account),
+   which proves the signature check passed. A wrong secret answers 400.
+
+## 8. Cron
+
+Vercel reads `vercel.json` and creates two cron jobs (`/api/jobs/purge`
+daily at 16:00 UTC, `/api/jobs/generate` daily at 16:30 UTC). It sends
+`Authorization: Bearer <CRON_SECRET>` itself. To confirm a run: Vercel
+project → **Cron Jobs** tab shows the schedule and the last run; the
+function log for `/api/jobs/generate` shows `jobs.generate.ran`. To run one
+by hand from your machine:
+
+    curl -H "Authorization: Bearer $CRON_SECRET" https://<domain>/api/jobs/generate
+
+(Hobby runs cron at most daily, D-053; the paid job is carried by the
+webhook's own run and the route's self-kick, the cron is the backstop.)
+
+## 9. Smoke test (PO runs it; you can too)
+
+    npm run smoke -- --base https://<domain>
+
+It checks health, home, pricing, sign-in, every legal page with its footer
+links, and the CSP header. It signs nothing in and changes nothing.
+
+## 10. The first real walk-through (PO, AC-4)
+
+Sign in on the deployed site with a magic link, finish the questionnaire,
+buy the pack with Stripe's test card `4242 4242 4242 4242` (any future
+date, any CVC), watch `/documents` move from "Preparing" to ready, download
+the zip. Then refund that payment in the Stripe dashboard and confirm the
+downloads close (`supabase/ops/refund.md`).
+
+## If something fails
+
+- Build fails with "check-env": add the named variables (Production
+  environment) and redeploy.
+- `/api/health` is 404: the deployment did not finish; check the build log.
+- Sign-in link lands on "That link did not work": the redirect URL in
+  step 5 is missing or the Site URL is wrong.
+- Buy button says "Buying is not available": one of the three Stripe
+  variables is missing in Production.
+- Webhook answers 400 in the Stripe dashboard: the signing secret in Vercel
+  does not match the endpoint; paste it again and redeploy.
+- Documents stay "Preparing" for more than 15 minutes: see "The paid
+  generation job did not finish" in `supabase/ops/refund.md`.

@@ -6,6 +6,18 @@
  */
 import { timingSafeEqual } from "node:crypto";
 
+/**
+ * REQ-010 FR-6: on Vercel, only the production deployment may run the
+ * scheduled jobs; a preview deployment shares the hosted database and must
+ * not purge or generate against it. Off Vercel (local, CI) the jobs run.
+ */
+export function mayRunScheduledJobs(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  if (!env.VERCEL) return true;
+  return env.VERCEL_ENV === "production";
+}
+
 export function isAuthorisedCronRequest(
   authorizationHeader: string | null,
   secret: string | undefined,
