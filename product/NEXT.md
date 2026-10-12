@@ -353,3 +353,21 @@ Waiting for the PO.
 Open for the PO: PR #9 (`req-005-generator`, 9aa867b) and the new `req-008-footer-dedupe` branch (f9f246c); D-531 to D-533 and D-805 to accept; the eleven no-standard documents under R-10; the carer exception wording; the full-set cap for batch 16.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 16)
+
+**PO actions this batch:** batch-15 review accepted (REQ-005 PO review); D-045 (basis for documents with no applicable standard), D-046 (prompt caching; Haiku comparison). PR for `req-008-footer-dedupe` opened by the PO. This PO commit is on `req-005-generator`.
+
+0. **Cherry-pick the PO's batch-16 commit onto `main`** and push `main`.
+
+1. **D-045 basis, no model calls**: `basis` field and reason per document type in the catalogue (PO assignments in the REQ-005 PO review), the fixed "Why this document" paragraph and the evidence-section wording for the no-standard case, with a test over the verification sole-trader set that no document shows a placeholder for a missing standard. If this changes fixed text only, fixture keys should not move; confirm by replay.
+
+2. **D-046 prompt caching, no model calls**: `cache_control` on the system prompt block and on the per-document context block (stable parts first, section-specific part last); fixture keys unchanged (confirm by replay); the recorder and the generation log record `cache_creation_input_tokens` and `cache_read_input_tokens` per call and the cost table prices them at the cached rates.
+
+3. **Full sole-trader set** (D-039 to D-046 apply): record every remaining tailored section of the 18 documents, one call each, thinking off, caching on; re-record the three behaviour-support sub-sections. Stop at $1.60 for this item. Re-render the review pack for all 18 documents (`sections.md` with every document, and the `.docx` files under `product/evidence/req-005/sole-trader/`). Report the cache hit rate and the real cost of the set.
+
+4. **Haiku comparison**: record the incident policy, complaints policy and self-assessment for the sole-trader case on `claude-haiku-5-5` (model from a `GENERATION_MODEL_OVERRIDE` env var used only by the recorder), fixtures under a model-keyed directory, no change to production. Report per section: pass first time, retry, fallback, readability grade, tokens and dollars, next to the Sonnet figures. Render the three Haiku documents into `product/evidence/req-005/sole-trader-haiku/` with a `sections.md`. Stop at $0.10 for this item.
+
+5. **Status** with the cost table (cached and uncached), running total, and the sole-trader set's full cost.
+
+6. STOP.
