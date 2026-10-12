@@ -82,6 +82,27 @@ const RECORDINGS = [
     typeId: "behaviour-support-plan-implementation-procedure",
     sectionId,
   })),
+  // Batch 13 item 3: every tailored section of the sole-trader complaints policy, one call each.
+  ...[
+    "purpose",
+    "scope",
+    "policy-statement",
+    "how-we-do-this",
+    "responsibilities",
+    "procedure",
+  ].map((sectionId) => ({
+    batch: 13,
+    caseId: "verification-sole-trader",
+    typeId: "complaints-management-policy-and-register",
+    sectionId,
+  })),
+  // Batch 13 item 3: both tailored sections of the sole-trader self-assessment.
+  ...["summary", "how-we-meet"].map((sectionId) => ({
+    batch: 13,
+    caseId: "verification-sole-trader",
+    typeId: "practice-standards-self-assessment",
+    sectionId,
+  })),
 ] as const;
 
 type ReportRow = Record<string, unknown> & {
