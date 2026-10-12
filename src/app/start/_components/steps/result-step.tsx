@@ -26,7 +26,7 @@ type Fetch = {
 };
 
 export function ResultStep() {
-  const { answers, clearDraft } = useQuestionnaire();
+  const { answers, clearDraft, contactEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -93,6 +93,7 @@ export function ResultStep() {
   return (
     <ResultView
       result={response.result}
+      contactEmail={contactEmail}
       onStartAgain={() => void clearDraft()}
     />
   );
@@ -100,28 +101,30 @@ export function ResultStep() {
 
 function ResultView({
   result,
+  contactEmail,
   onStartAgain,
 }: {
   result: QuestionnaireResult;
+  contactEmail: string | null;
   onStartAgain: () => void;
 }) {
   const r = result;
+  const pathwayWord =
+    r.pathway === "verification" ? "verification" : "certification";
   return (
     <div className="space-y-10" data-testid="result">
+      {/* REQ-013 FR-12: one summary block; the audit explanation lives here, not under a second heading. */}
       <section
         aria-labelledby="summary-heading"
         className="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="summary"
       >
-        <h2 id="summary-heading" className="sr-only">
-          In short
+        <h2 id="summary-heading" className="text-xl font-semibold">
+          Your audit: {pathwayWord}
+          {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
-        <p className="text-lg leading-8">
-          Your audit:{" "}
-          <strong>
-            {r.pathway === "verification" ? "verification" : "certification"}
-          </strong>
-          . You will need <strong>{r.documents.length} documents</strong> and{" "}
+        <p className="mt-2 text-lg leading-8">
+          You will need <strong>{r.documents.length} documents</strong> and{" "}
           <strong>{r.registers.length} registers</strong>. {BRAND} can draft the
           documents and keep the registers.
         </p>
@@ -130,15 +133,10 @@ function ResultView({
             ? "In practice: an auditor reviews your documents at their desk. Nobody visits, and nobody needs to speak to the people you support."
             : "In practice: an auditor visits your business, talks to your workers and to some of the people you support, and reads your documents and registers."}
         </p>
-      </section>
-
-      <section aria-labelledby="pathway-heading">
-        <h2 id="pathway-heading" className="text-xl font-semibold">
-          Your audit:{" "}
-          {r.pathway === "verification" ? "verification" : "certification"}
-          {r.modifiedCertification ? " (modified scope)" : ""}
-        </h2>
-        <p className="mt-2 leading-7" data-testid="pathway-description">
+        <p
+          className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+          data-testid="pathway-description"
+        >
           {r.pathwayDescription}
         </p>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -342,6 +340,30 @@ function ResultView({
           if you already have one.
         </p>
       </section>
+
+      {/* REQ-013 FR-9: a visible way to ask a question. */}
+      <p
+        className="text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+        data-testid="result-contact"
+      >
+        Questions about your result?{" "}
+        {contactEmail ? (
+          <>
+            Email us at{" "}
+            <a
+              href={`mailto:${contactEmail}`}
+              className="underline underline-offset-2"
+            >
+              {contactEmail}
+            </a>
+            .
+          </>
+        ) : (
+          "Email us at the contact address in the footer."
+        )}{" "}
+        We answer questions about the product and the registration process in
+        general; we cannot give legal advice.
+      </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link

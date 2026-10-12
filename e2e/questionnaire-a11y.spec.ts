@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { tickGroup } from "./helpers/groups";
 
 /**
  * REQ-003 AC-9 / AC-11 support: automated accessibility scan (axe, WCAG 2.1 A
@@ -46,8 +47,8 @@ test("every questionnaire step has no serious or critical accessibility violatio
   await expect(
     page.getByRole("heading", { level: 1, name: "The supports you deliver" }),
   ).toBeVisible();
-  await page.locator("#group-0138").check();
-  await page.locator("#group-0107").check();
+  await tickGroup(page, "0138");
+  await tickGroup(page, "0107");
   summary.supports = await scan(page, "supports (with SIL questions)");
   await page.locator("#silEligibility\\.fewHoursOnly-no").check();
   await page

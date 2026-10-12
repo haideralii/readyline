@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
+import { tickGroup } from "./helpers/groups";
 
 /**
  * Evidence capture for REQ-003: one screenshot per step on each project,
@@ -30,8 +31,8 @@ test.describe("questionnaire screenshots", () => {
     await page.locator("#abn").fill("51 824 753 556");
     await shot("1-business");
     await next(page);
-    await page.locator("#group-0120").check();
-    await page.locator("#group-0107").check();
+    await tickGroup(page, "0120");
+    await tickGroup(page, "0107");
     await shot("2-supports");
     await next(page);
     await page.getByRole("radio", { name: "No", exact: true }).check();

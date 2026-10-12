@@ -32,14 +32,22 @@ export function WorkforceStepForm() {
   const router = useRouter();
   const { answers, saveStep } = useQuestionnaire();
   const saved = answers.workforce;
+  // REQ-013 FR-6: a sole trader starts from the usual answers and can change them.
+  const soleTrader = !saved && answers.business?.structure === "sole-trader";
   const [workerCount, setWorkerCount] = useState(
-    saved ? String(saved.workerCount) : "",
+    saved ? String(saved.workerCount) : soleTrader ? "1" : "",
   );
   const [keyPersonnelCount, setKeyPersonnelCount] = useState(
-    saved ? String(saved.keyPersonnelCount) : "",
+    saved ? String(saved.keyPersonnelCount) : soleTrader ? "1" : "",
   );
   const [hasRisk, setHasRisk] = useState<YesNo | undefined>(
-    saved ? (saved.hasRiskAssessedRoles ? "yes" : "no") : undefined,
+    saved
+      ? saved.hasRiskAssessedRoles
+        ? "yes"
+        : "no"
+      : soleTrader
+        ? "yes"
+        : undefined,
   );
   const [screened, setScreened] = useState<Screening | undefined>(
     saved?.allRiskAssessedScreened,
@@ -69,6 +77,15 @@ export function WorkforceStepForm() {
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
+      {soleTrader ? (
+        <p
+          className="mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          data-testid="workforce-defaults-note"
+        >
+          You said you are a sole trader, so we have filled in the usual
+          answers. Change anything that is different for you.
+        </p>
+      ) : null}
       <Field
         id="workerCount"
         label={LABELS.workerCount}
@@ -102,7 +119,7 @@ export function WorkforceStepForm() {
       <Field
         id="keyPersonnelCount"
         label={LABELS.keyPersonnelCount}
-        help="People who make decisions about the business, such as owners, directors or managers. For a sole trader that is you: enter 1."
+        help="People who make decisions about the business. Examples: the owner, a director, the manager who hires workers or signs service agreements. For a sole trader that is you: 1."
         errors={errorsFor(errors, "keyPersonnelCount")}
       >
         {(describedBy, invalid) => (
@@ -122,7 +139,7 @@ export function WorkforceStepForm() {
       <RadioGroup
         name="hasRiskAssessedRoles"
         legend="Does anyone work in a risk-assessed role?"
-        help="Roles with more than incidental contact with participants, key personnel, and roles the Commission's rules list. Most support workers are in risk-assessed roles."
+        help="Roles with more than incidental contact with participants, key personnel, and roles the Commission's rules list. Examples: a support worker who helps someone shower or get out, a coordinator who visits participants, and you as the owner. Most support workers are in risk-assessed roles."
         options={[
           { value: "yes", label: "Yes" },
           { value: "no", label: "No" },

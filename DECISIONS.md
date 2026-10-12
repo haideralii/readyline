@@ -1614,6 +1614,32 @@ now explains that the helper answers pointed to yes.
 headings (test: all ids exactly once). The summary line counts documents
 and registers from the derived result and the "in practice" sentence per
 pathway is plain, claim-free copy.
+
+**D-1306 P2 shape (Dev, 2026-10-12, branch `req-013-p2` from `main`
+a77be8b).** FR-6: `NumberInput` already uses `inputmode="numeric"`; a sole
+trader's workforce step now starts at 1 worker, 1 key person and
+risk-assessed roles "yes" with a note that says so, only when no workforce
+answer is saved. FR-7: the wrapped step list is replaced by
+`ProgressLine` (`src/components/progress-line.tsx`, a `progressbar` whose
+label is "Step 2 of 6: Supports") and a one-line "Change: Business,
+Supports" list of completed steps; REQ-014 restyles the same component as
+the ready line. FR-8: every home-page string lives in `src/lib/home-copy.ts`
+with a claims-lint test; the example result is the sole-trader reference
+case (17 documents, 5 registers, verification, no mid-term audit) and a test
+pins it to the derived numbers so the copy cannot drift. FR-9: the public
+contact address reaches the result step through the questionnaire context
+(`contactEmail`, read on the server in the start layout), with a plain
+fallback when `CONTACT_EMAIL` is unset. FR-10: examples under the key
+personnel and risk-assessed role labels. FR-11: each everyday heading is a
+`details` element; phones start with "Personal care at home" and "Help
+around the house and getting out" open, screens of 640 px and wider start
+with all open (read through `useSyncExternalStore` on a media query, so no
+state is set in an effect), a search opens every heading with a match, the
+hint opens the headings of 0107 and 0120, and a closed heading still lists
+its ticked classes beneath the summary with "(n classes, k ticked)". FR-12:
+the audit explanation, groups in scope and flags sit inside the summary
+block under one "Your audit: …" heading; the second heading is gone.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
