@@ -759,6 +759,51 @@ needs. Rather than widen the token, `migrate.yml` pushes over a direct
 database URL (session pooler, port 5432, user `postgres.<ref>`) using only
 `SUPABASE_DB_PASSWORD`; the access token stays for future CLI use.
 
+**D-421 Magic links verify by token hash so they work on any device (Dev,
+2026-10-12, FR-9a, batch 18 addendum; branch
+`req-004-magic-link-any-device`).** The email template
+(`supabase/ops/magic-link-template.html`, which Haider pastes into the
+hosted project's Magic Link template once) links to the sign-in action's
+`emailRedirectTo` with `&token_hash={{ .TokenHash }}&type=magiclink`
+appended; `/auth/callback` verifies that with `verifyOtp`, which needs
+nothing from the requesting browser. The PKCE `code` path stays until
+2026-10-13 (`LEGACY_CODE_PATH_UNTIL`) for links already sent, then
+`decideCallback` refuses it as `legacy-expired`; the path decision is a pure
+function with unit tests, and the integration suite proves a fresh client
+can verify a generated hash once and not twice. The failure redirect carries
+only `error=link`: the token-hash link does not contain the address, and
+putting an email in a URL would leak it to logs and referrers, so the
+field is not prefilled (FR-9c "where safe" judged as never). The callback
+logs the error code and which path failed.
+
+**D-422 Account read-back: the hosted cause was missing table grants, and
+the query now says so (Dev, 2026-10-12, FR-10).** `getOwnedAccount` now
+runs two plain queries (membership, then account) in
+`src/server/accounts/owned-account.ts`, logs any database error with its
+code and message (no email) and returns null. With that logging in place
+the first e2e run against the hosted project showed the real cause:
+`42501 permission denied` on `memberships` for the `authenticated` role.
+The migrations created tables and policies but never granted table
+privileges, relying on the local stack's default privileges, which the
+hosted project does not share (the same gap D-538 closed for functions);
+the suspected PostgREST embed was not the cause. Migration
+`20261012060000_authenticated_table_grants.sql` grants, per table, exactly
+what the policies allow (users and accounts select and update, memberships
+select, drafts all four, audit log select, version sets and document
+versions select, purchases, entitlements and generation jobs select) and
+reloads PostgREST's schema cache; `20261012050000_reload_postgrest_schema.sql`
+does the reload alone for the migrations before it. The integration suite
+creates an account through `create_account` and reads it back through the
+same function, so CI's local stack would also catch a missing grant if its
+defaults ever change.
+
+**D-423 Screen copy for FR-9b and FR-9c (Dev, 2026-10-12).** The "link is
+on its way" message ends "The link works once and expires in an hour; open
+it on any device." (Supabase's default OTP expiry is one hour; the hosted
+setting is Haider's to confirm). The failure screen says "The link has
+expired or was already used. Request a new one below; the new link works on
+any device."
+
 ## REQ-005: document generator (branch `req-005-generator`, Dev response stage)
 
 Decision numbers D-5xx on this branch.
@@ -1453,13 +1498,3 @@ Items asserted in code or copy that still need a primary source.
   secret-key function, with an integration test through the service-role
   client) and R-12 (no-standard documents never ask for a standard in
   tailored text) block PR #9. Batch 17 budget up to $0.40 (cap $2.28).
-- D-052 (PO, 2026-10-13): the hosted project's secret-key role also lacked
-  table grants (second gap of the same kind as D-422); the migrations on the
-  open branches fix it. From now on every migration that creates a table
-  states its grants for `authenticated` and `service_role` explicitly, and
-  the integration suite runs as both roles against a fresh stack.
-- D-053 (PO, 2026-10-13): Vercel Hobby for the private trial; generation
-  relies on the webhook's post-response run and the job route's self-kick,
-  with the daily cron as backstop. Move to Pro and a one-minute schedule if
-  a customer waits over 15 minutes. REQ-006, REQ-013 P2, REQ-014 accepted
-  (see their PO reviews); REQ-014 R-1 to R-3 before merge.

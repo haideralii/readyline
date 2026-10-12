@@ -57,6 +57,3 @@ A: migration, entitlement model, RLS tests. B: Checkout creation, webhook, idemp
 
 ## PO review
 (PO fills in.)
-
-**13 Oct 2026, Session C review (branch `req-007-payments`, 685af97): ACCEPTED on the Dev status; the fake-mode e2e and screenshots are reviewed at merge; the real Stripe hop is verified at the first deploy.** D-706 to D-711 accepted. Decisions: the generation job's self-kick chain with a daily cron backstop is acceptable for the private trial on Vercel Hobby (D-053); if a paying customer ever waits more than 15 minutes for documents, the plan moves to Pro and the schedule to every minute. `GENERATION_LIVE` stays off until the first deploy's smoke test.
-

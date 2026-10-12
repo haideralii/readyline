@@ -62,8 +62,4 @@ Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0
 (Dev fills in.)
 
 ## PO review
-**13 Oct 2026 (branch `req-014-visual-identity`, ae7991a, stacked on `req-013-p2`): ACCEPTED with three small fixes.** Reviewed home (light and dark, phone and desktop), supports, result and pricing. The paper background, serif headings, ochre action and the ready-line under the wordmark read as a considered product rather than a template; dark mode holds up; copy on the home page is honest and claim-free. D-1401 to D-1404 accepted; stacking on `req-013-p2` accepted as a deviation.
-- R-1 Home CTA wraps to two lines on a phone ("Find out what registration needs from you"). Shorten to "See what registration needs" and keep the "Free, about ten minutes, no account needed" line under it.
-- R-2 Step progress bar on the supports step (step 2 of 6) shows a fill of a few pixels; it should be about a third. Check the width calculation and test it per step.
-- R-3 "Change: Business" above the step title reads oddly; use "Back to: Business" (or "Edit: Business") and keep the links for completed steps.
-- Desktop home leaves the right half empty; acceptable for v1, noted for the launch review (REQ-012).
+(PO fills in.)

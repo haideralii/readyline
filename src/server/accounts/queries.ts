@@ -3,18 +3,14 @@ import "server-only";
  * Read helpers that run with the user's session (RLS applies).
  * Pages call these to decide whether to render, redirect or prefill.
  */
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
-export type Account = {
-  id: string;
-  trading_name: string;
-  business_structure: string;
-  states: string[];
-  abn: string | null;
-};
+import { getOwnedAccount, type Account } from "./owned-account";
+
+export { getOwnedAccount, type Account };
 
 export type DeletedAccount = {
   id: string;
@@ -32,34 +28,6 @@ export async function getSessionUser(): Promise<User | null> {
     if (e instanceof SupabaseEnvError) return null;
     throw e;
   }
-}
-
-export async function getOwnedAccount(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<Account | null> {
-  const membership = await supabase
-    .from("memberships")
-    .select(
-      "account_id, accounts!inner(id, trading_name, business_structure, states, abn, deleted_at)",
-    )
-    .eq("user_id", userId)
-    .eq("role", "owner")
-    .limit(1)
-    .maybeSingle();
-  if (membership.error || !membership.data) return null;
-  const raw = membership.data as unknown as {
-    accounts: Account & { deleted_at: string | null };
-  };
-  const a = raw.accounts;
-  if (!a || a.deleted_at) return null;
-  return {
-    id: a.id,
-    trading_name: a.trading_name,
-    business_structure: a.business_structure,
-    states: a.states,
-    abn: a.abn,
-  };
 }
 
 /**
