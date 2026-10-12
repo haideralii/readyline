@@ -84,5 +84,7 @@ Noted: the PO owes the copy in `product/legal/` and has delivered first drafts; 
 
 Push: branch `req-008-legal-pages`; the PO opens the PR.
 
+**2026-10-12 (batch 15, item 3), footer dedupe on `req-008-footer-dedupe` from `main` (PR #12 merged).** The footer's general-information paragraph no longer carries the independence sentence; the trust line states it once (D-805). `GENERAL_INFORMATION_NOTICE` is unchanged in content for generated documents (now composed from `GENERAL_INFORMATION_STATEMENT` and `INDEPENDENCE_STATEMENT`), with a unit test pinning the split. Footer screenshots re-captured at both viewports into `product/evidence/req-008/footer-<project>.jpg` (the five page screenshots and request logs were re-captured in the same run).
+
 ## PO review
 **12 Oct 2026 (branch `req-008-legal-pages`, 792e113; PR #12): ACCEPTED.** Pages, footer, draft note, last-updated line and the no-third-party test are as specified; screenshots reviewed at 360 px. D-801 (own front-matter parser instead of gray-matter), D-802 (quoted banned words on the AI page exempt from the claims lint, on that page only) and D-803 (readability module copied until PR #9 merges) accepted. One cosmetic item for a later batch, not blocking: the footer states independence from the NDIA and the Commission twice (in the general-information paragraph and in the trust line); keep the trust line and shorten the paragraph. Merge when CI is green. Lighthouse: Haider records the score once when he next runs the app.

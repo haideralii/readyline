@@ -810,6 +810,15 @@ Both are listed in `.env.example`, and `CONTACT_EMAIL` in `REQUIRED_LATER`.
 The no-third-party test allows only the app host and the Supabase project
 host; Stripe hosts are added per purchase route by REQ-007.
 
+**D-805 Footer states independence once (Dev, 2026-10-12, PO review of
+REQ-008; branch `req-008-footer-dedupe`).** `GENERAL_INFORMATION_NOTICE` is
+now the general-information statement (three sentences) followed by the
+independence statement, as two exported constants. Generated documents keep
+the full notice (CLAUDE.md 4.2 and the house style's fixed text are
+unchanged); the site footer shows the statement, the AI disclosure and the
+trust line "Hosted in Australia. Independent of the NDIA and the NDIS Quality
+and Safeguards Commission.", so independence appears once on the page.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

@@ -4,7 +4,13 @@ import {
   findProhibitedClaims,
   isBrandNameAllowed,
 } from "./claims";
-import { AI_DISCLOSURE, BRAND, GENERAL_INFORMATION_NOTICE } from "./brand";
+import {
+  AI_DISCLOSURE,
+  BRAND,
+  GENERAL_INFORMATION_NOTICE,
+  GENERAL_INFORMATION_STATEMENT,
+  INDEPENDENCE_STATEMENT,
+} from "./brand";
 
 describe("findProhibitedClaims", () => {
   it.each([
@@ -77,6 +83,17 @@ describe("brand and site notices", () => {
     expect(GENERAL_INFORMATION_NOTICE).toMatch(/seek legal advice/i);
     expect(GENERAL_INFORMATION_NOTICE).toMatch(/not affiliated/i);
     expect(findProhibitedClaims(GENERAL_INFORMATION_NOTICE)).toEqual([]);
+    // The footer shows the statement without the independence sentence (its trust line says it once).
+    expect(GENERAL_INFORMATION_STATEMENT).toMatch(/general information/i);
+    expect(GENERAL_INFORMATION_STATEMENT).toMatch(/not legal advice/i);
+    expect(GENERAL_INFORMATION_STATEMENT).toMatch(/seek legal advice/i);
+    expect(GENERAL_INFORMATION_STATEMENT).not.toMatch(
+      /affiliated|independent/i,
+    );
+    expect(INDEPENDENCE_STATEMENT).toMatch(/not affiliated/i);
+    expect(GENERAL_INFORMATION_NOTICE).toBe(
+      `${GENERAL_INFORMATION_STATEMENT} ${INDEPENDENCE_STATEMENT}`,
+    );
   });
 
   it("AI disclosure names AI and the provider's responsibility", () => {
