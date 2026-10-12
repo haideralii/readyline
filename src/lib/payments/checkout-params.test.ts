@@ -50,5 +50,6 @@ describe("Checkout params (REQ-007 FR-2, AC-3, SR-3)", () => {
     ).toBe("https://readyline.example/pricing");
     expect(safeCancelPath(undefined)).toBe("/pricing");
     expect(safeCancelPath("/account")).toBe("/pricing");
+    expect(safeCancelPath("/documents")).toBe("/documents");
   });
 });

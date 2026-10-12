@@ -20,18 +20,19 @@ import { getViewer } from "@/server/accounts/queries";
 import { checkCheckoutAllowed } from "@/server/auth/rate-limit";
 import { answersHash } from "@/server/generation/run";
 import { createCheckoutSession } from "./checkout";
+import { FakeCheckoutClient } from "./fake";
 import { createStripeClient, readStripeEnv, StripeEnvError } from "./stripe";
 
 const Input = strictObject({ cancelPath: z.string().max(64).optional() });
 
-export type CheckoutActionResult = { ok: false; message: string };
-
-export const CHECKOUT_UNAVAILABLE =
-  "Buying is not available in this environment yet.";
-export const CHECKOUT_RATE_LIMITED =
-  "You have started a few checkouts in the last hour. Give it an hour and try again, or email us at the contact address in the footer.";
-export const CHECKOUT_NEEDS_ANSWERS =
-  "Finish every step of the questionnaire first; the pack is drafted from those answers.";
+// A "use server" module may export only async functions; the messages and
+// the result type live in ./messages.ts.
+import {
+  CHECKOUT_NEEDS_ANSWERS,
+  CHECKOUT_RATE_LIMITED,
+  CHECKOUT_UNAVAILABLE,
+  type CheckoutActionResult,
+} from "./messages";
 
 export async function createCheckoutAction(
   input: unknown,
@@ -74,7 +75,10 @@ export async function createCheckoutAction(
 
   const assessmentId = `${ANSWERS_VERSION}:${answersHash(answers.data)}`;
   const session = await createCheckoutSession({
-    stripe: createStripeClient(env.secretKey),
+    // Fake mode (D-709): a page on our own origin stands in for Checkout.
+    stripe: env.fake
+      ? new FakeCheckoutClient(env.webhookSecret)
+      : createStripeClient(env.secretKey),
     checkout: {
       priceId: env.pricePack,
       accountId: account.id,
@@ -92,4 +96,19 @@ export async function createCheckoutAction(
     sessionId: session.id,
   });
   redirect(session.url);
+}
+
+/**
+ * The Buy form's action (FR-2, FR-6): works with JavaScript off because it is
+ * a plain form post; with it on, `useActionState` shows the message when the
+ * checkout could not start. A successful call never returns (it redirects).
+ */
+export async function buyAction(
+  _previous: CheckoutActionResult | null,
+  formData: FormData,
+): Promise<CheckoutActionResult | null> {
+  const cancelPath = formData.get("cancelPath");
+  return createCheckoutAction(
+    typeof cancelPath === "string" ? { cancelPath } : {},
+  );
 }

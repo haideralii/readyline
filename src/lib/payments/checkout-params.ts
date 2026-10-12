@@ -6,7 +6,11 @@
  */
 import type Stripe from "stripe";
 
-export const CANCEL_PATHS = ["/pricing", "/start/result"] as const;
+export const CANCEL_PATHS = [
+  "/pricing",
+  "/start/result",
+  "/documents",
+] as const;
 export type CancelPath = (typeof CANCEL_PATHS)[number];
 
 export type CheckoutInput = {

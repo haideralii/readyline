@@ -25,6 +25,8 @@ export type WebhookResult = {
   body: { ok: boolean; outcome?: string; error?: string };
   /** For the log line: id and type only (SR-6). */
   event?: { id: string; type: string };
+  /** On a completed checkout: the ids the receipt lookup needs (FR-7), nothing else. */
+  payment?: { sessionId: string; paymentIntentId: string | null };
 };
 
 function idOf(
@@ -89,10 +91,19 @@ export async function handleStripeWebhook(input: {
   } catch {
     return { status: 400, body: { ok: false, error: "bad signature" } };
   }
-  const outcome = await input.store.applyEvent(toPaymentEvent(event));
+  const mapped = toPaymentEvent(event);
+  const outcome = await input.store.applyEvent(mapped);
   return {
     status: 200,
     body: { ok: true, outcome },
     event: { id: event.id, type: event.type },
+    ...(mapped.sessionId
+      ? {
+          payment: {
+            sessionId: mapped.sessionId,
+            paymentIntentId: mapped.paymentIntentId ?? null,
+          },
+        }
+      : {}),
   };
 }

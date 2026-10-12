@@ -79,6 +79,11 @@ export const REQUIRED_LATER: ReadonlyArray<{
     from: "REQ-007 (display price; checked against the Price with a live key)",
     productionHome: "Vercel project environment variables",
   },
+  {
+    name: "GENERATION_LIVE",
+    from: "REQ-007 Session C (the paid job calls the model only when this is 1; D-708)",
+    productionHome: "Vercel project environment variables (server only)",
+  },
 ];
 
 const schema = z.object({

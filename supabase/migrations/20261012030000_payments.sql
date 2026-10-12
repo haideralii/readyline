@@ -51,7 +51,11 @@ create table public.generation_jobs (
   attempts integer not null default 0,
   next_document_index integer not null default 0,
   version_set_id uuid references public.version_sets (id) on delete set null,
+  -- The document in flight: its finished tailored sections and their log rows,
+  -- so a tick can stop between sections and the next tick carries on (D-706).
+  progress jsonb not null default '{}'::jsonb,
   last_error text,
+  -- Doubles as the lease while a tick runs: a job whose lease has passed is claimable again.
   next_run_at timestamptz not null default now(),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

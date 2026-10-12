@@ -35,7 +35,7 @@ export const PRICING_COPY = {
   subscriptionHeading: "Audit-ready subscription",
   subscriptionComing:
     "Coming after the document pack: the incident and complaints registers, the worker screening expiry tracker, policy review reminders and the mid-term audit countdown, as a monthly subscription you can cancel at any time. No instalments, no interest, no late fees.",
-  subscriptionPriceLead: "Expected price:",
+  buy: "Buy the document pack",
   signInToBuy: "Sign in to buy",
   signInNote:
     "You sign in with an email link first, so the pack is tied to your account and you can download it again later.",

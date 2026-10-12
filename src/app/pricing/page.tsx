@@ -13,6 +13,7 @@ import { buildResult } from "@/lib/questionnaire/result";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
+import { BuyButton } from "@/app/documents/buy-button";
 
 export const metadata: Metadata = { title: "Pricing" };
 
@@ -27,13 +28,14 @@ export const metadata: Metadata = { title: "Pricing" };
 async function documentsForVisitor(): Promise<{
   titles: string[];
   tailored: boolean;
+  signedIn: boolean;
 }> {
   const core = documentSetsContent.always.map((id) => documentTitle(id));
   const viewer = await getViewer();
   if (!viewer?.account || viewer.deleted)
-    return { titles: core, tailored: false };
+    return { titles: core, tailored: false, signedIn: false };
   const draft = await loadServerDraft();
-  if (!draft) return { titles: core, tailored: false };
+  if (!draft) return { titles: core, tailored: false, signedIn: true };
   const dataset = getStandardsDataset();
   const schema = answersSchemaFor(
     new Set(dataset.registrationGroups.map((g) => g.code)),
@@ -42,15 +44,16 @@ async function documentsForVisitor(): Promise<{
     answersVersion: ANSWERS_VERSION,
     ...draft.answers,
   });
-  if (!parsed.success) return { titles: core, tailored: false };
+  if (!parsed.success) return { titles: core, tailored: false, signedIn: true };
   const built = buildResult(dataset, parsed.data);
-  if (!built.ok) return { titles: core, tailored: false };
+  if (!built.ok) return { titles: core, tailored: false, signedIn: true };
   return {
     titles: [
       ...built.result.documents.map((d) => d.title),
       "Practice Standards self-assessment",
     ],
     tailored: true,
+    signedIn: true,
   };
 }
 
@@ -96,18 +99,24 @@ export default async function PricingPage() {
             {pricing.gstLine}
           </p>
         ) : null}
-        <p className="mt-4">
-          <Link
-            href="/sign-in?next=%2Fpricing"
-            className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-            data-testid="sign-in-to-buy"
-          >
-            {C.signInToBuy}
-          </Link>
-        </p>
-        <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          {C.signInNote}
-        </p>
+        {docs.signedIn ? (
+          <BuyButton label={C.buy} cancelPath="/pricing" />
+        ) : (
+          <>
+            <p className="mt-4">
+              <Link
+                href="/sign-in?next=%2Fpricing"
+                className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+                data-testid="sign-in-to-buy"
+              >
+                {C.signInToBuy}
+              </Link>
+            </p>
+            <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              {C.signInNote}
+            </p>
+          </>
+        )}
         <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
           {C.termsLead}{" "}
           <Link href="/terms" className={link}>
@@ -182,11 +191,12 @@ export default async function PricingPage() {
         <h2 id="sub-heading" className={h2}>
           {C.subscriptionHeading}
         </h2>
+        {/* PO review (D-051): "AUD 39 a month, coming soon", no buy button. */}
         <p className={body} data-testid="subscription-coming">
-          {C.subscriptionComing}
           {pricing.subscriptionPriceCents
-            ? ` ${C.subscriptionPriceLead} ${formatAud(pricing.subscriptionPriceCents)} a month.`
-            : ""}
+            ? `${C.subscriptionHeading}: ${formatAud(pricing.subscriptionPriceCents)} a month, coming soon. `
+            : `${C.subscriptionHeading}: coming soon. `}
+          {C.subscriptionComing}
         </p>
       </section>
 

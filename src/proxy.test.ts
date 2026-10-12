@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { buildCsp, supabaseOriginFromEnv } from "./proxy";
+import { buildCsp, isPurchaseRoute, supabaseOriginFromEnv } from "./proxy";
 
 const ORIGINAL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -32,6 +32,31 @@ describe("buildCsp connect-src (REQ-004 SR-2)", () => {
     expect(csp).toContain(
       "connect-src 'self' http://127.0.0.1:54321 ws: wss:;",
     );
+  });
+});
+
+describe("buildCsp form-action on purchase routes (REQ-007 SR-5, D-710)", () => {
+  it("allows Stripe's hosted Checkout as a form destination only on purchase routes", () => {
+    expect(buildCsp("abc", false, null)).toContain("form-action 'self';");
+    expect(buildCsp("abc", false, null, { purchaseRoute: true })).toContain(
+      "form-action 'self' https://checkout.stripe.com;",
+    );
+  });
+
+  it("adds no Stripe host anywhere else in the policy", () => {
+    const csp = buildCsp("abc", false, null, { purchaseRoute: true });
+    expect(csp).toContain("script-src 'self' 'nonce-abc' 'strict-dynamic';");
+    expect(csp).toContain("connect-src 'self';");
+    expect(csp).not.toContain("frame-src");
+    expect(csp.match(/stripe/g)?.length).toBe(1);
+  });
+
+  it("names the pricing and documents pages exactly, not their subpaths", () => {
+    expect(isPurchaseRoute("/pricing")).toBe(true);
+    expect(isPurchaseRoute("/documents")).toBe(true);
+    expect(isPurchaseRoute("/documents/abc")).toBe(false);
+    expect(isPurchaseRoute("/")).toBe(false);
+    expect(isPurchaseRoute("/start/result")).toBe(false);
   });
 });
 

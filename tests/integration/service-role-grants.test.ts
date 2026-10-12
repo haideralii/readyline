@@ -28,6 +28,11 @@ const SECRET_KEY_FUNCTIONS: ReadonlyArray<{
     name: "generation_quota_hit",
     args: () => ({ p_account: "00000000-0000-4000-8000-000000000000" }),
   },
+  {
+    // REQ-007 Session C: returns a set of rows (empty when nothing is queued).
+    name: "claim_generation_job",
+    args: () => ({ p_lease_seconds: 60 }),
+  },
 ];
 
 describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
@@ -56,7 +61,7 @@ describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
         r.error,
         `${fn.name}: ${r.error?.code} ${r.error?.message}`,
       ).toBeNull();
-      expect(typeof r.data).toBe("boolean");
+      expect(["boolean", "object"]).toContain(typeof r.data);
     });
 
     it(`${fn.name} is refused for the publishable key, signed out and signed in`, async () => {
@@ -83,6 +88,42 @@ describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
       if (signed.error) throw signed.error;
       const inn = await signedIn.rpc(fn.name, fn.args());
       expect(inn.error?.code, `${fn.name} signed in`).toBe("42501");
+    });
+  }
+});
+
+/** Every table the server touches with the secret key (D-711); a read is enough to prove the grant. */
+const SECRET_KEY_TABLES = [
+  "accounts",
+  "memberships",
+  "questionnaire_drafts",
+  "version_sets",
+  "document_versions",
+  "generation_log",
+  "audit_log",
+  "auth_rate_limits",
+  "purchases",
+  "entitlements",
+  "generation_jobs",
+  "stripe_events",
+] as const;
+
+describe.skipIf(!enabled)("service_role table grants (D-711)", () => {
+  let service: SupabaseClient;
+
+  beforeAll(() => {
+    const env = readSupabaseAdminEnv();
+    service = createClient(env.url, env.secretKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+  });
+
+  for (const table of SECRET_KEY_TABLES) {
+    it(`${table} is readable through a service-role client`, async () => {
+      const r = await service.from(table).select("*").limit(1);
+      expect(r.error, `${table}: ${r.error?.code} ${r.error?.message}`).toBe(
+        null,
+      );
     });
   }
 });

@@ -42,4 +42,13 @@ export class SupabasePaymentStore implements PaymentStore {
       throw new Error(`apply_stripe_event: unknown outcome ${outcome}`);
     return outcome as ApplyOutcome;
   }
+
+  /** Stores the receipt URL on the purchase for a session (FR-7); a no-op when the row is missing. */
+  async setReceiptUrl(sessionId: string, receiptUrl: string): Promise<void> {
+    const r = await this.admin
+      .from("purchases")
+      .update({ receipt_url: receiptUrl })
+      .eq("stripe_checkout_session_id", sessionId);
+    if (r.error) throw new Error(`purchases update: ${r.error.message}`);
+  }
 }

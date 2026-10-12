@@ -9,6 +9,7 @@ import {
   getVersionSet,
   listDocumentVersions,
 } from "@/server/generation/queries";
+import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { RegenerateButton } from "./regenerate-button";
 
@@ -26,6 +27,8 @@ export default async function ReviewDocumentPage({
   const supabase = await createSupabaseServerClient();
   const set = await getVersionSet(supabase, setId);
   if (!set || set.account_id !== viewer.account.id) notFound();
+  // REQ-007 FR-8: a refunded pack is not shown.
+  if (await isSetLocked(supabase, set.id)) redirect(`/documents/${set.id}`);
   const versions = await listDocumentVersions(supabase, set.id, typeId);
   if (versions.length === 0) notFound();
   const current = versions[0];

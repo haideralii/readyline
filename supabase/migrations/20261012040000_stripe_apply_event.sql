@@ -24,6 +24,7 @@ declare
   v_inserted integer;
   v_purchase public.purchases%rowtype;
   v_purchase_id uuid;
+  v_entitlement_id uuid;
 begin
   -- Every event id once; a replay stops here.
   insert into public.stripe_events (id, type, received_at)
@@ -62,7 +63,12 @@ begin
       coalesce(p_occurred_at, now())
     ) returning id into v_purchase_id;
     insert into public.entitlements (account_id, kind, assessment_id, source_purchase_id, granted_at)
-    values (p_account_id, 'pack', p_assessment_id, v_purchase_id, coalesce(p_occurred_at, now()));
+    values (p_account_id, 'pack', p_assessment_id, v_purchase_id, coalesce(p_occurred_at, now()))
+    returning id into v_entitlement_id;
+    -- FR-5: the set is generated out of band; the webhook's after() hook and the
+    -- job route pick this row up (Session C, D-706).
+    insert into public.generation_jobs (account_id, purchase_id, entitlement_id, assessment_id)
+    values (p_account_id, v_purchase_id, v_entitlement_id, p_assessment_id);
     return 'granted';
   end if;
 

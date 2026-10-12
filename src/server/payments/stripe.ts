@@ -3,8 +3,19 @@ import "server-only";
  * The Stripe client and secrets (REQ-007 FR-9, SR-3). Built on the server
  * only; the secret key never reaches a client bundle (`server-only`). Code
  * that talks to Stripe takes the client as an argument so tests pass a fake.
+ * In fake mode (D-709) the missing values are filled with local-only ones so
+ * the webhook route can verify the fake page's signatures.
  */
 import Stripe from "stripe";
+import {
+  FAKE_PRICE_ID,
+  fakeSecretKey,
+  fakeWebhookSecret,
+  isFakeStripeMode,
+  isLiveKey,
+} from "@/lib/payments/fake-session";
+
+export { isLiveKey };
 
 export const STRIPE_ENV_NAMES = {
   secretKey: "STRIPE_SECRET_KEY",
@@ -23,12 +34,29 @@ export class StripeEnvError extends Error {
   }
 }
 
+export type StripeEnv = {
+  secretKey: string;
+  webhookSecret: string;
+  pricePack: string;
+  /** True when Checkout is the local fake page and the webhook secret is the local one. */
+  fake: boolean;
+};
+
 export function readStripeEnv(
   source: Record<string, string | undefined> = process.env,
-): { secretKey: string; webhookSecret: string; pricePack: string } {
+): StripeEnv {
+  const fake = isFakeStripeMode(source);
   const secretKey = source[STRIPE_ENV_NAMES.secretKey]?.trim();
   const webhookSecret = source[STRIPE_ENV_NAMES.webhookSecret]?.trim();
   const pricePack = source[STRIPE_ENV_NAMES.pricePack]?.trim();
+  if (fake) {
+    return {
+      secretKey: secretKey || fakeSecretKey(),
+      webhookSecret: fakeWebhookSecret(source),
+      pricePack: pricePack || FAKE_PRICE_ID,
+      fake: true,
+    };
+  }
   const missing: string[] = [];
   if (!secretKey) missing.push(STRIPE_ENV_NAMES.secretKey);
   if (!webhookSecret) missing.push(STRIPE_ENV_NAMES.webhookSecret);
@@ -38,14 +66,10 @@ export function readStripeEnv(
     secretKey: secretKey!,
     webhookSecret: webhookSecret!,
     pricePack: pricePack!,
+    fake: false,
   };
 }
 
 export function createStripeClient(secretKey: string): Stripe {
   return new Stripe(secretKey, { typescript: true, maxNetworkRetries: 2 });
-}
-
-/** True when the key is a live key: the startup price check (Session C) refuses to serve on a mismatch. */
-export function isLiveKey(secretKey: string): boolean {
-  return secretKey.startsWith("sk_live_") || secretKey.startsWith("rk_live_");
 }
