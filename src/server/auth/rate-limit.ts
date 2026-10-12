@@ -61,3 +61,12 @@ export async function checkMagicLinkAllowed(input: {
 export async function checkExportAllowed(accountId: string): Promise<boolean> {
   return hitRateLimit(`export:${accountId}`, EXPORT_LIMIT);
 }
+
+/** REQ-007 SR-4: five Checkout Sessions per account per rolling hour. */
+export const CHECKOUT_LIMIT = { limit: 5, windowSeconds: 3600 } as const;
+
+export async function checkCheckoutAllowed(
+  accountId: string,
+): Promise<boolean> {
+  return hitRateLimit(`checkout:${accountId}`, CHECKOUT_LIMIT);
+}

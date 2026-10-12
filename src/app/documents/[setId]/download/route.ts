@@ -13,6 +13,7 @@ import {
   listLatestDocuments,
 } from "@/server/generation/queries";
 import { isOwnedPath, signedDownloadUrl } from "@/server/generation/storage";
+import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -41,6 +42,9 @@ export async function GET(
   const supabase = await createSupabaseServerClient();
   const set = await getVersionSet(supabase, setId);
   if (!set || set.account_id !== viewer.account.id)
+    return new NextResponse("Not found", { status: 404 });
+  // REQ-007 FR-8: a refunded pack serves nothing; the data stays for the retention window.
+  if (await isSetLocked(supabase, set.id))
     return new NextResponse("Not found", { status: 404 });
 
   let path = `${set.account_id}/${set.id}/${query.data.file}`;

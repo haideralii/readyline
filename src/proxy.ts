@@ -10,10 +10,25 @@
  */
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Routes with a Buy form (REQ-007 SR-5). With JavaScript off the form posts
+ * and the server answers with a redirect to Stripe's hosted Checkout, which
+ * `form-action` governs; nowhere else may a form leave our origin. No Stripe
+ * script, frame or connection exists on any page, so nothing is added to
+ * script-src, frame-src or connect-src (D-710).
+ */
+export const PURCHASE_ROUTES = ["/pricing", "/documents"] as const;
+export const CHECKOUT_ORIGIN = "https://checkout.stripe.com";
+
+export function isPurchaseRoute(pathname: string): boolean {
+  return PURCHASE_ROUTES.some((p) => pathname === p);
+}
+
 export function buildCsp(
   nonce: string,
   isDev: boolean,
   supabaseOrigin: string | null = supabaseOriginFromEnv(),
+  options: { purchaseRoute?: boolean } = {},
 ): string {
   return [
     "default-src 'self'",
@@ -27,7 +42,7 @@ export function buildCsp(
     `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin}` : ""}${isDev ? " ws: wss:" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    `form-action 'self'${options.purchaseRoute ? ` ${CHECKOUT_ORIGIN}` : ""}`,
     "frame-ancestors 'none'",
   ].join("; ");
 }
@@ -45,7 +60,12 @@ export function supabaseOriginFromEnv(): string | null {
 
 export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
+  const csp = buildCsp(
+    nonce,
+    process.env.NODE_ENV === "development",
+    supabaseOriginFromEnv(),
+    { purchaseRoute: isPurchaseRoute(request.nextUrl.pathname) },
+  );
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);

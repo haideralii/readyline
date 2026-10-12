@@ -1361,6 +1361,211 @@ unchanged); the site footer shows the statement, the AI disclosure and the
 trust line "Hosted in Australia. Independent of the NDIA and the NDIS Quality
 and Safeguards Commission.", so independence appears once on the page.
 
+## REQ-007: payments (branch `req-007-payments`)
+
+Decision numbers D-7xx on this branch.
+
+**D-701 Payment tables are written only with the secret key (Dev,
+2026-10-12, FR-4, SR-2).** Migration `20261012030000_payments.sql` creates
+`purchases` (session id and payment intent id both unique and nullable, so a
+refund that arrives first can be recorded as a refunded shell), `entitlements`
+(kind, assessment id, source purchase, version set once generated, revoked
+at), `stripe_events` (id, type, time; never a payload) and `generation_jobs`
+(the out-of-band generation queue). Owners read purchases and entitlements,
+members read job status, no client may insert, update or delete any of them,
+and the event ledger has no client access at all. The webhook and the job
+runner write through the admin client, as the purge job does.
+
+**D-702 The entitlement state machine is a pure reducer first (Dev,
+2026-10-12, FR-3, SR-2).** `src/lib/payments/entitlement.ts` applies one
+Stripe event to a ledger and names the outcome (granted, duplicate, ignored,
+revoked, refunded before completion, refund recorded, already paid,
+invalid). It is the specification the SQL function `apply_stripe_event`
+(Session B) implements atomically, the fake store the webhook tests use, and
+the place the out-of-order rules live: a replayed id changes nothing, a
+second completion for a known session grants nothing, a refund before the
+completion leaves a refunded purchase that the later completion fills in
+without granting.
+
+**D-703 Pricing copy lives in one file and the refund promise is read from
+refunds.md (Dev, 2026-10-12, FR-1, AC-4).** `src/lib/payments/copy.ts`
+holds every string the pricing page shows and a unit test runs the
+prohibited-claims lint over all of them plus the refund promise; the
+promise itself is the "Our promise" and "The document pack" paragraphs of
+`product/legal/refunds.md`, read at render time, with a test that asserts
+identity with the file. The REQ's sample wording "does not guarantee
+registration" cannot be used as written because the claims lint bans the
+phrase even negated, so the page says "Buying the pack does not mean you
+will be registered. The auditor and the Commission decide that." The price
+and the GST sentence come from `PACK_PRICE_AUD_CENTS` and `GST_LINE`; when
+unset the page says so rather than inventing a number, and the subscription
+is "coming" without a price until `SUBSCRIPTION_PRICE_AUD_CENTS` is set
+(Dev response Q6). The Buy control in Session A is a sign-in link; Session C
+replaces it with the Checkout action.
+
+**D-704 The webhook is a pure handler over a store interface, and the
+database applies events in one function (Dev, 2026-10-12, FR-3, SR-1,
+SR-2, SR-6).** `src/lib/payments/webhook.ts` takes the raw payload, the
+`stripe-signature` header, the secret, a verifier (a Stripe instance; the
+SDK's `constructEvent` does the constant-time check with its 300-second
+tolerance) and a `PaymentStore`; it maps the event to the small
+`PaymentEvent` shape (ids, account, assessment, amount, currency, receipt
+URL; never the email or the session object) and returns 200 with the
+outcome, or 400 for a missing header or a bad signature with no body
+detail. `MemoryPaymentStore` runs the reducer for tests and the fake Stripe
+mode; `SupabasePaymentStore` calls `apply_stripe_event` (migration
+`20261012040000_stripe_apply_event.sql`, security definer, execute granted
+to `service_role` only per D-538), which inserts the event id first and
+stops on a conflict, then records the purchase and grants or revokes the
+entitlement in the same transaction. The route `src/app/api/stripe/webhook`
+runs on the Node runtime, reads `request.text()`, answers 503 when Stripe or
+Supabase is unconfigured and 500 (so Stripe retries) on a store error; the
+ledger makes a retry safe. Unit tests sign payloads with the SDK's
+`generateTestHeaderString`; the function's own cases run in CI's Supabase job.
+
+**D-705 Card only through `allowed_payment_method_types` (Dev, 2026-10-12,
+AC-3).** SDK 23.0.0 targets API 2026-09-30, where a Checkout Session no
+longer takes `payment_method_types`; the equivalent is
+`allowed_payment_method_types: ["card"]`, a filter on the dynamically
+computed set, so no pay-later method can appear. The params builder sets it,
+sets nothing under `payment_method_options` or
+`payment_method_configuration`, `allow_promotion_codes: false`, the account
+and assessment in both the session and the payment-intent metadata, and
+success and cancel URLs on our origin with the cancel path allow-listed to
+`/pricing` and `/start/result`. The REQ's AC-3 wording names the old field;
+the test asserts the new one and the absence of the old. The create-checkout
+action checks sign-in, a complete questionnaire, Stripe configuration and a
+rate limit of five sessions per account per hour (the same database counter
+as the export limit), then creates the session with an idempotency key per
+account, answers snapshot and hour, and redirects to Stripe's URL. The
+Stripe client is injected into `createCheckoutSession`, so its test uses a
+fake and asserts the parameters.
+
+**D-706 The paid set is generated by a resumable job, a section at a time
+(Dev, 2026-10-12, FR-5).** `apply_stripe_event` enqueues one
+`generation_jobs` row when it grants a pack. `runGenerationTick`
+(`src/server/generation/job.ts`) claims the oldest runnable job through
+`claim_generation_job` (skip-locked; `next_run_at` doubles as a lease, so a
+run that dies leaves a job that is claimable again once the lease passes),
+then generates the set document by document and, within a document,
+section by section, persisting each finished tailored section in the job's
+`progress` column and each finished document as a `document_versions` row,
+and hands the job back (`queued`, `next_document_index`) when its time
+budget is spent. The next run resumes at the saved section, so nothing is
+generated twice and no model call is wasted. When every document exists the
+run renders the summary PDF, builds the zip from the stored objects, marks
+the version set ready, writes the version set id on the entitlement, logs an
+audit entry and sends the "documents are ready" email through the REQ-004
+provider (log-only until D-013). A run that throws increments `attempts`
+with `last_error` and backs off (2, 4 minutes); the third failure marks the
+job `failed`, marks the version set failed and logs
+`payments.generation.failed` with the purchase id for the operator. A job
+whose entitlement was revoked before it ran is cancelled without generating.
+Answers come from the account's current questionnaire draft; if their hash
+no longer matches the entitlement's assessment id the run logs a warning
+and generates from the current answers (the customer's own latest answers
+are the right input; the hash was a snapshot for the receipt). The job
+counts one hit against the daily generation quota but is never blocked by
+it: the purchase is the gate. Unit tests drive the whole sole-trader set in
+one run, across several budgeted runs with a fake clock (same number of
+model calls as one run), through three failures to `failed`, through a
+revoked entitlement, and through the recorded fixtures with no fallback.
+Replaces the "document by document" wording of the Dev response's Q4 with a
+finer grain, because one document can take longer than a 60-second function.
+
+**D-707 Short runs chained by `after()` and a self-kick, with Vercel Cron as
+a daily backstop (Dev, 2026-10-12, FR-5).** The webhook answers Stripe
+first and then, in `after()`, runs the job for up to 35 seconds and asks
+`/api/jobs/generate` for another run (an authenticated GET with a
+three-second client timeout: the request is sent, the route keeps working).
+The route runs for up to 40 seconds (`maxDuration = 60`) and, when more
+remains, kicks itself the same way after its response. A sole-trader set is
+therefore carried by a chain of short invocations with no customer-facing
+wait beyond the first. `vercel.json` schedules the route once a day as a
+backstop because the Hobby plan runs cron jobs at most daily; on a Pro plan
+set it to every minute. The chain needs `CRON_SECRET` and
+`NEXT_PUBLIC_SITE_URL`; without them the run after the webhook still
+happens and the rest waits for the cron, with a warning logged.
+`supabase/ops/refund.md` tells the operator how to re-queue or trigger a run.
+
+**D-708 `GENERATION_LIVE=1` is the production switch for real model calls
+(Dev, 2026-10-12).** `createModelClient` kept its D-502 rule (replay unless
+`GENERATION_RECORD=1` with a key), which would have made a real customer's
+job fail on the first unrecorded request. A third mode, `GENERATION_LIVE=1`
+with a key, calls the model and writes no fixture. CI, the e2e server and
+the dev machine leave it unset, so nothing in this repository can spend
+without an explicit production setting. Listed in `REQUIRED_LATER` and
+`.env.example`.
+
+**D-709 Fake Stripe mode for the end-to-end run (Dev, 2026-10-12, AC-1, Q5
+of the Dev response).** `STRIPE_FAKE=1` is honoured only when `VERCEL_ENV`
+is not `production` and the secret key is not a live key. In that mode the
+Buy action's Checkout client returns a page on our own origin
+(`/dev/stripe-checkout/<id>`; 404 in every other mode) whose "Pay" and
+"Refund" buttons build the `checkout.session.completed` and
+`charge.refunded` events Stripe would send, sign them with the local
+webhook secret (`generateTestHeaderString`) and post them to the real
+webhook route on the same origin, so the signature check, the SQL function,
+the job and the download page run as in production. The session id carries
+the session's own data, signed with the webhook secret, so no process state
+is needed and a tampered id is refused; no email is in it. The missing
+Stripe values are filled with local-only ones built at runtime (never a
+literal that a secret scan could match). Playwright's server runs in this
+mode on both projects; the signed-in spec creates a throwaway user and
+account with the admin key, seeds the sole-trader answers, signs in by
+writing the session cookie `@supabase/ssr` expects, and drives the job
+route with the cron secret. It skips without a Supabase stack, so it runs in
+CI's Supabase job (which now builds, installs Chromium and runs this spec
+with `EVIDENCE=1`, uploading the screenshots as an artifact) and on a
+developer machine with `.env.local` (read inside Node, never through a shell
+variable). The real Stripe hop (hosted Checkout with card 4242, a dashboard
+webhook endpoint) is deferred to the first Vercel deploy per the PO.
+
+**D-710 Receipts from the payment intent's charge; downloads locked on
+revoke; CSP unchanged except `form-action` on purchase routes (Dev,
+2026-10-12, FR-6, FR-7, FR-8, SR-5).** A Checkout Session carries no receipt
+URL, so after a `granted` outcome the webhook route, in `after()`, retrieves
+the payment intent with `latest_charge` expanded and stores
+`charge.receipt_url` on the purchase; failure only logs (Stripe emails the
+receipt anyway); in fake mode the receipt URL is the fake page in its paid
+state. `/documents` derives one of five states from the owner's rows
+(`deriveDocumentsState`, unit-tested): none (price and Buy), preparing
+(count of documents drafted, auto-refresh, the "usually under 10 minutes"
+line), delayed (a failed job reads as "we are preparing your documents and
+will email you", never an error code), ready (zip, PDF, set page, receipt
+link, refund mailto with the purchase id prefilled to `CONTACT_EMAIL`), and
+refunded (downloads closed, Buy again). A version set whose entitlement is
+revoked is locked: the set page says so, the document page redirects, and
+the download route answers 404; the objects stay for the retention window.
+The free "Generate" button stays behind `GENERATION_ENABLED` and is
+independent of purchases. `/account` lists purchases with receipt links. The
+CSP gains only `form-action 'self' https://checkout.stripe.com` on
+`/pricing` and `/documents` (a JavaScript-off Buy form posts and the server
+redirects to hosted Checkout, which `form-action` governs); no Stripe
+script, frame or connection exists on any page, so script-src, frame-src and
+connect-src are unchanged, and a test asserts the host appears once in the
+policy and only on those routes. The cancel-path allow-list gains
+`/documents`. The PO's Q6 answer is applied: "Audit-ready subscription: AUD
+39 a month, coming soon" with no buy button.
+
+**D-711 Explicit table privileges for `service_role` (Dev, 2026-10-12).** A
+read-only probe of the hosted project with the secret key answered 42501
+(permission denied) on every existing public table (accounts, memberships,
+questionnaire_drafts, version_sets, document_versions, generation_log,
+audit_log, auth_rate_limits), while the D-538 functions run. The hosted
+project does not carry the local stack's default privileges, so every
+admin-client write the server already makes (the purge job, the generation
+store, audit entries, the magic-link limiter's table) and everything in this
+session (the payment store, the job) would fail there. Migration
+`20261012080000_service_role_table_grants.sql` grants all privileges on all
+public tables and sequences to `service_role` and sets default privileges
+for later ones; the integration suite reads every server table through a
+service-role client. Companion to D-422 (the same gap for `authenticated`,
+on PR #14). Consequence for evidence: the signed-in e2e cannot run against
+the hosted project from the dev machine until PR #15 is merged and the
+migrations apply; CI's Supabase job is where AC-1 runs and where the
+screenshots come from.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.
@@ -1498,6 +1703,9 @@ Items asserted in code or copy that still need a primary source.
   secret-key function, with an integration test through the service-role
   client) and R-12 (no-standard documents never ask for a standard in
   tailored text) block PR #9. Batch 17 budget up to $0.40 (cap $2.28).
+- D-051 (PO, 2026-10-12): REQ-004 FR-9/FR-10 accepted (PR #14); REQ-007
+  Sessions A and B accepted (PR #15). Subscription display price AUD 39 a
+  month, "coming soon", display only until REQ-009.
 - D-052 (PO, 2026-10-13): the hosted project's secret-key role also lacked
   table grants (second gap of the same kind as D-422); the migrations on the
   open branches fix it. From now on every migration that creates a table
