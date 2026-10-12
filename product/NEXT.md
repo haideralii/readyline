@@ -226,3 +226,28 @@ Waiting for the PO.
 3. **Sole-trader incident policy, complete** (D-039 scope widened for this item only): record the remaining tailored sections of `incident-management-policy-and-register` for the sole-trader case (purpose, scope, how we put this into practice, responsibilities, incident procedure), one call each, so the PO can read one whole real document. Expected about $0.10. Re-render `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and update `sections.md`. Stop after this document; do not record other documents.
 
 4. STOP. Append your status below, with the batch's total spend.
+**2026-10-12 (batch 11), Dev: items 0 to 3 done; batch spend about $0.15; nothing merged.**
+
+0. `main` pushed with the PO's batch-11 commit (product/ and DECISIONS.md only); `main` merged into `req-005-generator` (3539dba; the REQ-013 file add/add conflict resolved with main's copy).
+1. R-5 and R-6 with D-040 (894daba): a readability `fail` is a validation problem that triggers the single retry with "shorten sentences to under 20 words and use common words", then the fallback; replies carry the API `stop_reason`, a `max_tokens` reply is recorded as "reply truncated at N output tokens" and never retried unchanged, with the count in the recordings report; caps 4,000 for `steps` and `how-we-do-this`, 1,500 otherwise. The fixture key no longer includes the cap (so raising a cap cannot orphan fixtures); the four existing fixtures were re-keyed in place. Unit tests for the gate, the truncation and the caps; `fixtures-replay.test.ts` replays every fixture through the new gate: the governance purpose fixture now reports "readability grade 11.8 is above 11" and falls back instead of passing. No model calls. Check clean (43 files, 331 tests).
+2. Behaviour-support `steps` at the 4,000 cap, one call: truncated again at 4,000 output tokens (5,635 in, about $0.051); stopped as decided, so the outline is split in a later session rather than the cap raised (D-525).
+3. Sole-trader incident policy, one call per section (1a4ad6d): scope (grade 8.6), how we put this into practice (6.8) and responsibilities (6.3) passed first time; purpose failed readability twice (15.8, then 12.2 after the retry instruction) and fell back; the incident procedure was cut at the 1,500 cap. Real tokens and dollars per row are in the REQ-005 evidence table; `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and `sections.md` re-rendered, with the pipeline's reason named for each fallback. Stopped after this document.
+4. STOP. **Batch total:** 7 calls, about $0.15 ($0.26 to date, against the $0.50 batch budget in D-040). **PO decisions requested (D-525):** give extra sections ending in `procedure` the 4,000 cap; change the "purpose" brief to "two short sentences"; split the behaviour-support `steps` outline before any further call.
+
+Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 12)
+
+**PO actions this batch:** PR #11 merged once CI on 0762574 is green. REQ-005 batch-11 recordings accepted; D-525 approved as D-041; new fix R-7 (REQ-005 PO review). Spend to date $0.26; this batch may spend up to $0.40 (D-039 and D-040 still apply; one call per section, no re-record of a passing fixture).
+
+0. **Push `main`** with the PO's batch-12 commit after checking the stat (product/ and DECISIONS.md only). Merge `main` into `req-005-generator`.
+
+1. **REQ-005 R-7 and D-041, no model calls** on `req-005-generator`: timeframe lint for tailored sections with its retry instruction and unit tests; the catalogue `purpose` brief; `*procedure` cap; the behaviour-support `steps` outline split into sub-sections of at most eight steps. Replay the recorded fixtures through the lint and list in Delivery evidence which ones now fail (expected: section 5 and section 6 of the sole-trader incident policy).
+
+2. **Sole-trader incident policy, complete (second pass)**: record `purpose` with the new brief, `procedure` at the 4,000 cap, and re-record only the sections item 1 lists as failing R-7. Re-render the review-pack `.docx` and `sections.md`. Target: every tailored section of this one document is real text with no fallback marker.
+
+3. **Behaviour-support steps**: record the split sub-sections, one call each. If any sub-section truncates, stop and report.
+
+4. **Status**: the batch's cost table (calls, tokens, dollars, pass or retry per call) and the running total.
+
+5. STOP.
