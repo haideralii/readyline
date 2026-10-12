@@ -1,0 +1,24 @@
+{
+  "answersVersion": 1,
+  "business": {
+    "tradingName": "Sunrise Supports",
+    "structure": "sole-trader",
+    "states": ["NSW"],
+    "abn": ""
+  },
+  "supports": { "groups": ["0120"] },
+  "practices": { "restrictivePractices": "no" },
+  "workforce": {
+    "workerCount": 1,
+    "keyPersonnelCount": 1,
+    "hasRiskAssessedRoles": true,
+    "allRiskAssessedScreened": "yes"
+  },
+  "existing": {
+    "policies": "no",
+    "incidentRegister": "no",
+    "complaintsRegister": "no",
+    "insuranceCertificate": "yes",
+    "workerInductionRecords": "no"
+  }
+}

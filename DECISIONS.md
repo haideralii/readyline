@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-Ã¢â‚¬Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-Ã¢â‚¬Â¦'`, `img-src 'self'
+'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -759,6 +759,131 @@ needs. Rather than widen the token, `migrate.yml` pushes over a direct
 database URL (session pooler, port 5432, user `postgres.<ref>`) using only
 `SUPABASE_DB_PASSWORD`; the access token stays for future CLI use.
 
+## REQ-005: document generator (branch `req-005-generator`, Dev response stage)
+
+Decision numbers D-5xx on this branch.
+
+**D-501 Closed block schema for model output (Dev, 2026-10-11).** Tailored
+sections are JSON with five block types (paragraph, bullets, steps, table,
+callout) validated by zod `strictObject` before rendering; no HTML or
+Markdown from the model. One renderer path handles fixed and tailored
+sections because fixed text is authored in the same block schema. Snapshot
+tests serialise the document model, not the `.docx` binary.
+
+**D-502 Fixture replay keyed by request hash.** Model calls in CI replay
+fixtures keyed by SHA-256 of prompt version, model id and the canonical
+request; a missing fixture fails the test, so a prompt change is visible as a
+diff of re-recorded sections. CI never holds `ANTHROPIC_API_KEY`.
+
+**D-503 Readability measured in-repo.** Flesch-Kincaid grade implemented in
+the repo with tests rather than an unmaintained dependency; warn above 9.0
+per tailored section, fail the quality gate above 11.0; tables and headings
+excluded from the measure.
+
+**D-504 LibreOffice conversion as a separate CI job.** AC-1 is proven by
+converting every rendered `.docx` to PDF with headless LibreOffice in a job
+that runs only when generator code or fixtures change, and nightly.
+
+**D-505 Catalogue reconciles two document-id schemes.** `document-sets.json`
+(PO ids such as `governance-policy`) and the evidence items in
+`standards.json` (`policy.governance`) are joined through
+`evidenceAliases` in `document-types.json`; neither file is renamed. Gaps
+found while drafting (participant money and property; support planning and
+transitions; a restrictive practice use register) are flagged for the PO in
+the REQ-005 Dev response rather than silently added.
+
+**D-506 Session A document model (Dev, 2026-10-12).** `buildSkeleton` turns
+a catalogue entry plus the provider facts into numbered sections: fixed
+sections resolved from `fixed-text.ts`, tailored sections left as a
+"[Provider to complete]" callout with status `placeholder`. Document
+control and the notice are unnumbered front and back matter; every other
+section is numbered in order, so headings read "1 Purpose" as the house
+style asks. Document-specific extra sections are inserted before the fixed
+back matter (records, related documents, review, notice) so the notice is
+always last. Structure snapshots record ids, numbers, modes, statuses and
+block types only, which keeps them readable (3 cases, about 185 KB).
+
+**D-507 Fixed text is lint-clean by test.** Every fixed section of every
+skeleton passes the terminology and claims lint with the Commission's class
+names as the only allowed exceptions. Two phrasings had to change for this:
+the document-control row is "Approval" rather than "Approved by", and the
+worker definition says "people we employ" rather than "employees". The
+Code of Conduct section summarises the Code's elements in plain words and
+says the Commission's published text applies; no deep link is given because
+the Code page is not among the fetched sources.
+
+**D-508 Readability without the "-le" rule.** The Flesch-Kincaid syllable
+heuristic counts vowel groups after stripping a silent "e"; the common
+"-le adds a syllable" rule double-counts here (table, people) and was
+dropped. Tests pin the known words and the two thresholds from the house
+style (warn above 9, fail above 11), measured on paragraphs, bullets and
+steps only.
+
+**D-509 Provider facts are the whole context vocabulary (SR-3).** The
+`ProviderFacts` type has eleven keys (trading name, formatted ABN,
+structure, state names, support types, pathway, module names, worker count
+band, key personnel count, risk-assessed roles, restrictive practices) and
+`FACT_KEYS` is also the enum behind `usedFacts`. A test builds the facts
+from answers carrying a canary `servicesNote` and asserts the canary and
+the step-5 answers never appear. Worker counts are banded (sole, 2 to 5,
+6 to 10, 11 to 25, 26 or more) so the prompt never carries an exact
+headcount.
+
+**D-510 Reference cases live in the repo.** `fixtures/reference-cases`
+holds three fictional questionnaires (sole trader verification in NSW;
+company certification with personal care, transport and verification classes
+in NSW and QLD; company with restrictive practices in VIC, bringing in the
+implementing behaviour support plans module). They are the input for the
+structure snapshots, the LibreOffice job and, later, the recorded model
+fixtures.
+
+**D-511 LibreOffice job scope.** The `docx-render` CI job installs
+`libreoffice-writer` with apt, writes the skeleton sets through the
+skeleton test (`WRITE_SKELETONS=1`), converts every `.docx` to PDF with
+`soffice --headless` and fails if any file does not convert, then uploads
+the sets as an artifact for the PO. It runs on pushes, on manual dispatch,
+and on pull requests from `req-005-generator` or titled REQ-005.
+**D-512 Context pack and prompt (Dev, 2026-10-12).** `ContextPack` is a
+strict zod object: the eleven facts, the document (id, title, kind,
+purpose), the section (id, heading, brief), the mapped standards with the
+Commission's outcome and indicators verbatim, and the register titles the
+document references. The builder reads only named answer fields; a test
+traces property access with a Proxy and proves `supports.servicesNote` and
+the step-5 answers are never read, and a canary in the services note never
+reaches the pack or either prompt (SR-3). The system prompt is the house
+style verbatim plus the output contract; the user prompt carries the pack in
+`<<<FACTS>>>`, `<<<STANDARDS>>>` and `<<<REGISTERS>>>` blocks with
+length caps, and tells the model that text inside the delimiters is data,
+not instructions (SR-2). `PROMPT_VERSION` is `2026-10-12.1` and is bumped
+by hand with any prompt change.
+
+**D-513 Replay harness.** `ModelClient` has four implementations:
+`ReplayClient` (fixtures at `fixtures/generation/<type>/<section>/<sha256>.json`,
+`MissingFixtureError` naming the expected path), `RecordingClient`
+(wraps a real client and writes the fixture with request, reply, usage and
+time), `FakeClient` (tests) and `AnthropicClient` (the SDK, imported
+lazily, constructed only when `GENERATION_RECORD=1` and a key exist). The
+hash covers prompt version, model, system, user and max tokens over
+canonical JSON. `@anthropic-ai/sdk` 0.133.0 is the runtime dependency.
+
+**D-514 Validate, retry once, fall back.** `generateSection` parses the
+reply (code fences tolerated), validates the strict section schema, checks
+the section id, and runs the terminology and claims lint with class names
+exempt; errors are appended to a second request; a second failure yields two
+callouts ("Review and complete" and the placeholder) with status
+`fallback` and the problems recorded (AC-5). Readability is measured on
+accepted prose. The red-team fixture (injected trading name plus a services
+note carrying fake participant details) keeps the clean document structure,
+confines the injected text to the FACTS block, keeps the note out entirely,
+and a reply that obeys the injection is rejected and falls back without the
+claim (AC-4).
+
+**D-515 Waiting for the Anthropic key.** `.env.local` has no
+`ANTHROPIC_API_KEY` or `ANTHROPIC_MODEL`, so no real generation was
+recorded and `fixtures/generation` holds only its README. The recording
+path is `npm run generation:record` with `GENERATION_RECORD=1` and both
+variables set; it records every tailored section of the governance policy
+for the three reference cases and prints token totals for the cost note.
 **D-037 Drafting model: `claude-sonnet-5-5` (PO with Haider, 2026-10-12).**
 Prices checked 12 Oct 2026: Sonnet 5.5 $2/$10 per MTok in/out, Opus 5.5 $4/$20,
 Haiku 5.5 from $0.10/$0.50, Fable 5.1 $10/$50. Estimated full document set:
@@ -767,6 +892,378 @@ Opus is the fallback if the PO's review of the first real sets finds the
 tailored sections too thin; Haiku is reserved for cheap side tasks. Monthly
 spend cap set in the Anthropic console before the key is created. Revisit
 with measured token counts from the first recordings (REQ-005 Session B).
+
+**D-516 Session C persistence and tenancy (Dev, 2026-10-12).** Three tables
+(`version_sets`, `document_versions` with the resolved model as JSON,
+`generation_log` with counts only) and a per-account daily quota
+(`accounts.generation_daily_limit`, default 5, raisable by an operator;
+`generation_quota_hit()` counts in one statement on the Sydney date).
+Members read through RLS; every write goes through `SupabaseGenerationStore`
+with the service key after the server action has checked the session and
+ownership, so no client insert policy exists. The runner takes the store and
+the model client as interfaces and is unit-tested end to end with an
+in-memory store and a fake model.
+
+**D-517 Private bucket, account-prefixed paths, two locks.** The
+`documents` bucket is private with a 25 MB object limit and four allowed
+media types; objects live at `<account_id>/<version_set_id>/<file>`. A
+member may read their own prefix (policy on `storage.objects` using
+`is_member`); nobody writes through the API. The download route checks
+the session, that the set belongs to the account and that the object path is
+inside the account (`isOwnedPath`) before asking for a 5-minute signed URL;
+anything else is 404 (AC-7). The integration suite proves another tenant can
+neither sign nor download the object and that clients cannot upload.
+
+**D-518 What a set contains.** One `.docx` per document in the derived set
+plus the Practice Standards self-assessment, a PDF readiness summary
+rendered with `pdf-lib` (pathway, modules, documents with drafting status,
+registers, notices), a README and `set.zip` holding all of them. The
+self-assessment's standards table is fixed text with the Commission's
+outcome verbatim, chunked into tables of 20 rows; "how we meet these
+standards" is a separate tailored section, so the model never rewrites
+Commission text. Regenerating a section renders a new `.docx` as the next
+document version (`<type>.v<n>.docx`) and the download route always serves
+the latest version; the zip and summary are from the original generation.
+
+**D-519 Reviewer view.** Each section shows its mode and status, the
+questionnaire answers it used (fact keys mapped to step and question labels)
+and, after a regeneration, a line diff against the previous version computed
+with an in-repo longest-common-subsequence (no dependency). Only tailored
+sections can be regenerated; each regeneration counts against the daily
+quota.
+
+**D-520 Fixed extras written; two UNVERIFIED avoidances.** All
+document-specific fixed sections now have house-style text (registers,
+forms, checklists, agreement outlines). Two places deliberately avoid
+restating regulatory detail: the reportable-incident section names the Rules
+and tells the provider to keep the Commission's current list and timeframes
+with the procedure, and the retention schedule leaves the periods for the
+provider to confirm, because neither the Incident Management Rules text nor
+retention periods are among the fetched sources (CLAUDE.md 4.6).
+
+**D-521 Retention extension to the purge job.** `purgeGenerationArtifacts`
+removes `generation_log` rows older than two years and superseded version
+sets (a newer set exists for the account) older than twelve months, objects
+first, then rows by cascade; it runs inside the daily purge route and
+supports dry run.
+
+**D-522 Still waiting for the Anthropic key.** `.env.local` has no
+`ANTHROPIC_API_KEY` or `ANTHROPIC_MODEL` at the end of batch 8, so the
+client defaults to replay, no fixture exists, and a real generation would
+mark every tailored section "Review and complete" (AC-5 path). The model id
+defaults to `claude-sonnet-5-5` per D-037.
+**D-523 First recordings (Dev, 2026-10-12, under D-039).** The recorder
+records one named section per reference case, loads the Anthropic variables
+from `.env.local` itself, prints an input-token estimate before the first
+call and writes a counts-only report beside the fixtures. Two lessons: the
+recorder and the review pack must run under vitest's Node environment (the
+SDK refuses the default browser-like one), and long-running tests need an
+explicit timeout (the default cut one call off mid-flight). Outcome: two
+sections validated first time; the behaviour-support `steps` section hit
+the 2,000-token output cap twice and fell back, so `maxTokens` for
+`steps` and `how-we-do-this` sections will be raised to 4,000 before any
+further recording, pending the PO's approval of the spend. The review pack
+is rendered from fixtures only through the replay client.
+**D-524 Readability gate, truncation and the fixture key (Dev, 2026-10-12;
+R-5, R-6, D-040).** A readability `fail` is now a validation problem: the
+single retry carries "shorten sentences to under 20 words and use common
+words", and a second fail falls back. Replies carry the API's stop reason;
+`max_tokens` is reported as "reply truncated at N output tokens" and the
+identical request is never retried. Output caps are 4,000 for `steps` and
+`how-we-do-this` and 1,500 for every other section. The fixture key no
+longer includes the cap, so raising a cap cannot orphan fixtures; the four
+existing fixtures were re-keyed once and the recorder re-records a fixture
+only when it was cut at a lower cap than today's. Replay tests pin the three
+outcomes on the recorded fixtures.
+
+**D-525 Batch-11 recordings (Dev, 2026-10-12).** Seven calls, about `.15`.
+The behaviour-support `steps` section truncated again at 4,000 output
+tokens, so per the PO that section outline is split in a later session, not
+given a bigger cap. The sole-trader incident policy now has real text for
+scope, policy statement, how we put this into practice and responsibilities
+(grades 6.3 to 8.6); `purpose` failed the readability gate twice (15.8 then
+12.2) and the `procedure` extra section was cut at the 1,500 cap. Two
+proposals for the PO: give extra sections whose id ends in `procedure` the
+4,000 cap (they are step lists), and tighten the "purpose" brief in the
+catalogue to "two short sentences" so the model stops writing a dense
+paragraph there.
+**D-526 R-7 implemented through briefs and a lint, not the system prompt
+(Dev, 2026-10-12).** The timeframe rule lives in the catalogue briefs of the
+step-style sections and in a lint with a retry instruction that names the
+document's fixed rules section; the system prompt is unchanged so existing
+fixtures keep their keys. The rule moves into the system prompt at the next
+`PROMPT_VERSION` bump, when every fixture is re-recorded anyway. Catalogue
+gains `omitSections` and `insertAfter` so one document can replace a
+shared outline section with anchored sub-sections (the behaviour-support
+steps). Batch-12 recordings: 8 calls, about $0.13; every section passed,
+the `purpose` section after its one readability retry.
+
+**D-527 Review cycles are facts in the pack, stated through the briefs, and
+linted by subject (Dev, 2026-10-12, R-8, D-042).** The catalogue defaults
+carry `reviewCycleMonths` (12) and `registerReviewMonths` (3), overridable
+per document type; the context pack has a required `reviewCycles` object
+and the briefs of the sections that state cycles (`how-we-do-this`,
+`responsibilities`) end with a marker the pack fills in ("policy review
+every 12 months; register review every 3 months. Use them and never choose
+a cycle"), following the D-526 pattern so the system prompt and the other
+fixtures keep their keys. The lint reads every "every N months/weeks/years"
+(digits or words, "every month" as one) and decides by subject: a sentence
+naming the register must use the register cycle, one naming the policy,
+procedure, plan, framework or document must use the policy cycle, one
+naming both must fit both, and a sentence naming neither may use either
+pack value. In a table, cells are joined by " | " in the flattened text and a
+cycle cell with no subject of its own ("At least every 12 months") takes
+the row's subject. A hit is a validation problem with the retry instruction
+"use the review cycles given ...; never choose your own"; one retry, then
+fallback. Reporting cadences ("steps 1 and 2 apply every month") are
+flagged too, by the PO's wording; the lint is deliberately strict and the
+reviewer sees the fallback callout rather than a silent cycle.
+
+**D-528 Proposed: policy-statement cap 2,500 and a per-document stop rule
+(Dev, 2026-10-12, for PO approval).** The sole-trader complaints policy
+statement truncated at the 1,500 cap (D-040) on its first and only call; the
+incident policy statement had fitted with 103 tokens to spare. The brief asks
+for a commitment per quality indicator in a table, so the size scales with the
+standard. Proposal: `maxTokensFor("policy-statement")` becomes 2,500 (about
+$0.025 per call at most); the recorder's rule that a truncation stops the rest
+of the case becomes per document, since the self-assessment sections were
+skipped for a truncation in a different document. Not implemented until the
+PO approves; the six unrecorded sections of item 3 wait on it.
+
+**D-529 R-8 narrowed to review wording; D-043 implemented (Dev,
+2026-10-12).** `maxTokensFor("policy-statement")` is 2,500 (D-043); the
+fixture key still excludes the cap, so passing fixtures keep their keys and
+the recorder re-records only a fixture that was cut at a lower cap. The
+recorder's stop-after-truncation set is keyed by case and document type, so a
+truncation in one document no longer skips another document of the same
+reference case. The review-cycle lint only examines a sentence (or a table
+row) that contains review wording: review, reviews, reviewed, reviewing,
+check, checks, checked, checking, look at, looks at, looked at, looking at.
+"Steps 1 and 2 apply every month" and "we send the report every month" are
+cadences, not review cycles, and fall to R-7 (which requires them to refer to
+the fixed section that sets them). "Update" and "revise" are deliberately not
+review wording: "we update the Commission every month" is a reporting cadence.
+
+**D-530 Thinking is switched off on every generation call; hidden output had
+been eating the caps (Dev, 2026-10-12).** Comparing reply length with
+`output_tokens` across all fixtures showed two populations: clean replies at
+about 3 characters per output token, and many at 0.6 to 1.5, including one
+reply of 1,500 tokens with no text at all (the batch-11 incident procedure)
+and the self-assessment "how we meet" reply cut at 1,500 tokens with 1,618
+characters. Only `text` blocks are kept, so the rest of those tokens were
+non-text output billed and counted against `max_tokens`. The request now
+sends `thinking: {type: "between_tools"}`, which the API names as the off
+setting for this model (it rejects `{type: "disabled"}`); with no tools there
+is nothing between them. Re-recording "how we meet" with that setting gave
+721 output tokens for 2,393 characters (3.3 per token), passing first time.
+Fixtures record the setting and the content block types the API returned; a
+truncated fixture recorded without the setting is re-recorded once. Earlier
+fixtures stay valid (their text is unchanged) but their token and dollar
+figures overstate what the text cost by roughly half; every truncation before
+this batch except the 4,000-token behaviour-support steps is now explained by
+it. Caps D-040, D-041 and D-043 stand; they are now generous rather than
+tight. The two rejected `disabled` requests cost nothing (HTTP 400 before
+any tokens).
+
+**D-531 R-9 and R-10 implemented; the outline re-keys every fixture (Dev,
+2026-10-12, D-044).** The context pack carries `outline`, the document's
+numbered sections (fixed and tailored) from `outlineFor`, rendered in the
+user prompt as an OUTLINE block with the instruction to refer to sections
+only by the number and title given there, which overrides the house style's
+generic structure. The instruction sits in the user prompt beside the
+outline rather than in every brief, because the outline changes the user
+text for every section anyway; `PROMPT_VERSION` is 2026-10-12.2 for the
+same reason, and the R-7 example in the briefs no longer names "section 7
+Reportable incidents" (wrong for every document but the incident policy)
+but says "by its number and title in the outline". `lintCrossReferences`
+flags "section N" when N is not in the outline, and "section N Title" when
+the capitalised run after the number is not that section's heading; the
+retry instruction names what section N is, which section carries the title
+the model used, and the whole outline. Lowercase prose after a number
+("section 3 explains") is not a title. `standardsForType` intersects a
+document's listed standards with the standards of the case's applicable
+modules (`all-applicable` unchanged). Consequences: the verification
+sole-trader case loses the core twin of each verification standard, and the
+behaviour-support case loses the five `sbs.*` standards listed on the plan
+implementation procedure because that case implements plans (`ibsp`); the
+fixed "standards this document supports" text of eleven sole-trader
+documents whose standards are all core now renders the "no standard listed"
+callout, which the PO should weigh (the documents still ship; they just cite
+nothing). Every existing fixture is orphaned by the outline block; the
+three sole-trader documents are re-recorded in this batch, the
+behaviour-support sub-sections wait for the full-set batch
+(`GENERATION_RECORD_CASE` limits a recording run to one case).
+
+**D-532 Two lint false positives found by the batch-15 re-recording (Dev,
+2026-10-12; the second for PO confirmation).** (1) The R-8 lint rejected
+"We review this policy every 12 months and the incident register every 3
+months" and the cell "Policy every 12 months; register every 3 months",
+both correct, because it took the subject of every cycle mention from the
+whole sentence or row. The subject is now what the sentence (the cell, in a
+row) names between the previous cycle mention and this one, falling back to
+the sentence and then the row when that span names nothing; one cycle for
+both subjects is still rejected. Two sections fell back on this alone and
+were re-recorded. (2) The terminology lint flagged "participants, their
+families and carers" as the banned worker synonym "carer". That phrase is
+the Commission's own and means the participant's family carers, so
+"carer(s)" is now allowed when preceded by "families and", "family",
+"unpaid" or "informal", or followed by "and families"; "our carers" and "a
+carer completes the register" are still rejected. The house style itself is
+unchanged; the PO may fold the exception into it or strike it.
+
+**D-533 Purpose briefs ask for sentences under 15 words (Dev, 2026-10-12).**
+A purpose section is two sentences, so its reading grade rests on two
+sentences alone and the standard's name makes each one long: the incident
+purpose scored 16.5, 22 and 15.7 on first replies across batches and 11.4
+and 12.0 on retries. The brief now reads "Two short sentences, each under
+15 words: ..."; both recorded purpose sections then passed first time
+(grades 10.7 and 9.4). This re-keyed only the purpose sections, two of them
+recorded.
+
+**D-534 Basis implemented as fixed text only (Dev, 2026-10-12, D-045).**
+Every catalogue item carries `basis` (practice-standard, code-of-conduct,
+commission-rules, privacy-act or good-practice) and, unless it is a
+Practice Standard, a one-line `basisReason`; the schema refuses a non-standard
+basis without a reason. The PO's twelve assignments are in the catalogue with
+the PO's wording where given and plain reasons where not (privacy: the
+Privacy Act 1988 and the Code of Conduct; records: the record-keeping
+conditions of registration; continuity: the conditions of registration;
+emergency: every provider needs such a plan; the AI pair: the Commission's
+2026 position on AI use). The document-control section gains a "Why this
+document" paragraph under its table: the standards the document supports for
+this case, or "Verification providers are not audited against this document
+under the NDIS Practice Standards. We keep it because [reason]." The
+records-and-evidence section carries the same sentence plus a record-keeping
+sentence instead of the provider-to-complete placeholder. Fixed text is not
+in the prompt, so no fixture key moved (the replay suite passes unchanged);
+the structure snapshots changed for every document (one paragraph added).
+
+**D-535 Prompt caching re-keys the fixtures once; the recorder prices cache
+tokens and can record another model (Dev, 2026-10-12, D-046).** The request
+now carries its user text as two content blocks: a per-document block
+(document title and purpose, FACTS, STANDARDS, REGISTERS, OUTLINE and the
+outline rule, identical for every section of a document in a case) and a
+section block (the section line naming its outline number, the brief and the
+reply line). The client sends the system prompt and the document block with
+`cache_control: {type: "ephemeral"}` and the section block last; a retry
+appends the rejection to the section block, so the cached prefix survives.
+The PO asked for fixture keys to stay unchanged, but a per-document cache
+needs the section-specific text moved to the end of the user message, which
+changes the hashed text; `PROMPT_VERSION` is 2026-10-12.3 and every fixture
+was re-keyed, so the fourteen sole-trader sections recorded in batch 15 are
+recorded again inside item 3 (about $0.15 at cached rates). Caching only the
+system prompt would have kept the keys but saved less than half as much.
+Usage records `cacheCreationInputTokens` and `cacheReadInputTokens` beside
+the API's uncached `inputTokens`; the generation log gains the two columns
+(migration `20261012010000_generation_log_cache_tokens.sql`). The recorder
+prices a call at cache write 1.25x and cache read 0.1x of the input rate and
+also reports the uncached figure; Haiku 5.5 is priced at $1 in / $5 out per
+million as an UNVERIFIED Dev assumption for the comparison. The recorder's
+approved list is now derived from the sole-trader case (every tailored
+section of its 18 documents, 90 in all) plus the three behaviour-support
+sub-sections; `GENERATION_MODEL_OVERRIDE=<model>` records into
+`fixtures/generation-<model>/` with its own report and only the three
+review-pack documents, and `REVIEW_PACK_MODEL=<model>` renders those from that
+directory into `product/evidence/req-005/sole-trader-<family>/`. Production
+never reads a model-keyed directory.
+
+**D-536 Two more lint false positives from the full-set recording (Dev,
+2026-10-12).** (1) "Policy review register" is the register where reviews
+are recorded; a row such as "Reviews this policy and records the review in
+the Policy review register | Every 12 months" names both subjects by
+accident. The R-8 subject rule was rebuilt: the unit is the sentence (cut
+at a cell boundary in a row); a mention's subject is what the unit names
+between the previous mention and this one after the last ";", "," or ":",
+else what follows it up to the next mention ("every 12 months for the plan;
+every 3 months for the register"), else the object of the review verbs in
+the sentence and then in the row, where an object ends at a recording verb
+("reviews this policy and updates the register" reviews the policy) and
+"Policy review register" reads as a register. Three sections fell back on
+the old rule (records management responsibilities, emergency plan
+responsibilities, AI policy how-we-do-this); their recorded replies were
+correct and pass on replay. A String.match on a global regex (no index) was
+found and fixed on the way. (2) The R-9 cross-reference run stopped at a
+colon or comma, so "section 5 Steps: monitoring, reporting and review"
+matched only "Steps" and was rejected; the run now keeps colons and commas
+and the heading test requires a word boundary. One behaviour-support
+sub-section fell back on it and passes on replay. Only two of the six
+fallbacks were the model's: the continuity plan's sole-trader cover
+("Within 1 business day", the provider's own promise, caught by the R-7
+business-day rule, then grade 11.7) and the privacy purpose (grades 14.5 and
+12.4); both were recorded again. R-7 is left as the PO wrote it; whether a
+provider's own service timeframe in a continuity plan should pass is for the
+PO.
+
+**D-537 The Haiku comparison, and the thinking setting per model family
+(Dev, 2026-10-12, D-046).** Haiku 5.5 refuses `thinking: {type:
+"between_tools"}` with a 400; the client now tries `{type: "disabled"}` next
+and, only if that is refused too, sends no thinking parameter, recording
+which setting the reply came from. The first Haiku pass ran with no
+parameter and showed what the parameter is for: the replies carried
+`thinking` blocks (content types `["thinking","text"]`, 0.2 to 1.0
+characters per output token, three replies that were thinking only and
+truncated at 1,500 tokens), the same shape as the Sonnet calls before D-530.
+With `disabled`, Haiku replies are text only at about 3.1 characters per
+token. The comparison over the three review-pack documents (14 sections,
+Sonnet figures from the same batch): Sonnet 9 first time, 5 on retry, 0
+fallbacks, mean grade 8.5; Haiku 5 first time, 6 on retry, 3 fallbacks (a
+"support worker" role title, the word "guarantee", a restated timeframe,
+and a purpose above grade 11 twice), mean grade 9.7. Cost at the assumed
+Haiku prices ($1 in, $5 out per million, UNVERIFIED): Haiku about $0.09
+against Sonnet $0.14 for the same sections, with two Haiku rows still
+carrying hidden thinking tokens from the first pass. Production stays on
+Sonnet 5.5 unless the PO decides otherwise; the model-keyed fixture
+directory is never read by production code.
+
+**D-538 Secret-key functions carry an explicit grant to service_role (Dev,
+2026-10-12, R-11, D-050).** Migration
+`20261012020000_service_role_function_grants.sql` grants execute on
+`auth_rate_limit_hit(text, integer, integer)` and `generation_quota_hit(uuid)`
+to `service_role`; its header records that Haider applied the same two grants
+by hand on the hosted project, so the migration is a no-op there
+(idempotent `grant`). The gap existed because the earlier migrations revoked
+execute from public, anon and authenticated and left service_role to the
+local stack's default privileges, which the hosted project does not share.
+These are the only two functions the server calls with the secret key
+(`create_account` and `delete_account` run as the signed-in user; the purge
+job and the admin pages use table access). The integration suite gains
+`tests/integration/service-role-grants.test.ts`, which calls each function
+through a client built with the secret key and asserts the publishable key
+is refused (42501) signed out and signed in, so a new secret-key function
+without a grant fails CI's Supabase job.
+
+**D-539 Readability gate per document and section size, statutory anchors
+for R-7, obligation briefs for no-standard documents (Dev, 2026-10-12;
+D-047, D-049, D-050 R-12).** The catalogue carries
+`defaults.readabilityFailAbove` (11), `defaults.shortSectionWords` (40) and
+`readabilityFailAbove: 12` on the privacy and records management policies;
+the context pack carries `readabilityGate` (not in the prompt) and the gate
+fails a reply only when its grade is above the document's line and it has at
+least 40 words; shorter sections keep the warning level in the reviewer
+view. `lintTimeframes` takes the document's rules-section heading as an
+extra anchor and flags a timeframe only when its sentence (its row, in a
+table) names the Commission, notifying or reporting, the Rules or that
+heading. When the case cites none of a document's standards, the pack's
+`document.basisReason` holds the obligation and `briefFor` swaps the purpose
+brief ("which obligation it supports: [reason]; never name or ask for a
+Practice Standard") and the policy-statement brief (commitments resting on
+the obligation, columns "Our commitment" and "What we do", no indicator
+column); `lintPlaceholders` rejects any "[Provider to complete ...]" that
+mentions a standard or indicator, with a retry naming the obligation (or
+the STANDARDS block). Replay: the placeholder lint catches six batch-16
+recordings (AI policy purpose and policy statement, continuity purpose,
+governance, rights and records policy statements); the brief change re-keys
+seventeen sole-trader sections (purpose and policy statement of the nine
+no-standard policies, purpose of the two plans and the AI procedure) which
+item 3 records; the privacy purpose and the continuity sole-trader cover
+need no call, since their recorded first replies now pass (short section at
+15.3 warns; "within 1 business day" has no statutory anchor).
+
+**D-540 One readability module (Dev, 2026-10-12, closes D-803).** With
+`main` merged into `req-005-generator`, `src/lib/text/readability.ts` is
+the only copy (it gained `SHORT_SECTION_WORDS` from D-047); the generator,
+its tests and the legal-copy test import it, and the generator's copy and
+test are deleted.
 
 ## REQ-008: legal and trust pages (branch `req-008-legal-pages`)
 

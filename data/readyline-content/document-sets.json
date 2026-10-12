@@ -1,9 +1,9 @@
 {
-  "note": "First-pass mapping from Practice Standards modules to the documents and registers a provider will need. Written by the product owner for Readyline; NOT NDIS Quality and Safeguards Commission text. REQ-005 refines it. Conditions ('when') are Readyline's reading of the PO's bracketed notes: 'personal care groups' means the classes listed under personalCareGroups.",
+  "note": "First-pass mapping from Practice Standards modules to the documents and registers a provider will need. Written by the product owner for Readyline; NOT NDIS Quality and Safeguards Commission text. REQ-005 refines it. Conditions ('when') are Readyline's reading of the PO's bracketed notes: 'personal care groups' means the classes listed under personalCareGroups. PO batch 7 (12 Oct 2026): participant money and property procedure and support planning and transitions procedure added to the core set; restrictive practice use register added, applicable only when the implementing behaviour support plans module is in scope (REQ-009).",
   "author": "readyline",
   "status": "reviewed",
   "reviewedBy": "po",
-  "reviewedAt": "2026-10-11",
+  "reviewedAt": "2026-10-12",
   "personalCareGroups": ["0104", "0107", "0115", "0138"],
   "always": [
     "governance-policy",
@@ -27,58 +27,130 @@
   "byModule": {
     "verification": [],
     "core": [
-      { "id": "quality-management-and-continuous-improvement" },
-      { "id": "feedback-and-participant-engagement-procedure" },
+      {
+        "id": "quality-management-and-continuous-improvement"
+      },
+      {
+        "id": "feedback-and-participant-engagement-procedure"
+      },
       {
         "id": "medication-management-procedure",
-        "when": { "groupsAny": "personalCareGroups" }
+        "when": {
+          "groupsAny": "personalCareGroups"
+        }
       },
       {
         "id": "mealtime-management-procedure",
-        "when": { "groupsAny": "personalCareGroups" }
+        "when": {
+          "groupsAny": "personalCareGroups"
+        }
       },
-      { "id": "waste-and-infection-control-procedure" },
-      { "id": "transport-safety-procedure", "when": { "groupsAny": ["0108"] } }
+      {
+        "id": "waste-and-infection-control-procedure"
+      },
+      {
+        "id": "transport-safety-procedure",
+        "when": {
+          "groupsAny": ["0108"]
+        }
+      },
+      {
+        "id": "participant-money-and-property-procedure"
+      },
+      {
+        "id": "support-planning-and-transitions-procedure"
+      }
     ],
     "hidpa": [
-      { "id": "high-intensity-skills-descriptors-and-training-register" },
-      { "id": "clinical-oversight-procedure" }
+      {
+        "id": "high-intensity-skills-descriptors-and-training-register"
+      },
+      {
+        "id": "clinical-oversight-procedure"
+      }
     ],
     "sbs": [
-      { "id": "restrictive-practice-authorisation-and-reporting-procedure" },
-      { "id": "behaviour-support-plan-implementation-procedure" }
+      {
+        "id": "restrictive-practice-authorisation-and-reporting-procedure"
+      },
+      {
+        "id": "behaviour-support-plan-implementation-procedure"
+      }
     ],
     "ibsp": [
-      { "id": "restrictive-practice-authorisation-and-reporting-procedure" },
-      { "id": "behaviour-support-plan-implementation-procedure" }
+      {
+        "id": "restrictive-practice-authorisation-and-reporting-procedure"
+      },
+      {
+        "id": "behaviour-support-plan-implementation-procedure"
+      }
     ],
     "ec": [
-      { "id": "family-centred-practice-procedure" },
-      { "id": "child-safe-practices-policy" }
+      {
+        "id": "family-centred-practice-procedure"
+      },
+      {
+        "id": "child-safe-practices-policy"
+      }
     ],
     "ssc": [
-      { "id": "conflict-of-interest-in-coordination-procedure" },
-      { "id": "complex-support-escalation-procedure" }
+      {
+        "id": "conflict-of-interest-in-coordination-procedure"
+      },
+      {
+        "id": "complex-support-escalation-procedure"
+      }
     ],
     "sda": [
-      { "id": "dwelling-enrolment-and-maintenance-procedure" },
-      { "id": "tenancy-rights-and-dispute-procedure" }
+      {
+        "id": "dwelling-enrolment-and-maintenance-procedure"
+      },
+      {
+        "id": "tenancy-rights-and-dispute-procedure"
+      }
     ],
     "sil": [
-      { "id": "supported-decision-making-procedure" },
-      { "id": "sil-safeguarding-and-roster-oversight-procedure" },
-      { "id": "practice-governance-framework" },
-      { "id": "tenancy-housing-and-support-agreements-procedure" }
+      {
+        "id": "supported-decision-making-procedure"
+      },
+      {
+        "id": "sil-safeguarding-and-roster-oversight-procedure"
+      },
+      {
+        "id": "practice-governance-framework"
+      },
+      {
+        "id": "tenancy-housing-and-support-agreements-procedure"
+      }
     ]
   },
   "registers": [
-    { "id": "incidents", "title": "Incident register" },
-    { "id": "complaints", "title": "Complaints register" },
+    {
+      "id": "incidents",
+      "title": "Incident register"
+    },
+    {
+      "id": "complaints",
+      "title": "Complaints register"
+    },
     {
       "id": "worker-clearances",
       "title": "Worker screening clearance register"
     },
-    { "id": "training", "title": "Training register" },
-    { "id": "policy-reviews", "title": "Policy review register" }
+    {
+      "id": "training",
+      "title": "Training register"
+    },
+    {
+      "id": "policy-reviews",
+      "title": "Policy review register"
+    },
+    {
+      "id": "restrictive-practices",
+      "title": "Restrictive practice use register",
+      "when": {
+        "modulesAny": ["ibsp"]
+      }
+    }
   ]
 }

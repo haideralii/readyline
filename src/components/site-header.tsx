@@ -18,12 +18,20 @@ export async function SiteHeader() {
             In development
           </span>
           {user ? (
-            <Link
-              href="/account"
-              className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
-            >
-              Account
-            </Link>
+            <>
+              <Link
+                href="/documents"
+                className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+              >
+                Documents
+              </Link>
+              <Link
+                href="/account"
+                className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+              >
+                Account
+              </Link>
+            </>
           ) : (
             <Link
               href="/sign-in"

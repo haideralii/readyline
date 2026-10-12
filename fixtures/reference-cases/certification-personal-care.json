@@ -1,0 +1,24 @@
+{
+  "answersVersion": 1,
+  "business": {
+    "tradingName": "Harbour Care Services",
+    "structure": "company",
+    "states": ["NSW", "QLD"],
+    "abn": "51 824 753 556"
+  },
+  "supports": { "groups": ["0107", "0120", "0108"] },
+  "practices": { "restrictivePractices": "no" },
+  "workforce": {
+    "workerCount": 6,
+    "keyPersonnelCount": 2,
+    "hasRiskAssessedRoles": true,
+    "allRiskAssessedScreened": "not-sure"
+  },
+  "existing": {
+    "policies": "not-sure",
+    "incidentRegister": "yes",
+    "complaintsRegister": "no",
+    "insuranceCertificate": "yes",
+    "workerInductionRecords": "yes"
+  }
+}

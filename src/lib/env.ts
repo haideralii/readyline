@@ -50,6 +50,11 @@ export const REQUIRED_LATER: ReadonlyArray<{
     productionHome: "Vercel project environment variables (server only)",
   },
   {
+    name: "ANTHROPIC_MODEL",
+    from: "REQ-005",
+    productionHome: "Vercel project environment variables (server only)",
+  },
+  {
     name: "CONTACT_EMAIL",
     from: "REQ-008 (footer Contact link; public once set)",
     productionHome: "Vercel project environment variables",

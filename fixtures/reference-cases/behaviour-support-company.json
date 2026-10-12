@@ -1,0 +1,24 @@
+{
+  "answersVersion": 1,
+  "business": {
+    "tradingName": "Westside Living Supports",
+    "structure": "company",
+    "states": ["VIC"],
+    "abn": ""
+  },
+  "supports": { "groups": ["0107", "0115"] },
+  "practices": { "restrictivePractices": "yes" },
+  "workforce": {
+    "workerCount": 12,
+    "keyPersonnelCount": 3,
+    "hasRiskAssessedRoles": true,
+    "allRiskAssessedScreened": "yes"
+  },
+  "existing": {
+    "policies": "yes",
+    "incidentRegister": "yes",
+    "complaintsRegister": "yes",
+    "insuranceCertificate": "yes",
+    "workerInductionRecords": "not-sure"
+  }
+}

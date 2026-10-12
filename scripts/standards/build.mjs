@@ -27,6 +27,22 @@ const read = (p) =>
 const sha256 = (s) => createHash("sha256").update(s, "utf8").digest("hex");
 const squash = (s) => s.replace(/\s+/g, " ").trim();
 
+/**
+ * Evidence items are draft until the PO reviews them. Once meta.evidenceReview
+ * exists every item is marked reviewed unless it opts out with draft: true.
+ */
+function reviewEvidence(e, review) {
+  if (!review || e.draft === true) return { draft: true, ...e };
+  const rest = { ...e };
+  delete rest.draft;
+  return {
+    draft: false,
+    reviewedBy: review.reviewedBy,
+    reviewedAt: review.reviewedAt,
+    ...rest,
+  };
+}
+
 export function slugify(name) {
   return name
     .replace(/\([^)]*\)/g, " ")
@@ -274,7 +290,7 @@ export function build(meta, readFile = read) {
             page.parser === "sil-pdf"
               ? `PDF, "SIL Practice Standards: ${p.name}"`
               : `heading "${p.name}"`,
-          evidence: evidence.map((e) => ({ draft: true, ...e })),
+          evidence: evidence.map((e) => reviewEvidence(e, meta.evidenceReview)),
           verification: verified,
         };
         standards.push(record);

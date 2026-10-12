@@ -9,6 +9,9 @@
     "dev": "next dev",
     "build": "next build",
     "check:bundle": "node scripts/ci/check-client-bundle.mjs",
+    "generator:skeletons": "vitest run src/lib/generator/skeletons.test.ts",
+    "generation:record": "vitest run src/lib/generator/record-fixtures.test.ts",
+    "generation:review-pack": "vitest run src/lib/generator/review-pack.test.ts",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -26,10 +29,13 @@
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
+    "docx": "^9.10.0",
     "fflate": "^0.8.3",
     "next": "16.4.0",
+    "pdf-lib": "^1.17.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-markdown": "^10.1.0",

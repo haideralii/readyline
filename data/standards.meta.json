@@ -1,14 +1,24 @@
 {
   "$comment": "Hand-maintained inputs for scripts/standards/build.mjs. Outcome and indicator text is NOT here; it is parsed from data/sources. Evidence items are Readyline guidance (draft until the PO reviews them), not Commission text.",
-  "version": "1.0.0",
-  "generatedAt": "2026-10-11",
+  "version": "1.1.0",
+  "generatedAt": "2026-10-12",
   "checkedAt": "2026-10-11",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
+  "evidenceReview": {
+    "reviewedBy": "po",
+    "reviewedAt": "2026-10-12",
+    "note": "All evidence items reviewed and approved by the product owner (REQ-005 PO review, 12 Oct 2026). Items added later carry draft: true until reviewed."
+  },
   "changelog": [
     {
       "version": "1.0.0",
       "date": "2026-10-11",
       "note": "First full dataset: core module, the six legacy supplementary modules, the SIL module effective 1 July 2026, the verification module, all 38 registration classes with audit type and modules, and derivation rules. Sources fetched 2026-10-11."
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-10-12",
+      "note": "Evidence items reviewed by the product owner: all approved, draft flags cleared, reviewedBy and reviewedAt recorded. Three additions: signed Code of Conduct acknowledgement record under core and verification human resource management; worker screening clearance register under verification human resource management. No change to Commission text or sources."
     }
   ],
   "sources": [
@@ -367,7 +377,11 @@
       "effectiveFrom": null,
       "sourceIds": ["supp-ec", "ps-qi-v4", "legislation-rules-toc"],
       "pages": [
-        { "sourceId": "supp-ec", "parser": "commission-page", "expectCount": 7 }
+        {
+          "sourceId": "supp-ec",
+          "parser": "commission-page",
+          "expectCount": 7
+        }
       ]
     },
     {
@@ -412,7 +426,13 @@
         "mandatory-sil",
         "legislation-rules-toc"
       ],
-      "pages": [{ "sourceId": "sil-ps", "parser": "sil-pdf", "expectCount": 4 }]
+      "pages": [
+        {
+          "sourceId": "sil-ps",
+          "parser": "sil-pdf",
+          "expectCount": 4
+        }
+      ]
     },
     {
       "id": "verification",
@@ -651,6 +671,11 @@
       {
         "kind": "plan",
         "title": "Emergency workforce plan identifying workers with relevant capabilities and how a workforce is sourced in a disruption"
+      },
+      {
+        "kind": "record",
+        "title": "Signed NDIS Code of Conduct acknowledgement for every worker",
+        "documentTypeId": "form.code-of-conduct"
       }
     ],
     "core.governance.continuity-of-supports": [
@@ -1369,6 +1394,16 @@
         "kind": "training",
         "title": "NDIS worker orientation module completion, professional development, infection control and PPE training records",
         "documentTypeId": "register.training"
+      },
+      {
+        "kind": "register",
+        "title": "Worker screening clearance register with expiry dates",
+        "documentTypeId": "register.worker-clearances"
+      },
+      {
+        "kind": "record",
+        "title": "Signed NDIS Code of Conduct acknowledgement for every worker",
+        "documentTypeId": "form.code-of-conduct"
       }
     ],
     "verification.incident-management": [
@@ -1827,10 +1862,22 @@
       "sourceId": "types-of-audits"
     },
     "ratings": [
-      { "value": 3, "label": "conforms with elements of best practice" },
-      { "value": 2, "label": "conforms with NDIS Practice Standards" },
-      { "value": 1, "label": "minor non-conformity" },
-      { "value": 0, "label": "major non-conformity" }
+      {
+        "value": 3,
+        "label": "conforms with elements of best practice"
+      },
+      {
+        "value": 2,
+        "label": "conforms with NDIS Practice Standards"
+      },
+      {
+        "value": 1,
+        "label": "minor non-conformity"
+      },
+      {
+        "value": 0,
+        "label": "major non-conformity"
+      }
     ],
     "ratingsSourceId": "types-of-audits",
     "silDefinition": {

@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { parseInput, strictObject } from "@/lib/validation";
 import { log } from "@/lib/logging/logger";
-import { runPurge } from "@/server/accounts/purge";
+import { purgeGenerationArtifacts, runPurge } from "@/server/accounts/purge";
 import { createEmailProvider } from "@/server/email/provider";
 import { isAuthorisedCronRequest } from "@/server/jobs/cron-auth";
 import { SupabaseEnvError } from "@/server/supabase/env";
@@ -34,19 +34,24 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "invalid query" }, { status: 400 });
   const dryRun = query.data.dryRun === "1";
   try {
+    const admin = createSupabaseAdminClient();
     const report = await runPurge({
-      admin: createSupabaseAdminClient(),
+      admin,
       email: createEmailProvider(),
       dryRun,
     });
+    const generation = await purgeGenerationArtifacts({ admin, dryRun });
     log.info("jobs.purge.ran", {
       dryRun,
       purged: report.purged.length,
       errors: report.errors.length,
     });
-    return NextResponse.json(report, {
-      status: report.errors.length ? 207 : 200,
-    });
+    return NextResponse.json(
+      { ...report, generation },
+      {
+        status: report.errors.length ? 207 : 200,
+      },
+    );
   } catch (e) {
     if (e instanceof SupabaseEnvError)
       return NextResponse.json(
