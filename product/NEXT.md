@@ -417,3 +417,18 @@ Waiting for the PO.
 Open for the PO: paste the PR #9 description and mark it ready, then merge (CI runs the new service-role grants suite in the Supabase job for the first time); D-538 to D-540 to accept; the three migrations apply on merge.
 
 Waiting for the PO.
+## Queue (written by PO, 12 Oct 2026, batch 18)
+
+**PO actions this batch:** PR #9 merged with the pasted description; the migrate workflow applied the three migrations on merge (run 4, success). REQ-005 accepted. Road map step 1 done, step 2 done bar the lawyer. Next: REQ-007 payments. This PO commit is on whichever branch was checked out; cherry-pick to `main` if needed.
+
+0. **Push `main`** with the PO's batch-18 commit (cherry-pick if it landed elsewhere). Delete the merged remote branches `req-005-generator`, `req-008-legal-pages`, `req-008-footer-dedupe`, `req-013-first-time-ux`, `ops-pin-supabase-cli`, `req-004-migrate-dburl` (remote only; local branches may stay).
+
+1. **REQ-007 Dev response** on `req-007-payments` from `main`: read `product/requirements/REQ-007-payments.md`; answer the design questions (Stripe SDK version and the Checkout API shape; how the webhook gets the raw body in the App Router; idempotency storage; how generation is triggered on entitlement and how its failure is surfaced; how the e2e drives Stripe test mode in CI without a browser hop into Stripe, or whether that part stays a manual test); list by name the values Haider must set (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PACK`, `PACK_PRICE_AUD_CENTS`, `GST_LINE`); propose sessions. No build yet.
+
+2. **REQ-007 Session A** (no Stripe account needed): migration for `purchases`, `entitlements`, `stripe_events` with RLS and the cross-tenant test; the entitlement model and its unit tests; the pricing page copy wired from `product/legal/refunds.md` for the refund promise (test asserts identity) with the claims lint; `/pricing` rendered signed out with the price from config. Screenshots at both viewports. Stop before anything that needs a Stripe key.
+
+3. **REQ-007 Session B, offline parts**: webhook handler with signature verification using the Stripe SDK's `constructEvent` against a test secret (unit tests: valid, replayed, tampered, refund, out-of-order), `payment_method_types: ["card"]` assertion test, create-checkout server action behind the rate limit with the Stripe client injected so tests use a fake. Stop at the point that needs a real test-mode key; note what remains for Session C.
+
+4. **Status** with what Haider must do in Stripe before Session C (account on personal email, test mode, one Price in AUD, webhook endpoint secret for local testing with the Stripe CLI).
+
+5. STOP.
