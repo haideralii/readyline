@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { lintErrors, lintReviewCycles, lintText, lintTimeframes } from "./lint";
+import {
+  lintCrossReferences,
+  lintErrors,
+  lintReviewCycles,
+  lintText,
+  lintTimeframes,
+} from "./lint";
 
 describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
   it("passes house-style prose", () => {
@@ -107,5 +113,38 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
         cycles,
       ).map((f) => f.match),
     ).toEqual(["Every year", "every month"]);
+  });
+
+  it("R-9: cross-references must name a section of this document's outline", () => {
+    const outline = [
+      { number: "1", heading: "Purpose" },
+      { number: "2", heading: "Scope" },
+      { number: "3", heading: "Definitions" },
+      { number: "7", heading: "Reportable incidents" },
+      { number: "8", heading: "Incident procedure" },
+    ];
+    // Right number, right title, or no title: fine, including a lead-in after the title.
+    expect(
+      lintCrossReferences(
+        "See section 7 Reportable incidents for what to report and by when. Section 3 explains the terms. Timeframes are in section 7. We follow section 8 Incident procedure straight away.",
+        outline,
+      ),
+    ).toEqual([]);
+    // The house style's generic structure quoted in a document that has no such section.
+    const wrong = lintCrossReferences(
+      "Timeframes are in section 3 What we do. See section 4 Records we keep. Section 9 covers review. See section 3 Reportable incidents.",
+      outline,
+    );
+    expect(wrong.map((f) => f.match)).toEqual([
+      "section 3 What we do",
+      "section 4 Records we keep",
+      "section 9",
+      "section 3 Reportable incidents",
+    ]);
+    expect(wrong[0].why).toMatch(/section 3 is Definitions/);
+    expect(wrong[0].why).toMatch(/no section is called What we do/);
+    expect(wrong[1].why).toMatch(/no section 4 in this document/);
+    expect(wrong[3].why).toMatch(/Reportable incidents is section 7/);
+    expect(wrong[3].why).toMatch(/1 Purpose, 2 Scope, 3 Definitions/);
   });
 });

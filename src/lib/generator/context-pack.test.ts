@@ -17,7 +17,8 @@ import { buildModelRequest, buildUserPrompt, requestHash } from "./prompts";
 import { loadReferenceCases } from "./reference-cases";
 
 const dataset = getStandardsDataset();
-const [reference] = loadReferenceCases();
+const cases = loadReferenceCases();
+const [reference] = cases;
 const type = documentTypeById("governance-policy")!;
 const section = sectionsFor(type).find((s) => s.mode === "tailored")!;
 
@@ -114,9 +115,83 @@ describe("context pack (REQ-005 SR-2, SR-3)", () => {
     expect(user).toContain(
       `tradingName: ${reference.answers.business.tradingName}`,
     );
-    const standard = dataset.standards.find((s) => s.id === type.standards[0])!;
-    expect(user).toContain(standard.outcome);
-    expect(user).toContain(standard.indicators[0]);
+    // The governance policy's standards are core-module ones, which the
+    // verification case is not audited against (R-10); the incident policy
+    // has a verification-module standard to quote.
+    const incident = documentTypeById(
+      "incident-management-policy-and-register",
+    )!;
+    const incidentPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section: sectionsFor(incident).find((s) => s.mode === "tailored")!,
+    });
+    const standard = dataset.standards.find(
+      (s) => s.id === incidentPack.standards[0].id,
+    )!;
+    const incidentUser = buildUserPrompt(incidentPack);
+    expect(incidentUser).toContain(standard.outcome);
+    expect(incidentUser).toContain(standard.indicators[0]);
+    expect(user).toContain("<<<STANDARDS>>>\nnone");
+  });
+
+  it("R-10: standards are the document's list intersected with the case's applicable modules", () => {
+    const complaints = documentTypeById(
+      "complaints-management-policy-and-register",
+    )!;
+    const section = sectionsFor(complaints).find((s) => s.mode === "tailored")!;
+    const byCase = (id: string) => {
+      const c = cases.find((x) => x.id === id)!;
+      return buildContextPack({
+        answers: c.answers,
+        result: c.result,
+        dataset,
+        type: complaints,
+        section,
+      }).standards.map((s) => s.id);
+    };
+    expect(byCase("verification-sole-trader")).toEqual([
+      "verification.complaints-management",
+    ]);
+    expect(byCase("certification-personal-care")).toEqual([
+      "core.governance.feedback-and-complaints-management",
+    ]);
+  });
+
+  it("R-9: the pack carries the document's numbered outline and the user prompt lists it", () => {
+    const incident = documentTypeById(
+      "incident-management-policy-and-register",
+    )!;
+    const section = sectionsFor(incident).find((s) => s.id === "scope")!;
+    const pack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section,
+    });
+    expect(pack.outline.map((o) => `${o.number} ${o.heading}`)).toEqual([
+      "1 Purpose",
+      "2 Scope",
+      "3 Definitions",
+      "4 Policy statement",
+      "5 How we put this into practice",
+      "6 Responsibilities",
+      "7 Reportable incidents",
+      "8 Incident procedure",
+      "9 Incident register",
+      "10 Records and evidence to retain",
+      "11 Related documents and registers",
+      "12 Review",
+    ]);
+    const user = buildUserPrompt(pack);
+    expect(user).toContain(
+      "<<<OUTLINE>>>\n1 Purpose\n2 Scope (this section)\n3 Definitions",
+    );
+    expect(user).toContain('(for example "see section 1 Purpose")');
+    expect(user).toMatch(/never refer to a section that is not in the outline/);
   });
 
   it("hashes the exact request so any prompt or model change makes a new key", () => {

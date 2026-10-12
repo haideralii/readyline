@@ -238,6 +238,71 @@ function monthsOf(count: string, unit: string): number | null {
   return null;
 }
 
+/**
+ * R-9 / D-044: a cross-reference ("section N" or "section N Title") must name
+ * a section of this document's outline, and a title given with the number
+ * must be that section's heading. The model otherwise quotes the house
+ * style's generic structure ("section 3 What we do") in a document whose
+ * section 3 is Definitions.
+ */
+export type OutlineRef = { number: string; heading: string };
+
+export function lintCrossReferences(
+  text: string,
+  outline: readonly OutlineRef[],
+): LintFinding[] {
+  const findings: LintFinding[] = [];
+  const byNumber = new Map(outline.map((o) => [o.number, o.heading]));
+  const list = outline.map((o) => `${o.number} ${o.heading}`).join(", ");
+  const advice = `Refer to sections by the number and title in the outline (${list})`;
+  // "section N" and whatever follows it on the same line up to the next boundary.
+  const re = /\bsections?[ \t]+(\d+)\b([^.,;:()|\n]*)/gi;
+  for (const m of text.matchAll(re)) {
+    const number = m[1];
+    const rest = m[2].replace(/^[ \t]+/, "");
+    const heading = byNumber.get(number);
+    // A capitalised run after the number is a title; lowercase prose is not.
+    const titled = /^[A-Z]/.test(rest);
+    const named = titled
+      ? outline.find((o) => startsWithHeading(rest, o.heading))
+      : undefined;
+    const title = titled
+      ? (named?.heading ?? rest.trim().split(/\s+/).slice(0, 5).join(" "))
+      : "";
+    const match = title ? `section ${number} ${title}` : `section ${number}`;
+    if (heading === undefined) {
+      findings.push({
+        rule: "cross-reference",
+        severity: "error",
+        match,
+        index: m.index ?? 0,
+        why: named
+          ? `there is no section ${number} in this document; ${named.heading} is section ${named.number}. ${advice}`
+          : `there is no section ${number} in this document. ${advice}`,
+      });
+      continue;
+    }
+    if (!title || named?.heading === heading) continue;
+    findings.push({
+      rule: "cross-reference",
+      severity: "error",
+      match,
+      index: m.index ?? 0,
+      why: named
+        ? `section ${number} is ${heading}; ${named.heading} is section ${named.number}. ${advice}`
+        : `section ${number} is ${heading}, and no section is called ${title}. ${advice}`,
+    });
+  }
+  return findings;
+}
+
+/** "Reportable incidents for what to report" starts with the heading "Reportable incidents" (word boundary required). */
+function startsWithHeading(rest: string, heading: string): boolean {
+  const r = rest.toLowerCase();
+  const h = heading.toLowerCase();
+  return r === h || r.startsWith(`${h} `);
+}
+
 /** The text between the nearest boundary characters around a match. */
 function unitAround(
   text: string,

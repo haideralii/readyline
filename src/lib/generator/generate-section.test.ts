@@ -430,4 +430,49 @@ describe("validate, retry, fall back (AC-5)", () => {
     expect(v.ok).toBe(false);
     if (!v.ok) expect(v.problems[0]).toMatch(/blocks/);
   });
+
+  it("R-9: a cross-reference outside the outline is a validation problem that names the right section", async () => {
+    const complaints = documentTypeById(
+      "complaints-management-policy-and-register",
+    )!;
+    const responsibilities = sectionsFor(complaints).find(
+      (s) => s.id === "responsibilities",
+    )!;
+    const complaintsPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: complaints,
+      section: responsibilities,
+    });
+    const row = (when: string) =>
+      JSON.stringify({
+        sectionId: "responsibilities",
+        usedFacts: ["tradingName"],
+        blocks: [
+          {
+            type: "table",
+            columns: ["Role", "Does what", "When"],
+            rows: [["Owner", "Acknowledges each complaint.", when]],
+          },
+        ],
+      });
+    const client = new FakeClient([
+      row("Timeframes are in section 3 What we do."),
+      row("Timeframes are in section 7 Complaints procedure."),
+    ]);
+    const out = await generateSection({
+      pack: complaintsPack,
+      client,
+      model: "m",
+    });
+    expect(out.status).toBe("generated");
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toMatch(
+      /cross-reference "section 3 What we do" does not match the outline: section 3 is Definitions, and no section is called What we do/,
+    );
+    expect(client.requests[1].user).toMatch(
+      /Refer to sections by the number and title in the outline \(1 Purpose, 2 Scope, 3 Definitions/,
+    );
+  });
 });

@@ -74,6 +74,15 @@ export function buildUserPrompt(pack: ContextPack): string {
     )
     .join("\n\n");
   const registers = pack.registers.length ? pack.registers.join("; ") : "none";
+  // R-9 / D-044: the model sees this document's real numbering, so a cross-reference
+  // can only be made by the number and title in the outline, never from the house
+  // style's generic structure.
+  const outline = pack.outline
+    .map(
+      (o) =>
+        `${o.number} ${o.heading}${o.id === pack.section.id ? " (this section)" : ""}`,
+    )
+    .join("\n");
   return [
     `Write the section "${pack.section.heading}" (section id: ${pack.section.id}) of the document "${pack.document.title}" (${pack.document.kind}).`,
     `Document purpose: ${pack.document.purpose}`,
@@ -81,6 +90,8 @@ export function buildUserPrompt(pack: ContextPack): string {
     block("FACTS", facts),
     block("STANDARDS", standards || "none"),
     block("REGISTERS", registers),
+    block("OUTLINE", outline),
+    `The OUTLINE block is this document's numbered structure and overrides the generic structure in the house style. Refer to another section only by its number and title exactly as the outline gives them (for example "see section ${pack.outline[0].number} ${pack.outline[0].heading}"); never refer to a section that is not in the outline.`,
     `Reply with the JSON object only. sectionId must be "${pack.section.id}".`,
   ].join("\n\n");
 }

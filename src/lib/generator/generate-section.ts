@@ -9,6 +9,7 @@
  * complete" marker. Nothing here touches the network directly.
  */
 import {
+  lintCrossReferences,
   lintErrors,
   lintReviewCycles,
   lintText,
@@ -143,6 +144,19 @@ export function validateReply(
       ok: false,
       problems: [
         `states a review cycle ("${cycles[0].match}"): ${cycles[0].why}`,
+      ],
+    };
+  }
+  // R-9: cross-references must match this document's outline, not the house style's generic one.
+  const refs = lintCrossReferences(
+    blocksToText(result.data.blocks),
+    pack.outline,
+  );
+  if (refs.length) {
+    return {
+      ok: false,
+      problems: [
+        `cross-reference "${refs[0].match}" does not match the outline: ${refs[0].why}`,
       ],
     };
   }

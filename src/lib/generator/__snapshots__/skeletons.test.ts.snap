@@ -6480,8 +6480,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -6493,7 +6492,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",
@@ -6745,8 +6743,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -6756,7 +6753,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
           "paragraph",
         ],
         "heading": "Related documents and registers",
@@ -6878,8 +6874,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -6889,7 +6884,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
           "paragraph",
         ],
         "heading": "Related documents and registers",
@@ -7011,8 +7005,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -7022,7 +7015,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
           "paragraph",
         ],
         "heading": "Related documents and registers",
@@ -7142,8 +7134,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -7155,7 +7146,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",
@@ -7888,8 +7878,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records to keep",
         "id": "records-and-evidence",
@@ -8008,8 +7997,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -8019,7 +8007,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
           "paragraph",
         ],
         "heading": "Related documents and registers",
@@ -8139,8 +8126,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -8152,7 +8138,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",
@@ -8251,8 +8236,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -8264,7 +8248,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",
@@ -8394,8 +8377,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -8407,7 +8389,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",
@@ -8506,8 +8487,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "paragraph",
-          "bullets",
+          "callout",
         ],
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
@@ -8519,7 +8499,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "bullets",
-          "paragraph",
         ],
         "heading": "Related documents and registers",
         "id": "related-documents",

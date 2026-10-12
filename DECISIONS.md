@@ -1064,6 +1064,35 @@ this batch except the 4,000-token behaviour-support steps is now explained by
 it. Caps D-040, D-041 and D-043 stand; they are now generous rather than
 tight. The two rejected `disabled` requests cost nothing (HTTP 400 before
 any tokens).
+
+**D-531 R-9 and R-10 implemented; the outline re-keys every fixture (Dev,
+2026-10-12, D-044).** The context pack carries `outline`, the document's
+numbered sections (fixed and tailored) from `outlineFor`, rendered in the
+user prompt as an OUTLINE block with the instruction to refer to sections
+only by the number and title given there, which overrides the house style's
+generic structure. The instruction sits in the user prompt beside the
+outline rather than in every brief, because the outline changes the user
+text for every section anyway; `PROMPT_VERSION` is 2026-10-12.2 for the
+same reason, and the R-7 example in the briefs no longer names "section 7
+Reportable incidents" (wrong for every document but the incident policy)
+but says "by its number and title in the outline". `lintCrossReferences`
+flags "section N" when N is not in the outline, and "section N Title" when
+the capitalised run after the number is not that section's heading; the
+retry instruction names what section N is, which section carries the title
+the model used, and the whole outline. Lowercase prose after a number
+("section 3 explains") is not a title. `standardsForType` intersects a
+document's listed standards with the standards of the case's applicable
+modules (`all-applicable` unchanged). Consequences: the verification
+sole-trader case loses the core twin of each verification standard, and the
+behaviour-support case loses the five `sbs.*` standards listed on the plan
+implementation procedure because that case implements plans (`ibsp`); the
+fixed "standards this document supports" text of eleven sole-trader
+documents whose standards are all core now renders the "no standard listed"
+callout, which the PO should weigh (the documents still ship; they just cite
+nothing). Every existing fixture is orphaned by the outline block; the
+three sole-trader documents are re-recorded in this batch, the
+behaviour-support sub-sections wait for the full-set batch
+(`GENERATION_RECORD_CASE` limits a recording run to one case).
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

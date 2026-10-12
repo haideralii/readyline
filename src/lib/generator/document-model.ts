@@ -67,6 +67,20 @@ export function sectionNumbers(type: DocumentTypeSpec): Map<string, string> {
   return map;
 }
 
+export type OutlineEntry = { number: string; id: string; heading: string };
+
+/** The document's numbered outline as rendered, fixed and tailored sections alike (R-9, D-044). */
+export function outlineFor(type: DocumentTypeSpec): OutlineEntry[] {
+  const numbers = sectionNumbers(type);
+  return sectionsFor(type)
+    .map((spec) => ({
+      number: numbers.get(spec.id) ?? "",
+      id: spec.id,
+      heading: spec.heading,
+    }))
+    .filter((entry) => entry.number !== "");
+}
+
 /** Fixed sections that carry a statutory rule tailored text must refer to rather than restate (R-7). */
 const RULE_SECTION_IDS = ["reportable-incidents"];
 
@@ -90,10 +104,15 @@ export function standardsForType(
   dataset: StandardsDataset,
   result: QuestionnaireResult,
 ): StandardSummary[] {
+  // R-10 / D-044: a document only cites standards from the modules the case is
+  // audited against; a verification provider never sees core-module indicators.
+  const applicable = new Set(
+    result.modules.flatMap((m) => m.standards.map((s) => s.id)),
+  );
   const ids =
     type.standardsSelection === "all-applicable"
-      ? result.modules.flatMap((m) => m.standards.map((s) => s.id))
-      : type.standards;
+      ? [...applicable]
+      : type.standards.filter((id) => applicable.has(id));
   const wanted = new Set(ids);
   return dataset.standards
     .filter((s) => wanted.has(s.id))

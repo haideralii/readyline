@@ -55,13 +55,13 @@
         "id": "how-we-do-this",
         "heading": "How we put this into practice",
         "mode": "tailored",
-        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers). Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
+        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers). Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Table of role and responsibility; roles come from the business structure and worker count. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
+        "brief": "Table of role and responsibility; roles come from the business structure and worker count. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -111,13 +111,13 @@
         "id": "steps",
         "heading": "Steps",
         "mode": "tailored",
-        "brief": "Numbered steps with who does what and by when; timeframes as a table where the rules set them. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+        "brief": "Numbered steps with who does what and by when; timeframes as a table where the rules set them. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
       },
       {
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role and responsibility table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
+        "brief": "Role and responsibility table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -179,7 +179,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -341,7 +341,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\"). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). Review cycles for this document are fixed facts: [review cycles]. Use them and never choose a cycle."
       },
       {
         "id": "records-and-evidence",
@@ -564,7 +564,7 @@
           "id": "procedure",
           "heading": "Complaints procedure",
           "mode": "tailored",
-          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
         },
         {
           "id": "register",
@@ -597,7 +597,7 @@
           "id": "procedure",
           "heading": "Incident procedure",
           "mode": "tailored",
-          "brief": "Numbered steps sized to the business. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
+          "brief": "Numbered steps sized to the business. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
         },
         {
           "id": "register",
@@ -1041,21 +1041,21 @@
           "id": "steps-getting-the-plan",
           "heading": "Steps: getting and understanding the plan",
           "mode": "tailored",
-          "brief": "At most eight numbered steps: asking for a behaviour support plan or an interim plan, checking it is current and authorised where required, and making sure every worker who supports the participant has read and understood it. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "brief": "At most eight numbered steps: asking for a behaviour support plan or an interim plan, checking it is current and authorised where required, and making sure every worker who supports the participant has read and understood it. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline).",
           "insertAfter": "when-this-applies"
         },
         {
           "id": "steps-putting-the-plan-into-practice",
           "heading": "Steps: putting the plan into practice",
           "mode": "tailored",
-          "brief": "At most eight numbered steps: using only the strategies in the plan, training and supervising workers on them, recording each use of a regulated restrictive practice, and what workers do when the plan does not cover a situation. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "brief": "At most eight numbered steps: using only the strategies in the plan, training and supervising workers on them, recording each use of a regulated restrictive practice, and what workers do when the plan does not cover a situation. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline).",
           "insertAfter": "steps-getting-the-plan"
         },
         {
           "id": "steps-monitoring-reporting-and-review",
           "heading": "Steps: monitoring, reporting and review",
           "mode": "tailored",
-          "brief": "At most eight numbered steps: monthly reporting of regulated restrictive practice use, telling the practitioner what is working and what is not, reportable incidents, and asking for a plan review when needs change or the plan expires. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "brief": "At most eight numbered steps: monthly reporting of regulated restrictive practice use, telling the practitioner what is working and what is not, reportable incidents, and asking for a plan review when needs change or the plan expires. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline).",
           "insertAfter": "steps-putting-the-plan-into-practice"
         },
         {

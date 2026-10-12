@@ -13,10 +13,15 @@ import { strictObject } from "@/lib/validation";
 import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
 import { buildProviderFacts, FACT_KEYS, type ProviderFacts } from "./facts";
 import { HOUSE_STYLE_VERSION } from "./house-style";
-import { rulesSectionFor, standardsForType } from "./document-model";
+import {
+  outlineFor,
+  rulesSectionFor,
+  standardsForType,
+} from "./document-model";
 import { reviewCyclesFor } from "./catalogue";
 
-export const PROMPT_VERSION = "2026-10-12.1";
+/** .2 (batch 15, D-531): the user prompt carries the document outline (R-9). */
+export const PROMPT_VERSION = "2026-10-12.2";
 
 const FactsSchema = strictObject({
   tradingName: z.string().min(1).max(120),
@@ -64,6 +69,16 @@ export const ContextPack = strictObject({
     }),
   ),
   registers: z.array(z.string().min(1)),
+  /** The document's numbered outline; cross-references must match it (R-9, D-044). */
+  outline: z
+    .array(
+      strictObject({
+        number: z.string().min(1),
+        id: z.string().min(1),
+        heading: z.string().min(1),
+      }),
+    )
+    .min(1),
   /** The fixed section holding the statutory rule for this document, if any (R-7). */
   rulesSection: strictObject({
     id: z.string().min(1),
@@ -126,6 +141,7 @@ export function buildContextPackFromFacts(input: {
     registers: result.registers
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
+    outline: outlineFor(type),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
     reviewCycles: reviewCyclesFor(type),
   });
@@ -165,6 +181,7 @@ export function buildContextPack(input: {
     registers: result.registers
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
+    outline: outlineFor(type),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
     reviewCycles: reviewCyclesFor(type),
   };

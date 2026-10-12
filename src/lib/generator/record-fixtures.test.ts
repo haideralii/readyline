@@ -154,28 +154,35 @@ describe.skipIf(!enabled)(
       const allowed = dataset.registrationGroups.map((g) => g.name);
       const cases = loadReferenceCases();
 
-      const pending = RECORDINGS.map((r) => {
-        const c = cases.find((x) => x.id === r.caseId)!;
-        const type = documentTypeById(r.typeId)!;
-        const section = sectionsFor(type).find((s) => s.id === r.sectionId)!;
-        const pack = buildContextPack({
-          answers: c.answers,
-          result: c.result,
-          dataset,
-          type,
-          section,
-        });
-        const request = buildModelRequest(pack, model);
-        return {
-          ...r,
-          pack,
-          request,
-          exists: fixtureStillValid(request, {
-            documentTypeId: r.typeId,
-            sectionId: r.sectionId,
-          }),
-        };
-      }).filter((p) => !p.exists);
+      // GENERATION_RECORD_CASE=<caseId> limits a run to one reference case (batch 15: the
+      // outline re-keyed every fixture, but only the sole-trader set is re-recorded).
+      const onlyCase = process.env.GENERATION_RECORD_CASE?.trim();
+      const pending = RECORDINGS.filter(
+        (r) => !onlyCase || r.caseId === onlyCase,
+      )
+        .map((r) => {
+          const c = cases.find((x) => x.id === r.caseId)!;
+          const type = documentTypeById(r.typeId)!;
+          const section = sectionsFor(type).find((s) => s.id === r.sectionId)!;
+          const pack = buildContextPack({
+            answers: c.answers,
+            result: c.result,
+            dataset,
+            type,
+            section,
+          });
+          const request = buildModelRequest(pack, model);
+          return {
+            ...r,
+            pack,
+            request,
+            exists: fixtureStillValid(request, {
+              documentTypeId: r.typeId,
+              sectionId: r.sectionId,
+            }),
+          };
+        })
+        .filter((p) => !p.exists);
 
       const estimates = pending.map((p) => ({
         caseId: p.caseId,

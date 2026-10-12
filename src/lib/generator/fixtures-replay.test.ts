@@ -20,7 +20,8 @@ import {
   type Fixture,
 } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
-import { lintReviewCycles, lintTimeframes } from "./lint";
+import { outlineFor, standardsForType } from "./document-model";
+import { lintCrossReferences, lintReviewCycles, lintTimeframes } from "./lint";
 import { TailoredSection, blocksToProse, blocksToText } from "./section-schema";
 import { readability } from "./readability";
 
@@ -192,6 +193,96 @@ describe("recorded fixtures replay through the current gate", () => {
     expect(sections).toEqual([
       "incident-management-policy-and-register/how-we-do-this",
       "incident-management-policy-and-register/responsibilities",
+    ]);
+  });
+
+  it("R-9: lists which recorded replies cross-reference a section outside their document's outline", () => {
+    const results: Record<string, string[]> = {};
+    for (const typeId of readdirSync(DEFAULT_FIXTURES_DIR)) {
+      const typeDir = join(DEFAULT_FIXTURES_DIR, typeId);
+      if (typeId.endsWith(".json") || typeId.endsWith(".md")) continue;
+      const outline = outlineFor(documentTypeById(typeId)!);
+      for (const sectionId of readdirSync(typeDir)) {
+        for (const file of readdirSync(join(typeDir, sectionId))) {
+          const fx = JSON.parse(
+            readFileSync(join(typeDir, sectionId, file), "utf8"),
+          ) as Fixture;
+          let blocks: unknown;
+          try {
+            blocks = (JSON.parse(fx.reply) as { blocks: unknown }).blocks;
+          } catch {
+            continue;
+          }
+          const parsed = TailoredSection.shape.blocks.safeParse(blocks);
+          if (!parsed.success) continue;
+          const hits = lintCrossReferences(
+            blocksToText(parsed.data),
+            outline,
+          ).map((h) => h.match);
+          if (hits.length)
+            results[`${typeId}/${sectionId}/${file.slice(0, 8)}`] = hits;
+        }
+      }
+    }
+    const sections = [
+      ...new Set(
+        Object.keys(results).map((k) => k.split("/").slice(0, 2).join("/")),
+      ),
+    ].sort();
+    // Batch 15 (D-531): the model quoted the house style's generic structure
+    // ("section 3 What we do", "section 4 Records we keep") and, in the
+    // behaviour-support procedure, the incident policy's section numbers.
+    expect({ sections, results }).toEqual({
+      sections: [
+        "behaviour-support-plan-implementation-procedure/steps-getting-the-plan",
+        "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review",
+        "behaviour-support-plan-implementation-procedure/steps-putting-the-plan-into-practice",
+        "complaints-management-policy-and-register/responsibilities",
+        "incident-management-policy-and-register/how-we-do-this",
+      ],
+      results: {
+        "behaviour-support-plan-implementation-procedure/steps-getting-the-plan/0079e9dd":
+          ["section 7 Reportable incidents for what we"],
+        "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review/07b684d6":
+          [
+            "section 6 Reporting to the Commission for",
+            "section 7 Reportable incidents straight away",
+          ],
+        "behaviour-support-plan-implementation-procedure/steps-putting-the-plan-into-practice/124db386":
+          ["section 7 Reportable incidents", "section 8 Monitoring and review"],
+        "complaints-management-policy-and-register/responsibilities/01708a9f": [
+          "section 3 What we do",
+          "section 3 What we do",
+        ],
+        "incident-management-policy-and-register/how-we-do-this/bcd8234b": [
+          "section 4 Records we keep",
+        ],
+      },
+    });
+  });
+
+  it("R-10: lists the recorded sections whose standards block changes under module filtering", () => {
+    const changed = new Set<string>();
+    for (const r of report.recordings) {
+      const c = cases.find((x) => x.id === r.caseId)!;
+      const type = documentTypeById(r.documentTypeId)!;
+      if (type.standardsSelection === "all-applicable") continue;
+      const filtered = standardsForType(type, dataset, c.result).map(
+        (s) => s.id,
+      );
+      if (filtered.join() !== type.standards.join())
+        changed.add(
+          `${r.caseId}/${r.documentTypeId}: ${type.standards.filter((id) => !filtered.includes(id)).join(", ")} removed`,
+        );
+    }
+    // Batch 15 (D-531): the verification case loses the core-module twin of
+    // each verification standard; the behaviour-support case loses the
+    // specialist-behaviour-support (sbs) standards because it implements plans
+    // (ibsp) rather than writing them.
+    expect([...changed].sort()).toEqual([
+      "behaviour-support-company/behaviour-support-plan-implementation-procedure: sbs.behaviour-support-in-the-ndis, sbs.functional-behaviour-assessments-and-behaviour-support-plans, sbs.supporting-the-implementation-of-the-behaviour-support-plan, sbs.behaviour-support-plan-monitoring-and-review, sbs.interim-behaviour-support-plans removed",
+      "verification-sole-trader/complaints-management-policy-and-register: core.governance.feedback-and-complaints-management removed",
+      "verification-sole-trader/incident-management-policy-and-register: core.governance.incident-management removed",
     ]);
   });
 
