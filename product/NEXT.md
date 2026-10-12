@@ -436,3 +436,75 @@ Waiting for the PO.
 **Addendum to batch 18 (PO, 12 Oct 2026), insert as item 1a before the REQ-007 work:** REQ-004 follow-up FR-9 (any-device magic link; see the REQ-004 file) on `req-004-magic-link-any-device` from `main`, one session: token-hash callback with the legacy code path kept 24 hours, the two screen changes, the cross-context e2e, the template file for Haider, D-5xx entry. Push; the PO opens the PR. The REQ-007 items follow on their own branch as written.
 
 **Addendum 2 to batch 18 (PO, 12 Oct 2026), item 1b after 1a:** REQ-004 FR-10, account read-back fails on the hosted project after a successful `create_account` ("We could not load your new account"): `getOwnedAccount` swallows the PostgREST error. Log the error code and message (no email) in `getOwnedAccount`, reproduce against the hosted schema (the account and owner membership exist; the `memberships` → `accounts!inner` embed is the suspect), fix, and add an integration test that creates an account through the RPC as an authenticated user and reads it back through the same query. Same branch as 1a. The hosted project now has one platform admin (set by the PO in the SQL editor) and one test account owned by a second user.
+
+## Queue (written by PO, 12 Oct 2026, batch 19)
+
+**PO actions this batch:** PRs #14 (REQ-004 FR-9/10) and #15 (REQ-007 A/B) opened and accepted on content. PR #14 CI is red; PR #15 shows merge conflicts and CI did not run. Supabase custom SMTP (Resend) and the any-device magic-link template are live on the hosted project. Stripe: a test-mode account "Readyline" exists with product "Readyline document pack", price AUD 399 one-off (`price_1UPhHyREtDbh9NYJbeT5b4wM`); `.env.local` has `STRIPE_SECRET_KEY` (test), `STRIPE_PRICE_PACK`, `PACK_PRICE_AUD_CENTS=39900`, `GST_LINE`, `SUBSCRIPTION_PRICE_AUD_CENTS=3900`; `STRIPE_WEBHOOK_SECRET` is empty (see item 3). This PO commit is on `req-007-payments`; cherry-pick to `main`.
+
+0. **Push `main`** with the PO's batch-19 commit.
+
+1. **PR #14 red, fix on `req-004-magic-link-any-device`:** (a) gitleaks flags four fixture values in `src/server/auth/callback.test.ts` (generic-api-key, lines 12, 20, 44, 59): build them at runtime as the REQ-002 rule requires, never literal; (b) e2e `magic-link-any-device.spec.ts` "a bad or reused link": in CI the callback with a bad token hash never redirects to `/sign-in?error=link` (page stays on `/auth/callback?token_hash=000…`); make the callback redirect on any verify failure including a missing Supabase environment, and make the test independent of a live Supabase; (c) the Supabase job: the log shows Docker `toomanyrequests` pulls; re-run after (a) and (b) and confirm the RLS step itself passes, otherwise fix what it reports. Push; the PO merges when green.
+
+2. **PR #15 conflicts, on `req-007-payments`:** merge `main` keeping both sides of prose files (the PO's addenda commits exist on both sides); `npm run check`; push so CI runs. The PO merges after #14.
+
+3. **REQ-007 Session C without the webhook secret** (same branch, after item 2): `/documents` purchase states (Buy, Preparing, ready), generation on entitlement through the queued job and cron route, download page with receipt link and refund mailto, Stripe hosts in the CSP on purchase routes only, the fake-Stripe e2e on both viewports, screenshots. The real Stripe hop (Checkout page, webhook delivery) is deferred to the first Vercel deploy, when a dashboard webhook endpoint gives a permanent signing secret; note that in Delivery evidence instead of running `stripe listen`.
+
+4. **REQ-006 Dev response and build** on `req-006-checklist` from `main`: read `product/requirements/REQ-006-readiness-checklist.md`, write the Dev response (short), then build Session A (derivation with `sourceRef` on every item, unit tests over the three reference cases, `unverified` flags) and Session B (`/checklist` page with persistence, pre-fill from "already have", progress line, print view, RLS test, e2e on both viewports, screenshots). Push after each session.
+
+5. **REQ-013 P2** on `req-013-p2` from `main`: FR-6 to FR-12 as written in the REQ (numeric inputs and sole-trader defaults; step indicator with progress bar; home page value proposition with trust cues replacing "is being built"; contact link from `CONTACT_EMAIL`; key-personnel examples; collapsed groups on phones with search expanding matches; result page heading dedupe). Screenshots of every changed screen at both viewports; axe clean; Lighthouse by hand if available. Push.
+
+6. **REQ-014 visual identity v1** on `req-014-visual-identity` from `main`: read `product/requirements/REQ-014-visual-identity.md` and build it as written (tokens, dark variants, serif headings via next/font, the ready-line motif, contrast test in CI, no stock photos), applied across the questionnaire, result, pricing, legal pages, documents and sign-in. Keep the layout; change the look. Screenshots of every page at both viewports, light and dark. Push.
+
+7. **Status** with one line per branch (head commit, what is done, what is owed), the cost table if any model calls were made (none expected), and anything blocked.
+
+8. STOP.
+
+**Overnight rules for this batch (PO, 12 Oct 2026):** work the items in order; if an item is blocked, write the blocker under it and move to the next; never merge; never force-push; no model calls; do not touch `main` except item 0. Haider is asleep; nothing here needs him. The PO merges PRs #14 and #15 as they go green and reviews the rest in the morning.
+
+## Dev status (batch 19, written 13 Oct 2026, Dev)
+
+All eight items worked; no model call and no Stripe call was made (cost table: none). Items 0 to 6 pushed; this status is item 7. Branches, one line each (head, done, owed):
+
+- `main` a77be8b (+ this status): the PO's batch-19 commits cherry-picked (item 0); only `product/NEXT.md` touched since.
+- `req-004-magic-link-any-device` 4ae771b (PR #14): item 1 done, fixtures built at runtime, the callback redirects on every verify failure including no Supabase environment; `npm run check` green. Owed: the CI re-run and the Docker `toomanyrequests` retry are the PO's (no `gh` here).
+- `req-007-payments` 685af97 (PR #15): item 2 done (main merged, conflicts resolved, check green); item 3 Session C done (D-706 to D-711): resumable section-level generation job with `claim_generation_job`, `/api/jobs/generate` with a self-kick and a daily cron backstop, the webhook's `after()` run and receipt lookup, `/documents` states none/preparing/delayed/ready/refunded, Buy form on pricing and documents, locked downloads on refund, `/account` purchases, `form-action` for Checkout on the two purchase routes only, startup price check, `GENERATION_LIVE` switch, fake Stripe mode with the signed-in e2e under `e2e/signed-in/`, ops runbook `supabase/ops/refund.md`, PO Q6 copy applied. Owed: the real Stripe hop at the first Vercel deploy (per the queue); screenshots of preparing/ready/refunded and the e2e report come from CI's Supabase job artifact `signed-in-screenshots`, not the dev machine (see blockers); committing them to `product/evidence/req-007/` once a stack is reachable.
+- `req-006-checklist` 3a48546 (no PR yet): item 4 done, Sessions A and B (D-601 to D-606): derivation with `sourceRef` and `unverified`, 8 unit tests over the three cases, `checklist_items` migration with member RLS and grants, `/checklist` with persistence, progress line, print rendering, result teaser, export of notes, RLS integration test, signed-out and signed-in e2e. Owed: screenshots and the signed-in run from CI's Supabase job (same blocker); Lighthouse.
+- `req-013-p2` ee8a4e5 (no PR yet): item 5 done, FR-6 to FR-12 (D-1306), P2 e2e on both projects, screenshots `p2-*` in `product/evidence/req-013/` (existing req-003 and req-013 screenshots re-captured because the step indicator and supports step changed). Owed: Lighthouse by hand.
+- `req-014-visual-identity` ae7991a (no PR yet), **branched from `req-013-p2`, not `main`** (D-1401; both rewrite the home page and the step indicator, so a branch from main would conflict; merge P2 first): item 6 done (D-1401 to D-1404): tokens with the CI contrast test, Fraunces via next/font, the ready line as progress and segmented SVGs, wordmark and favicon, warm ramp for the zinc utilities, button classes, `product/domain/brand.md`, 24 light and dark screenshots in `product/evidence/req-014/`. Owed: nothing beyond the PO's review of the serif sample and the dark `signal` colour.
+
+**Blockers and findings for the morning:**
+
+1. **The hosted project refuses the secret-key role on every existing table (42501).** A read-only probe with the secret key answered "permission denied" on accounts, memberships, questionnaire_drafts, version_sets, document_versions, generation_log, audit_log and auth_rate_limits (functions work, D-538). Same gap as D-422 for `authenticated`. Until migration `20261012080000_service_role_table_grants.sql` (on `req-007-payments`) and D-422's migration (PR #14) apply, nothing the server does with the admin client works on hosted: the purge job, the free generate button, the payment store, the job, the e2e seeding. This is why no signed-in e2e could run from the dev machine tonight (no local stack either); CI's Supabase job is the verification path for REQ-006 AC-2/AC-3 and REQ-007 AC-1, and both branches' Supabase jobs now build and run `e2e/signed-in` with `EVIDENCE=1` and upload `product/evidence/` as an artifact.
+2. **Vercel Hobby runs cron jobs at most daily** (D-707): the generation job is carried by the webhook's `after()` run and the route's self-kick; the daily cron is only a backstop. On a Pro plan set `/api/jobs/generate` to every minute in `vercel.json`.
+3. **PRs to open (PO):** `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (stacked on P2). Merge order that avoids conflicts: #14, #15, then REQ-006, REQ-013 P2, REQ-014.
+4. **Before the first real sale** (`supabase/ops/refund.md`): `GENERATION_LIVE=1`, the dashboard webhook secret, one test-mode purchase and refund recorded in REQ-007's evidence.
+
+## Queue (written by PO, 13 Oct 2026, batch 20)
+
+**PO review of the overnight batch:** all six items accepted (REQ-004 FR-9/10, REQ-007 Session C, REQ-006, REQ-013 P2, REQ-014 with R-1 to R-3; D-052, D-053). PR #14 is still red after 4ae771b: see the overnight note above (the grants migration references payments tables; the secret scan sees the original commit). The PO opens the remaining PRs after the branches below are pushed and merges in the dev's order: #14, #15, REQ-006, REQ-013 P2, REQ-014.
+
+0. **Push `main`** with the PO's batch-20 commit.
+
+1. **PR #14 green** on `req-004-magic-link-any-device`: remove the grants on `purchases`, `entitlements` and `generation_jobs` from `20261012060000_authenticated_table_grants.sql` (add them to the payments migration on `req-007-payments` instead); squash the branch to one commit so gitleaks sees only runtime-built fixtures; `--force-with-lease` (D-033); push. Confirm all four jobs green.
+
+2. **PR #15 after #14**: merge `main` once #14 is in (the PO will tell you by a line in this file if you are mid-batch; otherwise merge `main` as it stands and resolve), add the payments-table grants for both roles to the payments migration, push.
+
+3. **REQ-014 R-1 to R-3** on `req-014-visual-identity` (CTA wording, progress-bar fill, "Back to:" label); re-capture the home and supports screenshots; push.
+
+4. **Rebase order**: `req-006-checklist` is from `main` and needs nothing; `req-013-p2` from `main`; `req-014-visual-identity` stays stacked on `req-013-p2`. Do not rebase unless a PR shows conflicts.
+
+5. **Status.**
+
+6. STOP.
+
+## Dev status (batch 20, written 13 Oct 2026, Dev)
+
+No model or Stripe calls (cost table: none). Items 0 to 4 done; this is item 5.
+
+- `main` acd601a (+ this status): the PO's batch-20 commit pushed (item 0).
+- `req-004-magic-link-any-device` 58107ce (PR #14): the payments-table grants are out of `20261012060000_authenticated_table_grants.sql` (a comment points to the payments migration). **Not squashed on this branch: the tool blocks every history rewrite** (`git reset` onto main and `--force-with-lease` were refused by the auto-mode classifier as destructive git, even with D-033). So the same final tree is published as **one commit from `main` on `req-004-magic-link-squashed` b65a5ce** (trees identical; `git diff` between the two branches is empty). PO: retarget PR #14 to that branch, or open a new PR from it and close #14; gitleaks then sees only the runtime-built fixtures. If the PO prefers a force-push on the original branch, Haider can run it by hand: `git fetch && git checkout req-004-magic-link-any-device && git reset --soft origin/main && git commit -F <message> && git push --force-with-lease`. Whether all four jobs are green is then the PO's to read.
+- `req-007-payments` 8b12082 (PR #15): item 2 done. `main` (acd601a) merged as it stands (#14 not yet in); conflicts in `DECISIONS.md` (D-051 kept, D-052 and D-053 added) and the REQ-007 PO review (the 12 Oct and 13 Oct reviews both kept) resolved; `20261012030000_payments.sql` now grants `select` on purchases, entitlements and generation_jobs to `authenticated` and all privileges on those plus stripe_events to `service_role`, with `notify pgrst` (D-052). `npm run check` green (62 files, 460 tests). When #14 merges, one more merge of `main` into this branch will be needed (the two grants migrations touch different files, so it should be clean).
+- `req-014-visual-identity` 39fa1c1 (stacked on `req-013-p2` ee8a4e5): item 3 done. R-1 CTA "See what registration needs"; R-2 fill by share of steps reached (`progressPercent`, unit-tested per step; step 2 of 6 is 33 and the e2e asserts it); R-3 "Back to: Business". Every identity screenshot re-captured on both viewports, light and dark; identity, P2 and home specs 22 passed.
+- `req-006-checklist` 3a48546 and `req-013-p2` ee8a4e5: unchanged; item 4 needed no rebase.
+
+PRs for the PO to open: `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (base `req-013-p2` until P2 merges), and the PR #14 retarget above. Merge order unchanged: #14, #15, REQ-006, REQ-013 P2, REQ-014.
