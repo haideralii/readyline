@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
+import { openAllGroups, tickGroup } from "./helpers/groups";
 
 /**
  * REQ-013 FR-2 / AC-2 (both projects): every radio and checkbox in the
@@ -92,13 +93,15 @@ test("every radio and checkbox has its human label as its accessible name and a 
   await expect(
     page.getByRole("heading", { level: 1, name: "The supports you deliver" }),
   ).toBeVisible();
-  await page.locator("#group-0138").check();
+  await tickGroup(page, "0138");
   await expect(page.locator("#group-0107")).toHaveAccessibleName(
     "Assistance with daily personal activities",
   );
+  // REQ-013 FR-11: headings collapse on phones; open them all so every class is audited.
+  await openAllGroups(page);
   all.push(...(await auditControls(page, "supports")));
-  await page.locator("#group-0138").uncheck();
-  await page.locator("#group-0107").check();
+  await tickGroup(page, "0138", false);
+  await tickGroup(page, "0107");
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   await expect(

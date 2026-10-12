@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   getGroupCategories,
   GROUP_HINT,
@@ -43,6 +43,14 @@ const YES_NO: { value: YesNo; label: string }[] = [
 ];
 
 const CATEGORIES = getGroupCategories();
+/** REQ-013 FR-11: the two most common groups start open; the rest open on wider screens, on search, or on a tap. */
+const OPEN_BY_DEFAULT = ["personal-care", "around-the-house"];
+const WIDE_SCREEN = "(min-width: 640px)";
+function subscribeWide(onChange: () => void) {
+  const query = window.matchMedia(WIDE_SCREEN);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
 
 function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
   return (
@@ -74,6 +82,20 @@ export function SupportsStepForm() {
   const [note, setNote] = useState(saved?.servicesNote ?? "");
   const [query, setQuery] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
+  // FR-11: which headings are open. Phones start with the two common ones;
+  // wider screens open everything, because there is room to scan. The
+  // viewport is read through an external-store subscription (no state set in
+  // an effect); explicit taps are remembered per heading.
+  const wide = useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE_SCREEN).matches,
+    () => false,
+  );
+  const [toggled, setToggled] = useState<Map<string, boolean>>(() => new Map());
+  const setOpen = (id: string, open: boolean) =>
+    setToggled((prev) => new Map(prev).set(id, open));
+  const isOpen = (id: string) =>
+    toggled.get(id) ?? (wide || OPEN_BY_DEFAULT.includes(id));
 
   const filtered = useMemo(
     () => groups.filter((g) => matchesGroupQuery(g, query)),
@@ -97,10 +119,20 @@ export function SupportsStepForm() {
         ? prev.filter((c) => c !== code)
         : [...prev, code].sort(),
     );
-  const applyHint = () =>
+  const applyHint = () => {
     setSelected((prev) =>
       [...new Set([...prev, ...GROUP_HINT.selects])].sort(),
     );
+    // The hint's classes become visible in their open headings.
+    setToggled((prev) => {
+      const next = new Map(prev);
+      for (const code of GROUP_HINT.selects) {
+        const id = groups.find((g) => g.code === code)?.categoryId;
+        if (id) next.set(id, true);
+      }
+      return next;
+    });
+  };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -131,10 +163,11 @@ export function SupportsStepForm() {
     router.push(stepHref("practices"));
   }
 
-  const renderGroup = (g: GroupOption) => (
+  // `suffix` keeps ids unique when a ticked class is also shown under a closed heading.
+  const renderGroup = (g: GroupOption, suffix = "") => (
     <li key={g.code}>
       <ChoiceRow
-        id={`group-${g.code}`}
+        id={`group-${g.code}${suffix}`}
         type="checkbox"
         name="groups"
         value={g.code}
@@ -220,17 +253,70 @@ export function SupportsStepForm() {
             ? "Nothing chosen yet."
             : `${selected.length} chosen: ${selected.map(nameOf).join("; ")}`}
         </p>
-        <div id="groups" className="mt-3 space-y-6">
+        <div id="groups" className="mt-3 space-y-3">
           {CATEGORIES.map((c) => {
             const items = byCategory.get(c.id) ?? [];
-            if (items.length === 0 && query.trim()) return null;
+            const searching = Boolean(query.trim());
+            if (items.length === 0 && searching) return null;
+            // A search opens every heading that has a match (FR-11).
+            const open = searching || isOpen(c.id);
+            const all = groupsInCategory(groups, c.id);
+            const ticked = all.filter((g) => selected.includes(g.code));
             return (
-              <div key={c.id} data-testid={`category-${c.id}`}>
-                <h2 className="text-base font-semibold">{c.title}</h2>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {c.description}
-                </p>
-                <ul className="mt-2 space-y-2">{items.map(renderGroup)}</ul>
+              <div
+                key={c.id}
+                className="rounded-md border border-zinc-200 dark:border-zinc-800"
+                data-testid={`category-${c.id}`}
+                data-open={open ? "true" : "false"}
+                data-codes={all.map((g) => g.code).join(" ")}
+              >
+                {/* A React-controlled disclosure (not <details>): a tap before
+                    hydration is a no-op rather than a native toggle React then
+                    undoes, so the open state is always what the state says. */}
+                <h2 className="m-0">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={`category-${c.id}-list`}
+                    disabled={searching}
+                    onClick={() => setOpen(c.id, !open)}
+                    className="flex min-h-12 w-full items-start gap-2 px-3 py-2 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-default"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="mt-1 inline-block w-4 shrink-0 text-sm text-zinc-500"
+                    >
+                      {open ? "▾" : "▸"}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="text-base font-semibold">{c.title}</span>{" "}
+                      <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                        ({all.length} {all.length === 1 ? "class" : "classes"}
+                        {ticked.length ? `, ${ticked.length} ticked` : ""})
+                      </span>
+                      <span className="block text-sm font-normal text-zinc-600 dark:text-zinc-400">
+                        {c.description}
+                      </span>
+                    </span>
+                  </button>
+                </h2>
+                {open ? (
+                  <ul
+                    id={`category-${c.id}-list`}
+                    className="space-y-2 px-3 pb-3"
+                  >
+                    {items.map((g) => renderGroup(g))}
+                  </ul>
+                ) : null}
+                {/* Ticked classes stay visible when the heading is closed (FR-11). */}
+                {!open && ticked.length ? (
+                  <ul
+                    className="space-y-2 px-3 pb-3"
+                    data-testid={`category-${c.id}-ticked`}
+                  >
+                    {ticked.map((g) => renderGroup(g, "-ticked"))}
+                  </ul>
+                ) : null}
               </div>
             );
           })}

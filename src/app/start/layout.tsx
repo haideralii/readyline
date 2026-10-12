@@ -1,3 +1,4 @@
+import { contactEmail } from "@/lib/legal/config";
 import { getGroupOptions } from "@/lib/questionnaire/groups";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { getViewer } from "@/server/accounts/queries";
@@ -10,7 +11,11 @@ export default async function StartLayout({ children }: LayoutProps<"/start">) {
   const viewer = await getViewer();
   const mode = viewer?.account ? "server" : "local";
   return (
-    <QuestionnaireProvider groups={groups} mode={mode}>
+    <QuestionnaireProvider
+      groups={groups}
+      mode={mode}
+      contactEmail={contactEmail()}
+    >
       {children}
     </QuestionnaireProvider>
   );

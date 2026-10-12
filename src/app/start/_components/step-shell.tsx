@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, type ReactNode } from "react";
+import { ProgressLine } from "@/components/progress-line";
 import {
   STEP_SHORT,
   STEP_TITLES,
@@ -21,6 +22,10 @@ export function StepShell({
   const { answers, saveStatus, ready } = useQuestionnaire();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const index = stepIndex(step);
+  // REQ-013 FR-7: completed earlier steps stay one tap away; nothing wraps.
+  const completed = STEP_IDS.filter(
+    (id, i) => i < index && ready && canOpenStep(id, answers),
+  );
 
   // AC-11: focus moves to the step heading on every step change.
   useEffect(() => {
@@ -29,46 +34,34 @@ export function StepShell({
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
-      <nav aria-label="Questionnaire steps" className="mb-6">
-        <ol className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-          {STEP_IDS.map((id, i) => {
-            const open = ready && canOpenStep(id, answers);
-            const current = id === step;
-            const label = `${i + 1}. ${STEP_SHORT[id]}`;
-            return (
-              <li key={id} className="flex items-center">
-                {open && !current ? (
-                  <Link
-                    href={stepHref(id)}
-                    className="inline-flex min-h-11 items-center rounded px-1 text-zinc-700 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-zinc-300"
-                  >
-                    {label}
-                  </Link>
-                ) : (
-                  <span
-                    aria-current={current ? "step" : undefined}
-                    className={
-                      current
-                        ? "inline-flex min-h-11 items-center rounded px-1 font-semibold text-zinc-900 dark:text-zinc-50"
-                        : "inline-flex min-h-11 items-center rounded px-1 text-zinc-600 dark:text-zinc-400"
-                    }
-                  >
-                    {label}
-                  </span>
-                )}
+      <ProgressLine
+        current={index + 1}
+        total={STEP_IDS.length}
+        label={`Step ${index + 1} of ${STEP_IDS.length}: ${STEP_SHORT[step]}`}
+      />
+      {completed.length > 0 ? (
+        <nav aria-label="Completed steps" className="mt-2 text-sm">
+          <span className="text-zinc-600 dark:text-zinc-400">Change: </span>
+          <ul className="inline">
+            {completed.map((id, i) => (
+              <li key={id} className="inline">
+                {i > 0 ? <span aria-hidden="true">, </span> : null}
+                <Link
+                  href={stepHref(id)}
+                  className="inline-flex min-h-11 items-center underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
+                >
+                  {STEP_SHORT[id]}
+                </Link>
               </li>
-            );
-          })}
-        </ol>
-      </nav>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
 
-      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-        Step {index + 1} of {STEP_IDS.length}
-      </p>
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="mt-1 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
+        className="mt-4 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
       >
         {STEP_TITLES[step]}
       </h1>
