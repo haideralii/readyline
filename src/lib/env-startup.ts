@@ -1,12 +1,16 @@
 /**
- * Node-only startup check used by src/instrumentation.ts (REQ-002 AC-4).
- * Kept out of instrumentation.ts itself because that file is also compiled
- * for the Edge runtime, where Turbopack warns about `process.exit`.
+ * Node-only startup check used by src/instrumentation.ts (REQ-002 AC-4,
+ * REQ-010 FR-2). Kept out of instrumentation.ts itself because that file is
+ * also compiled for the Edge runtime, where Turbopack warns about
+ * `process.exit`. On the Vercel production deployment the full production
+ * list is required; names only ever reach the log.
  */
-import { validateEnv } from "./env";
+import { isProductionDeployment, validateEnv } from "./env";
 
 export function exitIfEnvInvalid(): void {
-  const result = validateEnv();
+  const result = validateEnv(process.env, {
+    production: isProductionDeployment(),
+  });
   if (result.ok) return;
   const nodeProcess = globalThis.process;
   nodeProcess.stderr.write(

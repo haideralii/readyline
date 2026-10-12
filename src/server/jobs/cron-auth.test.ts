@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isAuthorisedCronRequest } from "./cron-auth";
+import { isAuthorisedCronRequest, mayRunScheduledJobs } from "./cron-auth";
 
 // Assembled at runtime so no secret-shaped literal is committed (gitleaks).
 const secret = Array.from(
@@ -19,5 +19,19 @@ describe("isAuthorisedCronRequest", () => {
   it("authorises nobody when the secret is unset or too short", () => {
     expect(isAuthorisedCronRequest("Bearer x", undefined)).toBe(false);
     expect(isAuthorisedCronRequest("Bearer short", "short")).toBe(false);
+  });
+});
+
+describe("mayRunScheduledJobs (REQ-010 FR-6)", () => {
+  it("runs locally and in CI, on Vercel production, and never on a Vercel preview", () => {
+    expect(mayRunScheduledJobs({})).toBe(true);
+    expect(mayRunScheduledJobs({ CI: "true" })).toBe(true);
+    expect(mayRunScheduledJobs({ VERCEL: "1", VERCEL_ENV: "production" })).toBe(
+      true,
+    );
+    expect(mayRunScheduledJobs({ VERCEL: "1", VERCEL_ENV: "preview" })).toBe(
+      false,
+    );
+    expect(mayRunScheduledJobs({ VERCEL: "1" })).toBe(false);
   });
 });

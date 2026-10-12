@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { EnvError, REQUIRED, assertEnv, validateEnv } from "./env";
+import {
+  EnvError,
+  PRODUCTION_REQUIRED,
+  REQUIRED,
+  assertEnv,
+  isProductionDeployment,
+  validateEnv,
+} from "./env";
 
 const good = {
   NODE_ENV: "test",
@@ -38,6 +45,36 @@ describe("validateEnv", () => {
     const r = validateEnv({ ...good, NEXT_PUBLIC_SITE_URL: "not a url" });
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.problems[0]).toMatch(/^NEXT_PUBLIC_SITE_URL:/);
+  });
+});
+
+describe("validateEnv for the production deployment (REQ-010 FR-2, AC-2)", () => {
+  it("requires every production variable and names each missing one", () => {
+    const r = validateEnv(good, { production: true });
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      for (const v of PRODUCTION_REQUIRED.filter((x) => !(x.name in good)))
+        expect(
+          r.problems.some((p) => p.startsWith(`${v.name} is missing`)),
+          v.name,
+        ).toBe(true);
+    }
+    const full = Object.fromEntries(
+      PRODUCTION_REQUIRED.map((v) => [v.name, "set"]),
+    );
+    expect(
+      validateEnv(
+        { ...full, NEXT_PUBLIC_SITE_URL: "https://readyline.example" },
+        { production: true },
+      ).ok,
+    ).toBe(true);
+  });
+
+  it("recognises the Vercel production deployment only", () => {
+    expect(isProductionDeployment({ VERCEL_ENV: "production" })).toBe(true);
+    expect(isProductionDeployment({ VERCEL_ENV: "preview" })).toBe(false);
+    expect(isProductionDeployment({ NODE_ENV: "production" })).toBe(false);
+    expect(isProductionDeployment({})).toBe(false);
   });
 });
 

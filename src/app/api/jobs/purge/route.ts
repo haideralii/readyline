@@ -10,7 +10,10 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { log } from "@/lib/logging/logger";
 import { purgeGenerationArtifacts, runPurge } from "@/server/accounts/purge";
 import { createEmailProvider } from "@/server/email/provider";
-import { isAuthorisedCronRequest } from "@/server/jobs/cron-auth";
+import {
+  isAuthorisedCronRequest,
+  mayRunScheduledJobs,
+} from "@/server/jobs/cron-auth";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 
@@ -26,6 +29,9 @@ export async function GET(request: Request) {
   ) {
     return new NextResponse("Not found", { status: 404 });
   }
+  // REQ-010 FR-6: a preview deployment never purges the shared database.
+  if (!mayRunScheduledJobs())
+    return NextResponse.json({ skipped: "not the production deployment" });
   const query = parseInput(
     Query,
     Object.fromEntries(new URL(request.url).searchParams.entries()),
