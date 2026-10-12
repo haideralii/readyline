@@ -36,6 +36,27 @@ export function accountDeletedEmail(input: {
   };
 }
 
+/** Sent once the paid document set is generated (REQ-007 FR-5). */
+export function documentsReadyEmail(input: {
+  to: string;
+  tradingName: string;
+  documentsUrl: string;
+}): EmailMessage {
+  return {
+    to: input.to,
+    subject: `${BRAND}: your documents are ready`,
+    text: [
+      `The document set for ${input.tradingName} is ready to download.`,
+      "",
+      `Sign in and open ${input.documentsUrl} to download the full set as a zip, the readiness summary, or each document on its own.`,
+      "",
+      'Every document is a first draft for your review. Sections marked "Review and complete" need your attention before use, and you adopt the documents yourself.',
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
 export function accountPurgedEmail(input: {
   to: string;
   tradingName: string;

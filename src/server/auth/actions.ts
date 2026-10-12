@@ -25,7 +25,7 @@ const RequestSchema = strictObject({
 });
 
 const GENERIC_MESSAGE =
-  "If that address can sign in, a link is on its way. Check your inbox and spam folder; the link works once and expires.";
+  "If that address can sign in, a link is on its way. Check your inbox and spam folder. The link works once and expires in an hour; open it on any device.";
 
 export type RequestMagicLinkResponse =
   | { ok: true; message: string }

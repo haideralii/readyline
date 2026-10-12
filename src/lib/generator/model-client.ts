@@ -315,13 +315,21 @@ function isThinkingRejection(error: unknown): boolean {
   );
 }
 
-/** Replay unless GENERATION_RECORD=1 and a key exist (record mode writes fixtures through a real call). */
+/**
+ * Replay unless asked otherwise: GENERATION_RECORD=1 with a key writes
+ * fixtures through a real call (D-502); GENERATION_LIVE=1 with a key calls
+ * the model without touching fixtures and is the production setting for the
+ * paid job (REQ-007 FR-5, D-708). CI and the e2e set neither, so a missing
+ * fixture fails loudly instead of spending.
+ */
 export function createModelClient(
   env: Record<string, string | undefined> = process.env,
   dir: string = DEFAULT_FIXTURES_DIR,
 ): ModelClient {
   const record = env.GENERATION_RECORD === "1";
+  const live = env.GENERATION_LIVE === "1";
   const key = env.ANTHROPIC_API_KEY?.trim();
   if (record && key) return new RecordingClient(new AnthropicClient(key), dir);
+  if (live && key) return new AnthropicClient(key);
   return new ReplayClient(dir);
 }

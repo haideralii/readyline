@@ -334,13 +334,20 @@ function ResultView({
           What happens next
         </h2>
         <p className="mt-2 leading-7">
-          {BRAND} will draft these documents for you and keep your registers
-          audit-ready. Sign-in and the document pack are coming in the next
-          releases.{" "}
-          <Link href="/documents" className="underline underline-offset-2">
-            Go to your documents
+          {BRAND} drafts these documents for you as a one-off pack, and the
+          registers follow as a subscription.{" "}
+          <Link
+            href="/pricing"
+            className="underline underline-offset-2"
+            data-testid="result-buy-link"
+          >
+            See the price and buy the document pack
           </Link>
-          .
+          , or{" "}
+          <Link href="/documents" className="underline underline-offset-2">
+            go to your documents
+          </Link>{" "}
+          if you already have one.
         </p>
       </section>
 

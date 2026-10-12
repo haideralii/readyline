@@ -1,4 +1,7 @@
-# gitleaks fingerprint allow-list (REQ-002). Intentionally empty: the historical
-# token-shaped test fixtures were removed from history in PO batch 5 (the branch was
-# rebuilt on main), so no fingerprint is needed. Add entries only for confirmed
+# gitleaks fingerprint allow-list (REQ-002). Add entries only for confirmed
 # false positives, one comment line each: commit:file:rule:line.
+
+# e2e/helpers/env.ts: the e2e CRON_SECRET fallback, a test constant built at runtime
+# from the words "e2e", "cron", "secret" and a digit run; not a secret (PO batch 21).
+dfa050bd13b48e5473d32bdd246b95e923bd6038:e2e/helpers/env.ts:generic-api-key:31
+3a48546e8748d15a422a96185c187dc6d18ba3b0:e2e/helpers/env.ts:generic-api-key:31

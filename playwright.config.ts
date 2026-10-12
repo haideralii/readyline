@@ -1,8 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
+import { e2eCronSecret, loadLocalEnv } from "./e2e/helpers/env";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${PORT}`;
 const isCI = Boolean(process.env.CI);
+
+// The signed-in specs need the Supabase values; read inside Node from .env.local locally (REQ-007 AC-1).
+loadLocalEnv();
 
 export default defineConfig({
   testDir: "./e2e",
@@ -38,6 +42,24 @@ export default defineConfig({
     reuseExistingServer: !isCI,
     timeout: 120_000,
     // The server refuses to start without the required variables (src/lib/env.ts).
-    env: { NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? baseURL },
+    env: {
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? baseURL,
+      // REQ-007: display pricing for the pricing-page spec; real values live in Vercel.
+      PACK_PRICE_AUD_CENTS: process.env.PACK_PRICE_AUD_CENTS ?? "39900",
+      GST_LINE:
+        process.env.GST_LINE ??
+        "No GST while Readyline is not registered for GST.",
+      SUBSCRIPTION_PRICE_AUD_CENTS:
+        process.env.SUBSCRIPTION_PRICE_AUD_CENTS ?? "3900",
+      // REQ-007 AC-1 (D-709): Checkout is the fake page; the webhook secret is the local one.
+      STRIPE_FAKE: "1",
+      STRIPE_WEBHOOK_SECRET: "",
+      // The job route and the webhook's hand-on need the cron secret the spec also sends.
+      CRON_SECRET: e2eCronSecret(),
+      // The paid job replays the recorded sole-trader fixtures: never record, never live.
+      GENERATION_RECORD: "",
+      GENERATION_LIVE: "",
+      ANTHROPIC_MODEL: "claude-sonnet-5-5",
+    },
   },
 });

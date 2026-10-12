@@ -7,7 +7,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DocumentModel } from "@/lib/generator/document-model";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
-import { removePrefix, uploadObject } from "./storage";
+import { downloadObject, removePrefix, uploadObject } from "./storage";
 
 export type VersionSetRow = {
   id: string;
@@ -78,6 +78,8 @@ export interface GenerationStore {
     bytes: Uint8Array,
     contentType: string,
   ): Promise<void>;
+  /** Reads an object back; the paid job zips documents written in earlier ticks (REQ-007 FR-5). */
+  getObject(path: string): Promise<Uint8Array>;
 }
 
 export class SupabaseGenerationStore implements GenerationStore {
@@ -158,6 +160,10 @@ export class SupabaseGenerationStore implements GenerationStore {
     contentType: string,
   ): Promise<void> {
     await uploadObject(this.admin, path, bytes, contentType);
+  }
+
+  async getObject(path: string): Promise<Uint8Array> {
+    return downloadObject(this.admin, path);
   }
 }
 

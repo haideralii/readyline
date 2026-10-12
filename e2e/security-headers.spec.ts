@@ -41,6 +41,16 @@ test.describe("security headers", () => {
     expect(directives["form-action"]).toEqual(["'self'"]);
     expect(directives["frame-ancestors"]).toEqual(["'none'"]);
 
+    // REQ-007 SR-5: Stripe's hosted Checkout is a form destination on the
+    // purchase routes only, and appears nowhere else in the policy.
+    const pricing = await page.request.get("/pricing");
+    const pricingCsp = pricing.headers()["content-security-policy"];
+    expect(pricingCsp).toContain(
+      "form-action 'self' https://checkout.stripe.com",
+    );
+    expect(pricingCsp.match(/stripe/g)?.length).toBe(1);
+    expect(csp).not.toContain("stripe");
+
     expect(headers["strict-transport-security"]).toBe(
       "max-age=63072000; includeSubDomains; preload",
     );

@@ -96,6 +96,11 @@ class MemoryStore implements GenerationStore {
   async putObject(path: string, bytes: Uint8Array, contentType: string) {
     this.objects.set(path, { bytes, contentType });
   }
+  async getObject(path: string) {
+    const o = this.objects.get(path);
+    if (!o) throw new Error(`no object at ${path}`);
+    return o.bytes;
+  }
 }
 
 /** A model that answers every section with a short, lint-clean paragraph naming the provider. */

@@ -5,8 +5,11 @@ import type {
   BusinessStructureAnswer,
   State,
 } from "@/lib/questionnaire/schema";
+import { formatAud } from "@/lib/payments/pricing";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
+import { listPurchases } from "@/server/payments/queries";
+import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
 
@@ -20,6 +23,11 @@ export default async function AccountPage() {
   if (viewer.deleted) redirect("/account/deleted");
   if (!viewer.account) redirect("/account/setup");
   const a = viewer.account;
+  // REQ-007 FR-7: the purchase rows with their receipt links.
+  const purchases = await listPurchases(
+    await createSupabaseServerClient(),
+    a.id,
+  );
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
@@ -80,6 +88,57 @@ export default async function AccountPage() {
         >
           Export my data (zip)
         </a>
+      </section>
+
+      <section aria-labelledby="purchases-heading" className="mt-10">
+        <h2 id="purchases-heading" className="text-xl font-semibold">
+          Purchases
+        </h2>
+        {purchases.length === 0 ? (
+          <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+            No purchases yet.{" "}
+            <Link href="/pricing" className="underline underline-offset-2">
+              See the document pack
+            </Link>
+            .
+          </p>
+        ) : (
+          <ul
+            className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800"
+            data-testid="purchases"
+          >
+            {purchases.map((p) => (
+              <li
+                key={p.id}
+                className="flex flex-col gap-1 py-3 text-sm leading-6 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <span>
+                  Document pack, {formatAud(p.amountCents)},{" "}
+                  {new Date(p.createdAt).toLocaleDateString("en-AU", {
+                    timeZone: "Australia/Sydney",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  {p.status === "refunded" ? " (refunded)" : ""}
+                </span>
+                {p.receiptUrl ? (
+                  <a
+                    href={p.receiptUrl}
+                    className="underline underline-offset-2"
+                    rel="noopener noreferrer"
+                  >
+                    View receipt
+                  </a>
+                ) : (
+                  <span className="text-zinc-600 dark:text-zinc-400">
+                    Receipt by email from Stripe
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section aria-labelledby="delete-heading" className="mt-10">
