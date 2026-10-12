@@ -11,6 +11,7 @@
     "check:bundle": "node scripts/ci/check-client-bundle.mjs",
     "generator:skeletons": "vitest run src/lib/generator/skeletons.test.ts",
     "generation:record": "vitest run src/lib/generator/record-fixtures.test.ts",
+    "generation:review-pack": "vitest run src/lib/generator/review-pack.test.ts",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

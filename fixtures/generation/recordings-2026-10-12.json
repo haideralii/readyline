@@ -1,0 +1,68 @@
+{
+  "decision": "D-039",
+  "prices": {
+    "inputPerM": 2,
+    "outputPerM": 10
+  },
+  "estimates": [
+    {
+      "caseId": "verification-sole-trader",
+      "estimatedInputTokens": 1689
+    },
+    {
+      "caseId": "certification-personal-care",
+      "estimatedInputTokens": 2021
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "estimatedInputTokens": 4498
+    }
+  ],
+  "recordings": [
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "model": "claude-sonnet-5-5",
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "problems": [],
+      "readabilityGrade": 8.5,
+      "inputTokensLastCall": 2325,
+      "outputTokensLastCall": 1397,
+      "estimatedDollarsLastCall": 0.0186,
+      "requestHash": "0e4452ef2da4f4e2a234cb92e62b5fe1a841452c418591083ec6eb903890b3f4"
+    },
+    {
+      "caseId": "certification-personal-care",
+      "documentTypeId": "governance-policy",
+      "sectionId": "purpose",
+      "model": "claude-sonnet-5-5",
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "problems": [],
+      "readabilityGrade": 11.8,
+      "inputTokensLastCall": 2672,
+      "outputTokensLastCall": 159,
+      "estimatedDollarsLastCall": 0.0069,
+      "requestHash": "7fbea9b44afbb91d8465f280d4c8ac0b2975ba1a0d63ca6e275c437a00f73be0"
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "documentTypeId": "behaviour-support-plan-implementation-procedure",
+      "sectionId": "steps",
+      "model": "claude-sonnet-5-5",
+      "status": "fallback",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "problems": ["reply was not valid JSON", "reply was not valid JSON"],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 5678,
+      "outputTokensLastCall": 2000,
+      "estimatedDollarsLastCall": 0.0314,
+      "requestHash": "5d5d147e8e5f652aaace3c4e4c57a9d046910f2d0c1f3ad25df8a1ba17a8d4e5"
+    }
+  ]
+}

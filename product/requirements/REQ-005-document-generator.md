@@ -199,6 +199,21 @@ Decisions applied: `participant-money-and-property-procedure` and the new `suppo
 **Item 3, owed Session C evidence.** CI for f9d89fa: the PO reports all four jobs green; the runs are listed at https://github.com/haideralii/readyline/actions?query=branch%3Areq-005-generator (Dev cannot read Actions from this machine, so the run id is not pasted). Screenshots of the documents pages: a local `supabase start` stack needs Docker, which the dev machine does not have, and the hosted project now carries the three REQ-004 migrations but a session there needs a magic-link email delivered to Dev, which is not possible here. So a signed-in session against the hosted project is needed and this item stops here, as the queue allows; the coming-soon state renders as soon as any signed-in owner opens `/documents`.
 
 **Item 4, Session B recordings.** Waiting for key: `.env.local` has neither `ANTHROPIC_API_KEY` nor `ANTHROPIC_MODEL` (checked by name).
+### Batch 10 items 2 and 3 (2026-10-12): first recordings and the review pack
+
+**Recordings (D-039, one call per case).** `npm run generation:record` now records exactly one section per reference case (the recorder loads the two Anthropic variables from `.env.local` itself, prints the estimated input tokens before the first call, and writes `fixtures/generation/recordings-2026-10-12.json` with counts only). Model `claude-sonnet-5-5`; prices from D-037 (`` in, `` out per million tokens).
+
+| Case | Document / section | Estimated in | Actual in | Out | Dollars | Validation |
+| --- | --- | --- | --- | --- | --- | --- |
+| verification-sole-trader | incident management policy / policy statement | 1,689 | 2,325 | 1,397 | 0.019 | passed first time; readability grade 8.5 |
+| certification-personal-care | governance policy / purpose | 2,021 | 2,672 | 159 | 0.007 | passed first time; readability grade 11.8 (above the fail threshold; see note) |
+| behaviour-support-company | behaviour support plan implementation / steps | 4,498 | 5,635 then 5,678 | 2,000 then 2,000 | 0.031 each | failed twice: the reply was cut at the 2,000-token output cap mid-JSON, so it never parsed; stopped per the queue, not re-recorded |
+
+Spend for the batch: about `.09` across four completed calls, plus one earlier attempt on the sole-trader case that vitest's default 5-second test timeout cut off mid-flight (its reply was lost; if the API billed it, roughly `.02` more). Two earlier attempts made no call at all (the SDK refused to run under vitest's browser-like environment; fixed with the Node environment directive). The estimate undercounted the real input by about 25 to 40 per cent because the house-style system prompt and the Commission text tokenise denser than four characters per token.
+
+Notes for the PO: (1) the `steps` section for the behaviour-support case needs a higher output cap (the model wrote a long numbered procedure; 2,000 tokens is too low for that section type). Dev will raise `maxTokens` to 4,000 for `steps` and `how-we-do-this` sections before any further recording, which the PO approves separately under D-039. (2) The governance purpose paragraph for the company case scored grade 11.8; it validated because readability is reported, not gated, in the pipeline today. The quality gate (fail above 11) is Session D work; this is the first measured signal that the house-style prompt should push harder on sentence length for "purpose" sections.
+
+**Review pack (item 3).** `npm run generation:review-pack` (`REVIEW_PACK=1`, replay client only, no model call) rendered the sole-trader case's incident management policy, complaints procedure and self-assessment into `product/evidence/req-005/sole-trader/`: three `.docx` files and `sections.md` listing every section as fixed text, model text (with the questionnaire answers it used, from `usedFacts`, and the text itself) or the fallback marker. Under D-039 only the incident policy's policy statement is real model text (it used trading name, structure, states, registration groups, number of workers and the restrictive practices answer); every other tailored section in the three documents shows the "Review and complete" fallback the provider would see when drafting is unavailable.
 ## PO review
 (PO fills in.)
 

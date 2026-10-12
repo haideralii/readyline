@@ -952,6 +952,18 @@ supports dry run.
 client defaults to replay, no fixture exists, and a real generation would
 mark every tailored section "Review and complete" (AC-5 path). The model id
 defaults to `claude-sonnet-5-5` per D-037.
+**D-523 First recordings (Dev, 2026-10-12, under D-039).** The recorder
+records one named section per reference case, loads the Anthropic variables
+from `.env.local` itself, prints an input-token estimate before the first
+call and writes a counts-only report beside the fixtures. Two lessons: the
+recorder and the review pack must run under vitest's Node environment (the
+SDK refuses the default browser-like one), and long-running tests need an
+explicit timeout (the default cut one call off mid-flight). Outcome: two
+sections validated first time; the behaviour-support `steps` section hit
+the 2,000-token output cap twice and fell back, so `maxTokens` for
+`steps` and `how-we-do-this` sections will be raised to 4,000 before any
+further recording, pending the PO's approval of the spend. The review pack
+is rendered from fixtures only through the replay client.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
