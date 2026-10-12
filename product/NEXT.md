@@ -508,3 +508,27 @@ No model or Stripe calls (cost table: none). Items 0 to 4 done; this is item 5.
 - `req-006-checklist` 3a48546 and `req-013-p2` ee8a4e5: unchanged; item 4 needed no rebase.
 
 PRs for the PO to open: `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (base `req-013-p2` until P2 merges), and the PR #14 retarget above. Merge order unchanged: #14, #15, REQ-006, REQ-013 P2, REQ-014.
+
+## Queue (written by PO, 13 Oct 2026, batch 21)
+
+**PO actions this batch:** PR #16 (the squashed sign-in branch) merged into `main`; PR #14 closed as superseded. PR #15 had three conflicts after that merge (`DECISIONS.md`, REQ-004 and REQ-007 files, all prose); the PO resolved them in the GitHub editor, keeping the Dev evidence and the PO reviews, and committed the merge on `req-007-payments`. PRs opened: #17 `req-006-checklist`, #18 `req-013-p2`, #19 `req-014-visual-identity` (base `req-013-p2`). Merge order from here: #15, #17, #18, then #19 retargeted to `main`. The PO merges each when its checks are green; `migrate.yml` applies migrations on each merge. REQ-010 part 1 (first deploy) is written: `product/requirements/REQ-010-operations.md`.
+
+Rules for this batch: items 0a and 0 first. Item 1 starts from `main` only after #15 is merged (check `git log origin/main --oneline -3` for the REQ-007 merge commit); if the PO has not merged it yet when you reach item 1, write the status and stop there. No rebases, no history rewrites (D-033 does not help; the tool refuses). Merge `main` into a branch instead.
+
+0a. **Push `main`** (the PO's batch-21 commit is local only: `git push origin main`).
+
+0. **PR #15 is red after the PO's conflict merge (run 38261240111); fix on `req-007-payments` and push, no history rewrite:**
+   - Supabase job: `tests/integration/payments-rls.test.ts:175` "no client can write to the payment tables, even the owner" expects the owner's `delete` on `entitlements` to return no error (RLS deleting zero rows). With the D-052 grants (`select` only to `authenticated`) Postgres now refuses at the grant level with 42501, which is the stronger outcome. Change the assertion to accept either path (error code 42501, or no error with the row still present), and apply the same reading to any sibling assertion on `purchases` and `generation_jobs`. Keep the test's intent: the row must survive.
+   - gitleaks: the same false positive on two PRs, `e2e/helpers/env.ts` line 31, the `["e2e","cron","secret",...].join("-")` test constant (rule generic-api-key). Not a secret. Fix it at the source and in history: put `// gitleaks:allow` on that line, and add both fingerprints to `.gitleaksignore` with a one-line comment: `dfa050bd13b48e5473d32bdd246b95e923bd6038:e2e/helpers/env.ts:generic-api-key:31` (PR #15) and `3a48546e8748d15a422a96185c187dc6d18ba3b0:e2e/helpers/env.ts:generic-api-key:31` (PR #17).
+   - Then confirm `npm run test:integration` against a fresh local stack and push. The PO merges #15 when all four jobs are green.
+   - **After #15 is merged:** merge `main` into `req-006-checklist` (brings the `.gitleaksignore` entry) and push; #17 goes green and the PO merges it. #18 and #19 are already 4/4 green; do not touch them.
+
+1. **REQ-010 part 1** on `req-010-deploy` from `main`: FR-1 to FR-6, SR-1 to SR-3, the two questions answered in the Dev response, AC-2 proven with a failing build in the Delivery evidence. D-10xx entries. Push; the PO opens the PR.
+
+2. **Reconcile `.env.example`** (REQ-010 FR-3) in the same branch, and add a one-line note at the top of `supabase/ops/DEPLOY.md` listing the variables Haider already has in `.env.local` so he can copy them across by name.
+
+3. **Pre-deploy sweep** on the same branch: `npm run check`, `next build`, both Playwright projects in CI mode, `npm audit --omit=dev --audit-level=high`, gitleaks on the tree. Record the versions of Node, Next and the Supabase CLI the deploy expects in `DEPLOY.md`.
+
+4. **Status** with: the exact runbook steps that need Haider (numbered, in order, nothing else), anything that blocks a Hobby deploy, and the branch SHA.
+
+5. STOP.
