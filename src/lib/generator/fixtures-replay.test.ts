@@ -28,7 +28,7 @@ import {
   lintTimeframes,
 } from "./lint";
 import { TailoredSection, blocksToProse, blocksToText } from "./section-schema";
-import { readability } from "./readability";
+import { readability } from "@/lib/text/readability";
 
 const report = JSON.parse(
   readFileSync(

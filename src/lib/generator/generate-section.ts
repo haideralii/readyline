@@ -20,7 +20,7 @@ import {
 import type { ContextPack } from "./context-pack";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
-import { readability, type Readability } from "./readability";
+import { readability, type Readability } from "@/lib/text/readability";
 import {
   TailoredSection,
   blocksToProse,

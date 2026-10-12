@@ -1,5 +1,13 @@
-﻿/** * Flesch-Kincaid grade level, implemented here so tests, the quality gate and * the reviewer view report the same number (REQ-005 FR-8, D-503). * Thresholds come from the house style: warn above 9, fail above 11. */ export const READABILITY_WARN_ABOVE = 9;
+/**
+ * Flesch-Kincaid grade level, implemented here so tests, the quality gate and
+ * the reviewer view report the same number (REQ-005 FR-8, D-503).
+ * Thresholds come from the house style: warn above 9, fail above 11.
+ */
+export const READABILITY_WARN_ABOVE = 9;
 export const READABILITY_FAIL_ABOVE = 11;
+/** D-047: a section with fewer words than this warns above the fail line but never fails (too small a sample). */
+export const SHORT_SECTION_WORDS = 40;
+
 export type Readability = {
   sentences: number;
   words: number;
@@ -7,7 +15,9 @@ export type Readability = {
   grade: number;
   level: "ok" | "warn" | "fail";
 };
+
 const WORD = /[A-Za-z][A-Za-z'’-]*/g;
+
 export function countSyllables(word: string): number {
   const w = word.toLowerCase().replace(/[^a-z]/g, "");
   if (w.length === 0) return 0;
@@ -19,6 +29,7 @@ export function countSyllables(word: string): number {
       .match(/[aeiouy]{1,2}/g)?.length ?? 0;
   return Math.max(1, s);
 }
+
 export function countSentences(text: string): number {
   const parts = text
     .split(/[.!?]+(?:\s|$)|\n+/)
@@ -26,6 +37,7 @@ export function countSentences(text: string): number {
     .filter((p) => p.length > 0);
   return Math.max(1, parts.length);
 }
+
 export function readability(text: string): Readability {
   const words = text.match(WORD) ?? [];
   const wordCount = Math.max(1, words.length);

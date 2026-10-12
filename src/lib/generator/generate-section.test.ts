@@ -26,7 +26,7 @@ import {
   type Fixture,
 } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
-import { readability } from "./readability";
+import { readability } from "@/lib/text/readability";
 import { loadReferenceCases } from "./reference-cases";
 
 const dataset = getStandardsDataset();
