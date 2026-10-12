@@ -101,7 +101,9 @@ jobs:
 
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          # Pinned (D-038): 'latest' asks the GitHub API anonymously and shared runners hit the rate limit.
+          version: 2.120.0
+          github-token: ${{ github.token }}
 
       - name: Start the local stack and apply supabase/migrations
         run: supabase start -x studio,imgproxy,logflare,vector

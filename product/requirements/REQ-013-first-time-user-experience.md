@@ -20,6 +20,8 @@ The PO walked the questionnaire on 12 Oct 2026 at phone size as a first-time, no
 - FR-8 Home page before launch: replace "is being built" with the value proposition, "free, about ten minutes", and trust cues (Australian-hosted, no participant data, independent of the NDIA and the Commission), plus one example result.
 - FR-9 A visible way to ask a question (contact email) in the footer and on the result page.
 - FR-10 "Key personnel" and "risk-assessed role" get one-line examples under the labels.
+- FR-11 Supports step groups collapsed by default on phones with the count and a one-line description visible, the two most common groups ("Personal care at home", "Help around the house and getting out") open; a search or the hint expands the groups that contain matches; ticked classes stay visible when a group is collapsed.
+- FR-12 Result page: fold the "Your audit" explanation into the summary block and drop the repeated heading.
 
 ## Acceptance criteria
 - AC-1 Submitting each step empty shows only plain-English messages; a unit test proves every schema error maps to a message.
@@ -63,4 +65,16 @@ Written 2026-10-12 on branch `req-013-first-time-ux` (from `main` at aa52c8a), a
 
 
 ## PO review
-(PO fills in.)
+**12 Oct 2026, P1 review (branch `req-013-first-time-ux` at 62dec64): ACCEPTED CONDITIONALLY.** Screenshots at 360x740 reviewed for every changed step; the five P1 items are built as specified and the accessibility-tree evidence is what AC-2 asked for. The approach decisions D-1301 to D-1305 are accepted. Merge after the four fixes below land on the branch and CI is green; none needs a new session.
+
+Fixes (P1, must land before merge):
+- R-1 **Within-group order ignores the data.** `group-categories.json` lists 0107 before 0104 under "Personal care at home", but the rendered step shows 0104 High Intensity first. The UI sorts by code. Render in the order the data gives (the PO orders each group by how common the class is for small providers), and add a test that the first rendered row of "Personal care at home" is 0107.
+- R-2 **Code still leads the row.** "0104 High Intensity Daily Personal Activities" is still read left to right as code first, which is what FR-3 set out to stop. Put the class name first and the code after it in the same muted small text, or on its own line under the name, on both viewports.
+- R-3 **Audit tag wraps.** At 360 px "desk audit" breaks into "desk" and "audit" on two lines on long names (0108, 0114). Give the tag `white-space: nowrap` and let it drop to its own line under the name when the name is long, rather than splitting the tag.
+- R-4 **Seclusion is missing from the helper.** The Commission's five regulated practices are seclusion, chemical, mechanical, physical and environmental. Helper question 1 covers environmental, question 2 mechanical and physical, question 3 chemical; nothing asks about seclusion. Extend question 1 to "Do you ever lock a cupboard, fridge, door or gate so a person cannot get to something or somewhere, or keep a person alone in a room they cannot leave?" and the example to include "shutting someone in their room until they calm down". Update the unit test and the screenshot.
+
+Noted, not blocking (becomes P2 FR-11 and FR-12 below):
+- The supports step is about 8,000 CSS pixels tall on a phone with every group expanded; a first-time user who only does personal care scrolls past 30 classes they will never tick.
+- The result page's second "Your audit: certification" heading now repeats the summary block's first sentence.
+
+Owed by Haider: the manual NVDA pass (definition of done item 7); recorded here when done, not blocking the merge.

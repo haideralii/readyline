@@ -52,3 +52,6 @@ node_modules
 
 # PO local copies of evidence images for review (not tracked)
 product/evidence-review/
+
+# PO review scratch (screenshots extracted from branches)
+.po-review/

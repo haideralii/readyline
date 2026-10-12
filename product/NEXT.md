@@ -181,3 +181,27 @@ For Haider: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` into `.env.local`; merge P
 4. **REQ-005 Session B recordings**: only if `.env.local` now has `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (check by name). Record the three reference cases, commit the fixtures, and write the cost note (input and output tokens and dollars per case). If the key is still absent, write "waiting for key" and move on.
 
 5. STOP. Append your status below.
+**2026-10-12 (batch 9), Dev: items 0 to 4 done; REQ-013 P1 delivered in four pushed sessions; nothing merged.**
+
+0. `main` pushed with the PO's two batch-9 commits after the stat check (product/ and DECISIONS.md only); `REQ-013-first-time-user-experience.md` is on `origin/main` (aa52c8a). Local main was rebased onto the PR #8 merge first.
+1. D-038 CLI pin: branch `ops-pin-supabase-cli` (9aeaadf, 3babd61): `supabase/setup-cli@v1` pinned to `2.120.0` (the current published CLI; the integration job also used `latest`) with `github-token: ${{ github.token }}` in both `ci.yml` and `migrate.yml` (the action's `action.yml` declares that input for exactly this rate-limit case). Dev cannot open PRs from this machine (no `gh`); PO opens and merges.
+2. REQ-013 P1 on `req-013-first-time-ux`: Session 1 FR-1 and FR-2 (44b8f1b), FR-3 (3c36a0a), FR-4 (6ba2416), FR-5 (b19776a), evidence (62dec64). Plain-English messages in every schema with a unit test over all error paths; `ChoiceRow` accessible names from visible labels and an accessibility-tree e2e test over every control (records in `product/evidence/req-013`); supports step led by "What do you do for participants?" with eight everyday headings, synonyms, audit tags and the two-class hint; restrictive practices examples, "What counts?" expander and the three-question helper that resolves "not sure" in the schema; result summary line, plain "in practice" sentence and documents under four headings. Screenshots of every changed step at 360x740 and desktop; axe clean on every step; Lighthouse accessibility 100 on `/start/business` (mobile and desktop) and `/start`. Check clean (28 files, 266 tests), build ok, Playwright 32 passed in CI mode. D-1301 to D-1305. **Owed by Haider:** the manual NVDA pass (no screen reader on the dev machine; the walkthrough note in the evidence says what to expect). Not merged; PO reviews the UI.
+3. REQ-005 owed evidence: the CI link is the branch's Actions listing (Dev cannot read run ids); documents-page screenshots need a signed-in session, which the dev machine cannot create (no Docker for a local stack; a hosted session needs a magic-link email Dev cannot receive), so that item stops there as the queue allows. Note added to REQ-005 (29a19e1).
+4. REQ-005 Session B recordings: **waiting for key** (`ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` absent from `.env.local`, checked by name).
+5. STOP.
+
+Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 10)
+
+**PO actions this batch:** PR #10 opened from `ops-pin-supabase-cli`; the PO merges it when green. REQ-013 P1 reviewed from the screenshots: accepted conditionally with four fixes R-1 to R-4 (in the REQ's PO review). `.env.local` has had `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` since before batch 9 finished (the Dev check ran earlier); D-039 applies.
+
+0. **Push `main`** with the PO's batch-10 commit after checking the stat (product/, DECISIONS.md, .gitignore only). Note: the PO review for REQ-013 is on `main`'s copy of the REQ file; merge `main` into `req-013-first-time-ux` before item 1 so the branch carries it.
+
+1. **REQ-013 R-1 to R-4** on `req-013-first-time-ux`: order within groups from the data with a test; name before code; non-wrapping audit tag; seclusion in helper question 1. Re-capture only the affected screenshots. `npm run check`, build, Playwright CI mode. Push. Do not merge; the PO checks the two screenshots and merges.
+
+2. **REQ-005 Session B recordings** (D-039 applies: three model calls in total, one per reference case; nothing else). Check `.env.local` by name again; it is there. Before the first call, print the estimated input tokens per case. Record the three cases with `npm run generation:record`, commit the fixtures on `req-005-generator`, and write the cost note into Delivery evidence: input tokens, output tokens, dollars per case, and whether validation passed first time or used the retry. If any call fails validation twice, stop that case and report; do not re-record.
+
+3. **REQ-005 PO content review pack**: for the sole-trader reference case only, export the recorded set's rendered `.docx` files for the incident management policy, the complaints procedure and the self-assessment into `product/evidence/req-005/sole-trader/` (these three only; the rest stay in the CI artifact), so the PO can read real tailored text. Note which tailored sections came from which answers.
+
+4. STOP. Append your status below.
