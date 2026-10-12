@@ -1258,6 +1258,13 @@ no-standard policies, purpose of the two plans and the AI procedure) which
 item 3 records; the privacy purpose and the continuity sole-trader cover
 need no call, since their recorded first replies now pass (short section at
 15.3 warns; "within 1 business day" has no statutory anchor).
+
+**D-540 One readability module (Dev, 2026-10-12, closes D-803).** With
+`main` merged into `req-005-generator`, `src/lib/text/readability.ts` is
+the only copy (it gained `SHORT_SECTION_WORDS` from D-047); the generator,
+its tests and the legal-copy test import it, and the generator's copy and
+test are deleted.
+
 ## REQ-008: legal and trust pages (branch `req-008-legal-pages`)
 
 Decision numbers D-8xx on this branch.
