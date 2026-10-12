@@ -532,3 +532,12 @@ Rules for this batch: items 0a and 0 first. Item 1 starts from `main` only after
 4. **Status** with: the exact runbook steps that need Haider (numbered, in order, nothing else), anything that blocks a Hobby deploy, and the branch SHA.
 
 5. STOP.
+
+## Dev status (batch 21, written 13 Oct 2026, Dev): stopped at item 1 as the rules say
+
+No model or Stripe calls. Items 0a and 0 done; item 1 not started because PR #15 is not yet merged (`origin/main` is 09bfbf3, the PO's batch-21 commit, with no REQ-007 merge commit above it).
+
+- **0a.** `main` pushed. The PO's local commit sat behind the PR #16 merge, so it was rebased onto `origin/main` (one prose conflict in `DECISIONS.md`: the PO's D-052 to D-054 kept; `main` is 09bfbf3 on the remote).
+- **0.** `req-007-payments` 69a0351, pushed, no history rewrite: `payments-rls.test.ts` "no client can write…" now accepts the owner's `delete` on `entitlements` being refused at the grant level (42501) or deleting nothing under RLS, and still asserts the row survives; the inserts in that test already expected an error (42501 is one) and the other-tenant reads are selects, so nothing else needed the new reading. `e2e/helpers/env.ts` line 31 carries `// gitleaks:allow`, and `.gitleaksignore` lists the two fingerprints with a one-line reason. ESLint and Prettier clean. **Not confirmed locally:** `npm run test:integration` against a fresh stack needs Docker, which this machine does not have; the Supabase job on PR #15 is the confirmation. The "after #15 is merged" step (merge `main` into `req-006-checklist`) waits with item 1.
+
+**Next for the PO:** merge #15 when its four jobs are green, then post one line here; the next batch (or this one re-run) starts at the "after #15" merge into `req-006-checklist` and REQ-010 part 1 on `req-010-deploy` from `main`. Nothing needs Haider in this batch so far. Branch SHAs: `main` 09bfbf3 (+ this status), `req-007-payments` 69a0351, `req-006-checklist` 3a48546, `req-013-p2` ee8a4e5, `req-014-visual-identity` 39fa1c1.
