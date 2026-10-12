@@ -463,8 +463,14 @@ Waiting for the PO.
 
 3. **REQ-007 Session C without the webhook secret** (same branch, after item 2): `/documents` purchase states (Buy, Preparing, ready), generation on entitlement through the queued job and cron route, download page with receipt link and refund mailto, Stripe hosts in the CSP on purchase routes only, the fake-Stripe e2e on both viewports, screenshots. The real Stripe hop (Checkout page, webhook delivery) is deferred to the first Vercel deploy, when a dashboard webhook endpoint gives a permanent signing secret; note that in Delivery evidence instead of running `stripe listen`.
 
-4. **REQ-006 Dev response only**: read `product/requirements/REQ-006-readiness-checklist.md`, answer the design questions, propose sessions. No build.
+4. **REQ-006 Dev response and build** on `req-006-checklist` from `main`: read `product/requirements/REQ-006-readiness-checklist.md`, write the Dev response (short), then build Session A (derivation with `sourceRef` on every item, unit tests over the three reference cases, `unverified` flags) and Session B (`/checklist` page with persistence, pre-fill from "already have", progress line, print view, RLS test, e2e on both viewports, screenshots). Push after each session.
 
-5. **Status.**
+5. **REQ-013 P2** on `req-013-p2` from `main`: FR-6 to FR-12 as written in the REQ (numeric inputs and sole-trader defaults; step indicator with progress bar; home page value proposition with trust cues replacing "is being built"; contact link from `CONTACT_EMAIL`; key-personnel examples; collapsed groups on phones with search expanding matches; result page heading dedupe). Screenshots of every changed screen at both viewports; axe clean; Lighthouse by hand if available. Push.
 
-6. STOP.
+6. **REQ-014 visual identity v1** on `req-014-visual-identity` from `main`: read `product/requirements/REQ-014-visual-identity.md` and build it as written (tokens, dark variants, serif headings via next/font, the ready-line motif, contrast test in CI, no stock photos), applied across the questionnaire, result, pricing, legal pages, documents and sign-in. Keep the layout; change the look. Screenshots of every page at both viewports, light and dark. Push.
+
+7. **Status** with one line per branch (head commit, what is done, what is owed), the cost table if any model calls were made (none expected), and anything blocked.
+
+8. STOP.
+
+**Overnight rules for this batch (PO, 12 Oct 2026):** work the items in order; if an item is blocked, write the blocker under it and move to the next; never merge; never force-push; no model calls; do not touch `main` except item 0. Haider is asleep; nothing here needs him. The PO merges PRs #14 and #15 as they go green and reviews the rest in the morning.
