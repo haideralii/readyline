@@ -50,6 +50,18 @@ export function fixturePath(
   return join(dir, labels.documentTypeId, labels.sectionId, `${hash}.json`);
 }
 
+/** The fixture recorded for this exact prompt, if any. */
+export function readFixture(
+  request: ModelRequest,
+  labels: FixtureLabels,
+  dir: string = DEFAULT_FIXTURES_DIR,
+): Fixture | null {
+  const path = fixturePath(dir, labels, requestHash(request));
+  return existsSync(path)
+    ? (JSON.parse(readFileSync(path, "utf8")) as Fixture)
+    : null;
+}
+
 /** True when a fixture for this exact request already exists (used to avoid re-spending). */
 export function hasFixture(
   request: ModelRequest,
@@ -74,7 +86,7 @@ export class MissingFixtureError extends Error {
 }
 
 /** Fixtures recorded before stop reasons were kept: a reply that used the whole cap was cut off. */
-function inferStopReason(fixture: Fixture): StopReason {
+export function inferStopReason(fixture: Fixture): StopReason {
   if (fixture.stopReason !== undefined) return fixture.stopReason;
   if (
     fixture.usage &&

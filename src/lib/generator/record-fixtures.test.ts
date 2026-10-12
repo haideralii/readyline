@@ -17,7 +17,8 @@ import { generateSection } from "./generate-section";
 import {
   createModelClient,
   DEFAULT_FIXTURES_DIR,
-  hasFixture,
+  inferStopReason,
+  readFixture,
 } from "./model-client";
 import { buildModelRequest } from "./prompts";
 import { loadReferenceCases } from "./reference-cases";
@@ -88,6 +89,17 @@ type ReportRow = Record<string, unknown> & {
   sectionId: string;
 };
 
+/** A fixture counts as done unless it was cut off at a cap lower than today's (D-040 re-record). */
+function fixtureStillValid(
+  request: ReturnType<typeof buildModelRequest>,
+  labels: { documentTypeId: string; sectionId: string },
+): boolean {
+  const fx = readFixture(request, labels);
+  if (!fx) return false;
+  const truncated = inferStopReason(fx) === "max_tokens";
+  return !(truncated && request.maxTokens > fx.request.maxTokens);
+}
+
 function readReport(): { estimates: unknown[]; recordings: ReportRow[] } {
   if (!existsSync(REPORT_PATH)) return { estimates: [], recordings: [] };
   return JSON.parse(readFileSync(REPORT_PATH, "utf8"));
@@ -129,7 +141,7 @@ describe.skipIf(!enabled)(
           ...r,
           pack,
           request,
-          exists: hasFixture(request, {
+          exists: fixtureStillValid(request, {
             documentTypeId: r.typeId,
             sectionId: r.sectionId,
           }),

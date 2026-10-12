@@ -1,5 +1,5 @@
 {
-  "decision": "D-039",
+  "decision": "D-039, D-040",
   "prices": {
     "inputPerM": 2,
     "outputPerM": 10
@@ -16,6 +16,42 @@
     {
       "caseId": "behaviour-support-company",
       "estimatedInputTokens": 4498
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "sectionId": "steps",
+      "cap": 4000,
+      "estimatedInputTokens": 4498
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1675
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1681
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1687
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1686
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 1500,
+      "estimatedInputTokens": 1670
     }
   ],
   "recordings": [
@@ -50,20 +86,125 @@
       "requestHash": "b7fd1e6912356a2d6062e3a88212ecbf2abf87fec38598ec981bef84df2ff619"
     },
     {
+      "batch": 11,
       "caseId": "behaviour-support-company",
       "documentTypeId": "behaviour-support-plan-implementation-procedure",
       "sectionId": "steps",
       "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "fallback",
+      "attempts": 1,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": 4000,
+      "problems": [
+        "reply truncated at 4000 output tokens (cap 4000); not retried"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 5635,
+      "outputTokensLastCall": 4000,
+      "estimatedDollarsLastCall": 0.0513,
+      "requestHash": "a1adc76ca50f431677688a9820bb4b99b518805c31adc1ae7cfc8c48e3fa1092",
+      "recordedAt": "2026-10-12T00:32:59.042Z"
+    },
+    {
+      "batch": 11,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
       "status": "fallback",
       "attempts": 2,
       "validationPassedFirstTime": false,
-      "problems": ["reply was not valid JSON", "reply was not valid JSON"],
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 15.8 is above 11: shorten sentences to under 20 words and use common words",
+        "readability grade 12.2 is above 11: shorten sentences to under 20 words and use common words"
+      ],
       "readabilityGrade": null,
-      "inputTokensLastCall": 5678,
-      "outputTokensLastCall": 2000,
-      "estimatedDollarsLastCall": 0.0314,
-      "requestHash": "a1adc76ca50f431677688a9820bb4b99b518805c31adc1ae7cfc8c48e3fa1092"
+      "inputTokensLastCall": 2376,
+      "outputTokensLastCall": 488,
+      "estimatedDollarsLastCall": 0.0096,
+      "requestHash": "650ec3b8a071ca968665da0fab28ca383e51fbe55a9512b7eb0d164f5f2d84a2",
+      "recordedAt": "2026-10-12T00:33:05.942Z"
+    },
+    {
+      "batch": 11,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "scope",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 8.6,
+      "inputTokensLastCall": 2320,
+      "outputTokensLastCall": 673,
+      "estimatedDollarsLastCall": 0.0114,
+      "requestHash": "467e7b24a2549a170489dafd3c653ba392405ed4dafe2003e4a48b66ee242533",
+      "recordedAt": "2026-10-12T00:33:11.739Z"
+    },
+    {
+      "batch": 11,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 6.8,
+      "inputTokensLastCall": 2328,
+      "outputTokensLastCall": 3052,
+      "estimatedDollarsLastCall": 0.0352,
+      "requestHash": "8eb19c1e70600092b69e16346c3f822b3b8d762ab38886afe7eadddcb591520b",
+      "recordedAt": "2026-10-12T00:33:35.988Z"
+    },
+    {
+      "batch": 11,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 6.3,
+      "inputTokensLastCall": 2320,
+      "outputTokensLastCall": 831,
+      "estimatedDollarsLastCall": 0.0129,
+      "requestHash": "6ec490a55add827f8ca9490eabd196eb9adf72322418fd003f7db52c9e967823",
+      "recordedAt": "2026-10-12T00:33:43.595Z"
+    },
+    {
+      "batch": 11,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "procedure",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "fallback",
+      "attempts": 1,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": 1500,
+      "problems": [
+        "reply truncated at 1500 output tokens (cap 1500); not retried"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 2305,
+      "outputTokensLastCall": 1500,
+      "estimatedDollarsLastCall": 0.0196,
+      "requestHash": "a37cf9538417a32ac054effa3c5a32b20984c50a554798b6dc3f79263c8485f0",
+      "recordedAt": "2026-10-12T00:34:01.039Z"
     }
-  ],
-  "note": "Fixture keys exclude the output cap since D-040 (batch 11); hashes were migrated once on 2026-10-12."
+  ]
 }

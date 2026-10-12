@@ -214,6 +214,26 @@ Spend for the batch: about `.09` across four completed calls, plus one earlier a
 Notes for the PO: (1) the `steps` section for the behaviour-support case needs a higher output cap (the model wrote a long numbered procedure; 2,000 tokens is too low for that section type). Dev will raise `maxTokens` to 4,000 for `steps` and `how-we-do-this` sections before any further recording, which the PO approves separately under D-039. (2) The governance purpose paragraph for the company case scored grade 11.8; it validated because readability is reported, not gated, in the pipeline today. The quality gate (fail above 11) is Session D work; this is the first measured signal that the house-style prompt should push harder on sentence length for "purpose" sections.
 
 **Review pack (item 3).** `npm run generation:review-pack` (`REVIEW_PACK=1`, replay client only, no model call) rendered the sole-trader case's incident management policy, complaints procedure and self-assessment into `product/evidence/req-005/sole-trader/`: three `.docx` files and `sections.md` listing every section as fixed text, model text (with the questionnaire answers it used, from `usedFacts`, and the text itself) or the fallback marker. Under D-039 only the incident policy's policy statement is real model text (it used trading name, structure, states, registration groups, number of workers and the restrictive practices answer); every other tailored section in the three documents shows the "Review and complete" fallback the provider would see when drafting is unavailable.
+### Batch 11 (2026-10-12): R-5, R-6, D-040 and the sole-trader incident policy
+
+**R-5 and R-6 (894daba).** `validateReply` treats a readability `fail` as a validation problem carrying the house-style instruction; the retry prompt includes it; a second fail falls back. `ModelReply` carries `stopReason` (mapped from the API; inferred for the four earlier fixtures from usage equal to the cap); a `max_tokens` reply is recorded as "reply truncated at N output tokens (cap M); not retried", surfaced in `SectionOutcome.truncatedAtTokens` and in the recordings report. D-040 caps live in `maxTokensFor`. The fixture key excludes the cap (D-524); the existing fixtures were re-keyed in place. Unit tests: readability fail retries with the instruction then falls back; truncation is reported with its count and makes exactly one call; caps per section type; cap outside the key. `fixtures-replay.test.ts` replays every fixture through the current gate: the sole-trader policy statement passes at grade 8.5, the governance purpose fixture now reports "readability grade 11.8 is above 11" and falls back, and the first behaviour-support recordings are reported as truncations. No model calls for this item.
+
+**Recordings (items 2 and 3), one run of `npm run generation:record`, 7 calls, about `.15`:**
+
+| Case / document / section | Cap | In | Out | Dollars | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| behaviour-support / BSP implementation / steps | 4,000 | 5,635 | 4,000 | 0.051 | truncated at 4,000 output tokens; stopped (the outline is too big for one call; split in a later session, per the PO) |
+| sole trader / incident policy / purpose | 1,500 | 2,376 | 488 | 0.010 (x2) | readability fail twice: grade 15.8, then 12.2 after the retry instruction; fell back |
+| sole trader / incident policy / scope | 1,500 | 2,320 | 673 | 0.011 | passed first time; grade 8.6 |
+| sole trader / incident policy / how we put this into practice | 4,000 | 2,328 | 3,052 | 0.035 | passed first time; grade 6.8 |
+| sole trader / incident policy / responsibilities | 1,500 | 2,320 | 831 | 0.013 | passed first time; grade 6.3 |
+| sole trader / incident policy / incident procedure | 1,500 | 2,305 | 1,500 | 0.020 | truncated at 1,500 output tokens; stopped |
+
+Spend to date about `.26` (`.11` before this batch). Estimates before the calls ran about 25 to 40 per cent under the real input counts, as in batch 10.
+
+**Review pack re-rendered.** `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` now carries real text in scope, policy statement, how we put this into practice and responsibilities, and `sections.md` names the pipeline's reason for each fallback (purpose: readability fail after the retry; incident procedure: cut at the cap). The complaints procedure and the self-assessment are unchanged from batch 10 (no recordings approved for them).
+
+**For the PO:** (1) extra sections whose id ends in `procedure` are step lists and should take the 4,000 cap; (2) the catalogue's "purpose" brief should say "two short sentences" so the model stops writing a dense paragraph there, after which one more call for the sole-trader purpose would complete that document; (3) the behaviour-support `steps` outline needs splitting into two sections before any further call (D-525).
 ## PO review
 (PO fills in.)
 

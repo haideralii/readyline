@@ -44,7 +44,7 @@ describe.skipIf(!enabled)("REQ-005 review pack (sole trader)", () => {
       "",
       `Case: ${CASE} (${facts.tradingName}, ${facts.structure}, ${facts.states.join("; ")}; classes ${facts.supportTypes.map((s) => s.code).join(", ")}; ${facts.pathway}).`,
       `Rendered ${new Date().toISOString().slice(0, 10)} from recorded fixtures only (replay client, no model call); model id in the fixtures: ${model}.`,
-      "Under D-039 one model call was recorded for this case, so one tailored section below is real model text; every other tailored section shows the fallback marker the provider would see when drafting is unavailable.",
+      "Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lint and readability gates; sections marked fallback show the marker the provider would see, with the reason the pipeline gave (no fixture recorded, readability fail after the retry, or a reply cut at the output cap).",
       "",
     ];
     for (const typeId of DOCUMENTS) {
@@ -99,7 +99,7 @@ describe.skipIf(!enabled)("REQ-005 review pack (sole trader)", () => {
           );
         } else {
           note.push(
-            `- ${section.number} ${section.heading}: fallback marker (no fixture recorded for this section under D-039).`,
+            `- ${section.number} ${section.heading}: fallback marker: ${out.problems[0] ?? "no fixture"}`,
           );
         }
       }

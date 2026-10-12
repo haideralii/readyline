@@ -964,6 +964,29 @@ the 2,000-token output cap twice and fell back, so `maxTokens` for
 `steps` and `how-we-do-this` sections will be raised to 4,000 before any
 further recording, pending the PO's approval of the spend. The review pack
 is rendered from fixtures only through the replay client.
+**D-524 Readability gate, truncation and the fixture key (Dev, 2026-10-12;
+R-5, R-6, D-040).** A readability `fail` is now a validation problem: the
+single retry carries "shorten sentences to under 20 words and use common
+words", and a second fail falls back. Replies carry the API's stop reason;
+`max_tokens` is reported as "reply truncated at N output tokens" and the
+identical request is never retried. Output caps are 4,000 for `steps` and
+`how-we-do-this` and 1,500 for every other section. The fixture key no
+longer includes the cap, so raising a cap cannot orphan fixtures; the four
+existing fixtures were re-keyed once and the recorder re-records a fixture
+only when it was cut at a lower cap than today's. Replay tests pin the three
+outcomes on the recorded fixtures.
+
+**D-525 Batch-11 recordings (Dev, 2026-10-12).** Seven calls, about `.15`.
+The behaviour-support `steps` section truncated again at 4,000 output
+tokens, so per the PO that section outline is split in a later session, not
+given a bigger cap. The sole-trader incident policy now has real text for
+scope, policy statement, how we put this into practice and responsibilities
+(grades 6.3 to 8.6); `purpose` failed the readability gate twice (15.8 then
+12.2) and the `procedure` extra section was cut at the 1,500 cap. Two
+proposals for the PO: give extra sections whose id ends in `procedure` the
+4,000 cap (they are step lists), and tighten the "purpose" brief in the
+catalogue to "two short sentences" so the model stops writing a dense
+paragraph there.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
