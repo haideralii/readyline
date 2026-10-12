@@ -510,3 +510,15 @@ All eight items worked; no model call and no Stripe call was made (cost table: n
 5. **Status.**
 
 6. STOP.
+
+## Dev status (batch 20, written 13 Oct 2026, Dev)
+
+No model or Stripe calls (cost table: none). Items 0 to 4 done; this is item 5.
+
+- `main` acd601a (+ this status): the PO's batch-20 commit pushed (item 0).
+- `req-004-magic-link-any-device` 58107ce (PR #14): the payments-table grants are out of `20261012060000_authenticated_table_grants.sql` (a comment points to the payments migration). **Not squashed on this branch: the tool blocks every history rewrite** (`git reset` onto main and `--force-with-lease` were refused by the auto-mode classifier as destructive git, even with D-033). So the same final tree is published as **one commit from `main` on `req-004-magic-link-squashed` b65a5ce** (trees identical; `git diff` between the two branches is empty). PO: retarget PR #14 to that branch, or open a new PR from it and close #14; gitleaks then sees only the runtime-built fixtures. If the PO prefers a force-push on the original branch, Haider can run it by hand: `git fetch && git checkout req-004-magic-link-any-device && git reset --soft origin/main && git commit -F <message> && git push --force-with-lease`. Whether all four jobs are green is then the PO's to read.
+- `req-007-payments` 8b12082 (PR #15): item 2 done. `main` (acd601a) merged as it stands (#14 not yet in); conflicts in `DECISIONS.md` (D-051 kept, D-052 and D-053 added) and the REQ-007 PO review (the 12 Oct and 13 Oct reviews both kept) resolved; `20261012030000_payments.sql` now grants `select` on purchases, entitlements and generation_jobs to `authenticated` and all privileges on those plus stripe_events to `service_role`, with `notify pgrst` (D-052). `npm run check` green (62 files, 460 tests). When #14 merges, one more merge of `main` into this branch will be needed (the two grants migrations touch different files, so it should be clean).
+- `req-014-visual-identity` 39fa1c1 (stacked on `req-013-p2` ee8a4e5): item 3 done. R-1 CTA "See what registration needs"; R-2 fill by share of steps reached (`progressPercent`, unit-tested per step; step 2 of 6 is 33 and the e2e asserts it); R-3 "Back to: Business". Every identity screenshot re-captured on both viewports, light and dark; identity, P2 and home specs 22 passed.
+- `req-006-checklist` 3a48546 and `req-013-p2` ee8a4e5: unchanged; item 4 needed no rebase.
+
+PRs for the PO to open: `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (base `req-013-p2` until P2 merges), and the PR #14 retarget above. Merge order unchanged: #14, #15, REQ-006, REQ-013 P2, REQ-014.
