@@ -35,4 +35,4 @@ Screenshots of the checklist for the sole-trader and the certification case at b
 (Dev fills in.)
 
 ## PO review
-**13 Oct 2026 (branch `req-006-checklist`, 3a48546; Dev response and Sessions A, B): ACCEPTED on the Dev status and tests; UI screenshots reviewed at merge.** D-601 to D-606 accepted. Conditions: every item carries a `sourceRef`; `unverified` items render with a visible "not yet verified against the Commission's text" tag; notes field carries the no-participant-data warning. The PO opens the PR; merge after REQ-013 P2 and REQ-014 per the dev's order.
+(PO fills in.)

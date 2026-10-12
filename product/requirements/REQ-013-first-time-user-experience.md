@@ -86,6 +86,3 @@ Noted, not blocking (becomes P2 FR-11 and FR-12 below):
 - The result page's second "Your audit: certification" heading now repeats the summary block's first sentence.
 
 Owed by Haider: the manual NVDA pass (definition of done item 7); recorded here when done, not blocking the merge.
-
-**13 Oct 2026, P2 review (branch `req-013-p2`, ee8a4e5): ACCEPTED.** FR-6 to FR-12 delivered; home page value proposition with trust cues and a real example result reviewed in the REQ-014 screenshots (the two branches are stacked). D-1306 accepted. Merge before REQ-014.
-
