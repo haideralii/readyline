@@ -29,7 +29,15 @@ In: a per-assessment checklist derived from the result (documents, registers, cl
 Screenshots of the checklist for the sole-trader and the certification case at both viewports, and the print view.
 
 ## Dev response
-(Dev fills in.)
+
+**2026-10-12 (batch 19, item 4; branch `req-006-checklist` from `main` a77be8b).**
+
+- **Derivation signature.** `deriveChecklist(result, answers, dataset)` rather than `deriveChecklist(result)`: the People and Business items need the worker counts, the key-personnel count, the screening answer, the business structure and the ABN, none of which is in the result. The result stays the source for documents, registers, modules and the mid-term rule. Pure, no I/O.
+- **What is sourced and what is `unverified`.** Every item carries a `sourceRef` (a standard id with the indicator number, a `standards.json` source id, a rule, or the Readyline content file) and a plain-words "why". Sourced from Commission text: the orientation module (core governance HR management indicator 3; verification HR management indicator 2), the three insurances (risk management indicator 6 / verification indicator 2 name professional indemnity, public liability and accident insurance), the ABN (Rules 2018 s 11, "Applicant must have an ABN"), the audit types, site visits, participant and worker interviews and the mid-term audit (the "Types of audits" page). Marked `unverified` because the Commission text in the dataset does not state them: worker screening clearances as a checklist count (the Worker Screening Rules are not in the dataset; the HR evidence item is ours), and workers compensation insurance (state law, not Commission text; shown only when workers > 1 or the structure is a company, per the REQ). No first-aid item is derived: nothing in `standards.json` ties first aid to a registration group, and inventing one would break CLAUDE.md 4.6.
+- **Statuses.** `need`, `in-progress`, `have` as the REQ says, stored per account and item in `checklist_items` (member-scoped RLS; explicit grants to `authenticated`, since the hosted project lacks default grants, D-422). Untouched items are not stored, so no row exists before the provider changes something (FR-5). Documents in a generated set show as `drafted` when a ready version set contains that document type and the provider has not set a status yet; `have` reads "Adopted" for documents (FR-2).
+- **Print** is a separate print-only rendering of every item with status, note, trading name, date and the not-legal-advice line, so collapsed groups never hide anything on paper.
+- **Teaser (FR-5)** comes from the result action: it returns the checklist size alongside the result, so the result step (a client component) shows "Your checklist has N items; sign in to track them" without shipping the standards dataset to the browser.
+- **Estimate.** Session A (derivation, tests) and Session B (migration, page, print, RLS test, e2e) in this batch. The signed-in e2e needs a Supabase stack and runs in CI's Supabase job (no local stack on the dev machine; the hosted project refuses the admin client until D-711's grants apply), so the screenshots come from that job's artifact.
 
 ## Delivery evidence
 (Dev fills in.)
