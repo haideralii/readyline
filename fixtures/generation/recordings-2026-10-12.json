@@ -52,6 +52,48 @@
       "sectionId": "procedure",
       "cap": 1500,
       "estimatedInputTokens": 1670
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1680
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1735
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1733
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1717
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "sectionId": "steps-getting-the-plan",
+      "cap": 4000,
+      "estimatedInputTokens": 4596
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "sectionId": "steps-putting-the-plan-into-practice",
+      "cap": 4000,
+      "estimatedInputTokens": 4603
+    },
+    {
+      "caseId": "behaviour-support-company",
+      "sectionId": "steps-monitoring-reporting-and-review",
+      "cap": 4000,
+      "estimatedInputTokens": 4605
     }
   ],
   "recordings": [
@@ -110,28 +152,6 @@
       "batch": 11,
       "caseId": "verification-sole-trader",
       "documentTypeId": "incident-management-policy-and-register",
-      "sectionId": "purpose",
-      "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "fallback",
-      "attempts": 2,
-      "validationPassedFirstTime": false,
-      "truncatedAtTokens": null,
-      "problems": [
-        "readability grade 15.8 is above 11: shorten sentences to under 20 words and use common words",
-        "readability grade 12.2 is above 11: shorten sentences to under 20 words and use common words"
-      ],
-      "readabilityGrade": null,
-      "inputTokensLastCall": 2376,
-      "outputTokensLastCall": 488,
-      "estimatedDollarsLastCall": 0.0096,
-      "requestHash": "650ec3b8a071ca968665da0fab28ca383e51fbe55a9512b7eb0d164f5f2d84a2",
-      "recordedAt": "2026-10-12T00:33:05.942Z"
-    },
-    {
-      "batch": 11,
-      "caseId": "verification-sole-trader",
-      "documentTypeId": "incident-management-policy-and-register",
       "sectionId": "scope",
       "model": "claude-sonnet-5-5",
       "cap": 1500,
@@ -148,7 +168,28 @@
       "recordedAt": "2026-10-12T00:33:11.739Z"
     },
     {
-      "batch": 11,
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 16.5 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": 10.3,
+      "inputTokensLastCall": 2381,
+      "outputTokensLastCall": 110,
+      "estimatedDollarsLastCall": 0.0059,
+      "requestHash": "d4a6446d7af4a23ab58ce65a1634d29075f93946ce157f5d875cb419351731c3",
+      "recordedAt": "2026-10-12T00:48:46.348Z"
+    },
+    {
+      "batch": 12,
       "caseId": "verification-sole-trader",
       "documentTypeId": "incident-management-policy-and-register",
       "sectionId": "how-we-do-this",
@@ -159,15 +200,15 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 6.8,
-      "inputTokensLastCall": 2328,
-      "outputTokensLastCall": 3052,
-      "estimatedDollarsLastCall": 0.0352,
-      "requestHash": "8eb19c1e70600092b69e16346c3f822b3b8d762ab38886afe7eadddcb591520b",
-      "recordedAt": "2026-10-12T00:33:35.988Z"
+      "readabilityGrade": 5.5,
+      "inputTokensLastCall": 2387,
+      "outputTokensLastCall": 2231,
+      "estimatedDollarsLastCall": 0.0271,
+      "requestHash": "bcd8234b65a63120d0c4dff231ae8f7147880e7214e064abb4980715927db4ab",
+      "recordedAt": "2026-10-12T00:49:04.825Z"
     },
     {
-      "batch": 11,
+      "batch": 12,
       "caseId": "verification-sole-trader",
       "documentTypeId": "incident-management-policy-and-register",
       "sectionId": "responsibilities",
@@ -178,33 +219,88 @@
       "validationPassedFirstTime": true,
       "truncatedAtTokens": null,
       "problems": [],
-      "readabilityGrade": 6.3,
-      "inputTokensLastCall": 2320,
-      "outputTokensLastCall": 831,
-      "estimatedDollarsLastCall": 0.0129,
-      "requestHash": "6ec490a55add827f8ca9490eabd196eb9adf72322418fd003f7db52c9e967823",
-      "recordedAt": "2026-10-12T00:33:43.595Z"
+      "readabilityGrade": 8,
+      "inputTokensLastCall": 2379,
+      "outputTokensLastCall": 760,
+      "estimatedDollarsLastCall": 0.0124,
+      "requestHash": "20a5a440fab4a8410075073efc9b394cc37412b373068b5159e6a8dbe55ee82b",
+      "recordedAt": "2026-10-12T00:49:11.974Z"
     },
     {
-      "batch": 11,
+      "batch": 12,
       "caseId": "verification-sole-trader",
       "documentTypeId": "incident-management-policy-and-register",
       "sectionId": "procedure",
       "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "fallback",
+      "cap": 4000,
+      "status": "generated",
       "attempts": 1,
-      "validationPassedFirstTime": false,
-      "truncatedAtTokens": 1500,
-      "problems": [
-        "reply truncated at 1500 output tokens (cap 1500); not retried"
-      ],
-      "readabilityGrade": null,
-      "inputTokensLastCall": 2305,
-      "outputTokensLastCall": 1500,
-      "estimatedDollarsLastCall": 0.0196,
-      "requestHash": "a37cf9538417a32ac054effa3c5a32b20984c50a554798b6dc3f79263c8485f0",
-      "recordedAt": "2026-10-12T00:34:01.039Z"
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 5.5,
+      "inputTokensLastCall": 2364,
+      "outputTokensLastCall": 1098,
+      "estimatedDollarsLastCall": 0.0157,
+      "requestHash": "873bc68606bfafbe19fb7608bfa013e49713ebeb128089b4bcef93d15c5b8d10",
+      "recordedAt": "2026-10-12T00:49:22.699Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "behaviour-support-company",
+      "documentTypeId": "behaviour-support-plan-implementation-procedure",
+      "sectionId": "steps-getting-the-plan",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 7.7,
+      "inputTokensLastCall": 5752,
+      "outputTokensLastCall": 1001,
+      "estimatedDollarsLastCall": 0.0215,
+      "requestHash": "0079e9ddded99f8dfc73a55ee0499963eeffeca310543b4d2d41e59b06cfb5f8",
+      "recordedAt": "2026-10-12T00:49:31.626Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "behaviour-support-company",
+      "documentTypeId": "behaviour-support-plan-implementation-procedure",
+      "sectionId": "steps-putting-the-plan-into-practice",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 8.3,
+      "inputTokensLastCall": 5765,
+      "outputTokensLastCall": 1049,
+      "estimatedDollarsLastCall": 0.022,
+      "requestHash": "124db386b0356ef7a7c5af5e9f8011f45140e4e93bdd999bd783344f0c15eaef",
+      "recordedAt": "2026-10-12T00:49:40.080Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "behaviour-support-company",
+      "documentTypeId": "behaviour-support-plan-implementation-procedure",
+      "sectionId": "steps-monitoring-reporting-and-review",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 8.5,
+      "inputTokensLastCall": 5772,
+      "outputTokensLastCall": 862,
+      "estimatedDollarsLastCall": 0.0202,
+      "requestHash": "07b684d63350334a66509dc9aabc5c1a0679ba93697f673c8cfdf1984c85e5dc",
+      "recordedAt": "2026-10-12T00:49:47.626Z"
     }
   ]
 }

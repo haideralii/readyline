@@ -7,7 +7,10 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
 ## Incident management policy, procedure and register (incident-management-policy-and-register.docx)
 
 - Document control: fixed text.
-- 1 Purpose: fallback marker: readability grade 15.8 is above 11: shorten sentences to under 20 words and use common words
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.3.
+
+  > This document explains how Sunrise Supports prevents, responds to, records and reports incidents. It also holds our incident register. It supports the Incident management standard under the NDIS Practice Standards.
+
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 8.6.
 
   > This policy covers all supports that Sunrise Supports delivers. Sunrise Supports is a sole trader. We deliver supports in New South Wales.
@@ -35,44 +38,66 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
   > We make sure everyone who delivers supports knows the procedure Everyone who delivers supports for Sunrise Supports, including the owner, learns this procedure before delivering supports. We follow it every time. Indicator 4
   > We do not use restrictive practices. If one ever happens, we treat it as an incident, record it and report it as the Rules require.
 
-- 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Registration groups (step 2); States and territories (step 1); Regulated restrictive practices (step 3); Registration groups (audit type derived) (step 2). Readability grade 6.8.
+- 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3); Number of key personnel (step 4). Readability grade 5.5.
 
-  > Sunrise Supports is a sole trader business with no other workers. The owner is our only key personnel and does every task in this section. We deliver household tasks (0120) in New South Wales. The steps below are sized to that scope.
-  > Prevent. Before we start work in a participant's home, we agree with the participant how they want us to act if something goes wrong. We note any hazards in the home that could affect the participant or us. We update these notes when things change.
-  > Make it safe. If an incident happens, we first make sure everyone is safe. We call 000 if anyone is hurt or in danger. We do not leave a participant at risk to complete paperwork.
-  > Tell the participant. We tell the participant what happened as soon as it is safe to do so. We ask who else they want us to contact. We use the way of communicating that suits them.
-  > Record it. We write the incident in the Incident register on the same day, and no later than 24 hours after it happens. We record what happened, when, who was involved, what we did and who we told. We do not record more personal information than we need.
-  > Decide if it is reportable. We check whether the incident is a reportable incident under the NDIS Incident Management and Reportable Incidents Rules 2018. These are the death of a participant, serious injury, abuse or neglect, unlawful sexual or physical contact, sexual misconduct, and unauthorised use of a restrictive practice, in connection with our supports.
-  > Notify the Commission. If the incident is reportable, we notify the NDIS Quality and Safeguards Commission (the Commission) through the NDIS Commission Portal within 24 hours of becoming aware of it. We do not wait until we have all the facts.
-  > Send the detailed report. We send the Commission a detailed report within 5 business days of becoming aware of the incident. If we need more time, we ask the Commission for an extension before the 5 days end. We record each notification and report date in the Incident register.
-  > Handle other incidents. If an incident is not reportable, we still record it, tell the participant and take action to reduce the chance of it happening again. We do not use restrictive practices. If one ever happened in connection with our supports, we would treat it as reportable.
-  > Look into the cause. We review what happened, why it happened and what we could change. We record the findings and the actions in the Incident register, with a date for each action.
-  > Close the loop with the participant. We tell the participant how we managed the incident and what we have changed. We record when and how we told them.
-  > Learn from it. We review the Incident register at least every 12 months, and after any reportable incident. We look for patterns in causes and outcomes. We ask participants for their views and update this policy and our risk notes when needed.
-  > Train any new worker. If we later engage another worker, we train them in these steps before they work with a participant. We record the training in our worker records.
+  > Sunrise Supports is run by one person, the owner. We have no workers. The owner does every task in this section. We deliver household tasks (support type 0120) in New South Wales, so the steps below fit that work.
+  > Prevent. Before we start with a participant, we explain how to tell us about an incident or concern, and we give the participant our information on how we manage incidents. At the first visit and on later visits, we check the home for hazards linked to household tasks, such as wet floors, cleaning products and heavy items.
+  > Make it safe. If anyone is hurt or in danger, we call 000 first. Then we make the area safe and stay with the participant until help arrives or the risk has passed.
+  > Tell the right people. We tell the participant what has happened. We also tell anyone the participant has asked us to contact, such as a family member or a support coordinator.
+  > Record it. We enter every incident in the Incident register on the day it happens. We write facts only: what happened, where, who was involved, what we did and who we told.
+  > Decide if it is reportable. We check each incident against section 7 Reportable incidents. If it is reportable, we follow the steps and timeframes in that section.
+  > Find out why. We look at what led to the incident, what we did and what could have gone differently. We write our findings in the Incident register.
+  > Fix and learn. We decide what to change, such as how we check a home or how we do a task. We make the change and note it in the Incident register.
+  > Close the loop with the participant. We tell the participant what we found and what we changed. We ask for their views and record them.
+  > Review. We read the whole Incident register at least once every 12 months. We look for patterns in causes and outcomes, and we update this document if we need to.
+  > If we take on workers. Before a worker starts, we will train them in this procedure and update our roles and records to match.
+  > We do not use restrictive practices. If one ever happens, we treat it as an incident and follow steps 2 to 8, and section 7 Reportable incidents.
   > Role Does what When
-  > Owner and key personnel Makes the situation safe, records the incident, decides if it is reportable and tells the participant Straight away, and record within 24 hours
-  > Owner and key personnel Notifies the Commission of a reportable incident Within 24 hours of becoming aware
-  > Owner and key personnel Sends the detailed report to the Commission Within 5 business days of becoming aware
-  > Owner and key personnel Reviews the cause, records actions and reviews the Incident register After each incident, and at least every 12 months
-  > [Provider to complete: name and contact details of a trusted person who can help or take over if the owner is injured or unavailable when an incident happens]
+  > Owner, Sunrise Supports Checks for hazards and explains incident information to the participant Before starting, and at each visit
+  > Owner, Sunrise Supports Makes the situation safe, calls 000 if needed and tells the participant and their chosen contacts Straight away
+  > Owner, Sunrise Supports Records the incident in the Incident register On the day it happens
+  > Owner, Sunrise Supports Checks whether the incident is reportable and reports it as set out in section 7 As soon as the incident is recorded
+  > Owner, Sunrise Supports Reviews causes, makes changes and tells the participant the outcome After each incident
+  > Owner, Sunrise Supports Reviews the Incident register and this document At least every 12 months
+  > The register itself is in section 4 Records we keep. We keep it free of anything that is not needed to describe the incident.
 
-- 6 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3). Readability grade 6.3.
+- 6 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); States and territories (step 1); Registration groups (step 2); Regulated restrictive practices (step 3). Readability grade 8.
 
-  > Sunrise Supports is a sole trader business. One person holds every role in this policy. We do not have other workers at this time, so we have not named separate managers or teams.
-  > The table below sets out what we do under each role. If we take on more workers, we will add their roles and review this table before they start work.
+  > Sunrise Supports is run by one person, a sole trader. The owner holds every role in this policy. If we later engage other workers, we will update this table and give each worker their duties before they start work.
   > Role Does what When
-  > Owner and key personnel (sole trader) Keeps this policy and the incident register up to date. Makes sure each participant knows how to raise an incident or a concern. At onboarding for each participant, and at every review
-  > Owner acting as worker Makes the participant and the situation safe first. Gets medical or emergency help if needed. Records the incident in the incident register. Straight away at the time of the incident, and record it on the same day
-  > Owner acting as incident manager Decides if the incident is a reportable incident under the NDIS Incident Management and Reportable Incidents Rules 2018. Looks into the cause. Decides what we change to stop it happening again. Within 24 hours of learning of the incident
-  > Owner acting as reporter to the Commission Gives notice of a reportable incident to the NDIS Quality and Safeguards Commission through the NDIS Commission Portal. Sends the follow-up details the Commission asks for. Within 24 hours for the most serious reportable incidents, and within 5 business days for other reportable incidents
-  > Owner acting as participant contact Tells the participant, and anyone they choose to involve, what happened and what we are doing about it. Tells them how we managed the incident once it is closed. As soon as it is safe to do so, and again when the incident is closed
-  > Owner acting as reviewer Reviews the incident register for patterns. Reviews this policy. Asks participants for their views and records any changes we make. At least every 12 months, and after any serious incident
-  > We do not use restrictive practices. If we ever need to use one, we will treat it as a reportable incident and update this policy first.
-  > [Provider to complete: name and contact details of any person who will cover for you if you are unwell or unavailable and an incident happens, if you have arranged one.]
+  > Owner and key personnel (sole trader) Keeps this policy and the incident management system up to date. Makes sure each participant gets information on how we manage incidents. At setup, when anything changes, and at each review
+  > Owner and key personnel (sole trader) Responds to an incident. Makes sure the participant is safe and gets any help they need. Records the incident in the Incident register. As soon as an incident happens or we learn of it
+  > Owner and key personnel (sole trader) Decides whether an incident is a reportable incident and tells the Commission if it is. See section 7 Reportable incidents for what to report and by when. Straight after the response, and within the timeframes in section 7
+  > Owner and key personnel (sole trader) Looks into the causes of each incident, decides what to change, and records the outcome and any follow-up. After each incident, within the time we set in the register entry
+  > Owner and key personnel (sole trader) Tells the participant, and anyone they choose, how we handled an incident involving them. After the incident is managed
+  > Owner and key personnel (sole trader) Reviews the Incident register for patterns. Asks participants for their views. Updates our practice and this policy. At least every 12 months
+  > Owner and key personnel (sole trader) Keeps own training on incident management up to date, including the Rules and this procedure. At setup and each review
+  > We deliver household tasks support in New South Wales. We do not use restrictive practices, so we have no separate role for approving or monitoring them.
+  > [Provider to complete: name a trusted person, such as a mentor or another registered provider, who can act for us or be contacted if the owner is unwell or unavailable when an incident happens.]
 
 - 7 Reportable incidents: fixed text.
-- 8 Incident procedure: fallback marker: reply truncated at 1500 output tokens (cap 1500); not retried
+- 8 Incident procedure: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3). Readability grade 5.5.
+
+  > Sunrise Supports is run by one person. The owner is the only worker and the only key person. This means the owner does every step below. The steps are short because the business is small. We still follow every step each time.
+  > Make everyone safe first. If a participant or anyone else is in danger or needs medical help, call 000. Give first aid if we are trained to do so. Stay until help arrives or the person is safe.
+  > Stop the cause of harm where we can do it safely. For example, make a hazard in the home safe, or stop a task that is causing harm.
+  > Write down what happened as soon as it is safe to do so, and on the same day. Record the date, time, place, who was involved, what we saw and heard, and what we did. Record facts only. Do not guess.
+  > Enter the incident in the Incident register. Use the participant's first name or an ID, not their full details, in any shared copy.
+  > Decide if the incident is a reportable incident. Use section 7 Reportable incidents. That section holds the definitions and the timeframes. If it is reportable, follow it and do not wait to finish the other steps.
+  > Tell the participant what happened and what we are doing about it, in a way they understand. Ask whether they want a family member, nominee, advocate or other support person told. Record what they say.
+  > Tell other people who need to know, such as the participant's plan manager or support coordinator, only with the participant's agreement unless the law requires us to share the information. Record who we told and when.
+  > Look into what happened. Ask what led to it, what we did, and what could have prevented it. Because we are a sole trader, we also ask someone we trust outside the business to read our findings for a second view where this is practical.
+  > Decide what we will change. Examples are a new step in how we do a household task, a change to the home risk check, or more training for ourselves. Write the action, the date we will finish it and the result in the Incident register.
+  > Check back with the participant. Tell them what we found and what we changed. Ask if they are satisfied with how we handled it. Record their answer.
+  > Close the incident in the Incident register only when all actions are done and the participant has been told the outcome.
+  > Review the Incident register at least every 3 months. Look for patterns in causes, places and times. Update our procedures when we find a pattern. Record the review date.
+  > We do not use restrictive practices. If we ever use or are asked to use a restrictive practice, we treat it as an incident, stop, and follow section 7 Reportable incidents.
+  > Role Does what When
+  > Owner and only worker Responds, records, reports, investigates, tells the participant and reviews the register Every incident, from the first moment until it is closed
+  > Owner and only worker Reviews the Incident register for patterns and updates procedures At least every 3 months
+  > Outside reviewer Reads our findings and gives a second view After a serious incident, where practical
+  > [Provider to complete: name and contact details of the trusted outside person who will review serious incidents, and how participants can make a complaint if they are unhappy with how an incident was handled.]
+
 - 9 Incident register: fixed text.
 - 10 Records and evidence to retain: fixed text.
 - 11 Related documents and registers: fixed text.
@@ -82,13 +107,13 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
 ## Complaints management policy, procedure and register (complaints-management-policy-and-register.docx)
 
 - Document control: fixed text.
-- 1 Purpose: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\purpose\87b8327326e9f0a41270c35444cde6685b944913368917d187324b8aa9938207.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 1 Purpose: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\purpose\75e081953e469aa200a0fa86418afc39415f80564787bbd19f3144738d690d3e.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
 - 2 Scope: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\scope\f3ae42b14b4d53d01ec3a7582bae14007797a481b804908f1c6464ae62ee92dd.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
 - 3 Definitions: fixed text.
 - 4 Policy statement: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\policy-statement\bfc627cad75343ee11371e9cebdf5a01b061b393e5bc88848301d4f00be98f82.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 5 How we put this into practice: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\how-we-do-this\11aa0f6116725d18d78ad61c31c4bec2e35451ae8c5b9d0b2b5696f8a9d20438.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 6 Responsibilities: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\responsibilities\c44f1dd52834ef3fadfbb3390b5ada74ea9a466f9939302d8485d0108a8dcdf8.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 7 Complaints procedure: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\procedure\0d3cd124bf0d9bc8016e6a21f06e4be5b3289fe3c7d16feed7cb936287157bc9.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 5 How we put this into practice: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\how-we-do-this\a70ff0a570dc0eba9253bc16c125e9539e9c3f6d410addef75a42544d006852e.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 6 Responsibilities: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\responsibilities\805548eda39db20dc880881c4bbbf372db728b4319490ce7e3963ddd3ae0957c.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 7 Complaints procedure: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\procedure\914db10036839d9a0ae6a9ab891c3d95a68b2abda05a50ac1e4f33f271fac8fd.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
 - 8 Complaints register: fixed text.
 - 9 Records and evidence to retain: fixed text.
 - 10 Related documents and registers: fixed text.

@@ -234,6 +234,25 @@ Spend to date about `.26` (`.11` before this batch). Estimates before the calls 
 **Review pack re-rendered.** `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` now carries real text in scope, policy statement, how we put this into practice and responsibilities, and `sections.md` names the pipeline's reason for each fallback (purpose: readability fail after the retry; incident procedure: cut at the cap). The complaints procedure and the self-assessment are unchanged from batch 10 (no recordings approved for them).
 
 **For the PO:** (1) extra sections whose id ends in `procedure` are step lists and should take the 4,000 cap; (2) the catalogue's "purpose" brief should say "two short sentences" so the model stops writing a dense paragraph there, after which one more call for the sole-trader purpose would complete that document; (3) the behaviour-support `steps` outline needs splitting into two sections before any further call (D-525).
+### Batch 12 (2026-10-12): R-7, D-041, the complete sole-trader incident policy and the behaviour-support split
+
+**R-7 and D-041, no model calls (e85abe2).** `lintTimeframes` (24 hours; N business days or "business days"; "within ... hours/days", overlapping matches merged) runs on every tailored reply after the terminology and readability gates; a hit is a validation problem whose retry instruction names the fixed section that holds the rule ("refer to section 7 Reportable incidents instead of restating the timeframe"; a generic instruction where a document has no such section). The context pack carries `rulesSection` (id, number, heading) computed from the document's numbering. Catalogue: every `purpose` brief is now "Two short sentences: what this document is for, and which standard it supports; nothing else."; the `how-we-do-this`, `responsibilities`, `steps` and `*procedure` briefs end with the R-7 rule; `*procedure` extras take the 4,000 cap; the behaviour-support `steps` section is omitted and replaced by three anchored sub-sections of at most eight steps (`omitSections` and `insertAfter` added to the catalogue schema). The prompt text itself is unchanged, so only the sections whose brief changed were re-keyed; adding the R-7 sentence to the system prompt would have orphaned every fixture and is deferred to the next prompt-version bump. Unit tests: lint patterns, the retry instruction with the section reference and the generic form, caps, split sub-sections. **Replay through the lint, as asked:** the fixture texts that restate a timeframe are exactly section 5 (how we put this into practice: "within 24 hours", "5 business days") and section 6 (responsibilities) of the batch-11 sole-trader incident policy; policy statement and scope pass; the governance purpose fixture, orphaned by the new brief, still fails the readability gate on its text (grade 11.8).
+
+**Recordings (items 2 and 3), one run, 8 calls, about $0.13:**
+
+| Case / document / section | Cap | In | Out | Dollars | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| sole trader / incident policy / purpose (new brief) | 1,500 | 2,381 | 110 | 0.006 (x2) | first reply grade 16.5; passed on the readability retry at grade 10.3 |
+| sole trader / incident policy / how we put this into practice (R-7 re-record) | 4,000 | 2,387 | 2,231 | 0.027 | passed first time; grade 5.5; no timeframe restated |
+| sole trader / incident policy / responsibilities (R-7 re-record) | 1,500 | 2,379 | 760 | 0.012 | passed first time; grade 8.0 |
+| sole trader / incident policy / incident procedure (4,000 cap) | 4,000 | 2,364 | 1,098 | 0.016 | passed first time; grade 5.5 |
+| behaviour support / BSP implementation / steps: getting the plan | 4,000 | 5,752 | 1,001 | 0.022 | passed first time; grade 7.7 |
+| behaviour support / BSP implementation / steps: putting the plan into practice | 4,000 | 5,765 | 1,049 | 0.022 | passed first time; grade 8.3 |
+| behaviour support / BSP implementation / steps: monitoring, reporting and review | 4,000 | 5,772 | 862 | 0.020 | passed first time; grade 8.5 |
+
+Running total about $0.39 ($0.26 before this batch), under the $0.66 cap in the batch-12 review. Scope and policy statement were not re-recorded (passing fixtures, per the queue).
+
+**Review pack.** `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` now has real model text in every tailored section (purpose, scope, policy statement, how we put this into practice, responsibilities, incident procedure) with no fallback marker; `sections.md` lists the answers each section used and its readability grade. The complaints procedure and the self-assessment are unchanged (no recordings approved).
 ## PO review
 (PO fills in.)
 

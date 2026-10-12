@@ -987,6 +987,16 @@ proposals for the PO: give extra sections whose id ends in `procedure` the
 4,000 cap (they are step lists), and tighten the "purpose" brief in the
 catalogue to "two short sentences" so the model stops writing a dense
 paragraph there.
+**D-526 R-7 implemented through briefs and a lint, not the system prompt
+(Dev, 2026-10-12).** The timeframe rule lives in the catalogue briefs of the
+step-style sections and in a lint with a retry instruction that names the
+document's fixed rules section; the system prompt is unchanged so existing
+fixtures keep their keys. The rule moves into the system prompt at the next
+`PROMPT_VERSION` bump, when every fixture is re-recorded anyway. Catalogue
+gains `omitSections` and `insertAfter` so one document can replace a
+shared outline section with anchored sub-sections (the behaviour-support
+steps). Batch-12 recordings: 8 calls, about `.13`; every section passed,
+the `purpose` section after its one readability retry.
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
