@@ -16,6 +16,7 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { getDeletedAccount, getOwnedAccount } from "@/server/accounts/queries";
 import { decideCallback } from "@/server/auth/callback";
 import { safeNextPath } from "@/server/auth/paths";
+import { SupabaseEnvError } from "@/server/supabase/env";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 // The raw query is read as strings; decideCallback validates each path's shape.
@@ -34,20 +35,31 @@ export async function GET(request: NextRequest) {
   };
   if (decision.kind === "invalid") return failed(decision.reason, "query");
 
+  // Any failure to verify, including an environment with no Supabase, lands on
+  // the plain failure screen rather than an error page (FR-9c).
+  let user;
+  try {
+    const supabase = await createSupabaseServerClient();
+    const verified =
+      decision.kind === "token_hash"
+        ? await supabase.auth.verifyOtp({
+            token_hash: decision.tokenHash,
+            type: decision.type,
+          })
+        : await supabase.auth.exchangeCodeForSession(decision.code);
+    if (verified.error || !verified.data.user)
+      return failed(
+        verified.error?.code ?? verified.error?.name ?? "no-user",
+        decision.kind,
+      );
+    user = verified.data.user;
+  } catch (e) {
+    if (e instanceof SupabaseEnvError)
+      return failed("not-configured", decision.kind);
+    log.error("auth.callback.error", { error: e, path: decision.kind });
+    return failed("error", decision.kind);
+  }
   const supabase = await createSupabaseServerClient();
-  const verified =
-    decision.kind === "token_hash"
-      ? await supabase.auth.verifyOtp({
-          token_hash: decision.tokenHash,
-          type: decision.type,
-        })
-      : await supabase.auth.exchangeCodeForSession(decision.code);
-  if (verified.error || !verified.data.user)
-    return failed(
-      verified.error?.code ?? verified.error?.name ?? "no-user",
-      decision.kind,
-    );
-  const user = verified.data.user;
 
   const account = await getOwnedAccount(supabase, user.id);
   if (!account) {
