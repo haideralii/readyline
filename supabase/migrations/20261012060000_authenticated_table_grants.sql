@@ -20,10 +20,8 @@ grant select on public.audit_log to authenticated;
 grant select on public.version_sets to authenticated;
 grant select on public.document_versions to authenticated;
 
--- REQ-007 (20261012030000): owners read purchases and entitlements, members read job status.
-grant select on public.purchases to authenticated;
-grant select on public.entitlements to authenticated;
-grant select on public.generation_jobs to authenticated;
+-- REQ-007's tables (purchases, entitlements, generation_jobs) carry their own grants in
+-- the payments migration on that branch (D-052: every migration states its grants).
 
 -- Server-only tables stay closed (no grant): auth_rate_limits, generation_log,
 -- generation_quota, stripe_events.
