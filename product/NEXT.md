@@ -253,3 +253,13 @@ Waiting for the PO.
 4. **Status**: the batch's cost table (calls, tokens, dollars, pass or retry per call) and the running total.
 
 5. STOP.
+**2026-10-12 (batch 12), Dev: items 0 to 4 done; batch spend about $0.13; running total about $0.39; nothing merged.**
+
+0. `main` pushed with the PO's batch-12 commit (product/ and DECISIONS.md only); `main` merged into `req-005-generator` (faff6d4).
+1. R-7 and D-041, no model calls (e85abe2): timeframe lint over every tailored reply (24 hours; N business days; "within ... hours/days"; overlaps merged) with the retry instruction naming the document's fixed rules section ("refer to section 7 Reportable incidents instead of restating the timeframe"), carried in the context pack as `rulesSection`; `purpose` briefs are now two short sentences; `*procedure` extras take the 4,000 cap; the behaviour-support `steps` section is replaced by three anchored sub-sections of at most eight steps (`omitSections` and `insertAfter` in the catalogue). Unit tests for the lint, the retry text, the caps and the split. **Replay through the lint:** exactly sections 5 (how we put this into practice) and 6 (responsibilities) of the batch-11 sole-trader incident policy restated timeframes; policy statement and scope passed. The rule went into the briefs and the lint, not the system prompt, so existing fixtures kept their keys (D-526). Check clean (43 files, 334 tests).
+2. Sole-trader incident policy, second pass (e64bcc6): `purpose` with the new brief, `procedure` at the 4,000 cap, and the two R-7 failures re-recorded; scope and policy statement untouched. **Every tailored section of that document is now real text with no fallback marker**; review-pack `.docx` and `sections.md` re-rendered.
+3. Behaviour-support steps: the three sub-sections recorded, one call each, none truncated (862 to 1,049 output tokens under the 4,000 cap; grades 7.7 to 8.5).
+4. **Cost table (8 calls):** purpose 2,381 in / 110 out, $0.006 x2 (readability retry: 16.5 then 10.3); how we put this into practice 2,387 / 2,231, $0.027, first time, grade 5.5; responsibilities 2,379 / 760, $0.012, first time, 8.0; incident procedure 2,364 / 1,098, $0.016, first time, 5.5; BSP getting the plan 5,752 / 1,001, $0.022, first time, 7.7; BSP putting the plan into practice 5,765 / 1,049, $0.022, first time, 8.3; BSP monitoring, reporting and review 5,772 / 862, $0.020, first time, 8.5. **Batch about $0.13; running total about $0.39 against the $0.66 cap.** Full table in REQ-005 Delivery evidence.
+5. STOP.
+
+Waiting for the PO.
