@@ -1,7 +1,7 @@
 {
   "project": "desktop-chromium",
   "baseURL": "http://localhost:3000",
-  "recordedAt": "2026-10-12T02:17:16.755Z",
+  "recordedAt": "2026-10-12T02:50:20.710Z",
   "hosts": [
     "localhost:3000"
   ],
@@ -69,12 +69,12 @@
     },
     {
       "route": "/",
-      "url": "http://localhost:3000/start?_rsc=tXyZJ52UQVBCVsD3",
+      "url": "http://localhost:3000/sign-in?_rsc=tXyZJ52UQVBCVsD3",
       "type": "fetch"
     },
     {
       "route": "/",
-      "url": "http://localhost:3000/sign-in?_rsc=tXyZJ52UQVBCVsD3",
+      "url": "http://localhost:3000/start?_rsc=tXyZJ52UQVBCVsD3",
       "type": "fetch"
     },
     {
@@ -279,12 +279,12 @@
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {

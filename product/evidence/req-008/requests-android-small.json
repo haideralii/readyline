@@ -1,7 +1,7 @@
 {
   "project": "android-small",
   "baseURL": "http://localhost:3000",
-  "recordedAt": "2026-10-12T02:17:29.090Z",
+  "recordedAt": "2026-10-12T02:50:33.758Z",
   "hosts": [
     "localhost:3000"
   ],
@@ -209,12 +209,12 @@
     },
     {
       "route": "/privacy",
-      "url": "http://localhost:3000/?_rsc=UnGutxUMZihRxjHi",
+      "url": "http://localhost:3000/sign-in?_rsc=UnGutxUMZihRxjHi",
       "type": "fetch"
     },
     {
       "route": "/privacy",
-      "url": "http://localhost:3000/sign-in?_rsc=UnGutxUMZihRxjHi",
+      "url": "http://localhost:3000/?_rsc=UnGutxUMZihRxjHi",
       "type": "fetch"
     },
     {
@@ -279,12 +279,12 @@
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {
@@ -419,12 +419,12 @@
     },
     {
       "route": "/about",
-      "url": "http://localhost:3000/?_rsc=yMFZbW3py_RmPDJX",
+      "url": "http://localhost:3000/sign-in?_rsc=yMFZbW3py_RmPDJX",
       "type": "fetch"
     },
     {
       "route": "/about",
-      "url": "http://localhost:3000/sign-in?_rsc=yMFZbW3py_RmPDJX",
+      "url": "http://localhost:3000/?_rsc=yMFZbW3py_RmPDJX",
       "type": "fetch"
     },
     {

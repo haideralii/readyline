@@ -13,12 +13,17 @@ export const BRAND =
  * Plain-language statement required on the site footer and in every generated
  * document (CLAUDE.md sections 4.2 and 4.3).
  */
-export const GENERAL_INFORMATION_NOTICE =
+export const GENERAL_INFORMATION_STATEMENT =
   `${BRAND} provides general information and document templates for your own review. ` +
   `It is not legal advice and does not take account of your specific circumstances. ` +
-  `Seek legal advice if you are unsure how a requirement applies to you. ` +
+  `Seek legal advice if you are unsure how a requirement applies to you.`;
+
+export const INDEPENDENCE_STATEMENT =
   `${BRAND} is an independent service and is not affiliated with the National Disability ` +
   `Insurance Agency or the NDIS Quality and Safeguards Commission.`;
+
+/** Documents carry both sentences together; the site footer carries the statement and its own trust line (REQ-008, D-805). */
+export const GENERAL_INFORMATION_NOTICE = `${GENERAL_INFORMATION_STATEMENT} ${INDEPENDENCE_STATEMENT}`;
 
 /**
  * AI transparency statement (CLAUDE.md sections 4.3 and 5).

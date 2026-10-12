@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { AI_DISCLOSURE, BRAND, GENERAL_INFORMATION_NOTICE } from "@/lib/brand";
+import {
+  AI_DISCLOSURE,
+  BRAND,
+  GENERAL_INFORMATION_STATEMENT,
+} from "@/lib/brand";
 import { businessAbn, contactEmail } from "@/lib/legal/config";
 import { LEGAL_NAV } from "@/lib/legal/nav";
 
@@ -40,7 +44,8 @@ export function SiteFooter() {
             ) : null}
           </ul>
         </nav>
-        <p data-testid="site-disclaimer">{GENERAL_INFORMATION_NOTICE}</p>
+        {/* Independence is stated once, in the trust line below (PO review of REQ-008). */}
+        <p data-testid="site-disclaimer">{GENERAL_INFORMATION_STATEMENT}</p>
         <p data-testid="ai-disclosure">{AI_DISCLOSURE}</p>
         <p data-testid="footer-trust">
           Hosted in Australia. Independent of the NDIA and the NDIS Quality and
