@@ -572,3 +572,19 @@ No model calls; no Stripe calls (the signed-in e2e ran in fake mode). Branch SHA
 **Hobby-plan limits to know (not blockers):** cron at most daily (D-053; the paid job is carried by the webhook run and the self-kick); function `maxDuration` 60 s is within Hobby's limit; one production and unlimited preview deployments; previews never run jobs. **One thing that could block:** the `prebuild` script needs Node 22.6 or later for `--experimental-strip-types`; Vercel's "22.x" setting satisfies it.
 
 Open PRs after this batch: #17 (`req-006-checklist` 2b3808f, green expected now) and the new one for `req-010-deploy` 5ae48cc.
+
+## Queue (written by PO, 13 Oct 2026, batch 22)
+
+**PO actions this batch:** PRs #15, #17, #18, #19 merged; `main` carries payments, checklist, REQ-013 P2 and the visual identity. PR #20 (`req-010-deploy`) opened; PO review accepted on content; the PO merges it when green. Next the deploy itself is Haider's (runbook steps 1 to 8), then the PO runs the smoke test and the walk-through (AC-3, AC-4). This batch is work the dev can do before and independently of the deploy. No model calls (cost table: none expected).
+
+Rules: branch from `main` after #20 merges (check for the REQ-010 merge commit; if absent, do item 0 and stop). No rebases or history rewrites; merge `main` into a branch instead.
+
+0. **Push `main`** if the PO's commit is local only. If PR #20 shows a red check, fix on `req-010-deploy` and push.
+
+1. **REQ-009 registers, Session A (data model only)** on `req-009-registers` from `main`. Read `product/requirements/REQ-009-registers.md` if it exists; if it does not, write the Dev response as a proposal only (no code): tables for incidents, complaints, worker clearances and policy reviews, each account-scoped with member RLS and the D-052 grants, a reminder table, no participant personal data by schema (code or reference number fields only, a CHECK or lint on free text), export per register as CSV. Stop there for the PO to turn into the REQ. If the REQ exists, build Session A as written.
+
+2. **Hosted sign-in evidence for the PO:** a short `supabase/ops/FIRST-SIGN-IN.md` that tells Haider, in five steps, how to sign in on the deployed site with his plain Gmail, reach `/admin`, and set up TOTP; include what "it worked" looks like on each screen. No values.
+
+3. **Status** with the branch SHA, and whether anything in the runbook changed after the PO's review.
+
+4. STOP.

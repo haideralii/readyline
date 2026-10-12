@@ -62,4 +62,4 @@ Shape of the work: the boot check gains a production list; a `prebuild` script r
 - **Not done (AC-1, AC-3, AC-4).** The PO reads the runbook; the smoke test and the walk-through run against the deployed site after Haider deploys.
 
 ## PO review
-(PO fills in.)
+**13 Oct 2026, part 1 (branch `req-010-deploy` 5ae48cc; PR #20): ACCEPTED on content.** D-1001 to D-1004 accepted. Runbook read in full (AC-1): a non-infra reader can follow it; every value has a source and none appears in the file. The `GENERATION_LIVE` vs `GENERATION_ENABLED` distinction is the right call and is named in the runbook. AC-2 proven on the dev machine. AC-3 (smoke) and AC-4 (walk-through with Stripe's test card and a refund) are the PO's, after Haider deploys; results will be appended here. One note for Haider's run, not a change request: the `STRIPE_SECRET_KEY` the runbook asks for is a *restricted* key; `.env.local` holds the standard test secret key, which also works for the trial, so he may copy that and tighten later. Part 2 stays draft until the site is up.
