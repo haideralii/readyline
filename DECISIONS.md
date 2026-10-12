@@ -1716,3 +1716,8 @@ Items asserted in code or copy that still need a primary source.
   with the daily cron as backstop. Move to Pro and a one-minute schedule if
   a customer waits over 15 minutes. REQ-006, REQ-013 P2, REQ-014 accepted
   (see their PO reviews); REQ-014 R-1 to R-3 before merge.
+- D-054 (PO, 2026-10-13): PR #14 closed in favour of #16 (same tree, one
+  commit); merged. PR #15 conflicts resolved by the PO in the GitHub editor
+  (prose only; both sides kept where both carried content). REQ-010 part 1
+  (first deploy on Vercel Hobby, runbook for Haider, env check, smoke test)
+  is the next build; parts of REQ-010 that need a live site wait for it.
