@@ -106,6 +106,54 @@
       "sectionId": "responsibilities",
       "cap": 1500,
       "estimatedInputTokens": 1770
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1776
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1778
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 1500,
+      "estimatedInputTokens": 1785
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1868
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1866
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1828
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "summary",
+      "cap": 1500,
+      "estimatedInputTokens": 2047
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2075
     }
   ],
   "recordings": [
@@ -313,6 +361,69 @@
       "estimatedDollarsLastCall": 0.017,
       "requestHash": "91bfa9343fd4ecd312cff5ee06f225c9eb5d364f0c1d5ae43cee679978393a61",
       "recordedAt": "2026-10-12T01:37:20.530Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 12.6 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": 9.4,
+      "inputTokensLastCall": 2497,
+      "outputTokensLastCall": 461,
+      "estimatedDollarsLastCall": 0.0096,
+      "requestHash": "75e081953e469aa200a0fa86418afc39415f80564787bbd19f3144738d690d3e",
+      "recordedAt": "2026-10-12T01:38:56.932Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "scope",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "term-worker: \"carers\" (Use 'worker'.)"
+      ],
+      "readabilityGrade": 7.8,
+      "inputTokensLastCall": 2489,
+      "outputTokensLastCall": 1116,
+      "estimatedDollarsLastCall": 0.0161,
+      "requestHash": "f3ae42b14b4d53d01ec3a7582bae14007797a481b804908f1c6464ae62ee92dd",
+      "recordedAt": "2026-10-12T01:39:18.746Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "fallback",
+      "attempts": 1,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": 1500,
+      "problems": [
+        "reply truncated at 1500 output tokens (cap 1500); not retried"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 2441,
+      "outputTokensLastCall": 1500,
+      "estimatedDollarsLastCall": 0.0199,
+      "requestHash": "bfc627cad75343ee11371e9cebdf5a01b061b393e5bc88848301d4f00be98f82",
+      "recordedAt": "2026-10-12T01:39:30.756Z"
     }
   ]
 }

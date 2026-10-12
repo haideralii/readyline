@@ -1018,6 +1018,17 @@ the row's subject. A hit is a validation problem with the retry instruction
 fallback. Reporting cadences ("steps 1 and 2 apply every month") are
 flagged too, by the PO's wording; the lint is deliberately strict and the
 reviewer sees the fallback callout rather than a silent cycle.
+
+**D-528 Proposed: policy-statement cap 2,500 and a per-document stop rule
+(Dev, 2026-10-12, for PO approval).** The sole-trader complaints policy
+statement truncated at the 1,500 cap (D-040) on its first and only call; the
+incident policy statement had fitted with 103 tokens to spare. The brief asks
+for a commitment per quality indicator in a table, so the size scales with the
+standard. Proposal: `maxTokensFor("policy-statement")` becomes 2,500 (about
+$0.025 per call at most); the recorder's rule that a truncation stops the rest
+of the case becomes per document, since the self-assessment sections were
+skipped for a truncation in a different document. Not implemented until the
+PO approves; the six unrecorded sections of item 3 wait on it.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

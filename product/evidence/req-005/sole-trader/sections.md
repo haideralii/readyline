@@ -102,10 +102,24 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
 ## Complaints management policy, procedure and register (complaints-management-policy-and-register.docx)
 
 - Document control: fixed text.
-- 1 Purpose: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\purpose\75e081953e469aa200a0fa86418afc39415f80564787bbd19f3144738d690d3e.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 2 Scope: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\scope\f3ae42b14b4d53d01ec3a7582bae14007797a481b804908f1c6464ae62ee92dd.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.4.
+
+  > This document explains how Sunrise Supports welcomes, answers, records and learns from feedback and complaints. It supports the Complaints management standard in the NDIS Practice Standards.
+
+- 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3). Readability grade 7.8.
+
+  > This policy covers all feedback and complaints about the supports Sunrise Supports delivers. Sunrise Supports is a sole trader. We deliver supports to participants in New South Wales.
+  > Area | What it covers
+  > Supports | 0120 Household tasks. This policy also covers any other support we add later, once we update this document.
+  > Location | All supports we deliver in New South Wales.
+  > Workers | We are a sole trader with one worker, who is also our key personnel. If we engage other workers, this policy applies to them in the same way.
+  > Key personnel | We have one key personnel. This person receives, manages and decides every complaint.
+  > Feedback and complaints | Compliments, suggestions and concerns, as well as formal complaints, about our supports, our workers, our decisions and how we handle complaints.
+  > Anyone can give us feedback or make a complaint. This includes participants, family members, nominees, advocates and other people who are concerned. A person does not need to be a participant to raise a concern with us.
+  > We do not use restrictive practices. If this changes, we will update this policy and tell participants before we make the change.
+
 - 3 Definitions: fixed text.
-- 4 Policy statement: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\policy-statement\bfc627cad75343ee11371e9cebdf5a01b061b393e5bc88848301d4f00be98f82.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 4 Policy statement: fallback marker: reply truncated at 1500 output tokens (cap 1500); not retried
 - 5 How we put this into practice: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\how-we-do-this\3ab2ba0416662f6716ba875367a97c284d8bd22629415b208d54930f6505b13d.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
 - 6 Responsibilities: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\responsibilities\01708a9fcce310e9e73c5f8346ef864574cc4be599902e80b34638078778cf7b.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
 - 7 Complaints procedure: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\procedure\914db10036839d9a0ae6a9ab891c3d95a68b2abda05a50ac1e4f33f271fac8fd.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.

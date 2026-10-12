@@ -266,6 +266,22 @@ Running total about $0.39 ($0.26 before this batch), under the $0.66 cap in the 
 | sole trader / incident policy / responsibilities (R-8 re-record) | 1,500 | 2,424 | 1,216 | 0.017 | passed first time; grade 6.4; rows "Reviews this policy and procedure. \| Every 12 months." and "Reviews the incident register ... \| Every 3 months." |
 
 The incident policy now agrees with itself: sections 5, 6 and 8 all say the register is reviewed every 3 months and the policy every 12 months. Review pack re-rendered; the incident policy keeps real text in all six tailored sections.
+
+**Two more documents (item 3), one run, 5 calls over 3 sections, about $0.07; the case stopped at a truncation, so 2 of the 8 sections are recorded:**
+
+| Case / document / section | Cap | In | Out | Dollars | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| sole trader / complaints policy / purpose | 1,500 | 2,497 | 461 | 0.010 (x2) | first reply grade 12.6; passed on the readability retry at grade 9.4 |
+| sole trader / complaints policy / scope | 1,500 | 2,489 | 1,116 | 0.016 (x2) | first reply used "carers" (terminology lint); passed on the retry at grade 7.8 |
+| sole trader / complaints policy / policy statement | 1,500 | 2,441 | 1,500 | 0.020 | **truncated at the 1,500 cap**; not retried (D-040); fallback callout |
+| sole trader / complaints policy / how we put this into practice, responsibilities, complaints procedure | | | | 0 | not attempted: the recorder stops a case after a truncation |
+| sole trader / self-assessment / our registration scope, how we meet these standards | | | | 0 | not attempted, same rule (same reference case) |
+
+Retry first calls are not itemised by the recorder (it keeps the last call's tokens), so the "(x2)" rows are counted at twice the last call, an upper bound. Batch 13 spend: about $0.04 (item 2) + $0.07 (item 3) = **about $0.11**, under the $0.50 batch ceiling. **Running total about $0.50** ($0.39 before this batch), under the $0.89 cap.
+
+Why the policy statement did not fit: the incident policy statement (batch 10, same cap) came in at 1,397 output tokens, so 1,500 was already marginal for a policy statement, which the brief shapes as a table of commitments against every quality indicator of the standard (the complaints standard has four indicators, each with a commitment, how-we-do-it text and an indicator reference). Proposed, for the PO (D-528 in `DECISIONS.md`): raise the `policy-statement` cap to 2,500 (the recorder re-records a fixture that was cut at a lower cap, so only this section is re-run) and make the recorder's stop-after-truncation rule per document rather than per reference case, so the self-assessment is not held back by a complaints-policy truncation. No further calls were made this batch; the remaining six sections wait for that decision.
+
+**Review pack.** `sections.md` now shows real text for the complaints policy's purpose and scope and fallback callouts for its other four tailored sections and for both self-assessment sections. The three documents are therefore not yet all complete; one is complete (incident), one is a third done (complaints), one is untouched (self-assessment).
 ## PO review
 (PO fills in.)
 
