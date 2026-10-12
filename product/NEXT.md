@@ -212,3 +212,17 @@ Waiting for the PO.
 4. STOP.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 11)
+
+**PO actions this batch:** REQ-013 R-1 to R-4 verified from the re-captured screenshots; PR #11 opened from `req-013-first-time-ux`; the PO merges it when CI is green. REQ-005 first recordings reviewed: accepted with R-5 and R-6 (REQ-005 PO review) and D-040.
+
+0. **Push `main`** with the PO's batch-11 commit after checking the stat (product/ and DECISIONS.md only). Merge `main` into `req-005-generator` so the branch carries the PO review and D-040.
+
+1. **REQ-005 R-5 and R-6** on `req-005-generator`: readability `fail` as a validation problem with the single retry; `stop_reason` handling for truncation; D-040 caps per section type; unit tests for both; replay the existing fixtures through the new gate (the governance purpose fixture must now show a readability problem in replay, not a pass). No model calls for this item.
+
+2. **One recording** (D-039, D-040): the behaviour-support `steps` section at the 4,000 cap, one call. Commit the fixture and append the row to the recordings report with real tokens and dollars. If it truncates, stop and report the output-token count.
+
+3. **Sole-trader incident policy, complete** (D-039 scope widened for this item only): record the remaining tailored sections of `incident-management-policy-and-register` for the sole-trader case (purpose, scope, how we put this into practice, responsibilities, incident procedure), one call each, so the PO can read one whole real document. Expected about $0.10. Re-render `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and update `sections.md`. Stop after this document; do not record other documents.
+
+4. STOP. Append your status below, with the batch's total spend.
