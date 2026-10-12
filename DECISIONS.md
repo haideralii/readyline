@@ -1175,3 +1175,7 @@ Items asserted in code or copy that still need a primary source.
   single source of the refund promise and REQ-007's pricing page quotes it
   from there (test asserts identity); the AI page names the provider and the
   model family ("Claude, made by Anthropic"), never the model id.
+- D-044 (PO, 2026-10-12): REQ-008 accepted (D-801 to D-803 confirmed). REQ-005
+  R-9: cross-references validated against the document's own outline; R-10:
+  standards in the context pack intersected with the case's applicable
+  modules. Budget: batch 15 up to $0.60 more (cap $1.25).

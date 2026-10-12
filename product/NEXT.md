@@ -297,3 +297,19 @@ Waiting for the PO.
 4. **Status** with the cost table and running total.
 
 5. STOP.
+
+## Queue (written by PO, 12 Oct 2026, batch 15)
+
+**PO actions this batch:** batch-14 review accepted (REQ-005 and REQ-008 PO reviews); PR #12 opened from `req-008-legal-pages`, PO merges when green; D-044. This PO commit is on `req-005-generator` (checked out at the time).
+
+0. **Cherry-pick the PO's batch-15 commit onto `main`** (product/ and DECISIONS.md only) and push `main`.
+
+1. **REQ-005 R-9 and R-10, no model calls** on `req-005-generator`: outline in the context pack and the cross-reference lint with its retry instruction; standards filtered to applicable modules with the two unit tests; replay every fixture and list, by document and section, what each fix invalidates.
+
+2. **Re-record only what item 1 invalidates** in the three sole-trader documents, one call each, thinking off, stop at $0.60 for the batch. Re-render the review pack; `sections.md` must again show three complete documents with no fallback marker and no cross-reference outside the outline.
+
+3. **Footer dedupe** (REQ-008 cosmetic note) on `req-008-legal-pages` only if PR #12 is not yet merged when you reach this item; otherwise on a branch `req-008-footer-dedupe` from `main`. Keep the trust line; shorten the general-information paragraph so independence is stated once. Re-capture the footer screenshots.
+
+4. **Status** with the cost table, running total, and the measured cost per complete document with thinking off (for the full-set cap).
+
+5. STOP.
