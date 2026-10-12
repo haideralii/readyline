@@ -159,7 +159,8 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
       /\/documents\/[0-9a-f-]{36}\/download\?file=set\.zip$/,
     );
     for (const file of ["set.zip", "readiness-summary.pdf"]) {
-      const r = await request.get(setHref!.replace("set.zip", file), {
+      // page.request shares the browser context's cookies; the bare request fixture has no session.
+      const r = await page.request.get(setHref!.replace("set.zip", file), {
         maxRedirects: 0,
       });
       expect(r.status(), file).toBe(302);
@@ -185,7 +186,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     await expect(page.getByTestId("purchase-refunded")).toBeVisible();
     await expect(page.getByTestId("buy-again-button")).toBeVisible();
     await shot(page, "documents-refunded", project);
-    const closed = await request.get(setHref!, { maxRedirects: 0 });
+    const closed = await page.request.get(setHref!, { maxRedirects: 0 });
     expect(closed.status()).toBe(404);
     await page.goto(setHref!.replace(/\/download\?file=set\.zip$/, ""));
     await expect(page.getByTestId("set-locked")).toBeVisible();
