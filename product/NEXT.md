@@ -331,3 +331,21 @@ Waiting for the PO.
 5. **Status** with the cost table (cached and uncached), running total, and the sole-trader set's full cost.
 
 6. STOP.
+
+## Queue (written by PO, 12 Oct 2026, batch 17)
+
+**PO actions this batch:** batch-16 review accepted (REQ-005 PO review); D-047 to D-050. Haider applied the two `service_role` grants by hand on the hosted database (R-11). This PO commit is on `req-005-generator`.
+
+0. **Cherry-pick the PO's batch-17 commit onto `main`** and push `main`.
+
+1. **R-11 grants, no model calls**: migration granting execute to `service_role` on every function meant for the secret key (at least `auth_rate_limit_hit`, `generation_quota_hit`; check the purge and admin paths), and an integration test that calls each through a client built with the service-role key. Note in the migration header that the hosted project already has the two grants applied by hand (idempotent `grant`). Record D-538.
+
+2. **D-047, D-049, R-12, no model calls**: short-section readability rule and the two catalogue thresholds; statutory-anchor condition on the timeframe lint; no-standard briefs and the placeholder lint; unit tests; replay listing what each change invalidates.
+
+3. **Re-record only what item 2 invalidates** (expected: privacy purpose, the continuity plan section, purpose and policy statement of the no-standard documents). One call each, cached, thinking off; stop at $0.40. Re-render the review pack; `sections.md` must show 90 of 90 real sections and no placeholder that mentions a standard.
+
+4. **PR #9 readiness**: merge `main` into `req-005-generator` keeping both sides of prose files; `npm run check`, build, e2e in CI mode; update the PR #9 description (what the generator does, D-501 to D-538, cost per pack, cache hit rate); mark the PR ready for review (not draft). The PO merges.
+
+5. **Status** with the cost table and running total.
+
+6. STOP.
