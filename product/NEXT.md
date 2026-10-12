@@ -474,3 +474,39 @@ Waiting for the PO.
 8. STOP.
 
 **Overnight rules for this batch (PO, 12 Oct 2026):** work the items in order; if an item is blocked, write the blocker under it and move to the next; never merge; never force-push; no model calls; do not touch `main` except item 0. Haider is asleep; nothing here needs him. The PO merges PRs #14 and #15 as they go green and reviews the rest in the morning.
+
+## Dev status (batch 19, written 13 Oct 2026, Dev)
+
+All eight items worked; no model call and no Stripe call was made (cost table: none). Items 0 to 6 pushed; this status is item 7. Branches, one line each (head, done, owed):
+
+- `main` a77be8b (+ this status): the PO's batch-19 commits cherry-picked (item 0); only `product/NEXT.md` touched since.
+- `req-004-magic-link-any-device` 4ae771b (PR #14): item 1 done, fixtures built at runtime, the callback redirects on every verify failure including no Supabase environment; `npm run check` green. Owed: the CI re-run and the Docker `toomanyrequests` retry are the PO's (no `gh` here).
+- `req-007-payments` 685af97 (PR #15): item 2 done (main merged, conflicts resolved, check green); item 3 Session C done (D-706 to D-711): resumable section-level generation job with `claim_generation_job`, `/api/jobs/generate` with a self-kick and a daily cron backstop, the webhook's `after()` run and receipt lookup, `/documents` states none/preparing/delayed/ready/refunded, Buy form on pricing and documents, locked downloads on refund, `/account` purchases, `form-action` for Checkout on the two purchase routes only, startup price check, `GENERATION_LIVE` switch, fake Stripe mode with the signed-in e2e under `e2e/signed-in/`, ops runbook `supabase/ops/refund.md`, PO Q6 copy applied. Owed: the real Stripe hop at the first Vercel deploy (per the queue); screenshots of preparing/ready/refunded and the e2e report come from CI's Supabase job artifact `signed-in-screenshots`, not the dev machine (see blockers); committing them to `product/evidence/req-007/` once a stack is reachable.
+- `req-006-checklist` 3a48546 (no PR yet): item 4 done, Sessions A and B (D-601 to D-606): derivation with `sourceRef` and `unverified`, 8 unit tests over the three cases, `checklist_items` migration with member RLS and grants, `/checklist` with persistence, progress line, print rendering, result teaser, export of notes, RLS integration test, signed-out and signed-in e2e. Owed: screenshots and the signed-in run from CI's Supabase job (same blocker); Lighthouse.
+- `req-013-p2` ee8a4e5 (no PR yet): item 5 done, FR-6 to FR-12 (D-1306), P2 e2e on both projects, screenshots `p2-*` in `product/evidence/req-013/` (existing req-003 and req-013 screenshots re-captured because the step indicator and supports step changed). Owed: Lighthouse by hand.
+- `req-014-visual-identity` ae7991a (no PR yet), **branched from `req-013-p2`, not `main`** (D-1401; both rewrite the home page and the step indicator, so a branch from main would conflict; merge P2 first): item 6 done (D-1401 to D-1404): tokens with the CI contrast test, Fraunces via next/font, the ready line as progress and segmented SVGs, wordmark and favicon, warm ramp for the zinc utilities, button classes, `product/domain/brand.md`, 24 light and dark screenshots in `product/evidence/req-014/`. Owed: nothing beyond the PO's review of the serif sample and the dark `signal` colour.
+
+**Blockers and findings for the morning:**
+
+1. **The hosted project refuses the secret-key role on every existing table (42501).** A read-only probe with the secret key answered "permission denied" on accounts, memberships, questionnaire_drafts, version_sets, document_versions, generation_log, audit_log and auth_rate_limits (functions work, D-538). Same gap as D-422 for `authenticated`. Until migration `20261012080000_service_role_table_grants.sql` (on `req-007-payments`) and D-422's migration (PR #14) apply, nothing the server does with the admin client works on hosted: the purge job, the free generate button, the payment store, the job, the e2e seeding. This is why no signed-in e2e could run from the dev machine tonight (no local stack either); CI's Supabase job is the verification path for REQ-006 AC-2/AC-3 and REQ-007 AC-1, and both branches' Supabase jobs now build and run `e2e/signed-in` with `EVIDENCE=1` and upload `product/evidence/` as an artifact.
+2. **Vercel Hobby runs cron jobs at most daily** (D-707): the generation job is carried by the webhook's `after()` run and the route's self-kick; the daily cron is only a backstop. On a Pro plan set `/api/jobs/generate` to every minute in `vercel.json`.
+3. **PRs to open (PO):** `req-006-checklist`, `req-013-p2`, `req-014-visual-identity` (stacked on P2). Merge order that avoids conflicts: #14, #15, then REQ-006, REQ-013 P2, REQ-014.
+4. **Before the first real sale** (`supabase/ops/refund.md`): `GENERATION_LIVE=1`, the dashboard webhook secret, one test-mode purchase and refund recorded in REQ-007's evidence.
+
+## Queue (written by PO, 13 Oct 2026, batch 20)
+
+**PO review of the overnight batch:** all six items accepted (REQ-004 FR-9/10, REQ-007 Session C, REQ-006, REQ-013 P2, REQ-014 with R-1 to R-3; D-052, D-053). PR #14 is still red after 4ae771b: see the overnight note above (the grants migration references payments tables; the secret scan sees the original commit). The PO opens the remaining PRs after the branches below are pushed and merges in the dev's order: #14, #15, REQ-006, REQ-013 P2, REQ-014.
+
+0. **Push `main`** with the PO's batch-20 commit.
+
+1. **PR #14 green** on `req-004-magic-link-any-device`: remove the grants on `purchases`, `entitlements` and `generation_jobs` from `20261012060000_authenticated_table_grants.sql` (add them to the payments migration on `req-007-payments` instead); squash the branch to one commit so gitleaks sees only runtime-built fixtures; `--force-with-lease` (D-033); push. Confirm all four jobs green.
+
+2. **PR #15 after #14**: merge `main` once #14 is in (the PO will tell you by a line in this file if you are mid-batch; otherwise merge `main` as it stands and resolve), add the payments-table grants for both roles to the payments migration, push.
+
+3. **REQ-014 R-1 to R-3** on `req-014-visual-identity` (CTA wording, progress-bar fill, "Back to:" label); re-capture the home and supports screenshots; push.
+
+4. **Rebase order**: `req-006-checklist` is from `main` and needs nothing; `req-013-p2` from `main`; `req-014-visual-identity` stays stacked on `req-013-p2`. Do not rebase unless a PR shows conflicts.
+
+5. **Status.**
+
+6. STOP.

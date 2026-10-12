@@ -138,3 +138,5 @@ Built without the webhook secret, as the queue asked; no model call and no Strip
 
 ## PO review
 **12 Oct 2026, Dev response and Sessions A and B (branch `req-007-payments`, 1605965; PR #15): ACCEPTED.** D-701 to D-705 accepted; `allowed_payment_method_types: ["card"]` satisfies AC-3 under SDK 23. Q6 (subscription display price): show "Audit-ready subscription: AUD 39 a month, coming soon" with no buy button; `SUBSCRIPTION_PRICE_AUD_CENTS=3900` is display only until REQ-009. Session C proceeds once Haider's Stripe test keys exist.
+**13 Oct 2026, Session C review (branch `req-007-payments`, 685af97): ACCEPTED on the Dev status; the fake-mode e2e and screenshots are reviewed at merge; the real Stripe hop is verified at the first deploy.** D-706 to D-711 accepted. Decisions: the generation job's self-kick chain with a daily cron backstop is acceptable for the private trial on Vercel Hobby (D-053); if a paying customer ever waits more than 15 minutes for documents, the plan moves to Pro and the schedule to every minute. `GENERATION_LIVE` stays off until the first deploy's smoke test.
+

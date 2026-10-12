@@ -83,5 +83,13 @@ create policy entitlements_select_owner on public.entitlements
 create policy generation_jobs_select_member on public.generation_jobs
   for select to authenticated using (public.is_member(account_id));
 
+-- Explicit privileges (D-052): the hosted project carries no default grants.
+-- Owners and members read through the policies above; the server writes.
+grant usage on schema public to authenticated, service_role;
+grant select on public.purchases, public.entitlements, public.generation_jobs to authenticated;
+grant all privileges on public.purchases, public.entitlements, public.generation_jobs, public.stripe_events to service_role;
+
 revoke insert, update, delete on public.purchases, public.entitlements, public.generation_jobs from anon, authenticated;
 revoke all on public.stripe_events from anon, authenticated;
+
+notify pgrst, 'reload schema';

@@ -1661,3 +1661,13 @@ Items asserted in code or copy that still need a primary source.
 - D-051 (PO, 2026-10-12): REQ-004 FR-9/FR-10 accepted (PR #14); REQ-007
   Sessions A and B accepted (PR #15). Subscription display price AUD 39 a
   month, "coming soon", display only until REQ-009.
+- D-052 (PO, 2026-10-13): the hosted project's secret-key role also lacked
+  table grants (second gap of the same kind as D-422); the migrations on the
+  open branches fix it. From now on every migration that creates a table
+  states its grants for `authenticated` and `service_role` explicitly, and
+  the integration suite runs as both roles against a fresh stack.
+- D-053 (PO, 2026-10-13): Vercel Hobby for the private trial; generation
+  relies on the webhook's post-response run and the job route's self-kick,
+  with the daily cron as backstop. Move to Pro and a one-minute schedule if
+  a customer waits over 15 minutes. REQ-006, REQ-013 P2, REQ-014 accepted
+  (see their PO reviews); REQ-014 R-1 to R-3 before merge.
