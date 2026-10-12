@@ -7,28 +7,28 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 # Refunds
 
-## 1 Our promise
+## Our promise
 
 We want you to be happy with what you buy. If you are not, tell us and we will put it right or refund you.
 
-## 2 The document pack
+## The document pack
 
 You can have a full refund within 14 days of buying the pack if you have not downloaded any of the documents.
 
 If you have downloaded the documents, we still refund you if they do not match the answers you gave in the questionnaire, or if they are missing something you were told they would include. When we are not sure, we decide in your favour.
 
-## 3 The audit-ready subscription (when available)
+## The audit-ready subscription (when available)
 
 You can cancel at any time. You keep access until the end of the period you have paid for. We do not charge for the next period after you cancel. We do not charge late fees or interest. If a payment fails, your access pauses; nothing is added to what you owe.
 
-## 4 How to ask
+## How to ask
 
 Email us at the contact address in the footer with the email address on your account and the receipt number. You do not need to give a reason.
 
-## 5 How long it takes
+## How long it takes
 
 We reply within two business days. Once we agree a refund, we send it to the card you paid with. Banks usually take 5 to 10 business days to show it.
 
-## 6 Your rights
+## Your rights
 
 Nothing on this page limits your rights under the Australian Consumer Law.

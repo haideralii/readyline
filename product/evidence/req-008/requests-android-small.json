@@ -1,0 +1,546 @@
+{
+  "project": "android-small",
+  "baseURL": "http://localhost:3000",
+  "recordedAt": "2026-10-12T02:17:29.090Z",
+  "hosts": [
+    "localhost:3000"
+  ],
+  "cookies": [],
+  "requests": [
+    {
+      "route": "/",
+      "url": "http://localhost:3000/",
+      "type": "document"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/sign-in?_rsc=5CB68i4pnAekjehf",
+      "type": "fetch"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/start?_rsc=5CB68i4pnAekjehf",
+      "type": "fetch"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/sign-in?_rsc=tXyZJ52UQVBCVsD3",
+      "type": "fetch"
+    },
+    {
+      "route": "/",
+      "url": "http://localhost:3000/start?_rsc=tXyZJ52UQVBCVsD3",
+      "type": "fetch"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/terms",
+      "type": "document"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/?_rsc=pfWg1qw4uMxqj7N2",
+      "type": "fetch"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/sign-in?_rsc=pfWg1qw4uMxqj7N2",
+      "type": "fetch"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/?_rsc=Jm_KudBfn_F9em99",
+      "type": "fetch"
+    },
+    {
+      "route": "/terms",
+      "url": "http://localhost:3000/sign-in?_rsc=Jm_KudBfn_F9em99",
+      "type": "fetch"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/privacy",
+      "type": "document"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/?_rsc=WzUDN3am5ctH078F",
+      "type": "fetch"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/sign-in?_rsc=WzUDN3am5ctH078F",
+      "type": "fetch"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/?_rsc=UnGutxUMZihRxjHi",
+      "type": "fetch"
+    },
+    {
+      "route": "/privacy",
+      "url": "http://localhost:3000/sign-in?_rsc=UnGutxUMZihRxjHi",
+      "type": "fetch"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/refunds",
+      "type": "document"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/?_rsc=Cp0KCQ2HZ6LUWFuP",
+      "type": "fetch"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/sign-in?_rsc=Cp0KCQ2HZ6LUWFuP",
+      "type": "fetch"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
+      "type": "fetch"
+    },
+    {
+      "route": "/refunds",
+      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
+      "type": "fetch"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/ai",
+      "type": "document"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/?_rsc=GRYw3Bom4IabT3Tl",
+      "type": "fetch"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/sign-in?_rsc=GRYw3Bom4IabT3Tl",
+      "type": "fetch"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/?_rsc=M9reuyUG1FaK8PwR",
+      "type": "fetch"
+    },
+    {
+      "route": "/ai",
+      "url": "http://localhost:3000/sign-in?_rsc=M9reuyUG1FaK8PwR",
+      "type": "fetch"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/about",
+      "type": "document"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/?_rsc=Sdev7PUlRw12F58X",
+      "type": "fetch"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/sign-in?_rsc=Sdev7PUlRw12F58X",
+      "type": "fetch"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/?_rsc=yMFZbW3py_RmPDJX",
+      "type": "fetch"
+    },
+    {
+      "route": "/about",
+      "url": "http://localhost:3000/sign-in?_rsc=yMFZbW3py_RmPDJX",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/sign-in",
+      "type": "document"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "type": "stylesheet"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/1x6obpmlu1_c2.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/2ym_f28swmlqn.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/1lha-inyemip4.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/3rbkk11w06gx9.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/27gjg8e11zukd.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/chunks/44xtwvxq7ao-6.js",
+      "type": "script"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/terms?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/privacy?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/refunds?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/ai?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/about?_rsc=72BAJJ2RGbqycj5I",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/terms?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/privacy?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/refunds?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/ai?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    },
+    {
+      "route": "/sign-in",
+      "url": "http://localhost:3000/about?_rsc=AyvoLoWfqsROpiIK",
+      "type": "fetch"
+    }
+  ]
+}
