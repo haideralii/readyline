@@ -1,0 +1,24 @@
+<!--
+  Readyline magic-link email (REQ-004 FR-9a). Paste the body below into
+  Supabase: Authentication -> Emails -> Magic Link, subject "Your Readyline
+  sign-in link". Haider does this once in the dashboard (hosted project
+  dpwwzhylcyosnkmlcnnp); the local CLI stack keeps Supabase's default.
+
+  Why this shape: the default template uses {{ .ConfirmationURL }}, a PKCE
+  code link that only works in the browser that requested it. This one uses
+  the token hash, which /auth/callback verifies with verifyOtp, so the link
+  works from any device. {{ .RedirectTo }} is the emailRedirectTo our sign-in
+  action sends (https://<site>/auth/callback?next=<path>), so the two extra
+  parameters are appended with "&". The email address is never put in the URL.
+-->
+<h2>Sign in to Readyline</h2>
+<p>
+  Open this link to sign in. It works once, on any device, and expires in an
+  hour.
+</p>
+<p>
+  <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=magiclink"
+    >Sign in to Readyline</a
+  >
+</p>
+<p>If you did not ask for this link, you can ignore this email.</p>
