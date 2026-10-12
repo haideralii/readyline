@@ -8,6 +8,10 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import type {
+  Message,
+  MessageCreateParamsNonStreaming,
+} from "@anthropic-ai/sdk/resources/messages";
 import { requestHash, type ModelRequest } from "./prompts";
 
 export type ModelUsage = { inputTokens: number; outputTokens: number };
@@ -16,7 +20,13 @@ export type ModelReply = {
   text: string;
   usage: ModelUsage | null;
   stopReason: StopReason;
+  /** Content block types the API returned, in order (D-530: non-text blocks spend output tokens too). */
+  contentTypes?: string[];
+  /** The thinking setting the request sent (D-530); "between_tools" is "off" for this model family. */
+  thinking?: ThinkingSetting;
 };
+export type ThinkingSetting = "between_tools";
+export const THINKING_SETTING: ThinkingSetting = "between_tools";
 
 export interface ModelClient {
   readonly mode: "replay" | "record" | "fake";
@@ -36,6 +46,9 @@ export type Fixture = {
   usage: ModelUsage | null;
   /** Absent in fixtures recorded before R-6; replay infers truncation from the usage then. */
   stopReason?: StopReason;
+  /** Absent in fixtures recorded before D-530 (thinking left at the model's default). */
+  thinking?: ThinkingSetting;
+  contentTypes?: string[];
   request: { system: string; user: string; maxTokens: number };
   reply: string;
 };
@@ -143,6 +156,8 @@ export class RecordingClient implements ModelClient {
       recordedAt: this.now().toISOString(),
       usage: reply.usage,
       stopReason: reply.stopReason,
+      ...(reply.thinking ? { thinking: reply.thinking } : {}),
+      ...(reply.contentTypes ? { contentTypes: reply.contentTypes } : {}),
       request: {
         system: request.system,
         user: request.user,
@@ -181,17 +196,29 @@ export class FakeClient implements ModelClient {
  * The real client. Imported lazily so the SDK is never loaded in replay mode
  * and never without a key.
  */
+/** The one SDK call we make; injectable so the request shape is unit-tested without the network. */
+export type CreateMessage = (
+  params: MessageCreateParamsNonStreaming,
+) => Promise<Message>;
+
 export class AnthropicClient implements ModelClient {
   readonly mode = "record" as const;
-  constructor(private readonly apiKey: string) {}
+  constructor(
+    private readonly apiKey: string,
+    private readonly create?: CreateMessage,
+  ) {}
   async complete(request: ModelRequest): Promise<ModelReply> {
-    const { default: Anthropic } = await import("@anthropic-ai/sdk");
-    const client = new Anthropic({ apiKey: this.apiKey });
-    const message = await client.messages.create({
+    const create = this.create ?? (await this.sdkCreate());
+    const message = await create({
       model: request.model,
       max_tokens: request.maxTokens,
       system: request.system,
       messages: [{ role: "user", content: request.user }],
+      // D-530: non-text blocks count against max_tokens and are not kept, so
+      // thinking is switched off. The API rejects {type: "disabled"} for this
+      // model family and names "between_tools" as the off setting (we use no
+      // tools, so nothing is produced between them).
+      thinking: { type: THINKING_SETTING },
     });
     const text = message.content
       .map((c) => (c.type === "text" ? c.text : ""))
@@ -210,7 +237,14 @@ export class AnthropicClient implements ModelClient {
         outputTokens: message.usage.output_tokens,
       },
       stopReason,
+      contentTypes: message.content.map((c) => c.type),
+      thinking: THINKING_SETTING,
     };
+  }
+  private async sdkCreate(): Promise<CreateMessage> {
+    const { default: Anthropic } = await import("@anthropic-ai/sdk");
+    const client = new Anthropic({ apiKey: this.apiKey });
+    return (params) => client.messages.create(params);
   }
 }
 

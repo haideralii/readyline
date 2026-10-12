@@ -119,10 +119,74 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
   > We do not use restrictive practices. If this changes, we will update this policy and tell participants before we make the change.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: fallback marker: reply truncated at 1500 output tokens (cap 1500); not retried
-- 5 How we put this into practice: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\how-we-do-this\3ab2ba0416662f6716ba875367a97c284d8bd22629415b208d54930f6505b13d.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 6 Responsibilities: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\responsibilities\01708a9fcce310e9e73c5f8346ef864574cc4be599902e80b34638078778cf7b.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
-- 7 Complaints procedure: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\procedure\914db10036839d9a0ae6a9ab891c3d95a68b2abda05a50ac1e4f33f271fac8fd.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4). Readability grade 9.5.
+
+  > Sunrise Supports is a sole trader that provides household tasks (support type 0120) in New South Wales. We welcome feedback and complaints from participants and from anyone else. We treat them as a way to make our supports better.
+  > We handle complaints in line with the National Disability Insurance Scheme (Complaints Management and Resolution) Rules 2018. The NDIS Quality and Safeguards Commission (the Commission) sets these Rules. The table shows each commitment and the quality indicator it supports.
+  > Our commitment | What we do | Quality indicator
+  > We keep a complaints system that fits our size and our supports. | We keep the system simple and in proportion to a sole trader providing household tasks. We handle every complaint fairly. We tell the person what is happening, listen to all sides, decide without bias and give our reasons. | Feedback and complaints management, indicator 1. Complaints management, indicator 1.
+  > We tell every participant how to give feedback or make a complaint. | We explain this when supports start and whenever a participant asks. We explain outside options, including the Commission, and the participant's right to use an advocate. We use a format the participant can understand. | Feedback and complaints management, indicator 2.
+  > We welcome feedback and protect the people who give it. | We thank the person, acknowledge what they told us and respect their view. We do not treat anyone worse for raising a concern. We let the participant choose who supports them in the process. | Feedback and complaints management, indicator 2.
+  > We record every complaint and what we did about it. | We enter each complaint in the Complaints register. We record how we handled it, the outcome and any follow-up. We keep these records private. | Complaints management, indicator 1.
+  > We use feedback to improve. | We review this policy every 12 months. We ask participants whether our complaints process is easy to find and use. We change how we work when feedback shows we should. | Feedback and complaints management, indicator 3.
+  > We make sure every worker knows and follows the process. | We train every worker on this procedure before they start work. This includes any worker who joins us later. We check that they follow it and refresh the training when the procedure changes. | Feedback and complaints management, indicator 4.
+
+- 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 5.8.
+
+  > Sunrise Supports is a sole trader business. We have no workers. The owner carries out every step below for our household tasks supports in New South Wales. If we ever take on workers, we will update this section and train them before they work with participants.
+  > Before supports start, we tell each participant how to give feedback or make a complaint. We explain it in the way that suits them, such as plain language, large print, Easy Read, spoken words or with an interpreter. We tell them they can bring a family member or an advocate, and that they can go outside Sunrise Supports at any time.
+  > We make it easy to speak up. We accept feedback and complaints by phone, message, email, in person, or through someone the participant trusts. A participant can complain without using a form. We write down what was said in the person's own words.
+  > We thank the person for raising it. We record it in the Complaints register on the day we receive it. We tell the person we have received it and what happens next. For the timeframes we must meet, see the section on complaint timeframes.
+  > We ask the person what outcome they want. We ask if they want a support person or advocate with them, and how they want us to contact them.
+  > We look into the matter fairly. We listen to the person, collect the facts and keep an open mind. Anyone the complaint is about gets a chance to respond. If the complaint is about us, we tell the participant they can take it to an outside body, and we explain how.
+  > We tell the person the result in the format they prefer. We say what we found, what we will do and by when. We tell them how to take the matter further if they are not satisfied. We ask if they are happy with how we handled it.
+  > We protect the person who raised the matter. Supports carry on as normal. We do not treat anyone worse because they gave feedback or made a complaint.
+  > We check if the matter is also a reportable incident. If it is, we follow the section on reportable incidents as well as this procedure.
+  > We close the entry in the Complaints register. We record what we found, what we did, the outcome and the date. We keep only the personal information we need and store it securely.
+  > We learn from every complaint and every piece of feedback, including praise. We review the Complaints register every 3 months to look for patterns and decide what to change. We note any changes we make.
+  > We review this policy every 12 months. At each review we ask participants if our complaints process is easy to find and use, and we make changes based on what they tell us.
+  > The owner reads this policy when it is issued and again at each 12-month review, so that we all follow the same steps every time.
+  > Role | Does what | When
+  > Owner of Sunrise Supports | Gives participants complaint information, receives and records feedback and complaints, investigates, replies and closes each entry | Before supports start, then for every complaint as it arises
+  > Owner of Sunrise Supports | Reviews the Complaints register for patterns and makes improvements | Every 3 months
+  > Owner of Sunrise Supports | Reviews this policy and asks participants about accessibility | Every 12 months
+  > [Provider to complete: the phone number, email address and postal address where participants can send feedback or complaints to Sunrise Supports.]
+
+- 6 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4). Readability grade 6.5.
+
+  > Sunrise Supports is a sole trader business. We have one worker, who is also our only key person. This means one person holds every role in our complaints system. The table below shows what each role does and when.
+  > Role | Does what | When
+  > Owner and worker (Sunrise Supports) | Welcomes and acknowledges all feedback and complaints. Resolves them fairly, listens to all sides, and records each one in the Complaints register. | Each time feedback or a complaint is received. Timeframes are in section 3 What we do.
+  > Owner and worker (Sunrise Supports) | Tells each participant how to give feedback or make a complaint. This includes ways to complain outside Sunrise Supports and the right to use an advocate. | Before we start supports, and again whenever a participant asks.
+  > Owner and worker (Sunrise Supports) | Reviews the Complaints register. Looks for patterns and records any changes we make to our work. | Every 3 months.
+  > Owner and worker (Sunrise Supports) | Reviews this policy and procedure. Asks participants how easy our complaints process is to use and updates the document. | Every 12 months.
+  > Participants and other people | Give feedback or make a complaint in any way that suits them. They may bring a family member, friend or advocate to support them. | At any time.
+  > If a complaint is about us, we still record it in the Complaints register and acknowledge it. We also tell the person they can take it to someone outside Sunrise Supports, including the Commission. The steps for this are in section 3 What we do.
+  > [Provider to complete: name an independent person, such as a trusted colleague or adviser, who can review a complaint about the owner, or write that none is available.]
+  > If we start to engage other workers, we will update this table before they begin work. We will also train them in these procedures before they handle any feedback or complaint.
+
+- 7 Complaints procedure: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); States and territories (step 1); Registration groups (step 2). Readability grade 5.8.
+
+  > Sunrise Supports is run by one person. We receive, record and resolve complaints ourselves. Anyone can complain: a participant, a family member, an advocate or another person. We welcome feedback as well as complaints. We treat both with respect.
+  > Receive. A person can tell us in any way that suits them: by phone, in writing, in person or through an advocate. They do not need to use a form or a special word. We listen and do not ask them to justify why they are unhappy.
+  > Record. We write the complaint in the Complaints register on the day we receive it. We use a reference number, not the participant's personal details, in any text we share.
+  > Acknowledge. We tell the person we have received the complaint and who is dealing with it. We use the timeframe set out in the Commission's complaints rules (see the section of this document that holds those rules).
+  > Check for incidents. If the complaint describes an injury, abuse, neglect or another event that may be reportable, we handle it under our incident process as well (see the Reportable incidents section).
+  > Look into it. We gather the facts, hear the person's account and give them the chance to respond to what we find. We act fairly and do not decide before we have the facts.
+  > Resolve and tell the person. We explain what we found, what we will do and why. We tell them they can ask for a review or take the matter to the Commission.
+  > Close and learn. We record the outcome and actions in the Complaints register. We ask the person if they are satisfied. We use the result to improve our supports and this procedure.
+  > Step | Who | When
+  > Receive the complaint | Sunrise Supports owner | Whenever it is raised, in any form
+  > Record in the Complaints register | Sunrise Supports owner | On the day we receive it
+  > Acknowledge the complaint | Sunrise Supports owner | Within the timeframe in the Commission's complaints rules
+  > Look into it and decide | Sunrise Supports owner | As soon as we can, and within the timeframe in the Commission's complaints rules
+  > Tell the person the outcome and their options | Sunrise Supports owner | When we decide, and in the way the person prefers
+  > Close the entry and review what we learned | Sunrise Supports owner | When the person has been told the outcome
+  > If we cannot reach the person at the time, we try again and note each attempt in the register. We keep the person updated if the matter takes longer than we first told them.
+  > Because we are a sole trader, no one else in our business can review a complaint about us. A participant can ask an advocate to help them. They can also take the complaint to the Commission at any time, and they do not need to complain to us first. We never treat a person badly for complaining.
+  > To complain to the NDIS Quality and Safeguards Commission (the Commission), a person can call 1800 035 544 or use the contact options on the Commission's website. They can complain for themselves or ask someone to do it for them. We give this information to every participant when they start with us.
+  > [Provider to complete: the phone number, email address and postal address participants can use to contact us with a complaint, and any advocacy service we will name for participants in New South Wales.]
+
 - 8 Complaints register: fixed text.
 - 9 Records and evidence to retain: fixed text.
 - 10 Related documents and registers: fixed text.
@@ -133,9 +197,29 @@ Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lin
 
 - Document control: fixed text.
 - 1 How to use this self-assessment: fixed text.
-- 2 Our registration scope: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\practice-standards-self-assessment\summary\c0c35699c5ce7f359567a4b04413d50bb1be22358c5e57d60f0d1787cd872edb.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 2 Our registration scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Registration groups (audit type derived) (step 2); Registration groups (modules derived) (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3); Risk-assessed roles (step 4). Readability grade 8.3.
+
+  > Sunrise Supports is a sole trader. We deliver NDIS supports in New South Wales. Our worker count band is sole, and we have one key personnel position.
+  > We are registered, or applying to register, for one registration group: 0120 Household tasks. This self-assessment covers only the supports in that group.
+  > Our assessment pathway is verification. The module that applies to us is the Verification module. We do not use restrictive practices, so no module for restrictive practices or behaviour support applies to our scope.
+  > The Verification module has four Practice Standards. This self-assessment has one row for each of them:
+  > Human resource management
+  > Incident management
+  > Complaints management
+  > Risk management
+  > We have worker roles that carry risk, so we record the checks and training for those roles under Human resource management and Risk management. We review this scope when our supports, our states or our worker numbers change.
+  > [Provider to complete: whether a mid-term audit applies to our pathway and registration group, as shown on our Commission registration or application, and the date if one is set.]
+
 - 3 Standards and how we meet them: fixed text.
-- 4 How we meet these standards: fallback marker: No recorded fixture for this request (prompt 2026-10-12.1, model claude-sonnet-5-5). Expected fixtures\generation\practice-standards-self-assessment\how-we-meet\a8d008af9f1ecc1fecd8d8213cbb95daf04d638181901281afdb96f990210bbb.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- 4 How we meet these standards: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Registration groups (modules derived) (step 2); Number of workers (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 10.
+
+  > Sunrise Supports is a sole trader that provides household tasks (support type 0120) in New South Wales. This section covers the Verification module. It says how we put each standard into practice and which documents and registers we keep. The status column in the table that follows is for us to complete before the audit.
+  > Human resource management: We work alone, so we are the only worker. We keep our own identity, right to work, worker screening and qualification records in the Worker screening clearance register, and our orientation and refresher training in the Training register. We keep our infection prevention and control and PPE training there too, and we keep PPE on hand for each participant who needs it.
+  > Incident management: We follow our incident management policy and procedure. We write down every incident in the Incident register, respond to it, and record what we learned. Our system is sized to a sole trader delivering household tasks. If the Rules require us to report an incident, we use the steps in the procedure.
+  > Complaints management: We follow our complaints management policy and procedure. We tell each participant how to make a complaint and how to contact the Commission. We record every complaint, our response and the outcome in the Complaints register. We treat each complaint fairly and give the person a chance to be heard.
+  > Risk management: We follow our risk management policy and procedure. Our risk assessments cover work health and safety, emergency and disaster planning, and how much each participant relies on us for daily living tasks. We keep a role risk assessment because we hold risk-assessed roles. We keep our insurance certificates with our risk records and apply infection prevention and control precautions at every participant's home. We use no restrictive practices. We record each review of these documents in the Policy review register.
+  > [Provider to complete: name the insurers and policy expiry dates held for professional indemnity, public liability and accident cover.]
+
 - 5 Items to prepare before the audit: fixed text.
 - About this document: fixed text.
 

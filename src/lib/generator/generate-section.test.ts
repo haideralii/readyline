@@ -3,7 +3,7 @@
  * through a temp directory, a missing fixture fails with its key, and the
  * validate-retry-fallback path behaves as the REQ describes. No network.
  */
-import { mkdtempSync, readdirSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -16,11 +16,14 @@ import {
   validateReply,
 } from "./generate-section";
 import {
+  AnthropicClient,
   createModelClient,
   FakeClient,
   MissingFixtureError,
   RecordingClient,
   ReplayClient,
+  type CreateMessage,
+  type Fixture,
 } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
 import { loadReferenceCases } from "./reference-cases";
@@ -86,6 +89,56 @@ describe("replay harness", () => {
     const second = await replay.complete(request, labels);
     expect(second.text).toBe(GOOD);
     expect(second.usage).toEqual({ inputTokens: 100, outputTokens: 50 });
+  });
+
+  it("D-530: the Anthropic client switches thinking off and the fixture keeps the content block types", async () => {
+    const seen: Parameters<CreateMessage>[0][] = [];
+    const create: CreateMessage = async (params) => {
+      seen.push(params);
+      return {
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        model: params.model,
+        content: [
+          { type: "thinking", thinking: "...", signature: "" },
+          { type: "text", text: GOOD, citations: null },
+        ],
+        stop_reason: "end_turn",
+        stop_sequence: null,
+        usage: {
+          input_tokens: 10,
+          output_tokens: 20,
+          cache_creation_input_tokens: null,
+          cache_read_input_tokens: null,
+          cache_creation: null,
+          server_tool_use: null,
+          service_tier: null,
+          inference_geo: null,
+        },
+      } as unknown as Awaited<ReturnType<CreateMessage>>;
+    };
+    const dir = mkdtempSync(join(tmpdir(), "readyline-anthropic-"));
+    const request = buildModelRequest(pack, "m");
+    const recording = new RecordingClient(
+      new AnthropicClient("test-key", create),
+      dir,
+    );
+    const reply = await recording.complete(request, labels);
+    expect(seen).toHaveLength(1);
+    expect(seen[0].thinking).toEqual({ type: "between_tools" });
+    expect(seen[0].max_tokens).toBe(request.maxTokens);
+    expect(reply.text).toBe(GOOD);
+    expect(reply.contentTypes).toEqual(["thinking", "text"]);
+    const fixture = JSON.parse(
+      readFileSync(
+        join(dir, type.id, section.id, `${requestHash(request)}.json`),
+        "utf8",
+      ),
+    ) as Fixture;
+    expect(fixture.thinking).toBe("between_tools");
+    expect(fixture.contentTypes).toEqual(["thinking", "text"]);
+    rmSync(dir, { recursive: true, force: true });
   });
 
   it("defaults to replay; record mode needs both the flag and a key", () => {

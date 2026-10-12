@@ -1043,6 +1043,27 @@ check, checks, checked, checking, look at, looks at, looked at, looking at.
 cadences, not review cycles, and fall to R-7 (which requires them to refer to
 the fixed section that sets them). "Update" and "revise" are deliberately not
 review wording: "we update the Commission every month" is a reporting cadence.
+
+**D-530 Thinking is switched off on every generation call; hidden output had
+been eating the caps (Dev, 2026-10-12).** Comparing reply length with
+`output_tokens` across all fixtures showed two populations: clean replies at
+about 3 characters per output token, and many at 0.6 to 1.5, including one
+reply of 1,500 tokens with no text at all (the batch-11 incident procedure)
+and the self-assessment "how we meet" reply cut at 1,500 tokens with 1,618
+characters. Only `text` blocks are kept, so the rest of those tokens were
+non-text output billed and counted against `max_tokens`. The request now
+sends `thinking: {type: "between_tools"}`, which the API names as the off
+setting for this model (it rejects `{type: "disabled"}`); with no tools there
+is nothing between them. Re-recording "how we meet" with that setting gave
+721 output tokens for 2,393 characters (3.3 per token), passing first time.
+Fixtures record the setting and the content block types the API returned; a
+truncated fixture recorded without the setting is re-recorded once. Earlier
+fixtures stay valid (their text is unchanged) but their token and dollar
+figures overstate what the text cost by roughly half; every truncation before
+this batch except the 4,000-token behaviour-support steps is now explained by
+it. Caps D-040, D-041 and D-043 stand; they are now generous rather than
+tight. The two rejected `disabled` requests cost nothing (HTTP 400 before
+any tokens).
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

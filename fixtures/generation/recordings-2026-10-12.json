@@ -154,6 +154,54 @@
       "sectionId": "how-we-meet",
       "cap": 1500,
       "estimatedInputTokens": 2075
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1785
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1868
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1866
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1828
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "summary",
+      "cap": 1500,
+      "estimatedInputTokens": 2047
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2075
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2075
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2075
     }
   ],
   "recordings": [
@@ -408,20 +456,113 @@
       "documentTypeId": "complaints-management-policy-and-register",
       "sectionId": "policy-statement",
       "model": "claude-sonnet-5-5",
-      "cap": 1500,
-      "status": "fallback",
+      "cap": 2500,
+      "status": "generated",
       "attempts": 1,
-      "validationPassedFirstTime": false,
-      "truncatedAtTokens": 1500,
-      "problems": [
-        "reply truncated at 1500 output tokens (cap 1500); not retried"
-      ],
-      "readabilityGrade": null,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.5,
       "inputTokensLastCall": 2441,
-      "outputTokensLastCall": 1500,
-      "estimatedDollarsLastCall": 0.0199,
+      "outputTokensLastCall": 1892,
+      "estimatedDollarsLastCall": 0.0238,
       "requestHash": "bfc627cad75343ee11371e9cebdf5a01b061b393e5bc88848301d4f00be98f82",
-      "recordedAt": "2026-10-12T01:39:30.756Z"
+      "recordedAt": "2026-10-12T01:53:22.614Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 5.8,
+      "inputTokensLastCall": 2548,
+      "outputTokensLastCall": 2459,
+      "estimatedDollarsLastCall": 0.0297,
+      "requestHash": "3ab2ba0416662f6716ba875367a97c284d8bd22629415b208d54930f6505b13d",
+      "recordedAt": "2026-10-12T01:53:43.507Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 6.5,
+      "inputTokensLastCall": 2540,
+      "outputTokensLastCall": 1462,
+      "estimatedDollarsLastCall": 0.0197,
+      "requestHash": "01708a9fcce310e9e73c5f8346ef864574cc4be599902e80b34638078778cf7b",
+      "recordedAt": "2026-10-12T01:53:56.073Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "procedure",
+      "model": "claude-sonnet-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 5.8,
+      "inputTokensLastCall": 2497,
+      "outputTokensLastCall": 2119,
+      "estimatedDollarsLastCall": 0.0262,
+      "requestHash": "914db10036839d9a0ae6a9ab891c3d95a68b2abda05a50ac1e4f33f271fac8fd",
+      "recordedAt": "2026-10-12T01:54:14.834Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "summary",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 8.3,
+      "inputTokensLastCall": 2755,
+      "outputTokensLastCall": 1228,
+      "estimatedDollarsLastCall": 0.0178,
+      "requestHash": "c0c35699c5ce7f359567a4b04413d50bb1be22358c5e57d60f0d1787cd872edb",
+      "recordedAt": "2026-10-12T01:54:25.404Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "how-we-meet",
+      "model": "claude-sonnet-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 10,
+      "inputTokensLastCall": 2786,
+      "outputTokensLastCall": 721,
+      "estimatedDollarsLastCall": 0.0128,
+      "requestHash": "a8d008af9f1ecc1fecd8d8213cbb95daf04d638181901281afdb96f990210bbb",
+      "recordedAt": "2026-10-12T02:00:33.922Z"
     }
   ]
 }

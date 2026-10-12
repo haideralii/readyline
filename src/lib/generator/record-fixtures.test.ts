@@ -19,6 +19,7 @@ import {
   DEFAULT_FIXTURES_DIR,
   inferStopReason,
   readFixture,
+  THINKING_SETTING,
 } from "./model-client";
 import { buildModelRequest } from "./prompts";
 import { loadReferenceCases } from "./reference-cases";
@@ -119,7 +120,13 @@ function fixtureStillValid(
   const fx = readFixture(request, labels);
   if (!fx) return false;
   const truncated = inferStopReason(fx) === "max_tokens";
-  return !(truncated && request.maxTokens > fx.request.maxTokens);
+  // A truncated fixture is re-recorded when the cap has risen (D-043) or when it
+  // was recorded with thinking at the model's default, which ate into the cap (D-530).
+  return !(
+    truncated &&
+    (request.maxTokens > fx.request.maxTokens ||
+      fx.thinking !== THINKING_SETTING)
+  );
 }
 
 function readReport(): { estimates: unknown[]; recordings: ReportRow[] } {

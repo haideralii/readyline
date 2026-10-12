@@ -286,6 +286,24 @@ Why the policy statement did not fit: the incident policy statement (batch 10, s
 ### Batch 14 (2026-10-12): D-043, the R-8 scope, the complaints policy and the self-assessment
 
 **D-043 and the R-8 scope change, no model calls (item 1, D-529).** `maxTokensFor` returns 2,500 for `policy-statement` (4,000 for steps, how-we-do-this and procedures; 1,500 otherwise), with a unit test on the sole-trader incident policy statement's request; the fixture key still excludes the cap. The recorder's truncation stop is keyed by case and document (`verification-sole-trader/complaints-management-policy-and-register`), so a truncation in the complaints policy no longer skips the self-assessment. `lintReviewCycles` now examines only sentences (or table rows) with review wording (review, check, look at, with their inflections); a cadence without it is left to R-7. Unit tests: the BSP monitoring sentence and "we send the report every month" produce no finding; "we check our records every week" still does. **Replay of all fixtures:** every recorded fixture passes the current gate except the batch-11 and batch-12 recordings of incident sections 5 and 6, orphaned by the R-8 brief and kept as history; a new test loads every fixture of `steps-monitoring-reporting-and-review`, asserts it says "every month", and asserts the lint returns nothing, so that fixture stands un-re-recorded as the PO asked.
+
+**Finishing the two documents (item 2), two runs, 7 billed calls, about $0.15:**
+
+| Case / document / section | Cap | In | Out | Dollars | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| sole trader / complaints policy / policy statement (re-record, D-043 cap) | 2,500 | 2,441 | 1,892 | 0.024 | passed first time; grade 9.5 |
+| sole trader / complaints policy / how we put this into practice | 4,000 | 2,548 | 2,459 | 0.030 | passed first time; grade 5.8 |
+| sole trader / complaints policy / responsibilities | 1,500 | 2,540 | 1,462 | 0.020 | passed first time; grade 6.5 |
+| sole trader / complaints policy / complaints procedure | 4,000 | 2,497 | 2,119 | 0.026 | passed first time; grade 5.8 |
+| sole trader / self-assessment / our registration scope | 1,500 | 2,755 | 1,228 | 0.018 | passed first time; grade 8.3 |
+| sole trader / self-assessment / how we meet these standards (first run) | 1,500 | 2,787 | 1,500 | 0.021 | **truncated** with only 1,618 characters of reply; stopped that document only (D-043 rule) |
+| sole trader / self-assessment / how we meet these standards (second run, thinking off, D-530) | 1,500 | 2,786 | 721 | 0.013 | passed first time; grade 10.0; 2,393 characters |
+
+Two requests with `thinking: {type: "disabled"}` were rejected by the API (HTTP 400, no tokens, $0) before the off setting was corrected to `between_tools`. Batch 14 spend: **about $0.15**, under the $0.30 ceiling. **Running total about $0.65** ($0.50 before this batch), under the $0.80 cap.
+
+**Why "how we meet" truncated, and the finding behind it (D-530).** The truncated reply was 1,618 characters for 1,500 output tokens, which cannot be text alone. Across all fixtures, replies fall into two groups: about 3 characters per output token, and 0.6 to 1.5 (one batch-11 fixture used 1,500 tokens for no text at all). The extra tokens were non-text blocks that the client drops. Every generation call now sends the model's off setting for thinking, the fixture records the setting and the content block types returned, and a truncated fixture recorded without it is re-recorded once (this is why the second call was made: the first was spent by the request defect, not by the cap; the queue's one-call rule was otherwise kept). Effect: the same section came back at 721 tokens and passed; earlier token and dollar figures in these tables overstate the cost of the text by roughly half, and the caps the PO set are now comfortable. Unit test: the client passes the setting and records `["thinking", "text"]` block types when the API returns them.
+
+**Review pack.** `sections.md` now shows three complete documents: the incident policy (six tailored sections), the complaints policy (six) and the self-assessment (two), all real model text, no fallback markers. Readability grades run 5.4 to 10.3; the two sections above 9 (incident purpose 10.3, self-assessment how we meet 10.0) are within the fail line of 11 and flagged by the reviewer view.
 ## PO review
 (PO fills in.)
 
