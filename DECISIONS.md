@@ -1358,6 +1358,44 @@ is "coming" without a price until `SUBSCRIPTION_PRICE_AUD_CENTS` is set
 (Dev response Q6). The Buy control in Session A is a sign-in link; Session C
 replaces it with the Checkout action.
 
+**D-704 The webhook is a pure handler over a store interface, and the
+database applies events in one function (Dev, 2026-10-12, FR-3, SR-1,
+SR-2, SR-6).** `src/lib/payments/webhook.ts` takes the raw payload, the
+`stripe-signature` header, the secret, a verifier (a Stripe instance; the
+SDK's `constructEvent` does the constant-time check with its 300-second
+tolerance) and a `PaymentStore`; it maps the event to the small
+`PaymentEvent` shape (ids, account, assessment, amount, currency, receipt
+URL; never the email or the session object) and returns 200 with the
+outcome, or 400 for a missing header or a bad signature with no body
+detail. `MemoryPaymentStore` runs the reducer for tests and the fake Stripe
+mode; `SupabasePaymentStore` calls `apply_stripe_event` (migration
+`20261012040000_stripe_apply_event.sql`, security definer, execute granted
+to `service_role` only per D-538), which inserts the event id first and
+stops on a conflict, then records the purchase and grants or revokes the
+entitlement in the same transaction. The route `src/app/api/stripe/webhook`
+runs on the Node runtime, reads `request.text()`, answers 503 when Stripe or
+Supabase is unconfigured and 500 (so Stripe retries) on a store error; the
+ledger makes a retry safe. Unit tests sign payloads with the SDK's
+`generateTestHeaderString`; the function's own cases run in CI's Supabase job.
+
+**D-705 Card only through `allowed_payment_method_types` (Dev, 2026-10-12,
+AC-3).** SDK 23.0.0 targets API 2026-09-30, where a Checkout Session no
+longer takes `payment_method_types`; the equivalent is
+`allowed_payment_method_types: ["card"]`, a filter on the dynamically
+computed set, so no pay-later method can appear. The params builder sets it,
+sets nothing under `payment_method_options` or
+`payment_method_configuration`, `allow_promotion_codes: false`, the account
+and assessment in both the session and the payment-intent metadata, and
+success and cancel URLs on our origin with the cancel path allow-listed to
+`/pricing` and `/start/result`. The REQ's AC-3 wording names the old field;
+the test asserts the new one and the absence of the old. The create-checkout
+action checks sign-in, a complete questionnaire, Stripe configuration and a
+rate limit of five sessions per account per hour (the same database counter
+as the export limit), then creates the session with an idempotency key per
+account, answers snapshot and hour, and redirects to Stripe's URL. The
+Stripe client is injected into `createCheckoutSession`, so its test uses a
+fake and asserts the parameters.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.
