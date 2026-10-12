@@ -1234,3 +1234,15 @@ Items asserted in code or copy that still need a primary source.
   R-9: cross-references validated against the document's own outline; R-10:
   standards in the context pack intersected with the case's applicable
   modules. Budget: batch 15 up to $0.60 more (cap $1.25).
+- D-045 (PO, 2026-10-12): documents that cite no Practice Standard for a
+  verification case stay in the set with a catalogue `basis` (code of
+  conduct, Commission rules, Privacy Act, good practice) stated in the fixed
+  "Why this document" text and the evidence section; no placeholder, no
+  escape to core standards. Batch 16 budget up to $2.00 (cap $2.93).
+- D-046 (PO, 2026-10-12): prompt caching. The generator marks the system
+  prompt and the per-document context block with `cache_control`
+  (ephemeral, 5 minutes), stable parts first; fixture keys unchanged; the
+  recorder reports cache read and write tokens per call. Model experiment:
+  the three sole-trader review-pack documents are also recorded on
+  `claude-haiku-5-5` under a model-keyed fixture directory for a side-by-side
+  comparison; production stays on Sonnet 5.5 until the PO decides.
