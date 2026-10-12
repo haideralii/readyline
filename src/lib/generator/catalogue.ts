@@ -17,33 +17,56 @@ export const SectionSpec = z.object({
 });
 export type SectionSpec = z.infer<typeof SectionSpec>;
 
-export const DocumentTypeSpec = z.object({
-  id: slug,
-  title: z.string().min(1),
-  kind: z.enum([
-    "policy",
-    "procedure",
-    "plan",
-    "template",
-    "acknowledgement",
-    "framework",
-    "self-assessment",
-  ]),
-  outline: z.string().min(1),
-  purpose: z.string().min(1),
-  standards: z.array(slug),
-  standardsSelection: z.literal("all-applicable").optional(),
-  evidenceAliases: z.array(slug),
-  registers: z.array(slug),
-  reviewCycleMonths: z.number().int().positive().optional(),
-  /** Register review cycle for this document (R-8); defaults to the catalogue default. */
-  registerReviewMonths: z.number().int().positive().optional(),
-  extraSections: z.array(SectionSpec),
-  /** Outline sections this document does not use (for example a split steps section, D-041). */
-  omitSections: z.array(slug).optional(),
-  proposed: z.boolean().optional(),
-});
+export const DocumentTypeSpec = z
+  .object({
+    id: slug,
+    title: z.string().min(1),
+    kind: z.enum([
+      "policy",
+      "procedure",
+      "plan",
+      "template",
+      "acknowledgement",
+      "framework",
+      "self-assessment",
+    ]),
+    outline: z.string().min(1),
+    purpose: z.string().min(1),
+    standards: z.array(slug),
+    standardsSelection: z.literal("all-applicable").optional(),
+    /** Why the document exists when a case cites none of its standards (D-045). */
+    basis: z.enum([
+      "practice-standard",
+      "code-of-conduct",
+      "commission-rules",
+      "privacy-act",
+      "good-practice",
+    ]),
+    /** Plain one-line reason, required unless the basis is a Practice Standard. */
+    basisReason: z.string().min(1).optional(),
+    evidenceAliases: z.array(slug),
+    registers: z.array(slug),
+    reviewCycleMonths: z.number().int().positive().optional(),
+    /** Register review cycle for this document (R-8); defaults to the catalogue default. */
+    registerReviewMonths: z.number().int().positive().optional(),
+    extraSections: z.array(SectionSpec),
+    /** Outline sections this document does not use (for example a split steps section, D-041). */
+    omitSections: z.array(slug).optional(),
+    proposed: z.boolean().optional(),
+  })
+  .refine((t) => t.basis === "practice-standard" || Boolean(t.basisReason), {
+    message: "basisReason is required unless the basis is a Practice Standard",
+    path: ["basisReason"],
+  });
 export type DocumentTypeSpec = z.infer<typeof DocumentTypeSpec>;
+
+/** The sentence a document carries when the case is not audited against any of its standards (D-045). */
+export function keptBecause(type: DocumentTypeSpec): string {
+  const reason =
+    type.basisReason ??
+    "an auditor still asks how we handle what this document covers";
+  return `Verification providers are not audited against this document under the NDIS Practice Standards. We keep it because ${reason}.`;
+}
 
 const Catalogue = z.object({
   note: z.string(),

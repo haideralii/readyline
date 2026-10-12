@@ -1119,6 +1119,24 @@ and 12.0 on retries. The brief now reads "Two short sentences, each under
 15 words: ..."; both recorded purpose sections then passed first time
 (grades 10.7 and 9.4). This re-keyed only the purpose sections, two of them
 recorded.
+
+**D-534 Basis implemented as fixed text only (Dev, 2026-10-12, D-045).**
+Every catalogue item carries `basis` (practice-standard, code-of-conduct,
+commission-rules, privacy-act or good-practice) and, unless it is a
+Practice Standard, a one-line `basisReason`; the schema refuses a non-standard
+basis without a reason. The PO's twelve assignments are in the catalogue with
+the PO's wording where given and plain reasons where not (privacy: the
+Privacy Act 1988 and the Code of Conduct; records: the record-keeping
+conditions of registration; continuity: the conditions of registration;
+emergency: every provider needs such a plan; the AI pair: the Commission's
+2026 position on AI use). The document-control section gains a "Why this
+document" paragraph under its table: the standards the document supports for
+this case, or "Verification providers are not audited against this document
+under the NDIS Practice Standards. We keep it because [reason]." The
+records-and-evidence section carries the same sentence plus a record-keeping
+sentence instead of the provider-to-complete placeholder. Fixed text is not
+in the prompt, so no fixture key moved (the replay suite passes unchanged);
+the structure snapshots changed for every document (one paragraph added).
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

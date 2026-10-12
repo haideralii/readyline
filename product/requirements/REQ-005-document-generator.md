@@ -345,6 +345,10 @@ Three of the four fallbacks were correct text rejected by two lint defects: the 
 **Review pack.** `sections.md` shows the three documents complete again: incident (grades 6.0 to 10.7), complaints (6.3 to 9.5), self-assessment (8.8, 9.3); no fallback marker; every cross-reference passed the outline lint at generation time (the replay listing for R-9 holds only the orphaned batch-12 and behaviour-support fixtures).
 
 **Measured cost per complete document with thinking off (last-call tokens, retries counted twice):** incident policy about $0.07 (six sections, one retry), complaints policy about $0.07 (six sections, one retry), self-assessment about $0.02 (two sections). About $0.011 per section that passes first time, $0.02 with a retry; input is 2,200 to 3,000 tokens per call with the outline block.
+
+### Batch 16 (2026-10-12): D-045 basis, D-046 caching, the full sole-trader set, the Haiku comparison
+
+**D-045 basis, no model calls (item 1, D-534).** Every catalogue item now has `basis` and, for the twelve the PO assigned, a `basisReason` (schema-enforced: a non-standard basis needs a reason). The document-control section carries a "Why this document" paragraph under its table: for a document with standards in scope, "Why this document: it supports the NDIS Practice Standards [names] for [provider]."; otherwise "Verification providers are not audited against this document under the NDIS Practice Standards. We keep it because [reason]." The records-and-evidence section uses the same sentence plus "We keep the records this document names, with the dates they were made, so an auditor can see it in use." in place of the placeholder. Test (every reference case): each document's control section carries one of the two sentences, no evidence section has a callout, and a kept-because document repeats the sentence in its evidence section. Fixed text only: the replay suite passes without a key change (confirmed); the three structure snapshots changed by one paragraph per document.
 ## PO review
 (PO fills in.)
 

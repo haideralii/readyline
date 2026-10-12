@@ -6,7 +6,11 @@
  * placeholder until Session D supplies their text.
  */
 import { AI_DISCLOSURE, BRAND, GENERAL_INFORMATION_NOTICE } from "@/lib/brand";
-import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
+import {
+  keptBecause,
+  type DocumentTypeSpec,
+  type SectionSpec,
+} from "./catalogue";
 import { describeProvider, type ProviderFacts } from "./facts";
 import type { StandardSummary } from "./document-model";
 import type { Block } from "./section-schema";
@@ -53,6 +57,21 @@ const DEFINITIONS: Block = {
   ],
 };
 
+/**
+ * The "Why this document" paragraph under the title (D-045): the Practice
+ * Standards it supports for this case, or the basis it is kept on when the
+ * case is not audited against any of its standards.
+ */
+export function whyThisDocument(ctx: FixedContext): Block {
+  if (ctx.standards.length === 0)
+    return { type: "paragraph", text: keptBecause(ctx.type) };
+  const names = ctx.standards.map((s) => s.name).join("; ");
+  return {
+    type: "paragraph",
+    text: `Why this document: it supports the NDIS Practice Standards ${names} for ${ctx.facts.tradingName}.`,
+  };
+}
+
 function uniqueTitles(items: readonly { title: string }[]): string[] {
   return [...new Set(items.map((i) => i.title))];
 }
@@ -82,16 +101,20 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
             ["Next review", formatDateAu(ctx.reviewDueAt)],
           ],
         },
+        whyThisDocument(ctx),
       ];
     case "definitions":
       return [DEFINITIONS];
     case "records-and-evidence": {
       const titles = uniqueTitles(ctx.standards.flatMap((s) => s.evidence));
       if (titles.length === 0)
+        // D-045: no standard for this case is not a gap to fill; say why the document is kept.
         return [
-          placeholder(
-            "list the records this document creates and where they are kept",
-          ),
+          { type: "paragraph", text: keptBecause(ctx.type) },
+          {
+            type: "paragraph",
+            text: "We keep the records this document names, with the dates they were made, so an auditor can see it in use.",
+          },
         ];
       return [
         {

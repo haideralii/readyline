@@ -1,5 +1,5 @@
 {
-  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps. Batch 13 (D-042, R-8): review cycles (policy 12 months, register 3 months by default) are provider facts; briefs of the sections that state cycles carry the marker [review cycles] that the context pack fills in. Batch 15 (D-533): purpose briefs ask for sentences under 15 words; two-sentence sections score the reading grade on their two sentences alone.",
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps. Batch 13 (D-042, R-8): review cycles (policy 12 months, register 3 months by default) are provider facts; briefs of the sections that state cycles carry the marker [review cycles] that the context pack fills in. Batch 15 (D-533): purpose briefs ask for sentences under 15 words; two-sentence sections score the reading grade on their two sentences alone. Batch 16 (D-045): every document type has a basis; documents that cite no standard for a case say why they are kept, from basisReason.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -433,7 +433,9 @@
           "mode": "tailored",
           "brief": "Describes the legal structure from the questionnaire (sole trader through to company), key personnel and who holds each delegation."
         }
-      ]
+      ],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "risk-management-policy-and-register",
@@ -460,7 +462,8 @@
           "mode": "fixed",
           "brief": "Blank register table: risk, rating, treatment, owner, review date; sample rows marked as examples."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "continuity-of-supports-plan",
@@ -478,7 +481,9 @@
           "mode": "tailored",
           "brief": "Present when the structure is sole trader or workers are fewer than three; names the arrangement type without naming people."
         }
-      ]
+      ],
+      "basis": "commission-rules",
+      "basisReason": "the conditions of registration require us to keep supports going"
     },
     {
       "id": "conflict-of-interest-policy",
@@ -499,7 +504,9 @@
           "mode": "fixed",
           "brief": "Declaration form and register table."
         }
-      ]
+      ],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "privacy-and-information-management-policy",
@@ -524,7 +531,9 @@
           "mode": "fixed",
           "brief": "Consent to collect and use personal information, including audio or visual recording; placeholders only."
         }
-      ]
+      ],
+      "basis": "privacy-act",
+      "basisReason": "the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support"
     },
     {
       "id": "records-management-policy",
@@ -542,7 +551,9 @@
           "mode": "tailored",
           "brief": "Table of record type and retention period, adjusted to the supports and states; cites the source for each period or marks it for the provider to confirm."
         }
-      ]
+      ],
+      "basis": "commission-rules",
+      "basisReason": "the record-keeping conditions of registration apply to every registered provider"
     },
     {
       "id": "complaints-management-policy-and-register",
@@ -572,7 +583,8 @@
           "mode": "fixed",
           "brief": "Register columns: reference code, date, summary, actions, outcome, improvement; warning not to record participant health details."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "incident-management-policy-and-register",
@@ -605,7 +617,8 @@
           "mode": "fixed",
           "brief": "Register columns with reference codes; participant privacy warning."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "worker-screening-and-recruitment-procedure",
@@ -635,7 +648,8 @@
           "mode": "fixed",
           "brief": "Columns: role, clearance type, number, expiry, next check."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "induction-and-training-procedure-and-register",
@@ -662,7 +676,8 @@
           "mode": "fixed",
           "brief": "Register columns."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "code-of-conduct-acknowledgement",
@@ -677,7 +692,9 @@
       ],
       "evidenceAliases": ["policy.human-resources", "form.code-of-conduct"],
       "registers": ["training"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "service-agreement-template",
@@ -702,7 +719,9 @@
           "mode": "tailored",
           "brief": "One-page summary of the agreement in short sentences, prefilled with the provider's supports; participant placeholders only."
         }
-      ]
+      ],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "participant-rights-and-choice-policy",
@@ -727,7 +746,9 @@
           "mode": "tailored",
           "brief": "Describes how communication needs and support networks are recorded in support plans, by reference code only."
         }
-      ]
+      ],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "safeguarding-policy",
@@ -747,7 +768,9 @@
           "mode": "tailored",
           "brief": "Steps that link to the incident procedure and the reportable incident timeframes."
         }
-      ]
+      ],
+      "basis": "code-of-conduct",
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
     },
     {
       "id": "emergency-and-disaster-management-plan",
@@ -758,7 +781,9 @@
       "standards": ["core.governance.emergency-and-disaster-management"],
       "evidenceAliases": ["plan.emergency-and-disaster"],
       "registers": ["policy-reviews"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "good-practice",
+      "basisReason": "every provider needs a plan for emergencies and disasters, whatever its registration pathway"
     },
     {
       "id": "ai-use-and-governance-policy",
@@ -786,7 +811,9 @@
           "mode": "fixed",
           "brief": "Rule: no participant personal, health or disability information goes into an AI tool unless de-identified and consented; cites the Commission position statement."
         }
-      ]
+      ],
+      "basis": "good-practice",
+      "basisReason": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI"
     },
     {
       "id": "ai-and-digital-data-handling-procedure",
@@ -807,7 +834,9 @@
           "mode": "fixed",
           "brief": "Checklist of identifiers to remove and the reference-code convention."
         }
-      ]
+      ],
+      "basis": "good-practice",
+      "basisReason": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use"
     },
     {
       "id": "quality-management-and-continuous-improvement",
@@ -825,7 +854,8 @@
           "mode": "fixed",
           "brief": "Columns: source, improvement, owner, due, done."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "feedback-and-participant-engagement-procedure",
@@ -839,7 +869,8 @@
       ],
       "evidenceAliases": ["policy.responsive-support"],
       "registers": [],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "support-planning-and-transitions-procedure",
@@ -870,7 +901,8 @@
           "mode": "fixed",
           "brief": "Checklist for planned and unplanned transitions, including handover of records with consent."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "medication-management-procedure",
@@ -881,7 +913,8 @@
       "standards": ["core.environment.management-of-medication"],
       "evidenceAliases": ["policy.medication-management"],
       "registers": ["incidents", "training"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "mealtime-management-procedure",
@@ -892,7 +925,8 @@
       "standards": ["core.environment.mealtime-management"],
       "evidenceAliases": ["policy.mealtime-management"],
       "registers": ["incidents", "training"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "waste-and-infection-control-procedure",
@@ -917,7 +951,8 @@
           "mode": "tailored",
           "brief": "Home, community, centre or vehicle, from the supports answers, each with the main hazards."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "transport-safety-procedure",
@@ -928,7 +963,8 @@
       "standards": ["core.environment.safe-environment"],
       "evidenceAliases": ["policy.safe-environment"],
       "registers": ["incidents"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "high-intensity-skills-descriptors-and-training-register",
@@ -961,7 +997,8 @@
           "mode": "fixed",
           "brief": "Columns per activity: worker role, training, assessor, date, review."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "clinical-oversight-procedure",
@@ -981,7 +1018,8 @@
       ],
       "evidenceAliases": ["policy.high-intensity-supports"],
       "registers": ["incidents", "training"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "restrictive-practice-authorisation-and-reporting-procedure",
@@ -1014,7 +1052,8 @@
           "mode": "fixed",
           "brief": "Columns supporting monthly reporting; reference codes only."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "behaviour-support-plan-implementation-procedure",
@@ -1065,7 +1104,8 @@
           "brief": "States which of the two modules applies from the result and adjusts the steps accordingly."
         }
       ],
-      "omitSections": ["steps"]
+      "omitSections": ["steps"],
+      "basis": "practice-standard"
     },
     {
       "id": "family-centred-practice-procedure",
@@ -1083,7 +1123,8 @@
       ],
       "evidenceAliases": ["policy.early-childhood-practice"],
       "registers": ["training"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "child-safe-practices-policy",
@@ -1101,7 +1142,8 @@
           "mode": "tailored",
           "brief": "One paragraph per state from the questionnaire naming the reporting scheme, marked unverified where not confirmed from a primary source."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "conflict-of-interest-in-coordination-procedure",
@@ -1115,7 +1157,8 @@
       ],
       "evidenceAliases": ["policy.support-coordination"],
       "registers": [],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "complex-support-escalation-procedure",
@@ -1126,7 +1169,8 @@
       "standards": ["ssc.specialised-support-coordination"],
       "evidenceAliases": ["policy.support-coordination"],
       "registers": ["incidents"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "dwelling-enrolment-and-maintenance-procedure",
@@ -1140,7 +1184,8 @@
       ],
       "evidenceAliases": [],
       "registers": ["incidents"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "tenancy-rights-and-dispute-procedure",
@@ -1162,7 +1207,8 @@
           "mode": "fixed",
           "brief": "Template placeholders; marked for legal review."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "supported-decision-making-procedure",
@@ -1173,7 +1219,8 @@
       "standards": ["sil.supported-decision-making"],
       "evidenceAliases": ["policy.supported-decision-making"],
       "registers": [],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "sil-safeguarding-and-roster-oversight-procedure",
@@ -1184,7 +1231,8 @@
       "standards": ["sil.safeguarding"],
       "evidenceAliases": ["policy.sil-safeguarding"],
       "registers": ["incidents", "worker-clearances"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "practice-governance-framework",
@@ -1195,7 +1243,8 @@
       "standards": ["sil.practice-governance"],
       "evidenceAliases": ["policy.sil-practice-governance"],
       "registers": ["training", "incidents"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "tenancy-housing-and-support-agreements-procedure",
@@ -1215,7 +1264,8 @@
           "mode": "fixed",
           "brief": "Separate SIL service agreement and tenancy agreement templates; placeholders; marked for legal review."
         }
-      ]
+      ],
+      "basis": "practice-standard"
     },
     {
       "id": "practice-standards-self-assessment",
@@ -1234,7 +1284,8 @@
         "policy-reviews",
         "restrictive-practices"
       ],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     },
     {
       "id": "participant-money-and-property-procedure",
@@ -1245,7 +1296,8 @@
       "standards": ["core.environment.participant-money-and-property"],
       "evidenceAliases": ["policy.participant-money-and-property"],
       "registers": ["incidents"],
-      "extraSections": []
+      "extraSections": [],
+      "basis": "practice-standard"
     }
   ]
 }

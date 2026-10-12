@@ -79,6 +79,28 @@ describe.each(cases.map((c) => [c.id] as const))(
       expect(models.map(modelStructure)).toMatchSnapshot();
     });
 
+    it("D-045: a document with no standard for this case says why it is kept, never a placeholder", () => {
+      for (const m of models) {
+        const control = m.sections.find((s) => s.id === "document-control")!;
+        const why = blocksToText(control.blocks);
+        expect(why, m.typeId).toMatch(
+          /Why this document: it supports the NDIS Practice Standards|We keep it because/,
+        );
+        const evidence = m.sections.find(
+          (s) => s.id === "records-and-evidence",
+        );
+        if (!evidence) continue;
+        expect(
+          evidence.blocks.filter((b) => b.type === "callout"),
+          `${m.typeId}: evidence section has a placeholder`,
+        ).toEqual([]);
+        if (why.includes("We keep it because"))
+          expect(blocksToText(evidence.blocks), m.typeId).toContain(
+            "We keep it because",
+          );
+      }
+    });
+
     it("carries the provider's name, the notice and no lint errors in fixed text", () => {
       for (const m of models) {
         const fixed = m.sections.filter((s) => s.status === "fixed");
