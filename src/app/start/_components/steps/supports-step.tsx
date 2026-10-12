@@ -1,11 +1,20 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import {
+  getGroupCategories,
+  GROUP_HINT,
+  GROUP_QUESTION,
+  groupsInCategory,
+  matchesGroupQuery,
+  type GroupOption,
+} from "@/lib/questionnaire/groups";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { SIL_CODE, SupportsStep } from "@/lib/questionnaire/schema";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { parseInput } from "@/lib/validation";
 import {
+  ChoiceRow,
   ErrorSummary,
   Field,
   ParticipantDataWarning,
@@ -19,7 +28,7 @@ import {
 import { useQuestionnaire } from "../questionnaire-provider";
 
 const LABELS = {
-  groups: "Registration groups",
+  groups: GROUP_QUESTION,
   "silEligibility.fewHoursOnly": "Supported independent living question 1",
   "silEligibility.participantManagesOwnWorkers":
     "Supported independent living question 2",
@@ -32,6 +41,16 @@ const YES_NO: { value: YesNo; label: string }[] = [
   { value: "yes", label: "Yes" },
   { value: "no", label: "No" },
 ];
+
+const CATEGORIES = getGroupCategories();
+
+function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
+  return (
+    <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+      {auditType === "verification" ? "desk audit" : "site audit"}
+    </span>
+  );
+}
 
 export function SupportsStepForm() {
   const router = useRouter();
@@ -56,28 +75,31 @@ export function SupportsStepForm() {
   const [query, setQuery] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q
-      ? groups.filter(
-          (g) =>
-            g.code.includes(q) ||
-            g.name.toLowerCase().includes(q) ||
-            g.description.toLowerCase().includes(q),
-        )
-      : groups;
-  }, [groups, query]);
-  const verification = filtered.filter((g) => g.auditType === "verification");
-  const certification = filtered.filter((g) => g.auditType === "certification");
+  const filtered = useMemo(
+    () => groups.filter((g) => matchesGroupQuery(g, query)),
+    [groups, query],
+  );
+  // R-1: within a heading, the data's order (most common first), not code order.
+  const byCategory = useMemo(() => {
+    const map = new Map<string, GroupOption[]>();
+    for (const c of CATEGORIES) map.set(c.id, groupsInCategory(filtered, c.id));
+    return map;
+  }, [filtered]);
   const silChosen = selected.includes(SIL_CODE);
   const sdaOnly = selected.length === 1 && selected[0] === "0131";
   const warnings = detectParticipantData(note);
+  const nameOf = (code: string) =>
+    groups.find((g) => g.code === code)?.name ?? code;
 
   const toggle = (code: string) =>
     setSelected((prev) =>
       prev.includes(code)
         ? prev.filter((c) => c !== code)
         : [...prev, code].sort(),
+    );
+  const applyHint = () =>
+    setSelected((prev) =>
+      [...new Set([...prev, ...GROUP_HINT.selects])].sort(),
     );
 
   async function onSubmit(e: React.FormEvent) {
@@ -109,43 +131,31 @@ export function SupportsStepForm() {
     router.push(stepHref("practices"));
   }
 
-  const renderGroup = (g: (typeof groups)[number]) => {
-    const id = `group-${g.code}`;
-    return (
-      <li key={g.code}>
-        <label
-          htmlFor={id}
-          className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
-        >
-          <input
-            type="checkbox"
-            id={id}
-            name="groups"
-            value={g.code}
-            checked={selected.includes(g.code)}
-            onChange={() => toggle(g.code)}
-            className="mt-1 h-5 w-5 shrink-0"
-          />
-          <span>
-            <span className="block text-base">
-              <span className="font-mono text-sm text-zinc-500 dark:text-zinc-400">
-                {g.code}
-              </span>{" "}
-              {g.name}
-              {g.mandatoryFrom ? (
-                <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-                  registration mandatory from 1 July 2026
-                </span>
-              ) : null}
-            </span>
-            <span className="block text-sm text-zinc-600 dark:text-zinc-400">
-              {g.description}
-            </span>
-          </span>
-        </label>
-      </li>
-    );
-  };
+  const renderGroup = (g: GroupOption) => (
+    <li key={g.code}>
+      <ChoiceRow
+        id={`group-${g.code}`}
+        type="checkbox"
+        name="groups"
+        value={g.code}
+        checked={selected.includes(g.code)}
+        onChange={() => toggle(g.code)}
+        label={g.name}
+        secondary={g.code}
+        help={g.description}
+        tag={
+          <>
+            <AuditTag auditType={g.auditType} />
+            {g.mandatoryFrom ? (
+              <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+                registration mandatory from 1 July 2026
+              </span>
+            ) : null}
+          </>
+        }
+      />
+    </li>
+  );
 
   const groupsErrors = errorsFor(errors, "groups");
 
@@ -159,20 +169,36 @@ export function SupportsStepForm() {
           groupsErrors.length ? "groups-error groups-help" : "groups-help"
         }
       >
-        <legend className="text-base font-medium">{LABELS.groups}</legend>
+        <legend className="text-xl font-semibold">{GROUP_QUESTION}</legend>
         <p
           id="groups-help"
           className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
         >
-          Choose every registration group (class of support) you deliver or plan
-          to deliver. The names and audit types are the Commission&apos;s; the
-          one-line descriptions are ours to help you recognise them. If any
-          chosen group needs a certification audit, your whole registration
-          does.
+          Tick everything you deliver or plan to deliver. The Commission calls
+          these registration groups; the names and the audit type (desk audit or
+          site audit) are theirs, and the short descriptions are ours to help
+          you recognise your work. If any ticked group needs a site audit, your
+          whole registration does.
         </p>
-        <div className="mt-3">
+
+        <div
+          className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+          data-testid="groups-hint"
+        >
+          <p>{GROUP_HINT.text}</p>
+          <button
+            type="button"
+            onClick={applyHint}
+            className="mt-2 inline-flex min-h-11 items-center rounded-md border border-zinc-400 px-3 text-sm font-medium hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:hover:bg-zinc-800"
+          >
+            Choose those two for me
+          </button>
+        </div>
+
+        <div className="mt-4">
           <label htmlFor="group-search" className="block text-sm font-medium">
-            Search the {groups.length} groups
+            Search by what you do (for example cleaning, support worker,
+            therapy, SIL)
           </label>
           <div className="mt-1">
             <TextInput
@@ -181,36 +207,39 @@ export function SupportsStepForm() {
               value={query}
               onChange={setQuery}
               invalid={false}
+              inputMode="search"
             />
           </div>
         </div>
         <p
           className="mt-3 text-sm text-zinc-700 dark:text-zinc-300"
           aria-live="polite"
+          data-testid="groups-chosen"
         >
           {selected.length === 0
-            ? "No groups chosen yet."
-            : `${selected.length} chosen: ${selected.join(", ")}`}
+            ? "Nothing chosen yet."
+            : `${selected.length} chosen: ${selected.map(nameOf).join("; ")}`}
         </p>
         <div id="groups" className="mt-3 space-y-6">
-          <div>
-            <h2 className="text-base font-semibold">
-              Needs a verification audit (desk review)
-            </h2>
-            <ul className="mt-2 space-y-2">{verification.map(renderGroup)}</ul>
-            {verification.length === 0 ? (
-              <p className="text-sm text-zinc-500">No matches.</p>
-            ) : null}
-          </div>
-          <div>
-            <h2 className="text-base font-semibold">
-              Needs a certification audit (site visit)
-            </h2>
-            <ul className="mt-2 space-y-2">{certification.map(renderGroup)}</ul>
-            {certification.length === 0 ? (
-              <p className="text-sm text-zinc-500">No matches.</p>
-            ) : null}
-          </div>
+          {CATEGORIES.map((c) => {
+            const items = byCategory.get(c.id) ?? [];
+            if (items.length === 0 && query.trim()) return null;
+            return (
+              <div key={c.id} data-testid={`category-${c.id}`}>
+                <h2 className="text-base font-semibold">{c.title}</h2>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  {c.description}
+                </p>
+                <ul className="mt-2 space-y-2">{items.map(renderGroup)}</ul>
+              </div>
+            );
+          })}
+          {filtered.length === 0 ? (
+            <p className="text-sm text-zinc-500" role="status">
+              No matches. Try another word, or clear the search to see every
+              group.
+            </p>
+          ) : null}
         </div>
         {groupsErrors.length ? (
           <p

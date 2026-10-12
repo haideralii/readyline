@@ -220,6 +220,34 @@ describe("buildResult", () => {
     ).toBe(true);
   });
 
+  it("REQ-013 AC-4: the not-sure helper resolves to yes or no and the assumption is shown only for yes", () => {
+    const allNo = build({
+      supports: { groups: ["0107"] },
+      practices: {
+        restrictivePractices: "not-sure",
+        notSureHelper: {
+          locksOrBarriers: false,
+          holdsOrRestraint: false,
+          medicationForBehaviour: false,
+        },
+      },
+    });
+    expect(allNo.modules.map((m) => m.id)).not.toContain("ibsp");
+    expect(allNo.flags.restrictivePracticesAssumed).toBe(false);
+    const oneYes = build({
+      supports: { groups: ["0107"] },
+      practices: {
+        restrictivePractices: "not-sure",
+        notSureHelper: {
+          locksOrBarriers: false,
+          holdsOrRestraint: true,
+          medicationForBehaviour: false,
+        },
+      },
+    });
+    expect(oneYes.modules.map((m) => m.id)).toContain("ibsp");
+    expect(oneYes.flags.restrictivePracticesAssumed).toBe(true);
+  });
   it("AC-10: result copy carries the general-information notice and no prohibited claims", () => {
     const r = build({
       supports: { groups: ["0120", "0107", "0104"] },

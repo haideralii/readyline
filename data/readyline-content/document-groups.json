@@ -1,0 +1,77 @@
+{
+  "note": "Four everyday headings for the document list on the result page (REQ-013 FR-5). Written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Grouping never changes which documents apply.",
+  "author": "readyline",
+  "status": "draft",
+  "draftedBy": "dev",
+  "draftedAt": "2026-10-12",
+  "pendingNote": "Ids listed under pending are grouped ahead of the REQ-005 branch (PR #9) that adds them to document-sets.json; the test tolerates them until that merge.",
+  "pending": [
+    "participant-money-and-property-procedure",
+    "support-planning-and-transitions-procedure"
+  ],
+  "groups": [
+    {
+      "id": "running-the-business",
+      "title": "Running the business",
+      "documents": [
+        "governance-policy",
+        "risk-management-policy-and-register",
+        "continuity-of-supports-plan",
+        "conflict-of-interest-policy",
+        "privacy-and-information-management-policy",
+        "records-management-policy",
+        "complaints-management-policy-and-register",
+        "incident-management-policy-and-register",
+        "quality-management-and-continuous-improvement",
+        "ai-use-and-governance-policy",
+        "ai-and-digital-data-handling-procedure",
+        "emergency-and-disaster-management-plan",
+        "practice-governance-framework"
+      ]
+    },
+    {
+      "id": "your-workers",
+      "title": "Your workers",
+      "documents": [
+        "worker-screening-and-recruitment-procedure",
+        "induction-and-training-procedure-and-register",
+        "code-of-conduct-acknowledgement",
+        "high-intensity-skills-descriptors-and-training-register",
+        "clinical-oversight-procedure"
+      ]
+    },
+    {
+      "id": "participants-and-supports",
+      "title": "Participants and supports",
+      "documents": [
+        "service-agreement-template",
+        "participant-rights-and-choice-policy",
+        "safeguarding-policy",
+        "feedback-and-participant-engagement-procedure",
+        "support-planning-and-transitions-procedure",
+        "participant-money-and-property-procedure",
+        "restrictive-practice-authorisation-and-reporting-procedure",
+        "behaviour-support-plan-implementation-procedure",
+        "family-centred-practice-procedure",
+        "child-safe-practices-policy",
+        "conflict-of-interest-in-coordination-procedure",
+        "complex-support-escalation-procedure",
+        "supported-decision-making-procedure",
+        "sil-safeguarding-and-roster-oversight-procedure",
+        "tenancy-housing-and-support-agreements-procedure",
+        "tenancy-rights-and-dispute-procedure"
+      ]
+    },
+    {
+      "id": "environment-and-safety",
+      "title": "Environment and safety",
+      "documents": [
+        "medication-management-procedure",
+        "mealtime-management-procedure",
+        "waste-and-infection-control-procedure",
+        "transport-safety-procedure",
+        "dwelling-enrolment-and-maintenance-procedure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "note": "Everyday groupings of the 38 registration classes for the supports step (REQ-013 FR-3). Written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. The class names, codes and audit types in standards.json stay authoritative; a grouping never changes which class applies.",
+  "author": "readyline",
+  "status": "draft",
+  "draftedBy": "dev",
+  "draftedAt": "2026-10-12",
+  "question": "What do you do for participants?",
+  "hint": {
+    "text": "Not sure? Most sole-trader support workers choose Assistance with daily personal activities and Household tasks.",
+    "selects": ["0107", "0120"]
+  },
+  "categories": [
+    {
+      "id": "personal-care",
+      "title": "Personal care at home",
+      "description": "Help with showering, dressing, eating, medication and health needs.",
+      "codes": ["0107", "0104", "0114"]
+    },
+    {
+      "id": "around-the-house",
+      "title": "Help around the house and getting out",
+      "description": "Cleaning, cooking, shopping, transport, community outings and daily living skills.",
+      "codes": ["0120", "0108", "0117", "0125", "0136", "0116"]
+    },
+    {
+      "id": "therapy-health",
+      "title": "Therapy and health",
+      "description": "Allied health, exercise, hearing services and interpreting.",
+      "codes": ["0128", "0126", "0119", "0134", "0121"]
+    },
+    {
+      "id": "equipment",
+      "title": "Equipment and modifications",
+      "description": "Supplying or fitting equipment, vehicle and home modifications, assistance animals.",
+      "codes": [
+        "0103",
+        "0105",
+        "0109",
+        "0111",
+        "0112",
+        "0113",
+        "0122",
+        "0123",
+        "0124",
+        "0135",
+        "0130"
+      ]
+    },
+    {
+      "id": "housing",
+      "title": "Housing and living arrangements",
+      "description": "Finding and keeping a home, shared living, supported independent living and specialist accommodation.",
+      "codes": ["0101", "0115", "0138", "0131"]
+    },
+    {
+      "id": "children",
+      "title": "Children and families",
+      "description": "Early intervention for young children and their families.",
+      "codes": ["0118"]
+    },
+    {
+      "id": "specialist",
+      "title": "Specialist supports",
+      "description": "Behaviour support, support coordination, life-stage transitions and specialised driver training.",
+      "codes": ["0110", "0132", "0106", "0129"]
+    },
+    {
+      "id": "business-platform",
+      "title": "Business and platform services",
+      "description": "Plan management, employment supports and digital platforms that connect participants with workers.",
+      "codes": ["0127", "0102", "0133", "0137"]
+    }
+  ]
+}
