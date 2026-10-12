@@ -14,7 +14,7 @@
  *   model-keyed fixture directory with its own report (D-046 comparison);
  *   production never reads that directory.
  */
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { documentTypeById, sectionsFor } from "./catalogue";
@@ -352,6 +352,7 @@ describe.skipIf(!enabled)(
           );
         }
       }
+      mkdirSync(FIXTURES_DIR, { recursive: true });
       writeFileSync(
         REPORT_PATH,
         JSON.stringify(

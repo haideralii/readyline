@@ -1,0 +1,524 @@
+{
+  "decision": "D-039 to D-046",
+  "prices": {
+    "claude-sonnet-5-5": {
+      "inputPerM": 2,
+      "outputPerM": 10
+    },
+    "claude-haiku-5-5": {
+      "inputPerM": 1,
+      "outputPerM": 5
+    }
+  },
+  "cacheFactors": {
+    "write": 1.25,
+    "read": 0.1
+  },
+  "estimates": [
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1572
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1565
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1561
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1655
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1650
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1598
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "purpose",
+      "cap": 1500,
+      "estimatedInputTokens": 1584
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1580
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1590
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1673
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1669
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1631
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "summary",
+      "cap": 1500,
+      "estimatedInputTokens": 2191
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2220
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1561
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1655
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1650
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1598
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "scope",
+      "cap": 1500,
+      "estimatedInputTokens": 1580
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "cap": 2500,
+      "estimatedInputTokens": 1590
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "cap": 4000,
+      "estimatedInputTokens": 1673
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "cap": 1500,
+      "estimatedInputTokens": 1669
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "procedure",
+      "cap": 4000,
+      "estimatedInputTokens": 1631
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "summary",
+      "cap": 1500,
+      "estimatedInputTokens": 2191
+    },
+    {
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "how-we-meet",
+      "cap": 1500,
+      "estimatedInputTokens": 2220
+    }
+  ],
+  "recordings": [
+    {
+      "batch": 10,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "model": "claude-haiku-5-5",
+      "cap": 2500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 10.3,
+      "inputTokensLastCall": 105,
+      "cacheCreationInputTokensLastCall": 2136,
+      "cacheReadInputTokensLastCall": 0,
+      "outputTokensLastCall": 2372,
+      "estimatedDollarsLastCall": 0.0146,
+      "uncachedDollarsLastCall": 0.0141,
+      "requestHash": "f9c59a139f8cdbbb2e5d6b5c9795194896ce30cfec5686ea03b3e434eb392040",
+      "recordedAt": "2026-10-12T03:36:27.984Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "fallback",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 12.4 is above 11: shorten sentences to under 20 words and use common words",
+        "usedFacts: Too small: expected array to have >=1 items"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 167,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2136,
+      "outputTokensLastCall": 1038,
+      "estimatedDollarsLastCall": 0.0056,
+      "uncachedDollarsLastCall": 0.0075,
+      "requestHash": "680700518e3e783f4c5170b1276242c347edb7a9b675e97f0a08ee05ee30269a",
+      "recordedAt": "2026-10-12T03:36:39.254Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "purpose",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": ["usedFacts: Too small: expected array to have >=1 items"],
+      "readabilityGrade": 9.3,
+      "inputTokensLastCall": 157,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2161,
+      "outputTokensLastCall": 106,
+      "estimatedDollarsLastCall": 0.0009,
+      "uncachedDollarsLastCall": 0.0028,
+      "requestHash": "2f020d0d3801545db110575a350e579a494764c15cea13e6f6c3d8984b772691",
+      "recordedAt": "2026-10-12T03:36:54.140Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "scope",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 11.7 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": 10.9,
+      "inputTokensLastCall": 162,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2135,
+      "outputTokensLastCall": 403,
+      "estimatedDollarsLastCall": 0.0024,
+      "uncachedDollarsLastCall": 0.0043,
+      "requestHash": "b89d60fd45021bb41ae2842727fdfe953d80a15e226c83754c4a5fd7b74e3848",
+      "recordedAt": "2026-10-12T03:39:42.989Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "model": "claude-haiku-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.9,
+      "inputTokensLastCall": 207,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2135,
+      "outputTokensLastCall": 678,
+      "estimatedDollarsLastCall": 0.0038,
+      "uncachedDollarsLastCall": 0.0057,
+      "requestHash": "70ec28425759936001916551b810113491e505d700803b77305f9db211ca56db",
+      "recordedAt": "2026-10-12T03:39:47.374Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.1,
+      "inputTokensLastCall": 198,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2135,
+      "outputTokensLastCall": 502,
+      "estimatedDollarsLastCall": 0.0029,
+      "uncachedDollarsLastCall": 0.0048,
+      "requestHash": "eff1ff136d337ade209c012ebc99ec2e4f4e91c58535d8788b405f2259d0ea6a",
+      "recordedAt": "2026-10-12T03:39:51.397Z"
+    },
+    {
+      "batch": 12,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "incident-management-policy-and-register",
+      "sectionId": "procedure",
+      "model": "claude-haiku-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 9.2,
+      "inputTokensLastCall": 139,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2135,
+      "outputTokensLastCall": 930,
+      "estimatedDollarsLastCall": 0.005,
+      "uncachedDollarsLastCall": 0.0069,
+      "requestHash": "337ef9c62bc8222320dc66665c67595991b297eabb4c3a106d6ccabab630c4b8",
+      "recordedAt": "2026-10-12T03:39:57.467Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "scope",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "term-worker: \"carers\" (Use 'worker'.)",
+        "term-worker: \"carers\" (Use 'worker'.)"
+      ],
+      "readabilityGrade": 11,
+      "inputTokensLastCall": 172,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2160,
+      "outputTokensLastCall": 408,
+      "estimatedDollarsLastCall": 0.0024,
+      "uncachedDollarsLastCall": 0.0044,
+      "requestHash": "6859d8899cdc71d9d44af78e1902addf9a25bc6a5b950af362fa990f31df160c",
+      "recordedAt": "2026-10-12T03:40:04.881Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "policy-statement",
+      "model": "claude-haiku-5-5",
+      "cap": 2500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 11.3 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": 7.9,
+      "inputTokensLastCall": 169,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2160,
+      "outputTokensLastCall": 490,
+      "estimatedDollarsLastCall": 0.0028,
+      "uncachedDollarsLastCall": 0.0048,
+      "requestHash": "b66ffffca71d07a1b4e6291f45f002638a3f6a92c6dc3ced679720e3abab6201",
+      "recordedAt": "2026-10-12T03:40:12.305Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "how-we-do-this",
+      "model": "claude-haiku-5-5",
+      "cap": 4000,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "restates a statutory timeframe (\"business day\"): refer to the fixed section that holds the rule instead of restating the timeframe"
+      ],
+      "readabilityGrade": 8.9,
+      "inputTokensLastCall": 281,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2160,
+      "outputTokensLastCall": 782,
+      "estimatedDollarsLastCall": 0.0044,
+      "uncachedDollarsLastCall": 0.0064,
+      "requestHash": "a9abc0e0ce4f7ab0b51184463d0ba9a5d31ed7eb43f6f738bc94d7a4b7f1d3db",
+      "recordedAt": "2026-10-12T03:40:22.637Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "responsibilities",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 1,
+      "validationPassedFirstTime": true,
+      "truncatedAtTokens": null,
+      "problems": [],
+      "readabilityGrade": 10.7,
+      "inputTokensLastCall": 198,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2160,
+      "outputTokensLastCall": 710,
+      "estimatedDollarsLastCall": 0.004,
+      "uncachedDollarsLastCall": 0.0059,
+      "requestHash": "2a38942725d350b9390f43505b0d9351f42da1b50400a1e04f7fd13ae6e6d943",
+      "recordedAt": "2026-10-12T03:40:27.767Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "complaints-management-policy-and-register",
+      "sectionId": "procedure",
+      "model": "claude-haiku-5-5",
+      "cap": 4000,
+      "status": "fallback",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "restates a statutory timeframe (\"within 2 working days\"): refer to the fixed section that holds the rule instead of restating the timeframe",
+        "term-worker: \"support worker\" (Use 'worker'.)"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 235,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2160,
+      "outputTokensLastCall": 846,
+      "estimatedDollarsLastCall": 0.0047,
+      "uncachedDollarsLastCall": 0.0066,
+      "requestHash": "4eba1a7f134bf9caceb73f7e9feca5f1fd378375a2fde6c234ce63980abfe1f8",
+      "recordedAt": "2026-10-12T03:40:39.111Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "summary",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "fallback",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "claim-words: \"guarantee\" (Say what we do, not that we comply (CLAUDE.md 4.3).)",
+        "readability grade 11.8 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": null,
+      "inputTokensLastCall": 172,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2846,
+      "outputTokensLastCall": 355,
+      "estimatedDollarsLastCall": 0.0022,
+      "uncachedDollarsLastCall": 0.0048,
+      "requestHash": "86dbe6fb8275c8fe5a07a6688e7f08a80b4b4aa1ea347591b7e936dee3065097",
+      "recordedAt": "2026-10-12T03:40:45.005Z"
+    },
+    {
+      "batch": 13,
+      "caseId": "verification-sole-trader",
+      "documentTypeId": "practice-standards-self-assessment",
+      "sectionId": "how-we-meet",
+      "model": "claude-haiku-5-5",
+      "cap": 1500,
+      "status": "generated",
+      "attempts": 2,
+      "validationPassedFirstTime": false,
+      "truncatedAtTokens": null,
+      "problems": [
+        "readability grade 12.3 is above 11: shorten sentences to under 20 words and use common words"
+      ],
+      "readabilityGrade": 9.6,
+      "inputTokensLastCall": 197,
+      "cacheCreationInputTokensLastCall": 0,
+      "cacheReadInputTokensLastCall": 2846,
+      "outputTokensLastCall": 783,
+      "estimatedDollarsLastCall": 0.0044,
+      "uncachedDollarsLastCall": 0.007,
+      "requestHash": "9ffb51f985ef7e2c6393a1ff7639b3f6b71a8127744480bd23bd2cccff1e3766",
+      "recordedAt": "2026-10-12T03:40:53.368Z"
+    }
+  ]
+}

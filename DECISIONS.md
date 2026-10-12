@@ -1193,6 +1193,27 @@ business-day rule, then grade 11.7) and the privacy purpose (grades 14.5 and
 12.4); both were recorded again. R-7 is left as the PO wrote it; whether a
 provider's own service timeframe in a continuity plan should pass is for the
 PO.
+
+**D-537 The Haiku comparison, and the thinking setting per model family
+(Dev, 2026-10-12, D-046).** Haiku 5.5 refuses `thinking: {type:
+"between_tools"}` with a 400; the client now tries `{type: "disabled"}` next
+and, only if that is refused too, sends no thinking parameter, recording
+which setting the reply came from. The first Haiku pass ran with no
+parameter and showed what the parameter is for: the replies carried
+`thinking` blocks (content types `["thinking","text"]`, 0.2 to 1.0
+characters per output token, three replies that were thinking only and
+truncated at 1,500 tokens), the same shape as the Sonnet calls before D-530.
+With `disabled`, Haiku replies are text only at about 3.1 characters per
+token. The comparison over the three review-pack documents (14 sections,
+Sonnet figures from the same batch): Sonnet 9 first time, 5 on retry, 0
+fallbacks, mean grade 8.5; Haiku 5 first time, 6 on retry, 3 fallbacks (a
+"support worker" role title, the word "guarantee", a restated timeframe,
+and a purpose above grade 11 twice), mean grade 9.7. Cost at the assumed
+Haiku prices ($1 in, $5 out per million, UNVERIFIED): Haiku about $0.09
+against Sonnet $0.14 for the same sections, with two Haiku rows still
+carrying hidden thinking tokens from the first pass. Production stays on
+Sonnet 5.5 unless the PO decides otherwise; the model-keyed fixture
+directory is never read by production code.
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

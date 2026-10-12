@@ -141,6 +141,59 @@ describe("replay harness", () => {
     rmSync(dir, { recursive: true, force: true });
   });
 
+  it("D-046: a model that refuses the thinking parameter gets 'disabled', then no parameter, once each", async () => {
+    const seen: Parameters<CreateMessage>[0][] = [];
+    const create: CreateMessage = async (params) => {
+      seen.push(params);
+      if ("thinking" in params)
+        throw Object.assign(
+          new Error(
+            '400 {"type":"error","error":{"message":"\\"thinking\\" is not supported on this model"}}',
+          ),
+          { status: 400 },
+        );
+      return {
+        id: "msg_test",
+        type: "message",
+        role: "assistant",
+        model: params.model,
+        content: [{ type: "text", text: GOOD, citations: null }],
+        stop_reason: "end_turn",
+        stop_sequence: null,
+        usage: {
+          input_tokens: 10,
+          output_tokens: 20,
+          cache_creation_input_tokens: 3,
+          cache_read_input_tokens: 4,
+        },
+      } as unknown as Awaited<ReturnType<CreateMessage>>;
+    };
+    const reply = await new AnthropicClient("test-key", create).complete(
+      buildModelRequest(pack, "claude-haiku-5-5"),
+    );
+    expect(seen).toHaveLength(3);
+    expect(seen[0].thinking).toEqual({ type: "between_tools" });
+    expect(seen[1].thinking).toEqual({ type: "disabled" });
+    expect("thinking" in seen[2]).toBe(false);
+    expect(seen[2].system).toEqual(seen[0].system);
+    expect(reply.thinking).toBe("none");
+    expect(reply.usage).toEqual({
+      inputTokens: 10,
+      outputTokens: 20,
+      cacheCreationInputTokens: 3,
+      cacheReadInputTokens: 4,
+    });
+    // Any other error is not retried.
+    const failing: CreateMessage = async () => {
+      throw Object.assign(new Error("500 overloaded"), { status: 500 });
+    };
+    await expect(
+      new AnthropicClient("test-key", failing).complete(
+        buildModelRequest(pack, "m"),
+      ),
+    ).rejects.toThrow(/overloaded/);
+  });
+
   it("defaults to replay; record mode needs both the flag and a key", () => {
     expect(createModelClient({}, tmp).mode).toBe("replay");
     expect(createModelClient({ GENERATION_RECORD: "1" }, tmp).mode).toBe(

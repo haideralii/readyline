@@ -382,6 +382,30 @@ Token totals across the 93 last calls: 14,750 uncached input, 12,409 cache write
 **Lint defects found by the volume (D-536).** (1) "Policy review register" names where reviews are recorded, so rows like "Reviews this policy and records the review in the Policy review register | Every 12 months" named both subjects; the R-8 subject rule was rebuilt (span before the mention, then after it, then the objects of the review verbs with recording verbs cut off) with eleven new unit cases, including "Every 12 months for the plan; every 3 months for the register". (2) The R-9 cross-reference run stopped at a colon, so "section 5 Steps: monitoring, reporting and review" was rejected; colons and commas now stay in the run and the heading test requires a word boundary. Replay listings re-pinned: R-7 lists seven first replies the gate refused (two batch-11, five batch-16: "within 5 business days", "Within 1 business day", "within 2 days"), R-8 six, R-9 unchanged (the behaviour-support first replies now pass), R-10 all eighteen sole-trader documents with core standards removed. One R-7 case is for the PO: the continuity plan's "Within 1 business day of being told" is the provider's own promise for its backup contact, not a statutory timeframe, and the rule as written rejects it.
 
 **Review pack.** `product/evidence/req-005/sole-trader/` now holds all 18 `.docx` files and a `sections.md` covering every document (89 model-text sections, 1 fallback), each section with the answers it used and its readability grade.
+
+**Haiku comparison (item 4, D-537).** `GENERATION_MODEL_OVERRIDE=claude-haiku-5-5` records into `fixtures/generation-claude-haiku-5-5/` (its own report; production never reads it) and `REVIEW_PACK_MODEL=claude-haiku-5-5` renders the three documents into `product/evidence/req-005/sole-trader-haiku/` with a `sections.md`. Haiku refuses the Sonnet off setting for thinking; the first pass therefore ran with no thinking parameter and its replies carried `thinking` blocks (three were thinking only and truncated at 1,500 tokens), which is direct evidence of the D-530 mechanism. The client now falls back to `{type: "disabled"}` (accepted by Haiku) before dropping the parameter, and the truncated and skipped sections were recorded again; two passing rows from the first pass keep their inflated token counts. Per section, Sonnet 5.5 and Haiku 5.5 side by side (last call; cached rates; Haiku prices assumed at $1 in / $5 out per million, UNVERIFIED):
+
+| Section | Sonnet 5.5 | Haiku 5.5 | Sonnet grade | Haiku grade | Sonnet tokens | Haiku tokens | Sonnet $ | Haiku $ |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| incident / policy statement | first time | first time (thinking on, first pass) | 10.7 | 10.3 | 2,240 in / 482 out | 2,241 in / 2,372 out | 0.010 | 0.015 |
+| incident / purpose | retry | fallback (empty `usedFacts`, then grade 12.4; thinking on) | 9.0 | - | 2,302 / 87 | 2,303 / 1,038 | 0.003 | 0.011 |
+| incident / scope | first time | retry (11.7, then 10.9) | 10.5 | 10.9 | 2,233 / 486 | 2,297 / 403 | 0.005 | 0.005 |
+| incident / how we put this into practice | first time | first time | 5.5 | 9.9 | 2,342 / 805 | 2,342 / 678 | 0.009 | 0.004 |
+| incident / responsibilities | first time | first time | 8.1 | 9.1 | 2,333 / 634 | 2,333 / 502 | 0.007 | 0.003 |
+| incident / incident procedure | retry | first time | 6.0 | 9.2 | 2,353 / 862 | 2,274 / 930 | 0.019 | 0.005 |
+| complaints / purpose | first time | retry (empty `usedFacts`; thinking on) | 9.3 | 9.3 | 2,263 / 96 | 2,318 / 106 | 0.003 | 0.002 |
+| complaints / scope | retry | retry ("carers" twice, passed under D-532) | 9.1 | 11.0 | 2,311 / 439 | 2,332 / 408 | 0.010 | 0.005 |
+| complaints / policy statement | retry | retry (11.3, then 7.9) | 9.2 | 7.9 | 2,318 / 544 | 2,329 / 490 | 0.012 | 0.006 |
+| complaints / how we put this into practice | first time | retry ("business day") | 7.5 | 8.9 | 2,367 / 710 | 2,441 / 782 | 0.008 | 0.009 |
+| complaints / responsibilities | first time | first time | 8.0 | 10.7 | 2,358 / 658 | 2,358 / 710 | 0.007 | 0.004 |
+| complaints / complaints procedure | retry | fallback ("within 2 working days", then "support worker") | 5.9 | - | 2,396 / 1,082 | 2,395 / 846 | 0.023 | 0.009 |
+| self-assessment / our registration scope | first time | fallback ("guarantee", then grade 11.8) | 10.3 | - | 2,946 / 483 | 3,018 / 355 | 0.009 | 0.004 |
+| self-assessment / how we meet | first time | retry (12.3, then 9.6) | 10.1 | 9.6 | 2,979 / 784 | 3,043 / 783 | 0.009 | 0.009 |
+| **Total / mean** | 9 first, 5 retry, 0 fallback | 5 first, 6 retry, 3 fallback | mean 8.5 | mean 9.7 | | | 0.136 (uncached 0.202) | 0.090 (uncached 0.135) |
+
+Haiku cache hit rate 86%. Reading: Haiku costs roughly two thirds of Sonnet per section at the assumed prices (less once the two thinking-on rows are discounted), but fails the house-style gates more often (a role title, a banned claim word, restated timeframes), reads about a grade harder, and leaves three of fourteen sections to the provider where Sonnet left none. The Haiku `.docx` files are in `sole-trader-haiku/` for the PO to read side by side. Item 4 spend: about $0.10 (first pass $0.05 including the thinking-on calls, second pass $0.04, retry first calls up to $0.02), at the $0.10 ceiling.
+
+**Running total.** $0.93 before this batch; item 3 about $0.85; item 4 about $0.10; **about $1.88 to date** (batch budget $2.00, cap $2.93).
 ## PO review
 (PO fills in.)
 

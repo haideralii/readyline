@@ -32,8 +32,10 @@ export type ModelReply = {
   /** The thinking setting the request sent (D-530); "between_tools" is "off" for this model family. */
   thinking?: ThinkingSetting;
 };
-export type ThinkingSetting = "between_tools";
-export const THINKING_SETTING: ThinkingSetting = "between_tools";
+/** "between_tools" is "off" for the Sonnet family; "disabled" for models that refuse it; "none" when a model refuses both and gets no parameter. */
+export type ThinkingSetting = "between_tools" | "disabled" | "none";
+export const THINKING_SETTING =
+  "between_tools" as const satisfies ThinkingSetting;
 
 export interface ModelClient {
   readonly mode: "replay" | "record" | "fake";
@@ -219,7 +221,7 @@ export class AnthropicClient implements ModelClient {
     // D-046: the system prompt and the per-document block are cache breakpoints
     // (ephemeral, five minutes); the section block comes last so a document's
     // sections share the cached prefix.
-    const message = await create({
+    const params: MessageCreateParamsNonStreaming = {
       model: request.model,
       max_tokens: request.maxTokens,
       system: [
@@ -247,7 +249,30 @@ export class AnthropicClient implements ModelClient {
       // model family and names "between_tools" as the off setting (we use no
       // tools, so nothing is produced between them).
       thinking: { type: THINKING_SETTING },
-    });
+    };
+    // A model that refuses "between_tools" with a 400 naming "thinking" gets
+    // the same request with {type: "disabled"}; one that refuses that too gets
+    // it with no thinking parameter. Each step is tried once.
+    const { thinking: _omitted, ...withoutThinking } = params;
+    void _omitted;
+    const attempts: Array<[ThinkingSetting, MessageCreateParamsNonStreaming]> =
+      [
+        [THINKING_SETTING, params],
+        ["disabled", { ...withoutThinking, thinking: { type: "disabled" } }],
+        ["none", withoutThinking],
+      ];
+    let thinking: ThinkingSetting = THINKING_SETTING;
+    let message: Message | undefined;
+    for (const [setting, candidate] of attempts) {
+      try {
+        message = await create(candidate);
+        thinking = setting;
+        break;
+      } catch (error) {
+        if (!isThinkingRejection(error) || setting === "none") throw error;
+      }
+    }
+    if (!message) throw new Error("no reply");
     const text = message.content
       .map((c) => (c.type === "text" ? c.text : ""))
       .join("")
@@ -269,7 +294,7 @@ export class AnthropicClient implements ModelClient {
       },
       stopReason,
       contentTypes: message.content.map((c) => c.type),
-      thinking: THINKING_SETTING,
+      thinking,
     };
   }
   private async sdkCreate(): Promise<CreateMessage> {
@@ -277,6 +302,17 @@ export class AnthropicClient implements ModelClient {
     const client = new Anthropic({ apiKey: this.apiKey });
     return (params) => client.messages.create(params);
   }
+}
+
+function isThinkingRejection(error: unknown): boolean {
+  const e = error as { status?: number; message?: string } | null;
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    e.status === 400 &&
+    typeof e.message === "string" &&
+    /thinking/i.test(e.message)
+  );
 }
 
 /** Replay unless GENERATION_RECORD=1 and a key exist (record mode writes fixtures through a real call). */
