@@ -12,8 +12,7 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 
 export const metadata: Metadata = { title: "Document set" };
 
-const button =
-  "inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 px-5 text-base font-medium hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-700 dark:hover:bg-zinc-900";
+const button = "btn-secondary";
 
 export default async function DocumentSetPage({
   params,

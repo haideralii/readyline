@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { Wordmark } from "@/components/wordmark";
 import { getSessionUser } from "@/server/accounts/queries";
 
 export async function SiteHeader() {
@@ -9,9 +10,10 @@ export async function SiteHeader() {
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="text-lg font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="text-xl focus-visible:outline-2 focus-visible:outline-offset-2"
+          aria-label={`${BRAND} home`}
         >
-          {BRAND}
+          <Wordmark />
         </Link>
         <nav aria-label="Account" className="flex items-center gap-4 text-sm">
           <span className="rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">

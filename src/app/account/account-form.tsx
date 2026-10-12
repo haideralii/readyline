@@ -220,11 +220,7 @@ export function AccountForm({
           Saved.
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={busy}
-        className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+      <button type="submit" disabled={busy} className="btn-primary">
         {busy
           ? "Saving…"
           : mode === "setup"

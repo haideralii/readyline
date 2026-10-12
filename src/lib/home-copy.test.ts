@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { readinessCounts } from "@/lib/questionnaire/readiness";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { HOME_COPY, homeStrings } from "./home-copy";
 
@@ -36,5 +37,7 @@ describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
     expect(c.result.pathway).toBe("verification");
     expect(c.result.modules.map((m) => m.id)).toEqual(["verification"]);
     expect(c.result.midTermAudit.applies).toBe(false);
+    // REQ-014: the example's ready line is what the reference case answered.
+    expect(HOME_COPY.example.line).toEqual(readinessCounts(c.result));
   });
 });

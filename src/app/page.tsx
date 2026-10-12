@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ReadyLine } from "@/components/ready-line";
 import { BRAND } from "@/lib/brand";
 import { HOME_COPY as C } from "@/lib/home-copy";
 
@@ -22,10 +23,7 @@ export default function Home() {
           {C.lead}
         </p>
         <p className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link
-            href="/start"
-            className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
+          <Link href="/start" className="btn-primary">
             {C.cta}
           </Link>
           <span
@@ -75,6 +73,13 @@ export default function Home() {
           <p className="text-lg leading-8">
             <strong>{C.example.audit}</strong> {C.example.summary}
           </p>
+          <div className="mt-4">
+            <ReadyLine
+              counts={C.example.line}
+              noun="documents and registers"
+              testId="home-ready-line"
+            />
+          </div>
           <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
             {C.example.facts.map((f) => (
               <div key={f.label}>

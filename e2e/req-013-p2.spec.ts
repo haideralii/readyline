@@ -83,6 +83,7 @@ test.describe("REQ-013 P2", () => {
       "Step 2 of 6: Supports",
     );
     const completed = page.getByRole("navigation", { name: "Completed steps" });
+    await expect(completed).toContainText("Back to:");
     await expect(
       completed.getByRole("link", { name: "Business" }),
     ).toHaveAttribute("href", "/start/business");
