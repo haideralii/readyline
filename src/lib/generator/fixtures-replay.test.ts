@@ -211,8 +211,10 @@ describe("recorded fixtures replay through the current gate", () => {
     // is what the replay passes through. Batch 16 adds three more rejected first
     // replies (a register reviewed every 12 months, "the whole register at least
     // every 12 months", "check the register every month"); their retries pass.
+    // Batch 17 adds the governance policy statement's refused first reply (register every 12 months).
     expect(sections).toEqual([
       "ai-and-digital-data-handling-procedure/steps",
+      "governance-policy/policy-statement",
       "incident-management-policy-and-register/how-we-do-this",
       "incident-management-policy-and-register/policy-statement",
       "incident-management-policy-and-register/procedure",

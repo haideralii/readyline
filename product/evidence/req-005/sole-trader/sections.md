@@ -3,14 +3,14 @@
 Case: verification-sole-trader (Sunrise Supports, sole trader, New South Wales; classes 0120; verification).
 Rendered 2026-10-12 from recorded fixtures only (replay client, no model call); model id in the fixtures: claude-sonnet-5-5; 18 documents.
 Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lint and readability gates; sections marked fallback show the marker the provider would see, with the reason the pipeline gave (no fixture recorded, readability fail after the retry, or a reply cut at the output cap).
-Tailored sections: 89 with model text, 1 with a fallback marker.
+Tailored sections: 90 with model text, 0 with a fallback marker.
 
 ## Governance policy (governance-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.7.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 5.8.
 
-  > This policy sets out how Sunrise Supports is governed and who decides what. It supports the Commission's governance and operational management standard.
+  > This policy sets out how Sunrise Supports is governed and who makes decisions. It supports our duty to meet the NDIS Code of Conduct.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 9.
 
@@ -27,18 +27,19 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > If we add workers, key personnel, supports or states, we will update this scope. We record the change in the policy review register.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Registration groups (audit type derived) (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 7.8.
+- 4 Policy statement: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4). Readability grade 8.2.
 
-  > Sunrise Supports is a sole trader business that provides household tasks supports (support class 0120) to NDIS participants in New South Wales. We are responsible for how our business is run, and we make the commitments below.
-  > We make every decision about our business ourselves, and we keep a record of each significant decision and the reason for it.
-  > We declare any conflict of interest as soon as we see it. We tell the participant, write it down and say how we will manage it.
-  > We keep to the conditions of our NDIS registration. We check them at each review and keep the evidence.
-  > We review how our supports are going on a set schedule. We look at feedback, complaints and incidents, and we act on what we find.
-  > We identify risks to participants and to our business, write them down, and review them on a schedule.
-  > We check that any person who does work for us has the right checks and is suitable for the role, including any role that carries a higher risk.
-  > We do not use restrictive practices in our supports. If that ever changed, we would meet the Commission's requirements before we started.
-  > We review this policy every 12 months, or sooner if our business or the rules change.
-  > [Provider to complete: list the quality indicators this policy supports. No standards or indicators were supplied for this document.]
+  > The NDIS Code of Conduct applies to every NDIS provider and every worker. Sunrise Supports is a sole trader, and I am both the provider and the only worker. These are our commitments to participants.
+  > Our commitment | What we do
+  > We make our own decisions about how Sunrise Supports is run, and we are accountable for them. | We keep one clear record of who decides what. We take responsibility for every decision about our business and our supports.
+  > We respect each participant's rights and choices. | We ask participants how they want their household tasks done and we follow their wishes. We do not make decisions for them.
+  > We are honest and open about who we are and what we offer. | We tell participants our trading name, the household tasks we provide and what we cannot do. We do not make promises we cannot keep.
+  > We declare and manage any conflict of interest. | We write down any personal, financial or other interest that could affect a decision. We tell the participant and put their interests first.
+  > We keep participants safe from harm. | We tell the right authority about any serious concern or incident. We act quickly to reduce the risk.
+  > We meet the conditions of our registration. | We keep a list of our registration conditions and check our work against them. We act when we find a gap.
+  > We keep participant information private. | We collect only what we need. We store it securely. We share it only when the participant agrees or the law requires it.
+  > We watch our own performance and risks. | We record problems, feedback and risks. We act on them and update our documents when something changes.
+  > We keep our policies current. | We record each policy in the policy review register. We review each policy every 12 months and the register every 3 months.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 8.4.
 
@@ -175,9 +176,10 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Continuity of supports plan (continuity-of-supports-plan.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 8.8.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.2.
 
-  > This plan shows how Sunrise Supports keeps supports going when a worker or we are unavailable, or the business changes. It supports the Commission's standard on continuity of supports. [Provider to complete: confirm the exact standard name or number.]
+  > This plan shows how Sunrise Supports keeps supports going when people or the business are unavailable.
+  > It supports the conditions of registration, which require us to keep supports going for participants.
 
 - 2 Our services and where we deliver them: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Registration groups (audit type derived) (step 2). Readability grade 6.1.
 
@@ -208,24 +210,28 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > Household tasks are not usually urgent in the way personal care is. Some participants may still depend on them for a safe and healthy home, so we decide how urgent each participant's supports are when we plan their services.
   > [Provider to complete: any participants whose supports are urgent, and any scenario specific to your area or work that is not listed above.]
 
-- 4 What we will do: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4). Readability grade 8.1.
+- 4 What we will do: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); States and territories (step 1). Readability grade 8.3.
 
-  > Sunrise Supports is run by one person. We plan in three stages: before something goes wrong, while it is happening, and after it is over. This section sets out the steps at each stage for household tasks supports delivered in New South Wales.
-  > Before: we keep a current list of each participant's agreed supports, visit days and times, and preferred contact. We keep it where we can reach it on any day.
-  > Before: we agree with each participant what they want us to do if a visit cannot go ahead, including who they would like us to call and whether they want a different day.
-  > Before: we name at least one other provider or trusted contact who could cover household tasks in an emergency, and we confirm each year that they are still willing.
-  > During: as soon as we know a visit cannot go ahead, we tell the participant and, where they have asked us to, their nominated contact. We say what has changed and when we will next be in touch.
-  > During: we offer a new visit time, or help the participant to arrange cover from the named alternative provider. We do not leave a participant without a way to get a support they depend on.
-  > During: if the cause is a risk to a participant's safety or wellbeing, we deal with that first and follow our incident and complaints documents for any reporting steps.
-  > After: we check that every affected participant has had their support or has a confirmed new time. We record what happened and how long supports were disrupted.
-  > After: we ask the participant if the arrangement worked for them. We change this plan if their answers or our own review show a gap.
-  > We tell participants about changes in plain language and in the way they have told us they prefer, such as a call, a text or a visit. We never rely on a participant to chase us for news.
-  > Stage | Who acts | What they do
-  > Before | Owner of Sunrise Supports | Keeps participant details, cover contacts and preferences up to date.
-  > During | Owner of Sunrise Supports | Contacts participants, arranges new times or cover, and records each contact.
-  > During | Alternative provider or trusted contact | Delivers agreed supports if asked to step in, using the information we have shared with the participant's consent.
-  > After | Owner of Sunrise Supports | Confirms supports are back on track, records the event and updates this plan.
-  > [Provider to complete: name and contact details of the alternative provider or trusted contact who can cover household tasks.]
+  > Sunrise Supports is run by one person, who delivers all of our household tasks supports. This section sets out what we do before a disruption, during it, and after it. See section 3 Scenarios we plan for for the situations we cover.
+  > Before a disruption, we get ready so that supports can carry on or hand over safely.
+  > We keep a current list of each participant's supports, schedule and contact details in a secure place we can reach quickly.
+  > We keep a note for each participant of any support needs or risks that a new worker or provider would need to know.
+  > We agree in advance with each participant who they would like us to contact, and how, if we cannot attend.
+  > We name a backup provider or worker we could ask to cover, and we check each year that they are still willing and available.
+  > We tell participants at the start of their supports how we handle absences and closure, and where to find this plan.
+  > During a disruption, we tell participants early and arrange cover or another way to meet their needs.
+  > Situation | What we do | When
+  > We cannot attend a visit (for example, illness) | We contact the participant, offer to reschedule or arrange cover, and confirm the new plan with them. | As soon as we know, and before the visit starts
+  > We are unavailable for a longer period | We contact each participant, offer cover from our backup, and help them find another provider if they prefer. | Within 1 business day of knowing
+  > The business changes hands or closes | We give each participant written notice, agree a final support date, and help them move to a new provider. | As early as we can, and before supports stop
+  > After a disruption, we check that every participant is settled and we learn from what happened.
+  > We contact each affected participant to confirm their supports are back on track or have moved to a new provider.
+  > We update our schedule and records, and note any missed or changed supports.
+  > We record what went well and what did not, and fix any gaps in this plan.
+  > If a participant is unhappy with how we handled the disruption, we treat it as feedback and follow our complaints process.
+  > As a sole trader, we are the only person who makes these decisions. See section 5 Responsibilities for roles, and section 6 Cover for the provider's own absence for what happens if we cannot act ourselves.
+  > We keep communication simple. We use the contact method each participant has told us they prefer, such as phone call or text message. We speak plainly, say what we will do and by when, and follow up in writing if the participant wants that. We do not share a participant's information with anyone they have not agreed to.
+  > [Provider to complete: name and contact details of the backup provider or worker who can cover supports in New South Wales.]
 
 - 5 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 4.9.
 
@@ -239,21 +245,21 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > Where a fact is missing, we say so rather than guess. We do not hold a cover person's details in this section.
   > [Provider to complete: name and contact details of the nominated cover person, and confirm they have agreed to this role.]
 
-- 6 Cover for the provider's own absence: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 10.1.
+- 6 Cover for the provider's own absence: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Registration groups (step 2); Number of key personnel (step 4); States and territories (step 1). Readability grade 7.2.
 
-  > Sunrise Supports is run by one person. If that person cannot work, no one else is on hand to deliver supports or to run the business. This section sets out the cover we arrange so that participants are not left without household support.
-  > Our cover arrangement is a named backup provider: another registered NDIS provider who delivers household tasks in New South Wales and has agreed to take on our participants for a short period. We record the backup provider's name and contact details in the Provider to complete field below and give them to each participant at service agreement.
-  > [Provider to complete: name and contact details of the backup provider, and the date the arrangement was last confirmed.]
-  > When | What we do | Who does it
-  > We know in advance that we will be unavailable | Tell each affected participant, offer to reschedule or move supports to the backup provider, and pass on only the information the backup provider needs to deliver the support safely | The provider
-  > We become unavailable without warning | The emergency contact tells each affected participant and the backup provider, and uses the contact list to reschedule or cancel visits | Emergency contact
-  > We are unavailable for longer than the backup provider can cover | Help each participant choose another provider, and support the move as set out in section 3 Scenarios we plan for | The provider or emergency contact
-  > We name one trusted emergency contact who can reach our participant list, visit schedule and backup provider details if we are suddenly unable to work. That person does not deliver supports. Their role is to tell people and arrange cover. We do not name them in this document.
-  > We keep an up-to-date participant contact list and visit schedule where the emergency contact can reach it.
-  > We tell each participant about the backup arrangement and get their agreement before any information is shared with the backup provider.
-  > We share only what is needed to deliver the support safely, and we record what was shared.
-  > We check the backup arrangement and the emergency contact details at each review set out in section 9 Review and testing.
-  > If a participant does not want to use the backup provider, we respect that choice and help them find another way to keep their supports going.
+  > Sunrise Supports is run by one person. There are no other workers, so no one can step in automatically if we are ill, injured or away. We plan for this so that participants are not left without help.
+  > Our arrangement is a named backup provider. This is another registered NDIS provider that delivers 0120 Household tasks in New South Wales and has agreed in advance to take on our participants for a short time. We keep their contact details in our records.
+  > [Provider to complete: name and contact details of the backup provider, and the date the arrangement was agreed. Keep these in the file listed in section 7 Records and evidence to retain.]
+  > We tell each participant, in plain words, who our backup provider is when they start with us.
+  > If we cannot work for a day or more, we contact each participant with a planned visit that day. We tell them what has happened and who will help.
+  > We contact the backup provider and pass on only what they need: the participant's name, the support due and the times. We share this only with the participant's agreement.
+  > If a participant has a support coordinator, plan manager or nominee, we tell them that cover has started.
+  > When we are able to work again, we tell participants and the backup provider, and we hand services back.
+  > Situation | What we do | When
+  > Short absence, up to 7 days | Offer the participant the backup provider or a rescheduled visit, whichever they choose | Before the next planned visit
+  > Longer absence, more than 7 days | Hand over to the backup provider and help the participant choose how to continue | Within 2 days of knowing
+  > Sudden absence, such as an emergency | The backup provider or our emergency contact tells participants. We keep the emergency contact's details in our records | As soon as possible, the same day
+  > Participants can always choose a different provider. We will not stop them, and we will help them move if they ask.
 
 - 7 Records and evidence to retain: fixed text.
 - 8 Related documents and registers: fixed text.
@@ -263,9 +269,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Conflict of interest policy (conflict-of-interest-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.2.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 8.5.
 
-  > This policy explains how Sunrise Supports finds, declares, records and manages conflicts of interest. It supports the NDIS Practice Standards on governance and participant choice and control.
+  > This policy explains how Sunrise Supports manages conflicts of interest so participants' choices stay their own. It supports our duties under the NDIS Code of Conduct.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 8.9.
 
@@ -279,21 +285,20 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > We have roles that carry added risk, because they involve direct contact with participants or decisions about participants' money and services. We treat these roles as covered by this policy at all times. See section 6 Responsibilities for who does what.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4). Readability grade 10.6.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Registration groups (step 2); Number of workers (step 4); States and territories (step 1). Readability grade 8.1.
 
-  > Sunrise Supports is a sole trader business that provides household tasks supports in New South Wales. We make our decisions in the interests of participants. We do not let our own interests, or the interests of anyone close to us, steer a participant's choices.
-  > We make the following commitments.
-  > We tell participants about any actual, potential or perceived conflict of interest before it affects a decision, and we do it in plain words.
-  > We do not push a participant towards a service, product, provider or arrangement because it benefits us, our family, our friends or our business.
-  > We tell participants they are free to choose other providers, and we do not treat a participant differently if they do.
-  > We do not accept gifts, money or favours from a participant or a participant's family that could affect how we support them, or that could look like they would.
-  > We declare any conflict of interest in writing as soon as we become aware of it, and we record how we decided to manage it.
-  > We tell a participant, and where the participant wishes, their nominee, about any referral we make and about any link we have to the person or business we refer them to.
-  > We look for conflicts of interest whenever we take on a new participant, start a new type of support, or take on a new worker or contractor.
-  > We review our conflict of interest records at least every 12 months, and sooner if something changes.
-  > We are a sole trader, so we have no manager to refer a conflict to. We manage this by writing each declaration down, saying what we will do about it, and being open with the participant. If we cannot manage a conflict fairly, we step back from the decision or the support and help the participant find another provider.
-  > If we take on a worker or contractor, they must follow this policy. We will tell them how to declare a conflict before they start work with a participant.
-  > Where a worker or contractor holds a role with more access to a participant's home, money or personal information, we look at their possible conflicts more closely before they start, and we record what we decided.
+  > The NDIS Code of Conduct applies to every NDIS provider and every worker. Sunrise Supports is a sole trader, so it applies to us directly. We are open about our interests and we do not let them steer a participant's choices.
+  > We treat a conflict of interest as a risk to the participant's choice and control. This applies to actual, potential and perceived conflicts. A conflict can exist even if no one has done anything wrong.
+  > Our commitment | What we do
+  > We put the participant's choices first. | We give participants clear, fair information about their options, including other providers, so they can decide for themselves.
+  > We declare conflicts early. | We tell the participant in writing as soon as we see a conflict, before we start or change any support. See section 7 Declaring a conflict.
+  > We do not steer participants. | We do not push a participant towards our services, or towards a business we have a link with, for our own benefit.
+  > We do not accept gifts or benefits that could influence us. | We decline gifts, favours and payments from participants, their families or other businesses when they could affect our decisions.
+  > We keep money and support separate. | We do not borrow from, sell to or take financial advantage of a participant. We do not become involved in a participant's money or property outside the agreed support.
+  > We keep records. | We write down each declared conflict, what we decided and how we manage it. See section 8 Records and evidence to retain.
+  > We stop when we cannot manage a conflict. | If a conflict cannot be managed fairly, we step back from that support and help the participant find another provider.
+  > We review our own position. | We check for new conflicts each time we start a new participant, take on a new type of work or change how we operate.
+  > We provide household tasks support in New South Wales. We do not use this policy to avoid a sensible arrangement. Where a conflict can be managed in the participant's interests, we say so openly and let the participant decide.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 9.5.
 
@@ -330,7 +335,11 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Privacy and information management policy (privacy-and-information-management-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: fallback marker: readability grade 15.3 is above 11: shorten sentences to under 20 words and use common words
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.9.
+
+  > This policy explains how Sunrise Supports collects, stores, uses, shares and disposes of personal information.
+  > It supports the Privacy Act 1988 and the NDIS Code of Conduct, which require us to respect participants' privacy.
+
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 10.1.
 
   > This policy applies to Sunrise Supports, a sole trader business. It covers all personal information we collect, store, use, share and dispose of in the course of our work.
@@ -344,21 +353,20 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > This policy does not cover information about our business that is not about a person, such as our own accounts.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4). Readability grade 10.6.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 9.6.
 
-  > Sunrise Supports is a sole trader business that provides household tasks support in New South Wales. We make the following commitments about the personal information of the participants we support.
-  > We collect only the information we need to deliver safe supports, and we tell the participant why we need it.
-  > We ask for consent before we collect, use or share personal information, and we record the consent in writing.
-  > We explain consent in a way the participant can understand, and we check that they understand before we go ahead.
-  > We store personal information securely and keep it for as long as we need it and no longer.
-  > We share information only with people the participant has agreed to, or where the law requires or allows us to share it.
-  > We respect each participant's privacy and dignity during supports, including in their home and when we talk about them.
-  > We let participants see their information and ask us to correct it, and we respond to those requests promptly.
-  > We dispose of personal information safely when we no longer need to keep it.
-  > We tell the participant if their information has been lost, accessed or shared by mistake, and we act to fix the problem.
-  > We handle any complaint about privacy under our complaints process.
-  > Because Sunrise Supports has one person delivering supports, the owner is responsible for keeping each of these commitments. If we later engage other workers, we will make sure each worker knows this policy and follows it before they work with a participant.
-  > Our work gives us access to participants' homes, and that may give us access to private belongings and information. We do not read, copy, photograph or share anything we see in a participant's home unless the participant has agreed and it is needed for their supports.
+  > Sunrise Supports is a sole trader business providing household tasks to participants in New South Wales. We keep this policy because the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support.
+  > We make the commitments below to every participant. We carry them out ourselves, because we are the only worker in the business.
+  > Our commitment | What we do
+  > We collect personal information only with consent. | We explain what we need and why before we ask. We collect only what we need to provide household tasks safely. We record the participant's consent before we collect it.
+  > We are open about how we use information. | We use personal information only for the purpose we told the participant about. We ask again before we use it for anything else.
+  > We store information securely. | We keep records in a locked place or in a password-protected file. We do not leave participant information where others can see it.
+  > We share information only when we have permission or the law requires it. | We ask the participant before we share their information with anyone. We share without consent only when the law requires it, and we record what we shared and why.
+  > We protect privacy and dignity during supports. | When we work in a participant's home, we do not look through their personal papers or belongings beyond what the task needs. We do not talk about one participant with another, and we respect each participant's wishes about their home and their things.
+  > We let participants see and correct their information. | A participant can ask to see the information we hold about them. We respond to the request and correct anything that is wrong.
+  > We dispose of information safely. | When we no longer need a record and the law does not require us to keep it, we destroy it securely, by shredding paper and permanently deleting files.
+  > We deal with privacy problems quickly and honestly. | If personal information is lost or shared by mistake, we act at once to limit the harm, tell the participant, and record what happened and what we changed.
+  > We do not use participant information for marketing. We do not put it on social media or in messages to others, and we do not use it for any purpose a participant has not agreed to.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 7.6.
 
@@ -399,9 +407,10 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Records management policy (records-management-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1). Readability grade 6.9.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 11.7.
 
-  > This policy sets out how Sunrise Supports keeps, shares and destroys its records. It supports the Commission's rules on keeping good records.
+  > This policy sets out how Sunrise Supports keeps, protects and destroys its records.
+  > It supports the record-keeping conditions of registration that apply to every registered provider.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 9.1.
 
@@ -417,18 +426,21 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > If we start delivering another type of support, work in another state or take on more workers, we will review this scope. We will record the change in the policy review register.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4). Readability grade 10.4.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4). Readability grade 8.1.
 
-  > Sunrise Supports is a sole trader business that provides household tasks support (0120) to participants in New South Wales. We make the following commitments about the records we keep.
-  > We keep accurate, dated records of the supports we provide, the agreements we make and the decisions we take.
-  > We keep the records the Commission expects a registered provider to hold, and we can find them when we are asked.
-  > We collect only the participant information we need to provide safe supports, and we use it only for that purpose.
-  > We store records securely, whether on paper or on a device, and we do not leave them where other people can see them.
-  > We share a participant's information only with people who need it, or when the participant agrees, or when the law requires us to.
-  > We keep each type of record for the time set out in section 7 Retention schedule, and we destroy it securely when that time ends.
-  > We keep records about workers, including checks for roles that carry a higher risk, for as long as that schedule requires.
-  > We update the registers listed in section 9 Related documents and registers when something changes, and we review this policy every 12 months.
-  > [Provider to complete: the quality indicators this document supports were not supplied. Add the relevant indicator numbers and wording here before approval.]
+  > Sunrise Supports is a sole trader that provides household tasks to participants in New South Wales. The record-keeping conditions of registration apply to every registered provider, and they apply to us. We keep the records we need to deliver safe supports and to show the Commission what we have done.
+  > We make the commitments below. Each one sets out what we do, not what we hope to do.
+  > Our commitment | What we do
+  > We keep the records a registered provider is expected to hold. | We create and keep records of the supports we deliver, our worker checks and screening, and our incidents and complaints. Section 7 Retention schedule lists each record and how long we keep it.
+  > We keep records accurate and up to date. | We write records at the time of the support or as soon as we can after it. We correct mistakes by adding a dated note. We do not delete the original entry.
+  > We keep participant information private. | We collect only what we need to deliver the support. We store records in one secure place and use a password or lock on every device and file. We share a record only with the participant, people they have agreed to, or a body that is legally entitled to ask for it.
+  > We make records easy to find. | We store records by type and date so we can find any record quickly. We list our registers in section 9 Related documents and registers.
+  > We keep records for as long as the retention schedule says. | We check the dates in section 7 Retention schedule when we close a file. We do not destroy a record early. We do not destroy a record that is part of a complaint, an incident review or a legal matter.
+  > We destroy records safely. | When a retention period ends, we destroy paper records by shredding. We delete electronic records permanently, including backup copies. We note what we destroyed and the date.
+  > We give participants access to their own records. | If a participant asks to see their records, we give them access promptly and in a way they can understand. We check who is asking before we release anything.
+  > We act quickly if a record is lost or seen by someone who should not see it. | We tell the participant, work out what happened, and fix the cause. We report it to the right body when the law or our registration requires it.
+  > We review this policy. | We review this policy every 12 months, or sooner if our supports, our systems or the rules change. We record each review in the policy review register.
+  > As the sole person running Sunrise Supports, I am responsible for each of these commitments. Section 6 Responsibilities sets out who does what if we add workers.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Registration groups (audit type derived) (step 2). Readability grade 7.4.
 
@@ -543,28 +555,29 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > If a complaint is about us, we do not decide it alone without telling the complainant about their other options. Section 7 Complaints procedure explains where a complainant can take their complaint outside Sunrise Supports.
   > If we take on workers later, we will add each new role to this table and tell those workers what is expected of them before they start work.
 
-- 7 Complaints procedure: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); States and territories (step 1). Readability grade 5.9.
+- 7 Complaints procedure: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4). Readability grade 6.8.
 
-  > Sunrise Supports is run by one person, so every step below is done by the owner. We follow these steps for every complaint, whether it is made in person, by phone, in writing or through someone speaking for the participant.
-  > Receive the complaint. We listen, thank the person for raising it and write down what they tell us in their own words. We ask how they would like us to keep in touch.
-  > Record it. We add the complaint to the complaints register described in section 8 Complaints register on the day we receive it.
-  > Acknowledge it. We tell the person we have received the complaint, who is dealing with it and what happens next. We use the timeframes set out in section 4 Policy statement.
-  > Check for risk. We decide whether anyone is at risk of harm right now. If a participant is at risk, we make them safe first. If the matter may be a reportable incident, we follow our incident management documents and tell the Commission as the rules require.
-  > Look into it. We gather the facts, talk with the person who complained and anyone else involved, and give each person a fair chance to share their view. We keep an open mind and do not decide before we have heard everyone.
-  > Decide and respond. We tell the person in plain language what we found, what we will do about it and why. We offer them a way to ask us to look at it again.
-  > Put things right. We make the changes we agreed to and tell the person when they are done.
-  > Close and learn. We record the outcome and the person's response in the register. We note what we will change to stop the same problem happening again.
-  > Step | Who does it | When
-  > Receive and record | Owner | On the day we receive the complaint
-  > Acknowledge | Owner | As set out in section 4 Policy statement
-  > Check for risk | Owner | Straight away, and again if new facts come up
-  > Look into it and decide | Owner | As quickly as we can, and within the time set out in section 4 Policy statement
-  > Respond to the person | Owner | As soon as we have decided, and within the time set out in section 4 Policy statement
-  > Close and learn | Owner | After the person has had our response; we record any changes we make
-  > If we cannot finish within the timeframes, we tell the person why, tell them when to expect an answer and keep them updated.
-  > A participant, or anyone acting for them, can also complain to the NDIS Quality and Safeguards Commission at any time. They do not have to complain to us first, and they can still go to the Commission if they are unhappy with our response. They can call 1800 035 544 (free from landlines) or use the complaint form on the Commission's website at ndiscommission.gov.au. They can also ask someone they trust, or an advocate, to help them make the complaint.
-  > We tell every participant how to complain to us and to the Commission when they start with us. We also tell them again whenever they ask, and when they are unhappy with something we have done. No participant is treated worse because they made a complaint.
-  > [Provider to complete: the phone number, email address and postal address participants should use to contact Sunrise Supports with a complaint.]
+  > This is the procedure Sunrise Supports follows each time someone raises a complaint or gives feedback about our household tasks supports in New South Wales. As a sole trader, I receive and manage every complaint myself, so there is one clear point of contact.
+  > Receive the complaint. Anyone can complain: a participant, a family member, a nominee, an advocate or another person. They can tell us in person, by phone, by text or email, in writing, or through an advocate. We do not need a form.
+  > Acknowledge it. We thank the person, confirm we have understood what they told us, and explain the steps that come next and how long each will take.
+  > Record it. We enter the complaint in the complaints register straight away (see section 8 Complaints register) and give it a reference number.
+  > Check what the person wants. We ask what outcome they are hoping for, whether they want support from an advocate or an interpreter, and whether they want to stay anonymous.
+  > Look into it. We gather the facts, listen to everyone involved and keep an open mind. The person complained about has a chance to respond before we decide anything. We do not treat anyone worse for having complained.
+  > Decide and fix it. We work out what went wrong, what we will do about it and who will do it. If the complaint is about me, I ask someone independent of the work to review it where I can.
+  > Tell the person the outcome. We explain what we found, what we will change and why, in plain words and in the way the person prefers. We tell them they can take the complaint further if they are not satisfied.
+  > Close and learn. We record the outcome and the person's response in the register, then check whether the same problem could happen again and change how we work if needed.
+  > Review for patterns. At each review of this document, we look at all complaints in the register to find trends and improvements (see section 11 Review).
+  > The table below sets out the timeframe we work to for each stage. The legal timeframes and requirements are set out in the Commission's complaints rules, not here.
+  > Stage | Who does it | When
+  > Acknowledge the complaint | Owner and sole worker | Within 1 business day of receiving it
+  > Record in the complaints register | Owner and sole worker | On the same day it is received
+  > Tell the person what happens next | Owner and sole worker | In the acknowledgement
+  > Give an update if it is not yet resolved | Owner and sole worker | At least every 5 business days
+  > Tell the person the outcome | Owner and sole worker | As soon as a decision is made, and within 21 days where possible
+  > Close the complaint in the register | Owner and sole worker | Within 2 business days of telling the person the outcome
+  > A participant can complain to the NDIS Quality and Safeguards Commission at any time. They do not have to complain to us first, and they can do so even after we have tried to resolve the complaint. They can phone the Commission on 1800 035 544 (free call from landlines; TTY 133 677; interpreter service on 131 450) or go to the Commission's website at ndiscommission.gov.au and use its complaints form. Someone can make a complaint on a participant's behalf.
+  > We tell every participant how to contact the Commission when we first meet them, and again whenever we give them the outcome of a complaint.
+  > [Provider to complete: the best phone number and email address for people to contact Sunrise Supports with a complaint]
 
 - 8 Complaints register: fixed text.
 - 9 Records and evidence to retain: fixed text.
@@ -575,9 +588,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Incident management policy, procedure and register (incident-management-policy-and-register.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1). Readability grade 9.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 11.1.
 
-  > This document shows how Sunrise Supports handles incidents and keeps a record of them. It supports the Incident management standard.
+  > This document explains how Sunrise Supports prevents, responds to, records and reports incidents. It supports the Incident management standard.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3). Readability grade 10.5.
 
@@ -759,26 +772,30 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > Some of our roles are risk-assessed, because the worker enters a participant's home or may be alone with a participant. For those roles, no worker starts supports until induction and the checks in section 3 Steps are complete.
   > Even while we are a one-person provider, we follow every step in this procedure for myself. If we add workers later, this procedure applies to them from their first day.
 
-- 3 Steps: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 9.7.
+- 3 Steps: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 8.2.
 
-  > Sunrise Supports is run by one person, a sole trader in New South Wales. These steps apply to the owner and to any worker we engage in future to deliver 0120 Household tasks.
-  > Before a worker starts, we collect and check their identity, right to work, pre-employment checks, and any qualifications or experience that the role needs. We file the evidence in the worker's record.
-  > Before a worker starts, we decide whether the role is risk-assessed. If it is, we complete the extra checks that the role needs and record the outcome in the worker's record.
-  > Before a worker supports any participant, they complete the mandatory NDIS orientation module. We keep the completion certificate and add the entry to the training register (see section 6 Training register).
-  > Before a worker supports any participant, they complete training in infection prevention and control standard precautions, including hand hygiene, respiratory hygiene and cough etiquette. We record the date in the training register.
-  > Before a worker supports any participant directly, they are trained in the use of PPE. We make sure PPE is available to each worker and each participant who needs it.
-  > In their first period of work, a new worker goes through our policies and procedures with us. We explain the participant's support plan and the tasks we expect, and record that this is done.
-  > We supervise each worker as set out in the table below and keep a short note of each supervision.
-  > We check the training register at the intervals in the table below. We book refresher training before any due date passes and update the register when it is done.
-  > We record any further training or professional development a worker completes, and we keep the certificate or other evidence with the register entry.
+  > Sunrise Supports is run by one person, who is the owner and the only worker. We follow these steps now and again each time we take on another worker. We follow them for any person who joins us later, including a subcontractor or a replacement worker.
+  > Before a worker starts, we collect and check their proof of identity and their right to work in Australia. We keep copies on the worker's file.
+  > Before a worker starts, we complete the pre-employment checks that apply to their role and record the date and result of each one. Our supports are household tasks in New South Wales. We work out which roles are risk assessed and make sure those checks are finished first.
+  > We check the worker's qualifications and experience against what the role needs. We record what we saw and when we saw it.
+  > Before the worker supports any participant, they complete the NDIS Commission's mandatory orientation module. We record the completion date and keep the certificate.
+  > Before the worker supports any participant, they complete training in infection prevention and control standard precautions. This covers hand hygiene, respiratory hygiene and cough etiquette. We record the date.
+  > Before the worker supports any participant directly, they complete training in using personal protective equipment (PPE). We record the date.
+  > We check that PPE is on hand for each worker and each participant who needs it, before the first visit and whenever we restock.
+  > We explain the participant's needs and preferences to the worker before their first visit with that participant. Participant details are shared only with workers who need them for the support.
+  > We supervise a new worker for their first visits, using the schedule in the table below. We write a short note of what we observed and any follow-up needed.
+  > We review each worker's training needs at least once a year. We organise refresher training and record any continuing professional development.
+  > We update the training register in section 6 Training register each time a worker completes training. We keep the supporting evidence listed in section 7 Records and evidence to retain.
+  > If a training date passes without the refresher being done, we stop rostering that worker to the support it covers. We restart once the training is complete and recorded.
   > Step | Who does it | When
-  > Identity, right to work and pre-employment checks | Owner | Before the worker's first shift
-  > NDIS orientation module | Worker; owner confirms and records | Before the worker supports any participant
-  > Infection prevention and control and PPE training | Worker; owner confirms and records | Before the worker supports any participant directly
-  > Supervision of workers | Owner | At the start of work, then at regular planned intervals
-  > Training register review | Owner | At regular planned intervals, and whenever a worker is added or a role changes
-  > Refresher training | Worker; owner books and records | Before the refresher due date in the training register
-  > [Provider to complete: how often supervision and training register reviews take place, and the refresher period for infection prevention and control and PPE training.]
+  > Identity, right to work, pre-employment checks and qualifications | Owner | Before the worker starts
+  > NDIS orientation module | Worker; owner records it | Before the first participant support
+  > Infection prevention and control and PPE training | Worker; owner records it | Before the first participant support
+  > Check that PPE is available | Owner | Before the first visit and at each restock
+  > Supervision of a new worker | Owner | During the first visits, then as the owner decides
+  > Training needs review and refresher training | Owner with the worker | At least every 12 months
+  > Training register update | Owner | Within 5 working days of training being completed
+  > While Sunrise Supports has no other workers, the owner completes each training step above and records it in the register. We do not use restrictive practices, so no restrictive practices training is needed now. We will add it to these steps before any such practice is used.
 
 - 4 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Registration groups (step 2). Readability grade 9.2.
 
@@ -920,9 +937,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Participant rights, choice and control policy (participant-rights-and-choice-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.2.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 8.3.
 
-  > This policy sets out how Sunrise Supports respects each participant's rights, choices and control. It supports the NDIS Practice Standards on rights and responsibilities.
+  > This policy sets out how Sunrise Supports respects each participant's choices, values and dignity. It supports our duties under the NDIS Code of Conduct.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Regulated restrictive practices (step 3). Readability grade 10.
 
@@ -937,19 +954,19 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > We do not use restrictive practices. This policy does not cover them. If a participant's situation ever raised a need for one, we would stop and get advice before acting.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Regulated restrictive practices (step 3); Number of workers (step 4). Readability grade 9.3.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 9.
 
-  > Sunrise Supports is a sole trader business that provides household tasks supports (support type 0120) to participants in New South Wales. We make the following commitments to every participant we support.
-  > We put the participant first. We plan and deliver supports around the participant's goals, strengths and daily life, and we ask what matters to them before we start.
-  > We respect each participant's values, beliefs, culture and identity. We do not ask a participant to change who they are to fit our way of working.
-  > We support informed choice. We explain what we can offer, what it involves and what the options are, in a way the participant can understand, and we give them time to decide.
-  > We respect the participant's right to make their own decisions, including decisions we would make differently. We support dignity of risk: we talk through the risks with the participant, help them think about how to reduce them, and then respect their decision.
-  > We treat each participant with dignity and respect. We take care of their home, their belongings and their privacy while we work.
-  > We tell participants about their rights, including the right to say no, to change their mind, to ask for a different worker, and to make a complaint, and we repeat this when asked.
-  > We include the people a participant chooses, such as family, friends, an advocate or a nominee, and we speak with them only when the participant wants us to.
-  > We do not use restrictive practices. If a participant's situation ever changes so that a restrictive practice might be considered, we will stop and get proper advice before we do anything, and we will update our policies first.
-  > We read this policy again whenever our services, our participants or the rules change, and at least every 12 months.
-  > [Provider to complete: add the quality indicator numbers from the NDIS Practice Standards that each commitment above supports, as no standards were supplied for this section.]
+  > The NDIS Code of Conduct applies to every NDIS provider and every worker. At Sunrise Supports, we hold ourselves to it in all the household task supports we deliver to participants in New South Wales. The commitments below set out how we do that.
+  > Our commitment | What we do
+  > We put the participant at the centre of their supports. | We ask each participant what they want done, when and how, and we plan our visits around their answers.
+  > We respect each participant's values, beliefs and culture. | We ask how a participant likes their home to be kept and what matters to them. We follow their wishes and do not impose our own.
+  > We support informed choice and control. | We explain the support we offer in plain words. We give the participant time to decide and respect their decision, including a decision to change or stop a support.
+  > We respect dignity of risk. | We tell the participant about the risks of a choice. We then support them to make it, unless doing so would put someone in serious danger.
+  > We act with respect for each participant's dignity and privacy. | We treat the participant and their home with respect. We keep their personal information private and share it only when they agree or the law requires it.
+  > We communicate in a way that suits the participant. | We use the participant's preferred way of communicating. If we cannot, we tell the participant and work out another way with them.
+  > We do not use restrictive practices. | We do not use restrictive practices in any support we provide. If a participant's needs change, we tell the participant and stop the support rather than use one.
+  > We listen when a participant is not happy. | We welcome feedback and complaints. We tell participants how to raise a concern with us, with a person they trust or with the NDIS Quality and Safeguards Commission.
+  > As a sole trader, I am responsible for keeping these commitments. If I engage another worker in future, I will make sure they know and follow this policy before they work with any participant.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 8.6.
 
@@ -1007,9 +1024,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Safeguarding policy (safeguarding-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1). Readability grade 6.5.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 11.1.
 
-  > This policy shows how Sunrise Supports keeps participants safe from harm. It supports the NDIS Practice Standards.
+  > This policy explains how Sunrise Supports prevents, recognises and responds to abuse, neglect, exploitation and discrimination. It supports our duty to follow the NDIS Code of Conduct.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 8.2.
 
@@ -1024,21 +1041,19 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > This policy covers violence, abuse, neglect, exploitation and discrimination. It covers harm by a worker, by another person, and between participants. It does not cover the use of restrictive practices, because we do not use them.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 8.8.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 8.7.
 
-  > Sunrise Supports is a sole trader business in New South Wales. We provide household tasks support (0120). We believe every participant has the right to be safe and to be treated with respect in their own home.
-  > We do not accept violence, abuse, neglect, exploitation or discrimination in any form. This applies to everyone we support and to anyone who works for us or with us.
-  > We make the following commitments.
-  > We treat every participant with dignity and respect, and we respect their privacy, choices and culture.
-  > We act to prevent harm before it happens by thinking about the risks in each home and in each role.
-  > We take every concern seriously, including concerns that come to us indirectly or that we only suspect.
-  > We make it easy for participants, their families and others to raise a concern, and we do not punish anyone for doing so.
-  > We respond to every allegation quickly, protect the participant first, and report to the right authority.
-  > We do not use restrictive practices. If this ever changes, we will update this policy and our other documents before any restrictive practice is used.
-  > We record every concern and every action we take in our incident register.
-  > We review this policy every 12 months and after any serious concern.
-  > We have no other workers at this time. If we take on workers or subcontractors in future, they will be told about this policy before they start work with participants, and we will check that they understand it.
-  > [Provider to complete: the name and contact details of the person participants should speak to first if they have a concern.]
+  > Sunrise Supports is a sole trader business that provides household tasks support to participants in New South Wales. The NDIS Code of Conduct applies to us as a provider and to every worker we engage. We keep this policy because we must act in line with that Code.
+  > We do not accept violence, abuse, neglect, exploitation or discrimination in our work. We take every concern seriously and act on it.
+  > Our commitment | What we do
+  > We respect each participant's rights, privacy and dignity. | We treat every participant as the person in charge of their own life. We ask before we enter a home, move belongings or start a task. We keep personal information private.
+  > We provide supports safely and with care. | We do the tasks agreed with the participant. We stop and speak to the participant if a task feels unsafe or unclear.
+  > We act with honesty and integrity. | We tell the truth in our records and conversations. We do not take money, gifts or belongings from participants.
+  > We prevent violence, abuse, neglect, exploitation and discrimination. | We do not use or allow any of them in our work. We do not use restrictive practices.
+  > We raise concerns and respond to them. | We tell a participant how to raise a concern with us or with the Commission. We record every concern in our incident register and act on it.
+  > We report what we are required to report. | We report any suspected abuse or neglect, and any incident we must notify, as set out in section 7 Responding to an allegation.
+  > We keep participants safe from harm in our own conduct. | As a sole trader, we hold ourselves to this policy. If we engage another worker later, they must follow it before they start work.
+  > If a participant, a worker or anyone else tells us they are unhappy with how they were treated, we will not punish them or treat them worse for speaking up.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 5.8.
 
@@ -1093,9 +1108,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## Emergency and disaster management plan (emergency-and-disaster-management-plan.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.7.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 10.2.
 
-  > This plan sets out how Sunrise Supports keeps participants safe during emergencies and disasters. It supports the NDIS Practice Standards on risk management and continuity of supports.
+  > This plan sets out how Sunrise Supports keeps participants safe during emergencies and disasters. Every provider needs a plan for emergencies and disasters, and this is ours.
 
 - 2 Our services and where we deliver them: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Registration groups (audit type derived) (step 2). Readability grade 7.5.
 
@@ -1174,10 +1189,10 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## AI use and governance policy (ai-use-and-governance-policy.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.4.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.5.
 
-  > This policy sets out how Sunrise Supports uses digital and AI tools safely and with human review.
-  > [Provider to complete: name the NDIS Practice Standard this policy supports, as listed in your standards pack.]
+  > This policy sets out how Sunrise Supports uses digital and AI tools, and the safeguards we apply.
+  > It supports the Commission's 2026 position that every provider must govern its use of AI.
 
 - 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 7.7.
 
@@ -1193,18 +1208,18 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
   > This policy does not cover tools used only in a personal capacity that never touch our business or our participants. If a personal tool is ever used for our work, this policy applies to that use.
 
 - 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4). Readability grade 8.2.
+- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4). Readability grade 8.2.
 
-  > Sunrise Supports is a sole trader business in New South Wales. We provide household tasks support (0120). We make these commitments about how we use digital and AI tools.
-  > We use only the tools listed in section 7 Approved tools and uses, and only for the uses listed there.
-  > We do not put participant personal information into any AI tool, unless the participant has agreed and we have checked how the tool stores and uses that information.
-  > We read and check everything an AI tool produces before we use it, send it or file it. A person is always responsible for the final result.
-  > We do not use AI to make decisions about a participant's supports, to assess risk, or to decide who works with a participant.
-  > We tell participants when we use AI in a way that affects them, and we explain this in plain language. We respect a participant's choice to say no, and their support stays the same if they do.
-  > We keep a record of the tools we approve and of any problem we find with an AI tool.
-  > We review this policy every 12 months, and sooner if the Commission changes its published position on AI or if we plan to add a new tool.
-  > These commitments follow the NDIS Quality and Safeguards Commission's published position on AI. This policy does not replace our duties on privacy, participant rights or safe supports.
-  > [Provider to complete: list the quality indicators this policy supports. None were provided for this document.]
+  > Sunrise Supports is a sole trader business in New South Wales. We provide household tasks support. The Commission's 2026 position on AI use by providers expects every provider to govern its use of AI. This policy is how we do that.
+  > We use digital and AI tools only when they help us do our work safely and well. We stay responsible for every decision and every document, whatever tool we used to prepare it.
+  > Our commitment | What we do
+  > We decide, not the tool | We read and check anything an AI tool produces before we use it. We make every decision about a participant's support ourselves.
+  > We use only approved tools | We use only the tools listed in section 7 Approved tools and uses. We add a new tool only after we have checked how it handles information.
+  > We protect participant information | We do not put participant names, contact details, health information or support details into an AI tool unless section 7 Approved tools and uses allows it for that tool.
+  > We are open with participants | We tell participants when we use AI in a way that affects them. We ask for their consent first where it involves their information. See section 8 Participant information and AI.
+  > We keep records | We keep a record of the tools we use, what we use them for and the checks we make. See section 9 Records and evidence to retain.
+  > We review our use | We review this policy and our list of tools every 12 months. We also review them sooner if a tool, a risk or the Commission's position changes.
+  > If we make a mistake with a tool, or a tool puts participant information at risk, we stop using it, fix the problem and record what happened. We tell the participant if their information was affected.
 
 - 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 8.2.
 
@@ -1255,10 +1270,9 @@ Tailored sections: 89 with model text, 1 with a fallback marker.
 ## AI and digital data handling procedure (ai-and-digital-data-handling-procedure.docx)
 
 - Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1). Readability grade 10.3.
+- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 12.7.
 
-  > This procedure shows how Sunrise Supports removes names and details before we use any AI or digital tool.
-  > It supports the Commission's rules on keeping participant information private and safe.
+  > This procedure shows how Sunrise Supports removes personal details before using any AI or digital tool. It supports the Commission's 2026 position that participant information is de-identified before any AI use.
 
 - 2 When this procedure applies: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 8.9.
 

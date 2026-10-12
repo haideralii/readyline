@@ -412,6 +412,32 @@ Haiku cache hit rate 86%. Reading: Haiku costs roughly two thirds of Sonnet per 
 **R-11 grants (item 1, D-538).** Migration `20261012020000_service_role_function_grants.sql` grants execute on `auth_rate_limit_hit(text, integer, integer)` and `generation_quota_hit(uuid)` to `service_role`; the header records Haider's hand-applied grants on the hosted project (idempotent) and lists where each function is called. These are the only two secret-key functions: `create_account` and `delete_account` run as the signed-in user with their existing grants; the purge job and the admin pages use table access. `tests/integration/service-role-grants.test.ts` calls each function through a client built with the secret key and asserts a boolean reply, and asserts the publishable key is refused (42501) both signed out and signed in; it runs in CI's Supabase job with the other integration suites (not runnable on this machine: no local stack).
 
 **D-047, D-049, R-12 (item 2, D-539).** Readability: the catalogue holds `defaults.readabilityFailAbove: 11`, `defaults.shortSectionWords: 40` and `readabilityFailAbove: 12` on the privacy and records management policies; the pack carries `readabilityGate` (not in the prompt, so no key change) and a reply fails only above the document's line with at least 40 words; shorter sections keep the warning in the reviewer view. R-7: `lintTimeframes` flags a timeframe only when its sentence (its row, in a table) carries a statutory anchor (the Commission, notify, report, reportable, the Rules, or the document's rules-section heading passed in from the pack). R-12: when the case cites none of a document's standards, the pack's `document.basisReason` names the obligation, the purpose and policy-statement briefs are swapped for obligation briefs ("Our commitment | What we do", never a standard or indicator), and `lintPlaceholders` rejects a "[Provider to complete ...]" that mentions a standard or indicator with a retry naming the obligation. Unit tests: timeframe anchors (promise allowed, Commission, Rules, rules-section heading, table rows), the placeholder lint, short-section warning against a 48-word fail, the privacy line at 12 against the default 11, the obligation briefs for the governance policy against the untouched incident policy, and a placeholder reply retried with the obligation named. **Replay listing of what each change invalidates:** the placeholder lint catches six batch-16 recordings (AI policy purpose and policy statement; continuity purpose; governance, rights and records policy statements); the obligation briefs re-key seventeen sole-trader sections (purpose and policy statement of the governance, conflict of interest, privacy, records, rights, safeguarding and AI use policies; purpose of the continuity plan, the emergency plan and the AI data-handling procedure), pinned in `fixtures-replay.test.ts`; D-047 and D-049 invalidate nothing and instead let two recorded first replies pass (the privacy purpose at 15.3 as a short section, the continuity cover's "within 1 business day"), so those two need no call; the R-7 listing drops from seven to three.
+
+**Re-recording (item 3), one run, 18 billed calls over 17 sections, cached, thinking off, about $0.09 ($0.13 uncached):**
+
+| Section | Outcome | Grade | Tokens (uncached in + cache write + cache read / out) | Cached $ |
+| --- | --- | --- | --- | --- |
+| governance / purpose | first time | 5.8 | 141 + 1,949 + 0 / 97 | 0.006 |
+| governance / policy statement | retry (register every 12 months, rightly refused) | 8.2 | 256 + 0 + 1,949 / 606 | 0.007 x2 |
+| continuity plan / purpose | first time | 10.2 | 135 + 468 + 1,475 / 118 | 0.003 |
+| conflict of interest / purpose | first time | 8.5 | 141 + 466 + 1,475 / 103 | 0.003 |
+| conflict of interest / policy statement | first time | 8.1 | 177 + 0 + 1,941 / 707 | 0.008 |
+| privacy / purpose | first time | 10.9 | 158 + 464 + 1,475 / 138 | 0.003 |
+| privacy / policy statement | first time | 9.6 | 194 + 0 + 1,939 / 740 | 0.008 |
+| records / purpose | first time (11.7: short section, warns) | 11.7 | 140 + 467 + 1,475 / 116 | 0.003 |
+| records / policy statement | first time | 8.1 | 176 + 0 + 1,942 / 868 | 0.009 |
+| rights / purpose | first time | 8.3 | 141 + 470 + 1,475 / 99 | 0.003 |
+| rights / policy statement | first time | 9.0 | 177 + 0 + 1,945 / 693 | 0.008 |
+| safeguarding / purpose | first time (11.1: short section, warns) | 11.1 | 141 + 479 + 1,475 / 114 | 0.003 |
+| safeguarding / policy statement | first time | 8.7 | 177 + 0 + 1,954 / 682 | 0.008 |
+| emergency plan / purpose | first time | 10.2 | 147 + 465 + 1,475 / 106 | 0.003 |
+| AI use policy / purpose | first time | 9.5 | 150 + 490 + 1,475 / 124 | 0.003 |
+| AI use policy / policy statement | first time | 8.2 | 186 + 0 + 1,965 / 600 | 0.007 |
+| AI data-handling procedure / purpose | first time (12.7: short section, warns) | 12.7 | 153 + 458 + 1,475 / 108 | 0.003 |
+
+Three purposes passed only because of the short-section rule (D-047); their grades are visible to the reviewer as warnings. The one retry was the register cycle, a correct rejection. Item 3 spend about $0.09 (under the $0.40 ceiling); **running total about $1.97** (cap $2.28).
+
+**Review pack.** `sections.md` now shows **90 of 90 tailored sections as real model text, no fallback marker, and no placeholder that mentions a standard or indicator**; the privacy purpose and the continuity cover replay their recorded first replies under D-047 and D-049. The sole-trader set's recorded cost, last call per section with retries counted twice, is about $0.80 at cached rates ($1.18 uncached). Replay listings re-pinned: R-8 gains the governance policy statement's refused first reply.
 ## PO review
 (PO fills in.)
 

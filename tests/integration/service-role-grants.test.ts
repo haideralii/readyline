@@ -33,7 +33,7 @@ const SECRET_KEY_FUNCTIONS: ReadonlyArray<{
 describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
   let service: SupabaseClient;
   let anon: SupabaseClient;
-  let userId: string | null = null;
+  const userIds: string[] = [];
 
   beforeAll(async () => {
     const env = readSupabaseAdminEnv();
@@ -46,7 +46,7 @@ describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
   });
 
   afterAll(async () => {
-    if (userId) await service.auth.admin.deleteUser(userId);
+    for (const id of userIds) await service.auth.admin.deleteUser(id);
   });
 
   for (const fn of SECRET_KEY_FUNCTIONS) {
@@ -71,7 +71,7 @@ describe.skipIf(!enabled)("service_role execute grants (R-11, D-538)", () => {
       });
       if (created.error || !created.data.user)
         throw created.error ?? new Error("createUser failed");
-      userId = created.data.user.id;
+      userIds.push(created.data.user.id);
       const env = readSupabaseAdminEnv();
       const signedIn = createClient(env.url, env.publishableKey, {
         auth: { persistSession: false, autoRefreshToken: false },
