@@ -1390,6 +1390,33 @@ its ticked classes beneath the summary with "(n classes, k ticked)". FR-12:
 the audit explanation, groups in scope and flags sit inside the summary
 block under one "Your audit: …" heading; the second heading is gone.
 
+## REQ-014: visual identity v1 (branch `req-014-visual-identity`, on `req-013-p2`)
+
+**D-1401 Branched from `req-013-p2`, not `main` (Dev, 2026-10-13).** The
+queue said "from `main`"; both REQs rewrite the home page and the step
+indicator, so stacking avoids a certain conflict. The PO merges P2 first.
+
+**D-1402 The zinc utilities resolve to a warm ramp (FR-1).** Every page was
+built on `zinc-*` with `dark:` variants. Instead of rewriting hundreds of
+class strings, `@theme` maps `zinc-50…950` to a monotonic ramp from paper
+(#F7F3EC) through slate (#4A5553 at 600) to ink (#1C2B2A at 900) and dark
+paper (#141C1B at 950), and `red-700`/`red-400` to signal. New code uses
+the named tokens. The contrast test pins the ramp's lightness order and the
+AA of the steps used for secondary and small text (`zinc-500` raised to
+#5E6866 after axe measured 4.4:1 on the class codes).
+
+**D-1403 Fraunces through `next/font`; SVG lines because of the CSP.** The
+serif is self-hosted at build time (no external origin). The ready line and
+the progress line are SVGs with attribute geometry: the nonce-only CSP
+blocks inline `style` attributes, which the security-headers e2e caught on
+the first version. The fill animates once (700 ms, `scaleX` from 0) and
+the global reduced-motion rule disables it.
+
+**D-1404 Dark `signal` is #E07A7A (5.97:1 on dark paper).** The PO's token
+list had no dark error colour; chosen to meet AA and recorded for review.
+Dark primary buttons use dark-paper text on dark ochre (5.5:1), the same
+`var(--paper)` token as light mode, so one rule serves both themes.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

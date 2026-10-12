@@ -1,7 +1,7 @@
 {
   "project": "desktop-chromium",
   "baseURL": "http://localhost:3000",
-  "recordedAt": "2026-10-12T02:50:20.710Z",
+  "recordedAt": "2026-10-12T13:11:21.259Z",
   "hosts": [
     "localhost:3000"
   ],
@@ -14,12 +14,17 @@
     },
     {
       "route": "/",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -34,7 +39,7 @@
     },
     {
       "route": "/",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -84,12 +89,17 @@
     },
     {
       "route": "/terms",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/terms",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/terms",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -104,7 +114,7 @@
     },
     {
       "route": "/terms",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -139,12 +149,12 @@
     },
     {
       "route": "/terms",
-      "url": "http://localhost:3000/?_rsc=Jm_KudBfn_F9em99",
+      "url": "http://localhost:3000/sign-in?_rsc=Jm_KudBfn_F9em99",
       "type": "fetch"
     },
     {
       "route": "/terms",
-      "url": "http://localhost:3000/sign-in?_rsc=Jm_KudBfn_F9em99",
+      "url": "http://localhost:3000/?_rsc=Jm_KudBfn_F9em99",
       "type": "fetch"
     },
     {
@@ -154,12 +164,17 @@
     },
     {
       "route": "/privacy",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/privacy",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/privacy",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -174,7 +189,7 @@
     },
     {
       "route": "/privacy",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -224,12 +239,17 @@
     },
     {
       "route": "/refunds",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/refunds",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -244,7 +264,7 @@
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -279,12 +299,12 @@
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {
       "route": "/refunds",
-      "url": "http://localhost:3000/?_rsc=R4BAEvhr11gUark2",
+      "url": "http://localhost:3000/sign-in?_rsc=R4BAEvhr11gUark2",
       "type": "fetch"
     },
     {
@@ -294,12 +314,17 @@
     },
     {
       "route": "/ai",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/ai",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/ai",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -314,7 +339,7 @@
     },
     {
       "route": "/ai",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -364,12 +389,17 @@
     },
     {
       "route": "/about",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/about",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/about",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -384,7 +414,7 @@
     },
     {
       "route": "/about",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -434,12 +464,17 @@
     },
     {
       "route": "/sign-in",
+      "url": "http://localhost:3000/_next/static/media/791bf8c4bb753ed6-s.p.0ggqn9ig56u4s.woff2",
+      "type": "font"
+    },
+    {
+      "route": "/sign-in",
       "url": "http://localhost:3000/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2",
       "type": "font"
     },
     {
       "route": "/sign-in",
-      "url": "http://localhost:3000/_next/static/chunks/3jfcuu8691_tx.css",
+      "url": "http://localhost:3000/_next/static/chunks/1f4dsvjjtkrrc.css",
       "type": "stylesheet"
     },
     {
@@ -454,7 +489,7 @@
     },
     {
       "route": "/sign-in",
-      "url": "http://localhost:3000/_next/static/chunks/1sgwvm69hc9zb.js",
+      "url": "http://localhost:3000/_next/static/chunks/0q06rmk6leuco.js",
       "type": "script"
     },
     {
@@ -479,7 +514,7 @@
     },
     {
       "route": "/sign-in",
-      "url": "http://localhost:3000/_next/static/chunks/44xtwvxq7ao-6.js",
+      "url": "http://localhost:3000/_next/static/chunks/0ees2b8v7oll0.js",
       "type": "script"
     },
     {

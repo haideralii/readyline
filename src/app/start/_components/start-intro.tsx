@@ -45,25 +45,19 @@ export function StartIntro() {
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         {ready && hasDraft ? (
           <>
-            <Link
-              href={resume}
-              className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-            >
+            <Link href={resume} className="btn-primary">
               Continue where you left off
             </Link>
             <button
               type="button"
               onClick={() => void clearDraft()}
-              className="inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 px-5 text-base font-medium hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              className="btn-secondary"
             >
               Start again and clear the draft
             </button>
           </>
         ) : (
-          <Link
-            href={stepHref("business")}
-            className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-          >
+          <Link href={stepHref("business")} className="btn-primary">
             Start the questionnaire
           </Link>
         )}
