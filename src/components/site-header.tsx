@@ -22,6 +22,12 @@ export async function SiteHeader() {
           {user ? (
             <>
               <Link
+                href="/checklist"
+                className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+              >
+                Checklist
+              </Link>
+              <Link
                 href="/documents"
                 className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
               >

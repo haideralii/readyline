@@ -34,6 +34,8 @@ export type SaveStatus = "idle" | "saved" | "unavailable";
 
 type QuestionnaireContext = {
   ready: boolean;
+  /** Where the draft lives: "server" for a signed-in owner (REQ-006 FR-5 uses it for the teaser). */
+  mode: "local" | "server";
   /** The public contact address for the result page's question line (REQ-013 FR-9), or null until CONTACT_EMAIL is set. */
   contactEmail: string | null;
   answers: Answers;
@@ -157,6 +159,7 @@ export function QuestionnaireProvider({
   const value = useMemo<QuestionnaireContext>(
     () => ({
       ready,
+      mode,
       contactEmail,
       answers,
       currentStep,
@@ -168,6 +171,7 @@ export function QuestionnaireProvider({
     }),
     [
       ready,
+      mode,
       contactEmail,
       answers,
       currentStep,
