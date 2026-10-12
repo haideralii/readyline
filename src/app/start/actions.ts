@@ -5,6 +5,7 @@
  * returns the derived result. Nothing is stored (SR-3, SR-4) and the free-text
  * services note never reaches derivation (the adapter drops it).
  */
+import { deriveChecklist } from "@/lib/checklist/derive";
 import { parseInput, type ParseFailed } from "@/lib/validation";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
@@ -14,7 +15,12 @@ import {
 import { answersSchemaFor } from "@/lib/questionnaire/schema";
 
 export type DeriveResultResponse =
-  | { ok: true; result: QuestionnaireResult }
+  | {
+      ok: true;
+      result: QuestionnaireResult;
+      /** How many readiness checklist items the result yields (REQ-006 FR-5 teaser). */
+      checklistTotal: number;
+    }
   | {
       ok: false;
       kind: "validation";
@@ -42,5 +48,9 @@ export async function deriveResult(
   const outcome = buildResult(dataset, parsed.data);
   if (!outcome.ok)
     return { ok: false, kind: "derivation", message: outcome.message };
-  return { ok: true, result: outcome.result };
+  return {
+    ok: true,
+    result: outcome.result,
+    checklistTotal: deriveChecklist(outcome.result, parsed.data, dataset).total,
+  };
 }

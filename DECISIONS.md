@@ -1316,6 +1316,72 @@ unchanged); the site footer shows the statement, the AI disclosure and the
 trust line "Hosted in Australia. Independent of the NDIA and the NDIS Quality
 and Safeguards Commission.", so independence appears once on the page.
 
+## REQ-006: readiness checklist (branch `req-006-checklist`)
+
+Decision numbers D-6xx on this branch.
+
+**D-601 Derivation takes the answers as well as the result (Dev,
+2026-10-12, FR-1).** `deriveChecklist(result, answers, dataset)` in
+`src/lib/checklist/derive.ts`: the People and Business items need the
+worker and key-personnel counts, the screening answer, the structure and the
+ABN, which the result does not carry. Items are stable ids
+(`<group>:<slug>`) so stored statuses survive a re-derivation; documents
+and registers come from the result, People and Business from the answers,
+Audit from the pathway and the mid-term rule.
+
+**D-602 Only Commission text in the dataset makes an item verified (FR-1,
+CLAUDE.md 4.6).** Sourced: the orientation module (HR management indicator
+3 core, indicator 2 verification), the three insurances (risk management
+indicator 6 core, indicator 2 verification: "professional indemnity, public
+liability and accident insurance"), the ABN (Rules 2018 s 11 in the
+legislation table of contents), the audit types, site visits, participant
+and worker interviews and the mid-term audit (the Commission's "Types of
+audits" page), and each register through the standard whose evidence names
+it (the standard named for the register wins over one that merely samples
+it). `unverified`: worker screening clearances as a count (the Worker
+Screening Rules are not in the dataset; the evidence item is Readyline's)
+and workers compensation (state law, shown when workers > 1 or the
+structure is a company). No first-aid item: nothing in `standards.json`
+ties first aid to a class, so none is invented; the REQ's "where the
+registration group requires it" yields nothing today.
+
+**D-603 Statuses and the drafted state (FR-2, FR-3).** Stored statuses are
+`need`, `in-progress` and `have`; `have` reads "Adopted" for documents. A
+document in the account's newest ready version set shows as `drafted`
+(computed, never stored) until the provider sets a status; drafted does
+not count as ready. Only what the provider changes is stored
+(`checklist_items`, one row per account and item, member-scoped RLS,
+explicit grants to `authenticated` and `service_role` since the hosted
+project has no default grants, D-422/D-711); the save action re-derives the
+checklist and refuses an id that is not on it. Notes are capped at 500
+characters in the database and the UI, carry the no-participant-data
+warning once at the top of the page and on each field's label, go out in
+the account export (SR-1) and cascade with the account at purge.
+
+**D-604 Print is a second rendering, not a stylesheet over the form
+(FR-4).** The page renders a print-only section listing every item with
+its status and note, the trading name, the date and the not-legal-advice
+line, and hides the interactive form in print; the global stylesheet hides
+the header, footer and nav. Collapsed groups therefore never hide anything
+on paper, and the e2e asserts the print rendering holds exactly `total`
+items under print media emulation.
+
+**D-605 The teaser count comes from the result action (FR-5).**
+`deriveResult` returns `checklistTotal` beside the result, so the result
+step shows "Your checklist has N items; sign in to track them" (or "Open
+your checklist" when signed in, which the questionnaire context now exposes
+as `mode`) without shipping `standards.json` to the browser. Nothing is
+stored before sign-in.
+
+**D-606 Signed-in e2e specs live under `e2e/signed-in/` and run in CI's
+Supabase job (AC-2).** They need a stack: the job now builds, installs
+Chromium and runs `npx playwright test e2e/signed-in` with `EVIDENCE=1`,
+uploading `product/evidence/` as an artifact. The specs sign in by writing
+the session cookie `@supabase/ssr` expects (the helper from REQ-007 Session
+C, copied byte for byte so the branches merge cleanly) and skip without the
+Supabase variables, so the `checks` job's e2e is unaffected. The same
+convention is intended for REQ-007's purchase spec.
+
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

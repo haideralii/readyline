@@ -26,7 +26,7 @@ type Fetch = {
 };
 
 export function ResultStep() {
-  const { answers, clearDraft } = useQuestionnaire();
+  const { answers, clearDraft, mode } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -93,6 +93,8 @@ export function ResultStep() {
   return (
     <ResultView
       result={response.result}
+      checklistTotal={response.checklistTotal}
+      signedIn={mode === "server"}
       onStartAgain={() => void clearDraft()}
     />
   );
@@ -100,9 +102,13 @@ export function ResultStep() {
 
 function ResultView({
   result,
+  checklistTotal,
+  signedIn,
   onStartAgain,
 }: {
   result: QuestionnaireResult;
+  checklistTotal: number;
+  signedIn: boolean;
   onStartAgain: () => void;
 }) {
   const r = result;
@@ -308,6 +314,40 @@ function ResultView({
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* REQ-006 FR-5: the checklist teaser; nothing is stored before sign-in. */}
+      <section
+        aria-labelledby="checklist-heading"
+        className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+        data-testid="checklist-teaser"
+      >
+        <h2 id="checklist-heading" className="text-xl font-semibold">
+          Your readiness checklist
+        </h2>
+        <p className="mt-2 leading-7">
+          Your checklist has {checklistTotal} items: the documents and registers
+          above, worker screening and orientation, your ABN and insurances, and
+          the audit itself.{" "}
+          {signedIn ? (
+            <Link
+              href="/checklist"
+              className="underline underline-offset-2"
+              data-testid="checklist-link"
+            >
+              Open your checklist
+            </Link>
+          ) : (
+            <Link
+              href="/sign-in?next=%2Fchecklist"
+              className="underline underline-offset-2"
+              data-testid="checklist-sign-in"
+            >
+              Sign in to track them
+            </Link>
+          )}
+          .
+        </p>
       </section>
 
       <p

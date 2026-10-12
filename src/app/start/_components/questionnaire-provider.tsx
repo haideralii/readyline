@@ -34,6 +34,8 @@ export type SaveStatus = "idle" | "saved" | "unavailable";
 
 type QuestionnaireContext = {
   ready: boolean;
+  /** Where the draft lives: "server" for a signed-in owner (REQ-006 FR-5 uses it for the teaser). */
+  mode: "local" | "server";
   answers: Answers;
   currentStep: StepId;
   saveStatus: SaveStatus;
@@ -153,6 +155,7 @@ export function QuestionnaireProvider({
   const value = useMemo<QuestionnaireContext>(
     () => ({
       ready,
+      mode,
       answers,
       currentStep,
       saveStatus,
@@ -163,6 +166,7 @@ export function QuestionnaireProvider({
     }),
     [
       ready,
+      mode,
       answers,
       currentStep,
       saveStatus,

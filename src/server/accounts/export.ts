@@ -14,6 +14,8 @@ export type AccountExport = {
   account: Record<string, unknown>;
   memberships: Record<string, unknown>[];
   questionnaireDraft: Record<string, unknown> | null;
+  /** REQ-006 SR-1: the checklist statuses and notes the provider set. */
+  checklistItems: Record<string, unknown>[];
   auditLog: Record<string, unknown>[];
 };
 
@@ -32,7 +34,7 @@ export async function buildAccountExport(
     .maybeSingle();
   if (account.error || !account.data) return null;
 
-  const [memberships, draft, audit] = await Promise.all([
+  const [memberships, draft, checklist, audit] = await Promise.all([
     supabase
       .from("memberships")
       .select("user_id, role, created_at")
@@ -42,6 +44,11 @@ export async function buildAccountExport(
       .select("answers, answers_version, current_step, updated_at")
       .eq("account_id", accountId)
       .maybeSingle(),
+    supabase
+      .from("checklist_items")
+      .select("item_id, status, note, updated_at")
+      .eq("account_id", accountId)
+      .order("item_id", { ascending: true }),
     supabase
       .from("audit_log")
       .select("id, actor_user_id, action, target, at")
@@ -55,6 +62,7 @@ export async function buildAccountExport(
     account: account.data,
     memberships: memberships.data ?? [],
     questionnaireDraft: draft.data ?? null,
+    checklistItems: checklist.data ?? [],
     auditLog: audit.data ?? [],
   };
 }
@@ -69,7 +77,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, and audit log as JSON.",
     "",
     "This export holds your provider business data only. It never contains participant information,",
     "because the product does not collect any.",

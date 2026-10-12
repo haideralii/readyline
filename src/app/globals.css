@@ -34,6 +34,23 @@ body {
   outline-offset: 2px;
 }
 
+/* Print (REQ-006 FR-4): the page content only, in black on white. */
+@media print {
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
