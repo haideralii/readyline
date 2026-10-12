@@ -69,6 +69,21 @@ export const REQUIRED_LATER: ReadonlyArray<{
     from: "REQ-007",
     productionHome: "Vercel project environment variables (server only)",
   },
+  {
+    name: "STRIPE_PRICE_PACK",
+    from: "REQ-007 (the pack's Price id)",
+    productionHome: "Vercel project environment variables (server only)",
+  },
+  {
+    name: "PACK_PRICE_AUD_CENTS",
+    from: "REQ-007 (display price; checked against the Price with a live key)",
+    productionHome: "Vercel project environment variables",
+  },
+  {
+    name: "GENERATION_LIVE",
+    from: "REQ-007 Session C (the paid job calls the model only when this is 1; D-708)",
+    productionHome: "Vercel project environment variables (server only)",
+  },
 ];
 
 const schema = z.object({

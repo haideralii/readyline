@@ -76,6 +76,88 @@ export function documentStatus(model: DocumentModel): {
   };
 }
 
+export type SectionLog = Omit<
+  GenerationLogRow,
+  "account_id" | "version_set_id"
+>;
+
+/**
+ * One tailored section through the model and its gates. Shared by the
+ * in-request runner below and the resumable paid job (REQ-007 FR-5), which
+ * persists each finished section so a tick can stop between sections.
+ */
+export async function generateTailoredSection(input: {
+  section: ResolvedSection;
+  type: DocumentTypeSpec;
+  facts: ProviderFacts;
+  result: QuestionnaireResult;
+  dataset: StandardsDataset;
+  client: ModelClient;
+  modelId: string;
+  allowedPhrases: string[];
+}): Promise<{
+  section: ResolvedSection;
+  log: SectionLog;
+  usage: { inputTokens: number; outputTokens: number };
+}> {
+  const spec = sectionsFor(input.type).find((s) => s.id === input.section.id);
+  if (!spec || spec.mode !== "tailored")
+    throw new Error(`section ${input.section.id} is not tailored`);
+  const pack = buildContextPackFromFacts({
+    facts: input.facts,
+    result: input.result,
+    dataset: input.dataset,
+    type: input.type,
+    section: spec,
+  });
+  const out = await generateSection({
+    pack,
+    client: input.client,
+    model: input.modelId,
+    allowedPhrases: input.allowedPhrases,
+  });
+  return {
+    section: {
+      ...input.section,
+      status: out.status,
+      blocks: out.blocks,
+      usedFacts: out.usedFacts,
+    },
+    log: {
+      document_type_id: input.type.id,
+      section_id: input.section.id,
+      prompt_version: PROMPT_VERSION,
+      model: input.modelId,
+      request_hash: out.hash,
+      status: out.status,
+      attempts: out.attempts,
+      input_tokens: out.usage?.inputTokens ?? null,
+      output_tokens: out.usage?.outputTokens ?? null,
+      cache_creation_input_tokens: out.usage?.cacheCreationInputTokens ?? null,
+      cache_read_input_tokens: out.usage?.cacheReadInputTokens ?? null,
+    },
+    usage: {
+      inputTokens: out.usage?.inputTokens ?? 0,
+      outputTokens: out.usage?.outputTokens ?? 0,
+    },
+  };
+}
+
+/** True for the sections of a skeleton the model fills. */
+export function isTailoredSection(
+  type: DocumentTypeSpec,
+  section: ResolvedSection,
+): boolean {
+  return (
+    sectionsFor(type).find((s) => s.id === section.id)?.mode === "tailored"
+  );
+}
+
+/** The note shipped inside every set.zip. */
+export function readmeText(tradingName: string, generatedAt: string): string {
+  return `Readyline document set for ${tradingName}, generated ${generatedAt}.\nOpen the .docx files in Word or LibreOffice. Sections marked "Review and complete" need your attention before use.\n`;
+}
+
 async function fillTailoredSections(input: {
   model: DocumentModel;
   type: DocumentTypeSpec;
@@ -88,55 +170,25 @@ async function fillTailoredSections(input: {
   only?: string;
 }): Promise<{
   model: DocumentModel;
-  logs: Omit<GenerationLogRow, "account_id" | "version_set_id">[];
+  logs: SectionLog[];
   usage: { inputTokens: number; outputTokens: number };
 }> {
-  const logs: Omit<GenerationLogRow, "account_id" | "version_set_id">[] = [];
+  const logs: SectionLog[] = [];
   const usage = { inputTokens: 0, outputTokens: 0 };
-  const specs = sectionsFor(input.type);
   const sections: ResolvedSection[] = [];
   for (const section of input.model.sections) {
-    const spec = specs.find((s) => s.id === section.id);
     const wanted =
-      spec?.mode === "tailored" && (!input.only || input.only === section.id);
-    if (!spec || !wanted) {
+      isTailoredSection(input.type, section) &&
+      (!input.only || input.only === section.id);
+    if (!wanted) {
       sections.push(section);
       continue;
     }
-    const pack = buildContextPackFromFacts({
-      facts: input.facts,
-      result: input.result,
-      dataset: input.dataset,
-      type: input.type,
-      section: spec,
-    });
-    const out = await generateSection({
-      pack,
-      client: input.client,
-      model: input.modelId,
-      allowedPhrases: input.allowedPhrases,
-    });
-    usage.inputTokens += out.usage?.inputTokens ?? 0;
-    usage.outputTokens += out.usage?.outputTokens ?? 0;
-    logs.push({
-      document_type_id: input.type.id,
-      section_id: section.id,
-      prompt_version: PROMPT_VERSION,
-      model: input.modelId,
-      request_hash: out.hash,
-      status: out.status,
-      attempts: out.attempts,
-      input_tokens: out.usage?.inputTokens ?? null,
-      output_tokens: out.usage?.outputTokens ?? null,
-      cache_creation_input_tokens: out.usage?.cacheCreationInputTokens ?? null,
-      cache_read_input_tokens: out.usage?.cacheReadInputTokens ?? null,
-    });
-    sections.push({
-      ...section,
-      status: out.status,
-      blocks: out.blocks,
-      usedFacts: out.usedFacts,
-    });
+    const out = await generateTailoredSection({ ...input, section });
+    usage.inputTokens += out.usage.inputTokens;
+    usage.outputTokens += out.usage.outputTokens;
+    logs.push(out.log);
+    sections.push(out.section);
   }
   return { model: { ...input.model, sections }, logs, usage };
 }
@@ -247,7 +299,7 @@ export async function generateDocumentSet(input: {
     );
     zipEntries["readiness-summary.pdf"] = pdf;
     zipEntries["README.txt"] = strToU8(
-      `Readyline document set for ${facts.tradingName}, generated ${generatedAt}.\nOpen the .docx files in Word or LibreOffice. Sections marked "Review and complete" need your attention before use.\n`,
+      readmeText(facts.tradingName, generatedAt),
     );
     await store.putObject(
       objectPath(input.accountId, set.id, "set.zip"),

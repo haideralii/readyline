@@ -3,6 +3,7 @@ import { findProhibitedClaims } from "@/lib/claims";
 import {
   accountDeletedEmail,
   accountPurgedEmail,
+  documentsReadyEmail,
   formatDateAu,
 } from "./templates";
 
@@ -37,5 +38,22 @@ describe("account emails (REQ-004 FR-6)", () => {
     expect(formatDateAu(new Date("2026-12-31T14:30:00Z"))).toBe(
       "1 January 2027",
     );
+  });
+});
+
+describe("documents-ready email (REQ-007 FR-5)", () => {
+  const ready = documentsReadyEmail({
+    to: "owner@example.test",
+    tradingName: "Sunrise Supports",
+    documentsUrl: "https://readyline.example/documents",
+  });
+
+  it("names the business, links the documents page and keeps the review wording", () => {
+    expect(ready.subject).toMatch(/documents are ready/);
+    expect(ready.text).toContain("Sunrise Supports");
+    expect(ready.text).toContain("https://readyline.example/documents");
+    expect(ready.text).toMatch(/first draft for your review/);
+    expect(ready.text).toMatch(/not legal advice/);
+    expect(findProhibitedClaims(`${ready.subject}\n${ready.text}`)).toEqual([]);
   });
 });

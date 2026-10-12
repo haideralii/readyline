@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { tickGroup } from "./helpers/groups";
 
 /**
  * REQ-003 end-to-end (both projects): happy path, back navigation, reload
@@ -20,7 +21,7 @@ async function fillBusiness(
 }
 
 async function chooseGroups(page: Page, codes: string[]) {
-  for (const code of codes) await page.locator(`#group-${code}`).check();
+  for (const code of codes) await tickGroup(page, code);
 }
 
 async function fillRest(
@@ -113,8 +114,9 @@ test.describe("questionnaire", () => {
       "What happens next",
     );
     // REQ-013 AC-5: the summary line and the grouped document list.
+    // REQ-013 FR-12: the audit word is the block's heading; the sentence follows it.
     await expect(page.getByTestId("summary")).toContainText(
-      /Your audit: verification\. You will need \d+ documents and \d+ registers/,
+      /Your audit: verification[\s\S]*You will need \d+ documents and \d+ registers/,
     );
     await expect(
       page.getByTestId("doc-group-running-the-business"),

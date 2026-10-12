@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" width="360" height="80" role="img" aria-label="Readyline">
+  <title>Readyline</title>
+  <text x="8" y="52" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="52" font-weight="500" letter-spacing="-0.5" fill="#1C2B2A">Readyline</text>
+  <rect x="8" y="64" width="344" height="3" rx="1.5" fill="#E6E0D6"/>
+  <rect x="8" y="64" width="150" height="3" rx="1.5" fill="#B4461F"/>
+</svg>

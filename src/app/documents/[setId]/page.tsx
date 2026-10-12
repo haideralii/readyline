@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 export const metadata: Metadata = { title: "Document set" };
 
-const button =
-  "inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 px-5 text-base font-medium hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-700 dark:hover:bg-zinc-900";
+const button = "btn-secondary";
 
 export default async function DocumentSetPage({
   params,
@@ -23,6 +24,28 @@ export default async function DocumentSetPage({
   const supabase = await createSupabaseServerClient();
   const set = await getVersionSet(supabase, setId);
   if (!set || set.account_id !== viewer.account.id) notFound();
+  // FR-8: a refunded pack keeps its data but serves nothing.
+  if (await isSetLocked(supabase, set.id)) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+        <p className="text-sm">
+          <Link href="/documents" className="underline underline-offset-2">
+            All document sets
+          </Link>
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+          Document set
+        </h1>
+        <p
+          role="status"
+          className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
+          data-testid="set-locked"
+        >
+          {DOCUMENTS_COPY.lockedSet}
+        </p>
+      </div>
+    );
+  }
   const documents = await listLatestDocuments(supabase, set.id);
 
   return (

@@ -28,7 +28,7 @@ export function loadLocalEnv(): void {
 export function e2eCronSecret(): string {
   return (
     process.env.CRON_SECRET?.trim() ||
-    ["e2e", "cron", "secret", "0123456789abcdef"].join("-")
+    ["e2e", "cron", "secret", "0123456789abcdef"].join("-") // gitleaks:allow
   );
 }
 
