@@ -20,6 +20,9 @@ import {
   type Fixture,
 } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
+import { lintTimeframes } from "./lint";
+import { TailoredSection, blocksToProse, blocksToText } from "./section-schema";
+import { readability } from "./readability";
 
 const report = JSON.parse(
   readFileSync(
@@ -66,19 +69,21 @@ describe("recorded fixtures replay through the current gate", () => {
     expect(out.readability?.grade).toBeLessThanOrEqual(11);
   });
 
-  it("the governance purpose recording now reports a readability problem instead of passing (R-5)", async () => {
-    const out = await replay(
-      "certification-personal-care",
-      "governance-policy",
-      "purpose",
+  it("the governance purpose recording fails the readability gate on its text (R-5); its request is orphaned by the D-041 purpose brief", () => {
+    const dir = join(DEFAULT_FIXTURES_DIR, "governance-policy", "purpose");
+    const fixtures = readdirSync(dir).map(
+      (f) => JSON.parse(readFileSync(join(dir, f), "utf8")) as Fixture,
     );
-    expect(out.status).toBe("fallback");
-    expect(out.problems[0]).toMatch(
-      /readability grade 11\.8 is above 11: shorten sentences/,
-    );
+    expect(fixtures.length).toBeGreaterThan(0);
+    for (const fx of fixtures) {
+      const blocks = TailoredSection.shape.blocks.parse(
+        (JSON.parse(fx.reply) as { blocks: unknown }).blocks,
+      );
+      expect(readability(blocksToProse(blocks)).grade).toBe(11.8);
+      expect(readability(blocksToProse(blocks)).level).toBe("fail");
+    }
   });
-
-  it("the first behaviour-support steps recording is reported as a truncation, not bad JSON (R-6)", async () => {
+  it("the first behaviour-support steps recordings stay on disk as truncations; the split sub-sections have no fixture until recorded (R-6, D-041)", async () => {
     const dir = join(
       DEFAULT_FIXTURES_DIR,
       "behaviour-support-plan-implementation-procedure",
@@ -86,22 +91,55 @@ describe("recorded fixtures replay through the current gate", () => {
     );
     const cut = readdirSync(dir)
       .map((f) => JSON.parse(readFileSync(join(dir, f), "utf8")) as Fixture)
-      .filter((f) => f.request.maxTokens === 2000);
+      .filter((f) => f.usage?.outputTokens === f.request.maxTokens);
     expect(cut.length).toBeGreaterThan(0);
-    for (const f of cut) expect(f.usage?.outputTokens).toBe(2000);
-    // The replay of the current request only finds the cap-4000 fixture when it exists (item 2).
-    const current = await replay(
-      "behaviour-support-company",
+    const type = documentTypeById(
       "behaviour-support-plan-implementation-procedure",
-      "steps",
-    );
-    if (current.status === "fallback") {
-      expect(current.problems.join("\n")).toMatch(
-        /truncated at \d+ output tokens|No recorded fixture/,
-      );
+    )!;
+    const ids = sectionsFor(type).map((s) => s.id);
+    expect(ids).not.toContain("steps");
+    expect(ids.filter((id) => id.startsWith("steps-"))).toHaveLength(3);
+    for (const id of ids.filter((x) => x.startsWith("steps-"))) {
+      const out = await replay("behaviour-support-company", type.id, id);
+      expect(["generated", "fallback"]).toContain(out.status);
+      if (out.status === "fallback")
+        expect(out.problems.join("\n")).toMatch(
+          /No recorded fixture|truncated at \d+ output tokens/,
+        );
     }
   });
 
+  it("R-7: lists which recorded replies restate a statutory timeframe", () => {
+    const results: Record<string, string[]> = {};
+    for (const typeId of readdirSync(DEFAULT_FIXTURES_DIR)) {
+      const typeDir = join(DEFAULT_FIXTURES_DIR, typeId);
+      if (typeId.endsWith(".json") || typeId.endsWith(".md")) continue;
+      for (const sectionId of readdirSync(typeDir)) {
+        for (const file of readdirSync(join(typeDir, sectionId))) {
+          const fx = JSON.parse(
+            readFileSync(join(typeDir, sectionId, file), "utf8"),
+          ) as Fixture;
+          let blocks: unknown;
+          try {
+            blocks = (JSON.parse(fx.reply) as { blocks: unknown }).blocks;
+          } catch {
+            continue; // truncated or invalid replies never reach the lint
+          }
+          const parsed = TailoredSection.shape.blocks.safeParse(blocks);
+          if (!parsed.success) continue;
+          const hits = lintTimeframes(blocksToText(parsed.data)).map(
+            (h) => h.match,
+          );
+          if (hits.length) results[`${typeId}/${sectionId}`] = hits;
+        }
+      }
+    }
+    // Expected after batch 11: sections 5 and 6 of the sole-trader incident policy restate the 24-hour and 5-business-day rules.
+    expect(Object.keys(results).sort()).toEqual([
+      "incident-management-policy-and-register/how-we-do-this",
+      "incident-management-policy-and-register/responsibilities",
+    ]);
+  });
   it("every fixture on disk is listed in the recordings report", () => {
     const listed = new Set(
       report.recordings.map((r) => `${r.documentTypeId}/${r.sectionId}`),

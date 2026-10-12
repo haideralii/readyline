@@ -12,6 +12,8 @@ export const SectionSpec = z.object({
   heading: z.string().min(1),
   mode: z.enum(["fixed", "tailored"]),
   brief: z.string().min(1),
+  /** For an extra section: place it right after this outline section instead of before the back matter. */
+  insertAfter: slug.optional(),
 });
 export type SectionSpec = z.infer<typeof SectionSpec>;
 
@@ -35,6 +37,8 @@ export const DocumentTypeSpec = z.object({
   registers: z.array(slug),
   reviewCycleMonths: z.number().int().positive().optional(),
   extraSections: z.array(SectionSpec),
+  /** Outline sections this document does not use (for example a split steps section, D-041). */
+  omitSections: z.array(slug).optional(),
   proposed: z.boolean().optional(),
 });
 export type DocumentTypeSpec = z.infer<typeof DocumentTypeSpec>;
@@ -77,9 +81,23 @@ export function sectionsFor(type: DocumentTypeSpec): SectionSpec[] {
       `document type ${type.id}: unknown outline ${type.outline}`,
     );
   // Document-specific sections sit before the fixed back matter so the notice stays last.
-  const cut = outline.findIndex((s) => BACK_MATTER.has(s.id));
-  const at = cut === -1 ? outline.length : cut;
-  return [...outline.slice(0, at), ...type.extraSections, ...outline.slice(at)];
+  const omitted = new Set(type.omitSections ?? []);
+  const base = outline.filter((s) => !omitted.has(s.id));
+  const anchored = type.extraSections.filter((s) => s.insertAfter);
+  const trailing = type.extraSections.filter((s) => !s.insertAfter);
+  // Anchored extras follow their anchor (in catalogue order, chaining allowed).
+  let result: SectionSpec[] = [...base];
+  for (const extra of anchored) {
+    const i = result.findIndex((s) => s.id === extra.insertAfter);
+    if (i === -1)
+      throw new Error(
+        `document type ${type.id}: ${extra.id} has no anchor ${extra.insertAfter}`,
+      );
+    result = [...result.slice(0, i + 1), extra, ...result.slice(i + 1)];
+  }
+  const cut = result.findIndex((s) => BACK_MATTER.has(s.id));
+  const at = cut === -1 ? result.length : cut;
+  return [...result.slice(0, at), ...trailing, ...result.slice(at)];
 }
 
 export function reviewCycleMonths(type: DocumentTypeSpec): number {

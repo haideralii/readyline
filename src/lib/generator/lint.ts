@@ -147,3 +147,54 @@ export function lintText(
 export function lintErrors(findings: readonly LintFinding[]): LintFinding[] {
   return findings.filter((f) => f.severity === "error");
 }
+
+/**
+ * R-7 / D-041: tailored sections never restate statutory timeframes; the
+ * fixed section that carries the Commission's rule is the single source.
+ */
+export const TIMEFRAME_RULES: readonly Rule[] = [
+  {
+    id: "timeframe-24-hours",
+    pattern: /\b24\s*hours?\b/gi,
+    severity: "error",
+    why: "A statutory timeframe; refer to the fixed section that holds it.",
+  },
+  {
+    id: "timeframe-business-days",
+    pattern: /\b\d+\s+business\s+days?\b|\bbusiness\s+days?\b/gi,
+    severity: "error",
+    why: "A statutory timeframe; refer to the fixed section that holds it.",
+  },
+  {
+    id: "timeframe-within-days",
+    pattern: /\bwithin\s+(?:\w+\s+){0,3}(?:hours?|days?)\b/gi,
+    severity: "error",
+    why: "A statutory timeframe; refer to the fixed section that holds it.",
+  },
+];
+
+export function lintTimeframes(text: string): LintFinding[] {
+  const findings: LintFinding[] = [];
+  for (const rule of TIMEFRAME_RULES) {
+    const re = new RegExp(rule.pattern.source, rule.pattern.flags);
+    for (const m of text.matchAll(re)) {
+      findings.push({
+        rule: rule.id,
+        severity: rule.severity,
+        match: m[0],
+        index: m.index ?? 0,
+        why: rule.why,
+      });
+    }
+  }
+  // Keep the earliest match where rules overlap ("within 24 hours" over "24 hours").
+  const kept: LintFinding[] = [];
+  for (const f of findings.sort(
+    (a, b) => a.index - b.index || b.match.length - a.match.length,
+  )) {
+    const last = kept[kept.length - 1];
+    if (last && f.index < last.index + last.match.length) continue;
+    kept.push(f);
+  }
+  return kept;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { lintErrors, lintText } from "./lint";
+import { lintErrors, lintText, lintTimeframes } from "./lint";
 
 describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
   it("passes house-style prose", () => {
@@ -50,5 +50,21 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
       }),
     ).toEqual([]);
     expect(lintText(text).map((x) => x.rule)).toEqual(["plain-words-assist"]);
+  });
+  it("R-7: flags restated statutory timeframes and nothing else", () => {
+    const f = lintTimeframes(
+      "We report the most serious incidents within 24 hours and the rest within 5 business days. We record it within three working days.",
+    );
+    expect(f.map((x) => x.match)).toEqual([
+      "within 24 hours",
+      "within 5 business days",
+      "within three working days",
+    ]);
+    expect(
+      lintTimeframes(
+        "We follow the timeframes in section 7 Reportable incidents.",
+      ),
+    ).toEqual([]);
+    expect(lintTimeframes("We review this every 12 months.")).toEqual([]);
   });
 });

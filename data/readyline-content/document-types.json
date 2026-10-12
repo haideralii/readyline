@@ -1,5 +1,5 @@
 {
-  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added.",
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -30,7 +30,7 @@
         "id": "purpose",
         "heading": "Purpose",
         "mode": "tailored",
-        "brief": "Two or three sentences naming the provider and what this policy commits to."
+        "brief": "Two short sentences: what this document is for, and which standard it supports; nothing else."
       },
       {
         "id": "scope",
@@ -54,13 +54,13 @@
         "id": "how-we-do-this",
         "heading": "How we put this into practice",
         "mode": "tailored",
-        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers)."
+        "brief": "Numbered steps, sized to the business (sole trader wording when there are no workers). Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Table of role and responsibility; roles come from the business structure and worker count."
+        "brief": "Table of role and responsibility; roles come from the business structure and worker count. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "records-and-evidence",
@@ -98,7 +98,7 @@
         "id": "purpose",
         "heading": "Purpose",
         "mode": "tailored",
-        "brief": "What the procedure achieves and which policy it supports."
+        "brief": "Two short sentences: what this document is for, and which standard it supports; nothing else."
       },
       {
         "id": "when-this-applies",
@@ -110,13 +110,13 @@
         "id": "steps",
         "heading": "Steps",
         "mode": "tailored",
-        "brief": "Numbered steps with who does what and by when; timeframes as a table where the rules set them."
+        "brief": "Numbered steps with who does what and by when; timeframes as a table where the rules set them. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role and responsibility table."
+        "brief": "Role and responsibility table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "records-and-evidence",
@@ -154,7 +154,7 @@
         "id": "purpose",
         "heading": "Purpose",
         "mode": "tailored",
-        "brief": "What the plan prepares the provider for."
+        "brief": "Two short sentences: what this document is for, and which standard it supports; nothing else."
       },
       {
         "id": "context",
@@ -178,7 +178,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "records-and-evidence",
@@ -316,7 +316,7 @@
         "id": "purpose",
         "heading": "Purpose",
         "mode": "tailored",
-        "brief": "What the framework governs."
+        "brief": "Two short sentences: what this document is for, and which standard it supports; nothing else."
       },
       {
         "id": "principles",
@@ -340,7 +340,7 @@
         "id": "responsibilities",
         "heading": "Responsibilities",
         "mode": "tailored",
-        "brief": "Role table."
+        "brief": "Role table. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
       },
       {
         "id": "records-and-evidence",
@@ -563,7 +563,7 @@
           "id": "procedure",
           "heading": "Complaints procedure",
           "mode": "tailored",
-          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission."
+          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
         },
         {
           "id": "register",
@@ -596,7 +596,7 @@
           "id": "procedure",
           "heading": "Incident procedure",
           "mode": "tailored",
-          "brief": "Numbered steps sized to the business."
+          "brief": "Numbered steps sized to the business. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\")."
         },
         {
           "id": "register",
@@ -1037,12 +1037,34 @@
       "registers": ["incidents", "training"],
       "extraSections": [
         {
+          "id": "steps-getting-the-plan",
+          "heading": "Steps: getting and understanding the plan",
+          "mode": "tailored",
+          "brief": "At most eight numbered steps: asking for a behaviour support plan or an interim plan, checking it is current and authorised where required, and making sure every worker who supports the participant has read and understood it. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "insertAfter": "when-this-applies"
+        },
+        {
+          "id": "steps-putting-the-plan-into-practice",
+          "heading": "Steps: putting the plan into practice",
+          "mode": "tailored",
+          "brief": "At most eight numbered steps: using only the strategies in the plan, training and supervising workers on them, recording each use of a regulated restrictive practice, and what workers do when the plan does not cover a situation. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "insertAfter": "steps-getting-the-plan"
+        },
+        {
+          "id": "steps-monitoring-reporting-and-review",
+          "heading": "Steps: monitoring, reporting and review",
+          "mode": "tailored",
+          "brief": "At most eight numbered steps: monthly reporting of regulated restrictive practice use, telling the practitioner what is working and what is not, reportable incidents, and asking for a plan review when needs change or the plan expires. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (for example \"see section 7 Reportable incidents\").",
+          "insertAfter": "steps-putting-the-plan-into-practice"
+        },
+        {
           "id": "our-role",
           "heading": "Our role: practitioner or implementing provider",
           "mode": "tailored",
           "brief": "States which of the two modules applies from the result and adjusts the steps accordingly."
         }
-      ]
+      ],
+      "omitSections": ["steps"]
     },
     {
       "id": "family-centred-practice-procedure",

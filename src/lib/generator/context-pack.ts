@@ -13,7 +13,7 @@ import { strictObject } from "@/lib/validation";
 import type { DocumentTypeSpec, SectionSpec } from "./catalogue";
 import { buildProviderFacts, FACT_KEYS, type ProviderFacts } from "./facts";
 import { HOUSE_STYLE_VERSION } from "./house-style";
-import { standardsForType } from "./document-model";
+import { rulesSectionFor, standardsForType } from "./document-model";
 
 export const PROMPT_VERSION = "2026-10-12.1";
 
@@ -63,6 +63,12 @@ export const ContextPack = strictObject({
     }),
   ),
   registers: z.array(z.string().min(1)),
+  /** The fixed section holding the statutory rule for this document, if any (R-7). */
+  rulesSection: strictObject({
+    id: z.string().min(1),
+    number: z.string(),
+    heading: z.string().min(1),
+  }).optional(),
 });
 export type ContextPack = z.infer<typeof ContextPack>;
 
@@ -99,6 +105,7 @@ export function buildContextPackFromFacts(input: {
     registers: result.registers
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
+    ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
   });
 }
 
@@ -132,6 +139,7 @@ export function buildContextPack(input: {
     registers: result.registers
       .filter((r) => wantedRegisters.has(r.id))
       .map((r) => r.title),
+    ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
   };
   // Parsing our own object guarantees the strict shape even if a caller passes extras later.
   return ContextPack.parse(pack);

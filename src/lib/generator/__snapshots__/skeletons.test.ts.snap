@@ -3093,10 +3093,30 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "blocks": [
           "callout",
         ],
-        "heading": "Steps",
-        "id": "steps",
+        "heading": "Steps: getting and understanding the plan",
+        "id": "steps-getting-the-plan",
         "mode": "tailored",
         "number": "3",
+        "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "callout",
+        ],
+        "heading": "Steps: putting the plan into practice",
+        "id": "steps-putting-the-plan-into-practice",
+        "mode": "tailored",
+        "number": "4",
+        "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "callout",
+        ],
+        "heading": "Steps: monitoring, reporting and review",
+        "id": "steps-monitoring-reporting-and-review",
+        "mode": "tailored",
+        "number": "5",
         "status": "placeholder",
       },
       {
@@ -3106,7 +3126,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Responsibilities",
         "id": "responsibilities",
         "mode": "tailored",
-        "number": "4",
+        "number": "6",
         "status": "placeholder",
       },
       {
@@ -3116,7 +3136,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Our role: practitioner or implementing provider",
         "id": "our-role",
         "mode": "tailored",
-        "number": "5",
+        "number": "7",
         "status": "placeholder",
       },
       {
@@ -3127,7 +3147,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Records and evidence to retain",
         "id": "records-and-evidence",
         "mode": "fixed",
-        "number": "6",
+        "number": "8",
         "status": "fixed",
       },
       {
@@ -3139,7 +3159,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Related documents and registers",
         "id": "related-documents",
         "mode": "fixed",
-        "number": "7",
+        "number": "9",
         "status": "fixed",
       },
       {
@@ -3150,7 +3170,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "heading": "Review",
         "id": "review",
         "mode": "fixed",
-        "number": "8",
+        "number": "10",
         "status": "fixed",
       },
       {

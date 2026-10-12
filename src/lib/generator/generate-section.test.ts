@@ -223,6 +223,80 @@ describe("validate, retry, fall back (AC-5)", () => {
       requestHash(buildModelRequest(pack, "m", 1500)),
     );
   });
+  it("R-7: a restated timeframe is a validation problem that names the fixed section", async () => {
+    const incident = documentTypeById(
+      "incident-management-policy-and-register",
+    )!;
+    const howWe = sectionsFor(incident).find((s) => s.id === "how-we-do-this")!;
+    const incidentPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section: howWe,
+    });
+    expect(incidentPack.rulesSection).toEqual({
+      id: "reportable-incidents",
+      number: "7",
+      heading: "Reportable incidents",
+    });
+    const restating = JSON.stringify({
+      sectionId: "how-we-do-this",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "steps",
+          items: [
+            "We tell the Commission within 24 hours.",
+            "We record it the same day.",
+          ],
+        },
+      ],
+    });
+    const fixed = JSON.stringify({
+      sectionId: "how-we-do-this",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "steps",
+          items: [
+            "We tell the Commission in the time set out in section 7 Reportable incidents.",
+            "We record it the same day.",
+          ],
+        },
+      ],
+    });
+    const client = new FakeClient([restating, fixed]);
+    const out = await generateSection({
+      pack: incidentPack,
+      client,
+      model: "m",
+      allowedPhrases: classNames,
+    });
+    expect(out.status).toBe("generated");
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toBe(
+      'restates a statutory timeframe ("within 24 hours"): refer to section 7 Reportable incidents instead of restating the timeframe',
+    );
+    expect(client.requests[1].user).toContain(
+      "refer to section 7 Reportable incidents",
+    );
+    // A document without a rules section gets the generic instruction.
+    const generic = await generateSection({
+      pack,
+      client: new FakeClient([
+        GOOD.replace(
+          "It names who makes each decision.",
+          "We report within 5 business days.",
+        ),
+        GOOD,
+      ]),
+      model: "m",
+    });
+    expect(generic.problems[0]).toMatch(
+      /refer to the fixed section that holds the rule/,
+    );
+  });
   it("validateReply rejects schema violations with readable paths", () => {
     const v = validateReply(
       JSON.stringify({

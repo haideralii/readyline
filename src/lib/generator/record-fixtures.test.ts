@@ -51,24 +51,14 @@ const REPORT_PATH = `${DEFAULT_FIXTURES_DIR}/recordings-2026-10-12.json`;
  * (D-040) and the rest of the sole-trader incident policy (queue item 3).
  */
 const RECORDINGS = [
+  // Batch 10 (D-039): the sole-trader policy statement (kept; passes every gate).
   {
     batch: 10,
     caseId: "verification-sole-trader",
     typeId: "incident-management-policy-and-register",
     sectionId: "policy-statement",
   },
-  {
-    batch: 10,
-    caseId: "certification-personal-care",
-    typeId: "governance-policy",
-    sectionId: "purpose",
-  },
-  {
-    batch: 11,
-    caseId: "behaviour-support-company",
-    typeId: "behaviour-support-plan-implementation-procedure",
-    sectionId: "steps",
-  },
+  // Batch 12 (D-041, R-7): the rest of the sole-trader incident policy, one call each.
   ...[
     "purpose",
     "scope",
@@ -76,9 +66,20 @@ const RECORDINGS = [
     "responsibilities",
     "procedure",
   ].map((sectionId) => ({
-    batch: 11,
+    batch: 12,
     caseId: "verification-sole-trader",
     typeId: "incident-management-policy-and-register",
+    sectionId,
+  })),
+  // Batch 12: the behaviour-support steps split into three sub-sections (D-041), one call each.
+  ...[
+    "steps-getting-the-plan",
+    "steps-putting-the-plan-into-practice",
+    "steps-monitoring-reporting-and-review",
+  ].map((sectionId) => ({
+    batch: 12,
+    caseId: "behaviour-support-company",
+    typeId: "behaviour-support-plan-implementation-procedure",
     sectionId,
   })),
 ] as const;

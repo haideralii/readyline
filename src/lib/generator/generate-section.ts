@@ -8,7 +8,7 @@
  * truncation, falls back to the fixed placeholder with a visible "Review and
  * complete" marker. Nothing here touches the network directly.
  */
-import { lintErrors, lintText, type LintFinding } from "./lint";
+import { lintErrors, lintText, lintTimeframes, type LintFinding } from "./lint";
 import type { ContextPack } from "./context-pack";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
@@ -111,6 +111,19 @@ export function validateReply(
       ok: false,
       problems: [
         `readability grade ${score.grade} is above ${READABILITY_FAIL_ABOVE}: ${READABILITY_RETRY_INSTRUCTION}`,
+      ],
+    };
+  }
+  // R-7: statutory timeframes live in fixed text only; tailored text refers to that section.
+  const timeframes = lintTimeframes(blocksToText(result.data.blocks));
+  if (timeframes.length) {
+    const target = pack.rulesSection
+      ? `section ${pack.rulesSection.number} ${pack.rulesSection.heading}`
+      : "the fixed section that holds the rule";
+    return {
+      ok: false,
+      problems: [
+        `restates a statutory timeframe ("${timeframes[0].match}"): refer to ${target} instead of restating the timeframe`,
       ],
     };
   }

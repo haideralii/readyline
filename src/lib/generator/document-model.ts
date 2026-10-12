@@ -58,6 +58,33 @@ export type StandardSummary = {
 
 const UNNUMBERED = new Set(["document-control", "notice"]);
 
+/** Section numbers as the rendered document shows them (front and back matter unnumbered). */
+export function sectionNumbers(type: DocumentTypeSpec): Map<string, string> {
+  const map = new Map<string, string>();
+  let n = 0;
+  for (const spec of sectionsFor(type))
+    map.set(spec.id, UNNUMBERED.has(spec.id) ? "" : String(++n));
+  return map;
+}
+
+/** Fixed sections that carry a statutory rule tailored text must refer to rather than restate (R-7). */
+const RULE_SECTION_IDS = ["reportable-incidents"];
+
+export function rulesSectionFor(
+  type: DocumentTypeSpec,
+): { id: string; number: string; heading: string } | null {
+  const numbers = sectionNumbers(type);
+  for (const spec of sectionsFor(type)) {
+    if (spec.mode === "fixed" && RULE_SECTION_IDS.includes(spec.id))
+      return {
+        id: spec.id,
+        number: numbers.get(spec.id) ?? "",
+        heading: spec.heading,
+      };
+  }
+  return null;
+}
+
 export function standardsForType(
   type: DocumentTypeSpec,
   dataset: StandardsDataset,
