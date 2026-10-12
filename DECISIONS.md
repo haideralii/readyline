@@ -946,3 +946,13 @@ Items asserted in code or copy that still need a primary source.
   the three sole-trader review-pack documents are also recorded on
   `claude-haiku-5-5` under a model-keyed fixture directory for a side-by-side
   comparison; production stays on Sonnet 5.5 until the PO decides.
+- D-047 (PO, 2026-10-12): readability. Sections under 40 words warn, never
+  fail; privacy and records management documents fail above 12; others 11.
+- D-048 (PO, 2026-10-12): production model stays `claude-sonnet-5-5`. Haiku
+  5.5 recorded as a reference only (3 fallbacks in 14 sections).
+- D-049 (PO, 2026-10-12): R-7 lint needs a statutory anchor in the sentence;
+  a provider's own service promise is allowed.
+- D-050 (PO, 2026-10-12): R-11 (grant execute to service_role for every
+  secret-key function, with an integration test through the service-role
+  client) and R-12 (no-standard documents never ask for a standard in
+  tailored text) block PR #9. Batch 17 budget up to $0.40 (cap $2.28).
