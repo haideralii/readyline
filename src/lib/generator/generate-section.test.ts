@@ -45,7 +45,7 @@ const GOOD = JSON.stringify({
   blocks: [
     {
       type: "paragraph",
-      text: "This policy explains how Sunrise Supports, a sole trader working in New South Wales, is run and who is accountable for decisions.",
+      text: "Sunrise Supports is a sole trader in New South Wales. This policy explains how we run the business. It names who makes each decision.",
     },
     {
       type: "paragraph",
@@ -54,8 +54,8 @@ const GOOD = JSON.stringify({
   ],
 });
 const CLAIMY = GOOD.replace(
-  "is run and who",
-  "is fully compliant with the standards and who",
+  "how we run the business",
+  "that we are fully compliant with the standards",
 );
 const WRONG_ID = GOOD.replace('"sectionId":"purpose"', '"sectionId":"scope"');
 
@@ -154,6 +154,75 @@ describe("validate, retry, fall back (AC-5)", () => {
     ]);
   });
 
+  it("R-5: a readability fail is a validation problem with the house-style retry instruction, then the fallback", async () => {
+    const dense = JSON.stringify({
+      sectionId: "purpose",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "paragraph",
+          text: "Notwithstanding the aforementioned organisational considerations, the comprehensive implementation of multidisciplinary governance arrangements necessitates the systematic utilisation of standardised documentation methodologies across all operational jurisdictions.",
+        },
+      ],
+    });
+    const client = new FakeClient([dense, GOOD]);
+    const out = await generateSection({
+      pack,
+      client,
+      model: "m",
+      allowedPhrases: classNames,
+    });
+    expect(out.status).toBe("generated");
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toMatch(
+      /readability grade \d+(\.\d+)? is above 11: shorten sentences to under 20 words and use common words/,
+    );
+    expect(client.requests[1].user).toContain(
+      "shorten sentences to under 20 words",
+    );
+    const twice = await generateSection({
+      pack,
+      client: new FakeClient([dense, dense]),
+      model: "m",
+    });
+    expect(twice.status).toBe("fallback");
+  });
+
+  it("R-6: a reply cut at the output cap is reported with its token count and never retried", async () => {
+    const client = new FakeClient([
+      {
+        text: '{"sectionId":"purpose","usedFacts":["tradingName"],"blocks":[{"type":"paragraph","text":"We keep',
+        stopReason: "max_tokens",
+        outputTokens: 1500,
+      },
+    ]);
+    const out = await generateSection({ pack, client, model: "m" });
+    expect(out.status).toBe("fallback");
+    expect(out.attempts).toBe(1);
+    expect(client.requests).toHaveLength(1);
+    expect(out.truncatedAtTokens).toBe(1500);
+    expect(out.problems).toEqual([
+      "reply truncated at 1500 output tokens (cap 1500); not retried",
+    ]);
+  });
+
+  it("D-040: steps and how-we-do-this sections get a 4,000 cap, others 1,500; the cap is not part of the fixture key", () => {
+    const stepsSection = sectionsFor(type).find(
+      (s) => s.id === "how-we-do-this",
+    )!;
+    const stepsPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type,
+      section: stepsSection,
+    });
+    expect(buildModelRequest(stepsPack, "m").maxTokens).toBe(4000);
+    expect(buildModelRequest(pack, "m").maxTokens).toBe(1500);
+    expect(requestHash(buildModelRequest(pack, "m", 2000))).toBe(
+      requestHash(buildModelRequest(pack, "m", 1500)),
+    );
+  });
   it("validateReply rejects schema violations with readable paths", () => {
     const v = validateReply(
       JSON.stringify({

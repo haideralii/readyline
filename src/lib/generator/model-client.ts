@@ -3,14 +3,20 @@
  * recorded fixtures keyed by the request hash and fails loudly when one is
  * missing, so CI never calls the network. `RecordingClient` wraps a real
  * client and writes fixtures. `AnthropicClient` is the only real
- * implementation and is constructed only in record mode.
+ * implementation and is constructed only in record mode. Every reply carries
+ * the API's stop reason so a truncated reply is recognised (R-6).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { requestHash, type ModelRequest } from "./prompts";
 
 export type ModelUsage = { inputTokens: number; outputTokens: number };
-export type ModelReply = { text: string; usage: ModelUsage | null };
+export type StopReason = "end_turn" | "max_tokens" | "other" | null;
+export type ModelReply = {
+  text: string;
+  usage: ModelUsage | null;
+  stopReason: StopReason;
+};
 
 export interface ModelClient {
   readonly mode: "replay" | "record" | "fake";
@@ -28,6 +34,8 @@ export type Fixture = {
   sectionId: string;
   recordedAt: string;
   usage: ModelUsage | null;
+  /** Absent in fixtures recorded before R-6; replay infers truncation from the usage then. */
+  stopReason?: StopReason;
   request: { system: string; user: string; maxTokens: number };
   reply: string;
 };
@@ -40,6 +48,15 @@ export function fixturePath(
   hash: string,
 ): string {
   return join(dir, labels.documentTypeId, labels.sectionId, `${hash}.json`);
+}
+
+/** True when a fixture for this exact request already exists (used to avoid re-spending). */
+export function hasFixture(
+  request: ModelRequest,
+  labels: FixtureLabels,
+  dir: string = DEFAULT_FIXTURES_DIR,
+): boolean {
+  return existsSync(fixturePath(dir, labels, requestHash(request)));
 }
 
 export class MissingFixtureError extends Error {
@@ -56,6 +73,18 @@ export class MissingFixtureError extends Error {
   }
 }
 
+/** Fixtures recorded before stop reasons were kept: a reply that used the whole cap was cut off. */
+function inferStopReason(fixture: Fixture): StopReason {
+  if (fixture.stopReason !== undefined) return fixture.stopReason;
+  if (
+    fixture.usage &&
+    fixture.request.maxTokens > 0 &&
+    fixture.usage.outputTokens >= fixture.request.maxTokens
+  )
+    return "max_tokens";
+  return null;
+}
+
 export class ReplayClient implements ModelClient {
   readonly mode = "replay" as const;
   constructor(private readonly dir: string = DEFAULT_FIXTURES_DIR) {}
@@ -67,7 +96,11 @@ export class ReplayClient implements ModelClient {
     const path = fixturePath(this.dir, labels, hash);
     if (!existsSync(path)) throw new MissingFixtureError(hash, path, request);
     const fixture = JSON.parse(readFileSync(path, "utf8")) as Fixture;
-    return { text: fixture.reply, usage: fixture.usage };
+    return {
+      text: fixture.reply,
+      usage: fixture.usage,
+      stopReason: inferStopReason(fixture),
+    };
   }
 }
 
@@ -97,6 +130,7 @@ export class RecordingClient implements ModelClient {
       sectionId: labels.sectionId,
       recordedAt: this.now().toISOString(),
       usage: reply.usage,
+      stopReason: reply.stopReason,
       request: {
         system: request.system,
         user: request.user,
@@ -110,16 +144,24 @@ export class RecordingClient implements ModelClient {
   }
 }
 
+export type FakeReply =
+  string | { text: string; stopReason?: StopReason; outputTokens?: number };
+
 /** Test double: answers from a queue of replies. */
 export class FakeClient implements ModelClient {
   readonly mode = "fake" as const;
   readonly requests: ModelRequest[] = [];
-  constructor(private readonly replies: string[]) {}
+  constructor(private readonly replies: FakeReply[]) {}
   async complete(request: ModelRequest): Promise<ModelReply> {
     this.requests.push(request);
-    const text = this.replies.shift();
-    if (text === undefined) throw new Error("FakeClient has no more replies");
-    return { text, usage: { inputTokens: 100, outputTokens: 50 } };
+    const next = this.replies.shift();
+    if (next === undefined) throw new Error("FakeClient has no more replies");
+    const r = typeof next === "string" ? { text: next } : next;
+    return {
+      text: r.text,
+      usage: { inputTokens: 100, outputTokens: r.outputTokens ?? 50 },
+      stopReason: r.stopReason ?? "end_turn",
+    };
   }
 }
 
@@ -143,12 +185,19 @@ export class AnthropicClient implements ModelClient {
       .map((c) => (c.type === "text" ? c.text : ""))
       .join("")
       .trim();
+    const stopReason: StopReason =
+      message.stop_reason === "end_turn"
+        ? "end_turn"
+        : message.stop_reason === "max_tokens"
+          ? "max_tokens"
+          : "other";
     return {
       text,
       usage: {
         inputTokens: message.usage.input_tokens,
         outputTokens: message.usage.output_tokens,
       },
+      stopReason,
     };
   }
 }

@@ -85,10 +85,15 @@ export function buildUserPrompt(pack: ContextPack): string {
   ].join("\n\n");
 }
 
+/** Output caps per section type (D-040): long procedures get room; everything else is short. */
+export function maxTokensFor(sectionId: string): number {
+  return sectionId === "steps" || sectionId === "how-we-do-this" ? 4000 : 1500;
+}
+
 export function buildModelRequest(
   pack: ContextPack,
   model: string,
-  maxTokens = 2000,
+  maxTokens = maxTokensFor(pack.section.id),
 ): ModelRequest {
   return {
     promptVersion: PROMPT_VERSION,
@@ -116,7 +121,11 @@ function sortKeys(value: unknown): unknown {
   return value;
 }
 
-/** Fixture key: prompt version, model and the exact request text (D-502). */
+/**
+ * Fixture key: prompt version, model and the exact request text (D-502). The
+ * output cap is deliberately not part of the key: raising a cap (D-040) must
+ * not orphan the fixtures recorded under the old one.
+ */
 export function requestHash(request: ModelRequest): string {
   return createHash("sha256")
     .update(
@@ -125,7 +134,6 @@ export function requestHash(request: ModelRequest): string {
         model: request.model,
         system: request.system,
         user: request.user,
-        maxTokens: request.maxTokens,
       }),
       "utf8",
     )

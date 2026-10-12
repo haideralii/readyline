@@ -1,21 +1,31 @@
 /**
  * One tailored section through the pipeline (REQ-005 FR-2 steps 2 to 4,
  * AC-5): prompt, model, JSON parse, schema validation, lint, readability.
- * A failed attempt retries once with the problems appended to the prompt;
- * a second failure falls back to the fixed placeholder with a visible
- * "Review and complete" marker. Nothing here touches the network directly.
+ * A failed validation retries once with the problems appended to the prompt
+ * (a readability fail adds the house-style instruction, R-5); a reply the
+ * model cut off at the output cap is a truncation, reported with its token
+ * count and never retried unchanged (R-6, D-040). A second failure, or a
+ * truncation, falls back to the fixed placeholder with a visible "Review and
+ * complete" marker. Nothing here touches the network directly.
  */
 import { lintErrors, lintText, type LintFinding } from "./lint";
 import type { ContextPack } from "./context-pack";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
-import { readability, type Readability } from "./readability";
+import {
+  readability,
+  READABILITY_FAIL_ABOVE,
+  type Readability,
+} from "./readability";
 import {
   TailoredSection,
   blocksToProse,
   blocksToText,
   type Block,
 } from "./section-schema";
+
+export const READABILITY_RETRY_INSTRUCTION =
+  "shorten sentences to under 20 words and use common words";
 
 export type SectionOutcome = {
   status: "generated" | "fallback";
@@ -26,6 +36,8 @@ export type SectionOutcome = {
   problems: string[];
   readability: Readability | null;
   usage: ModelUsage | null;
+  /** Output tokens of a reply the model cut off at the cap, when that is why the section fell back. */
+  truncatedAtTokens: number | null;
 };
 
 export function fallbackBlocks(pack: ContextPack): Block[] {
@@ -51,7 +63,12 @@ export function extractJson(text: string): string {
 }
 
 export type Validation =
-  | { ok: true; section: TailoredSection; findings: LintFinding[] }
+  | {
+      ok: true;
+      section: TailoredSection;
+      findings: LintFinding[];
+      readability: Readability;
+    }
   | { ok: false; problems: string[] };
 
 export function validateReply(
@@ -87,7 +104,17 @@ export function validateReply(
       problems: errors.map((e) => `${e.rule}: "${e.match}" (${e.why})`),
     };
   }
-  return { ok: true, section: result.data, findings };
+  // R-5: the house style's hard limit is a validation problem, not a note.
+  const score = readability(blocksToProse(result.data.blocks));
+  if (score.level === "fail") {
+    return {
+      ok: false,
+      problems: [
+        `readability grade ${score.grade} is above ${READABILITY_FAIL_ABOVE}: ${READABILITY_RETRY_INSTRUCTION}`,
+      ],
+    };
+  }
+  return { ok: true, section: result.data, findings, readability: score };
 }
 
 export async function generateSection(input: {
@@ -107,8 +134,11 @@ export async function generateSection(input: {
   const hash = requestHash(base);
   const problems: string[] = [];
   let usage: ModelUsage | null = null;
+  let truncatedAtTokens: number | null = null;
+  let attempts = 0;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
+    attempts = attempt;
     const request =
       attempt === 1
         ? base
@@ -125,6 +155,14 @@ export async function generateSection(input: {
       continue;
     }
     usage = reply.usage;
+    if (reply.stopReason === "max_tokens") {
+      // R-6: the same request would be cut off again; report and stop.
+      truncatedAtTokens = reply.usage?.outputTokens ?? request.maxTokens;
+      problems.push(
+        `reply truncated at ${truncatedAtTokens} output tokens (cap ${request.maxTokens}); not retried`,
+      );
+      break;
+    }
     const v = validateReply(reply.text, pack, allowed);
     if (v.ok) {
       return {
@@ -134,8 +172,9 @@ export async function generateSection(input: {
         attempts: attempt,
         hash,
         problems,
-        readability: readability(blocksToProse(v.section.blocks)),
+        readability: v.readability,
         usage,
+        truncatedAtTokens: null,
       };
     }
     problems.push(...v.problems);
@@ -144,10 +183,11 @@ export async function generateSection(input: {
     status: "fallback",
     blocks: fallbackBlocks(pack),
     usedFacts: [],
-    attempts: 2,
+    attempts,
     hash,
     problems,
     readability: null,
     usage,
+    truncatedAtTokens,
   };
 }
