@@ -153,3 +153,76 @@ Waiting for the PO.
 5. STOP.
 
 For Haider: `ANTHROPIC_API_KEY` (console key in a workspace with a monthly spend cap) and `ANTHROPIC_MODEL` into `.env.local`; then Dev records the first fixtures. PRs still to open by the PO: `req-004-migrate-dburl` and `req-005-generator`. Waiting for the PO.
+**2026-10-12 (batch 8), Dev: items 1 to 3 delivered and pushed; item 4 blocked; nothing merged.**
+
+0. Local `main` had the PO's four batch-8 commits on top of the old head while `origin/main` had the PR #7 merge; rebased the PO commits onto `origin/main` (product files only, CLAUDE.md v2.5 note, D-037) and pushed.
+1. PR #8 conflict: `req-004-migrate-dburl` merged with `main` (2062f6a); `REQ-004` evidence kept both sides in date order (Session C, then the batch-6 notes). `npm run check` clean (253 tests). Pushed; the PO merges.
+2. REQ-005 Session B recordings: **waiting for Anthropic key** (`.env.local` has neither `ANTHROPIC_API_KEY` nor `ANTHROPIC_MODEL`; checked by name). Branch merged with `main` first (2b83699; package.json, lockfile, backlog and DECISIONS conflicts resolved, lockfile reconciled with `npm install`). D-522.
+3. REQ-005 Session C (f9d89fa on `req-005-generator`): migration with `version_sets`, `document_versions`, `generation_log` (counts only), per-account daily quota in one statement and the private `documents` bucket with an account-scoped `storage.objects` policy; runner and store behind interfaces (unit-tested end to end with a fake model); server actions behind `GENERATION_ENABLED` and the quota; `/documents` pages (coming-soon state, sets, zip and PDF downloads through ownership-checked 5-minute signed URLs, reviewer view with "which answers drove this", regenerate-one-section and a line diff); PDF readiness summary (pdf-lib); Session D fixed extras written in the house style (register tables, forms, checklists, agreement outlines; the self-assessment table carries the Commission's outcomes verbatim in tables of 20 rows with a separate tailored "how we meet" section); retention purge extension. Tests: 41 files, 323 unit tests (AC-1, AC-2, AC-3, AC-5, AC-6 in `run.test.ts`), integration suite for AC-7 and AC-8, e2e 50 passed in CI mode, build and bundle check clean. D-516 to D-522. **Owed:** screenshots of the documents pages and the CI link; they need a signed-in session against a migrated database, which does not exist until PR #8 merges and the migrations run.
+4. **Blocked: REQ-013 has no requirements file.** `product/requirements` holds REQ-001 to REQ-005 and REQ-014 only; REQ-013 appears in the backlog, in REQ-014 cross-references and in this queue, but FR-1 to FR-5 and its acceptance criteria are not in the repo, so nothing was built. Ready to start the moment the file is committed.
+5. STOP.
+
+For Haider: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` into `.env.local`; merge PR #8 then dispatch `migrate.yml` so the four migrations reach the hosted project (the documents bucket and quota function are in the newest one). Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 9)
+
+**PO actions done this batch:** PR #8 merged into `main` (all three CI jobs green on 2062f6a). `migrate.yml` dispatched on `main`: first attempt failed in `supabase/setup-cli@v1` with "Failed to resolve latest Supabase CLI release: rate limit exceeded" (anonymous GitHub API call from a shared runner); the re-run succeeded and applied `20261011000000_init_accounts.sql`, `20261011010000_session_b_hardening.sql` and `20261011020000_session_c_delete_export_admin.sql` to the hosted project (run 38181942981, attempt 2). The fourth migration (Session C of REQ-005) is on `req-005-generator` and reaches the hosted project after PR #9 merges. `REQ-013` file restored on local `main` (04fefdc; the dev rebase in batch 8 dropped PO commit 4a4a938). PR #9 CI: all four jobs green on f9d89fa.
+
+0. **Push `main`** with the PO's batch-9 commits after checking the stat (product/ and DECISIONS.md only). `product/requirements/REQ-013-first-time-user-experience.md` must be on `origin/main` after this.
+
+1. **D-038 migrate.yml CLI pin** (small, on a branch `ops-pin-supabase-cli` from `main`): replace `version: latest` in `supabase/setup-cli@v1` with a pinned CLI version (the one `npx supabase --version` reports locally, or the version the CI integration job already uses) so the action downloads directly instead of asking the GitHub API for "latest"; add `GITHUB_TOKEN: ${{ github.token }}` to the step's `env` if the action honours it. Same pin in `ci.yml` if it also uses `latest`. Open the PR; the PO merges.
+
+2. **REQ-013 P1** on `req-013-first-time-ux` from `main`: FR-1 to FR-5 as written in the file, with the evidence listed under "Evidence required on delivery". Session order: FR-1 and FR-2 first (accessibility defects), then FR-3, FR-4, FR-5. Push after each session. Do not merge; the PO reviews UI.
+
+3. **REQ-005 Session C owed evidence**: now that the hosted database has the three migrations and `/documents` exists on `req-005-generator`, capture the documents-page screenshots (coming-soon state is enough while `GENERATION_ENABLED` is off) at 360x740 and desktop against a local `supabase start` stack, and paste the CI link for f9d89fa into Delivery evidence. If a signed-in session against the hosted project is needed instead, say so and stop that item.
+
+4. **REQ-005 Session B recordings**: only if `.env.local` now has `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` (check by name). Record the three reference cases, commit the fixtures, and write the cost note (input and output tokens and dollars per case). If the key is still absent, write "waiting for key" and move on.
+
+5. STOP. Append your status below.
+**2026-10-12 (batch 9), Dev: items 0 to 4 done; REQ-013 P1 delivered in four pushed sessions; nothing merged.**
+
+0. `main` pushed with the PO's two batch-9 commits after the stat check (product/ and DECISIONS.md only); `REQ-013-first-time-user-experience.md` is on `origin/main` (aa52c8a). Local main was rebased onto the PR #8 merge first.
+1. D-038 CLI pin: branch `ops-pin-supabase-cli` (9aeaadf, 3babd61): `supabase/setup-cli@v1` pinned to `2.120.0` (the current published CLI; the integration job also used `latest`) with `github-token: ${{ github.token }}` in both `ci.yml` and `migrate.yml` (the action's `action.yml` declares that input for exactly this rate-limit case). Dev cannot open PRs from this machine (no `gh`); PO opens and merges.
+2. REQ-013 P1 on `req-013-first-time-ux`: Session 1 FR-1 and FR-2 (44b8f1b), FR-3 (3c36a0a), FR-4 (6ba2416), FR-5 (b19776a), evidence (62dec64). Plain-English messages in every schema with a unit test over all error paths; `ChoiceRow` accessible names from visible labels and an accessibility-tree e2e test over every control (records in `product/evidence/req-013`); supports step led by "What do you do for participants?" with eight everyday headings, synonyms, audit tags and the two-class hint; restrictive practices examples, "What counts?" expander and the three-question helper that resolves "not sure" in the schema; result summary line, plain "in practice" sentence and documents under four headings. Screenshots of every changed step at 360x740 and desktop; axe clean on every step; Lighthouse accessibility 100 on `/start/business` (mobile and desktop) and `/start`. Check clean (28 files, 266 tests), build ok, Playwright 32 passed in CI mode. D-1301 to D-1305. **Owed by Haider:** the manual NVDA pass (no screen reader on the dev machine; the walkthrough note in the evidence says what to expect). Not merged; PO reviews the UI.
+3. REQ-005 owed evidence: the CI link is the branch's Actions listing (Dev cannot read run ids); documents-page screenshots need a signed-in session, which the dev machine cannot create (no Docker for a local stack; a hosted session needs a magic-link email Dev cannot receive), so that item stops there as the queue allows. Note added to REQ-005 (29a19e1).
+4. REQ-005 Session B recordings: **waiting for key** (`ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` absent from `.env.local`, checked by name).
+5. STOP.
+
+Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 10)
+
+**PO actions this batch:** PR #10 opened from `ops-pin-supabase-cli`; the PO merges it when green. REQ-013 P1 reviewed from the screenshots: accepted conditionally with four fixes R-1 to R-4 (in the REQ's PO review). `.env.local` has had `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` since before batch 9 finished (the Dev check ran earlier); D-039 applies.
+
+0. **Push `main`** with the PO's batch-10 commit after checking the stat (product/, DECISIONS.md, .gitignore only). Note: the PO review for REQ-013 is on `main`'s copy of the REQ file; merge `main` into `req-013-first-time-ux` before item 1 so the branch carries it.
+
+1. **REQ-013 R-1 to R-4** on `req-013-first-time-ux`: order within groups from the data with a test; name before code; non-wrapping audit tag; seclusion in helper question 1. Re-capture only the affected screenshots. `npm run check`, build, Playwright CI mode. Push. Do not merge; the PO checks the two screenshots and merges.
+
+2. **REQ-005 Session B recordings** (D-039 applies: three model calls in total, one per reference case; nothing else). Check `.env.local` by name again; it is there. Before the first call, print the estimated input tokens per case. Record the three cases with `npm run generation:record`, commit the fixtures on `req-005-generator`, and write the cost note into Delivery evidence: input tokens, output tokens, dollars per case, and whether validation passed first time or used the retry. If any call fails validation twice, stop that case and report; do not re-record.
+
+3. **REQ-005 PO content review pack**: for the sole-trader reference case only, export the recorded set's rendered `.docx` files for the incident management policy, the complaints procedure and the self-assessment into `product/evidence/req-005/sole-trader/` (these three only; the rest stay in the CI artifact), so the PO can read real tailored text. Note which tailored sections came from which answers.
+
+4. STOP. Append your status below.
+**2026-10-12 (batch 10), Dev: items 0 to 3 done; nothing merged.**
+
+0. `main` pushed with the PO's batch-10 commit after the stat check (product/, backlog, the REQ-013 review and the `.po-review/` ignore line). `main` then merged into `req-013-first-time-ux` (bcb7877) so the branch carries the review.
+1. REQ-013 R-1 to R-4 (e3cc19c on `req-013-first-time-ux`): classes render in the data's order within each heading (`groupsInCategory`; unit test that 0107 leads "Personal care at home"; e2e on the first checkbox); class name first with the code after it in muted text; both tags `whitespace-nowrap` inside a wrapping row; seclusion added to helper question 1 and the first example, with the copy moved to `practices-copy.ts` and a test that the three questions cover all five regulated practices. Only the supports and practices screenshots were re-captured (business and result are byte-identical). Check clean (29 files, 270 tests), build ok, Playwright CI mode 29 passed on both projects (one axe scan of the empty business step on android-small passed on Playwright's automatic retry; noted in the REQ as a timing flake to watch). Not merged; PO checks the two screenshots.
+2. REQ-005 recordings (8a06f78 on `req-005-generator`), D-039 honoured at one named section per case: sole trader incident-policy statement validated first time (2,325 in, 1,397 out, about `.019`, grade 8.5); company governance purpose validated first time (2,672 in, 159 out, about `.007`, grade 11.8); behaviour-support `steps` failed twice because the reply was cut at the 2,000-token output cap mid-JSON (5,635 and 5,678 in, 2,000 out each, about `.031` each), stopped and not re-recorded. Batch spend about `.09` plus one lost call (about `.02`) that vitest's default 5-second timeout cut off before the fix; two earlier attempts made no call (SDK refused the jsdom environment). Full table, estimates and notes in REQ-005 Delivery evidence; D-523. **PO decision needed:** raise `maxTokens` to 4,000 for `steps` and `how-we-do-this` sections and allow one more call for the behaviour-support case.
+3. Review pack: `product/evidence/req-005/sole-trader/` holds the incident management policy, complaints procedure and self-assessment `.docx` rendered from fixtures only (replay client, no call) plus `sections.md` saying which sections are fixed, which is model text (with the answers it used and the text), and which show the fallback marker. With one recorded section per case only the incident policy statement is real model text.
+4. STOP.
+
+Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 11)
+
+**PO actions this batch:** REQ-013 R-1 to R-4 verified from the re-captured screenshots; PR #11 opened from `req-013-first-time-ux`; the PO merges it when CI is green. REQ-005 first recordings reviewed: accepted with R-5 and R-6 (REQ-005 PO review) and D-040.
+
+0. **Push `main`** with the PO's batch-11 commit after checking the stat (product/ and DECISIONS.md only). Merge `main` into `req-005-generator` so the branch carries the PO review and D-040.
+
+1. **REQ-005 R-5 and R-6** on `req-005-generator`: readability `fail` as a validation problem with the single retry; `stop_reason` handling for truncation; D-040 caps per section type; unit tests for both; replay the existing fixtures through the new gate (the governance purpose fixture must now show a readability problem in replay, not a pass). No model calls for this item.
+
+2. **One recording** (D-039, D-040): the behaviour-support `steps` section at the 4,000 cap, one call. Commit the fixture and append the row to the recordings report with real tokens and dollars. If it truncates, stop and report the output-token count.
+
+3. **Sole-trader incident policy, complete** (D-039 scope widened for this item only): record the remaining tailored sections of `incident-management-policy-and-register` for the sole-trader case (purpose, scope, how we put this into practice, responsibilities, incident procedure), one call each, so the PO can read one whole real document. Expected about $0.10. Re-render `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and update `sections.md`. Stop after this document; do not record other documents.
+
+4. STOP. Append your status below, with the batch's total spend.

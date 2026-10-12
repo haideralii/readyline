@@ -18,7 +18,7 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ-010 | Operations: backups, monitoring, incident response runbook, data export and deletion | 5 | must | draft |
 | REQ-011 | Content system and first ten SEO articles | 6 | should | draft |
 | REQ-012 | Launch readiness review (security re-test, a11y audit, claims audit, performance) | 6 | must | draft |
-| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | in progress (P1 queued batch 8) |
+| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | P1 accepted conditionally (R-1 to R-4), 12 Oct |
 | REQ-014 | Visual identity v1: tokens, serif headings, the ready-line motif, home page | 4 | should | ready |
 
 Parking lot (not scheduled): fee-free list of approved auditors (no referral fees, D-109); mid-term audit countdown emails; multi-user accounts for small organisations; de-identification helper for providers' own documents; AML/CTF variant of the engine (only if LEAP conflict is cleared).

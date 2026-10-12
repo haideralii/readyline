@@ -1,8 +1,11 @@
 name: Migrate hosted database
 
-# REQ-004 / D-032: migrations reach the hosted Supabase project through this
-# job, never by hand. It runs on pushes to main that touch supabase/migrations
-# and skips cleanly, with a notice, until the repository secrets exist.
+# REQ-004 / D-032 / D-036: migrations reach the hosted Supabase project through
+# this job, never by hand. It runs on pushes to main that touch
+# supabase/migrations and by hand (workflow_dispatch). It pushes over a direct
+# database URL (session pooler) built from SUPABASE_DB_PASSWORD, so no
+# `supabase link` and no access-token scope beyond what the CLI needs to run.
+# It skips cleanly, with a notice, until the repository secrets exist.
 
 on:
   push:
@@ -24,6 +27,7 @@ jobs:
       contents: read
     env:
       SUPABASE_PROJECT_REF: dpwwzhylcyosnkmlcnnp
+      SUPABASE_POOLER_HOST: aws-0-ap-southeast-2.pooler.supabase.com
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
@@ -34,6 +38,7 @@ jobs:
             echo "::notice title=Migration skipped::SUPABASE_ACCESS_TOKEN and SUPABASE_DB_PASSWORD are not set as repository secrets; the hosted database was not changed."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
+            echo "::add-mask::$SUPABASE_DB_PASSWORD"
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -43,16 +48,24 @@ jobs:
       - uses: supabase/setup-cli@v1
         if: steps.gate.outputs.ready == 'true'
         with:
-          version: latest
+          # Pinned (D-038): 'latest' asks the GitHub API anonymously and shared runners hit the rate limit.
+          version: 2.120.0
+          github-token: ${{ github.token }}
 
-      - name: Link to the hosted project
+      - name: Build the database URL (never printed)
         if: steps.gate.outputs.ready == 'true'
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        run: |
+          # URL-encode the password with Python's stdlib so any character is safe in the URL.
+          ENCODED="$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')"
+          echo "::add-mask::$ENCODED"
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_REF}:${ENCODED}@${SUPABASE_POOLER_HOST}:5432/postgres"
+          echo "::add-mask::$DB_URL"
+          echo "DB_URL=$DB_URL" >> "$GITHUB_ENV"
 
-      - name: Apply pending migrations
+      - name: Apply pending migrations over the database URL
         if: steps.gate.outputs.ready == 'true'
-        run: supabase db push --include-all
+        run: supabase db push --include-all --db-url "$DB_URL"
 
       - name: Summary
         if: steps.gate.outputs.ready == 'true'
-        run: supabase migration list
+        run: supabase migration list --db-url "$DB_URL"

@@ -993,3 +993,13 @@ Items asserted in code or copy that still need a primary source.
 - CLAUDE.md section 2 audit cost ranges: third-party figures, not Commission data.
 - D-205: dev-only `npm audit` high advisories (test and build toolchain) are
   tracked, not fixed; production dependencies are clean.
+- D-038 (PO, 2026-10-12): `migrate.yml` run 3 failed before touching the database
+  because `supabase/setup-cli@v1` with `version: latest` calls the GitHub API
+  anonymously and shared runners hit the rate limit. Re-run succeeded and applied
+  the three migrations on `main`. Decision: pin the CLI version in every workflow
+  and pass the job token to the action; `latest` is not used in CI.
+- D-040 (PO, 2026-10-12): generator output caps. `maxTokens` 4,000 for `steps`
+  and `how-we-do-this` sections, 1,500 for all other section types. A reply
+  that stops on `max_tokens` is a truncation problem, never retried unchanged.
+  A readability `fail` (grade above 11) is a validation problem with one
+  retry. Spend approved: $0.11 to date; up to $0.50 for batch 11.

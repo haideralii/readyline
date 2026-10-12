@@ -223,3 +223,13 @@ Notes for the PO: (1) the `steps` section for the behaviour-support case needs a
 
 **12 Oct 2026, Session A and Session B preparation review (PR #9, 2cb4cfd): ACCEPTED.** CI green including the LibreOffice job (every skeleton converts). Read `fixed-text.ts` (first person plural, plain definitions, placeholders marked for the provider), `prompts.ts` (house style verbatim as the system prompt; strict JSON block contract; facts delimited and declared as data, not instructions; length caps) and the context-pack exclusion proof. The dataset is 1.1.0 with 186 reviewed evidence items. Session B recordings wait only on the Anthropic key; Session C may proceed in parallel. Status: in progress.
 
+**12 Oct 2026, first recordings review (branch `req-005-generator`, 8a06f78): ACCEPTED with two fixes and three decisions.** The sole-trader incident policy statement is good work: Year 8 reading level, first person, names the Incident Management and Reportable Incidents Rules 2018 correctly, treats an unauthorised restrictive practice as a reportable incident, uses only facts from the answers, and makes no prohibited claim. That is the quality bar for every tailored section.
+
+Fixes before the next recording:
+- R-5 **Readability gate is not enforced.** The governance purpose section recorded at grade 11.8 with `validationPassedFirstTime: true`. The house style says fail above 11; `readability.ts` knows that, but the pipeline accepts the section. Make a `fail` readability level a validation problem that triggers the single retry with the instruction "shorten sentences to under 20 words and use common words", and the fallback marker if the retry also fails. Add the unit test. (Replay the existing fixture through the new gate; do not re-record it.)
+- R-6 **Truncated replies must be recognised.** Both behaviour-support attempts hit the 2,000-token cap and were reported as "not valid JSON". Read the API's `stop_reason`; when it is `max_tokens`, record the problem as "reply truncated at N output tokens", do not retry the identical request, and surface the count in the recordings report.
+
+Decisions:
+- D-040 `maxTokens` is 4,000 for `steps` and `how-we-do-this` sections and 1,500 for every other section type. Recorded in DECISIONS.md by the PO.
+- One more call is approved for the behaviour-support `steps` case at the new cap (about $0.06). If it truncates again, stop; the section outline is too big for one call and we split it, not the cap.
+- Spend to date ($0.11) and the batch-11 budget (up to $0.50) are approved.
