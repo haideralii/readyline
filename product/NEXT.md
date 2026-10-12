@@ -205,3 +205,35 @@ Waiting for the PO.
 3. **REQ-005 PO content review pack**: for the sole-trader reference case only, export the recorded set's rendered `.docx` files for the incident management policy, the complaints procedure and the self-assessment into `product/evidence/req-005/sole-trader/` (these three only; the rest stay in the CI artifact), so the PO can read real tailored text. Note which tailored sections came from which answers.
 
 4. STOP. Append your status below.
+**2026-10-12 (batch 10), Dev: items 0 to 3 done; nothing merged.**
+
+0. `main` pushed with the PO's batch-10 commit after the stat check (product/, backlog, the REQ-013 review and the `.po-review/` ignore line). `main` then merged into `req-013-first-time-ux` (bcb7877) so the branch carries the review.
+1. REQ-013 R-1 to R-4 (e3cc19c on `req-013-first-time-ux`): classes render in the data's order within each heading (`groupsInCategory`; unit test that 0107 leads "Personal care at home"; e2e on the first checkbox); class name first with the code after it in muted text; both tags `whitespace-nowrap` inside a wrapping row; seclusion added to helper question 1 and the first example, with the copy moved to `practices-copy.ts` and a test that the three questions cover all five regulated practices. Only the supports and practices screenshots were re-captured (business and result are byte-identical). Check clean (29 files, 270 tests), build ok, Playwright CI mode 29 passed on both projects (one axe scan of the empty business step on android-small passed on Playwright's automatic retry; noted in the REQ as a timing flake to watch). Not merged; PO checks the two screenshots.
+2. REQ-005 recordings (8a06f78 on `req-005-generator`), D-039 honoured at one named section per case: sole trader incident-policy statement validated first time (2,325 in, 1,397 out, about `.019`, grade 8.5); company governance purpose validated first time (2,672 in, 159 out, about `.007`, grade 11.8); behaviour-support `steps` failed twice because the reply was cut at the 2,000-token output cap mid-JSON (5,635 and 5,678 in, 2,000 out each, about `.031` each), stopped and not re-recorded. Batch spend about `.09` plus one lost call (about `.02`) that vitest's default 5-second timeout cut off before the fix; two earlier attempts made no call (SDK refused the jsdom environment). Full table, estimates and notes in REQ-005 Delivery evidence; D-523. **PO decision needed:** raise `maxTokens` to 4,000 for `steps` and `how-we-do-this` sections and allow one more call for the behaviour-support case.
+3. Review pack: `product/evidence/req-005/sole-trader/` holds the incident management policy, complaints procedure and self-assessment `.docx` rendered from fixtures only (replay client, no call) plus `sections.md` saying which sections are fixed, which is model text (with the answers it used and the text), and which show the fallback marker. With one recorded section per case only the incident policy statement is real model text.
+4. STOP.
+
+Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 11)
+
+**PO actions this batch:** REQ-013 R-1 to R-4 verified from the re-captured screenshots; PR #11 opened from `req-013-first-time-ux`; the PO merges it when CI is green. REQ-005 first recordings reviewed: accepted with R-5 and R-6 (REQ-005 PO review) and D-040.
+
+0. **Push `main`** with the PO's batch-11 commit after checking the stat (product/ and DECISIONS.md only). Merge `main` into `req-005-generator` so the branch carries the PO review and D-040.
+
+1. **REQ-005 R-5 and R-6** on `req-005-generator`: readability `fail` as a validation problem with the single retry; `stop_reason` handling for truncation; D-040 caps per section type; unit tests for both; replay the existing fixtures through the new gate (the governance purpose fixture must now show a readability problem in replay, not a pass). No model calls for this item.
+
+2. **One recording** (D-039, D-040): the behaviour-support `steps` section at the 4,000 cap, one call. Commit the fixture and append the row to the recordings report with real tokens and dollars. If it truncates, stop and report the output-token count.
+
+3. **Sole-trader incident policy, complete** (D-039 scope widened for this item only): record the remaining tailored sections of `incident-management-policy-and-register` for the sole-trader case (purpose, scope, how we put this into practice, responsibilities, incident procedure), one call each, so the PO can read one whole real document. Expected about $0.10. Re-render `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and update `sections.md`. Stop after this document; do not record other documents.
+
+4. STOP. Append your status below, with the batch's total spend.
+**2026-10-12 (batch 11), Dev: items 0 to 3 done; batch spend about $0.15; nothing merged.**
+
+0. `main` pushed with the PO's batch-11 commit (product/ and DECISIONS.md only); `main` merged into `req-005-generator` (3539dba; the REQ-013 file add/add conflict resolved with main's copy).
+1. R-5 and R-6 with D-040 (894daba): a readability `fail` is a validation problem that triggers the single retry with "shorten sentences to under 20 words and use common words", then the fallback; replies carry the API `stop_reason`, a `max_tokens` reply is recorded as "reply truncated at N output tokens" and never retried unchanged, with the count in the recordings report; caps 4,000 for `steps` and `how-we-do-this`, 1,500 otherwise. The fixture key no longer includes the cap (so raising a cap cannot orphan fixtures); the four existing fixtures were re-keyed in place. Unit tests for the gate, the truncation and the caps; `fixtures-replay.test.ts` replays every fixture through the new gate: the governance purpose fixture now reports "readability grade 11.8 is above 11" and falls back instead of passing. No model calls. Check clean (43 files, 331 tests).
+2. Behaviour-support `steps` at the 4,000 cap, one call: truncated again at 4,000 output tokens (5,635 in, about $0.051); stopped as decided, so the outline is split in a later session rather than the cap raised (D-525).
+3. Sole-trader incident policy, one call per section (1a4ad6d): scope (grade 8.6), how we put this into practice (6.8) and responsibilities (6.3) passed first time; purpose failed readability twice (15.8, then 12.2 after the retry instruction) and fell back; the incident procedure was cut at the 1,500 cap. Real tokens and dollars per row are in the REQ-005 evidence table; `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` and `sections.md` re-rendered, with the pipeline's reason named for each fallback. Stopped after this document.
+4. STOP. **Batch total:** 7 calls, about $0.15 ($0.26 to date, against the $0.50 batch budget in D-040). **PO decisions requested (D-525):** give extra sections ending in `procedure` the 4,000 cap; change the "purpose" brief to "two short sentences"; split the behaviour-support `steps` outline before any further call.
+
+Waiting for the PO.

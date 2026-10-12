@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-â€¦' 'strict-dynamic'`, `style-src 'self' 'nonce-â€¦'`, `img-src 'self'
+'nonce-Ã¢â‚¬Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-Ã¢â‚¬Â¦'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -856,3 +856,8 @@ Items asserted in code or copy that still need a primary source.
   from CI, tests or exploratory runs; real token and dollar counts go into
   Delivery evidence after every recording. The cap is the hard stop; the PO
   raises it only after seeing the first cost note.
+- D-040 (PO, 2026-10-12): generator output caps. `maxTokens` 4,000 for `steps`
+  and `how-we-do-this` sections, 1,500 for all other section types. A reply
+  that stops on `max_tokens` is a truncation problem, never retried unchanged.
+  A readability `fail` (grade above 11) is a validation problem with one
+  retry. Spend approved: $0.11 to date; up to $0.50 for batch 11.
