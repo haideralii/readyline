@@ -7,7 +7,7 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 # How Readyline uses AI
 
-## 1 What is written by people and what is drafted by AI
+## What is written by people and what is drafted by AI
 
 Every document Readyline produces has two kinds of text.
 
@@ -17,18 +17,18 @@ Tailored text is drafted by an AI model from the answers you give in the questio
 
 Every document shows which sections are which.
 
-## 2 Which model, and where your data goes
+## Which model, and where your data goes
 
 We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models.
 
-## 3 How we check the drafts
+## How we check the drafts
 
 Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as "guaranteed" or "audit-proof", and refer to the fixed sections for legal timeframes rather than restating them. A section that fails these checks is redrafted once; if it still fails, you see a clear marker asking you to complete that section yourself.
 
-## 4 What you must do
+## What you must do
 
 The documents are drafts for your review. You are responsible for reading them, changing anything that is not true for your business, and adopting them. Readyline does not give legal advice and does not guarantee that you will pass an audit or be registered.
 
-## 5 Telling us about a wrong output
+## Telling us about a wrong output
 
 If a draft says something wrong, odd or unclear, email us at the contact address in the footer with the document name and the section. We read every report and use them to improve the checks.
