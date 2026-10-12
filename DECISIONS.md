@@ -871,3 +871,11 @@ Items asserted in code or copy that still need a primary source.
   pack (policy review 12 months, register review 3 months by default, per
   document type in the catalogue); tailored text uses them and never chooses
   its own; a lint enforces it (R-8). Budget: batch 13 up to $0.50 more.
+- D-043 (PO, 2026-10-12): approves D-528. `policy-statement` cap 2,500;
+  truncation stops the current document only. R-8 lint covers review
+  wording only; statutory reporting cadences fall under R-7 and must refer to
+  the fixed section. REQ-008 answers: headings numbered from structure and
+  hand-typed numbers removed from the copy; `product/legal/refunds.md` is the
+  single source of the refund promise and REQ-007's pricing page quotes it
+  from there (test asserts identity); the AI page names the provider and the
+  model family ("Claude, made by Anthropic"), never the model id.

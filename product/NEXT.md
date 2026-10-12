@@ -1,4 +1,4 @@
-# NEXT: the dev work queue
+﻿# NEXT: the dev work queue
 
 The PO maintains this file. Dev works through the items **in order**, one at a time, and after each item: runs `npm run check` and `npm run build`, commits with a message that names the REQ, pushes to the named branch, and fills in the REQ's **Delivery evidence** (or **Dev response**) section. Do not skip ahead if an item is blocked; write the blocker under the item and move to the next item only if it does not depend on the blocked one. When you reach STOP, finish by appending a short status summary at the bottom of this file under "Dev status" and stop.
 
@@ -295,3 +295,19 @@ Waiting for the PO.
 Open for the PO: D-528 (cap and stop rule); the BSP monitoring fixture under R-8; REQ-008 questions Q1 to Q3; PR #9 (`req-005-generator`, 7675633) still open.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 14)
+
+**PO actions this batch:** batch-13 review accepted (REQ-005 PO review); D-043 records the approvals and the REQ-008 answers (Q1 number from structure and strip the hand-typed numbers; Q2 `refunds.md` is the source, REQ-007 quotes it; Q3 provider and model family only). This PO commit was made on `req-005-generator` because that branch was checked out.
+
+0. **Cherry-pick the PO's batch-14 commit onto `main`** (product/ and DECISIONS.md only) and push `main`; the branch already has it.
+
+1. **REQ-005 D-043 and the R-8 scope change, no model calls**: policy-statement cap, per-document truncation stop, lint narrowed to review wording with a test that the behaviour-support monitoring fixture passes. Replay all fixtures.
+
+2. **Finish the two documents** (sole-trader case): complaints policy statement and the three remaining complaints sections; the two self-assessment sections. One call each; stop at $0.30 for the batch. Re-render the review pack; `sections.md` should show three complete documents.
+
+3. **REQ-008 build** on `req-008-legal-pages` from `main`, one session as the Dev response describes: strip the hand-typed heading numbers from `product/legal/*.md` (mechanical edit; the PO's text is otherwise untouched), pages, footer, legal-copy test, request-log and cookie test, axe, screenshots at both viewports into `product/evidence/req-008/`. `CONTACT_EMAIL` left unset in `.env.example`; the test warns. Push; the PO opens the PR.
+
+4. **Status** with the cost table and running total.
+
+5. STOP.
