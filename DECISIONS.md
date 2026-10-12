@@ -807,3 +807,9 @@ Items asserted in code or copy that still need a primary source.
   that stops on `max_tokens` is a truncation problem, never retried unchanged.
   A readability `fail` (grade above 11) is a validation problem with one
   retry. Spend approved: $0.11 to date; up to $0.50 for batch 11.
+- D-041 (PO, 2026-10-12): approves D-525. `*procedure` extra sections use the
+  4,000 cap; `purpose` brief is "two short sentences"; behaviour-support
+  `steps` outline split into sub-sections of at most eight steps, one call
+  each. Tailored sections never restate statutory timeframes, reportable
+  incident lists or Commission definitions (R-7): they refer to the fixed
+  section that holds them, and a lint enforces it.

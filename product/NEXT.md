@@ -235,3 +235,19 @@ Waiting for the PO.
 4. STOP. **Batch total:** 7 calls, about $0.15 ($0.26 to date, against the $0.50 batch budget in D-040). **PO decisions requested (D-525):** give extra sections ending in `procedure` the 4,000 cap; change the "purpose" brief to "two short sentences"; split the behaviour-support `steps` outline before any further call.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 12)
+
+**PO actions this batch:** PR #11 merged once CI on 0762574 is green. REQ-005 batch-11 recordings accepted; D-525 approved as D-041; new fix R-7 (REQ-005 PO review). Spend to date $0.26; this batch may spend up to $0.40 (D-039 and D-040 still apply; one call per section, no re-record of a passing fixture).
+
+0. **Push `main`** with the PO's batch-12 commit after checking the stat (product/ and DECISIONS.md only). Merge `main` into `req-005-generator`.
+
+1. **REQ-005 R-7 and D-041, no model calls** on `req-005-generator`: timeframe lint for tailored sections with its retry instruction and unit tests; the catalogue `purpose` brief; `*procedure` cap; the behaviour-support `steps` outline split into sub-sections of at most eight steps. Replay the recorded fixtures through the lint and list in Delivery evidence which ones now fail (expected: section 5 and section 6 of the sole-trader incident policy).
+
+2. **Sole-trader incident policy, complete (second pass)**: record `purpose` with the new brief, `procedure` at the 4,000 cap, and re-record only the sections item 1 lists as failing R-7. Re-render the review-pack `.docx` and `sections.md`. Target: every tailored section of this one document is real text with no fallback marker.
+
+3. **Behaviour-support steps**: record the split sub-sections, one call each. If any sub-section truncates, stop and report.
+
+4. **Status**: the batch's cost table (calls, tokens, dollars, pass or retry per call) and the running total.
+
+5. STOP.
