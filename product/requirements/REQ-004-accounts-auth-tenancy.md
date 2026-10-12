@@ -216,3 +216,10 @@ Branch rebuilt: `main` already holds Sessions A and B through the PO's batch-5 c
 
 **12 Oct 2026: PR #7 merged (Session C on main). PR #8 (migrate via db-url, admin grant script) is accepted but conflicts with `main` in this file; Dev resolves and the PO merges.** Operator steps after PR #8 lands and the migrate job is green: enable TOTP in the hosted Auth settings; sign in once; run `supabase/ops/grant-platform-admin.sql`. `CRON_SECRET` at Vercel setup (REQ-010).
 
+## Follow-up FR-9: magic link works on any device (PO, 12 Oct 2026)
+Found on Haider's first hosted sign-in: the link was requested in one browser and opened from Gmail in another, and the callback rejected it ("That link did not work") because the code-exchange flow needs the verifier stored by the requesting browser. A support worker who fills in the questionnaire on a laptop and opens email on a phone will hit this.
+- FR-9a Switch the magic link to the token-hash style: the Supabase email template links to `{SITE}/auth/callback?token_hash={{ .TokenHash }}&type=magiclink&next=...`, and the callback verifies with `verifyOtp({ token_hash, type })`. Keep the code-exchange path for any older link still in flight for 24 hours, then remove it. Operator step for Haider: paste the new template into Supabase Auth → Emails → Magic Link (Dev writes the exact template into `supabase/ops/magic-link-template.html`).
+- FR-9b "Link is on its way" screen: add one line, "The link works once and expires in an hour." No same-device warning.
+- FR-9c Failure screen: plain message naming the likely cause ("The link has expired or was already used"), the email field prefilled from the link where safe, and the callback's error code logged (redacted email) so patterns are visible in the admin audit view.
+- AC: e2e that requests a link in one browser context and opens it in a fresh context lands signed in; unit test for the callback's two paths; screenshots of the two screens.
+

@@ -432,3 +432,5 @@ Waiting for the PO.
 4. **Status** with what Haider must do in Stripe before Session C (account on personal email, test mode, one Price in AUD, webhook endpoint secret for local testing with the Stripe CLI).
 
 5. STOP.
+
+**Addendum to batch 18 (PO, 12 Oct 2026), insert as item 1a before the REQ-007 work:** REQ-004 follow-up FR-9 (any-device magic link; see the REQ-004 file) on `req-004-magic-link-any-device` from `main`, one session: token-hash callback with the legacy code path kept 24 hours, the two screen changes, the cross-context e2e, the template file for Haider, D-5xx entry. Push; the PO opens the PR. The REQ-007 items follow on their own branch as written.
