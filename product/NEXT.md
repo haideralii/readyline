@@ -281,3 +281,19 @@ Waiting for the PO.
 5. **Status** with the cost table and running total.
 
 6. STOP.
+
+## Queue (written by PO, 12 Oct 2026, batch 14)
+
+**PO actions this batch:** batch-13 review accepted (REQ-005 PO review); D-043 records the approvals and the REQ-008 answers (Q1 number from structure and strip the hand-typed numbers; Q2 `refunds.md` is the source, REQ-007 quotes it; Q3 provider and model family only). This PO commit was made on `req-005-generator` because that branch was checked out.
+
+0. **Cherry-pick the PO's batch-14 commit onto `main`** (product/ and DECISIONS.md only) and push `main`; the branch already has it.
+
+1. **REQ-005 D-043 and the R-8 scope change, no model calls**: policy-statement cap, per-document truncation stop, lint narrowed to review wording with a test that the behaviour-support monitoring fixture passes. Replay all fixtures.
+
+2. **Finish the two documents** (sole-trader case): complaints policy statement and the three remaining complaints sections; the two self-assessment sections. One call each; stop at $0.30 for the batch. Re-render the review pack; `sections.md` should show three complete documents.
+
+3. **REQ-008 build** on `req-008-legal-pages` from `main`, one session as the Dev response describes: strip the hand-typed heading numbers from `product/legal/*.md` (mechanical edit; the PO's text is otherwise untouched), pages, footer, legal-copy test, request-log and cookie test, axe, screenshots at both viewports into `product/evidence/req-008/`. `CONTACT_EMAIL` left unset in `.env.example`; the test warns. Push; the PO opens the PR.
+
+4. **Status** with the cost table and running total.
+
+5. STOP.
