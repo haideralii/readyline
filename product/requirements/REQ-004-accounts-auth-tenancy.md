@@ -223,3 +223,5 @@ Found on Haider's first hosted sign-in: the link was requested in one browser an
 - FR-9c Failure screen: plain message naming the likely cause ("The link has expired or was already used"), the email field prefilled from the link where safe, and the callback's error code logged (redacted email) so patterns are visible in the admin audit view.
 - AC: e2e that requests a link in one browser context and opens it in a fresh context lands signed in; unit test for the callback's two paths; screenshots of the two screens.
 
+**PO review of FR-9 and FR-10 (12 Oct 2026, branch `req-004-magic-link-any-device`, f622ef8; PR #14): ACCEPTED.** D-421 to D-423 accepted. The real cause of the hosted read-back failure was missing table grants to `authenticated`, the second grant gap found by running against the hosted project rather than the local stack; the migration fixes it and the integration suite now covers it. Operator step for Haider: paste `supabase/ops/magic-link-template.html` into Supabase Auth → Emails → Magic Link.
+

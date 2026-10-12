@@ -1533,3 +1533,6 @@ Items asserted in code or copy that still need a primary source.
   secret-key function, with an integration test through the service-role
   client) and R-12 (no-standard documents never ask for a standard in
   tailored text) block PR #9. Batch 17 budget up to $0.40 (cap $2.28).
+- D-051 (PO, 2026-10-12): REQ-004 FR-9/FR-10 accepted (PR #14); REQ-007
+  Sessions A and B accepted (PR #15). Subscription display price AUD 39 a
+  month, "coming soon", display only until REQ-009.

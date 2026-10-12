@@ -120,4 +120,4 @@ Three sessions; A and B need no Stripe account.
 - **Stops here** (needs a real test-mode key): the startup price check, the generation job and its cron route, `/documents` purchase states and receipts, the Buy button wiring, the fake-mode e2e, the ops refund doc, the manual Stripe CLI run. Nothing in this session calls Stripe.
 
 ## PO review
-(PO fills in.)
+**12 Oct 2026, Dev response and Sessions A and B (branch `req-007-payments`, 1605965; PR #15): ACCEPTED.** D-701 to D-705 accepted; `allowed_payment_method_types: ["card"]` satisfies AC-3 under SDK 23. Q6 (subscription display price): show "Audit-ready subscription: AUD 39 a month, coming soon" with no buy button; `SUBSCRIPTION_PRICE_AUD_CENTS=3900` is display only until REQ-009. Session C proceeds once Haider's Stripe test keys exist.
