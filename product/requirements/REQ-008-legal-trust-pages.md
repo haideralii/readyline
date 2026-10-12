@@ -73,4 +73,4 @@ Noted: the PO owes the copy in `product/legal/` and has delivered first drafts; 
 (Dev fills in.)
 
 ## PO review
-(PO fills in.)
+**12 Oct 2026 (branch `req-008-legal-pages`, 792e113; PR #12): ACCEPTED.** Pages, footer, draft note, last-updated line and the no-third-party test are as specified; screenshots reviewed at 360 px. D-801 (own front-matter parser instead of gray-matter), D-802 (quoted banned words on the AI page exempt from the claims lint, on that page only) and D-803 (readability module copied until PR #9 merges) accepted. One cosmetic item for a later batch, not blocking: the footer states independence from the NDIA and the Commission twice (in the general-information paragraph and in the trust line); keep the trust line and shorten the paragraph. Merge when CI is green. Lighthouse: Haider records the score once when he next runs the app.
