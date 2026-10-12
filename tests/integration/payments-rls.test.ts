@@ -168,11 +168,14 @@ describe.skipIf(!enabled)("payments tables RLS (REQ-007 AC-5)", () => {
       .eq("id", purchaseId)
       .single();
     expect(check.data?.status).toBe("paid");
+    // Either Postgres refuses at the grant level (42501; D-052 grants the
+    // signed-in role select only) or RLS lets the statement through and it
+    // deletes nothing. Both keep the row, which is the point.
     const del = await a.client
       .from("entitlements")
       .delete()
       .eq("account_id", a.accountId);
-    expect(del.error ?? null).toBeNull();
+    if (del.error) expect(del.error.code).toBe("42501");
     const still = await admin
       .from("entitlements")
       .select("id")
