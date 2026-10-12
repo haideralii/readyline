@@ -162,6 +162,26 @@ function isFamilyCarer(text: string, index: number, length: number): boolean {
   );
 }
 
+/**
+ * R-12 / D-050: a "[Provider to complete: ...]" placeholder that asks for a
+ * Practice Standard or quality indicator. The pack either holds the standards
+ * or names the obligation the document rests on, so the model never needs one.
+ */
+export function lintPlaceholders(text: string): LintFinding[] {
+  const findings: LintFinding[] = [];
+  for (const m of text.matchAll(/\[Provider to complete[^\]]*\]/gi)) {
+    if (!/\b(?:standards?|indicators?)\b/i.test(m[0])) continue;
+    findings.push({
+      rule: "placeholder-standard",
+      severity: "error",
+      match: m[0],
+      index: m.index ?? 0,
+      why: "never ask the provider to name a Practice Standard or quality indicator",
+    });
+  }
+  return findings;
+}
+
 export function lintErrors(findings: readonly LintFinding[]): LintFinding[] {
   return findings.filter((f) => f.severity === "error");
 }
@@ -191,11 +211,33 @@ export const TIMEFRAME_RULES: readonly Rule[] = [
   },
 ];
 
-export function lintTimeframes(text: string): LintFinding[] {
+/**
+ * D-049: a timeframe is statutory only when its sentence (its row, in a
+ * table) also names the Commission, notifying or reporting, the Rules, or the
+ * document's own rules section; otherwise it is the provider's promise.
+ */
+const STATUTORY_ANCHOR =
+  /\b(?:the\s+commission|commission|notif(?:y|ies|ied|ication|ications)|report(?:s|ed|ing|able)?|the\s+rules|rules)\b/i;
+
+export function lintTimeframes(
+  text: string,
+  options: { anchors?: readonly string[] } = {},
+): LintFinding[] {
+  const extra = (options.anchors ?? [])
+    .filter(Boolean)
+    .map((a) => new RegExp(a.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+  const anchored = (index: number, length: number) => {
+    const line = unitAround(text, index, length, /\n/);
+    const scope = line.includes(" | ")
+      ? line
+      : unitAround(text, index, length, /[.\n]/);
+    return STATUTORY_ANCHOR.test(scope) || extra.some((re) => re.test(scope));
+  };
   const findings: LintFinding[] = [];
   for (const rule of TIMEFRAME_RULES) {
     const re = new RegExp(rule.pattern.source, rule.pattern.flags);
     for (const m of text.matchAll(re)) {
+      if (!anchored(m.index ?? 0, m[0].length)) continue;
       findings.push({
         rule: rule.id,
         severity: rule.severity,

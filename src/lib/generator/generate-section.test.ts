@@ -26,6 +26,7 @@ import {
   type Fixture,
 } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
+import { readability } from "./readability";
 import { loadReferenceCases } from "./reference-cases";
 
 const dataset = getStandardsDataset();
@@ -139,6 +140,125 @@ describe("replay harness", () => {
     expect(fixture.thinking).toBe("between_tools");
     expect(fixture.contentTypes).toEqual(["thinking", "text"]);
     rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("D-047: short sections warn but never fail on readability; the fail line is the document's", () => {
+    const hard =
+      "Organisational governance arrangements continuously demonstrate accountability and transparency.";
+    const reply = (sentences: number) =>
+      JSON.stringify({
+        sectionId: "purpose",
+        usedFacts: ["tradingName"],
+        blocks: [
+          { type: "paragraph", text: Array(sentences).fill(hard).join(" ") },
+        ],
+      });
+    // Two sentences (16 words): far above 11, but too short a sample to fail.
+    const short = validateReply(reply(2), pack, []);
+    expect(short.ok).toBe(true);
+    if (short.ok) expect(short.readability.level).toBe("fail");
+    // Six sentences (48 words) at the same grade fail at 11.
+    const long = validateReply(reply(6), pack, []);
+    expect(long.ok).toBe(false);
+    if (!long.ok) expect(long.problems[0]).toMatch(/is above 11:/);
+    // The privacy policy's line is 12 (D-047); a grade between 11 and 12 passes there only.
+    const privacy = documentTypeById(
+      "privacy-and-information-management-policy",
+    )!;
+    const privacyPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: privacy,
+      section: sectionsFor(privacy).find((s) => s.id === "scope")!,
+    });
+    expect(privacyPack.readabilityGate).toEqual({
+      failAbove: 12,
+      shortSectionWords: 40,
+    });
+    expect(pack.readabilityGate).toEqual({
+      failAbove: 11,
+      shortSectionWords: 40,
+    });
+    const between =
+      "We keep participant information secure, share it only with consent, and destroy it when the retention period ends. ";
+    const text = Array(5).fill(between).join("").trim();
+    const grade = readability(text).grade;
+    expect(grade).toBeGreaterThan(11);
+    expect(grade).toBeLessThanOrEqual(12);
+    const body = JSON.stringify({
+      sectionId: "scope",
+      usedFacts: ["tradingName"],
+      blocks: [{ type: "paragraph", text }],
+    });
+    expect(validateReply(body, privacyPack, []).ok).toBe(true);
+    expect(
+      validateReply(body.replace('"scope"', '"purpose"'), pack, []).ok,
+    ).toBe(false);
+  });
+
+  it("R-12: a document kept on an obligation gets briefs that name it, and a placeholder asking for a standard is retried", async () => {
+    // The governance policy cites only core standards, which the verification case is not audited against.
+    expect(pack.document.basisReason).toBe(
+      "the NDIS Code of Conduct applies to every provider and worker",
+    );
+    expect(pack.section.brief).toContain(
+      "which obligation it supports: the NDIS Code of Conduct applies to every provider and worker",
+    );
+    expect(pack.section.brief).toMatch(
+      /Never name or ask for a Practice Standard/,
+    );
+    const statement = sectionsFor(type).find(
+      (s) => s.id === "policy-statement",
+    )!;
+    const statementPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type,
+      section: statement,
+    });
+    expect(statementPack.section.brief).toContain(
+      '"Our commitment" and "What we do"',
+    );
+    expect(statementPack.section.brief).not.toMatch(
+      /quality indicators listed/,
+    );
+    // The incident policy has a verification standard: briefs and basis untouched.
+    const incident = documentTypeById(
+      "incident-management-policy-and-register",
+    )!;
+    const incidentPack = buildContextPack({
+      answers: reference.answers,
+      result: reference.result,
+      dataset,
+      type: incident,
+      section: sectionsFor(incident).find((s) => s.id === "purpose")!,
+    });
+    expect(incidentPack.document.basisReason).toBeNull();
+    expect(incidentPack.section.brief).toMatch(/which standard it supports/);
+    // A placeholder that asks for a standard is a validation problem naming the obligation.
+    const asking = JSON.stringify({
+      sectionId: "purpose",
+      usedFacts: ["tradingName"],
+      blocks: [
+        {
+          type: "paragraph",
+          text: "This policy sets out how we run the business.",
+        },
+        {
+          type: "callout",
+          text: "[Provider to complete: name the NDIS Practice Standard this policy supports.]",
+        },
+      ],
+    });
+    const client = new FakeClient([asking, GOOD]);
+    const out = await generateSection({ pack, client, model: "m" });
+    expect(out.status).toBe("generated");
+    expect(out.attempts).toBe(2);
+    expect(out.problems[0]).toMatch(
+      /asks the provider for a standard .*this document rests on this obligation: the NDIS Code of Conduct applies to every provider and worker; never ask the provider to name a Practice Standard or quality indicator/,
+    );
   });
 
   it("D-046: a model that refuses the thinking parameter gets 'disabled', then no parameter, once each", async () => {
@@ -267,7 +387,8 @@ describe("validate, retry, fall back (AC-5)", () => {
       blocks: [
         {
           type: "paragraph",
-          text: "Notwithstanding the aforementioned organisational considerations, the comprehensive implementation of multidisciplinary governance arrangements necessitates the systematic utilisation of standardised documentation methodologies across all operational jurisdictions.",
+          // Two sentences so the section is over the D-047 short-section line (40 words) and can fail.
+          text: "Notwithstanding the aforementioned organisational considerations, the comprehensive implementation of multidisciplinary governance arrangements necessitates the systematic utilisation of standardised documentation methodologies across all operational jurisdictions. Furthermore, the aforementioned organisational considerations necessitate the comprehensive implementation of standardised documentation methodologies across all multidisciplinary governance arrangements.",
         },
       ],
     });

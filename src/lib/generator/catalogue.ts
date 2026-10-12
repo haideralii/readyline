@@ -49,6 +49,8 @@ export const DocumentTypeSpec = z
     reviewCycleMonths: z.number().int().positive().optional(),
     /** Register review cycle for this document (R-8); defaults to the catalogue default. */
     registerReviewMonths: z.number().int().positive().optional(),
+    /** Readability grade above which a tailored section fails (D-047); defaults to the catalogue default. */
+    readabilityFailAbove: z.number().positive().optional(),
     extraSections: z.array(SectionSpec),
     /** Outline sections this document does not use (for example a split steps section, D-041). */
     omitSections: z.array(slug).optional(),
@@ -76,6 +78,8 @@ const Catalogue = z.object({
     .object({
       reviewCycleMonths: z.number().int().positive(),
       registerReviewMonths: z.number().int().positive(),
+      readabilityFailAbove: z.number().positive(),
+      shortSectionWords: z.number().int().positive(),
     })
     .passthrough(),
   outlines: z.record(z.string(), z.array(SectionSpec).min(1)),
@@ -134,6 +138,18 @@ export function reviewCycleMonths(type: DocumentTypeSpec): number {
 
 export function registerReviewMonths(type: DocumentTypeSpec): number {
   return type.registerReviewMonths ?? catalogue.defaults.registerReviewMonths;
+}
+
+/** The readability gate for a document's tailored sections (D-047): fail above this grade, except in short sections. */
+export function readabilityGateFor(type: DocumentTypeSpec): {
+  failAbove: number;
+  shortSectionWords: number;
+} {
+  return {
+    failAbove:
+      type.readabilityFailAbove ?? catalogue.defaults.readabilityFailAbove,
+    shortSectionWords: catalogue.defaults.shortSectionWords,
+  };
 }
 
 /** The review cycles the model must use (D-042). */

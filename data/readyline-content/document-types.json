@@ -1,5 +1,5 @@
 {
-  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps. Batch 13 (D-042, R-8): review cycles (policy 12 months, register 3 months by default) are provider facts; briefs of the sections that state cycles carry the marker [review cycles] that the context pack fills in. Batch 15 (D-533): purpose briefs ask for sentences under 15 words; two-sentence sections score the reading grade on their two sentences alone. Batch 16 (D-045): every document type has a basis; documents that cite no standard for a case say why they are kept, from basisReason.",
+  "note": "Document catalogue for the generator (REQ-005 FR-1): one entry per document type in document-sets.json, plus the Practice Standards self-assessment and two proposed additions. Titles, purposes, outlines and briefs are written by Readyline for the product owner's review; NOT NDIS Quality and Safeguards Commission text. Standards ids and evidence aliases point at data/standards.json, which holds the Commission's wording. PO batch 7 decisions applied 12 Oct 2026: money-and-property procedure accepted into core; support planning and transitions split out; restrictive practice use register added. Batch 12 (D-041, R-7): purpose briefs are two short sentences; step-style briefs refer timeframes to fixed text; the behaviour-support steps are three sub-sections of at most eight steps. Batch 13 (D-042, R-8): review cycles (policy 12 months, register 3 months by default) are provider facts; briefs of the sections that state cycles carry the marker [review cycles] that the context pack fills in. Batch 15 (D-533): purpose briefs ask for sentences under 15 words; two-sentence sections score the reading grade on their two sentences alone. Batch 16 (D-045): every document type has a basis; documents that cite no standard for a case say why they are kept, from basisReason. Batch 17 (D-047): readabilityFailAbove per document (privacy and records 12, default 11); sections under shortSectionWords (40) warn, never fail.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -13,7 +13,9 @@
       "review",
       "notice"
     ],
-    "registerReviewMonths": 3
+    "registerReviewMonths": 3,
+    "readabilityFailAbove": 11,
+    "shortSectionWords": 40
   },
   "sectionModes": {
     "fixed": "Rendered from template text only; the model never sees or writes it.",
@@ -533,7 +535,8 @@
         }
       ],
       "basis": "privacy-act",
-      "basisReason": "the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support"
+      "basisReason": "the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support",
+      "readabilityFailAbove": 12
     },
     {
       "id": "records-management-policy",
@@ -553,7 +556,8 @@
         }
       ],
       "basis": "commission-rules",
-      "basisReason": "the record-keeping conditions of registration apply to every registered provider"
+      "basisReason": "the record-keeping conditions of registration apply to every registered provider",
+      "readabilityFailAbove": 12
     },
     {
       "id": "complaints-management-policy-and-register",

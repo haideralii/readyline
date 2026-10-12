@@ -18,7 +18,7 @@ import {
   rulesSectionFor,
   standardsForType,
 } from "./document-model";
-import { reviewCyclesFor } from "./catalogue";
+import { readabilityGateFor, reviewCyclesFor } from "./catalogue";
 
 /** .2 (batch 15, D-531): the user prompt carries the document outline (R-9). .3 (batch 16, D-046): document block first, section block last, for caching. */
 export const PROMPT_VERSION = "2026-10-12.3";
@@ -54,6 +54,13 @@ export const ContextPack = strictObject({
     title: z.string().min(1),
     kind: z.string().min(1),
     purpose: z.string().min(1),
+    /** The obligation the document rests on when the case cites none of its standards (D-045, R-12); null otherwise. */
+    basisReason: z.string().min(1).nullable(),
+  }),
+  /** The readability gate for this document's tailored sections (D-047); not part of the prompt. */
+  readabilityGate: strictObject({
+    failAbove: z.number().positive(),
+    shortSectionWords: z.number().int().positive(),
   }),
   section: strictObject({
     id: z.string().min(1),
@@ -102,13 +109,43 @@ export function briefWithCycles(
     `policy review every ${cycles.policyMonths} months; register review every ${cycles.registerMonths} months`,
   );
 }
+
+/**
+ * R-12 / D-050: when the case cites none of the document's standards, the
+ * purpose and policy-statement briefs name the obligation the document rests
+ * on instead of a standard, so the model never asks the provider for one.
+ */
+export function briefFor(
+  section: SectionSpec,
+  type: DocumentTypeSpec,
+  standardsCount: number,
+  cycles: { policyMonths: number; registerMonths: number },
+): string {
+  const noStandard = standardsCount === 0 && type.basis !== "practice-standard";
+  const reason = type.basisReason ?? "";
+  let brief = section.brief;
+  if (noStandard && section.id === "purpose")
+    brief = `Two short sentences, each under 15 words: what this document is for, and which obligation it supports: ${reason}; nothing else. Never name or ask for a Practice Standard.`;
+  if (noStandard && section.id === "policy-statement")
+    brief = `The commitments, in the provider's voice, each resting on the obligation this document is kept for: ${reason}. If you use a table, its columns are "Our commitment" and "What we do"; never add a quality-indicator column and never ask the provider to name a standard or indicator.`;
+  return briefWithCycles(brief, cycles);
+}
+
+function basisReasonFor(
+  type: DocumentTypeSpec,
+  standardsCount: number,
+): string | null {
+  return standardsCount === 0 && type.basis !== "practice-standard"
+    ? (type.basisReason ?? null)
+    : null;
+}
 export type ContextPack = z.infer<typeof ContextPack>;
 
 /** The fact keys, exported so tests can prove the pack's vocabulary matches. */
 export const CONTEXT_FACT_KEYS = FACT_KEYS;
 
-/** Same pack from already-built facts (regeneration of a stored version). */
-export function buildContextPackFromFacts(input: {
+/** The pack for one section, from facts already built (shared by both builders). */
+function assemble(input: {
   facts: ProviderFacts;
   result: QuestionnaireResult;
   dataset: StandardsDataset;
@@ -117,7 +154,9 @@ export function buildContextPackFromFacts(input: {
 }): ContextPack {
   const { facts, result, dataset, type, section } = input;
   const wantedRegisters = new Set(type.registers);
-  return ContextPack.parse({
+  const standards = standardsForType(type, dataset, result);
+  const cycles = reviewCyclesFor(type);
+  const pack = {
     promptVersion: PROMPT_VERSION,
     houseStyleVersion: HOUSE_STYLE_VERSION,
     facts,
@@ -126,13 +165,15 @@ export function buildContextPackFromFacts(input: {
       title: type.title,
       kind: type.kind,
       purpose: type.purpose,
+      basisReason: basisReasonFor(type, standards.length),
     },
+    readabilityGate: readabilityGateFor(type),
     section: {
       id: section.id,
       heading: section.heading,
-      brief: briefWithCycles(section.brief, reviewCyclesFor(type)),
+      brief: briefFor(section, type, standards.length, cycles),
     },
-    standards: standardsForType(type, dataset, result).map((s) => ({
+    standards: standards.map((s) => ({
       id: s.id,
       name: s.name,
       outcome: s.outcome,
@@ -143,8 +184,21 @@ export function buildContextPackFromFacts(input: {
       .map((r) => r.title),
     outline: outlineFor(type),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
-    reviewCycles: reviewCyclesFor(type),
-  });
+    reviewCycles: cycles,
+  };
+  // Parsing our own object guarantees the strict shape even if a caller passes extras later.
+  return ContextPack.parse(pack);
+}
+
+/** Same pack from already-built facts (regeneration of a stored version). */
+export function buildContextPackFromFacts(input: {
+  facts: ProviderFacts;
+  result: QuestionnaireResult;
+  dataset: StandardsDataset;
+  type: DocumentTypeSpec;
+  section: SectionSpec;
+}): ContextPack {
+  return assemble(input);
 }
 
 export function buildContextPack(input: {
@@ -155,36 +209,11 @@ export function buildContextPack(input: {
   section: SectionSpec;
 }): ContextPack {
   const { answers, result, dataset, type, section } = input;
-  const facts = buildProviderFacts(answers, result);
-  const wantedRegisters = new Set(type.registers);
-  const pack = {
-    promptVersion: PROMPT_VERSION,
-    houseStyleVersion: HOUSE_STYLE_VERSION,
-    facts,
-    document: {
-      id: type.id,
-      title: type.title,
-      kind: type.kind,
-      purpose: type.purpose,
-    },
-    section: {
-      id: section.id,
-      heading: section.heading,
-      brief: briefWithCycles(section.brief, reviewCyclesFor(type)),
-    },
-    standards: standardsForType(type, dataset, result).map((s) => ({
-      id: s.id,
-      name: s.name,
-      outcome: s.outcome,
-      indicators: s.indicators,
-    })),
-    registers: result.registers
-      .filter((r) => wantedRegisters.has(r.id))
-      .map((r) => r.title),
-    outline: outlineFor(type),
-    ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
-    reviewCycles: reviewCyclesFor(type),
-  };
-  // Parsing our own object guarantees the strict shape even if a caller passes extras later.
-  return ContextPack.parse(pack);
+  return assemble({
+    facts: buildProviderFacts(answers, result),
+    result,
+    dataset,
+    type,
+    section,
+  });
 }

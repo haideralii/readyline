@@ -5,6 +5,8 @@
  */
 export const READABILITY_WARN_ABOVE = 9;
 export const READABILITY_FAIL_ABOVE = 11;
+/** D-047: a section with fewer words than this warns above the fail line but never fails (too small a sample). */
+export const SHORT_SECTION_WORDS = 40;
 
 export type Readability = {
   sentences: number;

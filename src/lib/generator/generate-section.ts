@@ -11,6 +11,7 @@
 import {
   lintCrossReferences,
   lintErrors,
+  lintPlaceholders,
   lintReviewCycles,
   lintText,
   lintTimeframes,
@@ -19,11 +20,7 @@ import {
 import type { ContextPack } from "./context-pack";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
-import {
-  readability,
-  READABILITY_FAIL_ABOVE,
-  type Readability,
-} from "./readability";
+import { readability, type Readability } from "./readability";
 import {
   TailoredSection,
   blocksToProse,
@@ -112,17 +109,36 @@ export function validateReply(
     };
   }
   // R-5: the house style's hard limit is a validation problem, not a note.
+  // D-047: the limit is the document's (12 for privacy and records, else 11),
+  // and a short section only warns, since two sentences are too small a sample.
   const score = readability(blocksToProse(result.data.blocks));
-  if (score.level === "fail") {
+  const gate = pack.readabilityGate;
+  if (score.grade > gate.failAbove && score.words >= gate.shortSectionWords) {
     return {
       ok: false,
       problems: [
-        `readability grade ${score.grade} is above ${READABILITY_FAIL_ABOVE}: ${READABILITY_RETRY_INSTRUCTION}`,
+        `readability grade ${score.grade} is above ${gate.failAbove}: ${READABILITY_RETRY_INSTRUCTION}`,
+      ],
+    };
+  }
+  // R-12: a document kept on an obligation never asks the provider for a standard.
+  const placeholders = lintPlaceholders(blocksToText(result.data.blocks));
+  if (placeholders.length) {
+    const basis = pack.document.basisReason
+      ? `this document rests on this obligation: ${pack.document.basisReason}`
+      : "the standards for this document are in the STANDARDS block";
+    return {
+      ok: false,
+      problems: [
+        `asks the provider for a standard ("${placeholders[0].match}"): ${basis}; never ask the provider to name a Practice Standard or quality indicator`,
       ],
     };
   }
   // R-7: statutory timeframes live in fixed text only; tailored text refers to that section.
-  const timeframes = lintTimeframes(blocksToText(result.data.blocks));
+  // D-049: only a sentence with a statutory anchor counts; a provider's own promise is tailoring.
+  const timeframes = lintTimeframes(blocksToText(result.data.blocks), {
+    anchors: pack.rulesSection ? [pack.rulesSection.heading] : [],
+  });
   if (timeframes.length) {
     const target = pack.rulesSection
       ? `section ${pack.rulesSection.number} ${pack.rulesSection.heading}`

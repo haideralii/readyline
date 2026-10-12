@@ -1214,6 +1214,50 @@ against Sonnet $0.14 for the same sections, with two Haiku rows still
 carrying hidden thinking tokens from the first pass. Production stays on
 Sonnet 5.5 unless the PO decides otherwise; the model-keyed fixture
 directory is never read by production code.
+
+**D-538 Secret-key functions carry an explicit grant to service_role (Dev,
+2026-10-12, R-11, D-050).** Migration
+`20261012020000_service_role_function_grants.sql` grants execute on
+`auth_rate_limit_hit(text, integer, integer)` and `generation_quota_hit(uuid)`
+to `service_role`; its header records that Haider applied the same two grants
+by hand on the hosted project, so the migration is a no-op there
+(idempotent `grant`). The gap existed because the earlier migrations revoked
+execute from public, anon and authenticated and left service_role to the
+local stack's default privileges, which the hosted project does not share.
+These are the only two functions the server calls with the secret key
+(`create_account` and `delete_account` run as the signed-in user; the purge
+job and the admin pages use table access). The integration suite gains
+`tests/integration/service-role-grants.test.ts`, which calls each function
+through a client built with the secret key and asserts the publishable key
+is refused (42501) signed out and signed in, so a new secret-key function
+without a grant fails CI's Supabase job.
+
+**D-539 Readability gate per document and section size, statutory anchors
+for R-7, obligation briefs for no-standard documents (Dev, 2026-10-12;
+D-047, D-049, D-050 R-12).** The catalogue carries
+`defaults.readabilityFailAbove` (11), `defaults.shortSectionWords` (40) and
+`readabilityFailAbove: 12` on the privacy and records management policies;
+the context pack carries `readabilityGate` (not in the prompt) and the gate
+fails a reply only when its grade is above the document's line and it has at
+least 40 words; shorter sections keep the warning level in the reviewer
+view. `lintTimeframes` takes the document's rules-section heading as an
+extra anchor and flags a timeframe only when its sentence (its row, in a
+table) names the Commission, notifying or reporting, the Rules or that
+heading. When the case cites none of a document's standards, the pack's
+`document.basisReason` holds the obligation and `briefFor` swaps the purpose
+brief ("which obligation it supports: [reason]; never name or ask for a
+Practice Standard") and the policy-statement brief (commitments resting on
+the obligation, columns "Our commitment" and "What we do", no indicator
+column); `lintPlaceholders` rejects any "[Provider to complete ...]" that
+mentions a standard or indicator, with a retry naming the obligation (or
+the STANDARDS block). Replay: the placeholder lint catches six batch-16
+recordings (AI policy purpose and policy statement, continuity purpose,
+governance, rights and records policy statements); the brief change re-keys
+seventeen sole-trader sections (purpose and policy statement of the nine
+no-standard policies, purpose of the two plans and the AI procedure) which
+item 3 records; the privacy purpose and the continuity sole-trader cover
+need no call, since their recorded first replies now pass (short section at
+15.3 warns; "within 1 business day" has no statutory anchor).
 ## REQ-013: first-time user experience (branch `req-013-first-time-ux`)
 
 Decision numbers D-13xx on this branch.

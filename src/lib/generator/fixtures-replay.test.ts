@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { documentTypeById, sectionsFor } from "./catalogue";
-import { buildContextPack } from "./context-pack";
+import { briefWithCycles, buildContextPack } from "./context-pack";
 import { generateSection } from "./generate-section";
 import {
   DEFAULT_FIXTURES_DIR,
@@ -21,7 +21,12 @@ import {
 } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
 import { outlineFor, standardsForType } from "./document-model";
-import { lintCrossReferences, lintReviewCycles, lintTimeframes } from "./lint";
+import {
+  lintCrossReferences,
+  lintPlaceholders,
+  lintReviewCycles,
+  lintTimeframes,
+} from "./lint";
 import { TailoredSection, blocksToProse, blocksToText } from "./section-schema";
 import { readability } from "./readability";
 
@@ -143,13 +148,12 @@ describe("recorded fixtures replay through the current gate", () => {
     // 24-hour and 5-business-day rules. Batch 16 adds five rejected first replies
     // whose recorded retries pass ("within 5 business days", "Within 1 business
     // day" and the like); every fixture here is a first attempt the gate refused.
+    // D-049 (batch 17): a timeframe counts only with a statutory anchor in its
+    // sentence, so the continuity plan's own promises, the induction steps and
+    // the complaints procedure's working-days line no longer appear.
     expect(Object.keys(results).sort()).toEqual([
-      "complaints-management-policy-and-register/procedure",
-      "continuity-of-supports-plan/actions",
-      "continuity-of-supports-plan/sole-trader-cover",
       "incident-management-policy-and-register/how-we-do-this",
       "incident-management-policy-and-register/responsibilities",
-      "induction-and-training-procedure-and-register/steps",
       "safeguarding-policy/responding",
     ]);
   });
@@ -280,6 +284,90 @@ describe("recorded fixtures replay through the current gate", () => {
         ],
       },
     });
+  });
+
+  it("R-12: lists which recorded replies ask the provider for a standard or indicator", () => {
+    const results: Record<string, string[]> = {};
+    for (const typeId of readdirSync(DEFAULT_FIXTURES_DIR)) {
+      const typeDir = join(DEFAULT_FIXTURES_DIR, typeId);
+      if (typeId.endsWith(".json") || typeId.endsWith(".md")) continue;
+      for (const sectionId of readdirSync(typeDir)) {
+        for (const file of readdirSync(join(typeDir, sectionId))) {
+          const fx = JSON.parse(
+            readFileSync(join(typeDir, sectionId, file), "utf8"),
+          ) as Fixture;
+          let blocks: unknown;
+          try {
+            blocks = (JSON.parse(fx.reply) as { blocks: unknown }).blocks;
+          } catch {
+            continue;
+          }
+          const parsed = TailoredSection.shape.blocks.safeParse(blocks);
+          if (!parsed.success) continue;
+          const hits = lintPlaceholders(blocksToText(parsed.data)).map((h) =>
+            h.match.slice(0, 40),
+          );
+          if (hits.length) results[`${typeId}/${sectionId}`] = hits;
+        }
+      }
+    }
+    // Batch 16 recordings for documents kept on an obligation (D-045) asked for a
+    // standard because their briefs still named one; D-050 re-keys those sections.
+    expect(Object.keys(results).sort()).toEqual([
+      "ai-use-and-governance-policy/policy-statement",
+      "ai-use-and-governance-policy/purpose",
+      "continuity-of-supports-plan/purpose",
+      "governance-policy/policy-statement",
+      "participant-rights-and-choice-policy/policy-statement",
+      "records-management-policy/policy-statement",
+    ]);
+  });
+
+  it("D-050: lists the sole-trader sections re-keyed by the no-standard briefs", () => {
+    const c = cases.find((x) => x.id === "verification-sole-trader")!;
+    const rekeyed: string[] = [];
+    for (const doc of [
+      ...c.result.documents.map((d) => d.id),
+      "practice-standards-self-assessment",
+    ]) {
+      const type = documentTypeById(doc)!;
+      for (const section of sectionsFor(type)) {
+        if (section.mode !== "tailored") continue;
+        const pack = buildContextPack({
+          answers: c.answers,
+          result: c.result,
+          dataset,
+          type,
+          section,
+        });
+        if (
+          pack.section.brief !==
+          briefWithCycles(section.brief, pack.reviewCycles)
+        )
+          rekeyed.push(`${doc}/${section.id}`);
+      }
+    }
+    expect(rekeyed.sort()).toEqual(
+      [
+        "ai-use-and-governance-policy/policy-statement",
+        "ai-use-and-governance-policy/purpose",
+        "conflict-of-interest-policy/policy-statement",
+        "conflict-of-interest-policy/purpose",
+        "continuity-of-supports-plan/purpose",
+        "emergency-and-disaster-management-plan/purpose",
+        "governance-policy/policy-statement",
+        "governance-policy/purpose",
+        "participant-rights-and-choice-policy/policy-statement",
+        "participant-rights-and-choice-policy/purpose",
+        "privacy-and-information-management-policy/policy-statement",
+        "privacy-and-information-management-policy/purpose",
+        "records-management-policy/policy-statement",
+        "records-management-policy/purpose",
+        "safeguarding-policy/policy-statement",
+        "safeguarding-policy/purpose",
+        "ai-and-digital-data-handling-procedure/purpose",
+      ].sort(),
+    );
   });
 
   it("R-10: lists the recorded sections whose standards block changes under module filtering", () => {

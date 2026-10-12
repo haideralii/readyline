@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   lintCrossReferences,
   lintErrors,
+  lintPlaceholders,
   lintReviewCycles,
   lintText,
   lintTimeframes,
@@ -61,10 +62,10 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
     const f = lintTimeframes(
       "We report the most serious incidents within 24 hours and the rest within 5 business days. We record it within three working days.",
     );
+    // D-049: "We record it within three working days" has no statutory anchor and is the provider's own promise.
     expect(f.map((x) => x.match)).toEqual([
       "within 24 hours",
       "within 5 business days",
-      "within three working days",
     ]);
     expect(
       lintTimeframes(
@@ -72,6 +73,45 @@ describe("terminology and claims lint (REQ-005 AC-9, house style)", () => {
       ),
     ).toEqual([]);
     expect(lintTimeframes("We review this every 12 months.")).toEqual([]);
+    expect(
+      lintTimeframes(
+        "Our backup contact tells participants within 1 business day of being told. We answer the phone within 2 days.",
+      ),
+    ).toEqual([]);
+    expect(
+      lintTimeframes("We notify the Commission within 24 hours.").map(
+        (x) => x.match,
+      ),
+    ).toEqual(["within 24 hours"]);
+    expect(
+      lintTimeframes("We tell the Rules officer within 5 business days.").map(
+        (x) => x.match,
+      ),
+    ).toEqual(["within 5 business days"]);
+    // The document's own rules-section title is an anchor too; a table row anchors on the whole row.
+    expect(
+      lintTimeframes(
+        "Reportable incidents go in within 24 hours.\nAnything else | Owner | within 2 days",
+        { anchors: ["Reportable incidents"] },
+      ).map((x) => x.match),
+    ).toEqual(["within 24 hours"]);
+    expect(
+      lintTimeframes("Tell the Commission | Owner | within 24 hours").map(
+        (x) => x.match,
+      ),
+    ).toEqual(["within 24 hours"]);
+  });
+
+  it("R-12: a placeholder that asks for a standard or indicator is rejected", () => {
+    expect(
+      lintPlaceholders(
+        "[Provider to complete: name the NDIS Practice Standard this policy supports.] We keep records. [Provider to complete: list the quality indicators this policy supports.] [Provider to complete: owner name and role]",
+      ).map((f) => f.match),
+    ).toEqual([
+      "[Provider to complete: name the NDIS Practice Standard this policy supports.]",
+      "[Provider to complete: list the quality indicators this policy supports.]",
+    ]);
+    expect(lintPlaceholders("No placeholders here.")).toEqual([]);
   });
   it("R-8: review cycles must match the document's facts, by subject", () => {
     const cycles = { policyMonths: 12, registerMonths: 3 };
