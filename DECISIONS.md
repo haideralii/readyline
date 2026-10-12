@@ -867,3 +867,7 @@ Items asserted in code or copy that still need a primary source.
   each. Tailored sections never restate statutory timeframes, reportable
   incident lists or Commission definitions (R-7): they refer to the fixed
   section that holds them, and a lint enforces it.
+- D-042 (PO, 2026-10-12): review cycles are provider facts in the context
+  pack (policy review 12 months, register review 3 months by default, per
+  document type in the catalogue); tailored text uses them and never chooses
+  its own; a lint enforces it (R-8). Budget: batch 13 up to $0.50 more.

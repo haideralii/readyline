@@ -263,3 +263,21 @@ Waiting for the PO.
 5. STOP.
 
 Waiting for the PO.
+
+## Queue (written by PO, 12 Oct 2026, batch 13)
+
+**PO actions this batch:** PR #11 (REQ-013 P1) merged. REQ-005 batch-12 recordings accepted; new fix R-8 (review cycles as provider facts); budget for this batch up to $0.50 more (cap $0.89 total). REQ-006, REQ-007 and REQ-008 are written; the PO's commit 7fa7df9 carrying them landed on `req-005-generator` (the checked-out branch at the time) and must also reach `main`.
+
+0. **Push `main`** with the PO's batch-13 commit after checking the stat; cherry-pick 7fa7df9 (product/ only) onto `main` and push; merge `main` into `req-005-generator`.
+
+1. **REQ-005 R-8, no model calls**: `reviewCycles` in the context pack with catalogue defaults (policy 12 months, register 3 months), the prompt instruction via the briefs (D-526 pattern), the cycle lint with its retry instruction, unit tests, replay of the recorded fixtures listing which fail.
+
+2. **Re-record only the failing sections** from item 1 for the sole-trader incident policy; re-render the review pack.
+
+3. **Two more complete documents, sole-trader case**: every tailored section of `complaints-management-policy-and-register` and of `practice-standards-self-assessment`, one call each, under D-039 to D-041. Re-render the review pack so `sections.md` shows three complete real documents. Stop if the batch's spend reaches $0.50.
+
+4. **REQ-008 Dev response only** (no build): read `product/requirements/REQ-008-legal-trust-pages.md`; answer how the markdown pages, the footer and the no-third-party-request test will be built; list by name any config values Haider must set. Note that the PO owes the copy in `product/legal/`.
+
+5. **Status** with the cost table and running total.
+
+6. STOP.
