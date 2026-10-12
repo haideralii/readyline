@@ -126,18 +126,18 @@ jobs:
       - name: Install Playwright (Chromium only)
         run: npx playwright install --with-deps chromium
 
-      - name: Purchase flow in fake Stripe mode against the local stack (REQ-007 AC-1, both viewports)
-        run: npx playwright test e2e/purchase-flow.spec.ts
+      - name: Signed-in end-to-end specs against the local stack (both viewports)
+        run: npx playwright test e2e/signed-in
         env:
           CI: "true"
           EVIDENCE: "1"
 
-      - name: Upload the purchase-flow screenshots (REQ-007 evidence)
+      - name: Upload the signed-in screenshots (REQ evidence)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: req-007-purchase-screenshots
-          path: product/evidence/req-007/
+          name: signed-in-screenshots
+          path: product/evidence/
           retention-days: 14
           if-no-files-found: ignore
 
@@ -145,7 +145,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-purchase
+          name: playwright-report-signed-in
           path: playwright-report/
           retention-days: 7
 

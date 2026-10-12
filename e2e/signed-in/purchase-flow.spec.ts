@@ -1,12 +1,12 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
-import { e2eCronSecret, hasSupabaseForE2e } from "./helpers/env";
+import { e2eCronSecret, hasSupabaseForE2e } from "../helpers/env";
 import {
   createTenant,
   deleteTenant,
   signInContext,
   type TestTenant,
-} from "./helpers/session";
+} from "../helpers/session";
 
 /**
  * REQ-007 AC-1 on both projects, in fake Stripe mode (D-709): a signed-in
@@ -46,7 +46,6 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
   let tenant: TestTenant;
   let checkoutUrl = "";
 
-  // eslint-disable-next-line no-empty-pattern -- Playwright requires the destructuring form
   test.beforeAll(async ({}, testInfo) => {
     tenant = await createTenant({
       label: testInfo.project.name,
