@@ -51,6 +51,13 @@ test.describe("home page v2 (batch 24)", () => {
       /Full refund within 14 days/,
     );
     await expect(page.getByTestId("home-free-line")).toContainText(/Free/);
+    // Batch 26 item 5: the three-line hero paragraph.
+    await expect(page.getByTestId("home-hero")).toContainText(
+      /which audit you face, with the Commission's text behind it/,
+    );
+    // Batch 26 item 6: the badge shows off production (every e2e run); the
+    // smoke test asserts its absence on the deployed site.
+    await expect(page.getByTestId("dev-badge")).toHaveText("In development");
     await shot(page, "home-v2", testInfo.project.name);
   });
 

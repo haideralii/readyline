@@ -32,6 +32,11 @@ describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
     );
   });
 
+  it("the hero paragraph is short enough for three lines on a phone (batch 26 item 5)", () => {
+    expect(HOME_COPY.lead.length).toBeLessThanOrEqual(170);
+    expect(HOME_COPY.lead).toMatch(/which audit you face/);
+  });
+
   it("states the price of entry, the time and the three trust cues", () => {
     expect(HOME_COPY.ctaNote).toMatch(/Free/);
     expect(HOME_COPY.ctaNote).toMatch(/ten minutes/);

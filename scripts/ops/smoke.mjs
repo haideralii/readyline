@@ -81,6 +81,11 @@ async function main() {
     !/is being built/.test(home.text),
     "home no longer says it is being built",
   );
+  // Batch 26 item 6: the badge renders only off production (D-1309).
+  check(
+    !/In development/.test(home.text),
+    "home does not show the In development badge on production",
+  );
   console.log("smoke ok");
 }
 
