@@ -41,7 +41,6 @@ export default defineConfig({
       name: "iphone",
       use: { ...devices["iPhone 17 Pro"] },
       testMatch:
-        /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow))\.spec\.ts$/,
     },
   ],
   webServer: {
