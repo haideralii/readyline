@@ -901,3 +901,21 @@ REQ-016 delivered on **branch `req-016-document-standard` 5728c7b** (from `req-0
 - **Not run locally:** the signed-in purchase-flow e2e (which now screenshots the numbered set, the finish page and one document on the three viewports) needs this branch's migration on the hosted project; it runs in CI's Supabase job. Word screenshots on a laptop and an iPhone are Haider's.
 - **Next, per the PO's order:** batch 34 on `req-017-guided-path` (from this branch), then batch 31 on `req-011-groups`.
 
+- Item A10 (manual fire follow-up): the reportable-incident guide and primer bullet may cite Rules ss 20, 21 and 25 verbatim (24 hours; 5 business days in writing for unauthorised restrictive practice; 7-year record) and drop their UNVERIFIED marker.
+- Item A12 (for PO judgement, government source not Commission): the cost guide may say "The Commission does not charge an application fee; you pay the auditor" citing ABLIS, pending a human check of the Commission portal.
+
+
+
+## Dev status (batch 34, written 14 Oct 2026, Dev; second unattended run)
+
+REQ-017 delivered on **branch `req-017-guided-path` d2aaaef** (from `req-016-document-standard`; every open branch carries `main` edcc952 per the standing rule). No model calls (cost table: none). `npm run check` green (91 files, 664 tests + 3 skipped), `npm run build` green; public e2e on desktop and small Android (result card, checklist teaser, questionnaire, documents, home) 48 passed. Decisions D-1701 to D-1703; Dev response and Delivery evidence in REQ-017; the principle paragraph is in `CLAUDE.md` section 1 (v2.7).
+
+- **FR-1.** "Your next step" on every signed-in page: a pure state table (`src/lib/path/next-step.ts`, eight rows, first match wins, a unit test per row) read once per page with the owner's session; one sentence, one button, never two things.
+- **Steps 1 to 3.** The result's one button is "Start getting ready" (the checklist and the price stay as plain links); `/path/before-you-buy` is three lines (document count, the price from config, the refund promise's first paragraph) and one button; the drafting screen is batch 32's copy.
+- **FR-2, step 4.** `/documents/<set>/finish` asks one question per fact across the set, one per screen on a phone with Back and Next, grouped by topic on desktop, an example under each, the participant-data warning once; each answer saves to `account_facts` (migration `20261014000000`) as it is given; the last screen re-renders every document, refreshes the summary and the zip, and reads "Done. Your N documents are complete." A later pack is filled from the same facts in the job (AC-2 unit test).
+- **FR-3, steps 5 and 7.** `/path/adopt/<group>`: one screen per group in audit order, names with the catalogue purpose as the summary, one button that marks the checklist Done, sets the adopted date, seeds the policy review register, saves the approval date and re-renders (the download then drops the draft marks). `/path/audit-day`: the auditor's questions in order with a tick each, the pack download and the summary; both print.
+- **FR-4, FR-5.** Every page derives from the same state and resumes where the provider left off; `tests/path-screens.test.ts` fails a path screen with more than one primary button, one h1, or three paragraphs above the control.
+- **Evidence.** `e2e/signed-in/guided-path.spec.ts` walks a fresh account from the result to the audit-day page on the three projects with screenshots under `product/evidence/req-017/`; it needs this stack's migrations, so it runs in CI's Supabase job, not on the Dev machine.
+- **Not done, for the PO:** the thirty checklist items rewritten as instructions (REQ-006 copy; titles left as they are); AC-1 is Haider's walk on his phone.
+- **Housekeeping.** This status commit also carries the two NDIS-watch edits that sat uncommitted in the working tree (NEXT.md items A10 and A12, and the 13 Oct research addendum), as the batch 35 note asked.
+- **Next:** batch 31 (the 38 registration-group pages) on `req-011-groups`, re-pointed to the top of the stack (`req-017-guided-path`) so it merges last as the PO's order says.

@@ -2056,6 +2056,8 @@ review never changes the checklist. A delete button is not in Session B:
 owners can delete through RLS, but a wrong entry is edited or closed, and
 a delete with confirm is one component away if the PO wants it.
 
+
+
 **D-1101 Guides are markdown with the legal pages' convention, not MDX
 (Dev, 2026-10-13, batch 29, branch `req-011-content` from `main` 491e6fb
 with `req-015-plain-language` merged in; REQ-011 to be written by the
@@ -2102,6 +2104,26 @@ rule from the standards data, and the three-year term. The compulsory
 registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
+
+
+
+**D-907 Register pages (Dev, 2026-10-13, batch 28, branch
+`req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
+`req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
+One list component for the four registers (rows with a text-and-icon
+status tag, a filter by status, 44 px targets), one page shell that
+resolves the signed-in owner and the subscription state, and forms built
+from shared inputs (select, date, reference code, free text with the
+participant-data detector). Lists read the Session A status views so the
+tag and the filter use the database's own arithmetic. Events for status
+changes, reportable flags, notification, acknowledgement and resolution
+are written by the server action, never typed. The gate is the database's
+(42501 becomes the lapse sentence); the UI hides Add and Edit and
+redirects the add and edit routes when the subscription is not active.
+The REQ-015 branch was merged in because the pages are built on its
+patterns (ConfirmButton, the width check, the iPhone project), so the
+Session B pull request lands after REQ-015's.
+
 
 **D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
 batch 30, branch `req-009-session-c` from `req-011-content` with
@@ -2158,6 +2180,7 @@ stay open), lapsed (the one-line read-only sentence), or not subscribed
 with the Subscribe button; and "Due soon" under Registers, read from the
 same `reminders` rows the emails are sent from, with "(emailed)" once
 sent.
+
 
 
 
@@ -2341,6 +2364,9 @@ session storage (this tab only) and the supports step ticks until the
 provider touches the list. "Guides" joined the footer's nav list; the home
 page gained one line under the mission section; the sitemap carries the
 index and the 38 pages. The two written guides keep their draft banner.
+
+
+
 
 ## Open questions for Haider
 
