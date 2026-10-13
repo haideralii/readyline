@@ -20,13 +20,13 @@ pairs are for later); leave them out of Vercel.
 
 ## What the deploy expects
 
-| Thing        | Version                                 | Where it is pinned                    |
-| ------------ | --------------------------------------- | ------------------------------------- |
-| Node         | 22 (LTS)                                | `.nvmrc`; set the same in Vercel      |
-| Next.js      | 16.4.0                                  | `package.json` (exact)                |
-| Supabase CLI | 2.120.0                                 | CI (`supabase/setup-cli`); migrations |
-| Region       | Sydney, `syd1`                          | Vercel project settings (step 2)      |
-| Build        | `npm run build` (runs `prebuild` first) | `package.json`                        |
+| Thing        | Version                                 | Where it is pinned                                                     |
+| ------------ | --------------------------------------- | ---------------------------------------------------------------------- |
+| Node         | 22 (LTS)                                | `.nvmrc`, `package.json` `engines.node` `22.x`; set the same in Vercel |
+| Next.js      | 16.4.0                                  | `package.json` (exact)                                                 |
+| Supabase CLI | 2.120.0                                 | CI (`supabase/setup-cli`); migrations                                  |
+| Region       | Sydney, `syd1`                          | Vercel project settings (step 2)                                       |
+| Build        | `npm run build` (runs `prebuild` first) | `package.json`                                                         |
 
 The `prebuild` step runs `scripts/ops/check-env.ts` with Node's
 `--experimental-strip-types` flag (Node 22.6 or later). On the production
@@ -52,8 +52,12 @@ prints the names; previews and local builds only need
 1. Settings → General → **Node.js Version**: 22.x.
 2. Settings → Functions → **Function Region**: Sydney (`syd1`).
 3. Settings → Git: production branch `main`. Previews for pull requests can
-   stay on; they never run the scheduled jobs or generation (REQ-010 FR-6)
-   and only need `NEXT_PUBLIC_SITE_URL`.
+   stay on; they never run the scheduled jobs or generation (REQ-010 FR-6).
+   **A preview build needs two variables ticked for the Preview
+   environment: `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME`** (see
+   section 3). Until they are, every pull-request preview fails at the
+   `check-env` step with "missing NEXT_PUBLIC_SITE_URL"; that is expected on
+   Hobby and does not affect production.
 4. Settings → Domains: add your domain when you have it; until then the
    `*.vercel.app` address is the production domain. Whatever it is, that
    is `<domain>` below.
@@ -61,8 +65,13 @@ prints the names; previews and local builds only need
 ## 3. Environment variables
 
 Add each one under Settings → Environment Variables. **Environment:
-Production only** for everything marked server-only; tick "Preview" only
-for `NEXT_PUBLIC_SITE_URL` (and `NEXT_PUBLIC_BRAND_NAME` if you set it).
+Production only** for everything marked server-only; tick **both
+"Production" and "Preview"** for `NEXT_PUBLIC_SITE_URL` and
+`NEXT_PUBLIC_BRAND_NAME`, and nothing else for Preview. A variable added as
+Production-only (the default when you re-add one) is invisible to preview
+builds, which then fail at `check-env`; a preview with the two public
+variables builds and serves the public pages, while sign-in and payments
+stay unavailable there by design.
 Leave **"Expose to the browser" / "Sensitive"** as Vercel suggests: every
 name without the `NEXT_PUBLIC_` prefix is server-only and must stay
 unexposed.
