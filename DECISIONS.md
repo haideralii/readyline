@@ -2396,6 +2396,47 @@ row count back from the table for that account, and checks the outbox for
 that owner did not grow on the second run. The subscription-ledger test
 already measured against a baseline and needed nothing.
 
+**D-1901 The audit-day registers follow the REQ-009 shape, one migration
+(Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
+SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
+`corporate_risks` (nine fixed areas, likelihood, controls, owner role,
+review date, a `starter` flag), `participant_risks` (participant code
+only, plus the support plan review date for FR-10), `conflicts_of_interest`
+(W-, KP-, P-, FAM- or OTH- codes), `delegations` (six fixed roles plus
+other, holder and backup as W- or KP- codes), `insurance_items` (insurances
+and vehicles as dates and labels, never a certificate, SR-3),
+`improvements` (source kind and reference such as INC-0003, learned,
+changed, owner role, due and done), `decisions` (append only: a decision is
+not rewritten), `staff_matrix` (one row per worker code; training and
+clearance expiries come from `worker_clearances` by the same code, which
+gained `manual-handling` and `medication` kinds), `onboarding_checklists`
+with append-only `onboarding_ticks` (item id, date, who ticked). Members
+read; members with an unrevoked subscription insert and update; owners
+delete; every free-text column is capped and refuses an NDIS-number shape;
+explicit grants per D-052; status views compute review, expiry,
+supervision (31 days) and appraisal (365 days) states at read time.
+`tests/integration/audit-day-rls.test.ts` proves the tenancy, the 42501
+refusals, the CHECKs and the views on the stack; no Postgres runs on the
+Dev machine, so CI's Supabase job is the proof.
+
+**D-1902 One shared append-only event table for the new registers (Dev,
+2026-10-14, batch 39 Session A).** `register_events` (register name, row
+id, kind, note) replaces one trail table per register: the same policy
+shape, update revoked so an edit fails with 42501 (D-906), and the pages
+read a row's trail by (register, row id). The REQ-009 trails stay as they
+are.
+
+**D-1903 Starter rows for the corporate risk register come from the
+questionnaire (Dev, 2026-10-14, batch 39 Session A, FR-1).**
+`starterCorporateRisks(answers, result, today)` gives one row per area in
+plain words that follow the answers (the states by name, the structure and
+worker count, the pathway for the mid-term audit line, restrictive
+practices in the compliance line), owner role from the structure, review
+date six months out, all marked `starter`; the unit test runs the copy and
+claims lints over every sentence of the three reference cases. Session B
+seeds them on the register's first open and shows "check this and change
+it" until a row is edited.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
