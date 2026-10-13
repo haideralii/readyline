@@ -1,4 +1,4 @@
-# Decisions log
+﻿# Decisions log
 
 Every assumption or choice not already fixed by [CLAUDE.md](CLAUDE.md) is
 recorded here, newest at the bottom of each phase. Anything about the
@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
+'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -1703,7 +1703,7 @@ state is set in an effect), a search opens every heading with a match, the
 hint opens the headings of 0107 and 0120, and a closed heading still lists
 its ticked classes beneath the summary with "(n classes, k ticked)". FR-12:
 the audit explanation, groups in scope and flags sit inside the summary
-block under one "Your audit: …" heading; the second heading is gone.
+block under one "Your audit: â€¦" heading; the second heading is gone.
 
 ## REQ-014: visual identity v1 (branch `req-014-visual-identity`, on `req-013-p2`)
 
@@ -1713,7 +1713,7 @@ indicator, so stacking avoids a certain conflict. The PO merges P2 first.
 
 **D-1402 The zinc utilities resolve to a warm ramp (FR-1).** Every page was
 built on `zinc-*` with `dark:` variants. Instead of rewriting hundreds of
-class strings, `@theme` maps `zinc-50…950` to a monotonic ramp from paper
+class strings, `@theme` maps `zinc-50â€¦950` to a monotonic ramp from paper
 (#F7F3EC) through slate (#4A5553 at 600) to ink (#1C2B2A at 900) and dark
 paper (#141C1B at 950), and `red-700`/`red-400` to signal. New code uses
 the named tokens. The contrast test pins the ramp's lightness order and the
@@ -1793,6 +1793,62 @@ storage sentence and the step footer's draft line now say where the draft
 lives: the account for a signed-in owner, this device otherwise. Account
 details are never changed by the questionnaire.
 
+**D-1308 Home page v2 (Dev, 2026-10-13, batch 24, branch `req-013-home-v2`
+from `main` ec262cb, REQ-013 scope, no model calls).** Proof over promise,
+after the competitor review:
+- *Hero.* The headline is the PO's text with the price composed from
+  `readPricing()` (`heroHeadline(price)` in `home-copy.ts`), so the home
+  page can never disagree with the pricing page or Stripe; with no price
+  configured it ends "for one fixed price" and the price line is omitted.
+  The first screen carries the price, "no subscription needed, no
+  instalments, no interest" and the refund promise with a link to
+  `/refunds`. Primary CTA to `/start`, secondary an in-page anchor to the
+  sample. Every string stays in `home-copy.ts` under the claims lint, which
+  now also rejects instalment, BNPL and urgency phrasing.
+- *Sample before buying.* `data/samples/complaints-policy.json` is a real
+  `DocumentModel` built by replaying the recorded sole-trader fixtures for
+  the complaints policy (`buildSampleDocument()`), with the trading name
+  replaced by the fictional "Example Supports" across every string; a unit
+  test regenerates it and fails on drift, on any leftover "Sunrise
+  Supports", or on a prohibited claim in any section (`WRITE_SAMPLE=1`
+  rewrites it). The page renders it as a server component with the five
+  block types and each section labelled "Drafted from the answers" or
+  "Fixed text, the same for every provider" (ochre edge for tailored).
+  Only the first three sections are open; the other ten sit behind a
+  native `details` (no script, no hydration race, since nothing on the
+  page controls it), which cut the phone page from about 18,000 to about
+  6,600 CSS pixels. The table wrapper is a focusable labelled region
+  (axe `scrollable-region-focusable` at 360 px). `GET
+  /sample/complaints-policy.docx` renders the same model through
+  `renderDocx` once per instance, rejects any query string (400), and is
+  memory rate-limited (30 a minute per address) like `/api/health`; it
+  reads no database and no session.
+- *Mission.* A Dev draft of about 120 words in `about.md` style with
+  "[Name and ABN to be added when registered.]" as the placeholder; the
+  PO owns and replaces this copy.
+- *Honest counters and testimonials.* `data/readyline-content/trust.json`
+  (owner PO) holds `counters.providersHelped`, `counters.firstAuditsPassed`
+  (null until a real number exists) and `testimonials[]` (quote, name,
+  business, audit kind, date; zod-validated at build). `TrustCounters` and
+  `Testimonials` render nothing while empty; the e2e asserts that absence.
+  No count, rating or quote appears anywhere else on the page.
+- *Order on the page.* Hero, sample, trust cues, example result,
+  testimonials (when any), mission, what you get. The example result and
+  the four trust cues from P2 are unchanged and still pinned by tests.
+
+**D-1309 Home follow-ups after the PO's phone review (Dev, 2026-10-13,
+batch 26 items 5 and 6, branch `req-013-home-fixes` from `main`
+762c54c).** The hero paragraph is the PO's three-line text (a unit test
+caps it at 170 characters so it cannot creep back to seven lines on a
+375-pixel screen and push the price and refund lines off the first
+screen). The "In development" badge in the header renders only when
+`isProductionDeployment()` is false, so previews and local runs keep it
+and trial providers on production never see it. The home e2e asserts the
+badge is present off production (where every e2e run happens) and the
+smoke test asserts it is absent on the deployed site, so the production
+case is checked where it matters. The mission placeholder stays as it is
+until the PO replaces it (item 7).
+
 **D-901 Registers Session A shape (Dev, 2026-10-13, batch 25, branch
 `req-009-registers` after merging `main` ec262cb; REQ-009 FR-1, FR-2, FR-4,
 SR-1 to SR-3).** One migration, `20261013000000_registers.sql`: eight
@@ -1850,7 +1906,7 @@ days before through the day itself). Two additions: a `policy_reviews`
 row with no `adopted_on` reads `not-adopted` rather than `current`, so an
 unadopted policy is never shown as in date; and `incidents_status` exposes
 `notification-due` beside FR-2's `overdue-notification` so a page can say
-"Notify the Commission by …" before the date passes. `expires_on` null
+"Notify the Commission by â€¦" before the date passes. `expires_on` null
 means no expiry (the orientation module) and is always `valid`. The
 TypeScript rules and the SQL views are the same arithmetic; the unit tests
 pin the boundaries and the integration test checks the views.

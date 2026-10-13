@@ -1,0 +1,488 @@
+{
+  "typeId": "complaints-management-policy-and-register",
+  "title": "Complaints management policy, procedure and register",
+  "kind": "policy",
+  "version": "1",
+  "generatedAt": "2026-10-13",
+  "reviewDueAt": "2027-10-13",
+  "facts": {
+    "tradingName": "Example Supports",
+    "abn": null,
+    "structure": "sole trader",
+    "states": ["New South Wales"],
+    "supportTypes": [
+      {
+        "code": "0120",
+        "name": "Household tasks"
+      }
+    ],
+    "pathway": "verification",
+    "modules": ["Verification module"],
+    "workerCountBand": "sole",
+    "keyPersonnelCount": 1,
+    "hasRiskAssessedRoles": true,
+    "usesRestrictivePractices": "no"
+  },
+  "sections": [
+    {
+      "id": "document-control",
+      "number": "",
+      "heading": "Document control",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "table",
+          "columns": ["Item", "Detail"],
+          "rows": [
+            [
+              "Document",
+              "Complaints management policy, procedure and register"
+            ],
+            ["Provider", "Example Supports"],
+            ["Version", "1"],
+            ["Generated", "13 October 2026"],
+            ["Approval", "[Provider to complete: name, role and date]"],
+            ["Next review", "13 October 2027"]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "Why this document: it supports the NDIS Practice Standards Complaints management for Example Supports."
+        }
+      ]
+    },
+    {
+      "id": "purpose",
+      "number": "1",
+      "heading": "Purpose",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "This document explains how Example Supports welcomes, resolves, records and learns from complaints and feedback. It supports the Complaints management standard."
+        }
+      ],
+      "usedFacts": ["tradingName"]
+    },
+    {
+      "id": "scope",
+      "number": "2",
+      "heading": "Scope",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "This policy covers Example Supports, a sole trader business. It applies to all supports we deliver and to everyone who may raise a concern about them."
+        },
+        {
+          "type": "table",
+          "columns": ["Area", "What it covers"],
+          "rows": [
+            ["Supports", "Household tasks (support type 0120)."],
+            ["Location", "New South Wales."],
+            [
+              "Who delivers supports",
+              "Example Supports is a sole trader business. There are no other workers. One key personnel member is responsible for this policy."
+            ],
+            [
+              "Who can complain",
+              "Participants, and their family members, nominees, advocates and other people acting for them. Anyone else with a concern about our supports can also complain."
+            ]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "It covers complaints about our supports, our conduct, our decisions and how we handle earlier complaints. It also covers feedback that is not a complaint, such as a suggestion or a compliment."
+        },
+        {
+          "type": "paragraph",
+          "text": "If we take on workers or start delivering other types of support, we will update this section and tell all workers about the change."
+        },
+        {
+          "type": "callout",
+          "text": "[Provider to complete: name of the key personnel member responsible for complaints.]"
+        }
+      ],
+      "usedFacts": [
+        "tradingName",
+        "structure",
+        "states",
+        "supportTypes",
+        "workerCountBand",
+        "keyPersonnelCount",
+        "pathway"
+      ]
+    },
+    {
+      "id": "definitions",
+      "number": "3",
+      "heading": "Definitions",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "bullets",
+          "items": [
+            "Participant: a person who receives supports from us under the NDIS.",
+            "Worker: anyone who delivers or supports the delivery of our services, including the owner, people we employ, contractors and volunteers.",
+            "Key personnel: the people who own, run or make decisions for the business.",
+            "Provider: our business, named in the document control table.",
+            "The Commission: the NDIS Quality and Safeguards Commission, which registers and regulates providers.",
+            "Rules: the NDIS rules made under the National Disability Insurance Scheme Act 2013 that apply to registered providers."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "policy-statement",
+      "number": "4",
+      "heading": "Policy statement",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Example Supports is a sole trader that provides household task supports (0120 Household tasks) to participants in New South Wales. We welcome feedback and complaints from every participant, and from anyone else who raises a concern about our supports."
+        },
+        {
+          "type": "paragraph",
+          "text": "We keep one complaints management and resolution system. It is sized to match a one-person business that provides household tasks, and it meets the National Disability Insurance Scheme (Complaints Management and Resolution) Rules 2018. This supports the Complaints management standard."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "We make sure each participant knows how to complain and can do so easily, in the way that suits them, including through a family member, advocate or other person they choose.",
+            "We welcome complaints from all parties and treat each person with respect. No one is treated worse for making a complaint.",
+            "We acknowledge each complaint promptly and tell the person who is dealing with it and what happens next.",
+            "We follow procedural fairness and natural justice. We listen to everyone involved, keep an open mind and give reasons for our decision.",
+            "We record every complaint and its outcome in our complaints register and keep the records secure and private.",
+            "We use what complaints tell us to improve our supports, and we look at the register as part of each review.",
+            "We tell participants and others they can contact the Commission at any time, and we do not discourage them from doing so."
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "The steps we follow are in section 7 Complaints procedure. The register is in section 8 Complaints register."
+        }
+      ],
+      "usedFacts": [
+        "tradingName",
+        "structure",
+        "states",
+        "supportTypes",
+        "workerCountBand"
+      ]
+    },
+    {
+      "id": "how-we-do-this",
+      "number": "5",
+      "heading": "How we put this into practice",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Example Supports is run by one person, so I am the person who receives, looks into and resolves every complaint. These steps show how we welcome feedback and use it to improve our household tasks supports in New South Wales."
+        },
+        {
+          "type": "steps",
+          "items": [
+            "We tell every participant, and anyone supporting them, how to give feedback or make a complaint. We do this when supports start and again whenever they ask.",
+            "We accept feedback and complaints in any way a person finds easy: in person, by phone, by email, in writing, or through a family member, advocate or other person they choose.",
+            "We offer help to anyone who needs it to make a complaint, such as an interpreter, an easy read copy or an independent advocate. We tell participants they can also contact the Commission at any time.",
+            "We thank the person for raising the issue and acknowledge it as soon as we can. We follow the steps and timeframes in section 7 Complaints procedure.",
+            "We treat the person with respect. A complaint never changes the supports a participant receives or how we treat them.",
+            "We keep the details private. We share them only with people who need them to resolve the complaint or where the law requires it.",
+            "We look at each complaint fairly. We listen to everyone involved, tell them what is being said, and give them a chance to respond before we decide.",
+            "Because I am the only worker, I ask an independent person to look at any complaint about me. This could be an advocate or another provider. I do not review a complaint about myself alone.",
+            "We tell the person what we found, what we will do about it, and how they can ask for the outcome to be reviewed or take the matter further.",
+            "We record every complaint in the complaints register described in section 8 Complaints register, from the day we receive it to the day we close it.",
+            "We look for patterns and causes. We use each complaint to change how we work, and we record the changes we make.",
+            "We review this policy every 12 months and the complaints register every 3 months, as set out in section 11 Review."
+          ]
+        },
+        {
+          "type": "callout",
+          "text": "[Provider to complete: name of the independent person or organisation who will review any complaint about the sole trader]"
+        }
+      ],
+      "usedFacts": [
+        "tradingName",
+        "structure",
+        "workerCountBand",
+        "states",
+        "supportTypes"
+      ]
+    },
+    {
+      "id": "responsibilities",
+      "number": "6",
+      "heading": "Responsibilities",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Example Supports is run by one person, a sole trader. There are no other workers. We hold every role in this policy ourselves, so we have written the table by role to show what is done and when."
+        },
+        {
+          "type": "table",
+          "columns": ["Role", "Does what", "When"],
+          "rows": [
+            [
+              "Owner and sole worker, Example Supports",
+              "Welcomes feedback and complaints, acknowledges them, works to resolve them and keeps the complaints register up to date. The steps are in section 7 Complaints procedure.",
+              "Every time feedback or a complaint is received"
+            ],
+            [
+              "Owner and sole worker, Example Supports",
+              "Makes sure each participant knows how to give feedback or make a complaint and how to use outside help if they prefer.",
+              "When a participant starts with us, and again if they ask or their needs change"
+            ],
+            [
+              "Owner and sole worker, Example Supports",
+              "Records each complaint in the complaints register and keeps the records listed in section 9 Records and evidence to retain.",
+              "As each complaint is received and each step is taken"
+            ],
+            [
+              "Owner and sole worker, Example Supports",
+              "Looks at what complaints show us and decides what to change to improve our supports.",
+              "When a complaint is closed, and at each register review"
+            ],
+            [
+              "Owner and sole worker, Example Supports",
+              "Reviews this policy and procedure.",
+              "Every 12 months"
+            ],
+            [
+              "Owner and sole worker, Example Supports",
+              "Reviews the complaints register.",
+              "Every 3 months"
+            ]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "If a complaint is about us, we do not decide it alone without telling the complainant about their other options. Section 7 Complaints procedure explains where a complainant can take their complaint outside Example Supports."
+        },
+        {
+          "type": "paragraph",
+          "text": "If we take on workers later, we will add each new role to this table and tell those workers what is expected of them before they start work."
+        }
+      ],
+      "usedFacts": [
+        "tradingName",
+        "structure",
+        "workerCountBand",
+        "keyPersonnelCount"
+      ]
+    },
+    {
+      "id": "procedure",
+      "number": "7",
+      "heading": "Complaints procedure",
+      "mode": "tailored",
+      "status": "generated",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "This is the procedure Example Supports follows each time someone raises a complaint or gives feedback about our household tasks supports in New South Wales. As a sole trader, I receive and manage every complaint myself, so there is one clear point of contact."
+        },
+        {
+          "type": "steps",
+          "items": [
+            "Receive the complaint. Anyone can complain: a participant, a family member, a nominee, an advocate or another person. They can tell us in person, by phone, by text or email, in writing, or through an advocate. We do not need a form.",
+            "Acknowledge it. We thank the person, confirm we have understood what they told us, and explain the steps that come next and how long each will take.",
+            "Record it. We enter the complaint in the complaints register straight away (see section 8 Complaints register) and give it a reference number.",
+            "Check what the person wants. We ask what outcome they are hoping for, whether they want support from an advocate or an interpreter, and whether they want to stay anonymous.",
+            "Look into it. We gather the facts, listen to everyone involved and keep an open mind. The person complained about has a chance to respond before we decide anything. We do not treat anyone worse for having complained.",
+            "Decide and fix it. We work out what went wrong, what we will do about it and who will do it. If the complaint is about me, I ask someone independent of the work to review it where I can.",
+            "Tell the person the outcome. We explain what we found, what we will change and why, in plain words and in the way the person prefers. We tell them they can take the complaint further if they are not satisfied.",
+            "Close and learn. We record the outcome and the person's response in the register, then check whether the same problem could happen again and change how we work if needed.",
+            "Review for patterns. At each review of this document, we look at all complaints in the register to find trends and improvements (see section 11 Review)."
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "The table below sets out the timeframe we work to for each stage. The legal timeframes and requirements are set out in the Commission's complaints rules, not here."
+        },
+        {
+          "type": "table",
+          "columns": ["Stage", "Who does it", "When"],
+          "rows": [
+            [
+              "Acknowledge the complaint",
+              "Owner and sole worker",
+              "Within 1 business day of receiving it"
+            ],
+            [
+              "Record in the complaints register",
+              "Owner and sole worker",
+              "On the same day it is received"
+            ],
+            [
+              "Tell the person what happens next",
+              "Owner and sole worker",
+              "In the acknowledgement"
+            ],
+            [
+              "Give an update if it is not yet resolved",
+              "Owner and sole worker",
+              "At least every 5 business days"
+            ],
+            [
+              "Tell the person the outcome",
+              "Owner and sole worker",
+              "As soon as a decision is made, and within 21 days where possible"
+            ],
+            [
+              "Close the complaint in the register",
+              "Owner and sole worker",
+              "Within 2 business days of telling the person the outcome"
+            ]
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "A participant can complain to the NDIS Quality and Safeguards Commission at any time. They do not have to complain to us first, and they can do so even after we have tried to resolve the complaint. They can phone the Commission on 1800 035 544 (free call from landlines; TTY 133 677; interpreter service on 131 450) or go to the Commission's website at ndiscommission.gov.au and use its complaints form. Someone can make a complaint on a participant's behalf."
+        },
+        {
+          "type": "paragraph",
+          "text": "We tell every participant how to contact the Commission when we first meet them, and again whenever we give them the outcome of a complaint."
+        },
+        {
+          "type": "callout",
+          "text": "[Provider to complete: the best phone number and email address for people to contact Example Supports with a complaint]"
+        }
+      ],
+      "usedFacts": [
+        "tradingName",
+        "structure",
+        "states",
+        "supportTypes",
+        "workerCountBand"
+      ]
+    },
+    {
+      "id": "register",
+      "number": "8",
+      "heading": "Complaints register",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Example Supports keeps this register up to date. We record a reference code for each person, never a name, date of birth, NDIS number, address or health detail."
+        },
+        {
+          "type": "table",
+          "columns": [
+            "Reference",
+            "Date received",
+            "Summary and actions",
+            "Outcome and improvement"
+          ],
+          "rows": [
+            [
+              "[C-001]",
+              "[Date]",
+              "[What was raised; what we did; dates]",
+              "[Outcome; what we changed]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "records-and-evidence",
+      "number": "9",
+      "heading": "Records and evidence to retain",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "We keep the following records so an auditor can see this document in use."
+        },
+        {
+          "type": "bullets",
+          "items": [
+            "Complaints management and resolution policy and procedure aligned to the 2018 Rules",
+            "Complaints register"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related-documents",
+      "number": "10",
+      "heading": "Related documents and registers",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "This document is part of the Example Supports policy set prepared with Readyline on 13 October 2026."
+        },
+        {
+          "type": "bullets",
+          "items": ["Complaints register"]
+        },
+        {
+          "type": "paragraph",
+          "text": "Practice Standards this document supports: Complaints management."
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "number": "11",
+      "heading": "Review",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "We review this document every 12 months, after any incident or complaint that shows a gap, and when the Commission changes the rules it supports. Next review: 13 October 2027."
+        },
+        {
+          "type": "table",
+          "columns": ["Role", "Does what", "When"],
+          "rows": [
+            [
+              "[Provider to complete: owner role]",
+              "Reviews and approves this document",
+              "Every 12 months"
+            ],
+            [
+              "All workers",
+              "Read the current version and follow it",
+              "At induction and after each change"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notice",
+      "number": "",
+      "heading": "About this document",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Readyline provides general information and document templates for your own review. It is not legal advice and does not take account of your specific circumstances. Seek legal advice if you are unsure how a requirement applies to you. Readyline is an independent service and is not affiliated with the National Disability Insurance Agency or the NDIS Quality and Safeguards Commission."
+        },
+        {
+          "type": "paragraph",
+          "text": "First drafts of your documents are generated with AI from your questionnaire answers. You are responsible for reviewing, editing and adopting them before use."
+        }
+      ]
+    }
+  ],
+  "footer": "Prepared with Readyline"
+}

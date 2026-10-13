@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { isProductionDeployment } from "@/lib/env";
 import { Wordmark } from "@/components/wordmark";
 import { getSessionUser } from "@/server/accounts/queries";
 
@@ -16,9 +17,15 @@ export async function SiteHeader() {
           <Wordmark />
         </Link>
         <nav aria-label="Account" className="flex items-center gap-4 text-sm">
-          <span className="rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-            In development
-          </span>
+          {/* Previews and local runs only (batch 26 item 6): trial providers on production never see it. */}
+          {isProductionDeployment() ? null : (
+            <span
+              className="rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs text-zinc-600 dark:border-zinc-700 dark:text-zinc-400"
+              data-testid="dev-badge"
+            >
+              In development
+            </span>
+          )}
           {user ? (
             <>
               <Link

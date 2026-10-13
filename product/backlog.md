@@ -19,7 +19,7 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ-011 | Content system and first ten SEO articles | 6 | should | draft |
 | REQ-012 | Launch readiness review (security re-test, a11y audit, claims audit, performance) | 6 | must | draft |
 | REQ-015 | Plain language, feedback on every action, accessibility pass | 6 | must | ready 13 Oct; batch 27 |
-| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | P1 merged (PR #11); P2 merged (PR #18) |
+| REQ-013 | First-time user experience and accessibility fixes (PO walkthrough 12 Oct) | 4 (P1) / 6 (P2) | must | P1 merged (PR #11); P2 merged (PR #18); home v2 merged 13 Oct (PR #22) |
 | REQ-014 | Visual identity v1: tokens, serif headings, the ready-line motif, home page | 4 | should | accepted 13 Oct; merged (PR #19) |
 
 ## Road to a sellable product (agreed with Haider, 12 Oct 2026)

@@ -42,8 +42,9 @@ test.describe("REQ-013 P2", () => {
     page,
   }, testInfo) => {
     await page.goto("/");
+    // Batch 24 (home v2): the headline asks the audit question.
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      /without a consultant/,
+      /which NDIS audit/,
     );
     await expect(page.getByText(/is being built/)).toHaveCount(0);
     await expect(page.getByTestId("home-free-line")).toContainText(

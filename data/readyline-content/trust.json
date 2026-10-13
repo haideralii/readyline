@@ -1,0 +1,10 @@
+{
+  "note": "Honest trust content for the home page (batch 24 item 4). Counters render only when a number is present; testimonials render only when the list has entries. The PO fills these during the private trial from real, consenting providers; nothing here is ever invented (CLAUDE.md 4.3, 5).",
+  "owner": "po",
+  "updated": "2026-10-13",
+  "counters": {
+    "providersHelped": null,
+    "firstAuditsPassed": null
+  },
+  "testimonials": []
+}
