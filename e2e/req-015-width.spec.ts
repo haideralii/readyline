@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openResultSections } from "./helpers/result";
 import { checkWidths } from "./helpers/width";
 
 /**
@@ -26,6 +27,8 @@ test.describe("no sideways movement (REQ-015 FR-16a)", () => {
   for (const path of PUBLIC_PAGES) {
     test(`${path} fits the screen`, async ({ page }) => {
       await page.goto(path);
+      // A signed-out page may redirect to sign-in; let the final document settle (WebKit resolves goto early).
+      await page.waitForLoadState("networkidle");
       await page.waitForFunction(() => document.title.length > 0);
       // The home sample's later sections are folded; open them so their tables are checked too.
       const more = page.getByTestId("sample-more");
@@ -37,6 +40,8 @@ test.describe("no sideways movement (REQ-015 FR-16a)", () => {
   test("every questionnaire step and the result fit the screen", async ({
     page,
   }) => {
+    // Six steps, three widths each on a phone, plus the result twice.
+    test.setTimeout(90_000);
     await page.goto("/start/business");
     await checkWidths(page, "business (empty)");
     await page.getByRole("button", { name: "Save and continue" }).click();
@@ -79,9 +84,9 @@ test.describe("no sideways movement (REQ-015 FR-16a)", () => {
       await page.locator(`#${key}-no`).check();
     await page.getByRole("button", { name: "See my result" }).click();
     await expect(page.getByTestId("result")).toBeVisible();
+    await checkWidths(page, "result (card)");
     // Open every disclosure on the result so folded content is measured too.
-    for (const d of await page.locator("details:not([open]) > summary").all())
-      await d.click();
+    await openResultSections(page);
     await checkWidths(page, "result (all open)");
   });
 });

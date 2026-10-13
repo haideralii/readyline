@@ -15,6 +15,9 @@ export type WidthReport = {
 };
 
 export async function widthReport(page: Page): Promise<WidthReport> {
+  // A redirecting page can be between documents for a moment; wait for a body.
+  await page.waitForFunction(() => Boolean(document.body));
+  await page.waitForLoadState("domcontentloaded");
   return page.evaluate(() => {
     const w = window.innerWidth;
     const contained = (el: Element): boolean => {
@@ -54,13 +57,24 @@ export async function widthReport(page: Page): Promise<WidthReport> {
 
 /** Sets or clears the root font size through the CSSOM (allowed by the nonce CSP, unlike a style attribute). */
 export async function setTextZoom(page: Page, percent: number | null) {
-  await page.evaluate((p) => {
-    document.documentElement.style.fontSize = p === null ? "" : `${p}%`;
-  }, percent);
-  // Let the layout settle.
-  await page.evaluate(
-    () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50))),
-  );
+  // A late redirect (WebKit resolves goto before the final document) destroys
+  // the context once; wait for the page to settle and try again.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await page.evaluate((p) => {
+        document.documentElement.style.fontSize = p === null ? "" : `${p}%`;
+      }, percent);
+      // Let the layout settle.
+      await page.evaluate(
+        () =>
+          new Promise((r) => requestAnimationFrame(() => setTimeout(r, 50))),
+      );
+      return;
+    } catch (e) {
+      if (attempt === 1) throw e;
+      await page.waitForLoadState("networkidle");
+    }
+  }
 }
 
 export async function expectNoSidewaysScroll(page: Page, label: string) {

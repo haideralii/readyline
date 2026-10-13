@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import { Fraunces, Geist } from "next/font/google";
 import "./globals.css";
 import { BRAND } from "@/lib/brand";
+import { RouteProgress } from "@/components/route-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
@@ -50,6 +51,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to main content
         </a>
+        {/* REQ-015 FR-14: the line across the top while the next page loads. */}
+        <RouteProgress />
         <SiteHeader />
         <main id="main-content" tabIndex={-1} className="flex-1">
           {children}
