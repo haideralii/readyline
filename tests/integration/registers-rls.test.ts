@@ -173,7 +173,7 @@ describe.skipIf(!enabled)(
       });
     });
 
-    it("notify_by is the next day for a 24-hour kind and five business days for an unauthorised restrictive practice", async () => {
+    it("notify_by is the next day for a 24-hour kind, five business days for a low-severity unauthorised restrictive practice and the next day when it caused harm", async () => {
       const serious = await a.client
         .from("incidents")
         .insert(
@@ -192,7 +192,7 @@ describe.skipIf(!enabled)(
         .insert(
           incident(a.accountId, {
             category: "restrictive-practice-unauthorised",
-            severity: "medium",
+            severity: "low",
             reportable: true,
           }),
         )
@@ -201,6 +201,22 @@ describe.skipIf(!enabled)(
       expect(rp.error).toBeNull();
       // Friday 9 October plus five business days is Friday 16 October.
       expect(rp.data?.notify_by).toBe("2026-10-16");
+      // Harm (severity medium or high) moves it to the 24-hour window (D-902).
+      for (const severity of ["medium", "high"]) {
+        const harmed = await a.client
+          .from("incidents")
+          .insert(
+            incident(a.accountId, {
+              category: "restrictive-practice-unauthorised",
+              severity,
+              reportable: true,
+            }),
+          )
+          .select("notify_by")
+          .single();
+        expect(harmed.error).toBeNull();
+        expect(harmed.data?.notify_by).toBe("2026-10-10");
+      }
       const notFlagged = await a.client
         .from("incidents")
         .insert(
@@ -287,12 +303,46 @@ describe.skipIf(!enabled)(
         .single();
       expect(ev.error).toBeNull();
       expect(ev.data?.actor_user_id).toBe(a.userId);
+      // A loud refusal (42501, no update privilege), never a silent zero-row no-op (D-906).
       const edit = await a.client
         .from("incident_events")
         .update({ note: "changed" })
         .eq("id", ev.data!.id)
         .select("note");
-      expect(edit.error).not.toBeNull();
+      expect(edit.error?.code).toBe("42501");
+      const reread = await a.client
+        .from("incident_events")
+        .select("note")
+        .eq("id", ev.data!.id);
+      expect(reread.data).toEqual([{ note: "Spoke with the worker." }]);
+      const cmp = await a.client
+        .from("complaints")
+        .select("id")
+        .eq("account_id", a.accountId)
+        .eq("reference", "CMP-0001")
+        .single();
+      const cev = await a.client
+        .from("complaint_events")
+        .insert({
+          complaint_id: cmp.data!.id,
+          account_id: a.accountId,
+          kind: "acknowledged",
+          note: "Called back the same day.",
+        })
+        .select("id")
+        .single();
+      expect(cev.error).toBeNull();
+      const cedit = await a.client
+        .from("complaint_events")
+        .update({ note: "changed" })
+        .eq("id", cev.data!.id)
+        .select("note");
+      expect(cedit.error?.code).toBe("42501");
+      const creread = await a.client
+        .from("complaint_events")
+        .select("note")
+        .eq("id", cev.data!.id);
+      expect(creread.data).toEqual([{ note: "Called back the same day." }]);
       const wrongIncident = await b.client.from("incident_events").insert({
         incident_id: inc.data!.id,
         account_id: b.accountId,

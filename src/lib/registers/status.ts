@@ -11,7 +11,11 @@ import {
   INCIDENT_CATEGORIES_5BD,
   INCIDENT_CATEGORIES_24H,
   type IncidentCategory,
+  type IncidentSeverity,
 } from "./types";
+
+/** Severities that count as harm to the participant for the restrictive-practice window (batch 26 item 2). */
+export const HARM_SEVERITIES: readonly IncidentSeverity[] = ["medium", "high"];
 
 export type ClearanceStatus = "valid" | "expiring" | "expired";
 export type ReviewStatus = "not-adopted" | "current" | "due-soon" | "overdue";
@@ -77,19 +81,23 @@ export function addBusinessDays(date: string, days: number): string {
 
 /**
  * The date by which the Commission must be told, as the database generates
- * it: the next day for the five 24-hour kinds, five business days for an
- * unauthorised restrictive practice, null when not reportable or when the
- * category has no window.
+ * it: the next day for the five 24-hour kinds; for an unauthorised
+ * restrictive practice the next day when it caused harm (severity medium or
+ * high) and five business days when low (Commission page, verified 13 Oct
+ * 2026, D-902); null when not reportable or when the category has no window.
  */
 export function incidentNotifyBy(
   occurredOn: string,
   category: IncidentCategory,
   reportable: boolean,
+  severity: IncidentSeverity,
 ): string | null {
   if (!reportable) return null;
   if (INCIDENT_CATEGORIES_24H.includes(category)) return addDays(occurredOn, 1);
   if (INCIDENT_CATEGORIES_5BD.includes(category))
-    return addBusinessDays(occurredOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS);
+    return HARM_SEVERITIES.includes(severity)
+      ? addDays(occurredOn, 1)
+      : addBusinessDays(occurredOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS);
   return null;
 }
 

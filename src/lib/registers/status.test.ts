@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  HARM_SEVERITIES,
   addBusinessDays,
   addDays,
   clearanceStatus,
@@ -14,6 +15,7 @@ import {
   INCIDENT_CATEGORIES,
   INCIDENT_CATEGORIES_24H,
   INCIDENT_CATEGORIES_5BD,
+  INCIDENT_SEVERITIES,
   NDIS_NUMBER_SHAPE,
   REF_PATTERNS,
 } from "./types";
@@ -79,23 +81,33 @@ describe("registerStatus (REQ-009 AC-2)", () => {
   });
 
   describe("notify_by by category (AC-1 rule, same as the database)", () => {
-    it("the five 24-hour kinds are due the next day, even over a weekend", () => {
+    it("the five 24-hour kinds are due the next day, even over a weekend, at any severity", () => {
       for (const c of INCIDENT_CATEGORIES_24H)
-        expect(incidentNotifyBy("2026-10-09", c, true)).toBe("2026-10-10");
+        for (const s of INCIDENT_SEVERITIES)
+          expect(incidentNotifyBy("2026-10-09", c, true, s)).toBe("2026-10-10");
     });
-    it("an unauthorised restrictive practice is due in 5 business days", () => {
+    it("a low-severity unauthorised restrictive practice is due in 5 business days", () => {
       for (const c of INCIDENT_CATEGORIES_5BD)
-        expect(incidentNotifyBy("2026-10-09", c, true)).toBe("2026-10-16");
+        expect(incidentNotifyBy("2026-10-09", c, true, "low")).toBe(
+          "2026-10-16",
+        );
+    });
+    it("an unauthorised restrictive practice that caused harm (medium or high) is due the next day (D-902)", () => {
+      expect(HARM_SEVERITIES).toEqual(["medium", "high"]);
+      for (const c of INCIDENT_CATEGORIES_5BD)
+        for (const s of HARM_SEVERITIES)
+          expect(incidentNotifyBy("2026-10-09", c, true, s)).toBe("2026-10-10");
     });
     it("the other categories and an incident not flagged reportable have no date", () => {
-      for (const c of INCIDENT_CATEGORIES) {
-        expect(incidentNotifyBy("2026-10-09", c, false)).toBeNull();
-        if (
-          !INCIDENT_CATEGORIES_24H.includes(c) &&
-          !INCIDENT_CATEGORIES_5BD.includes(c)
-        )
-          expect(incidentNotifyBy("2026-10-09", c, true)).toBeNull();
-      }
+      for (const c of INCIDENT_CATEGORIES)
+        for (const s of INCIDENT_SEVERITIES) {
+          expect(incidentNotifyBy("2026-10-09", c, false, s)).toBeNull();
+          if (
+            !INCIDENT_CATEGORIES_24H.includes(c) &&
+            !INCIDENT_CATEGORIES_5BD.includes(c)
+          )
+            expect(incidentNotifyBy("2026-10-09", c, true, s)).toBeNull();
+        }
     });
     it("every category is in exactly one window or none", () => {
       for (const c of INCIDENT_CATEGORIES_24H)

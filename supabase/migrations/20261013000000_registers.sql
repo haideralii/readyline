@@ -27,18 +27,18 @@
 --   behaviour support plan in the 5-business-day window unless it caused
 --   harm, in which case 24 hours. Both windows run from when the provider
 --   (its key personnel) became aware of the incident.
---   UNVERIFIED in part (2026-10-13): the Rules' section headings were read
---   from legislation.gov.au this session; the Commission's page would not
---   load from the build machine (timeouts), so the category split above is
---   taken from its indexed text and the June 2019 detailed guidance, and
---   needs one look at the live page by the PO. Two deliberate
---   simplifications, both recorded in REQ-009's Dev response: the column
+--   Verified by the PO on the Commission's reportable incidents page on
+--   13 October 2026 (D-902): six categories as above; 24 hours for most;
+--   5 business days for an unauthorised restrictive practice, except that
+--   where the use caused harm to the participant it is 24 hours. Here
+--   "harm" is `severity` of medium or high; a low-severity unauthorised
+--   restrictive practice gets the 5-business-day date (batch 26 item 2).
+--   One simplification, recorded in REQ-009's Dev response: the column
 --   counts from `occurred_on` as the REQ says (the Rules count from
---   awareness; `reported_on` is the nearest thing we hold), and a
---   restrictive practice that caused harm is entered under the harm's own
---   category (serious injury, abuse or neglect) so it gets the 24-hour date.
---   Business days skip Saturday and Sunday only; public holidays differ by
---   state and are not modelled (a reminder one day early is the safe side).
+--   awareness; `reported_on` is the nearest thing we hold), so the date
+--   can only be early, never late. Business days skip Saturday and Sunday
+--   only; public holidays differ by state and are not modelled (a reminder
+--   one day early is the safe side).
 
 -- ---------------------------------------------------------------------------
 -- Helpers (immutable, so generated columns can use them)
@@ -81,8 +81,10 @@ end;
 $$;
 
 -- The date by which the Commission must be told, or null when the incident is
--- not flagged reportable or its category has no reportable window.
-create or replace function public.incident_notify_by(p_occurred_on date, p_category text, p_reportable boolean)
+-- not flagged reportable or its category has no reportable window. An
+-- unauthorised restrictive practice that caused harm (severity medium or
+-- high) takes the 24-hour window; a low-severity one the 5 business days.
+create or replace function public.incident_notify_by(p_occurred_on date, p_category text, p_reportable boolean, p_severity text)
 returns date
 language sql
 immutable
@@ -93,6 +95,7 @@ as $$
       'death', 'serious-injury', 'abuse-or-neglect',
       'unlawful-sexual-or-physical-contact', 'sexual-misconduct'
     ) then p_occurred_on + 1
+    when p_category = 'restrictive-practice-unauthorised' and p_severity in ('medium', 'high') then p_occurred_on + 1
     when p_category = 'restrictive-practice-unauthorised' then public.add_business_days(p_occurred_on, 5)
     else null
   end;
@@ -119,11 +122,11 @@ $$;
 
 revoke all on function public.looks_like_ndis_number(text) from public;
 revoke all on function public.add_business_days(date, integer) from public;
-revoke all on function public.incident_notify_by(date, text, boolean) from public;
+revoke all on function public.incident_notify_by(date, text, boolean, text) from public;
 revoke all on function public.has_active_subscription(uuid) from public;
 grant execute on function public.looks_like_ndis_number(text) to authenticated, service_role;
 grant execute on function public.add_business_days(date, integer) to authenticated, service_role;
-grant execute on function public.incident_notify_by(date, text, boolean) to authenticated, service_role;
+grant execute on function public.incident_notify_by(date, text, boolean, text) to authenticated, service_role;
 grant execute on function public.has_active_subscription(uuid) to authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
@@ -207,7 +210,7 @@ create table public.incidents (
   -- The provider decides (PO answer 1): a serious injury not connected with supports is not reportable.
   reportable boolean not null default false,
   reportable_notified_on date check (reportable_notified_on is null or reportable),
-  notify_by date generated always as (public.incident_notify_by(occurred_on, category, reportable)) stored,
+  notify_by date generated always as (public.incident_notify_by(occurred_on, category, reportable, severity)) stored,
   status text not null default 'open' check (status in ('open', 'under-review', 'closed')),
   closed_on date check ((closed_on is null) = (status <> 'closed')),
   created_by uuid,
@@ -530,8 +533,12 @@ grant usage on schema public to authenticated, service_role;
 grant select, insert, update, delete on
   public.incidents, public.complaints, public.worker_clearances, public.policy_reviews
   to authenticated;
--- Append-only for clients: no update privilege on the event tables.
+-- Append-only for clients (D-906): no update privilege on the event tables.
+-- The revoke matters where default privileges exist (the CLI's local stack
+-- grants `authenticated` everything in `public`); without it an update is a
+-- silent zero-row no-op under RLS instead of a 42501 refusal.
 grant select, insert, delete on public.incident_events, public.complaint_events to authenticated;
+revoke update on public.incident_events, public.complaint_events from anon, authenticated;
 grant select on public.reminders to authenticated;
 grant select on
   public.worker_clearances_status, public.policy_reviews_status, public.incidents_status

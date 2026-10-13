@@ -1805,20 +1805,24 @@ the pure rules in `src/lib/registers/status.ts` (`registerStatus`). No UI,
 no routes, no reminder job (Sessions B and C). Rate limits and audit-log
 lines (SR-3) belong to the routes and come with Session B.
 
-**D-902 Reportable-incident windows and what `notify_by` counts from.**
-The Rules' section 20 (24 hours) and section 21 (5 business days) were
-read from legislation.gov.au this session; the Commission's own page would
-not load from the build machine, so the category split is from its indexed
-text and the 2019 detailed guidance and stays `UNVERIFIED` in part until
-the PO glances at the live page (the migration comment carries the URLs).
-`notify_by` is a stored generated column from `occurred_on` as the REQ
-says, and null unless the provider has ticked `reportable`; the Rules
-count from awareness, which the register does not hold separately
-(`reported_on` is the nearest), so the date can only be early, never late.
-A restrictive practice that caused harm is entered under the harm's own
-category and so gets the 24-hour date. Business days skip Saturday and
-Sunday only; public holidays differ by state and are not modelled, which
-again errs early.
+**D-902 Reportable-incident windows and what `notify_by` counts from
+(revised batch 26).** The Rules' section 20 (24 hours) and section 21 (5
+business days) were read from legislation.gov.au; the category split was
+verified by the PO on the Commission's reportable incidents page on 13
+October 2026: six reportable categories as in the REQ, 24 hours for most,
+5 business days for an unauthorised restrictive practice except that where
+the use caused harm to the participant it is 24 hours. The `UNVERIFIED`
+is cleared. "Caused harm" is modelled as `severity` of medium or high, so
+`incident_notify_by(occurred_on, category, reportable, severity)` gives a
+low-severity unauthorised restrictive practice the 5-business-day date and
+a medium or high one the next day; the UI will say "5 business days, or 24
+hours if the participant was harmed" beside the severity field. `notify_by`
+is a stored generated column from `occurred_on` as the REQ says, and null
+unless the provider has ticked `reportable`; the Rules count from
+awareness, which the register does not hold separately (`reported_on` is
+the nearest), so the date can only be early, never late. Business days skip
+Saturday and Sunday only; public holidays differ by state and are not
+modelled, which again errs early.
 
 **D-903 References come from the database.** A `before insert` trigger
 fills `incidents.reference` (`INC-0001`) and `complaints.reference`
@@ -1850,6 +1854,21 @@ unadopted policy is never shown as in date; and `incidents_status` exposes
 means no expiry (the orientation module) and is always `valid`. The
 TypeScript rules and the SQL views are the same arithmetic; the unit tests
 pin the boundaries and the integration test checks the views.
+
+**D-906 Append-only means a loud refusal (Dev, 2026-10-13, batch 26 item
+1).** PR #23's Supabase job showed an update on `incident_events` by a
+member succeeding with zero rows: the migration never granted `update` on
+the event tables, but the CLI's local stack carries default privileges
+that give `authenticated` everything in `public`, so RLS with no update
+policy made the write a silent no-op (the PR #15 lesson in reverse). The
+migration now also `revoke update on incident_events, complaint_events
+from anon, authenticated`, so an update fails with 42501 on both the local
+stack and the hosted project; `select` and `insert` stay, and `delete` for
+owners stays as policy plus grant. The test asserts the 42501 code and
+re-reads the original note on both event tables. Rule for later
+migrations: when a table must refuse a verb, revoke it explicitly as well
+as not granting it; grants alone describe the hosted project, not the
+local stack.
 
 ## Open questions for Haider
 

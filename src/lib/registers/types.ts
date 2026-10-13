@@ -33,7 +33,7 @@ export const INCIDENT_CATEGORIES_24H: readonly IncidentCategory[] = [
   "unlawful-sexual-or-physical-contact",
   "sexual-misconduct",
 ];
-/** Reportable kinds notified within 5 business days (Rules s 21). */
+/** Reportable kinds notified within 5 business days (Rules s 21), or 24 hours when the use caused harm (severity medium or high, D-902). */
 export const INCIDENT_CATEGORIES_5BD: readonly IncidentCategory[] = [
   "restrictive-practice-unauthorised",
 ];
