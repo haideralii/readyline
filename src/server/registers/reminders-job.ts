@@ -171,6 +171,12 @@ export async function runRemindersJob(input: {
   dryRun?: boolean;
   /** Resolves the owner's address; the job never reads auth tables itself in tests. */
   ownerEmail: (accountId: string) => Promise<string | null>;
+  /**
+   * Only these accounts (batch 41): the integration test shares its stack
+   * with the other integration files' accounts, and the report's totals
+   * must count the seeded account alone. The route never sets it.
+   */
+  accountIds?: readonly string[];
 }): Promise<RemindersReport> {
   const report: RemindersReport = {
     accounts: 0,
@@ -179,7 +185,10 @@ export async function runRemindersJob(input: {
     emailed: 0,
     errors: [],
   };
-  const accounts = await accountsWithRegisters(input.admin);
+  const only = input.accountIds ? new Set(input.accountIds) : null;
+  const accounts = (await accountsWithRegisters(input.admin)).filter(
+    (a) => !only || only.has(a.id),
+  );
   report.accounts = accounts.length;
   for (const account of accounts) {
     try {
@@ -213,13 +222,14 @@ export async function runRemindersJob(input: {
   if (input.dryRun) return report;
 
   // Send everything unsent whose day has come, one email per account per run (SR-4: register and reference only).
-  const unsent = await input.admin
+  let unsentQuery = input.admin
     .from("reminders")
     .select("id, account_id, kind, subject_table, subject_id, due_on, send_on")
     .is("sent_at", null)
-    .lte("send_on", input.today)
-    .order("account_id")
-    .limit(2000);
+    .lte("send_on", input.today);
+  if (input.accountIds)
+    unsentQuery = unsentQuery.in("account_id", [...input.accountIds]);
+  const unsent = await unsentQuery.order("account_id").limit(2000);
   const byAccount = new Map<string, typeof unsent.data>();
   for (const r of unsent.data ?? []) {
     const list = byAccount.get(r.account_id) ?? [];
