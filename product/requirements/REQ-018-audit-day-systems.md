@@ -48,3 +48,12 @@ AC-4 The audit-day page lists the twelve items above with live states, and the f
 ## Out of scope
 
 Document uploads, participant full records, rostering, payroll, training delivery.
+## Added 14 Oct 2026 (PO, after the webinar research in `product/research/webinars/2026-10-14-what-auditors-look-for.md`)
+
+FR-13 Document control register. Generated from the pack itself, no typing: one row per document with title, version, adopted on, adopted by (role), next review date, and whether the latest version was circulated to workers (ticked in the Adopt step). Shown first in the registers list and exported as the first page of the readiness summary. Changes when a document is re-generated or re-adopted.
+
+FR-14 Policy circulation record. When a provider adopts a document in the Adopt step (REQ-017), they tick which workers were walked through it and when; the record is appended to the document control register row. Auditors ask how workers were told about a policy; this is the evidence.
+
+AC-5 A newly adopted pack shows a complete document control register with no empty cells and a next review date 12 months from adoption; re-adopting one document updates only its row.
+
+Source note: the register list in this REQ matches section B of the research file; the five gaps in section D map to FR-1, FR-2, FR-6 and REQ-005's incident, complaints, risk, restrictive practice and worker screening briefs (batch 40).
