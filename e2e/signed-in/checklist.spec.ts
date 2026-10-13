@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
 import { hasSupabaseForE2e } from "../helpers/env";
+import { checkWidths } from "../helpers/width";
 import {
   createTenant,
   deleteTenant,
@@ -91,6 +92,8 @@ test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Readiness checklist" }),
     ).toBeVisible();
+    // REQ-015 FR-16a: the signed-in header and the checklist fit the screen.
+    await checkWidths(page, "checklist (signed in)");
     // FR-2: the sole trader said yes to insurance and screening: 4 items ready.
     const progress = page.getByTestId("checklist-progress");
     await expect(progress).toHaveText(/^4 of \d+ items ready$/);

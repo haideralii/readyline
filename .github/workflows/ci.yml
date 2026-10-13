@@ -50,10 +50,10 @@ jobs:
       - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
         run: node scripts/ci/check-client-bundle.mjs
 
-      - name: Install Playwright (Chromium only)
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
+        run: npx playwright install --with-deps chromium webkit
 
-      - name: End-to-end tests (desktop + small Android viewport)
+      - name: End-to-end tests (desktop, small Android viewport, iPhone WebKit)
         run: npm run test:e2e
         env:
           CI: "true"
@@ -123,10 +123,10 @@ jobs:
       - name: Build for the signed-in end-to-end run
         run: npm run build
 
-      - name: Install Playwright (Chromium only)
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
+        run: npx playwright install --with-deps chromium webkit
 
-      - name: Signed-in end-to-end specs against the local stack (both viewports)
+      - name: Signed-in end-to-end specs against the local stack (three projects)
         run: npx playwright test e2e/signed-in
         env:
           CI: "true"
