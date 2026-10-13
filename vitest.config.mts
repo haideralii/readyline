@@ -19,6 +19,8 @@ export default defineConfig({
       "scripts/**/*.test.ts",
       // REQ-015 FR-2: the copy lint walks the pages; the integration suite stays separate.
       "tests/copy-lint.test.ts",
+      // D-1507: no byte-order mark or double-encoded character in any text file.
+      "tests/text-encoding.test.ts",
     ],
     exclude: ["e2e/**", "node_modules/**", ".next/**"],
   },

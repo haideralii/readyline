@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
+'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -1849,6 +1849,83 @@ smoke test asserts it is absent on the deployed site, so the production
 case is checked where it matters. The mission placeholder stays as it is
 until the PO replaces it (item 7).
 
+**D-901 Registers Session A shape (Dev, 2026-10-13, batch 25, branch
+`req-009-registers` after merging `main` ec262cb; REQ-009 FR-1, FR-2, FR-4,
+SR-1 to SR-3).** One migration, `20261013000000_registers.sql`: eight
+tables (`incidents`, `incident_events`, `complaints`, `complaint_events`,
+`worker_clearances`, `policy_reviews`, `reminders`, `register_sequences`),
+three `security_invoker` status views, four immutable or stable helper
+functions, `next_register_reference()`, and the two FR-4 columns on
+`accounts`. Row types and vocabularies in `src/lib/registers/types.ts`;
+the pure rules in `src/lib/registers/status.ts` (`registerStatus`). No UI,
+no routes, no reminder job (Sessions B and C). Rate limits and audit-log
+lines (SR-3) belong to the routes and come with Session B.
+
+**D-902 Reportable-incident windows and what `notify_by` counts from
+(revised batch 26).** The Rules' section 20 (24 hours) and section 21 (5
+business days) were read from legislation.gov.au; the category split was
+verified by the PO on the Commission's reportable incidents page on 13
+October 2026: six reportable categories as in the REQ, 24 hours for most,
+5 business days for an unauthorised restrictive practice except that where
+the use caused harm to the participant it is 24 hours. The `UNVERIFIED`
+is cleared. "Caused harm" is modelled as `severity` of medium or high, so
+`incident_notify_by(occurred_on, category, reportable, severity)` gives a
+low-severity unauthorised restrictive practice the 5-business-day date and
+a medium or high one the next day; the UI will say "5 business days, or 24
+hours if the participant was harmed" beside the severity field. `notify_by`
+is a stored generated column from `occurred_on` as the REQ says, and null
+unless the provider has ticked `reportable`; the Rules count from
+awareness, which the register does not hold separately (`reported_on` is
+the nearest), so the date can only be early, never late. Business days skip
+Saturday and Sunday only; public holidays differ by state and are not
+modelled, which again errs early.
+
+**D-903 References come from the database.** A `before insert` trigger
+fills `incidents.reference` (`INC-0001`) and `complaints.reference`
+(`CMP-0001`) from `next_register_reference(account, register)`, a
+security-definer upsert on `register_sequences` that takes the row lock, so
+two concurrent inserts get consecutive distinct numbers. The function
+checks membership (or the service role) itself; clients have no privilege
+on the sequences table. A rolled-back insert leaves a gap, which an auditor
+can live with and the trail explains; the test asserts order and
+distinctness, not the absence of gaps across failures.
+
+**D-904 Entitlement gate as a function in the policies.**
+`has_active_subscription(account)` (security definer over
+`entitlements.kind = 'subscription' and revoked_at is null`) is ANDed with
+`is_member` in every insert and update policy of the four registers and
+the two event tables; select needs only membership; delete needs the
+owner. The event tables have no update policy and no update privilege
+(append-only). `reminders` is read-only for clients; the job writes it
+with the secret key. All grants are explicit in the same migration (D-052)
+and `anon` is revoked from every new relation.
+
+**D-905 Status vocabulary beyond FR-2.** The clearance and review rules
+are as written (expired after the date, expiring or due-soon from 90 or 60
+days before through the day itself). Two additions: a `policy_reviews`
+row with no `adopted_on` reads `not-adopted` rather than `current`, so an
+unadopted policy is never shown as in date; and `incidents_status` exposes
+`notification-due` beside FR-2's `overdue-notification` so a page can say
+"Notify the Commission by …" before the date passes. `expires_on` null
+means no expiry (the orientation module) and is always `valid`. The
+TypeScript rules and the SQL views are the same arithmetic; the unit tests
+pin the boundaries and the integration test checks the views.
+
+**D-906 Append-only means a loud refusal (Dev, 2026-10-13, batch 26 item
+1).** PR #23's Supabase job showed an update on `incident_events` by a
+member succeeding with zero rows: the migration never granted `update` on
+the event tables, but the CLI's local stack carries default privileges
+that give `authenticated` everything in `public`, so RLS with no update
+policy made the write a silent no-op (the PR #15 lesson in reverse). The
+migration now also `revoke update on incident_events, complaint_events
+from anon, authenticated`, so an update fails with 42501 on both the local
+stack and the hosted project; `select` and `insert` stay, and `delete` for
+owners stays as policy plus grant. The test asserts the 42501 code and
+re-reads the original note on both event tables. Rule for later
+migrations: when a table must refuse a verb, revoke it explicitly as well
+as not granting it; grants alone describe the hosted project, not the
+local stack.
+
 **D-1501 The sideways scroll was the signed-in header (Dev, 2026-10-13,
 batch 27, REQ-015 FR-16a, branch `req-015-plain-language` from `main`
 d3d4ea9).** A width check on every public page and every questionnaire
@@ -1943,6 +2020,21 @@ against a local production server; it is not in CI because it needs a
 second server and a minute per page, and because axe covers the same
 rules on every commit. FR-18 (screen-reader passes) stays with the PO
 and Haider.
+
+**D-1507 The text corruption on `main` came from Dev's conflict-resolution
+scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
+a file without a byte-order mark as Windows-1252 and writes it back as
+UTF-8 with a mark, so every non-ASCII character in a file those scripts
+touched (DECISIONS.md, NEXT.md, backlog.md at c95e1d7, and earlier
+REQ-004, a source file and the generator's prompt) was encoded twice; the
+nonce line in this file went through three times. Repaired by reversing the
+round trip (`scripts/ops/repair-mojibake.ts`, which `src/lib/text/encoding.ts`
+backs), never by retyping; `tests/text-encoding.test.ts` now fails `npm
+test` on a mark or a double-encoded run in any text file outside
+`data/sources`; `.editorconfig` already said `charset = utf-8`. Rule for
+Dev: edit files through Node or the editor tools, and never through
+`Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
+
 
 ## Open questions for Haider
 
