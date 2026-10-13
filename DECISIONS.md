@@ -2518,6 +2518,66 @@ new sentences arrive when those sections are re-recorded at Haider's next
 recording session (five sections on the sole-trader set, listed in the
 batch 35 status).
 
+**D-544 House style version 2 and its four lints; live replies are held
+to them, recorded replies are measured (Dev, 2026-10-14, batch 40 items 1,
+2 and 4).** `product/domain/house-style.md` is version 2 with the eight
+sections the PO listed (outcome, commitment, procedure; actors are roles;
+time frames are numbers; records we keep by exact name; words we use; if
+X happens; a restrictive practice position in every pack; two levels of
+risk), in the PO's voice, marked v2; `HOUSE_STYLE_VERSION` is 2 and
+`PROMPT_VERSION` 2026-10-14.2. Four lints in `lint.ts`:
+`lintIndicatorRestatement` (a sentence sharing 80 percent or more of its
+content words with a quality indicator sentence from the STANDARDS block),
+`lintVagueTime` (timely, promptly, as soon as practicable, regularly,
+periodically, appropriate, without a number within six words),
+`lintStaffActor` (staff, the team, someone as an actor; "staff matrix" and a
+class name pass) and `lintRecordNames` (a named register, form, checklist,
+matrix, log or template that is not in `record-names.ts`: the result's
+registers, the Readyline registers of REQ-009 and REQ-018, the catalogue's
+document titles and the pack's forms). `generate-section.ts` applies them
+to a live reply (client mode other than replay) and rejects with the
+reason, so the retry fixes it; a replayed recording predates version 2
+and passes through, measured by `lint-v2-fixtures.test.ts`, which reports
+the counts (208 recorded replies, 60 with a finding: indicator restatement
+36, vague time 13, staff as actor 30, record name 11). Those counts are
+the same before and after the brief changes by construction: a recording
+cannot change until it is re-recorded, and the next recording session is
+where the figures fall. Every tailored brief ends with the audit test
+sentence, appended in `briefFor` rather than typed into forty briefs, with
+an option the re-key tool uses to rebuild a previous brief without it.
+Fixtures: the system pass re-keyed every recording; the user pass with
+`REKEY_SECTIONS=*` and the previous catalogue moved 137 of 211 recordings
+(the live ones) under the new prompts, skipping folders whose section the
+catalogue no longer has and recordings of older briefs; the STATE FACTS
+block is dropped from both sides of the comparison because a recording
+re-keyed in batch 35 carries it. The replay has 187 sections (the
+escalation table) and the committed sample document is unchanged.
+
+**D-545 The section briefs the PO named, and the escalation pathway as
+fixed text (Dev, 2026-10-14, batch 40 item 3).** The incident procedure
+brief asks for roles, numbers and records on every step, an "If X
+happens" step for a medical emergency and for a restrictive practice used
+in an emergency, and a "Words we use" callout; the Commission's windows
+(24 hours under s 20, 5 business days under s 21, from the primer) live in
+a new fixed extra section, "Who tells whom, and by when", a table the
+tailored procedure refers to, because R-7 forbids a tailored section to
+restate a statutory time frame; the section is unnumbered (D-542) so every
+recorded prompt's outline stays valid, and it sits after the reportable
+incidents section in the extras' order rather than anchored on it (the
+loader anchors only on outline sections). The complaints procedure brief
+gains the feedback-versus-complaint distinction, our own resolution time
+frames as a table and the words workers use; the risk areas brief names
+both registers and participants as an area of the corporate register; the
+worker screening roles brief ends with "our records match this procedure"
+naming the staff matrix and the worker checks register; the support
+planning procedure's steps carry the per-participant medical emergency
+list with the agreed action (a brief addition, D-1802). Recording list for
+Haider's session: the five sections above on the sole-trader set
+(incident procedure, complaints procedure, risk areas, risk-assessed
+roles, and the support planning steps on a case that has it), plus the 60
+recordings the version 2 lints flag, at about one call each at the
+current model price; no recording without the PO's go-ahead.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

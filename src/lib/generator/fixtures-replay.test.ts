@@ -12,7 +12,11 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { documentTypeById, sectionsFor } from "./catalogue";
-import { briefWithCycles, buildContextPack } from "./context-pack";
+import {
+  AUDIT_TEST_SENTENCE,
+  briefWithCycles,
+  buildContextPack,
+} from "./context-pack";
 import { generateSection } from "./generate-section";
 import {
   DEFAULT_FIXTURES_DIR,
@@ -348,9 +352,13 @@ describe("recorded fixtures replay through the current gate", () => {
           type,
           section,
         });
+        // Batch 40 (D-544): every tailored brief now ends with the audit test; the D-050 list is about the no-standard briefs only.
         if (
           pack.section.brief !==
-          briefWithCycles(section.brief, pack.reviewCycles)
+          briefWithCycles(
+            `${section.brief} ${AUDIT_TEST_SENTENCE}`,
+            pack.reviewCycles,
+          )
         )
           rekeyed.push(`${doc}/${section.id}`);
       }

@@ -11,14 +11,19 @@
 import {
   lintCrossReferences,
   lintErrors,
+  lintIndicatorRestatement,
   lintPlaceholders,
+  lintRecordNames,
   lintReviewCycles,
+  lintStaffActor,
   lintText,
   lintTimeframes,
+  lintVagueTime,
   type LintFinding,
 } from "./lint";
 import type { ContextPack } from "./context-pack";
 import { genericFallbackBlocks } from "./fallback-text";
+import { knownRecordNames } from "./record-names";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
 import { readability, type Readability } from "@/lib/text/readability";
@@ -136,6 +141,8 @@ export function validateReply(
   text: string,
   pack: ContextPack,
   allowedPhrases: readonly string[],
+  /** House style version 2 lints apply to live replies only (D-544); a recorded reply predates them. */
+  strict = false,
 ): Validation {
   let parsed: unknown;
   try {
@@ -233,6 +240,27 @@ export function validateReply(
       ],
     };
   }
+  // House style version 2 (batch 40, D-544): live replies only; a recorded
+  // reply predates the rules and is listed for the next recording session.
+  if (strict) {
+    const text = blocksToText(result.data.blocks);
+    const v2 = [
+      ...lintIndicatorRestatement(
+        text,
+        pack.standards.flatMap((s) => s.indicators),
+      ).map((f) => `restates a quality indicator ("${f.match}"): ${f.why}`),
+      ...lintVagueTime(text).map(
+        (f) => `vague time word ("${f.match}"): ${f.why}`,
+      ),
+      ...lintStaffActor(text, { allowedPhrases }).map(
+        (f) => `"${f.match}" as an actor: ${f.why}`,
+      ),
+      ...lintRecordNames(text, knownRecordNames()).map(
+        (f) => `names a record that does not exist ("${f.match}"): ${f.why}`,
+      ),
+    ];
+    if (v2.length) return { ok: false, problems: v2.slice(0, 4) };
+  }
   return { ok: true, section: result.data, findings, readability: score };
 }
 
@@ -291,7 +319,13 @@ export async function generateSection(input: {
       );
       break;
     }
-    const v = validateReply(reply.text, pack, allowed);
+    // D-544: a replayed recording predates house style version 2; a live reply is held to it.
+    const v = validateReply(
+      reply.text,
+      pack,
+      allowed,
+      client.mode !== "replay",
+    );
     if (v.ok) {
       return {
         status: "generated",

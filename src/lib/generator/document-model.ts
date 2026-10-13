@@ -69,6 +69,8 @@ const UNNUMBERED = new Set([
   "ai-and-digital-tools",
   "notice",
   "change-log",
+  // Batch 40 (D-545): the incident escalation table, added after the recordings.
+  "escalation-pathway",
 ]);
 
 /** Section numbers as the rendered document shows them (front and back matter unnumbered). */

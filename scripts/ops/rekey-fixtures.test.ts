@@ -73,24 +73,28 @@ const userNote = process.env.REKEY_NOTE ?? "";
  * stays as history, as D-502 intends.
  */
 const previousCataloguePath = process.env.REKEY_PREVIOUS_CATALOGUE ?? "";
-type PreviousCatalogue = {
-  outlines: Record<string, SectionSpec[]>;
-  items: { id: string; outline: string; extraSections: SectionSpec[] }[];
-};
 function previousSection(
   typeId: string,
   sectionId: string,
-): SectionSpec | undefined {
+):
+  | { section: SectionSpec; briefAdditions?: Record<string, string> }
+  | undefined {
   if (!previousCataloguePath) return undefined;
-  const prev = JSON.parse(
-    readFileSync(previousCataloguePath, "utf8"),
-  ) as PreviousCatalogue;
+  const prev = JSON.parse(readFileSync(previousCataloguePath, "utf8")) as {
+    outlines: Record<string, SectionSpec[]>;
+    items: {
+      id: string;
+      outline: string;
+      extraSections: SectionSpec[];
+      briefAdditions?: Record<string, string>;
+    }[];
+  };
   const item = prev.items.find((i) => i.id === typeId);
   if (!item) return undefined;
-  return (
+  const section =
     item.extraSections.find((s) => s.id === sectionId) ??
-    prev.outlines[item.outline]?.find((s) => s.id === sectionId)
-  );
+    prev.outlines[item.outline]?.find((s) => s.id === sectionId);
+  return section ? { section, briefAdditions: item.briefAdditions } : undefined;
 }
 
 function rekeyUserPrompts(dir: string): {
@@ -103,7 +107,14 @@ function rekeyUserPrompts(dir: string): {
   let changed = 0;
   let same = 0;
   const unmatched: string[] = [];
-  for (const key of userSections) {
+  // REKEY_SECTIONS=* takes every section folder on disk (batch 40: every tailored brief changed).
+  const keys =
+    userSections.length === 1 && userSections[0] === "*" && existsSync(dir)
+      ? readdirSync(dir)
+          .filter((t) => statSync(join(dir, t)).isDirectory())
+          .flatMap((t) => readdirSync(join(dir, t)).map((s) => `${t}/${s}`))
+      : userSections;
+  for (const key of keys) {
     const [typeId, sectionId] = key.split("/");
     const sectionDir = join(dir, typeId, sectionId);
     if (!existsSync(sectionDir)) continue;
@@ -111,7 +122,14 @@ function rekeyUserPrompts(dir: string): {
     const section = type
       ? sectionsFor(type).find((s) => s.id === sectionId)
       : undefined;
-    if (!type || !section) throw new Error(`unknown section ${key}`);
+    if (!type || !section) {
+      // A folder for a section the catalogue no longer has (a split or retired section) is history; with "*" it is skipped.
+      if (userSections[0] === "*") {
+        unmatched.push(`${key} (no longer in the catalogue; left as history)`);
+        continue;
+      }
+      throw new Error(`unknown section ${key}`);
+    }
     for (const file of readdirSync(sectionDir)) {
       if (!file.endsWith(".json")) continue;
       const path = join(sectionDir, file);
@@ -151,19 +169,24 @@ function rekeyUserPrompts(dir: string): {
         throw new Error(
           `no previous brief for ${key}; set REKEY_PREVIOUS_CATALOGUE`,
         );
+      // The previous brief through the same rules, with the previous catalogue's
+      // additions and, unless REKEY_PREVIOUS_HAS_AUDIT_TEST=1, without the
+      // version 2 audit sentence (batch 40, D-544).
       const previousBrief = briefFor(
-        prev,
-        { ...type, briefAdditions: undefined },
+        prev.section,
+        { ...type, briefAdditions: prev.briefAdditions },
         standardsForType(type, dataset, c.result).length,
         reviewCyclesFor(type),
+        { auditTest: process.env.REKEY_PREVIOUS_HAS_AUDIT_TEST === "1" },
       );
+      // The STATE FACTS paragraphs are dropped from both sides: a recording made
+      // before the block (batch 35) has none, one re-keyed since carries it.
+      const stateFacts =
+        /\n\n<<<STATE FACTS>>>[\s\S]*?<<<END STATE FACTS>>>\n\nEverything between <<<STATE FACTS>>>[^\n]*/;
       const undone = built.user
-        .replace(
-          /\n\n<<<STATE FACTS>>>[\s\S]*?<<<END STATE FACTS>>>\n\nEverything between <<<STATE FACTS>>>[^\n]*/,
-          "",
-        )
+        .replace(stateFacts, "")
         .replace(/^Section brief: .*$/m, `Section brief: ${previousBrief}`);
-      if (undone !== oldPrefix) {
+      if (undone !== oldPrefix.replace(stateFacts, "")) {
         unmatched.push(`${key}/${file} (an earlier brief; left as history)`);
         continue;
       }
