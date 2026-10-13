@@ -1022,8 +1022,8 @@ Fix on **`req-009-session-c` 53e780d** (fix commit aa810b0, D-1009), merged up t
 - **Merges.** DECISIONS.md and NEXT.md conflicted at every stacked step (each branch appends at the same place); resolved keeping both sides, markdown only, each block present once, no markers.
 - **Next:** batch 37 on `req-017-close-out`.
 
-<<<<<<< HEAD
-=======
+
+
 
 ## Dev status (batch 37, written 14 Oct 2026, Dev; third unattended run)
 
@@ -1036,4 +1036,4 @@ Close-out on **`req-017-close-out` 41138e0** (from `req-011-groups` after batch 
 - **Proof here.** `npm run check` and `npm run build` green on the branch: lint, format, typecheck, 681 unit tests passing (1 skipped file, 3 skipped tests), production build. The targeted e2e cannot run here (Supabase); CI's job runs it.
 - **Overlap to know about.** This branch and `req-013-phone-fixes` (batch 36) both edit `checklist-view.tsx` and `derive.ts`-adjacent copy: batch 36 removed the evidence badge and changed the panel sentence; batch 37 added the action link and the `setId` prop. A throwaway merge shows one conflict hunk in that file (both insert at the same point of the panel) plus the usual DECISIONS.md one; resolution: keep both, the check sentence first, then the action link. D-1705 records it. Whichever PR the PO merges second carries that resolution; say the word and Dev does it on the branch of your choice.
 - **Next:** batch 35 on `req-018-ndis-watch-1`.
->>>>>>> origin/main
+
