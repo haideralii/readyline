@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
 import { readinessCounts } from "@/lib/questionnaire/readiness";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
-import { HOME_COPY, homeStrings } from "./home-copy";
+import { HOME_COPY, heroHeadline, homeStrings } from "./home-copy";
 
 describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
   it("passes the prohibited-claims lint and names no superlative or testimonial", () => {
@@ -13,6 +13,23 @@ describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
       /market[- ]leading|best|#1|number one|trusted by|customers say|testimonial|guarantee/i,
     );
     expect(all).not.toMatch(/is being built/);
+  });
+
+  it("hero (batch 24 item 1): the audit question, the configured price, the deal and the refund promise", () => {
+    expect(heroHeadline("AUD 399")).toBe(
+      "Find out which NDIS audit you'll face — free. Then get every document it needs, drafted from your answers, for AUD 399.",
+    );
+    expect(heroHeadline(null)).toMatch(/for one fixed price\.$/);
+    expect(HOME_COPY.cta).toBe("See which audit I need");
+    expect(HOME_COPY.ctaSecondary).toBe("See a sample document");
+    expect(HOME_COPY.priceLine("AUD 399")).toMatch(
+      /^AUD 399 one-off .*No subscription needed, no instalments, no interest\./,
+    );
+    expect(HOME_COPY.refundLine).toMatch(/refund/i);
+    // Never a countdown, instalment or BNPL phrasing (CLAUDE.md section 5).
+    expect(homeStrings().join("\n")).not.toMatch(
+      /pay later|afterpay|zip pay|per month for|limited time|only \d+ left|hurry/i,
+    );
   });
 
   it("states the price of entry, the time and the three trust cues", () => {

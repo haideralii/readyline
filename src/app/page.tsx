@@ -1,38 +1,83 @@
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
+import { SampleDocument } from "@/components/sample-document";
+import { Testimonials, TrustCounters } from "@/components/trust-blocks";
 import { BRAND } from "@/lib/brand";
-import { HOME_COPY as C } from "@/lib/home-copy";
+import { HOME_COPY as C, heroHeadline } from "@/lib/home-copy";
+import { formatAud, readPricing } from "@/lib/payments/pricing";
 
 /**
- * Home page (REQ-013 FR-8): the value proposition in plain words, what it
- * costs and how long it takes, trust cues we can stand behind, and one
- * example result. Every string lives in src/lib/home-copy.ts so the claims
- * lint runs over it. No testimonials until real ones exist.
+ * Home page v2 (REQ-013 FR-8; batch 24): the audit question and the price in
+ * the first screen, a real sample document before buying, trust cues we can
+ * stand behind, the example result, the mission, and counters and
+ * testimonials that render only when real. Every string lives in
+ * src/lib/home-copy.ts so the claims lint runs over it.
  */
 export default function Home() {
+  const pricing = readPricing();
+  const price = pricing.packPriceCents
+    ? formatAud(pricing.packPriceCents)
+    : null;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-      <section className="max-w-2xl">
+      <section className="max-w-2xl" data-testid="home-hero">
         <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
           {C.eyebrow}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-          {C.headline}
+        <h1 className="mt-2 text-3xl tracking-tight sm:text-4xl">
+          {heroHeadline(price)}
         </h1>
         <p className="mt-4 text-lg leading-8 text-zinc-700 dark:text-zinc-300">
           {C.lead}
         </p>
-        <p className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link href="/start" className="btn-primary">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Link href="/start" className="btn-primary" data-testid="home-cta">
             {C.cta}
           </Link>
-          <span
-            className="text-sm text-zinc-600 dark:text-zinc-400"
-            data-testid="home-free-line"
+          <a
+            href="#sample"
+            className="btn-secondary"
+            data-testid="home-cta-sample"
           >
-            {C.ctaNote}
-          </span>
+            {C.ctaSecondary}
+          </a>
+        </div>
+        <p
+          className="mt-3 text-sm text-zinc-600 dark:text-zinc-400"
+          data-testid="home-free-line"
+        >
+          {C.ctaNote}
         </p>
+        {price ? (
+          <p
+            className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            data-testid="home-price-line"
+          >
+            {C.priceLine(price)} {C.refundLine}{" "}
+            <Link href="/refunds" className="underline underline-offset-2">
+              Refunds
+            </Link>
+            .
+          </p>
+        ) : null}
+        <TrustCounters />
+      </section>
+
+      <section
+        id="sample"
+        className="mt-12 max-w-3xl scroll-mt-6"
+        aria-labelledby="sample-heading"
+        data-testid="home-sample"
+      >
+        <h2 id="sample-heading" className="text-xl font-semibold">
+          {C.sampleHeading}
+        </h2>
+        <p className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300">
+          {C.sampleLead}
+        </p>
+        <div className="mt-4">
+          <SampleDocument />
+        </div>
       </section>
 
       <section
@@ -92,6 +137,31 @@ export default function Home() {
             {C.example.note}
           </p>
         </div>
+      </section>
+
+      <Testimonials />
+
+      <section
+        className="mt-12 max-w-2xl"
+        aria-labelledby="mission-heading"
+        data-testid="home-mission"
+      >
+        <h2 id="mission-heading" className="text-xl font-semibold">
+          {C.missionHeading}
+        </h2>
+        {C.mission.map((p) => (
+          <p
+            key={p.slice(0, 24)}
+            className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
+          >
+            {p}
+          </p>
+        ))}
+        <p className="mt-3 text-sm">
+          <Link href="/about" className="underline underline-offset-2">
+            More about {BRAND}
+          </Link>
+        </p>
       </section>
 
       <section className="mt-12 max-w-2xl" aria-labelledby="what-heading">
