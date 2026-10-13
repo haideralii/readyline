@@ -936,3 +936,13 @@ Branch `req-017-close-out` from `req-011-groups` after merging `main`.
 
 ## Queue (written by PO, 14 Oct 2026, batch 38: CI red on all four open PRs; do this FIRST, before batches 36, 37 and 35)
 PRs #28 (Session C), #29 (kicker), #30 (REQ-016) and #31 (REQ-017) all fail the same CI job, "Supabase local stack, migrations and RLS tests": `tests/integration/reminders-job.test.ts` fails to load with "This module cannot be imported from a Client Component module. It should only be used from a Server Component." That is Next's `server-only` guard throwing under Vitest: the test (or something it imports, probably the reminders job or the email provider) pulls in a module marked `server-only`. This is the test the dev could not run locally. Fix on `req-009-session-c`: alias `server-only` to an empty module in the Vitest config for the integration project (or import the pure rules module and the job function through a path that does not carry the guard), prove the Supabase job green on PR #28, then merge the fix up through `req-010-generation-kicker`, `req-016-document-standard`, `req-017-guided-path` and `req-011-groups` and push all five. Status with the five SHAs. STOP. The PO then merges #28 to #31 in order and opens the groups PR.
+
+
+## Dev status (batch 38, written 14 Oct 2026, Dev; third unattended run)
+
+CI fix for the Supabase job on **`req-009-session-c` 98f19ea** (fix commit ffb999b), merged up the stack: **`req-010-generation-kicker` dc303ae, `req-016-document-standard` ef6fc70, `req-017-guided-path` e918fc2, `req-011-groups` 4f2ab7b**; every branch also carries `main` 9abfdae. No model calls. Decision D-1008.
+
+- **Cause.** `tests/integration/reminders-job.test.ts` imports the reminders job, the email provider and the admin client, all marked `import "server-only"`; Next's guard throws outside a Next server bundle, and the integration project had no mock for it (the unit project mocks it per file).
+- **Fix.** `vitest.integration.config.mts` resolves `server-only` to an empty module (`tests/integration/server-only-stub.ts`) for every integration file. Proven locally by loading the whole suite without Supabase variables: 12 files load, 12 pass, 62 skip, nothing throws (before, the file failed at import). The rows themselves are CI's to prove on PR #28.
+- **Merges.** Markdown-only conflicts (DECISIONS.md, NEXT.md) resolved keeping both sides; no code file was touched by the resolver (the standing rule's new clause).
+- **Next:** batch 36 (Haider's phone findings) on a new branch from `req-011-groups`, then 37, then 35.
