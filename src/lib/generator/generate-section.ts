@@ -18,6 +18,7 @@ import {
   type LintFinding,
 } from "./lint";
 import type { ContextPack } from "./context-pack";
+import { genericFallbackBlocks } from "./fallback-text";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
 import { readability, type Readability } from "@/lib/text/readability";
@@ -31,6 +32,18 @@ import {
 export const READABILITY_RETRY_INSTRUCTION =
   "shorten sentences to under 20 words and use common words";
 
+/** Why a section fell back (REQ-016 FR-0b), for the log and the tick line; never the content. */
+export type FailureKind =
+  "model-error" | "gate" | "truncation" | "fixture-missing";
+
+export type SectionFailure = {
+  kind: FailureKind;
+  /** Rule names or error names, at most 300 characters, never reply text. */
+  detail: string;
+  /** True when the model declined rather than erred. */
+  refusal: boolean;
+};
+
 export type SectionOutcome = {
   status: "generated" | "fallback";
   blocks: Block[];
@@ -42,19 +55,63 @@ export type SectionOutcome = {
   usage: ModelUsage | null;
   /** Output tokens of a reply the model cut off at the cap, when that is why the section fell back. */
   truncatedAtTokens: number | null;
+  /** Set when the status is fallback. */
+  failure: SectionFailure | null;
 };
 
+/**
+ * The fallback is a complete generic section marked "Generic text: add your
+ * details" (FR-0b); the catalogue brief never reaches it (FR-0a).
+ */
 export function fallbackBlocks(pack: ContextPack): Block[] {
-  return [
-    {
-      type: "callout",
-      text: "Review and complete: this section could not be drafted automatically.",
-    },
-    {
-      type: "callout",
-      text: `[Provider to complete: ${pack.section.heading}. ${pack.section.brief}]`,
-    },
-  ];
+  return genericFallbackBlocks(pack);
+}
+
+/** Classifies the recorded problems: what failed and which rules, in names only. */
+export function classifyFailure(
+  problems: readonly string[],
+  truncatedAtTokens: number | null,
+): SectionFailure {
+  if (truncatedAtTokens !== null)
+    return {
+      kind: "truncation",
+      detail: `truncated at ${truncatedAtTokens} output tokens`,
+      refusal: false,
+    };
+  const text = problems.join("\n");
+  if (/No recorded fixture/.test(text))
+    return {
+      kind: "fixture-missing",
+      detail: "no recorded fixture",
+      refusal: false,
+    };
+  const rules = new Set<string>();
+  let gate = false;
+  let modelError = false;
+  let refusal = false;
+  for (const p of problems) {
+    const rule = p.match(/^([a-z0-9:-]+):\s/i)?.[1];
+    if (rule) {
+      rules.add(rule);
+      gate = true;
+    } else if (
+      /^reply was not valid JSON|^sectionId must be|^readability grade|^asks the provider|^restates a statutory|^states a review cycle|^cross-reference/.test(
+        p,
+      )
+    ) {
+      rules.add(p.split(/[ :(]/)[0].toLowerCase());
+      gate = true;
+    } else if (/: .+$/.test(p) && /^[a-zA-Z]+\.[a-zA-Z.]+: /.test(p)) {
+      rules.add("schema");
+      gate = true;
+    } else {
+      modelError = true;
+      if (/refus|declin|cannot help|can't help/i.test(p)) refusal = true;
+      rules.add(p.replace(/\s.*$/, "").slice(0, 40) || "error");
+    }
+  }
+  const kind: FailureKind = gate && !modelError ? "gate" : "model-error";
+  return { kind, detail: [...rules].join(", ").slice(0, 300), refusal };
 }
 
 /** Strips code fences the model sometimes adds despite the contract. */
@@ -246,6 +303,7 @@ export async function generateSection(input: {
         readability: v.readability,
         usage,
         truncatedAtTokens: null,
+        failure: null,
       };
     }
     problems.push(...v.problems);
@@ -260,5 +318,6 @@ export async function generateSection(input: {
     readability: null,
     usage,
     truncatedAtTokens,
+    failure: classifyFailure(problems, truncatedAtTokens),
   };
 }

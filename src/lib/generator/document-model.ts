@@ -56,7 +56,20 @@ export type StandardSummary = {
   evidence: { kind: string; title: string }[];
 };
 
-const UNNUMBERED = new Set(["document-control", "notice"]);
+/**
+ * Front and back matter outside the numbered outline the model sees. REQ-016
+ * added the change log (in place of the notice) and the participant-facing
+ * front matter (the plain-language summary and the Easy Read place); keeping
+ * them unnumbered keeps every recorded prompt's outline valid (D-542).
+ */
+const UNNUMBERED = new Set([
+  "document-control",
+  "plain-language-summary",
+  "easy-read",
+  "ai-and-digital-tools",
+  "notice",
+  "change-log",
+]);
 
 /** Section numbers as the rendered document shows them (front and back matter unnumbered). */
 export function sectionNumbers(type: DocumentTypeSpec): Map<string, string> {
@@ -183,7 +196,8 @@ export function buildSkeleton(input: {
     reviewDueAt,
     facts,
     sections,
-    footer: `Prepared with ${BRAND}`,
+    // D-058: the draft mark goes when the provider adopts the document (render option).
+    footer: `Draft prepared with ${BRAND}`,
   };
 }
 

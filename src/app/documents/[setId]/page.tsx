@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
+import { collectBlanks } from "@/lib/generator/blanks";
+import { orderDocuments } from "@/lib/generator/set-order";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
@@ -9,10 +11,18 @@ import {
 } from "@/server/generation/queries";
 import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { DocumentsNotices } from "../notices";
 
 export const metadata: Metadata = { title: "Document set" };
 
 const button = "btn-secondary";
+
+/**
+ * REQ-016 S-7: the set reads as one system, numbered in audit order under
+ * the result page's four headings; FR-0c: the count is the provider's own
+ * blanks, never generator failures; D-058: the notices sit here, not in
+ * the documents.
+ */
 
 export default async function DocumentSetPage({
   params,
@@ -47,6 +57,14 @@ export default async function DocumentSetPage({
     );
   }
   const documents = await listLatestDocuments(supabase, set.id);
+  // S-7: one running number across the groups, in audit order.
+  let counter = 0;
+  const groups = orderDocuments(documents).map((g) => ({
+    title: g.title,
+    documents: g.documents.map((d) => ({ ...d, n: ++counter })),
+  }));
+  // REQ-016 FR-0c: what the page counts is the provider's own blanks, never generator failures.
+  const blanks = documents.flatMap((d) => collectBlanks(d.model));
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
@@ -58,13 +76,28 @@ export default async function DocumentSetPage({
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         Document set
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-        Generated{" "}
+      <p
+        className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
+        data-testid="set-summary"
+      >
+        Drafted{" "}
         {new Date(set.created_at).toLocaleString("en-AU", {
           timeZone: "Australia/Sydney",
         })}
-        . {set.document_count} documents; {set.fallback_section_count} section
-        {set.fallback_section_count === 1 ? "" : "s"} marked for your review.
+        . {documents.length} documents.{" "}
+        {blanks.length === 0 ? (
+          "No blanks to fill in."
+        ) : (
+          <Link
+            href={`/documents/${set.id}/finish`}
+            className="underline underline-offset-2"
+            data-testid="finish-link"
+          >
+            {blanks.length === 1
+              ? "1 detail to fill in"
+              : `${blanks.length} details to fill in`}
+          </Link>
+        )}
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -86,28 +119,48 @@ export default async function DocumentSetPage({
 
       <section aria-labelledby="docs-heading" className="mt-10">
         <h2 id="docs-heading" className="text-xl font-semibold">
-          Documents
+          Documents, in audit order
         </h2>
-        <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
-          {documents.map((d) => (
-            <li
-              key={d.id}
-              className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+        {groups.map((g) => (
+          <div key={g.title} className="mt-4" data-testid="set-group">
+            <h3 className="text-base font-semibold text-zinc-700 dark:text-zinc-300">
+              {g.title}
+            </h3>
+            <ol
+              className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800"
+              data-testid="set-list"
             >
-              <Link
-                href={`/documents/${set.id}/${d.document_type_id}`}
-                className="underline-offset-4 hover:underline"
-              >
-                {d.model.title}
-              </Link>
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                {d.status === "ready" ? "Drafted" : "Review needed"} · version{" "}
-                {d.version}
-              </span>
-            </li>
-          ))}
-        </ul>
+              {g.documents.map((d) => {
+                return (
+                  <li
+                    key={d.id}
+                    className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span>
+                      <span className="mr-2 text-zinc-500 tabular-nums">
+                        {d.n}.
+                      </span>
+                      <Link
+                        href={`/documents/${set.id}/${d.document_type_id}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {d.model.title}
+                      </Link>
+                    </span>
+                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                      {d.status === "ready"
+                        ? "Drafted"
+                        : "Drafted, with generic text to make yours"}{" "}
+                      · version {d.version}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))}
       </section>
+      <DocumentsNotices />
     </div>
   );
 }

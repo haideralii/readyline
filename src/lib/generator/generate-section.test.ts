@@ -370,14 +370,25 @@ describe("validate, retry, fall back (AC-5)", () => {
     });
     expect(out.status).toBe("fallback");
     expect(out.attempts).toBe(2);
+    // REQ-016 FR-0b: the fallback is a complete generic section behind the marker, never the brief (FR-0a).
     expect(out.blocks[0]).toEqual({
       type: "callout",
-      text: expect.stringMatching(/^Review and complete/),
+      text: expect.stringMatching(/^Generic text: add your details/),
     });
+    expect(out.blocks.length).toBeGreaterThan(1);
+    const text = JSON.stringify(out.blocks);
+    expect(text).toContain(pack.facts.tradingName);
+    expect(text).not.toContain(pack.section.brief);
+    expect(text).not.toMatch(/Never|Provider to complete/);
     expect(out.problems).toEqual([
       "reply was not valid JSON",
       'sectionId must be "purpose"',
     ]);
+    expect(out.failure).toEqual({
+      kind: "gate",
+      detail: expect.stringMatching(/reply|sectionid/i),
+      refusal: false,
+    });
   });
 
   it("R-5: a readability fail is a validation problem with the house-style retry instruction, then the fallback", async () => {

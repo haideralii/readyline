@@ -63,10 +63,12 @@ describe.each(cases.map((c) => [c.id] as const))(
     const models = skeletonsFor(caseId);
 
     it("resolves every document in the set and the self-assessment", () => {
-      expect(models.length).toBeGreaterThan(17);
+      // REQ-016 S-6: two fewer documents (the AI content is a privacy policy section); S-2: the change log closes every outline.
+      expect(models.length).toBeGreaterThan(15);
       for (const m of models) {
         expect(m.sections[0].id).toBe("document-control");
-        expect(m.sections.at(-1)?.id).toBe("notice");
+        expect(m.sections.at(-1)?.id).toBe("change-log");
+        expect(m.typeId.startsWith("ai-")).toBe(false);
         expect(m.sections.some((s) => s.status === "placeholder")).toBe(true);
         const numbered = m.sections
           .filter((s) => s.number)
@@ -106,7 +108,8 @@ describe.each(cases.map((c) => [c.id] as const))(
         const fixed = m.sections.filter((s) => s.status === "fixed");
         const text = fixed.map((s) => blocksToText(s.blocks)).join("\n");
         expect(text).toContain(m.facts.tradingName);
-        expect(text).toContain(GENERAL_INFORMATION_NOTICE);
+        // REQ-016 D-058: the notices sit at the point of delivery, never inside the provider's document.
+        expect(text).not.toContain(GENERAL_INFORMATION_NOTICE);
         const errors = lintErrors(
           lintText(text, { allowedPhrases: classNames }),
         );
@@ -130,7 +133,10 @@ describe.each(cases.map((c) => [c.id] as const))(
         expect(headings, m.typeId).toBe(m.sections.length);
         expect(body).toContain(escapeXml(m.facts.tradingName));
         const footer = docxXml(buffer, "word/footer1.xml");
-        expect(footer).toContain("Prepared with");
+        // REQ-016 S-3, D-058: title, version, page numbers and the draft mark until adoption.
+        expect(footer).toContain("Draft prepared with");
+        expect(footer).toContain(escapeXml(m.title));
+        expect(footer).toContain("NUMPAGES");
         if (write) {
           const file = `${m.typeId}.docx`;
           writeFileSync(join("out", "skeletons", caseId, file), buffer);

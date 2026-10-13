@@ -241,3 +241,24 @@ export async function registerOverview(
     },
   };
 }
+
+/**
+ * True once the checklist's Done has set the policy review's adopted date
+ * for this document type (REQ-016 D-058): the download then serves the
+ * document without the draft marks. Reads with the user's session (RLS).
+ */
+export async function isDocumentAdopted(
+  supabase: SupabaseClient,
+  accountId: string,
+  documentTypeId: string,
+): Promise<boolean> {
+  const r = await supabase
+    .from("policy_reviews")
+    .select("adopted_on")
+    .eq("account_id", accountId)
+    .eq("document_type_id", documentTypeId)
+    .not("adopted_on", "is", null)
+    .limit(1)
+    .maybeSingle();
+  return Boolean(r.data?.adopted_on);
+}

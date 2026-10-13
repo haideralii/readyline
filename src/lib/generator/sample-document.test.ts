@@ -25,7 +25,10 @@ describe("sample document (batch 24 item 2)", () => {
     expect(model.facts.tradingName).toBe(SAMPLE_TRADING_NAME);
     const tailored = model.sections.filter((s) => s.mode === "tailored");
     expect(tailored.length).toBeGreaterThanOrEqual(4);
-    expect(tailored.every((s) => s.status === "generated")).toBe(true);
+    // REQ-016 S-4: the new plain-language summary has no recording yet and ships as marked generic text (D-542).
+    expect(
+      tailored.filter((s) => s.status !== "generated").map((s) => s.id),
+    ).toEqual(["plain-language-summary"]);
     const text = JSON.stringify(model);
     expect(text).not.toContain("Sunrise Supports");
     expect(text).toContain(SAMPLE_TRADING_NAME);

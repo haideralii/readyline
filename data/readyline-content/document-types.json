@@ -11,7 +11,7 @@
       "records-and-evidence",
       "related-documents",
       "review",
-      "notice"
+      "change-log"
     ],
     "registerReviewMonths": 3,
     "readabilityFailAbove": 11,
@@ -84,10 +84,10 @@
         "brief": "Review cycle, trigger events (incident, complaint, change in the rules), who reviews."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "General-information and AI-drafting notice (CLAUDE.md 4.2, 4.3)."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "procedure": [
@@ -140,10 +140,10 @@
         "brief": "Cycle and triggers."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "plan": [
@@ -202,10 +202,10 @@
         "brief": "Cycle, plus a yearly walk-through."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "template": [
@@ -252,10 +252,10 @@
         "brief": "Cycle."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice, including that it is not legal advice and a lawyer should review agreement terms."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "acknowledgement": [
@@ -302,10 +302,10 @@
         "brief": "Cycle."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "framework": [
@@ -364,10 +364,10 @@
         "brief": "Cycle."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ],
     "self-assessment": [
@@ -408,10 +408,10 @@
         "brief": "The readiness checklist items from the result page."
       },
       {
-        "id": "notice",
-        "heading": "About this document",
+        "id": "change-log",
+        "heading": "Change log",
         "mode": "fixed",
-        "brief": "Notice."
+        "brief": "Version, date, what changed and by whom; seeded with version 1."
       }
     ]
   },
@@ -528,6 +528,13 @@
       "registers": [],
       "extraSections": [
         {
+          "id": "ai-and-digital-tools",
+          "heading": "Appendix: AI and digital tools",
+          "mode": "fixed",
+          "brief": "Appendix, unnumbered so recorded prompts keep their outline (D-542): which digital and AI tools we allow and for what, no participant information in public tools, de-identification before any AI use, telling participants, human review and the accountable person; replaces the two standalone AI documents (REQ-016 S-6).",
+          "insertAfter": "review"
+        },
+        {
           "id": "consent-form",
           "heading": "Consent form",
           "mode": "fixed",
@@ -588,7 +595,8 @@
           "brief": "Register columns: reference code, date, summary, actions, outcome, improvement; warning not to record participant health details."
         }
       ],
-      "basis": "practice-standard"
+      "basis": "practice-standard",
+      "participantFacing": true
     },
     {
       "id": "incident-management-policy-and-register",
@@ -725,7 +733,8 @@
         }
       ],
       "basis": "code-of-conduct",
-      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker",
+      "participantFacing": true
     },
     {
       "id": "participant-rights-and-choice-policy",
@@ -752,7 +761,8 @@
         }
       ],
       "basis": "code-of-conduct",
-      "basisReason": "the NDIS Code of Conduct applies to every provider and worker"
+      "basisReason": "the NDIS Code of Conduct applies to every provider and worker",
+      "participantFacing": true
     },
     {
       "id": "safeguarding-policy",
@@ -817,7 +827,9 @@
         }
       ],
       "basis": "good-practice",
-      "basisReason": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI"
+      "basisReason": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI",
+      "retired": true,
+      "retiredNote": "Retired for new sets on 13 October 2026 (REQ-016 S-6): its content is the 'AI and digital tools' section of the privacy and information management policy. Sets generated before then keep their copy."
     },
     {
       "id": "ai-and-digital-data-handling-procedure",
@@ -840,7 +852,9 @@
         }
       ],
       "basis": "good-practice",
-      "basisReason": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use"
+      "basisReason": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use",
+      "retired": true,
+      "retiredNote": "Retired for new sets on 13 October 2026 (REQ-016 S-6): its content is the 'AI and digital tools' section of the privacy and information management policy. Sets generated before then keep their copy."
     },
     {
       "id": "quality-management-and-continuous-improvement",
@@ -874,7 +888,8 @@
       "evidenceAliases": ["policy.responsive-support"],
       "registers": [],
       "extraSections": [],
-      "basis": "practice-standard"
+      "basis": "practice-standard",
+      "participantFacing": true
     },
     {
       "id": "support-planning-and-transitions-procedure",
@@ -1301,7 +1316,8 @@
       "evidenceAliases": ["policy.participant-money-and-property"],
       "registers": ["incidents"],
       "extraSections": [],
-      "basis": "practice-standard"
+      "basis": "practice-standard",
+      "participantFacing": true
     }
   ]
 }

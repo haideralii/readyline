@@ -50,7 +50,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       rows: [
         [
           "[Name and role]",
-          "[Describe the interest or relationship]",
+          "[nature of the conflict]",
           "[Steps agreed]",
           "[Date] [Review date]",
         ],
@@ -102,22 +102,14 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       type: "table",
       columns: ["Record", "Kept for", "Where"],
       rows: [
-        [
-          "Service agreements and support plans",
-          "[Provider to confirm: period set by the Rules and your state]",
-          "[Location]",
-        ],
-        [
-          "Incident and complaint records",
-          "[Provider to confirm]",
-          "[Location]",
-        ],
+        ["Service agreements and support plans", "[period]", "[Location]"],
+        ["Incident and complaint records", "[period]", "[Location]"],
         [
           "Worker files, screening and training records",
-          "[Provider to confirm]",
+          "[period]",
           "[Location]",
         ],
-        ["Financial records", "[Provider to confirm]", "[Location]"],
+        ["Financial records", "[period]", "[Location]"],
       ],
     },
   ],
@@ -138,7 +130,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
         [
           "[C-001]",
           "[Date]",
-          "[What was raised; what we did; dates]",
+          "[summary and actions]",
           "[Outcome; what we changed]",
         ],
       ],
@@ -197,12 +189,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       rows: [
         ["[Role]", "NDIS worker orientation module", "[Date]", "[Date]"],
         ["[Role]", "Infection prevention and control", "[Date]", "[Date]"],
-        [
-          "[Role]",
-          "[Other training required for the supports delivered]",
-          "[Date]",
-          "[Date]",
-        ],
+        ["[Role]", "[other training]", "[Date]", "[Date]"],
       ],
     },
   ],
@@ -210,14 +197,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     {
       type: "table",
       columns: ["Source", "Improvement", "Owner and due date", "Done"],
-      rows: [
-        [
-          "[Complaint / incident / audit / feedback]",
-          "[What we changed]",
-          "[Owner] [Date]",
-          "[Date]",
-        ],
-      ],
+      rows: [["[source]", "[What we changed]", "[Owner] [Date]", "[Date]"]],
     },
   ],
   "support-plan-template": () => [
@@ -307,6 +287,50 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
         "Replace each person with a reference code and keep the code list outside the tool.",
         "Check the output for anything that could identify the person before it is used.",
       ],
+    },
+  ],
+  // REQ-016 S-6: the two standalone AI documents folded into the privacy policy as one section.
+  "ai-and-digital-tools": (ctx) => [
+    {
+      type: "paragraph",
+      text: `${ctx.facts.tradingName} uses digital and AI tools only as set out here. [name], [role], is accountable for this section, approves each tool before it is used, and reviews this list at every review of this policy.`,
+    },
+    {
+      type: "table",
+      columns: ["Tool category", "Allowed use", "Not allowed", "Approver"],
+      rows: [
+        [
+          "General AI assistants",
+          "Drafting our own documents with no participant information",
+          "Any participant information, even partial",
+          "[role]",
+        ],
+        [
+          "Rostering and record systems",
+          "As set up for our business",
+          "Sharing logins",
+          "[role]",
+        ],
+        ["[other tool]", "[allowed use]", "[limits]", "[role]"],
+      ],
+    },
+    {
+      type: "paragraph",
+      text: "We do not put a participant's personal, health or disability information into any AI tool. If a tool is needed for a participant task, we first remove every identifier, we have the participant's consent, and a worker checks the output before it is used. We tell each participant when an AI tool has been used for something about them.",
+    },
+    {
+      type: "bullets",
+      items: [
+        "Remove names, initials and nicknames.",
+        "Remove dates of birth, NDIS numbers, addresses, phone numbers and email addresses.",
+        "Remove health conditions, medications and diagnoses unless the task needs them and consent covers it.",
+        "Replace each person with a reference code and keep the code list outside the tool.",
+        "Check the output for anything that could identify the person before it is used.",
+      ],
+    },
+    {
+      type: "paragraph",
+      text: "A mistake with a tool, such as participant information entered by accident, is recorded in the incident register the same day and handled under our incident management procedure. The Commission has published a position on the use of AI by providers; we keep its current statement with this policy and follow it.",
     },
   ],
   "use-register": () => [

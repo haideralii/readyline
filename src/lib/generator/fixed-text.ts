@@ -15,6 +15,7 @@ import { describeProvider, type ProviderFacts } from "./facts";
 import type { StandardSummary } from "./document-model";
 import type { Block } from "./section-schema";
 import { fixedExtra } from "./fixed-extras";
+import { placeholderFor } from "./placeholders";
 
 export type FixedContext = {
   type: DocumentTypeSpec;
@@ -36,13 +37,14 @@ export function formatDateAu(iso: string): string {
   }).format(new Date(`${iso}T03:00:00Z`));
 }
 
+/** A bracketed line for the provider; the text is already in the customer's voice (REQ-016 FR-0a). */
 export function placeholder(text: string): Block {
-  return { type: "callout", text: `[Provider to complete: ${text}]` };
+  return { type: "callout", text: text.startsWith("[") ? text : `[${text}]` };
 }
 
-/** What a tailored section shows before the model has written it. */
+/** What a tailored section shows before the model has written it: the customer placeholder, never the brief (FR-0a). */
 export function placeholderBlocks(spec: SectionSpec): Block[] {
-  return [placeholder(`${spec.heading}. ${spec.brief}`)];
+  return [placeholder(placeholderFor(spec))];
 }
 
 const DEFINITIONS: Block = {
@@ -89,6 +91,7 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
         {
           type: "table",
           columns: ["Item", "Detail"],
+          // REQ-016 S-2: title, provider, version, approved by (name and role), approval date, next review, standards.
           rows: [
             ["Document", ctx.type.title],
             [
@@ -96,9 +99,17 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
               f.abn ? `${f.tradingName} (ABN ${f.abn})` : f.tradingName,
             ],
             ["Version", ctx.version],
-            ["Generated", formatDateAu(ctx.generatedAt)],
-            ["Approval", "[Provider to complete: name, role and date]"],
+            ["Drafted", formatDateAu(ctx.generatedAt)],
+            // "Approver" rather than "approved by": the claims lint bans that phrase in a document (house style, CLAUDE.md 4.3).
+            ["Approver", "[name], [role]"],
+            ["Approval date", "[date]"],
             ["Next review", formatDateAu(ctx.reviewDueAt)],
+            [
+              "Standards it supports",
+              ctx.standards.length
+                ? ctx.standards.map((s) => s.name).join("; ")
+                : (ctx.type.basisReason ?? "See below"),
+            ],
           ],
         },
         whyThisDocument(ctx),
@@ -151,11 +162,7 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
           type: "table",
           columns: ["Role", "Does what", "When"],
           rows: [
-            [
-              "[Provider to complete: owner role]",
-              "Reviews and approves this document",
-              "Every 12 months",
-            ],
+            ["[role]", "Reviews and approves this document", "Every 12 months"],
             [
               "All workers",
               "Read the current version and follow it",
@@ -264,6 +271,35 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
       }
       return blocks;
     }
+    case "change-log":
+      // REQ-016 S-2: version, date, what changed and by whom, seeded with version 1.
+      return [
+        {
+          type: "paragraph",
+          text: "We record every change to this document here and tell workers when a new version applies.",
+        },
+        {
+          type: "table",
+          columns: ["Version", "Date", "What changed", "By whom"],
+          rows: [
+            [
+              ctx.version,
+              formatDateAu(ctx.generatedAt),
+              "First version, drafted from our questionnaire answers",
+              "[name]",
+            ],
+          ],
+        },
+      ];
+    case "easy-read":
+      // REQ-016 S-4: a marked place; Easy Read is good practice, not a rule.
+      return [
+        {
+          type: "paragraph",
+          text: "We keep an Easy Read version of the summary above with this document: one idea per line, with a picture for each idea, in large print.",
+        },
+        { type: "callout", text: "[Easy Read version]" },
+      ];
     default:
       return fixedExtra(spec.id, ctx) ?? extraFixedBlocks(spec, ctx);
   }
@@ -291,8 +327,8 @@ function extraFixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
         type: "paragraph",
         text: `${describeProvider(ctx.facts)}, uses this template with each participant.`,
       },
-      placeholder(`${spec.heading}. ${spec.brief}`),
+      placeholder(placeholderFor(spec)),
     ];
   }
-  return [placeholder(`${spec.heading}. ${spec.brief}`)];
+  return [placeholder(placeholderFor(spec))];
 }

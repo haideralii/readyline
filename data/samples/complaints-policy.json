@@ -41,14 +41,51 @@
             ],
             ["Provider", "Example Supports"],
             ["Version", "1"],
-            ["Generated", "13 October 2026"],
-            ["Approval", "[Provider to complete: name, role and date]"],
-            ["Next review", "13 October 2027"]
+            ["Drafted", "13 October 2026"],
+            ["Approver", "[name], [role]"],
+            ["Approval date", "[date]"],
+            ["Next review", "13 October 2027"],
+            ["Standards it supports", "Complaints management"]
           ]
         },
         {
           "type": "paragraph",
           "text": "Why this document: it supports the NDIS Practice Standards Complaints management for Example Supports."
+        }
+      ]
+    },
+    {
+      "id": "plain-language-summary",
+      "number": "",
+      "heading": "In plain words",
+      "mode": "tailored",
+      "status": "fallback",
+      "blocks": [
+        {
+          "type": "callout",
+          "text": "Generic text: add your details."
+        },
+        {
+          "type": "paragraph",
+          "text": "This document is about how Example Supports works with you. You choose your supports. We listen to you. If something is wrong, tell us or tell [name]. We will fix it."
+        }
+      ],
+      "usedFacts": []
+    },
+    {
+      "id": "easy-read",
+      "number": "",
+      "heading": "Easy Read version",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "We keep an Easy Read version of the summary above with this document: one idea per line, with a picture for each idea, in large print."
+        },
+        {
+          "type": "callout",
+          "text": "[Easy Read version]"
         }
       ]
     },
@@ -389,7 +426,7 @@
             [
               "[C-001]",
               "[Date]",
-              "[What was raised; what we did; dates]",
+              "[summary and actions]",
               "[Outcome; what we changed]"
             ]
           ]
@@ -452,11 +489,7 @@
           "type": "table",
           "columns": ["Role", "Does what", "When"],
           "rows": [
-            [
-              "[Provider to complete: owner role]",
-              "Reviews and approves this document",
-              "Every 12 months"
-            ],
+            ["[role]", "Reviews and approves this document", "Every 12 months"],
             [
               "All workers",
               "Read the current version and follow it",
@@ -467,22 +500,30 @@
       ]
     },
     {
-      "id": "notice",
+      "id": "change-log",
       "number": "",
-      "heading": "About this document",
+      "heading": "Change log",
       "mode": "fixed",
       "status": "fixed",
       "blocks": [
         {
           "type": "paragraph",
-          "text": "Readyline provides general information and document templates for your own review. It is not legal advice and does not take account of your specific circumstances. Seek legal advice if you are unsure how a requirement applies to you. Readyline is an independent service and is not affiliated with the National Disability Insurance Agency or the NDIS Quality and Safeguards Commission."
+          "text": "We record every change to this document here and tell workers when a new version applies."
         },
         {
-          "type": "paragraph",
-          "text": "First drafts of your documents are generated with AI from your questionnaire answers. You are responsible for reviewing, editing and adopting them before use."
+          "type": "table",
+          "columns": ["Version", "Date", "What changed", "By whom"],
+          "rows": [
+            [
+              "1",
+              "13 October 2026",
+              "First version, drafted from our questionnaire answers",
+              "[name]"
+            ]
+          ]
         }
       ]
     }
   ],
-  "footer": "Prepared with Readyline"
+  "footer": "Draft prepared with Readyline"
 }

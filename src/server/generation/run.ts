@@ -7,6 +7,8 @@
  */
 import { createHash } from "node:crypto";
 import { strToU8, zipSync } from "fflate";
+import { AI_DISCLOSURE, BRAND, GENERAL_INFORMATION_NOTICE } from "@/lib/brand";
+import { sectionsWithBlanks } from "@/lib/generator/blanks";
 import {
   documentTypeById,
   sectionsFor,
@@ -19,7 +21,10 @@ import {
   type ResolvedSection,
 } from "@/lib/generator/document-model";
 import { buildProviderFacts, type ProviderFacts } from "@/lib/generator/facts";
-import { generateSection } from "@/lib/generator/generate-section";
+import {
+  generateSection,
+  type SectionFailure,
+} from "@/lib/generator/generate-section";
 import type { ModelClient } from "@/lib/generator/model-client";
 import { PROMPT_VERSION } from "@/lib/generator/prompts";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
@@ -63,16 +68,29 @@ export function answersHash(answers: QuestionnaireAnswers): string {
     .digest("hex");
 }
 
+/** A document ships with at most this many generic (fallback) sections; above it the job redrafts it once (REQ-016 FR-0b). */
+export const MAX_GENERIC_SECTIONS = 2;
+
 export function documentStatus(model: DocumentModel): {
   status: "ready" | "review";
+  /** Sections the generator could not draft: generic text (fallback) or still a placeholder. */
   fallbackSections: number;
+  /** Sections still undrafted: a placeholder with no text at all (FR-0c: never shipped). */
+  undraftedSections: number;
+  /** Sections carrying a blank for the provider (FR-0c: what the set page counts). */
+  providerInputSections: number;
 } {
   const fallbackSections = model.sections.filter(
     (s) => s.status === "fallback" || s.status === "placeholder",
   ).length;
+  const undraftedSections = model.sections.filter(
+    (s) => s.status === "placeholder",
+  ).length;
   return {
     status: fallbackSections === 0 ? "ready" : "review",
     fallbackSections,
+    undraftedSections,
+    providerInputSections: sectionsWithBlanks(model),
   };
 }
 
@@ -99,6 +117,8 @@ export async function generateTailoredSection(input: {
   section: ResolvedSection;
   log: SectionLog;
   usage: { inputTokens: number; outputTokens: number };
+  /** Why the section fell back (REQ-016 FR-0b), for the tick line; null when generated. */
+  failure: SectionFailure | null;
 }> {
   const spec = sectionsFor(input.type).find((s) => s.id === input.section.id);
   if (!spec || spec.mode !== "tailored")
@@ -135,11 +155,19 @@ export async function generateTailoredSection(input: {
       output_tokens: out.usage?.outputTokens ?? null,
       cache_creation_input_tokens: out.usage?.cacheCreationInputTokens ?? null,
       cache_read_input_tokens: out.usage?.cacheReadInputTokens ?? null,
+      failure_kind: out.failure?.kind ?? null,
+      failure_detail: out.failure
+        ? `${out.failure.detail}${out.failure.refusal ? " (refusal)" : ""}`.slice(
+            0,
+            300,
+          )
+        : null,
     },
     usage: {
       inputTokens: out.usage?.inputTokens ?? 0,
       outputTokens: out.usage?.outputTokens ?? 0,
     },
+    failure: out.failure,
   };
 }
 
@@ -153,9 +181,25 @@ export function isTailoredSection(
   );
 }
 
-/** The note shipped inside every set.zip. */
+/**
+ * The one-page cover note shipped inside every set.zip (REQ-016 D-058): the
+ * general-information notice and the AI disclosure live here, on the
+ * download page and on the readiness summary's first page, never inside the
+ * provider's own policies.
+ */
 export function readmeText(tradingName: string, generatedAt: string): string {
-  return `Readyline document set for ${tradingName}, generated ${generatedAt}.\nOpen the .docx files in Word or LibreOffice. Sections marked "Review and complete" need your attention before use.\n`;
+  return [
+    `${BRAND} document set for ${tradingName}, drafted ${generatedAt}.`,
+    "",
+    "What is in this zip: one Word document (.docx) for each policy, procedure, plan or template in your set, the readiness summary (PDF), and this note.",
+    "",
+    'How to use them: open each document in Word or LibreOffice. Fill in every bracketed blank, such as [name] or [date]; the readiness summary lists them by document and section. A section marked "Generic text: add your details" is complete but general; make it yours. When you have reviewed and adopted a document, mark it Done on your checklist.',
+    "",
+    "About these documents:",
+    GENERAL_INFORMATION_NOTICE,
+    AI_DISCLOSURE,
+    "",
+  ].join("\n");
 }
 
 async function fillTailoredSections(input: {

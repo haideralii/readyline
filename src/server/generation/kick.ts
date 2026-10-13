@@ -120,6 +120,9 @@ export async function runGenerationAndLog(
             documentsDone: r.documentsDone,
             documentsTotal: r.documentsTotal,
             sections: r.sectionsGenerated,
+            // REQ-016 FR-0b: why a section fell back (kind, rule names, refusal flag), never content.
+            failures: r.failures ?? [],
+            redrafted: r.redrafted ?? [],
           }
         : { claimed: false },
     ),

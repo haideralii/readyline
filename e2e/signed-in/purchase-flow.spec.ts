@@ -177,6 +177,49 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
       page.getByRole("heading", { level: 1, name: "Document set" }),
     ).toBeVisible();
     await expect(page.getByTestId("set-locked")).toHaveCount(0);
+    // REQ-016 S-7 and FR-4: one numbered list in audit order under the result
+    // page's headings; FR-0c: the count is the provider's blanks; D-058: the
+    // notices sit here, not inside the documents; S-6: no AI document.
+    const groups = page.getByTestId("set-group");
+    expect(await groups.count()).toBeGreaterThanOrEqual(3);
+    await expect(groups.first().getByRole("heading", { level: 3 })).toHaveText(
+      "Running the business",
+    );
+    const items = page.getByTestId("set-list").getByRole("listitem");
+    await expect(items.first()).toContainText("1.");
+    await expect(items.first()).toContainText("Governance policy");
+    await expect(items.last()).toContainText(
+      "Practice Standards self-assessment",
+    );
+    await expect(page.getByTestId("set-list")).not.toContainText(
+      "AI use and governance policy",
+    );
+    await expect(page.getByTestId("set-summary")).toContainText(
+      /details? to fill in|No blanks to fill in/,
+    );
+    await expect(page.getByTestId("documents-notices")).toContainText(
+      "not legal advice",
+    );
+    await checkWidths(page, "document set");
+    await shot(page, "document-set", project);
+    if (await page.getByTestId("finish-link").count()) {
+      await page.getByTestId("finish-link").click();
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Finish your pack" }),
+      ).toBeVisible();
+      await expect(page.getByTestId("finish-document").first()).toBeVisible();
+      await checkWidths(page, "finish your pack");
+      await shot(page, "finish-pack", project);
+      await page.goBack();
+    }
+    // One document on this viewport (REQ-016 AC-1 evidence: laptop and phone).
+    await items.first().getByRole("link").click();
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "Governance policy",
+    );
+    await checkWidths(page, "document review");
+    await shot(page, "document-review", project);
+    await page.goBack();
 
     // The account page lists the purchase with its receipt.
     await page.goto("/account");

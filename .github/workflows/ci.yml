@@ -197,6 +197,14 @@ jobs:
           echo "converted $converted of $total documents"
           [ "$total" -gt 0 ] && [ "$converted" -eq "$total" ]
 
+      - name: Document standard lint over every rendered set (REQ-016 FR-1); prints the fonts and heading styles found
+        run: |
+          mkdir -p out
+          npx vitest run src/lib/generator/docx-lint.test.ts
+          cat out/docx-lint-report.txt
+        env:
+          DOCX_REPORT: "1"
+
       - name: Upload the skeleton sets for the PO
         uses: actions/upload-artifact@v4
         with:

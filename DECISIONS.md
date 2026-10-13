@@ -2201,6 +2201,85 @@ the 2,000 free for a private repository; the schedule runs only from
 repository, `*/30`, or the overage).
 
 
+**D-540 Why every section of Haider's AI procedure shipped undrafted, and
+what the log can and cannot say (Dev, 2026-10-14, batch 33 item 1, REQ-016
+FR-0d).** Two defects sat on one path. (1) The catalogue `brief` (the
+model's instruction) was also the customer placeholder: `placeholderBlocks`
+and the fallback both printed `[Provider to complete: <heading>. <brief>]`,
+so the procedure's "Never restate statutory timeframes … the outline"
+instruction reached the document verbatim. (2) The fallback fired for every
+tailored section of that one document. The fixture replay of the recorded
+sole-trader case cannot reproduce it: all seven AI sections generate (two
+on the retry: readability 12 on "when this applies", a stated review cycle
+on "steps"). The generation log held only `status`, `attempts` and token
+counts, so a model error and a gate rejection were indistinguishable after
+the fact; the most likely causes, in order, are a burst of API errors on
+consecutive calls (one document's sections run back to back, and both
+attempts of each would fail inside the same minute) and, for a case whose
+STANDARDS block is "none", the R-12 gate rejecting a reply that asks for a
+standard twice. The PO can settle it with the rows for that set:
+`select section_id, status, attempts, input_tokens from generation_log where
+document_type_id = 'ai-and-digital-data-handling-procedure'`; null tokens
+on a fallback row mean the call threw. From this batch the log carries
+`failure_kind` and `failure_detail` (rule names, never content), and the
+tick line carries the same, so the next one is readable. The placeholder
+and the brief are now different strings (`placeholders.ts`), a lint fails
+any instruction phrasing inside a bracketed placeholder, and the fallback
+is a complete generic section marked "Generic text: add your details."
+
+**D-541 Blanks, not instructions (REQ-016 S-8), and what the count on the set
+page means (FR-0c).** A missing fact is a bracketed blank of at most four
+words naming the fact inside a complete sentence, highlighted in a light
+ochre tint with the brackets kept; `lintBlanks` refuses a blank over six
+words, one that starts with a verb in the imperative, or a question. The
+fixed text was rewritten to that rule ("Approver: [name], [role]"; the
+change log's "[name]"; "[period]" in the retention schedule). The set page
+counts the provider's own blanks ("N details to fill in", listed on
+`/documents/<set>/finish` by document and section) and never generator
+failures, which are an admin-page line. On the recorded sole-trader set the
+figure is 67 of 186 sections (36 %), above the 10 % the REQ asks for,
+because every document carries the same three fixed blanks (approver name
+and role, approval date, change-log author) and 88 of the 188 recorded
+replies still use the old "[Provider to complete: …]" style. REQ-017 FR-2
+turns those repeated facts into account facts filled once, which is where
+the figure falls; the model-side change needs the prompt rule below and a
+recording session. "Approved by" is "Approver" in the control table because
+the claims lint bans "approved by" in a document.
+
+**D-542 The prompt moved; the fixtures were re-keyed, not re-recorded.** The
+house style now carries the blank rule (S-8) and says the notices live at
+the point of delivery (D-058), so the system prompt changed and
+`PROMPT_VERSION` is `2026-10-13.1`. D-502 would orphan all 188 fixtures (and
+the 24 Haiku ones); the unattended rules forbid a model call. The replies are
+still the right answers to the same questions, so
+`scripts/ops/rekey-fixtures.test.ts` (run on request, through vitest so the
+aliases resolve) rewrote each fixture's system prompt, version and hash and
+renamed the file; the user prompt was never touched, and a fixture whose
+user prompt no longer matches stays orphaned. To keep every user prompt
+identical, the new sections are unnumbered front or back matter outside the
+outline the model sees: the change log, the plain-language summary and the
+Easy Read place, and the privacy policy's "Appendix: AI and digital tools".
+The old-style placeholders in recorded replies are lint warnings, not
+failures, until Haider re-records at the next model session, which also
+records the five new plain-language summaries (generic text until then).
+
+**D-543 The document standard as code (REQ-016 S-2 to S-7, FR-1).** Calibri
+12 pt, 1.15 line spacing, left-aligned, Word heading styles, bordered tables
+with repeating header rows, a footer with title, version and Page X of Y;
+document control on page one with approver, approval date, next review and
+the standards; a change log at the end seeded with version 1; a tailored
+section marked "Drafted from your answers." in words; the plain-language
+summary at 16 pt. `docx-lint.ts` reads the XML inside every rendered file
+and fails on a miss; it runs in `npm test` over the three skeleton sets and
+the replayed sole-trader set, and in the LibreOffice CI job, which prints
+the fonts and heading styles found. The set page lists the documents as one
+numbered list in audit order under the result page's headings. The two AI
+documents are retired for new sets (the catalogue keeps them for the sets
+that hold them); the sole-trader set is 16 documents, not the 22 the REQ
+guessed. Adoption (checklist Done) makes the download serve the document
+without the draft footer and the section marks, rendered from the stored
+model; the zip keeps the draft files.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
