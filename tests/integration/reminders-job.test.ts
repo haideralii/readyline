@@ -113,13 +113,19 @@ describe.skipIf(!enabled)(
 
     it("a forced run inserts exactly the expected rows, emails them once, and a second run inserts nothing", async () => {
       const provider = new LogOnlyEmailProvider();
+      // Batch 41: the other integration files seed accounts into the same
+      // stack, and the job reports totals over every account it visits, so
+      // both runs are scoped to this account and the row counts are read
+      // back from the table for this account alone.
       const first = await runRemindersJob({
         admin,
         email: provider,
         today: TODAY,
         ownerEmail: async () => email,
+        accountIds: [accountId],
       });
       expect(first.errors).toEqual([]);
+      expect(first.accounts).toBe(1);
       const rows = await admin
         .from("reminders")
         .select("kind, subject_table, due_on, send_on, sent_at")
@@ -137,6 +143,7 @@ describe.skipIf(!enabled)(
           `mid-term-audit@${TODAY}`,
         ].sort(),
       );
+      expect(rows.data?.length).toBe(5);
       expect(first.inserted).toBe(5);
       expect(first.emailed).toBe(5);
       expect((rows.data ?? []).every((r) => r.sent_at)).toBe(true);
@@ -147,19 +154,26 @@ describe.skipIf(!enabled)(
       expect(sent?.text).toContain("CMP-0001");
       expect(sent?.text).not.toMatch(/kitchen|Late twice/);
 
+      const sentBefore = provider.sent.filter((m) => m.to === email).length;
       const second = await runRemindersJob({
         admin,
         email: provider,
         today: TODAY,
         ownerEmail: async () => email,
+        accountIds: [accountId],
       });
+      expect(second.errors).toEqual([]);
       expect(second.inserted).toBe(0);
       expect(second.emailed).toBe(0);
+      // The table and the outbox for this account, not the job's totals.
       const again = await admin
         .from("reminders")
         .select("id", { count: "exact", head: true })
         .eq("account_id", accountId);
       expect(again.count).toBe(5);
+      expect(provider.sent.filter((m) => m.to === email).length).toBe(
+        sentBefore,
+      );
     });
 
     it("apply_stripe_subscription_event: grant, past_due keeps, canceled revokes, active re-grants, replay duplicates", async () => {
