@@ -2467,6 +2467,54 @@ the starter rows, the forms, the ticks, the one-tap improvement and the
 index on the three projects with the width check and axe (AC-1), in CI's
 Supabase job. Not done: FR-11 to FR-14 and the reminders are Session C.
 
+**D-1905 Six reminder kinds for the audit-day registers, pure rules in the
+same module (Dev, 2026-10-14, batch 39 Session C, REQ-018 FR-5, FR-8,
+FR-10, AC-3).** `insurance-expiry` 30 and 7 days before and on the day;
+`supervision-due` 31 days after the last supervision; `appraisal-due` 365
+days after the last appraisal with a 30-day warning (a worker with no date
+gets no reminder: the staff matrix shows the gap instead); `support-plan-
+review` 30 and 7 days before and on the day; `register-review` 14 days
+before and on the day for every corporate risk, participant risk and
+conflict row; `emergency-drill` six months after the last drill, recorded
+on the audit-day page in `accounts.last_emergency_drill_on`, with a 14-day
+warning. The reminders table's kind and subject CHECKs take the new
+values; the job reads the five tables and names a reminder by the row's
+code, label or area, never its content (SR-4). `reminders-audit-day.test.ts`
+pins every rule with fixed dates and `reminders-job.test.ts` seeds one row
+per new kind on the stack (AC-3).
+
+**D-1906 The document control register is derived from the pack, with the
+Adopt step's circulation tick as its last column (Dev, 2026-10-14, batch
+39 Session C, REQ-018 FR-13, FR-14, AC-5).** No table of its own:
+`documentControlRows` folds the newest ready set's documents, the policy
+reviews (adopted on, next review from the database's generated column or
+adoption plus the cycle), the owner's role from the account facts (D-1704)
+and the `policy_circulations` rows (append only, worker codes only, written
+by any member from the Adopt step, which every pack buyer walks). A
+circulation counts for a document only when it is on or after the day of
+the document's current version, so a re-generated document shows "not
+yet" until it is walked through again. The register is first on the
+registers page, has its own read-only page with the gaps and the tap to
+the Adopt step, and is the first page of the readiness summary when the
+set is re-rendered at Finish or Adopt; the first generation's summary has
+no page because nothing is adopted yet. The Adopt step asks "Who did you
+walk these through?" (codes, optional) and the date.
+
+**D-1907 "What the auditor will ask to see" is twelve records with live
+states, and the audit kinds are content (Dev, 2026-10-14, batch 39 Session
+C, REQ-018 FR-11, AC-4).** The list is section B of the auditor research:
+document control, decisions, corporate risks, participant risks, conflicts
+of interest, delegations, insurances and vehicles, improvements, staff
+matrix, onboarding checklists, incidents, complaints; each line carries
+filled, missing or overdue from the register's counts and one tap (add,
+open or fix). The five audit kinds (provisional, first with participants,
+mid-term, renewal, conditional) live in
+`data/readyline-content/audit-kinds.json` as PO-owned draft content, shown
+on the audit-day page as the plain-words glossary; there is no separate
+glossary page in the product, so the audit-day page is where the REQ's
+"glossary" lives. The pricing page gains FR-12's sentence beside the
+subscription.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

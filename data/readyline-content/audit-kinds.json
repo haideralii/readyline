@@ -1,0 +1,32 @@
+{
+  "note": "The five kinds of audit a provider meets, in plain words, for the audit-day page's glossary (REQ-018 FR-11, AC-4; D-1907). Written by the product owner's research of 14 October 2026 (section B of product/research/webinars/2026-10-14-what-auditors-look-for.md) and checked against the Commission's registration pages for the cycle; NOT NDIS Quality and Safeguards Commission text. The verification and certification pathways themselves are in audit-types.json.",
+  "author": "readyline",
+  "status": "draft",
+  "items": [
+    {
+      "id": "provisional",
+      "name": "Provisional audit",
+      "description": "Your first registration before you have participants. The auditor checks your documents, forms and credentials; there is nobody to interview yet."
+    },
+    {
+      "id": "first-with-participants",
+      "name": "First audit with participants",
+      "description": "Your first audit once you support people. The auditor reads your documents and your registers, and talks to your workers and some participants."
+    },
+    {
+      "id": "mid-term",
+      "name": "Mid-term audit",
+      "description": "For certification only, about 18 months into your three-year registration. It covers governance and operational management and anything that had a corrective action last time."
+    },
+    {
+      "id": "renewal",
+      "name": "Renewal audit",
+      "description": "Before your registration ends, every three years. A full audit again, against the standards that apply to you then."
+    },
+    {
+      "id": "conditional",
+      "name": "Conditional or follow-up audit",
+      "description": "When the Commission sets conditions on your registration, an auditor comes back to check they are met."
+    }
+  ]
+}

@@ -342,6 +342,41 @@ export async function markReviewedAction(
   return { ok: true, id: parsed.data.id };
 }
 
+const DrillInput = strictObject({
+  last_emergency_drill_on: dateField("date of the drill"),
+});
+
+/** REQ-018 FR-10: the last emergency drill, on the account; the reminder fires six months after. */
+export async function recordDrillAction(
+  input: unknown,
+): Promise<AuditDayActionResult> {
+  const parsed = parseInput(DrillInput, input);
+  if (!parsed.ok)
+    return {
+      ok: false,
+      message: "Enter the date of the drill.",
+      fieldErrors: parsed.fieldErrors,
+    };
+  const ctx = await context();
+  if (!ctx) return SIGN_IN;
+  if (ctx === "limited") return LIMITED;
+  const r = await ctx.supabase
+    .from("accounts")
+    .update({ last_emergency_drill_on: parsed.data.last_emergency_drill_on })
+    .eq("id", ctx.account.id)
+    .select("id")
+    .single();
+  if (r.error) return { ok: false, message: plainDatabaseMessage(r.error) };
+  await audit(
+    ctx.supabase,
+    ctx.account.id,
+    ctx.viewer.user.id,
+    "account.drill.recorded",
+    ctx.account.id,
+  );
+  return { ok: true, id: ctx.account.id };
+}
+
 export async function deleteAuditDayRowAction(
   input: unknown,
 ): Promise<AuditDayActionResult> {

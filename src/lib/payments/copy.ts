@@ -35,6 +35,9 @@ export const PRICING_COPY = {
   subscriptionHeading: "Audit-ready subscription",
   subscriptionComing:
     "Coming after the document pack: the incident and complaints registers, the worker screening expiry tracker, policy review reminders and the mid-term audit countdown, as a monthly subscription you can cancel at any time. No instalments, no interest, no late fees.",
+  /** REQ-018 FR-12: what the registers do that a spreadsheet does not. */
+  registersLinked:
+    "The registers are linked: an incident becomes an improvement row, a worker check becomes a staff matrix row, and the reminders go out by email, which a spreadsheet does not do.",
   buy: "Buy the document pack",
   signInToBuy: "Sign in to buy",
   signInNote:

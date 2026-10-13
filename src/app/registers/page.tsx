@@ -4,7 +4,9 @@ import {
   AUDIT_DAY_META,
   AUDIT_DAY_SLUGS,
 } from "@/lib/registers/audit-day-forms";
+import { documentControlSentence } from "@/lib/registers/document-control";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
+import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
@@ -17,10 +19,19 @@ export const metadata: Metadata = { title: "Registers" };
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const [o, a] = await Promise.all([
+  const [o, a, dc] = await Promise.all([
     registerOverview(ctx.supabase, ctx.viewer.account.id),
     auditDayOverview(ctx.supabase, ctx.viewer.account.id),
+    documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
   ]);
+  // REQ-018 FR-13: the document control register, generated from the pack, shown first.
+  const documentControlRow = {
+    href: "/registers/document-control",
+    title: "Document control",
+    total: dc.rows.length,
+    attention: documentControlSentence(dc.rows).replace(/\.$/, ""),
+    urgent: dc.rows.some((r) => r.state === "overdue"),
+  };
   const auditDayRows = AUDIT_DAY_SLUGS.map((slug) => ({
     href: `/registers/${slug}`,
     title: AUDIT_DAY_META[slug].title,
@@ -88,7 +99,7 @@ export default async function RegistersPage() {
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
         data-testid="registers-index"
       >
-        {[...rows, ...auditDayRows].map((r) => (
+        {[documentControlRow, ...rows, ...auditDayRows].map((r) => (
           <li key={r.href}>
             <Link
               href={r.href}

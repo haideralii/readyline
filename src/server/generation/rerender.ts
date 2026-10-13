@@ -15,6 +15,7 @@ import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { auditOrder } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
+import { documentControlForSet } from "@/server/registers/document-control-queries";
 import { listLatestDocuments } from "./queries";
 import { DOCX_TYPE, documentStatus, readmeText } from "./run";
 import { objectPath } from "./storage";
@@ -82,11 +83,18 @@ export async function rerenderSetWithFacts(input: {
   const first = sorted[0]?.model;
   if (first) {
     const generatedAt = set.created_at.slice(0, 10);
+    // REQ-018 FR-13: the document control register as the summary's first page (adoption re-renders here).
+    const documentControl = await documentControlForSet(
+      admin,
+      set.account_id,
+      set.id,
+    );
     const pdf = await renderSummaryPdf({
       facts: first.facts,
       result: set.derived_result,
       documents: summaries,
       blanks,
+      documentControl,
       generatedAt,
       version: "1",
     });

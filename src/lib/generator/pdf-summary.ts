@@ -18,12 +18,24 @@ export type SummaryDocumentLine = {
   fallbackSections: number;
 };
 
+/** REQ-018 FR-13: one row of the document control register, as the first page shows it. */
+export type SummaryControlRow = {
+  title: string;
+  version: string;
+  adopted_on: string | null;
+  adopted_by: string;
+  next_review_on: string | null;
+  circulated: { on: string; workers: number } | null;
+};
+
 export type SummaryInput = {
   facts: ProviderFacts;
   result: QuestionnaireResult;
   documents: SummaryDocumentLine[];
   /** Every bracketed blank in the set, by document and section (S-8). */
   blanks?: DocumentBlank[];
+  /** REQ-018 FR-13: when present, the document control register is the first page. */
+  documentControl?: SummaryControlRow[];
   generatedAt: string;
   version: string;
 };
@@ -77,6 +89,26 @@ export async function renderSummaryPdf(
   const gap = (n = 8) => {
     y -= n;
   };
+
+  // REQ-018 FR-13: the document control register is the first page once a pack exists.
+  if (input.documentControl && input.documentControl.length > 0) {
+    line(`${BRAND} document control register`, 20, bold);
+    line(input.facts.tradingName, 14, bold);
+    line(
+      `As at ${input.generatedAt}. One row per document: version, adopted on, by whom, next review, and whether workers were walked through it.`,
+      10,
+    );
+    gap(8);
+    input.documentControl.forEach((r, i) => {
+      line(`${i + 1}. ${r.title}`, 11, bold);
+      line(
+        `Version ${r.version}. Adopted ${r.adopted_on ?? "not yet"}${r.adopted_by ? ` by ${r.adopted_by}` : ""}. Next review ${r.next_review_on ?? "not set"}. Circulated ${r.circulated ? `${r.circulated.on} to ${r.circulated.workers} worker${r.circulated.workers === 1 ? "" : "s"}` : "not yet"}.`,
+        10,
+      );
+    });
+    page = pdf.addPage([PAGE.width, PAGE.height]);
+    y = PAGE.height - MARGIN;
+  }
 
   line(`${BRAND} readiness summary`, 20, bold);
   line(input.facts.tradingName, 14, bold);

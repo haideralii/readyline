@@ -121,8 +121,30 @@ export const REMINDER_KINDS = [
   "incident-open",
   "complaint-unacknowledged",
   "reportable-not-notified",
+  // REQ-018 Session C (FR-5, FR-8, FR-10; D-1905).
+  "insurance-expiry",
+  "supervision-due",
+  "appraisal-due",
+  "support-plan-review",
+  "emergency-drill",
+  "register-review",
 ] as const;
 export type ReminderKind = (typeof REMINDER_KINDS)[number];
+
+/** The tables a reminder can point at, the same list as the database CHECK. */
+export const REMINDER_SUBJECT_TABLES = [
+  "incidents",
+  "complaints",
+  "worker_clearances",
+  "policy_reviews",
+  "accounts",
+  "insurance_items",
+  "staff_matrix",
+  "participant_risks",
+  "corporate_risks",
+  "conflicts_of_interest",
+] as const;
+export type ReminderSubjectTable = (typeof REMINDER_SUBJECT_TABLES)[number];
 
 export const REGISTRATION_KINDS = ["certification", "verification"] as const;
 export type RegistrationKind = (typeof REGISTRATION_KINDS)[number];
@@ -315,12 +337,7 @@ export type ReminderRow = {
   id: string;
   account_id: string;
   kind: ReminderKind;
-  subject_table:
-    | "incidents"
-    | "complaints"
-    | "worker_clearances"
-    | "policy_reviews"
-    | "accounts";
+  subject_table: ReminderSubjectTable;
   subject_id: string;
   due_on: string;
   send_on: string;
