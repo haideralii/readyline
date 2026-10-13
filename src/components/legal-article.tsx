@@ -28,7 +28,8 @@ function slugify(text: string): string {
 
 const body = "leading-7 text-zinc-700 dark:text-zinc-300";
 
-const components: Components = {
+/** The markdown renderers; the guides (REQ-011) reuse them so every page reads the same. */
+export const markdownComponents: Components = {
   h2: ({ children }) => (
     <h2
       id={slugify(textOf(children))}
@@ -100,7 +101,7 @@ export function LegalArticle({ page }: { page: LegalPage }) {
           <strong className="font-semibold">Draft.</strong> {note}
         </p>
       ) : null}
-      <Markdown remarkPlugins={[remarkGfm]} components={components}>
+      <Markdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
         {page.markdown}
       </Markdown>
     </article>
