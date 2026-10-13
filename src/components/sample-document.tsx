@@ -1,4 +1,4 @@
-﻿import type { DocumentModel } from "@/lib/generator/document-model";
+import type { DocumentModel } from "@/lib/generator/document-model";
 import type { Block } from "@/lib/generator/section-schema";
 import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
 

@@ -1,4 +1,4 @@
-﻿# Decisions log
+# Decisions log
 
 Every assumption or choice not already fixed by [CLAUDE.md](CLAUDE.md) is
 recorded here, newest at the bottom of each phase. Anything about the
@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
+'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -1703,7 +1703,7 @@ state is set in an effect), a search opens every heading with a match, the
 hint opens the headings of 0107 and 0120, and a closed heading still lists
 its ticked classes beneath the summary with "(n classes, k ticked)". FR-12:
 the audit explanation, groups in scope and flags sit inside the summary
-block under one "Your audit: â€¦" heading; the second heading is gone.
+block under one "Your audit: …" heading; the second heading is gone.
 
 ## REQ-014: visual identity v1 (branch `req-014-visual-identity`, on `req-013-p2`)
 
@@ -1713,7 +1713,7 @@ indicator, so stacking avoids a certain conflict. The PO merges P2 first.
 
 **D-1402 The zinc utilities resolve to a warm ramp (FR-1).** Every page was
 built on `zinc-*` with `dark:` variants. Instead of rewriting hundreds of
-class strings, `@theme` maps `zinc-50â€¦950` to a monotonic ramp from paper
+class strings, `@theme` maps `zinc-50…950` to a monotonic ramp from paper
 (#F7F3EC) through slate (#4A5553 at 600) to ink (#1C2B2A at 900) and dark
 paper (#141C1B at 950), and `red-700`/`red-400` to signal. New code uses
 the named tokens. The contrast test pins the ramp's lightness order and the
@@ -1906,7 +1906,7 @@ days before through the day itself). Two additions: a `policy_reviews`
 row with no `adopted_on` reads `not-adopted` rather than `current`, so an
 unadopted policy is never shown as in date; and `incidents_status` exposes
 `notification-due` beside FR-2's `overdue-notification` so a page can say
-"Notify the Commission by â€¦" before the date passes. `expires_on` null
+"Notify the Commission by …" before the date passes. `expires_on` null
 means no expiry (the orientation module) and is always `valid`. The
 TypeScript rules and the SQL views are the same arithmetic; the unit tests
 pin the boundaries and the integration test checks the views.
@@ -2055,6 +2055,21 @@ set to Done on a document sets `adopted_on` on its review when empty; the
 review never changes the checklist. A delete button is not in Session B:
 owners can delete through RLS, but a wrong entry is edited or closed, and
 a delete with confirm is one component away if the PO wants it.
+
+**D-1507 The text corruption on `main` came from Dev's conflict-resolution
+scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
+a file without a byte-order mark as Windows-1252 and writes it back as
+UTF-8 with a mark, so every non-ASCII character in a file those scripts
+touched (DECISIONS.md, NEXT.md, backlog.md at c95e1d7, and earlier
+REQ-004, a source file and the generator's prompt) was encoded twice; the
+nonce line in this file went through three times. Repaired by reversing the
+round trip (`scripts/ops/repair-mojibake.ts`, which `src/lib/text/encoding.ts`
+backs), never by retyping; `tests/text-encoding.test.ts` now fails `npm
+test` on a mark or a double-encoded run in any text file outside
+`data/sources`; `.editorconfig` already said `charset = utf-8`. Rule for
+Dev: edit files through Node or the editor tools, and never through
+`Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
+
 
 ## Open questions for Haider
 

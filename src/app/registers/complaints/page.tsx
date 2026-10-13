@@ -45,7 +45,7 @@ export default async function ComplaintsPage() {
         rows={rows.map((r) => ({
           id: r.id,
           href: `/registers/complaints/${r.id}`,
-          title: `${r.reference}: ${r.summary.slice(0, 60)}${r.summary.length > 60 ? "â€¦" : ""}`,
+          title: `${r.reference}: ${r.summary.slice(0, 60)}${r.summary.length > 60 ? "…" : ""}`,
           detail: `Received ${r.received_on}${r.from_ref ? ` from ${r.from_ref}` : ""}.`,
           status: complaintStatus(r),
         }))}

@@ -288,7 +288,7 @@ export function SupportsStepForm() {
                       aria-hidden="true"
                       className="mt-1 inline-block w-4 shrink-0 text-sm text-zinc-500"
                     >
-                      {open ? "â–¾" : "â–¸"}
+                      {open ? "▾" : "▸"}
                     </span>
                     <span className="min-w-0">
                       <span className="text-base font-semibold">{c.title}</span>{" "}

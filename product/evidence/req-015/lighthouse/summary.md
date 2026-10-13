@@ -1,4 +1,4 @@
-﻿# Lighthouse accessibility (REQ-015 FR-19)
+# Lighthouse accessibility (REQ-015 FR-19)
 
 Run 13 Oct 2026 with scripts/ops/lighthouse.mjs (Lighthouse 12.8.2, Playwright Chromium, accessibility category only) against a local production build (next start on port 3100).
 
