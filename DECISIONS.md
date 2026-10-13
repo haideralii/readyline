@@ -2212,6 +2212,18 @@ of what that suite is: server code driven against a real database. Proven
 locally by loading every integration file without Supabase variables (they
 skip, and no longer throw); CI's job proves the rows.
 
+**D-1009 The reminders job takes a test-only account filter (Dev,
+2026-10-14, batch 41).** With the guard aliased, PR #28's Supabase job ran
+the reminders test for real and `first.inserted` came back 9 against the
+expected 5: the other integration files seed accounts into the same stack,
+and the job runs for every account and reports totals. `runRemindersJob`
+now accepts an optional `accountIds` list that limits both the accounts it
+visits and the unsent rows it emails; the route never sets it. The test
+passes its own account on both runs and keeps the exact figures, reads the
+row count back from the table for that account, and checks the outbox for
+that owner did not grow on the second run. The subscription-ledger test
+already measured against a baseline and needed nothing.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
