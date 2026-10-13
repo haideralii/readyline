@@ -82,6 +82,7 @@ export function SupportsStepForm() {
   const [note, setNote] = useState(saved?.servicesNote ?? "");
   const [query, setQuery] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [pending, setPending] = useState(false);
   // FR-11: which headings are open. Phones start with the two common ones;
   // wider screens open everything, because there is room to scan. The
   // viewport is read through an external-store subscription (no state set in
@@ -159,6 +160,7 @@ export function SupportsStepForm() {
       return;
     }
     setErrors({});
+    setPending(true);
     await saveStep("supports", parsed.data, "practices");
     router.push(stepHref("practices"));
   }
@@ -286,7 +288,7 @@ export function SupportsStepForm() {
                       aria-hidden="true"
                       className="mt-1 inline-block w-4 shrink-0 text-sm text-zinc-500"
                     >
-                      {open ? "▾" : "▸"}
+                      {open ? "â–¾" : "â–¸"}
                     </span>
                     <span className="min-w-0">
                       <span className="text-base font-semibold">{c.title}</span>{" "}
@@ -419,7 +421,7 @@ export function SupportsStepForm() {
         </div>
       ) : null}
 
-      <StepButtons backHref={stepHref("business")} />
+      <StepButtons pending={pending} backHref={stepHref("business")} />
     </form>
   );
 }

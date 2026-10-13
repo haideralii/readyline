@@ -53,6 +53,7 @@ export function WorkforceStepForm() {
     saved?.allRiskAssessedScreened,
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [pending, setPending] = useState(false);
   const large = Number(workerCount) > LARGE_PROVIDER_THRESHOLD;
 
   async function onSubmit(e: React.FormEvent) {
@@ -70,6 +71,7 @@ export function WorkforceStepForm() {
       return;
     }
     setErrors({});
+    setPending(true);
     await saveStep("workforce", parsed.data, "existing");
     router.push(stepHref("existing"));
   }
@@ -166,7 +168,7 @@ export function WorkforceStepForm() {
         errors={errorsFor(errors, "allRiskAssessedScreened")}
       />
 
-      <StepButtons backHref={stepHref("practices")} />
+      <StepButtons pending={pending} backHref={stepHref("practices")} />
     </form>
   );
 }

@@ -5,6 +5,7 @@ import type {
   BusinessStructureAnswer,
   State,
 } from "@/lib/questionnaire/schema";
+import { ConfirmButton } from "@/components/confirm-button";
 import { formatAud } from "@/lib/payments/pricing";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
@@ -65,9 +66,14 @@ export default async function AccountPage() {
             </button>
           </form>
           <form action={signOutEverywhere}>
-            <button type="submit" className={secondaryButton}>
-              Sign out of all devices
-            </button>
+            {/* REQ-015 FR-15: a destructive action asks first. */}
+            <ConfirmButton
+              label="Sign out of all devices"
+              question="Sign out of every device, including this one?"
+              confirmLabel="Yes, sign out everywhere"
+              submit
+              testId="sign-out-everywhere"
+            />
           </form>
         </div>
       </section>

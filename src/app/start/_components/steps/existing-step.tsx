@@ -58,6 +58,7 @@ export function ExistingStepForm() {
     answers.existing ?? {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,6 +68,7 @@ export function ExistingStepForm() {
       return;
     }
     setErrors({});
+    setPending(true);
     await saveStep("existing", parsed.data, "result");
     router.push(stepHref("result"));
   }
@@ -90,7 +92,11 @@ export function ExistingStepForm() {
           errors={errorsFor(errors, item.key)}
         />
       ))}
-      <StepButtons backHref={stepHref("workforce")} nextLabel="See my result" />
+      <StepButtons
+        pending={pending}
+        backHref={stepHref("workforce")}
+        nextLabel="See my result"
+      />
     </form>
   );
 }

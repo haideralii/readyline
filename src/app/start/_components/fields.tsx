@@ -413,12 +413,15 @@ export function ErrorSummary({
   );
 }
 
+/** REQ-015 FR-15: the submit shows it is working and cannot be tapped twice. */
 export function StepButtons({
   backHref,
   nextLabel = "Save and continue",
+  pending = false,
 }: {
   backHref: string | null;
   nextLabel?: string;
+  pending?: boolean;
 }) {
   return (
     <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -429,10 +432,50 @@ export function StepButtons({
       ) : (
         <span />
       )}
-      <button type="submit" className="btn-primary">
-        {nextLabel}
+      <button
+        type="submit"
+        className="btn-primary"
+        disabled={pending}
+        aria-busy={pending || undefined}
+        data-testid="step-submit"
+      >
+        {pending ? (
+          <>
+            <Spinner />
+            Saving…
+          </>
+        ) : (
+          nextLabel
+        )}
       </button>
     </div>
+  );
+}
+
+/** A small turning ring beside a pending label; hidden from assistive tech (the label says it). */
+export function Spinner() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="mr-2 h-4 w-4 animate-spin"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        stroke="currentColor"
+        strokeOpacity="0.35"
+        strokeWidth="3"
+      />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 

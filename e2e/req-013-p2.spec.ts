@@ -26,6 +26,8 @@ async function shot(page: Page, name: string, project: string) {
 }
 
 async function axeClean(page: Page) {
+  // Client navigation can update <title> a tick after the heading renders.
+  await page.waitForFunction(() => document.title.length > 0);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
@@ -107,7 +109,8 @@ test.describe("REQ-013 P2", () => {
     const housing = page.getByTestId("category-housing");
     await expect(personal).toHaveAttribute("data-open", "true");
     await expect(personal).toContainText(/3 classes/);
-    const phone = testInfo.project.name === "android-small";
+    // Any phone-width project (Android or the WebKit iPhone) starts with the headings collapsed.
+    const phone = (page.viewportSize()?.width ?? 1280) < 640;
     if (phone) {
       await expect(housing).toHaveAttribute("data-open", "false");
       await expect(page.locator("#group-0138")).toBeHidden();

@@ -66,6 +66,7 @@ export function PracticesStepForm() {
       : {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [pending, setPending] = useState(false);
 
   const helperComplete = HELPER.every((h) => helper[h.key] !== undefined);
   const preview =
@@ -101,6 +102,7 @@ export function PracticesStepForm() {
       return;
     }
     setErrors({});
+    setPending(true);
     await saveStep("practices", parsed.data, "workforce");
     router.push(stepHref("workforce"));
   }
@@ -122,11 +124,14 @@ export function PracticesStepForm() {
           What counts? The Commission&apos;s definition
         </summary>
         <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-          Regulated restrictive practices are the practices the NDIS
-          (Restrictive Practices and Behaviour Support) Rules 2018 regulate:
-          seclusion, and chemical, mechanical, physical and environmental
-          restraint. They may only be used under a behaviour support plan with
-          any state or territory authorisation.{" "}
+          The NDIS (Restrictive Practices and Behaviour Support) Rules 2018 name
+          five: seclusion, and chemical, mechanical, physical and environmental
+          restraint. They may only be used under a behaviour support plan, with
+          any state or territory authorisation.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          If you use them, the implementing behaviour support plans module
+          applies to you, whatever your registration groups.{" "}
           <a
             href="https://www.ndiscommission.gov.au/rules-and-standards/behaviour-support-and-restrictive-practices"
             className="underline underline-offset-2"
@@ -135,8 +140,7 @@ export function PracticesStepForm() {
           >
             Read the Commission&apos;s explanation (opens in a new tab)
           </a>
-          . Providers using them must also meet the implementing behaviour
-          support plans module, whatever their registration groups.
+          .
         </p>
       </details>
 
@@ -186,7 +190,7 @@ export function PracticesStepForm() {
         </div>
       ) : null}
 
-      <StepButtons backHref={stepHref("supports")} />
+      <StepButtons pending={pending} backHref={stepHref("supports")} />
     </form>
   );
 }

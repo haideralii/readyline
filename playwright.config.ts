@@ -33,6 +33,16 @@ export default defineConfig({
         viewport: { width: 360, height: 740 },
       },
     },
+    {
+      // REQ-015 FR-16a: iOS Safari had never been tested. WebKit with the
+      // descriptor of Haider's own phone (an iPhone 17 Pro, the newest in
+      // Playwright's list), on the specs that cover the width check, the
+      // home page, the result, the checklist and the purchase path.
+      name: "iphone",
+      use: { ...devices["iPhone 17 Pro"] },
+      testMatch:
+        /(req-015-width|home-v2|home|req-013-p2|questionnaire|signed-in[\\/](checklist|purchase-flow))\.spec\.ts$/,
+    },
   ],
   webServer: {
     // CI runs the production build (npm run build happens in the workflow first).

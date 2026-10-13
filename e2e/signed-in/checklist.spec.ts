@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
 import { hasSupabaseForE2e } from "../helpers/env";
+import { checkWidths } from "../helpers/width";
 import {
   createTenant,
   deleteTenant,
@@ -58,6 +59,8 @@ async function axeClean(page: Page) {
 
 test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
   test.skip(!enabled, "needs the Supabase variables");
+  // A hosted Supabase link from a developer machine adds a second to every write.
+  test.describe.configure({ timeout: 120_000 });
 
   let sole: TestTenant;
   let cert: TestTenant;
@@ -91,6 +94,8 @@ test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Readiness checklist" }),
     ).toBeVisible();
+    // REQ-015 FR-16a: the signed-in header and the checklist fit the screen.
+    await checkWidths(page, "checklist (signed in)");
     // FR-2: the sole trader said yes to insurance and screening: 4 items ready.
     const progress = page.getByTestId("checklist-progress");
     await expect(progress).toHaveText(/^4 of \d+ items ready$/);
@@ -107,18 +112,47 @@ test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
     await shot(page, "checklist-sole-trader", project);
     await axeClean(page);
 
-    // Tick the ABN item (inside the Business group) and add a note.
+    // REQ-015 Section C: the next three things to do, then the ABN item as a row that opens.
+    await expect(page.getByTestId("checklist-next")).toContainText(
+      "Next three things to do",
+    );
     const business = page.getByTestId("checklist-group-business");
     await business.locator("summary").click();
     const abn = page.getByTestId("checklist-item-business-abn");
-    await abn.getByRole("radio", { name: "Have" }).check();
+    await abn.getByTestId("checklist-row-business-abn").click();
+    await expect(abn.getByRole("radio", { name: "Done" })).toBeVisible();
+    // FR-10: the choice shows at once and the count updates before the save returns (FR-12).
+    await abn.getByRole("radio", { name: "Done" }).check();
+    await expect(abn.getByTestId("status-tag")).toContainText("Done");
     await expect(progress).toHaveText(
       new RegExp(`^5 of ${total} items ready$`),
     );
-    await expect(page.getByTestId("checklist-save-status")).toHaveText("Saved");
+    await expect(page.getByTestId("checklist-save-status")).toContainText(
+      "Saved",
+    );
+    // FR-15: undo is offered for a moment and restores the previous status.
+    await expect(page.getByTestId("checklist-undo")).toBeVisible();
+    await page.getByTestId("checklist-undo").click();
+    await expect(abn.getByTestId("status-tag")).toContainText("Need");
+    await expect(progress).toHaveText(
+      new RegExp(`^4 of ${total} items ready$`),
+    );
+    await abn.getByRole("radio", { name: "Done" }).check();
+    await expect(progress).toHaveText(
+      new RegExp(`^5 of ${total} items ready$`),
+    );
+    await expect(page.getByTestId("checklist-save-status")).toContainText(
+      "Saved",
+    );
+    // FR-11: the note field is hidden until asked for; the warning is once at the top.
+    await expect(page.getByText(/Do not enter any participant/)).toHaveCount(1);
+    await abn.getByTestId("add-note-business-abn").click();
     await abn.getByRole("textbox").fill("ABN confirmed with the accountant");
-    await expect(page.getByTestId("checklist-save-status")).toHaveText("Saved");
+    await expect(page.getByTestId("checklist-save-status")).toContainText(
+      "Saved",
+    );
     await page.waitForTimeout(1200);
+    await shot(page, "checklist-item-open", project);
 
     // Reload: both persisted, the progress line reflects it.
     await page.reload();
@@ -129,25 +163,35 @@ test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
       .getByTestId("checklist-group-business")
       .locator("summary")
       .click();
+    await page
+      .getByTestId("checklist-item-business-abn")
+      .getByTestId("checklist-row-business-abn")
+      .click();
     await expect(
       page
         .getByTestId("checklist-item-business-abn")
-        .getByRole("radio", { name: "Have" }),
+        .getByRole("radio", { name: "Done" }),
     ).toBeChecked();
     await expect(
       page.getByTestId("checklist-item-business-abn").getByRole("textbox"),
     ).toHaveValue("ABN confirmed with the accountant");
 
-    // Unverified items carry the badge; sources link out.
+    // Unverified items carry the badge; sources link out (inside the opened row).
     await page.getByTestId("checklist-group-people").locator("summary").click();
     await expect(
       page.getByTestId("checklist-item-people-worker-screening-clearances"),
     ).toContainText("Not confirmed by the Commission's text");
+    const orientation = page.getByTestId(
+      "checklist-item-people-worker-orientation-module",
+    );
+    await orientation
+      .getByTestId("checklist-row-people-worker-orientation-module")
+      .click();
     await expect(
-      page
-        .getByTestId("checklist-item-people-worker-orientation-module")
-        .getByRole("link", { name: /Source:/ }),
+      orientation.getByRole("link", { name: /Source:/ }),
     ).toHaveAttribute("href", /ndiscommission\.gov\.au/);
+    // FR-2 of REQ-015: no internal path anywhere on the page.
+    await expect(page.locator("body")).not.toContainText(/data\/|\.json/);
 
     // FR-4: the print rendering is hidden on screen and complete in print.
     const printView = page.getByTestId("checklist-print");

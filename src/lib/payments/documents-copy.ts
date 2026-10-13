@@ -6,7 +6,7 @@
 import { BRAND } from "@/lib/brand";
 
 export const DOCUMENTS_COPY = {
-  intro: `${BRAND} drafts your policy and procedure set and a Practice Standards self-assessment from your questionnaire answers. Every document is a first draft for your review; sections we could not draft are marked for you to complete.`,
+  intro: `${BRAND} drafts your policies, procedures and self-assessment from your answers. Every document is a first draft for your review. Sections we could not draft are marked for you to complete.`,
   buyHeading: "Buy your document pack",
   buyLead:
     "One fixed price for the documents your answers call for, drafted for your business as editable Word files, with the readiness summary.",

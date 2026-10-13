@@ -77,6 +77,7 @@ export function BusinessStepForm() {
   );
   const [abn, setAbn] = useState(saved?.abn ?? prefilled?.abn ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,6 +95,7 @@ export function BusinessStepForm() {
       return;
     }
     setErrors({});
+    setPending(true);
     await saveStep("business", parsed.data, "supports");
     router.push(stepHref("supports"));
   }
@@ -170,7 +172,7 @@ export function BusinessStepForm() {
         )}
       </Field>
 
-      <StepButtons backHref={null} />
+      <StepButtons pending={pending} backHref={null} />
     </form>
   );
 }
