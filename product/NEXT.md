@@ -1027,3 +1027,14 @@ REQ-018 Session A on **`req-018-audit-day-systems` 83c9279** (cut from the head 
 - **Starter rows (FR-1):** `starterCorporateRisks` derives nine plain-words rows from the questionnaire; the unit test runs the copy and claims lints over every sentence of the three reference cases.
 - **Proof:** `tests/integration/audit-day-rls.test.ts` asserts tenancy, the 42501 refusals on the append-only tables, the NDIS-number and code CHECKs, the status views and owner-only delete. No Postgres on the Dev machine: CI's Supabase job proves the migration. Unit tests and lint green on the branch.
 - **Next:** Session B (pages) now, on the same branch.
+
+## Dev status (batch 39 Session B, written 14 Oct 2026, Dev; third unattended run)
+
+REQ-018 Session B on **`req-018-audit-day-systems` fd1ef71**. No model calls. Decision D-1904. `npm run check` and `npm run build` green (94 test files, 677 tests passing).
+
+- **Pages (FR-1 to FR-9).** One form, one list page and one detail page serve the nine registers from data (`src/lib/registers/audit-day-forms.ts`: schema keyed by column, field specs, words, list functions); the 27 route files are one line each. Phones get one field after another in the REQ-009 inputs; desktop the same form. The corporate risk register seeds its nine starter rows on first open and says "check this and change it" until a row is edited (FR-1). "Reviewed today, next review on" is one tap on the three registers with a review date. Decisions are never edited. Each row has the shared trail (D-1902).
+- **FR-6, AC-2.** A closed incident or a resolved complaint shows one tap to the improvement form with the source kind and reference pre-filled; the row lands in the register with the source.
+- **FR-9.** Two onboarding checklists in the instruction voice; a tick records the date and who ticked it and cannot be undone; a complete worker checklist sets the staff matrix's onboarding date.
+- **Index.** The registers page lists all nine with counts and attention words.
+- **Proof.** `audit-day-forms.test.ts` runs the copy and claims lints over every customer-facing word and the schemas' refusals; `e2e/signed-in/audit-day-registers.spec.ts` (three projects, iPhone included) walks the starter rows, the forms, the ticks, the one-tap improvement and the index with the width check and axe (AC-1), in CI's Supabase job.
+- **Next:** Session C (reminders, audit-day page, audit types, pricing sentence, FR-13 document control register, FR-14 circulation record) on the same branch, then the branch merge and the batch status.
