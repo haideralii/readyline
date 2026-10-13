@@ -1110,3 +1110,48 @@ House style version 2 on **`req-005-house-style-v2` d1ea3db** (cut from the head
 - **Proof here.** Unit and copy-lint green; the fixtures replay and the docx lint green; the production build passes.
 - **Queue status.** Batches 38, 41, 36, 37, 35, 39 and 40 are done; nothing else is queued. Next, per Haider's instruction: run the full suite on every open branch, fix anything red, then the three-persona review as a numbered list.
 
+
+
+
+## Dev status (queue empty: full suite on every open branch, and the three-persona review; written 14 Oct 2026, Dev; third unattended run, final)
+
+The queue is empty after batches 38, 41, 36, 37, 35, 39 and 40. As instructed: `npm run check` (lint, format, typecheck, unit tests) ran on every open branch, in this order, each with `main` 7fa9840 merged in:
+
+- `req-009-session-c` 478bb12: green, 616 passed | 2 skipped (618)
+- `req-010-generation-kicker` fb418aa: green, 628 passed | 2 skipped (630)
+- `req-016-document-standard` 038cb8b: green, 641 passed | 3 skipped (644)
+- `req-017-guided-path` 3416bae: green, 664 passed | 3 skipped (667)
+- `req-011-groups` 0188079: green, 669 passed | 3 skipped (672)
+- `req-013-phone-fixes` a081300: green, 669 passed | 3 skipped (672)
+- `req-017-close-out` bb7bda3: green, 681 passed | 3 skipped (684)
+- `req-018-ndis-watch-1` 5910ab3: green, 688 passed | 4 skipped (692)
+- `req-018-audit-day-systems` d3628f0: green, 695 passed | 3 skipped (698)
+- `req-005-house-style-v2` eee7ee9: green, 698 passed | 4 skipped (702)
+
+No code changes in this status. Then the three-persona review, done on the rendered sole-trader pack (the fixtures replay, 187 sections) and the pages as they stand on the branches; findings only, numbered, for the PO to pick from.
+
+**A layman on a phone**
+1. The result card and the pricing page say "verification" and "certification" before anything explains them; the plain-words kinds now live on the audit-day page (batch 39) and in the guide. One line under the result's audit sentence ("a desk check of your documents" / "a visit, with interviews") would stop the first question.
+2. The documents still show "[Provider to complete: …]" instructions inside sentences in 88 recorded sections (D-542), for example "[Provider to complete: name of a trusted person who can step in…]" in the incident policy. A customer reads an instruction to themselves in a policy they are told is theirs. The recording session is the fix; until then the Finish page cannot ask for these because they are not blanks in the S-8 shape.
+3. The registers page now lists fourteen registers in one column. On a 360 px screen that is three screens of rows before the one wanted. Two headings ("Keep as things happen" for incidents, complaints, improvements, decisions; "Keep current" for the rest) and the attention word first would carry it.
+4. Codes (W-1, P-14, KP-1) are asked for on every register form with a one-line hint each time, but nowhere is there a single "how codes work and where I keep the list" note. One short panel on the registers page, linked from every hint, would do.
+5. The audit-day page has grown to the twelve records, the drill form, the five kinds and the checklist groups; it prints well but on a phone the primary button is far above the new sections. Fine for now; worth a second look after Haider's walk on his phone (REQ-017 AC-1).
+
+**A provider reading against the Practice Standards**
+6. Verification module, human resource management: the self-assessment says the sole trader records their clearance "in the Worker screening clearance register and the Training register". The product's live registers are "Worker checks" and, from batch 39, the staff matrix; the training register exists only as fixed text in the pack. The pack and the app name the same record differently (REQ-018 FR-8 and the v2 record-name lint will catch it on the next recording, but the fixed text and the register page titles should agree first: one naming table).
+7. Risk management: the self-assessment asks the provider to "[list your professional indemnity, public liability and accident insurance policies]" while the insurances register (batch 39) now holds exactly that. The self-assessment's fixed "Items to prepare" section and the summary brief should point at the register rather than ask for a list.
+8. Incident management: the new fixed table "Who tells whom, and by when" (batch 40) carries the Commission's windows; section 8 refers to section 7 correctly. The recorded procedure still says "As soon as possible after the incident" in its steps table, which the version 2 vague-time lint will reject when re-recorded. Good: the escalation pathway gap (research D1) is closed by fixed text now, not only by a brief.
+9. Complaints: the recorded procedure quotes the Commission's phone number, TTY and interpreter numbers from the model's memory ("1800 035 544 … 133 677 … 131 450"). Those are not sourced anywhere in the repository. **This is the one finding I would fix before the trial:** contact details for the Commission belong in fixed text from a verified Commission page (and the tailored lint should refuse a phone number or URL the pack did not supply). The number may well be right; the point is that nothing checked it.
+10. Complaints: the distinction between feedback and a complaint, and our own resolution time frames, are in the recorded procedure (1 business day, 5 business days, 21 days) but the policy statement says "acknowledge each complaint promptly" (vague-time lint). Consistent with the D2 gap; the brief change in batch 40 asks for it explicitly on re-recording.
+11. The review pack still renders the two retired AI documents (`ai-use-and-governance-policy`, `ai-and-digital-data-handling-procedure`) because the reference case's documents list predates REQ-016 S-6; the docx-lint set is 16 documents. Cosmetic, but the PO reading the evidence folder sees 18.
+
+**An auditor at a desk with one pack**
+12. First pages read at Year 10 to 11: Purpose, Scope and Policy statement of the incident and complaints documents score 9.1 to 11.1, against a Year 8 target (warn above 9). The procedure steps score 5.5 to 7.5. An auditor skims the front of each document; the recording session should take the first three sections of every document first.
+13. "Records we keep" (fixed) lists the standards' evidence items, which is right, but the tailored text names registers in three spellings across the pack ("incident register", "Incident register", "Worker screening clearance register"). The v2 record-name lint accepts them all by design; an auditor would prefer one spelling, matched to the register page titles. Same root as finding 6.
+14. The self-assessment's fixed "Items to prepare before the audit" and the audit-day page's "What the auditor will ask to see" are two lists of the same thing in different orders and words. Making the fixed section mirror the twelve records, in the same order with the same names, would let the auditor tick the pack against the app.
+15. The restrictive practice position (house style v2 h) is in the sole-trader pack only as "We do not use restrictive practices. If we ever need to, we will update this policy first." The v2 rule asks for emergency use and unintended practices (a locked door, a withheld item). Because that position should be in every pack regardless of recordings, it is a candidate for fixed text in the safeguarding policy rather than a brief alone.
+16. The unnumbered escalation table sits between "7 Reportable incidents" and "8 Incident procedure" without a number (D-542, so recorded cross-references stay valid). An auditor reading "see section 7" lands right; the heading without a number between two numbered ones looks like a layout slip. When the sections are re-recorded, number it.
+17. The document control table's "Approver [name], [role]" and "[date]" are filled from the account (batch 37); in the evidence render they show as blanks because the render has no account. Expected, but the evidence folder is what the PO reads: a render with the sample owner facts would read as a customer's pack does.
+
+**Numbers for the record.** Fact blanks after the owner's name: 3 of 187 sections (2 percent). Version 2 lint findings over recorded replies: 60 of 208 (36 indicator restatement, 13 vague time, 30 staff as actor, 11 record name). Replay generic sections: 3. Recording list for Haider's session, in priority order: the complaints procedure (finding 9), the first three sections of every document (12), the five sections whose briefs changed in batch 40, then the 60 flagged recordings.
+
