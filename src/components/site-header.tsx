@@ -17,8 +17,10 @@ export async function SiteHeader() {
        * on phones. Signed in, the badge plus three links ran to 438 px on a
        * 402 px screen and the page panned on every page. The row now wraps
        * as blocks: the wordmark, then the badge (previews only) and the nav
-       * as one unit that drops under the logo when it does not fit; the
-       * links inside the nav never wrap (FR-16).
+       * as one unit that drops under the logo when it does not fit. A link
+       * never splits across lines (FR-16); with four links at a large text
+       * size the nav itself wraps whole links onto a second row rather than
+       * widening the page (the signed-in width check at 360 px and 130 %).
        */}
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6 sm:py-3">
         <Link
@@ -39,13 +41,16 @@ export async function SiteHeader() {
         )}
         <nav
           aria-label="Account"
-          className="ml-auto flex items-center gap-x-3 text-sm whitespace-nowrap sm:gap-x-4"
+          className="ml-auto flex flex-wrap items-center justify-end gap-x-3 text-sm whitespace-nowrap sm:gap-x-4"
           data-testid="site-nav"
         >
           {user ? (
             <>
               <Link href="/checklist" className={navLink}>
                 Checklist
+              </Link>
+              <Link href="/registers" className={navLink}>
+                Registers
               </Link>
               <Link href="/documents" className={navLink}>
                 Documents

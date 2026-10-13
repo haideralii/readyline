@@ -62,6 +62,22 @@ export async function checkExportAllowed(accountId: string): Promise<boolean> {
   return hitRateLimit(`export:${accountId}`, EXPORT_LIMIT);
 }
 
+/** REQ-009 SR-3: five register exports per account per rolling hour; sixty register writes per user per minute. */
+export const REGISTER_EXPORT_LIMIT = { limit: 5, windowSeconds: 3600 } as const;
+export const REGISTER_WRITE_LIMIT = { limit: 60, windowSeconds: 60 } as const;
+
+export async function checkRegisterExportAllowed(
+  accountId: string,
+): Promise<boolean> {
+  return hitRateLimit(`register-export:${accountId}`, REGISTER_EXPORT_LIMIT);
+}
+
+export async function checkRegisterWriteAllowed(
+  userId: string,
+): Promise<boolean> {
+  return hitRateLimit(`register-write:${userId}`, REGISTER_WRITE_LIMIT);
+}
+
 /** REQ-007 SR-4: five Checkout Sessions per account per rolling hour. */
 export const CHECKOUT_LIMIT = { limit: 5, windowSeconds: 3600 } as const;
 

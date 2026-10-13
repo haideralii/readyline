@@ -2021,6 +2021,41 @@ second server and a minute per page, and because axe covers the same
 rules on every commit. FR-18 (screen-reader passes) stays with the PO
 and Haider.
 
+**D-907 Register pages (Dev, 2026-10-13, batch 28, branch
+`req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
+`req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
+One list component for the four registers (rows with a text-and-icon
+status tag, a filter by status, 44 px targets), one page shell that
+resolves the signed-in owner and the subscription state, and forms built
+from shared inputs (select, date, reference code, free text with the
+participant-data detector). Lists read the Session A status views so the
+tag and the filter use the database's own arithmetic. Events for status
+changes, reportable flags, notification, acknowledgement and resolution
+are written by the server action, never typed. The gate is the database's
+(42501 becomes the lapse sentence); the UI hides Add and Edit and
+redirects the add and edit routes when the subscription is not active.
+The REQ-015 branch was merged in because the pages are built on its
+patterns (ConfirmButton, the width check, the iPhone project), so the
+Session B pull request lands after REQ-015's.
+
+**D-908 Exports and limits.** CSV with a byte-order mark and CRLF for
+Excel, dates as stored, formula-leading cells prefixed with an apostrophe;
+incidents and complaints as a zip of two files joined by reference. Five
+exports an hour per account and sixty writes a minute per user through
+the existing rate-limit function. Every route takes its own empty strict
+schema so the boundary guard sees the validation import where the route
+lives.
+
+**D-909 Policy reviews are seeded once and adopted from the checklist.**
+The first visit to the policy-reviews register by a subscribed account
+with a ready set and no rows inserts one row per document in the set
+(cycle 3 months for a register document, 12 otherwise), through an upsert
+that ignores duplicates so a race cannot double-seed. A checklist item
+set to Done on a document sets `adopted_on` on its review when empty; the
+review never changes the checklist. A delete button is not in Session B:
+owners can delete through RLS, but a wrong entry is edited or closed, and
+a delete with confirm is one component away if the PO wants it.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
