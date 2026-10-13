@@ -2159,6 +2159,8 @@ with the Subscribe button; and "Due soon" under Registers, read from the
 same `reminders` rows the emails are sent from, with "(emailed)" once
 sent.
 
+
+
 **D-1507 The text corruption on `main` came from Dev's conflict-resolution
 scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
 a file without a byte-order mark as Windows-1252 and writes it back as
@@ -2199,6 +2201,8 @@ least one runner minute, so `*/5` is about 8,600 minutes a month against
 the 2,000 free for a private repository; the schedule runs only from
 `main`, so nothing is spent until the PO merges and chooses (public
 repository, `*/30`, or the overage).
+
+
 
 
 ## Open questions for Haider
