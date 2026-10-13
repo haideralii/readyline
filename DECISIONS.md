@@ -2199,6 +2199,19 @@ Dev: edit files through Node or the editor tools, and never through
 `Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
 
 
+**D-1008 The integration suite aliases Next's `server-only` guard (Dev,
+2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
+`tests/integration/reminders-job.test.ts` imports the reminders job, the
+email provider and the admin client, all marked `import "server-only"`, and
+Next's guard throws outside a Next server bundle. The unit project mocks
+the guard per file (`vi.mock("server-only", () => ({}))`); the integration
+project now resolves it to an empty module for every file
+(`resolve.alias` in `vitest.integration.config.mts`,
+`tests/integration/server-only-stub.ts`), which is the honest statement
+of what that suite is: server code driven against a real database. Proven
+locally by loading every integration file without Supabase variables (they
+skip, and no longer throw); CI's job proves the rows.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
