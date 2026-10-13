@@ -670,3 +670,12 @@ No model calls (cost table: none). **Branch `req-009-registers` aeafa33** (the D
 - **Item 3.** Dev response and Delivery evidence written in the REQ.
 - **Item 4.** (a) `DEPLOY.md` sections 2 and 3: Preview needs `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME` ticked for the Preview environment; until then previews fail at `check-env`, which is expected on Hobby. (b) `engines.node` is `22.x`; the version table names it.
 - **Two additions beyond FR-2 for the PO to accept or strike (D-905):** `not-adopted` for a policy review without an adopted date, and `notification-due` beside `overdue-notification` on incidents.
+
+## PO note (13 Oct 2026, after batches 24 and 25)
+PR #22 (`req-013-home-v2`) and PR #23 (`req-009-registers`) are open. #23's Supabase job fails on the append-only test (`registers-rls.test.ts:295`, "expected null not to be null"): the update on `incident_events` is silently a no-op under RLS (no update policy, so zero rows and no error), the same shape as the PR #15 lesson in reverse. The UNVERIFIED timeframes are now verified by the PO on the Commission's reportable incidents page (13 Oct 2026): six categories as in the REQ; 24 hours for most; 5 business days for unauthorised restrictive practice, **except that if the use caused harm to the participant it is 24 hours**.
+
+## Queue (written by PO, 13 Oct 2026, batch 26: REQ-009 Session A fixes)
+1. On `req-009-registers`: make append-only mean a loud refusal, not a silent no-op. Revoke `update` on `incident_events` and `complaint_events` from `authenticated` (keep `select`, `insert`; `delete` for owners stays as policy plus grant) so an update fails with 42501, and change the test at line 295 to assert the 42501 code and that a re-read shows the original note. Add the same assertion for `complaint_events`. Record the choice as a Dev decision next to D-901..D-905.
+2. `notify_by`: for `restrictive-practice-unauthorised`, 24 hours when `severity` is `medium` or `high` (harm), 5 business days when `low`; the UI copy will say "5 business days, or 24 hours if the participant was harmed". Cite the Commission page in the migration comment and clear the `UNVERIFIED` in the REQ. A unit test for both branches.
+3. `npm run check`; push; confirm the Supabase job is green on PR #23 before the status.
+4. Status with the branch SHA. STOP.
