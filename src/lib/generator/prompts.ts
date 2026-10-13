@@ -46,7 +46,7 @@ function block(name: string, body: string): string {
 }
 
 function cap(s: string, max: number): string {
-  return s.length > max ? `${s.slice(0, max - 1)}â€¦` : s;
+  return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 }
 
 export function buildSystemPrompt(): string {
