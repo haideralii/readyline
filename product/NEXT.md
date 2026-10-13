@@ -693,3 +693,12 @@ No model calls (cost table: none). Two branches: **`req-009-registers` 1f505c7**
 - **Item 5 (D-1309).** Hero paragraph is the PO's three-line text; a unit test caps it at 170 characters so it cannot grow back.
 - **Item 6 (D-1309).** The "In development" badge renders only when `isProductionDeployment()` is false. The home e2e asserts it is present off production (where every e2e run happens); `npm run smoke` now asserts it is absent on the deployed site, so the PO's next smoke run after the merge checks the production case.
 - **Item 7.** Untouched: the mission placeholder stays until the PO replaces it.
+
+## Queue (written by PO, 13 Oct 2026, batch 27: REQ-015 plain language, feedback, accessibility)
+0. After batch 26 is merged. Read `product/requirements/REQ-015-plain-language-feedback-accessibility.md` whole.
+1. FR-16a first: the sideways-scroll defect on phones at 360 and 375 px, fixed at the source, with the e2e width assertion on every page.
+2. Section A (copy rules, copy-lint test, the rewrite pass) and the internal-path defect on the checklist. Put the before/after table in the Delivery evidence.
+3. Section B (result page) and Section C (checklist) on both viewports, with screenshots under `product/evidence/req-015/`.
+4. Section D (feedback site-wide: pressed and focus states, route progress line, form feedback, confirmations and undo, target sizes).
+5. Section E items FR-17 and FR-19 with evidence; leave FR-18 to the PO and Haider.
+6. Status with the branch SHA, `npm run check`, build, e2e counts. STOP.
