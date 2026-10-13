@@ -39,7 +39,35 @@ export function StepShell({
         total={STEP_IDS.length}
         label={`Step ${index + 1} of ${STEP_IDS.length}: ${STEP_SHORT[step]}`}
       />
-      {completed.length > 0 ? (
+      {completed.length > 0 && step === "result" ? (
+        // REQ-015 FR-6: on the result, one link to change answers; the per-step links fold away.
+        <nav aria-label="Change your answers" className="mt-2 text-sm">
+          <Link
+            href={stepHref("business")}
+            className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+            data-testid="change-answers"
+          >
+            Change my answers
+          </Link>
+          <details className="mt-1">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center underline-offset-4 hover:underline">
+              Change a step
+            </summary>
+            <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+              {completed.map((id) => (
+                <li key={id}>
+                  <Link
+                    href={stepHref(id)}
+                    className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+                  >
+                    {STEP_SHORT[id]}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </nav>
+      ) : completed.length > 0 ? (
         <nav aria-label="Completed steps" className="mt-2 text-sm">
           <span className="text-zinc-600 dark:text-zinc-400">Back to: </span>
           <ul className="inline">

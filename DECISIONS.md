@@ -1,4 +1,4 @@
-﻿# Decisions log
+# Decisions log
 
 Every assumption or choice not already fixed by [CLAUDE.md](CLAUDE.md) is
 recorded here, newest at the bottom of each phase. Anything about the
@@ -412,7 +412,7 @@ inline scripts, or hash allow-listing of Next's bootstrap scripts if Next
 ships stable support).
 
 **D-203 CSP directives.** Production: `default-src 'self'`, `script-src 'self'
-'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' 'strict-dynamic'`, `style-src 'self' 'nonce-ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦'`, `img-src 'self'
+'nonce-…' 'strict-dynamic'`, `style-src 'self' 'nonce-…'`, `img-src 'self'
 blob: data:`, `font-src 'self'`, `connect-src 'self'`, `object-src 'none'`,
 `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`.
 Development adds `'unsafe-eval'` (React dev tooling) and `style-src
@@ -1703,7 +1703,7 @@ state is set in an effect), a search opens every heading with a match, the
 hint opens the headings of 0107 and 0120, and a closed heading still lists
 its ticked classes beneath the summary with "(n classes, k ticked)". FR-12:
 the audit explanation, groups in scope and flags sit inside the summary
-block under one "Your audit: â€¦" heading; the second heading is gone.
+block under one "Your audit: …" heading; the second heading is gone.
 
 ## REQ-014: visual identity v1 (branch `req-014-visual-identity`, on `req-013-p2`)
 
@@ -1713,7 +1713,7 @@ indicator, so stacking avoids a certain conflict. The PO merges P2 first.
 
 **D-1402 The zinc utilities resolve to a warm ramp (FR-1).** Every page was
 built on `zinc-*` with `dark:` variants. Instead of rewriting hundreds of
-class strings, `@theme` maps `zinc-50â€¦950` to a monotonic ramp from paper
+class strings, `@theme` maps `zinc-50…950` to a monotonic ramp from paper
 (#F7F3EC) through slate (#4A5553 at 600) to ink (#1C2B2A at 900) and dark
 paper (#141C1B at 950), and `red-700`/`red-400` to signal. New code uses
 the named tokens. The contrast test pins the ramp's lightness order and the
@@ -1906,7 +1906,7 @@ days before through the day itself). Two additions: a `policy_reviews`
 row with no `adopted_on` reads `not-adopted` rather than `current`, so an
 unadopted policy is never shown as in date; and `incidents_status` exposes
 `notification-due` beside FR-2's `overdue-notification` so a page can say
-"Notify the Commission by â€¦" before the date passes. `expires_on` null
+"Notify the Commission by …" before the date passes. `expires_on` null
 means no expiry (the orientation module) and is always `valid`. The
 TypeScript rules and the SQL views are the same arithmetic; the unit tests
 pin the boundaries and the integration test checks the views.
@@ -1925,6 +1925,116 @@ re-reads the original note on both event tables. Rule for later
 migrations: when a table must refuse a verb, revoke it explicitly as well
 as not granting it; grants alone describe the hosted project, not the
 local stack.
+
+**D-1501 The sideways scroll was the signed-in header (Dev, 2026-10-13,
+batch 27, REQ-015 FR-16a, branch `req-015-plain-language` from `main`
+d3d4ea9).** A width check on every public page and every questionnaire
+step, at the project width, at 375 px and at 360 px with the root font at
+130 %, on Chromium and WebKit, found nothing; the same check signed in
+found the header row at 438 px on a 402 px iPhone screen: the wordmark,
+the preview badge and the three account links in one non-wrapping flex
+row. Signed in is how Haider walked the site, which is why every page
+panned. The row now wraps as blocks (wordmark; badge; the nav as one unit
+that drops under the logo when it does not fit) and the links inside the
+nav never wrap. The check (`e2e/helpers/width.ts`) runs in
+`req-015-width.spec.ts` for public pages and inside the signed-in
+checklist and purchase specs; it fails on any element outside the
+viewport unless an ancestor scrolls or clips on its own. A third
+Playwright project `iphone` runs WebKit with Playwright's `iPhone 17 Pro`
+descriptor (Haider's phone; the PO's note named the 15 Pro as the newest,
+but the list goes to 17) on the width, home, result, checklist and
+purchase specs; CI installs WebKit in both jobs. Long unbroken strings
+wrap (`overflow-wrap: anywhere` on text blocks).
+
+**D-1502 Copy lint over the real source (FR-2).** `tests/copy-lint.test.ts`
+parses every page and component with the TypeScript compiler and lints
+the customer-readable text: JSX text and inline children of
+paragraph-like elements (`p`, `li`, `summary`, `label`, `td`, headings)
+as paragraphs, loose JSX text and the customer-facing attributes
+(`placeholder`, `aria-label`, `title`, `alt`) as strings, both arms of a
+conditional measured separately. The copy modules (home, pricing,
+documents, checklist, questionnaire navigation and schema messages, legal
+nav, payment messages) are linted on their natural-language string
+literals (three words or more), and the content JSON on its string values
+except notes, URLs and the generator's `brief` fields, which the model
+reads and the customer never does. The rules live in
+`src/lib/copy-lint/rules.ts` with the seeded unit test AC-3 asks for.
+Legal page bodies come from markdown and are out of scope by FR-3.
+
+**D-1503 Result page shape (Section B).** One card: the audit as the
+heading, the groups as chips under it, one sentence of what happens in
+practice, the counts, the ready line, "Open your checklist" as the one
+primary button (to sign-in with `next` when signed out) and "See the
+price" as a text link. Below it three closed `details`: why (flags,
+reasons with sources, modules with their standards, mid-term audit),
+documents (legend, then one nested `details` per group with "n: x you
+have, y to prepare, z not sure" in its summary and a text-and-icon tag per
+item), registers. Disclosure state is kept in `localStorage` under one
+non-personal key and restored on the next visit; the result view mounts
+on the client only, so reading storage in the initialiser is safe. The
+step shell shows "Change my answers" and a folded "Change a step" on the
+result instead of the "Back to" row; clearing the draft asks first. Every
+REQ-013 and REQ-014 test id survived; the specs that asserted on folded
+content open the disclosures through `e2e/helpers/result.ts`.
+
+**D-1504 Checklist as a task list (Section C).** The counts line, the
+warning once, "Next three things to do" (the first three Need items in
+audit order; a tap opens the group and the item and moves focus to it),
+then groups as before with each item one row: title, status tag with
+icon and text, chevron. The row opens to the why line, a segmented
+status control (`Need`, `Doing`, `Done`; stored values unchanged; "Done
+means reviewed and adopted" said once at the top), "Add a note" that
+reveals the field (placeholder carries the no-participant-data line), and
+a link to the documents when a draft exists. A status tap is optimistic:
+the tag and the count change at once, "Saved" with a tick follows the
+server's answer and stays two seconds, an Undo stays five seconds, and a
+failure reverts the row and shows "Not saved, try again" with a retry.
+
+**D-1505 Feedback site-wide (Section D).** CSS pressed states on every
+link, button, summary and label (a background shift to mist, buttons also
+move one pixel), the ochre focus ring unchanged; `RouteProgress` draws a
+two-pixel line across the top from a same-site link tap until the URL
+changes (a document click listener and `useSyncExternalStore`, no router
+hooks beyond the pathname), marks the tapped link `aria-busy` so it keeps
+its pressed look, and gives up after fifteen seconds; `app/loading.tsx`
+fills the content area while a server page renders. Step forms show a
+spinner and "Saving…" on a disabled submit (`StepButtons pending`).
+`ConfirmButton` asks before clearing a draft and before signing out
+everywhere, with "Keep" focused; account deletion already asked. A
+Suspense boundary above a page (the first draft had `RouteProgress` with
+`useSearchParams` and a root `loading.tsx`) makes Next stream the shell
+before `notFound()` throws, so `/admin` answered 200 instead of 404: the
+progress line reads only the pathname and the loading files sit under
+`/checklist` and `/documents` only.
+
+**D-1506 Section E recorded as tests, not a checklist.** FR-17's manual
+items are e2e assertions in `req-015-a11y.spec.ts` with screenshots under
+`product/evidence/req-015/`, so they re-run on every change: heading
+order and one `h1`, unique titles, skip link, `autocomplete`, 200 % text
+at 1280 px, reduced motion, text-and-icon status, a keyboard-only walk,
+and target sizes (24 px everywhere, 44 px for controls on phones; inline
+text links are exempt as WCAG 2.5.8 allows). axe runs with the 2.2 AA
+tags. Lighthouse accessibility runs through `scripts/ops/lighthouse.mjs`
+(the CLI via npx in Playwright's Chromium, accessibility category only)
+against a local production server; it is not in CI because it needs a
+second server and a minute per page, and because axe covers the same
+rules on every commit. FR-18 (screen-reader passes) stays with the PO
+and Haider.
+
+**D-1507 The text corruption on `main` came from Dev's conflict-resolution
+scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
+a file without a byte-order mark as Windows-1252 and writes it back as
+UTF-8 with a mark, so every non-ASCII character in a file those scripts
+touched (DECISIONS.md, NEXT.md, backlog.md at c95e1d7, and earlier
+REQ-004, a source file and the generator's prompt) was encoded twice; the
+nonce line in this file went through three times. Repaired by reversing the
+round trip (`scripts/ops/repair-mojibake.ts`, which `src/lib/text/encoding.ts`
+backs), never by retyping; `tests/text-encoding.test.ts` now fails `npm
+test` on a mark or a double-encoded run in any text file outside
+`data/sources`; `.editorconfig` already said `charset = utf-8`. Rule for
+Dev: edit files through Node or the editor tools, and never through
+`Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
+
 
 ## Open questions for Haider
 

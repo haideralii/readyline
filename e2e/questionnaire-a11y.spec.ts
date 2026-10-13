@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { tickGroup } from "./helpers/groups";
+import { openResultSections } from "./helpers/result";
 
 /**
  * REQ-003 AC-9 / AC-11 support: automated accessibility scan (axe, WCAG 2.1 A
@@ -96,8 +97,9 @@ test("every questionnaire step has no serious or critical accessibility violatio
   await page.getByRole("button", { name: "See my result" }).click();
 
   await expect(page.getByTestId("result")).toBeVisible();
-  await page.getByTestId("module-core").locator("summary").click();
-  summary.result = await scan(page, "result (expander open)");
+  summary["result-card"] = await scan(page, "result (card only)");
+  await openResultSections(page);
+  summary.result = await scan(page, "result (every disclosure open)");
 
   test.info().annotations.push({
     type: "axe-summary",

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { openResultSections } from "./helpers/result";
 import { tickGroup } from "./helpers/groups";
 
 /**
@@ -70,6 +71,8 @@ async function fillFromWorkforce(page: Page) {
     page.getByRole("heading", { level: 1, name: "Your result" }),
   ).toBeVisible();
   await expect(page.getByTestId("result")).toBeVisible();
+  // REQ-015 Section B: the detail sits in closed disclosures; open them for the assertions below.
+  await openResultSections(page);
 }
 
 test.describe("questionnaire", () => {
@@ -144,12 +147,10 @@ test.describe("questionnaire", () => {
     await expect(page.getByTestId("mid-term")).toContainText(
       "governance and operational management",
     );
-    // FR-7: the explain expander lists the standards by name.
-    await page
-      .getByTestId("module-core")
-      .getByRole("group")
-      .locator("summary")
-      .click();
+    // FR-7: the explain expander lists the standards by name (opened by the helper above).
+    await expect(
+      page.getByTestId("module-core").getByRole("group"),
+    ).toHaveAttribute("open", "");
     await expect(page.getByTestId("module-core")).toContainText(
       "Person-centred supports",
     );
