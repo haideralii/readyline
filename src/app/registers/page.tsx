@@ -1,17 +1,33 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  AUDIT_DAY_META,
+  AUDIT_DAY_SLUGS,
+} from "@/lib/registers/audit-day-forms";
+import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
 export const metadata: Metadata = { title: "Registers" };
 
 /**
- * The four registers with what needs attention (REQ-009 FR-5, batch 28
- * item 1): one row each, the overdue counts in words, never colour alone.
+ * The registers with what needs attention (REQ-009 FR-5, batch 28 item 1;
+ * REQ-018 Session B adds the nine audit-day registers): one row each, the
+ * overdue counts in words, never colour alone.
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const o = await registerOverview(ctx.supabase, ctx.viewer.account.id);
+  const [o, a] = await Promise.all([
+    registerOverview(ctx.supabase, ctx.viewer.account.id),
+    auditDayOverview(ctx.supabase, ctx.viewer.account.id),
+  ]);
+  const auditDayRows = AUDIT_DAY_SLUGS.map((slug) => ({
+    href: `/registers/${slug}`,
+    title: AUDIT_DAY_META[slug].title,
+    total: a[slug].total,
+    attention: a[slug].attentionLabel,
+    urgent: a[slug].attentionLabel.endsWith("overdue"),
+  }));
   const rows = [
     {
       href: "/registers/incidents",
@@ -72,7 +88,7 @@ export default async function RegistersPage() {
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
         data-testid="registers-index"
       >
-        {rows.map((r) => (
+        {[...rows, ...auditDayRows].map((r) => (
           <li key={r.href}>
             <Link
               href={r.href}

@@ -2437,6 +2437,36 @@ claims lints over every sentence of the three reference cases. Session B
 seeds them on the register's first open and shows "check this and change
 it" until a row is edited.
 
+**D-1904 One form, one list page and one detail page serve all nine
+audit-day registers from data (Dev, 2026-10-14, batch 39 Session B,
+REQ-018 FR-1 to FR-9, AC-1, AC-2).** `src/lib/registers/audit-day-forms.ts`
+holds, per register, the zod schema (keys are the column names), the field
+specs the generic form renders with the REQ-009 inputs, the words (title,
+intro, add label, empty state) and three small functions for the list
+(title, detail, status tag); the route files are one line each and the
+page builders in `audit-day-pages.tsx` do the rest. `saveAuditDayRowAction`
+validates with the register's schema, writes with the caller's session
+(RLS and the subscription gate), adds a `register_events` line (D-1902),
+and marks an edited starter row as the provider's own; `markReviewedAction`
+is the one-tap "Reviewed today, next review on" for the three registers
+with a review date; decisions have no edit path (append only, the page
+says to add a new one). The corporate risk register seeds its nine starter
+rows on first open when the questionnaire is answered (FR-1). A closed
+incident or a resolved complaint shows one tap to the improvement form
+with the source kind and reference pre-filled through the query string
+(FR-6, AC-2; the new page accepts only field names the register knows). The
+onboarding checklists (FR-9) are two fixed item lists in the instruction
+voice; a tick records the date and who ticked it and cannot be undone by a
+member; when every item is ticked the checklist completes and a worker's
+staff-matrix row takes the onboarding date. The registers index lists the
+nine with their counts and attention words. `audit-day-forms.test.ts` runs
+the copy and claims lints over every title, intro, label, help, option and
+onboarding line, checks fields match schema keys, and exercises the code
+and NDIS-number refusals; `e2e/signed-in/audit-day-registers.spec.ts` walks
+the starter rows, the forms, the ticks, the one-tap improvement and the
+index on the three projects with the width check and axe (AC-1), in CI's
+Supabase job. Not done: FR-11 to FR-14 and the reminders are Session C.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
