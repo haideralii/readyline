@@ -266,6 +266,15 @@ function ResultView({
           Your audit: {pathwayWord}
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
+        {/* Batch 42 item 6 (D-549): what the word means, in one line under the heading. */}
+        <p
+          className="mt-1 text-sm text-zinc-700 dark:text-zinc-300"
+          data-testid="audit-kind"
+        >
+          {r.pathway === "verification"
+            ? "That is a desk check of your documents."
+            : "That is a visit, with interviews."}
+        </p>
         <ul
           className="mt-2 flex flex-wrap gap-1.5"
           aria-label="Registration groups in scope"

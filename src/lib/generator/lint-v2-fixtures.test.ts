@@ -11,7 +11,10 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
+import { COMMISSION_CONTACT_STRINGS } from "./fixed-extras";
 import {
+  contactStringsIn,
+  lintContactDetails,
   lintIndicatorRestatement,
   lintRecordNames,
   lintStaffActor,
@@ -34,9 +37,25 @@ function indicatorsOf(user: string): string[] {
 }
 
 export type LintV2Counts = Record<
-  "indicator-restatement" | "vague-time" | "staff-actor" | "record-name",
+  | "indicator-restatement"
+  | "vague-time"
+  | "staff-actor"
+  | "record-name"
+  | "contact-details",
   number
 >;
+
+/** The FACTS and STATE FACTS blocks of a recorded prompt: the contact strings a reply may quote (D-546). */
+function allowedContactsOf(user: string): string[] {
+  const blocks = [
+    /<<<FACTS>>>\n([\s\S]*?)<<<END FACTS>>>/.exec(user)?.[1] ?? "",
+    /<<<STATE FACTS>>>\n([\s\S]*?)<<<END STATE FACTS>>>/.exec(user)?.[1] ?? "",
+  ].join("\n");
+  return [
+    ...COMMISSION_CONTACT_STRINGS,
+    ...contactStringsIn(blocks).map((c) => c.value),
+  ];
+}
 
 export function lintV2OverFixtures(): {
   fixtures: number;
@@ -52,6 +71,7 @@ export function lintV2OverFixtures(): {
     "vague-time": 0,
     "staff-actor": 0,
     "record-name": 0,
+    "contact-details": 0,
   };
   const bySection: Record<string, LintV2Counts> = {};
   let fixtures = 0;
@@ -90,6 +110,10 @@ export function lintV2OverFixtures(): {
             "staff-actor": lintStaffActor(text, { allowedPhrases: allowed })
               .length,
             "record-name": lintRecordNames(text, known).length,
+            "contact-details": lintContactDetails(
+              text,
+              allowedContactsOf(fx.request.user),
+            ).length,
           };
           const key = `${typeId}/${sectionId}`;
           const section = (bySection[key] ??= {
@@ -97,6 +121,7 @@ export function lintV2OverFixtures(): {
             "vague-time": 0,
             "staff-actor": 0,
             "record-name": 0,
+            "contact-details": 0,
           });
           let any = false;
           for (const k of Object.keys(counts) as (keyof LintV2Counts)[]) {

@@ -15,11 +15,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
-import { documentTypeById, sectionsFor } from "./catalogue";
+import { documentTypeById, isRetired, sectionsFor } from "./catalogue";
 import { buildContextPack } from "./context-pack";
 import { buildSkeleton, type ResolvedSection } from "./document-model";
 import { describeFactSources } from "./fact-sources";
 import { buildProviderFacts } from "./facts";
+import { applyFacts } from "./facts-fill";
 import { generateSection } from "./generate-section";
 import { DEFAULT_FIXTURES_DIR, ReplayClient } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
@@ -39,6 +40,13 @@ const OUT = join(
 const FIXTURES_DIR = modelOverride
   ? `${DEFAULT_FIXTURES_DIR}-${modelOverride}`
   : DEFAULT_FIXTURES_DIR;
+/** The account facts a customer's account supplies (D-541); a sample so the evidence render shows a filled document control table. */
+const SAMPLE_OWNER_FACTS = {
+  name: "Jane Citizen",
+  role: "Owner",
+  "owner-role": "Owner",
+  date: "14 October 2026",
+};
 const COMPARISON_DOCUMENTS = [
   "incident-management-policy-and-register",
   "complaints-management-policy-and-register",
@@ -56,6 +64,7 @@ describe.skipIf(!enabled)("REQ-005 review pack (sole trader)", () => {
     const client = new ReplayClient(FIXTURES_DIR);
     const allowed = dataset.registrationGroups.map((g) => g.name);
     // The self-assessment sits beside the document set (it is not in result.documents).
+    // Batch 42 item 5 (D-549): a retired type is not rendered, so the pack is the 16 a customer gets.
     const documents = modelOverride
       ? COMPARISON_DOCUMENTS
       : [
@@ -63,7 +72,7 @@ describe.skipIf(!enabled)("REQ-005 review pack (sole trader)", () => {
             ...c.result.documents.map((d) => d.id),
             "practice-standards-self-assessment",
           ]),
-        ];
+        ].filter((id) => !isRetired(id));
     mkdirSync(OUT, { recursive: true });
     let generated = 0;
     let fallbacks = 0;
@@ -134,7 +143,10 @@ describe.skipIf(!enabled)("REQ-005 review pack (sole trader)", () => {
           );
         }
       }
-      const docx = await renderDocx({ ...skeleton, sections });
+      // Batch 42 item 8 (D-549): the sample owner facts fill document control, as a customer's account would.
+      const docx = await renderDocx(
+        applyFacts({ ...skeleton, sections }, SAMPLE_OWNER_FACTS),
+      );
       writeFileSync(join(OUT, `${typeId}.docx`), docx);
       note.push("");
     }

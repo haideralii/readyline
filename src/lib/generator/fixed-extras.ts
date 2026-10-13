@@ -32,6 +32,18 @@ export const AI_POSITION_STATEMENT =
 export const AUTOMATED_DECISIONS_SENTENCE =
   "If we use a computer program, including an AI tool, to make or help make a decision that could significantly affect a person, this policy says what personal information it uses and what kinds of decisions it is used for.";
 
+/**
+ * Batch 42 item 1 (D-546): the only phone numbers, email addresses and
+ * web addresses a document may carry, all from the fixed contact block;
+ * the contact-details lint allows these strings and nothing else.
+ */
+export const COMMISSION_CONTACT_STRINGS: readonly string[] = [
+  "1800 035 544",
+  "133 677",
+  "contactcentre@ndiscommission.gov.au",
+  "ndiscommission.gov.au",
+];
+
 export const FIXED_EXTRAS: Record<string, Extra> = {
   "risk-register": () => [
     {
@@ -158,6 +170,65 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
           "[Outcome; what we changed]",
         ],
       ],
+    },
+  ],
+  // Batch 42 item 1 (D-546): the Commission's contact details as fixed text,
+  // read by the PO from https://www.ndiscommission.gov.au/contact-us on
+  // 14 October 2026; the NDIS watch re-checks this block. A tailored section
+  // refers to it by heading and may not carry a phone number, email or URL.
+  "commission-contact": () => [
+    {
+      type: "paragraph",
+      text: "Anyone can contact the NDIS Quality and Safeguards Commission directly, at any time, without telling us first.",
+    },
+    {
+      type: "table",
+      columns: ["How", "Detail"],
+      rows: [
+        [
+          "Phone",
+          "1800 035 544, Monday to Friday, 9 am to 5 pm (Western Australia 7:30 am to 3:30 pm), closed on public holidays",
+        ],
+        ["TTY", "133 677"],
+        [
+          "National Relay Service",
+          "Call the relay service and ask for 1800 035 544",
+        ],
+        ["Email", "contactcentre@ndiscommission.gov.au"],
+        ["Website", "ndiscommission.gov.au"],
+      ],
+    },
+  ],
+  // Batch 42 item 4 (D-548): the restrictive practice position every pack
+  // takes. The five regulated practices are the NDIS (Restrictive Practices
+  // and Behaviour Support) Rules 2018 s 6 in plain words; the notification
+  // windows are the Incident Rules ss 20 and 21 as in the escalation table.
+  // The watch should confirm the s 6 wording against legislation.gov.au.
+  "restrictive-practice-position": (ctx) => [
+    {
+      type: "paragraph",
+      text: `${ctx.facts.tradingName} does not use a restrictive practice unless it is in a behaviour support plan and authorised under the rules of the state or territory we work in.`,
+    },
+    {
+      type: "paragraph",
+      text: "A restrictive practice is anything that limits a person's rights or freedom of movement. The rules name five kinds: seclusion (keeping a person alone in a room or space they cannot leave), chemical restraint (medication to control behaviour, not to treat a health condition), mechanical restraint (a device that stops a person moving), physical restraint (holding a person to stop them moving) and environmental restraint (stopping a person reaching things or places, such as a locked door, a locked cupboard or a withheld item).",
+    },
+    {
+      type: "paragraph",
+      text: "A locked door, a withheld phone or snack, or a held arm can be a restrictive practice even when nobody meant it to be. We treat it as one.",
+    },
+    {
+      type: "steps",
+      items: [
+        "If a worker uses a restrictive practice in an emergency to keep someone safe, the worker keeps the person safe first and stops the practice as soon as the danger has passed.",
+        "The worker tells the owner the same day and records what happened in the incident register before the end of the shift.",
+        "The owner reports the use to the Commission as an unauthorised restrictive practice: within 5 business days, or within 24 hours if the person was harmed (the escalation table in our incident management policy holds the rule).",
+        "The owner reviews what led to it within 5 business days and records what we change in the improvement register.",
+      ],
+    },
+    {
+      type: "paragraph",
+      text: "The owner reviews this position every 12 months and whenever a participant's needs change in a way that could lead to a restrictive practice.",
     },
   ],
   // Batch 40 item 3 (D-545): the escalation pathway as fixed text, so the
