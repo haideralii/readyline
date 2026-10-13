@@ -607,3 +607,36 @@ Rules: branch from `main` after #20 merges (check for the REQ-010 merge commit; 
 4. **Generation chain on Hobby: it stalled.** The first hosted run drafted 6 of 18 documents, then nothing for 5 minutes (no `/api/jobs/generate` invocations in the Vercel log) until the PO called the route by hand with the cron secret; it then ran to the end at about one document a minute (18 documents, about 20 minutes total). So the post-response self-kick does not reliably survive on Vercel. Fix: (a) use Vercel's `waitUntil` (`@vercel/functions`) for the self-kick so the platform keeps the invocation alive, and make each run draft as many documents as fit in the time budget; (b) a lightweight recovery: when the signed-in documents page polls and sees a job with no progress for 90 seconds, it calls the job route itself (session-authenticated variant, same claim lock), so a customer is never stuck waiting for the daily cron. Then change the copy to "usually 10 to 20 minutes" and show the measured per-document time in the Dev response. D-053 stays; if (a) and (b) still leave stalls, Pro.
 
 5. **Status** with the branch SHA and the measured per-document time. STOP.
+<<<<<<< Updated upstream
+=======
+
+## Queue (written by PO, 13 Oct 2026, batch 24: home page after the competitor review)
+
+Read `product/research/competitors-and-go-to-market.md` first. Branch `req-013-home-v2` from `main` after batch 23 merges. REQ-013 scope, D-13xx entries, no model calls.
+
+1. **Hero rewrite.** Headline: "Find out which NDIS audit you'll face — free. Then get every document it needs, drafted from your answers, for AUD 399." Primary CTA "See which audit I need" (to `/start`); secondary "See a sample document". Price and "no subscription, refund promise" in the first screen. Keep the identity tokens.
+2. **Sample before buying.** A "See exactly what you get" section showing one real generated document from the recorded sole-trader set (the complaints policy), tailored sections visibly marked, business name replaced with a fictional one, as an embedded preview plus a download of that one document as .docx. Claims lint applies to the surrounding copy.
+3. **Mission section.** 120 words, PO supplies the copy in `product/legal/about.md` style: who built it, why one price, why no instalments. Placeholder name until the ABN is in.
+4. **Honest counters.** A component for "providers helped" and "first audits passed" that renders nothing until a number exists in config (no fake counts), plus a testimonial block fed from a JSON file the PO fills during the trial.
+5. **Status** with screenshots on both viewports. STOP.
+
+## Dev status (batch 22, written 13 Oct 2026, Dev)
+
+No model calls (cost table: none). PR #20 was merged before this batch started, so items ran from `main` 2b26e77 / f437e42.
+
+- **Item 0.** `main` pushed.
+- **Item 1.** No REQ-009 file existed, so `product/requirements/REQ-009-registers.md` on `req-009-registers` c96dcaf is a **Dev proposal only, no code**: eight tables (incidents and their events, complaints and their events, worker clearances, policy reviews, reminders, per-account reference sequences), no participant personal data by schema (`participant_ref`/`worker_ref` code patterns, capped free text, a CHECK against NDIS-number shapes, the client detector), member RLS with the D-052 grants, a subscription-entitlement gate that freezes writes but keeps reads on lapse, CSV export per register, and four questions for the PO (enum vocabulary, email-only reminders, no clearance numbers, grace period). Stops there for the PO to turn into the REQ.
+- **Item 2.** `supabase/ops/FIRST-SIGN-IN.md` (on `req-010-part1-fixes`, with the other runbook changes): five steps from the sign-in form to `/admin` with the authenticator, each with what the screen shows when it worked, plus two failure hints. No values.
+- **Item 3.** Branch SHAs: `req-009-registers` c96dcaf, `req-010-part1-fixes` b5a15d7. **The runbook changed after the PO's review:** section 3 gained the three deploy traps and section 5's redirect entries carry the trailing `*` (batch 23 item 1); nothing else in `DEPLOY.md` moved.
+
+## Dev status (batch 23, written 13 Oct 2026, Dev)
+
+No model calls (cost table: none); the signed-in e2e ran in fake Stripe mode against the hosted project. **Branch `req-010-part1-fixes` b5a15d7** (from `main` f437e42); the PO opens the PR. `npm run check` green (71 files, 499 tests + 2 skipped); `npm run build` green; `npm audit --omit=dev` 0 advisories with `@vercel/functions` 3.9.11 added.
+
+- **Item 1.** Runbook: the three traps in `DEPLOY.md` section 3 (public variables type Config, one Stripe account and mode with the dashboard check, allow-list matched against the whole URL), the `*` entries in section 5, the first two traps in `.env.example`'s header.
+- **Item 2.** A Stripe failure inside `createCheckoutSession` is caught in the action, logged as `payments.checkout.failed` with the error's type, code and status (never the message or the key), and shown on the page as "Buying is not available right now; nothing was charged…" through the existing Buy form. Unit tests with a mocked `StripeAuthenticationError` and a rejected `createCheckoutSession`.
+- **Item 3 (D-1307).** Signed-in intro and step-footer copy say the draft is saved to the account; step 1 starts filled in from the account with a line saying so; a saved draft wins; account details are never changed from the questionnaire.
+- **Item 4 (D-1005).** `keepAlive()` uses Vercel's `waitUntil` when the request context exposes it (the package's helper is a silent no-op elsewhere, so the context is detected directly) and `after()` off Vercel; the job route's self-kick and the webhook's follow-on run go through it. The documents page now sees `generation_jobs.updated_at`; after 90 seconds without a row change its refresh loop calls `nudgeGenerationAction`, an owner-only server action that runs the job behind the same claim lock and hands on, once per stall window. Copy "usually 10 to 20 minutes". **Measured per-document time:** the only measurement is the PO's first hosted run, about one document a minute once the chain ran (18 documents in about 20 minutes; the model's latency, not the chain). The dev machine replays fixtures and cannot time the hosted model path; the next hosted purchase's `payments.generation.tick` lines (`documentsDone` and timestamps) are the measurement of record.
+- **e2e.** Purchase, questionnaire, documents, home, P2 and health specs on both projects: one run had the desktop purchase test fail because the local link to the hosted Supabase dropped mid-job (`update: TypeError: fetch failed` three times, so the job's own retry policy marked it failed after its backoff; working as designed, but a hosted-link flake from this machine); the purchase spec alone then passed 4 of 4 (2.6 minutes). Two other tests were flaky on first attempt and passed on retry.
+- **Nothing blocks a Hobby deploy.** D-053 stands; if the next hosted purchase still stalls with `waitUntil` and the nudge in place, the answer is Pro and a one-minute cron.
+>>>>>>> Stashed changes
