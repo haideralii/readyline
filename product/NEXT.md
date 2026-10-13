@@ -1053,3 +1053,39 @@ NDIS-watch items applied on **`req-018-ndis-watch-1` 265f9bf** (cut from the hea
 - **Proof here.** npm run check and npm run build green on the branch (96 test files, 688 tests passing, 4 skipped); standards:verify 27 sources. Copy-lint and the docx lint are inside `npm test`; the docx replay figures are above.
 - **Next:** batch 39 (REQ-018 audit-day systems). PRs #28 to #31 are still open, so per Haider's instruction the branch is cut from the head of `req-011-groups`.
 
+
+
+
+## Dev status (batch 39 Session A, written 14 Oct 2026, Dev; third unattended run)
+
+REQ-018 Session A on **`req-018-audit-day-systems` 83c9279** (cut from the head of `req-011-groups` 0d5f59b, as Haider's instruction says while PRs #28 to #31 are open). No model calls. Decisions D-1901 to D-1903.
+
+- **Migration** `20261014100000_audit_day_registers.sql`: corporate risks (nine areas, starter flag), participant risks (codes only, plus the support plan review date for FR-10), conflicts of interest, delegations, insurances and vehicles (dates only, SR-3), improvements, decisions (append only), staff matrix (training and clearance expiries from the worker checks table by worker code, which gains manual handling and medication kinds), onboarding checklists with append-only ticks (FR-9's tables are in this one migration so Session B has them), and one shared append-only `register_events` trail (D-1902). RLS and grants as REQ-009; update revoked on the three append-only tables; status views for review, expiry, supervision and appraisal states.
+- **Starter rows (FR-1):** `starterCorporateRisks` derives nine plain-words rows from the questionnaire; the unit test runs the copy and claims lints over every sentence of the three reference cases.
+- **Proof:** `tests/integration/audit-day-rls.test.ts` asserts tenancy, the 42501 refusals on the append-only tables, the NDIS-number and code CHECKs, the status views and owner-only delete. No Postgres on the Dev machine: CI's Supabase job proves the migration. Unit tests and lint green on the branch.
+- **Next:** Session B (pages) now, on the same branch.
+
+## Dev status (batch 39 Session B, written 14 Oct 2026, Dev; third unattended run)
+
+REQ-018 Session B on **`req-018-audit-day-systems` fd1ef71**. No model calls. Decision D-1904. `npm run check` and `npm run build` green (94 test files, 677 tests passing).
+
+- **Pages (FR-1 to FR-9).** One form, one list page and one detail page serve the nine registers from data (`src/lib/registers/audit-day-forms.ts`: schema keyed by column, field specs, words, list functions); the 27 route files are one line each. Phones get one field after another in the REQ-009 inputs; desktop the same form. The corporate risk register seeds its nine starter rows on first open and says "check this and change it" until a row is edited (FR-1). "Reviewed today, next review on" is one tap on the three registers with a review date. Decisions are never edited. Each row has the shared trail (D-1902).
+- **FR-6, AC-2.** A closed incident or a resolved complaint shows one tap to the improvement form with the source kind and reference pre-filled; the row lands in the register with the source.
+- **FR-9.** Two onboarding checklists in the instruction voice; a tick records the date and who ticked it and cannot be undone; a complete worker checklist sets the staff matrix's onboarding date.
+- **Index.** The registers page lists all nine with counts and attention words.
+- **Proof.** `audit-day-forms.test.ts` runs the copy and claims lints over every customer-facing word and the schemas' refusals; `e2e/signed-in/audit-day-registers.spec.ts` (three projects, iPhone included) walks the starter rows, the forms, the ticks, the one-tap improvement and the index with the width check and axe (AC-1), in CI's Supabase job.
+- **Next:** Session C (reminders, audit-day page, audit types, pricing sentence, FR-13 document control register, FR-14 circulation record) on the same branch, then the branch merge and the batch status.
+
+## Dev status (batch 39 Session C, written 14 Oct 2026, Dev; third unattended run; REQ-018 complete on the branch)
+
+REQ-018 Session C on **`req-018-audit-day-systems` 8b90c37** (Session A 83c9279, Session B fd1ef71, Session C f91a81f). The branch contains `main` 4da8eef and every open branch has `main` merged under the standing rule. No model calls. Decisions D-1905 to D-1907. npm run check and npm run build green on the branch (97 test files, 695 tests passing). The PO opens the PR.
+
+- **Reminders (FR-5, FR-8, FR-10, AC-3).** Six new kinds: insurance and vehicle expiry (30, 7, 0 days), supervision due (31 days after the last), appraisal due (365 days, with a 30-day warning), support plan review per participant (30, 7, 0), each register row's review date (14, 0), emergency drill six months after the last with a 14-day warning. Pure rules in the reminders module with fixed-date tests; the job reads the five tables and names a reminder by code, label or area only (SR-4); the stack test seeds one row per new kind and expects eleven reminders. Migration `20261014200000`: the CHECKs, `accounts.last_emergency_drill_on`, the append-only `policy_circulations` table (members insert from the Adopt step; update revoked).
+- **Audit-day page (FR-11, AC-4).** "What the auditor will ask to see": twelve records (document control, decisions, corporate risks, participant risks, conflicts, delegations, insurances and vehicles, improvements, staff matrix, onboarding, incidents, complaints) with filled, missing or overdue from the live counts and one tap each; the drill date form; the five audit kinds in plain words from `data/readyline-content/audit-kinds.json` (PO-owned, `status: draft`). There is no separate glossary page in the product, so the audit-day page is where the REQ's glossary lives; say if you want it elsewhere.
+- **Pricing (FR-12).** One sentence beside the subscription: the registers are linked and send the reminders, which a spreadsheet does not do.
+- **Document control (FR-13, FR-14, AC-5).** Derived from the pack, the policy reviews, the owner's role (D-1704) and the Adopt step's new "Who did you walk these through?" tick (codes, optional, with the date); first on the registers page; its own read-only page with the gaps and the tap to the Adopt step; the first page of the readiness summary when the set is re-rendered at Finish or Adopt (the first generation's summary has no page because nothing is adopted yet). A newly adopted pack shows a complete register with next review 12 months from adoption; re-adopting one document updates its row; a circulation counts only on or after the current version's day (unit tests).
+- **Proof.** Unit: reminder rules, document control, the ask list, the audit kinds schema, copy-lint over every new word. Stack (CI's Supabase job): `audit-day-rls.test.ts`, `reminders-job.test.ts` with the new seeds. E2E (CI): `audit-day-registers.spec.ts` on the three projects; `guided-path.spec.ts` now also checks the twelve records, the five kinds and the complete document control register after adoption. No Postgres on the Dev machine.
+- **Decisions you asked to see.** None stores a participant full name; no new plan or price; no uploads. Table and column names, starter-row wording and the training lead times (the same 90/30/7/0 as worker checks, through the existing clearance-expiry kind) were Dev's.
+- **Merge note.** This branch is cut from `req-011-groups`, so it merges after PRs #28 to #31 and the groups PR; it does not carry batches 36, 37 or 35.
+- **Next:** batch 40 (`req-005-house-style-v2`), cut from the head of `req-018-ndis-watch-1` under the standing rule.
+
