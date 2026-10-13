@@ -2462,8 +2462,13 @@ source line already carries the Commission's page. `derive.test.ts` runs
 the copy lint over every derived title, reason and label of the three
 reference cases and checks each title starts with an instruction verb.
 The batch 36 branch (`req-013-phone-fixes`) also edits
-`checklist-view.tsx` (the evidence badge); the two changes touch different
-lines of the panel and merge cleanly in either order.
+`checklist-view.tsx`: it replaces the evidence badge with a "Check this
+against the Commission's page" sentence inserted at the same point of the
+panel where this batch inserts the action link, so the two branches
+conflict there (checked with a throwaway merge, 14 Oct 2026). The
+resolution is to keep both, the check sentence first and the action link
+after it; DECISIONS.md conflicts as usual and the prose resolver handles
+it. Whichever PR the PO merges second carries that one-hunk resolution.
 
 ## Open questions for Haider
 
