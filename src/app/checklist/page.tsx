@@ -13,10 +13,7 @@ import { buildResult } from "@/lib/questionnaire/result";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
-import {
-  listChecklistItems,
-  listDraftedDocumentTypeIds,
-} from "@/server/checklist/queries";
+import { latestReadySet, listChecklistItems } from "@/server/checklist/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { ChecklistView } from "./checklist-view";
 
@@ -61,15 +58,15 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, drafted] = await Promise.all([
+  const [stored, latest] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
-    listDraftedDocumentTypeIds(supabase, viewer.account.id),
+    latestReadySet(supabase, viewer.account.id),
   ]);
   const checklist = deriveChecklist(built.result, answers.data, dataset);
   const shown = mergeChecklist({
     checklist,
     stored,
-    draftedDocumentTypeIds: drafted,
+    draftedDocumentTypeIds: latest.documentTypeIds,
   });
   const today = new Intl.DateTimeFormat("en-AU", {
     day: "numeric",
@@ -84,6 +81,7 @@ export default async function ChecklistPage() {
         tradingName={viewer.account.trading_name}
         pathway={built.result.pathway}
         shown={shown}
+        setId={latest.setId}
       />
 
       {/* FR-4: the print rendering, every item with status and note. */}

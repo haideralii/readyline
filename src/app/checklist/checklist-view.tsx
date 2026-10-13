@@ -64,10 +64,13 @@ export function ChecklistView({
   tradingName,
   pathway,
   shown,
+  setId,
 }: {
   tradingName: string;
   pathway: "verification" | "certification";
   shown: ShownChecklist;
+  /** The newest ready set, so a document item opens its document in one tap (REQ-017 step 6). */
+  setId: string | null;
 }) {
   const [local, setLocal] = useState<Local>(() =>
     Object.fromEntries(
@@ -308,6 +311,7 @@ export function ChecklistView({
                 <ChecklistRow
                   key={item.id}
                   item={item}
+                  setId={setId}
                   status={local[item.id]?.status ?? item.status}
                   note={local[item.id]?.note ?? ""}
                   open={openItems.has(item.id)}
@@ -334,6 +338,7 @@ function rowId(id: string) {
 
 function ChecklistRow({
   item,
+  setId,
   status,
   note,
   open,
@@ -343,6 +348,7 @@ function ChecklistRow({
   feedback,
 }: {
   item: ShownItem;
+  setId: string | null;
   status: ShownStatus;
   note: string;
   open: boolean;
@@ -356,6 +362,15 @@ function ChecklistRow({
   const noteId = `${b}-note`;
   const panelId = `${b}-panel`;
   const [noteOpen, setNoteOpen] = useState(note.length > 0);
+  // REQ-017 step 6: one tap to do it where the app can; a document item opens its document.
+  const action =
+    item.action ??
+    (item.documentTypeId && setId
+      ? {
+          label: "Open this document",
+          href: `/documents/${setId}/${item.documentTypeId}`,
+        }
+      : null);
   return (
     <li className="py-2" data-testid={`checklist-item-${b}`}>
       {/* FR-9: one row; the controls open under it. */}
@@ -406,6 +421,17 @@ function ChecklistRow({
             </a>
           )}
         </p>
+        {action ? (
+          <p className="mt-2">
+            <Link
+              href={action.href}
+              className="btn-secondary text-sm"
+              data-testid={`checklist-action-${b}`}
+            >
+              {action.label}
+            </Link>
+          </p>
+        ) : null}
         {status === "drafted" ? (
           <p
             className="mt-2 text-sm font-medium"

@@ -113,6 +113,17 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     }
     expect(ready, "the set became ready").toBe(true);
 
+    // D-541 as amended (batch 37): the owner's name and role are account
+    // facts the documents fill in; the finish form never asks for them.
+    await page.goto("/account");
+    await page.locator("#ownerName").fill("Jane Citizen");
+    await page.locator("#ownerRole").fill("Owner");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(
+      page.getByRole("status").filter({ hasText: "Saved." }),
+    ).toBeVisible();
+    await page.goto("/documents");
+
     // Step 4: finish your pack, one question at a time on a phone, grouped on desktop.
     await expectStep(page, "finish");
     await page.getByTestId("next-step-button").click();
@@ -153,12 +164,11 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     );
     await shot(page, "finish-done", project);
 
-    // AC-2: the set shows no blanks and the re-rendered document carries the answers.
+    // AC-2: the re-rendered document carries the answers and the owner's name
+    // from the account; the approval date fills in on adoption (D-541), so the
+    // "no blanks" check comes after step 5.
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
-    await expect(page.getByTestId("set-summary")).toContainText(
-      "No blanks to fill in",
-    );
     await page.getByTestId("set-list").getByRole("link").first().click();
     await expect(page.getByText("Jane Citizen").first()).toBeVisible();
 
@@ -191,9 +201,27 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     }
     await expect(page).toHaveURL(/\/checklist$/);
 
-    // Step 6: the checklist, and the strip now points at it.
+    // Step 6: the checklist, and the strip now points at it; each item is an
+    // instruction with one tap to do it where the app can (batch 37).
     await expectStep(page, "checklist");
+    await expect(
+      page.getByTestId("checklist-next").getByRole("listitem").first(),
+    ).toHaveText(/^(Ask|Get|Read|Start|Type|Book|Choose|Tell|Put)\b/);
+    const registersGroup = page.getByTestId("checklist-group-registers");
+    if (!(await registersGroup.evaluate((e) => (e as HTMLDetailsElement).open)))
+      await registersGroup.locator("summary").click();
+    await page.getByTestId("checklist-row-registers-incidents").click();
+    await expect(
+      page.getByTestId("checklist-action-registers-incidents"),
+    ).toHaveAttribute("href", "/registers/incidents");
     await shot(page, "checklist", project);
+
+    // AC-2 (D-541): adoption filled the approval date, so the set has no blanks left.
+    await page.goto("/documents");
+    await page.getByTestId("open-set").click();
+    await expect(page.getByTestId("set-summary")).toContainText(
+      "No blanks to fill in",
+    );
 
     // Step 7: the audit-day page, printable, with the pack download.
     await page.goto("/path/audit-day");

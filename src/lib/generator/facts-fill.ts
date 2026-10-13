@@ -117,6 +117,31 @@ const TEMPLATE_PATTERNS: readonly RegExp[] = [
   /^(?:name|date|role)\] \[/i,
 ];
 
+/**
+ * Facts the account holds rather than the Finish your pack form (D-541 as
+ * amended, batch 37): the owner's name and role come from the account page,
+ * the approval date from the day a group is adopted. The form never asks
+ * for them; the three fixed blanks in every document (approver, approval
+ * date, change-log author) fill from these.
+ */
+export const ACCOUNT_FACT_KEYS: ReadonlySet<string> = new Set([
+  "name",
+  "role",
+  "owner-role",
+  "date",
+]);
+
+export function isAccountFactKey(key: string): boolean {
+  return ACCOUNT_FACT_KEYS.has(key);
+}
+
+/** The form's questions: every fact except the ones the account holds. */
+export function formQuestionsFor(
+  blanks: readonly DocumentBlank[],
+): FactQuestion[] {
+  return questionsFor(blanks).filter((q) => !isAccountFactKey(q.key));
+}
+
 export function factKeyFor(blank: string): string | null {
   const inner = blank
     .replace(/^\[|\]$/g, "")

@@ -17,6 +17,7 @@ import {
 } from "@/server/registers/queries";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
+import { loadFacts } from "@/server/path/facts";
 import { listPurchases } from "@/server/payments/queries";
 import { subscriptionAvailable } from "@/server/payments/stripe";
 import {
@@ -46,13 +47,14 @@ export default async function AccountPage() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  const [purchases, overview, subscription, subscribed, reminders] =
+  const [purchases, overview, subscription, subscribed, reminders, facts] =
     await Promise.all([
       listPurchases(supabase, a.id),
       registerOverview(supabase, a.id),
       getSubscription(supabase, a.id),
       hasActiveSubscription(supabase, a.id),
       listUpcomingReminders(supabase, a.id, today),
+      loadFacts(supabase, a.id),
     ]);
   const registers = registersLine(overview);
   const pricing = readPricing();
@@ -199,6 +201,8 @@ export default async function AccountPage() {
             structure: a.business_structure as BusinessStructureAnswer,
             states: a.states as State[],
             abn: a.abn ?? "",
+            ownerName: facts.name ?? "",
+            ownerRole: facts.role ?? "",
           }}
         />
       </section>

@@ -2396,6 +2396,75 @@ row count back from the table for that account, and checks the outbox for
 that owner did not grow on the second run. The subscription-ledger test
 already measured against a baseline and needed nothing.
 
+**D-1010 The app dispatches the kicker workflow; the schedule is the safety
+net (Dev, 2026-10-14, batch 37, implementing the PO's D-059).** The
+workflow runs on `*/30` and on a `repository_dispatch` event of type
+`generate`, and loops for up to twenty minutes (`KICK_MAX_SECONDS` 1200,
+`timeout-minutes` 25, under the schedule). `continueGeneration` sends the
+dispatch first, before its own budgeted run, so the chain is carried even
+when the invocation is frozen (D-057); both the webhook and the nudge go
+through it, and the kicker and the cron do not, so a dispatched run never
+dispatches again. The call needs `GITHUB_DISPATCH_TOKEN` (optional; listed
+in `OPTIONAL` in `src/lib/env.ts` and named by the prebuild check when
+absent) and is skipped with one log line without it. The repository is a
+constant in `src/server/generation/dispatch.ts`. **Permission:** the PO
+wrote "Actions write"; GitHub's "Permissions required for fine-grained
+personal access tokens" lists `POST /repos/{owner}/{repo}/dispatches` under
+Contents, write, so the runbook asks for Contents: read and write on this
+repository alone and nothing else. Minutes: about 1,440 a month for the
+schedule (one call when idle) plus dispatched runs only while a pack is
+generating.
+
+**D-1011 The prose conflict resolver lives in the repository and refuses
+code (Dev, 2026-10-14, batch 37, the PO's standing rule).**
+`scripts/ops/resolve-prose-conflicts.ts` keeps both sides of a conflict
+block in order (HEAD first), keeps the repaired side alone when the other
+is its mojibake, strips a byte-order mark and repairs mojibake on the way
+out. It refuses any path that is not `.md` before writing anything, so a
+mixed list changes no file. `resolve-prose-conflicts.test.ts` covers the
+refusal (`playwright.config.ts`, `.sql`, `.yml`, `.json`, `.mdx`), the
+concatenation, the mojibake case and the leftover-marker error.
+
+**D-1704 The owner's name and role are account facts; the Finish form never
+asks for them (Dev, 2026-10-14, batch 37, implementing the PO's amended
+D-541).** The account form (setup and settings) gains "Your name" and
+"Your role", optional, saved as the facts `name`, `role` and `owner-role`
+(the AI documents' "[owner role]" is the same fact) through
+`saveOwnerAction`; the approval date is the `date` fact set on the day a
+group is adopted (D-1703). `formQuestionsFor` drops the four account keys,
+and the Finish page says where the name goes and that the date fills in
+on adoption. The three fixed blanks (approver, approval date, change-log
+author) fill from these facts in the job and in every re-render, as
+before. **Measure:** `lintDocx` now counts fact blanks per Heading 1
+section from the rendered XML (`blanks` on the report; a register's row
+template such as "[Code]" is not a fact blank). On the sole-trader set
+replayed through the fixtures: 61 of 186 sections (33 percent) carry a
+fact blank before the owner's name, 3 of 186 (2 percent) after it, with
+name, role and date applied; the test fails above 10 percent. The three
+left are the records-management policy (period, location), the privacy
+policy and the service agreement (notice period), all Finish-form facts.
+The guided-path e2e sets the owner on the account page before the Finish
+step and checks "No blanks to fill in" after adoption rather than after
+the form.
+
+**D-1705 Checklist items are instructions with one tap to do them (Dev,
+2026-10-14, batch 37, REQ-017 step 6).** Every title starts with a verb in
+the customer's voice ("Ask your 1 key person for their NDIS Worker
+Screening clearance, and type each expiry date here"; "Read your
+Complaints management policy and register and adopt it"; "Get public
+liability insurance and keep the certificate of currency"); the `why`
+lines and item ids are unchanged, so stored statuses and the e2e test ids
+carry over. `ChecklistItem.action` is an in-app route and label: the four
+registers with pages, the clearance item (add a clearance) and the ABN
+item (the account page); a document item's link is built by the page from
+the newest ready set (`latestReadySet`). No external links are added: the
+source line already carries the Commission's page. `derive.test.ts` runs
+the copy lint over every derived title, reason and label of the three
+reference cases and checks each title starts with an instruction verb.
+The batch 36 branch (`req-013-phone-fixes`) also edits
+`checklist-view.tsx` (the evidence badge); the two changes touch different
+lines of the panel and merge cleanly in either order.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

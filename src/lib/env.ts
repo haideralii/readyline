@@ -87,6 +87,23 @@ export const REQUIRED_LATER: ReadonlyArray<{
 ];
 
 /**
+ * Variables the code reads when present and does without when absent; the
+ * prebuild check names the ones that are not set (names only) so a missing
+ * optional value is a visible choice, never a surprise.
+ */
+export const OPTIONAL: ReadonlyArray<{
+  name: string;
+  from: string;
+  without: string;
+}> = [
+  {
+    name: "GITHUB_DISPATCH_TOKEN",
+    from: "D-059 (the app starts the kicker workflow when work exists)",
+    without: "the thirty-minute schedule picks jobs up instead",
+  },
+];
+
+/**
  * Variables a production deployment cannot run without (REQ-010 FR-2). The
  * boot check and the prebuild script require them when the deployment is
  * Vercel's production environment; previews, CI's `next start` and local

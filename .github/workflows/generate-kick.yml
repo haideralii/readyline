@@ -1,16 +1,27 @@
 name: Kick paid generation
 
-# Batch 32 item 1 (D-1006): the paid document chain on Vercel Hobby only
-# progresses while something calls /api/jobs/generate (Hobby cron is daily
-# and `waitUntil` does not carry the self-kick reliably, D-057). This job
-# calls the route with the bearer every five minutes until it answers
-# `"more": false` or four minutes have passed. The route refuses without
-# the bearer (404) and claims jobs behind a skip-locked lease, so a kick
-# that overlaps a live chain is a no-op (scripts/ops/kick-generation.test.ts).
+# Batch 32 item 1 (D-1006), schedule and dispatch per D-059 (batch 37): the
+# paid document chain on Vercel Hobby only progresses while something calls
+# /api/jobs/generate (Hobby cron is daily and `waitUntil` does not carry the
+# self-kick reliably, D-057). The app sends a `repository_dispatch` event
+# (type `generate`) when work exists: on a paid checkout and on a nudge from
+# the documents page that finds a stalled job (src/server/generation/
+# dispatch.ts, needs GITHUB_DISPATCH_TOKEN in Vercel). The schedule every
+# thirty minutes is the safety net when the token is missing or the
+# dispatch failed. Either way the job calls the route with the bearer until
+# it answers `"more": false` or twenty minutes have passed. The route
+# refuses without the bearer (404) and claims jobs behind a skip-locked
+# lease, so a kick that overlaps a live chain is a no-op
+# (scripts/ops/kick-generation.test.ts).
+#
+# Minutes: a scheduled run with nothing to do makes one call and ends, so
+# the schedule costs about 1,440 runner minutes a month against GitHub's
+# 2,000 free for a private repository; a dispatched run costs only while a
+# pack is generating.
 #
 # Needs: repository variable PROD_URL (https://<domain>, no trailing slash)
 # and repository secret CRON_SECRET (the same value as the Vercel variable;
-# Haider pastes it, see supabase/ops/DEPLOY.md section 8). Until both exist
+# Haider pastes it, see supabase/ops/DEPLOY.md section 8a). Until both exist
 # the job skips with a notice.
 #
 # Dry run (act is not installed on the Dev machine): the YAML is parsed and
@@ -23,7 +34,9 @@ name: Kick paid generation
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/30 * * * *"
+  repository_dispatch:
+    types: [generate]
   workflow_dispatch:
 
 concurrency:
@@ -37,11 +50,11 @@ jobs:
   kick:
     name: Call /api/jobs/generate until drained
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 25
     env:
       PROD_URL: ${{ vars.PROD_URL }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      KICK_MAX_SECONDS: "240"
+      KICK_MAX_SECONDS: "1200"
     steps:
       - name: Check that the variable and the secret exist
         id: gate

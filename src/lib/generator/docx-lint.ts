@@ -12,9 +12,22 @@
 import { strFromU8, unzipSync } from "fflate";
 import { auditOrder } from "./set-order";
 import { findInstructionLeaks } from "./placeholders";
-import { lintBlanks } from "./blanks";
+import { BLANK, lintBlanks } from "./blanks";
+import { factKeyFor } from "./facts-fill";
 
 export type DocxFinding = { rule: string; detail: string };
+
+/**
+ * Blanks counted per document from the rendered text (D-541 as amended):
+ * a fact blank is one the provider fills from the account or the Finish
+ * form ("[name]", "[phone or email]"); a row template in a register
+ * ("[Code]", "[Summary]") is not. Sections are the Heading 1 parts.
+ */
+export type DocxBlankCount = {
+  sections: number;
+  factBlanks: number;
+  sectionsWithFactBlanks: number;
+};
 
 export type DocxReport = {
   findings: DocxFinding[];
@@ -25,7 +38,34 @@ export type DocxReport = {
   sizes: number[];
   headingStyles: string[];
   headings: number;
+  blanks: DocxBlankCount;
 };
+
+/** Fact blanks per Heading 1 section of the body XML. */
+export function countFactBlanks(body: string): DocxBlankCount {
+  const chunks: string[] = [];
+  let current: string | null = null;
+  for (const p of body.match(/<w:p[ >][\s\S]*?<\/w:p>/g) ?? []) {
+    if (/<w:pStyle w:val="Heading1"\/>/.test(p)) {
+      if (current !== null) chunks.push(current);
+      current = "";
+    }
+    // The title block before the first heading is not a section.
+    if (current === null) continue;
+    current += ` ${text(p)}`;
+  }
+  if (current !== null) chunks.push(current);
+  let factBlanks = 0;
+  let sectionsWithFactBlanks = 0;
+  for (const chunk of chunks) {
+    const n = [...chunk.matchAll(BLANK)].filter((m) =>
+      Boolean(factKeyFor(m[0])),
+    ).length;
+    factBlanks += n;
+    if (n > 0) sectionsWithFactBlanks += 1;
+  }
+  return { sections: chunks.length, factBlanks, sectionsWithFactBlanks };
+}
 
 function xmlOf(files: Record<string, Uint8Array>, name: string): string {
   const f = files[name];
@@ -217,7 +257,15 @@ export function lintDocx(
   if (/not legal advice|generated with AI/i.test(plain))
     fail("d058-notice", "a delivery notice is inside the document");
 
-  return { findings, warnings, fonts, sizes, headingStyles, headings };
+  return {
+    findings,
+    warnings,
+    fonts,
+    sizes,
+    headingStyles,
+    headings,
+    blanks: countFactBlanks(body),
+  };
 }
 
 /** S-7: the files of a set, by type id, in audit order. */

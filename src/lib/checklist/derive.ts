@@ -45,11 +45,20 @@ export type SourceRef =
   | { kind: "source"; id: string; title: string; url: string }
   | { kind: "content"; id: "document-sets"; title: string };
 
+/**
+ * One tap to do the item where the app can (REQ-017 step 6): an in-app
+ * route, never an external site. A document item's link needs the set id,
+ * which the page adds; `documentTypeId` marks it.
+ */
+export type ChecklistAction = { label: string; href: string };
+
 export type ChecklistItem = {
   /** Stable across derivations: "<group>:<slug>"; the persistence key. */
   id: string;
   group: ChecklistGroupId;
+  /** An instruction in the customer's voice: what to do, where to type it. */
   title: string;
+  action?: ChecklistAction;
   /** One line, plain words. */
   why: string;
   sourceRef: SourceRef;
@@ -113,6 +122,30 @@ const CONTENT_REF: SourceRef = {
   kind: "content",
   id: "document-sets",
   title: "Every registered provider needs this",
+};
+
+/** REQ-017 step 6: each register item as the thing to do, in the customer's words. */
+const REGISTER_INSTRUCTIONS: Record<string, string> = {
+  incidents:
+    "Start your incident register and record each incident on the day it happens",
+  complaints:
+    "Start your complaints register and record each complaint on the day it comes in",
+  "worker-clearances":
+    "Type each worker's screening clearance and its expiry date into your clearance register",
+  "policy-reviews":
+    "Start your policy review register and note when each policy is next due",
+  training:
+    "Start your training register and note each worker's training and when it expires",
+  "restrictive-practices":
+    "Start your restrictive practice use register and record every use on the day",
+};
+
+/** The register pages the app has; a register without a page gets no tap. */
+const REGISTER_ROUTES: Record<string, string> = {
+  incidents: "/registers/incidents",
+  complaints: "/registers/complaints",
+  "worker-clearances": "/registers/worker-checks",
+  "policy-reviews": "/registers/policy-reviews",
 };
 
 /** The standard that names a register as evidence, within the applicable modules. */
@@ -179,7 +212,7 @@ export function deriveChecklist(
     items.push({
       id: `documents:${d.id}`,
       group: "documents",
-      title: d.title,
+      title: `Read your ${d.title} and adopt it`,
       why:
         from.length === 0
           ? "Every provider's set includes this; auditors ask to see it."
@@ -194,10 +227,16 @@ export function deriveChecklist(
   // Registers: one per register, cited to the standard whose evidence names it.
   for (const r of result.registers) {
     const ref = registerStandardRef(dataset, moduleIds, r.id);
+    const route = REGISTER_ROUTES[r.id];
     items.push({
       id: `registers:${r.id}`,
       group: "registers",
-      title: r.title,
+      title:
+        REGISTER_INSTRUCTIONS[r.id] ??
+        `Start your ${r.title.toLowerCase()} and keep it up to date`,
+      action: route
+        ? { label: `Open the ${r.title.toLowerCase()}`, href: route }
+        : undefined,
       why: ref
         ? `Auditors sample this register as evidence for the ${ref.title} standard, and you keep it after registration.`
         : "Kept after registration so policy reviews are on time; auditors ask how reviews are tracked.",
@@ -213,12 +252,14 @@ export function deriveChecklist(
   const screeningCount = w.hasRiskAssessedRoles
     ? Math.max(w.keyPersonnelCount, 1)
     : w.keyPersonnelCount;
+  const keyPeople = `${w.keyPersonnelCount} key ${w.keyPersonnelCount === 1 ? "person" : "personnel"}`;
   items.push({
     id: "people:worker-screening-clearances",
     group: "people",
     title: w.hasRiskAssessedRoles
-      ? `NDIS Worker Screening clearances for your ${w.keyPersonnelCount} key ${w.keyPersonnelCount === 1 ? "person" : "personnel"} and every worker in a risk-assessed role`
-      : `NDIS Worker Screening clearances for your ${w.keyPersonnelCount} key ${w.keyPersonnelCount === 1 ? "person" : "personnel"}`,
+      ? `Ask your ${keyPeople} and every worker in a risk-assessed role for their NDIS Worker Screening clearance, and type each expiry date here`
+      : `Ask your ${keyPeople} for their NDIS Worker Screening clearance, and type each expiry date here`,
+    action: { label: "Add a clearance", href: "/registers/worker-checks/new" },
     why: "Auditors sample worker files for a current clearance and check the clearance register's expiry dates.",
     sourceRef: standardRef(dataset, hr.id),
     // The Worker Screening Rules are not in the dataset; the evidence item is Readyline's.
@@ -229,7 +270,7 @@ export function deriveChecklist(
   items.push({
     id: "people:worker-orientation-module",
     group: "people",
-    title: `NDIS Worker Orientation Module completed by all ${w.workerCount} worker${w.workerCount === 1 ? "" : "s"}`,
+    title: `Ask all ${w.workerCount} worker${w.workerCount === 1 ? "" : "s"} to complete the NDIS Worker Orientation Module and keep each certificate`,
     why: "The Practice Standards require every worker to complete the Commission's orientation module as part of induction; keep the certificates.",
     sourceRef: standardRef(dataset, hr.id, hr.orientationIndicator),
     unverified: false,
@@ -241,7 +282,8 @@ export function deriveChecklist(
   items.push({
     id: "business:abn",
     group: "business",
-    title: "An ABN for the business",
+    title: "Get an ABN for the business and type it on your account page",
+    action: { label: "Open your account page", href: "/account" },
     why: "The registration rules say an applicant must have an ABN; the application form asks for it first.",
     sourceRef: sourceRef(dataset, "legislation-rules-toc"),
     unverified: false,
@@ -251,15 +293,15 @@ export function deriveChecklist(
   const insurances: [string, string][] = [
     [
       "public-liability",
-      "Public liability insurance (certificate of currency)",
+      "Get public liability insurance and keep the certificate of currency",
     ],
     [
       "professional-indemnity",
-      "Professional indemnity insurance (certificate of currency)",
+      "Get professional indemnity insurance and keep the certificate of currency",
     ],
     [
       "personal-accident",
-      "Personal accident insurance (certificate of currency)",
+      "Get personal accident insurance and keep the certificate of currency",
     ],
   ];
   for (const [slug, title] of insurances) {
@@ -277,7 +319,8 @@ export function deriveChecklist(
     items.push({
       id: "business:insurance-workers-compensation",
       group: "business",
-      title: "Workers compensation insurance for your workers",
+      title:
+        "Get workers compensation insurance for your workers and keep the certificate",
       why: "A state or territory requirement for employers, not a Commission requirement; auditors commonly ask for it alongside the other certificates.",
       sourceRef: CONTENT_REF,
       unverified: true,
@@ -291,7 +334,8 @@ export function deriveChecklist(
   items.push({
     id: "audit:choose-auditor",
     group: "audit",
-    title: "Choose an approved quality auditor",
+    title:
+      "Choose an approved quality auditor from the Commission's list and ask for a quote",
     why: "Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list. Readyline takes no fee or commission from any auditor.",
     sourceRef: audits,
     unverified: false,
@@ -301,8 +345,8 @@ export function deriveChecklist(
     id: "audit:book-audit",
     group: "audit",
     title: certification
-      ? "Book the certification audit (a site visit)"
-      : "Book the verification audit (a desktop review of your documents)",
+      ? "Book your certification audit with the auditor; it includes a site visit"
+      : "Book your verification audit with the auditor; it is a desktop review of your documents",
     why: certification
       ? "A certification audit includes site visits, participant interviews and worker interviews."
       : "A verification audit is a desktop review of your documents; nobody visits.",
@@ -314,7 +358,8 @@ export function deriveChecklist(
     items.push({
       id: "audit:participant-interview-consent",
       group: "audit",
-      title: "Participants who agree to be interviewed by the auditor",
+      title:
+        "Ask participants whether they agree to be interviewed by the auditor, and note only that they agreed",
       why: "The auditor interviews participants during a certification audit; arrange consent in advance and record only that it was given, never health details.",
       sourceRef: audits,
       unverified: false,
@@ -323,7 +368,8 @@ export function deriveChecklist(
     items.push({
       id: "audit:worker-interview-availability",
       group: "audit",
-      title: "Workers available for interview on the audit days",
+      title:
+        "Tell your workers the audit days and make sure some are free for an interview",
       why: "The auditor interviews workers during a certification audit.",
       sourceRef: audits,
       unverified: false,
@@ -333,7 +379,7 @@ export function deriveChecklist(
       items.push({
         id: "audit:mid-term-audit-date",
         group: "audit",
-        title: `Mid-term audit date noted: about ${result.midTermAudit.monthsAfterRegistration} months after registration`,
+        title: `Put your mid-term audit in the calendar: about ${result.midTermAudit.monthsAfterRegistration} months after registration`,
         why: `Certified providers have a mid-term audit against the governance standards; start preparing from month ${result.midTermAudit.prepareFromMonth}.`,
         sourceRef: {
           kind: "rule",

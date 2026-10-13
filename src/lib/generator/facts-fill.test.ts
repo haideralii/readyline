@@ -9,6 +9,8 @@ import {
   applyFacts,
   factKeyFor,
   fillText,
+  formQuestionsFor,
+  isAccountFactKey,
   questionsFor,
   remainingBlanks,
 } from "./facts-fill";
@@ -24,6 +26,47 @@ const governance = buildSkeleton({
   result: c.result,
   version: "1",
   generatedAt: "2026-10-14",
+});
+
+describe("account facts stay off the Finish form (D-541 as amended, batch 37)", () => {
+  it("the owner's name, role and the approval date are account facts; the form asks for everything else", () => {
+    for (const key of ["name", "role", "owner-role", "date"])
+      expect(isAccountFactKey(key), key).toBe(true);
+    expect(isAccountFactKey("phone-or-email")).toBe(false);
+    const blanks = collectBlanks(governance);
+    const all = questionsFor(blanks).map((q) => q.key);
+    expect(all).toContain("name");
+    expect(all).toContain("date");
+    const form = formQuestionsFor(blanks).map((q) => q.key);
+    expect(form).not.toContain("name");
+    expect(form).not.toContain("role");
+    expect(form).not.toContain("date");
+    expect(form).toEqual(all.filter((k) => !isAccountFactKey(k)));
+  });
+
+  it("the three fixed blanks fill from the account facts: approver, approval date, change-log author", () => {
+    const filled = applyFacts(governance, {
+      name: "Jane Citizen",
+      role: "Owner",
+      date: "14 October 2026",
+    });
+    const control = filled.sections.find((s) => s.id === "document-control")!;
+    const rows = control.blocks.flatMap((b) =>
+      b.type === "table" ? b.rows : [],
+    );
+    expect(rows).toContainEqual(["Approver", "Jane Citizen, Owner"]);
+    expect(rows).toContainEqual(["Approval date", "14 October 2026"]);
+    const log = filled.sections.find((s) => s.id === "change-log")!;
+    const logRows = log.blocks.flatMap((b) =>
+      b.type === "table" ? b.rows : [],
+    );
+    expect(logRows[0]?.at(-1)).toBe("Jane Citizen");
+    expect(
+      collectBlanks(filled).filter((b) =>
+        ["[name]", "[role]", "[date]"].includes(b.blank),
+      ),
+    ).toEqual([]);
+  });
 });
 
 describe("facts-fill (REQ-017 FR-2, D-1702)", () => {

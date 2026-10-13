@@ -23,11 +23,11 @@ export async function listChecklistItems(
   }));
 }
 
-/** Document type ids in the account's newest ready set (FR-2 "drafted"). */
-export async function listDraftedDocumentTypeIds(
+/** The account's newest ready set and the document type ids in it (FR-2 "drafted"; REQ-017 step 6 one-tap links). */
+export async function latestReadySet(
   supabase: SupabaseClient,
   accountId: string,
-): Promise<string[]> {
+): Promise<{ setId: string | null; documentTypeIds: string[] }> {
   const set = await supabase
     .from("version_sets")
     .select("id")
@@ -36,12 +36,24 @@ export async function listDraftedDocumentTypeIds(
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!set.data) return [];
+  if (!set.data) return { setId: null, documentTypeIds: [] };
+  const setId = set.data.id as string;
   const docs = await supabase
     .from("document_versions")
     .select("document_type_id")
-    .eq("version_set_id", set.data.id as string);
-  return ((docs.data as { document_type_id: string }[] | null) ?? []).map(
-    (d) => d.document_type_id,
-  );
+    .eq("version_set_id", setId);
+  return {
+    setId,
+    documentTypeIds: (
+      (docs.data as { document_type_id: string }[] | null) ?? []
+    ).map((d) => d.document_type_id),
+  };
+}
+
+/** Document type ids in the account's newest ready set (FR-2 "drafted"). */
+export async function listDraftedDocumentTypeIds(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<string[]> {
+  return (await latestReadySet(supabase, accountId)).documentTypeIds;
 }
