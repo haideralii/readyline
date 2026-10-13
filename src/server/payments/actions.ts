@@ -28,9 +28,11 @@ const Input = strictObject({ cancelPath: z.string().max(64).optional() });
 // A "use server" module may export only async functions; the messages and
 // the result type live in ./messages.ts.
 import {
+  CHECKOUT_FAILED,
   CHECKOUT_NEEDS_ANSWERS,
   CHECKOUT_RATE_LIMITED,
   CHECKOUT_UNAVAILABLE,
+  stripeFailureFields,
   type CheckoutActionResult,
 } from "./messages";
 
@@ -74,23 +76,34 @@ export async function createCheckoutAction(
   }
 
   const assessmentId = `${ANSWERS_VERSION}:${answersHash(answers.data)}`;
-  const session = await createCheckoutSession({
-    // Fake mode (D-709): a page on our own origin stands in for Checkout.
-    stripe: env.fake
-      ? new FakeCheckoutClient(env.webhookSecret)
-      : createStripeClient(env.secretKey),
-    checkout: {
-      priceId: env.pricePack,
+  let session;
+  try {
+    session = await createCheckoutSession({
+      // Fake mode (D-709): a page on our own origin stands in for Checkout.
+      stripe: env.fake
+        ? new FakeCheckoutClient(env.webhookSecret)
+        : createStripeClient(env.secretKey),
+      checkout: {
+        priceId: env.pricePack,
+        accountId: account.id,
+        email: viewer.user.email ?? "",
+        assessmentId,
+        packVersion: PROMPT_VERSION,
+        siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "",
+        cancelPath,
+      },
+      // One session per account and answers snapshot per hour: a double click or a retry reuses it.
+      idempotencyKey: `checkout:${account.id}:${assessmentId}:${Math.floor(Date.now() / 3_600_000)}`,
+    });
+  } catch (e) {
+    // Batch 23 item 2: a Stripe failure (wrong key, missing Price, outage) is a
+    // message on the page, never Next's error page; the code is logged, not the key.
+    log.error("payments.checkout.failed", {
       accountId: account.id,
-      email: viewer.user.email ?? "",
-      assessmentId,
-      packVersion: PROMPT_VERSION,
-      siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "",
-      cancelPath,
-    },
-    // One session per account and answers snapshot per hour: a double click or a retry reuses it.
-    idempotencyKey: `checkout:${account.id}:${assessmentId}:${Math.floor(Date.now() / 3_600_000)}`,
-  });
+      ...stripeFailureFields(e),
+    });
+    return { ok: false, message: CHECKOUT_FAILED };
+  }
   log.info("payments.checkout.created", {
     accountId: account.id,
     sessionId: session.id,

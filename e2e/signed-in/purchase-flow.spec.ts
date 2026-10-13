@@ -115,7 +115,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     await expect(page.getByTestId("purchase-preparing")).toBeVisible();
     await expect(page.getByTestId("purchase-thanks")).toBeVisible();
     await expect(page.getByRole("status")).toContainText(
-      "usually under 10 minutes",
+      "usually 10 to 20 minutes",
     );
     await shot(page, "documents-preparing", project);
 

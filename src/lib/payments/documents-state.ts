@@ -27,11 +27,29 @@ export type JobView = {
   status: "queued" | "running" | "ready" | "failed";
   nextDocumentIndex: number;
   versionSetId: string | null;
+  /** When the job row last changed; the page uses it to notice a stalled chain (batch 23 item 4). */
+  updatedAt?: string;
 };
+
+/** A job that has not moved for this long is nudged by the documents page itself (D-1005). */
+export const STALL_AFTER_MS = 90_000;
+
+/** True when a queued or running job has shown no progress for STALL_AFTER_MS. */
+export function isJobStalled(job: JobView | undefined, now: Date): boolean {
+  if (!job || !job.updatedAt) return false;
+  if (job.status !== "queued" && job.status !== "running") return false;
+  return now.getTime() - new Date(job.updatedAt).getTime() >= STALL_AFTER_MS;
+}
 
 export type DocumentsState =
   | { kind: "none" }
-  | { kind: "preparing"; purchase: PurchaseView | null; documentsDone: number }
+  | {
+      kind: "preparing";
+      purchase: PurchaseView | null;
+      documentsDone: number;
+      /** The job row behind the state, so the page can watch for a stall. */
+      job: JobView | null;
+    }
   | { kind: "delayed"; purchase: PurchaseView | null }
   | { kind: "ready"; purchase: PurchaseView | null; versionSetId: string }
   | { kind: "refunded"; purchase: PurchaseView };
@@ -70,6 +88,7 @@ export function deriveDocumentsState(input: {
       kind: "preparing",
       purchase,
       documentsDone: job?.nextDocumentIndex ?? 0,
+      job: job ?? null,
     };
   }
   const latest = newest(input.purchases, (p) => p.createdAt);

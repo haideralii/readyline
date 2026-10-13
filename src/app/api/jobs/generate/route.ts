@@ -5,7 +5,7 @@
  * through a chain of short runs. Anything unauthorised gets 404 so the route
  * is invisible. Answers with what each run did, never with document content.
  */
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
@@ -14,6 +14,7 @@ import {
   mayRunScheduledJobs,
 } from "@/server/jobs/cron-auth";
 import {
+  keepAlive,
   kickGenerationRoute,
   runQueuedGeneration,
 } from "@/server/generation/kick";
@@ -53,8 +54,9 @@ export async function GET(request: Request) {
       runs: reports.length,
       more,
     });
-    // More to do: ask for another run once this response has gone out.
-    if (more) after(() => kickGenerationRoute());
+    // More to do: ask for another run once this response has gone out; the
+    // platform keeps this invocation alive until the request is sent (D-1005).
+    if (more) keepAlive(() => kickGenerationRoute());
     return NextResponse.json({
       runs: reports.map((r) =>
         r.claimed

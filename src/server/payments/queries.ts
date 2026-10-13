@@ -72,7 +72,9 @@ export async function listGenerationJobs(
 ): Promise<JobView[]> {
   const r = await supabase
     .from("generation_jobs")
-    .select("entitlement_id, status, next_document_index, version_set_id")
+    .select(
+      "entitlement_id, status, next_document_index, version_set_id, updated_at",
+    )
     .eq("account_id", accountId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -81,12 +83,14 @@ export async function listGenerationJobs(
     status: JobView["status"];
     next_document_index: number;
     version_set_id: string | null;
+    updated_at: string;
   };
   return ((r.data as Row[] | null) ?? []).map((j) => ({
     entitlementId: j.entitlement_id,
     status: j.status,
     nextDocumentIndex: j.next_document_index,
     versionSetId: j.version_set_id,
+    updatedAt: j.updated_at,
   }));
 }
 

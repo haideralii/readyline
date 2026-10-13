@@ -160,7 +160,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-preparing"
         >
-          <AutoRefresh />
+          <AutoRefresh lastChangeAt={state.job?.updatedAt ?? null} />
           <h2 id="preparing-heading" className="text-xl font-semibold">
             {C.preparingHeading}
           </h2>

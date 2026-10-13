@@ -6,12 +6,12 @@
  * granted pack gets its receipt URL looked up and its generation job started
  * (D-706, D-707). Logs carry the event id and type, never the payload.
  */
-import { NextResponse, after } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
 import { handleStripeWebhook } from "@/lib/payments/webhook";
-import { continueGeneration } from "@/server/generation/kick";
+import { continueGeneration, keepAlive } from "@/server/generation/kick";
 import {
   fakeReceiptLookup,
   stripeReceiptLookup,
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
         const lookup = env.fake
           ? fakeReceiptLookup(new URL(request.url).origin)
           : stripeReceiptLookup(stripe);
-        after(async () => {
+        keepAlive(async () => {
           if (payment) await attachReceipt(lookup, store, payment);
           await continueGeneration(AFTER_BUDGET_MS);
         });

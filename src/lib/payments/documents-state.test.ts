@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   deriveDocumentsState,
+  isJobStalled,
   refundMailto,
   type EntitlementView,
   type JobView,
@@ -43,14 +44,32 @@ describe("documents page state (REQ-007 FR-5, FR-6, FR-8)", () => {
         entitlements: [entitlement],
         jobs: [],
       }),
-    ).toEqual({ kind: "preparing", purchase, documentsDone: 0 });
+    ).toEqual({ kind: "preparing", purchase, documentsDone: 0, job: null });
+    const running = {
+      ...job,
+      status: "running" as const,
+      nextDocumentIndex: 4,
+    };
     expect(
       deriveDocumentsState({
         purchases: [purchase],
         entitlements: [entitlement],
-        jobs: [{ ...job, status: "running", nextDocumentIndex: 4 }],
+        jobs: [running],
       }),
-    ).toEqual({ kind: "preparing", purchase, documentsDone: 4 });
+    ).toEqual({ kind: "preparing", purchase, documentsDone: 4, job: running });
+  });
+
+  it("calls a queued or running job stalled after 90 seconds without a row change, never a finished one (batch 23 item 4)", () => {
+    const now = new Date("2026-10-13T10:00:00Z");
+    const fresh = { ...job, updatedAt: "2026-10-13T09:59:00Z" };
+    const old = { ...job, updatedAt: "2026-10-13T09:58:00Z" };
+    expect(isJobStalled(fresh, now)).toBe(false);
+    expect(isJobStalled(old, now)).toBe(true);
+    expect(isJobStalled({ ...old, status: "running" }, now)).toBe(true);
+    expect(isJobStalled({ ...old, status: "ready" }, now)).toBe(false);
+    expect(isJobStalled({ ...old, status: "failed" }, now)).toBe(false);
+    expect(isJobStalled(job, now)).toBe(false);
+    expect(isJobStalled(undefined, now)).toBe(false);
   });
 
   it("is 'ready' once the entitlement or the job carries a version set", () => {

@@ -1,5 +1,5 @@
 # REQ-009: Registers (incidents, complaints, worker clearances, policy reviews) and reminders
-Status: Dev proposal, no code (batch 22 item 1; the PO turns this into the REQ)   Phase: 5   Priority: must   Owner: Dev
+Status: written (PO, 13 Oct 2026, from the Dev proposal below); Session A ready to build   Phase: 5   Priority: must   Owner: Dev
 Depends on: REQ-004 (accounts), REQ-006 (checklist), REQ-007 (entitlements; the subscription product is the second entitlement kind).
 
 ## Why (from the brief)
@@ -35,6 +35,40 @@ Migration with the eight tables, policies, grants, CHECKs, the reference functio
 2. Reminders by email only in v1, from the REQ-004 provider once D-013 picks one?
 3. Should the clearance register hold the clearance *number* at all? Proposal: no (it identifies a person outside our system); expiry and kind are enough for the audit sample.
 4. Subscription lapse: freeze writes but keep reads, as proposed, or keep writes too for a 14-day grace?
+
+## PO answers to the Dev questions (13 Oct 2026)
+1. **Vocabulary.** Use the Commission's own words where it has them and Readyline's where it does not.
+   - Incident `category` (what happened): `death`, `serious-injury`, `abuse-or-neglect`, `unlawful-sexual-or-physical-contact`, `sexual-misconduct`, `restrictive-practice-unauthorised`, `near-miss`, `medication`, `property-or-environment`, `other`. The first six are the reportable kinds in the NDIS (Incident Management and Reportable Incidents) Rules; `reportable` is still its own boolean because a serious injury that did not happen in connection with supports is not reportable, and the provider decides.
+   - Add `notify_by` (date, generated): 24 hours after `occurred_on` for the first five reportable kinds, 5 business days for `restrictive-practice-unauthorised` (`UNVERIFIED` against the current Rules; Dev checks the Commission's reportable incidents page and cites it in the migration comment). The UI shows "Notify the Commission by …" and a reminder of kind `reportable-not-notified` fires the morning after `notify_by` if `reportable_notified_on` is null. Keep `severity` as proposed.
+   - Incident `status`: `open`, `under-review`, `closed`. Complaint `status`: `received`, `acknowledged`, `in-progress`, `resolved`, `escalated-to-commission`, plus `withdrawn`. Complaint `channel`: as proposed. Complaint `from_ref` prefixes: `P-` participant, `FAM-` family, `ADV-` advocate, `W-` worker, `OTH-` other.
+   - Worker clearance `clearance_kind`: `ndis-worker-screening`, `wwcc`, `police-check`, `first-aid`, `ndis-worker-orientation-module`, `other`. Rename the table `worker_checks` in the UI copy ("Worker checks register"); the table name can stay. Default `expires_on` suggestion in the UI: 5 years from `issued_on` for `ndis-worker-screening`, none for the orientation module (no expiry), otherwise blank.
+2. **Reminders: email only in v1**, from the REQ-004 provider once D-013 lands (log-only until then), plus the same list on the account page under "Due soon" so a provider who ignores email still sees it. No SMS, no push.
+3. **No clearance number** in v1, as proposed. The Commission's worker screening database and the provider's HR file are the records of the number; Readyline tracks kind and expiry. If a trial provider asks for it, raise it as a question, not a change.
+4. **Lapse: freeze writes, keep reads, no app-level grace.** Stripe's own retry window is the grace: the entitlement is revoked only when the subscription reaches `canceled` or `unpaid` (REQ-007 webhook), not on `past_due`, so a failed card gets Stripe's retries (Dev sets the Billing retry schedule to 7 days in the runbook, Haider applies it) before anything freezes. No fee, no penalty, no lost data (CLAUDE.md shariah rules; the brief). A frozen register shows one line: "Your subscription has lapsed; your records are safe and read-only. Renew to add to them."
+
+## Functional requirements (Session A: data; B: pages; C: reminders, billing, export)
+- FR-1 The eight tables, policies, grants, CHECKs, reference function and status views as in the Dev proposal, with the question-1 vocabulary and the `notify_by` column. Migration is forward-only and idempotent as the earlier ones.
+- FR-2 `registerStatus()` pure functions: clearance `valid` / `expiring` (90 days) / `expired`; review `current` / `due-soon` (60 days) / `overdue`; incident `overdue-notification` when reportable, not notified and past `notify_by`.
+- FR-3 Reminder rules (Session C, nightly job through the existing cron route, idempotent on `(account_id, kind, subject_id, due_on)`): clearance expiry at 90, 30 and 7 days before and on the day; policy review at 60 and 14 days before and on the day; incident open 30 days with no event; complaint not acknowledged 2 business days after `received_on`; reportable not notified the morning after `notify_by`; mid-term audit at months 12, 15 and 17 after `registration_date` when `registration_kind = 'certification'` only (verification registrations have no mid-term audit); renewal at 6 and 3 months before `registration_date + 3 years` for both kinds.
+- FR-4 `accounts.registration_date` (date, null) and `registration_kind` (`certification` / `verification` / null), entered on the account page with one line of help; never asked in the questionnaire.
+- FR-5 Register pages (Session B): list with the computed status pill, filters by status, add and edit forms with the participant-data warning and the reference-code hint, the events trail under an incident or complaint, "Export CSV" per register; the ready line from REQ-014 shows the counts of overdue items.
+- FR-6 Export as proposed (per-register CSV with BOM, events in a zip, the account export gains the registers as JSON).
+- FR-7 Seed `policy_reviews` from the purchased pack when the subscription starts (one row per document; `adopted_on` null until the checklist tick), and keep the two in step: ticking "adopted" on the checklist sets `adopted_on` if null.
+
+## Security requirements
+- SR-1 No participant personal data by schema (CLAUDE.md 4.5): the ref patterns, caps, the NDIS-number CHECK on every free-text column, the client-side detector before submit; nothing from a register is ever sent to the model.
+- SR-2 Member RLS with explicit grants in the same migration (D-052); events tables append-only (no update policy, delete for owners only); the entitlement gate in insert and update policies, not only in the UI.
+- SR-3 Rate limits on the export routes (5 an hour per account) and on register writes (60 a minute per user); audit log lines for create, status change and export with ids only.
+- SR-4 The reminder email names the register and the reference (`INC-0004`), never the summary text.
+
+## Acceptance criteria
+- AC-1 (Session A) Integration tests: member reads and writes own rows; another account reads nothing; lapsed subscription reads but cannot write (RLS, not only UI); NDIS-number CHECK fires; references are per account and gap-free in order; `notify_by` is 24 hours or 5 business days by category.
+- AC-2 (Session A) Unit tests for `registerStatus()` across the boundaries (89/90/91 days; 59/60/61; the business-day arithmetic over a weekend).
+- AC-3 (Session B) The PO adds one incident, one complaint, one worker check and one policy review on the hosted site with a trial account, sees the right status pills, exports a CSV that opens in Excel with the dates intact, and the participant-data warning fires on a typed name.
+- AC-4 (Session C) A forced run of the nightly job on a seeded account produces exactly the expected reminder rows and no duplicates on a second run; the lapse test freezes writes and leaves reads.
+
+## Not in v1
+Restrictive-practice reporting to the Commission's portal, participant records of any kind, document storage for evidence (a link field is enough), SMS, multi-site.
 
 ## Delivery evidence
 (Dev fills in once the REQ is written.)

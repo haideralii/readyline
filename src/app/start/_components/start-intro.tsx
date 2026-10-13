@@ -12,7 +12,7 @@ const STEPS = [
 ];
 
 export function StartIntro() {
-  const { ready, answers, saveStatus, clearDraft } = useQuestionnaire();
+  const { ready, answers, saveStatus, clearDraft, mode } = useQuestionnaire();
   const hasDraft = Object.keys(answers).length > 0;
   const resume = stepHref(firstIncompleteStep(answers));
 
@@ -35,11 +35,14 @@ export function StartIntro() {
           <li key={s}>{s}</li>
         ))}
       </ol>
-      <p className="mt-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-        Nothing you type is sent anywhere until the last step, and nothing is
-        stored on our servers in this version. Your answers are kept as a draft
-        on this device so you can come back later. Do not enter any
-        participant&apos;s details.
+      {/* Batch 23 item 3: the storage sentence must match where the draft actually lives. */}
+      <p
+        className="mt-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        data-testid="start-storage-note"
+      >
+        {mode === "server"
+          ? "You are signed in, so your answers are saved to your account after each step and you can continue from any device. Step 1 starts with the business details from your account. Do not enter any participant's details."
+          : "Nothing you type is sent anywhere until the last step. Your answers are kept as a draft on this device so you can come back later; sign in to keep them with your account instead. Do not enter any participant's details."}
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">

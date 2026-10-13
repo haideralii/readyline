@@ -1765,6 +1765,34 @@ purge route, the generate route and the webhook's post-response generation
 run only on the Vercel production deployment (or off Vercel entirely), so a
 preview never purges or generates against the shared hosted database.
 
+**D-1005 The generation chain is kept alive by the platform, and the
+documents page nudges a stalled job (Dev, 2026-10-13, batch 23 item 4).**
+The first hosted run drafted 6 of 18 documents and then stopped for five
+minutes: with Next's `after()` alone the invocation was frozen before the
+self-kick request left. `keepAlive()` (`src/server/generation/kick.ts`) now
+hands the follow-on work to Vercel's `waitUntil` from `@vercel/functions`
+whenever the request context exposes it (detected through the
+`@vercel/request-context` symbol, since the package's helper is a silent
+no-op elsewhere), and falls back to `after()` off Vercel so local and CI
+chains behave as before. The job route and the webhook use it. Recovery:
+`generation_jobs.updated_at` reaches the documents page; when a queued or
+running job has not changed for 90 seconds, the page's refresh loop calls
+`nudgeGenerationAction` (a signed-in owner's own job only), which runs the
+job behind the same claim lock and hands on as the route does. A nudge is
+sent once per stall window. The copy says "usually 10 to 20 minutes": the
+first hosted run measured about one document a minute on Sonnet (18
+documents in about 20 minutes, which is the model's latency, not the
+chain). D-053 stands; if the chain still stalls, Pro and a one-minute cron.
+
+**D-1307 Signed-in copy and account prefill (Dev, 2026-10-13, batch 23 item
+3, REQ-013 scope).** The questionnaire context carries `accountPrefill`
+(trading name, structure, states, ABN from the owner's account, passed by
+the start layout); step 1 starts filled in when no draft business answers
+exist, with a line saying so, and a saved draft always wins. The intro's
+storage sentence and the step footer's draft line now say where the draft
+lives: the account for a signed-in owner, this device otherwise. Account
+details are never changed by the questionnaire.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
@@ -1877,3 +1905,11 @@ Items asserted in code or copy that still need a primary source.
   site. Config traps and the generation-chain stall are batch 23. Haider's
   `.env.local` Stripe key must be replaced by the Readyline account's test
   key (the one now in Vercel); the sandbox key is retired.
+- D-056 (PO, 2026-10-13): REQ-009 written from the Dev proposal. Commission
+  vocabulary for the six reportable incident kinds with a generated
+  `notify_by` (24 hours; 5 business days for unauthorised restrictive
+  practice, UNVERIFIED until Dev cites the Rules); reminders by email only
+  plus a "Due soon" list; no clearance numbers stored; on a lapsed
+  subscription writes freeze and reads stay, with Stripe's retry window as
+  the only grace (revoke on `canceled`/`unpaid`, never on `past_due`); no
+  fee, no penalty. Session A (data) may start once PR #21 is merged.
