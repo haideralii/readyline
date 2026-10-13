@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -12,7 +13,18 @@ import { defineConfig } from "vitest/config";
  * suites skip themselves and report why.
  */
 export default defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    // Batch 38 (D-1008): the server modules under test carry Next's
+    // `server-only` guard, which throws outside a Next server bundle; the
+    // integration suite is that case by design, so the guard resolves to an
+    // empty module here (the unit suite mocks it per file).
+    alias: {
+      "server-only": fileURLToPath(
+        new URL("./tests/integration/server-only-stub.ts", import.meta.url),
+      ),
+    },
+  },
   test: {
     environment: "node",
     include: ["tests/integration/**/*.test.ts"],
