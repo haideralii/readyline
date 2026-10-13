@@ -1,19 +1,33 @@
 /**
- * Every string on the home page (REQ-013 FR-8; REQ-014 FR-2 restyles it),
- * in one place so the claims lint runs over all of it in a unit test. Proof
- * over promise: what the Commission publishes, where data lives, what we
- * never collect. No superlatives, no testimonials (none exist yet; none
- * will ever be made up).
+ * Every string on the home page (REQ-013 FR-8; batch 24 home v2 after the
+ * competitor review), in one place so the claims lint runs over all of it in
+ * a unit test. Proof over promise: what the Commission publishes, where data
+ * lives, what we never collect, a real sample document, honest counters.
+ * No superlatives; testimonials only from data/readyline-content/trust.json.
  */
 import { BRAND } from "@/lib/brand";
 
+/** The hero headline with the configured price (batch 24 item 1); the price clause is dropped when no price is set. */
+export function heroHeadline(price: string | null): string {
+  return price
+    ? `Find out which NDIS audit you'll face — free. Then get every document it needs, drafted from your answers, for ${price}.`
+    : "Find out which NDIS audit you'll face — free. Then get every document it needs, drafted from your answers, for one fixed price.";
+}
+
 export const HOME_COPY = {
   eyebrow: "For sole traders and small providers",
-  headline: "Get ready for NDIS provider registration without a consultant",
-  lead: `Answer a few questions about the supports you deliver and your workers. ${BRAND} tells you which Practice Standards modules apply, which audit you face and what documents and registers you need, with the Commission's own text behind every answer. Then it drafts the documents for your review.`,
-  // REQ-014 R-1: short enough for one line on a 360 px phone.
-  cta: "See what registration needs",
+  lead: `Answer plain questions about the supports you deliver and your workers. ${BRAND} tells you whether you face a verification or certification audit, with the Commission's own text behind the answer, and what documents and registers you will need. Then it drafts the documents to fit your answers.`,
+  cta: "See which audit I need",
+  ctaSecondary: "See a sample document",
   ctaNote: "Free, about ten minutes, no account needed.",
+  /** The first screen says what it costs and what the deal is (batch 24 item 1). */
+  priceLine: (price: string) =>
+    `${price} one-off for the document pack. No subscription needed, no instalments, no interest.`,
+  refundLine:
+    "Full refund within 14 days if you have not downloaded the documents; after a download, a refund if they do not match your answers.",
+  sampleHeading: "See exactly what you get",
+  sampleLead:
+    "This is a real document from a recorded run, not a template: the complaints policy for a fictional sole trader. The sections marked in colour were drafted from that provider's answers; the rest is fixed text every provider gets. Your pack has every document your audit calls for, each one like this.",
   trustHeading: "What you can count on",
   trust: [
     {
@@ -49,6 +63,17 @@ export const HOME_COPY = {
     line: { done: 0, toPrepare: 6, remainder: 16 },
     note: "Add personal care and the result changes to a certification audit with the core module, a site visit and a mid-term audit. The questionnaire shows the reason and the source for each change.",
   },
+  missionHeading: "Why one price, and who is behind it",
+  /**
+   * Batch 24 item 3: 120 words in the style of product/legal/about.md. A Dev
+   * draft for the PO to replace; the name and ABN are placeholders until the
+   * business is registered.
+   */
+  mission: [
+    `${BRAND} is built and run by one person in Sydney, a software quality engineer who tests systems for a living. [Name and ABN to be added when registered.] It exists because a sole trader facing their first audit is choosing between a consultant at several thousand dollars and a template pack that describes someone else's business.`,
+    "One fixed price, paid once, because the pack is something you need once. No instalments and no interest, because debt is not a service we want to sell. No subscription is needed to use what you bought. The registers are a separate, optional subscription you can cancel at any time.",
+    "Every document is a draft for your review. The audit decision is the auditor's and the Commission's, not ours.",
+  ],
   whatHeading: "What you get",
   what: [
     "A guided questionnaire about the supports you deliver, your workers and where you operate.",
@@ -65,7 +90,11 @@ export const HOME_COPY = {
 } as const;
 
 export function homeStrings(): string[] {
-  const out: string[] = [];
+  const out: string[] = [
+    heroHeadline("AUD 399"),
+    heroHeadline(null),
+    HOME_COPY.priceLine("AUD 399"),
+  ];
   const walk = (v: unknown) => {
     if (typeof v === "string") out.push(v);
     else if (Array.isArray(v)) v.forEach(walk);

@@ -1793,6 +1793,49 @@ storage sentence and the step footer's draft line now say where the draft
 lives: the account for a signed-in owner, this device otherwise. Account
 details are never changed by the questionnaire.
 
+**D-1308 Home page v2 (Dev, 2026-10-13, batch 24, branch `req-013-home-v2`
+from `main` ec262cb, REQ-013 scope, no model calls).** Proof over promise,
+after the competitor review:
+- *Hero.* The headline is the PO's text with the price composed from
+  `readPricing()` (`heroHeadline(price)` in `home-copy.ts`), so the home
+  page can never disagree with the pricing page or Stripe; with no price
+  configured it ends "for one fixed price" and the price line is omitted.
+  The first screen carries the price, "no subscription needed, no
+  instalments, no interest" and the refund promise with a link to
+  `/refunds`. Primary CTA to `/start`, secondary an in-page anchor to the
+  sample. Every string stays in `home-copy.ts` under the claims lint, which
+  now also rejects instalment, BNPL and urgency phrasing.
+- *Sample before buying.* `data/samples/complaints-policy.json` is a real
+  `DocumentModel` built by replaying the recorded sole-trader fixtures for
+  the complaints policy (`buildSampleDocument()`), with the trading name
+  replaced by the fictional "Example Supports" across every string; a unit
+  test regenerates it and fails on drift, on any leftover "Sunrise
+  Supports", or on a prohibited claim in any section (`WRITE_SAMPLE=1`
+  rewrites it). The page renders it as a server component with the five
+  block types and each section labelled "Drafted from the answers" or
+  "Fixed text, the same for every provider" (ochre edge for tailored).
+  Only the first three sections are open; the other ten sit behind a
+  native `details` (no script, no hydration race, since nothing on the
+  page controls it), which cut the phone page from about 18,000 to about
+  6,600 CSS pixels. The table wrapper is a focusable labelled region
+  (axe `scrollable-region-focusable` at 360 px). `GET
+  /sample/complaints-policy.docx` renders the same model through
+  `renderDocx` once per instance, rejects any query string (400), and is
+  memory rate-limited (30 a minute per address) like `/api/health`; it
+  reads no database and no session.
+- *Mission.* A Dev draft of about 120 words in `about.md` style with
+  "[Name and ABN to be added when registered.]" as the placeholder; the
+  PO owns and replaces this copy.
+- *Honest counters and testimonials.* `data/readyline-content/trust.json`
+  (owner PO) holds `counters.providersHelped`, `counters.firstAuditsPassed`
+  (null until a real number exists) and `testimonials[]` (quote, name,
+  business, audit kind, date; zod-validated at build). `TrustCounters` and
+  `Testimonials` render nothing while empty; the e2e asserts that absence.
+  No count, rating or quote appears anywhere else on the page.
+- *Order on the page.* Hero, sample, trust cues, example result,
+  testimonials (when any), mission, what you get. The example result and
+  the four trust cues from P2 are unchanged and still pinned by tests.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
