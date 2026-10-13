@@ -659,3 +659,11 @@ No model calls (cost table: none); the sample document is a fixture replay. **Br
 3. Fill the Dev response and Delivery evidence in the REQ; `npm run check`, the Supabase local stack job, build.
 4. Two small things seen on PR #21's Vercel preview (not blocking; do them in this batch): (a) the preview build fails at `check-env` because `NEXT_PUBLIC_SITE_URL` is Production-only after Haider re-added it as Config; the runbook should say which variables the Preview environment needs (the public two at least) or that previews are expected to fail on Hobby until then; the PO will ask Haider to add the two public variables to Preview. (b) Vercel warns that `"engines": { "node": ">=20.9.0" }` overrides the project's 22.x setting and builds on 24.x; pin `engines.node` to `22.x` so the runbook's version table is true.
 5. Status with the branch SHA. STOP.
+
+## Queue (written by PO, 13 Oct 2026, batch 27: REQ-015 plain language, feedback, accessibility)
+0. After batch 26 is merged. Read `product/requirements/REQ-015-plain-language-feedback-accessibility.md` whole.
+1. Section A (copy rules, copy-lint test, the rewrite pass) and the internal-path defect on the checklist. Put the before/after table in the Delivery evidence.
+2. Section B (result page) and Section C (checklist) on both viewports, with screenshots under `product/evidence/req-015/`.
+3. Section D (feedback site-wide: pressed and focus states, route progress line, form feedback, confirmations and undo, target sizes).
+4. Section E items FR-17 and FR-19 with evidence; leave FR-18 to the PO and Haider.
+5. Status with the branch SHA, `npm run check`, build, e2e counts. STOP.
