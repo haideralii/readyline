@@ -2365,6 +2365,19 @@ provider touches the list. "Guides" joined the footer's nav list; the home
 page gained one line under the mission section; the sitemap carries the
 index and the 38 pages. The two written guides keep their draft banner.
 
+**D-1008 The integration suite aliases Next's `server-only` guard (Dev,
+2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
+`tests/integration/reminders-job.test.ts` imports the reminders job, the
+email provider and the admin client, all marked `import "server-only"`, and
+Next's guard throws outside a Next server bundle. The unit project mocks
+the guard per file (`vi.mock("server-only", () => ({}))`); the integration
+project now resolves it to an empty module for every file
+(`resolve.alias` in `vitest.integration.config.mts`,
+`tests/integration/server-only-stub.ts`), which is the honest statement
+of what that suite is: server code driven against a real database. Proven
+locally by loading every integration file without Supabase variables (they
+skip, and no longer throw); CI's job proves the rows.
+
 
 
 
