@@ -1121,3 +1121,20 @@ CI is paused until Haider raises the GitHub Actions spending limit (every job fa
 9. Findings 16, 2, 8, 10 and 12 wait for the recording session; list them in the runbook's recording order, nothing else.
 10. Status with the SHA and the lint counts. STOP.
 PO note on the merge order: after CI is back, the PO merges #28, #29, #30, #31, then the groups PR, then the remaining stack in branch order; the `req-013-phone-fixes` versus `req-017-close-out` hunk in the checklist view is resolved keeping both, the check sentence then the action link, as the dev proposed.
+
+## Standing backlog (written by PO, 14 Oct 2026; the dev works this whenever no numbered queue is open, so Haider does not have to paste)
+Rule: at the end of every batch, pull `origin/main` and re-read this file; a numbered PO queue always comes before the backlog. Work the backlog in order, one branch per item stacked on the previous head under the standing merge-main rule, a Dev status on `main` after each, STOP lines as usual, never merge to `main`. Decisions that need the PO are listed per item; if one blocks you, note it in the status and move to the next item.
+
+Backlog 1 (branch `req-015-accessibility-pass`): REQ-015 section E in full. axe-core in Playwright on every public and signed-in page in all three projects (fail on serious and critical), keyboard-only end-to-end for the questionnaire, Finish your pack, Adopt and one register form (visible focus, logical order, no traps), accessible names on every icon button and every register table, reduced-motion respected, 200 percent zoom without sideways scroll on iPhone. Needs the PO: nothing.
+
+Backlog 2 (branch `req-010-performance-budget`): Lighthouse CI on the home, pricing, questionnaire and documents pages in the mobile profile with budgets (performance 90, LCP 2.5 s, CLS 0.1, total JS under 250 kB on the questionnaire); fix what fails (route-level caching, image sizes, dynamic imports of docx rendering off the critical path). Needs the PO: nothing.
+
+Backlog 3 (branch `req-011-guides-2`): three new guides in `content/guides` in the plain-words voice, sourced from official Commission pages first and the research file second, each with a Sources section: "What happens at an NDIS audit" (the five kinds, what the auditor reads, interviews, how pricing works), "The registers an auditor asks for" (the twelve records, mapped to Readyline), "Verification or certification: which audit is yours" (update the existing guide if it covers this). Copy-lint, draft status until the PO flips them. Needs the PO: publishing.
+
+Backlog 4 (branch `req-018-register-tests`): integration tests for every REQ-018 register (append-only 42501, cross-tenant read denied, starter rows present once), reminder fixtures for every kind with fixed dates, the docx lint over the full 16-document pack in CI, and a flake triage of the Playwright suites (retry policy only where a real race is documented). Needs the PO: nothing.
+
+Backlog 5 (branch `req-004-admin-hardening`): REQ-002 and REQ-004 re-check against OWASP ASVS level 1: rate limits on every public POST, CSRF on every form, security headers verified by a test, dependency audit with `npm audit --omit=dev` clean or justified, secret scan on every branch. Needs the PO: any new paid service.
+
+Backlog 6 (branch `req-005-recording-prep`): everything that can be done before Haider's recording session without model calls: the runbook's recording list in priority order with the command for each group, fixture-key diffs, a dry run that reports what would be recorded and the estimated cost. Needs the PO: the session itself.
+
+When the backlog is empty: run the full suite on every open branch, write a status, and stop.
