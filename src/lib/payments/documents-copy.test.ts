@@ -9,7 +9,7 @@ describe("documents page copy (REQ-007 FR-5, FR-6; CLAUDE.md 4.3)", () => {
   });
 
   it("shows preparing and delayed states without an error code, and the refund promise's two conditions", () => {
-    expect(DOCUMENTS_COPY.preparing).toMatch(/usually under 10 minutes/);
+    expect(DOCUMENTS_COPY.preparing).toMatch(/usually 10 to 20 minutes/);
     expect(DOCUMENTS_COPY.delayed).toMatch(/will email you/);
     expect(documentsStrings().join("\n")).not.toMatch(
       /error|failed|exception|code \d/i,

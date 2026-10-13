@@ -51,14 +51,31 @@ const LABELS = {
 
 export function BusinessStepForm() {
   const router = useRouter();
-  const { answers, saveStep } = useQuestionnaire();
+  const { answers, saveStep, accountPrefill } = useQuestionnaire();
   const saved = answers.business;
-  const [tradingName, setTradingName] = useState(saved?.tradingName ?? "");
+  // Batch 23 item 3 (D-1307): a signed-in owner's account details start the
+  // step filled in, so nothing is typed twice; a saved draft still wins.
+  const prefilled = !saved && accountPrefill ? accountPrefill : null;
+  const [tradingName, setTradingName] = useState(
+    saved?.tradingName ?? prefilled?.tradingName ?? "",
+  );
   const [structure, setStructure] = useState<
     BusinessStructureAnswer | undefined
-  >(saved?.structure);
-  const [states, setStates] = useState<State[]>(saved?.states ?? []);
-  const [abn, setAbn] = useState(saved?.abn ?? "");
+  >(
+    saved?.structure ??
+      (prefilled
+        ? (prefilled.structure as BusinessStructureAnswer)
+        : undefined),
+  );
+  const [states, setStates] = useState<State[]>(
+    saved?.states ??
+      (prefilled
+        ? prefilled.states.filter((s): s is State =>
+            (State.options as readonly string[]).includes(s),
+          )
+        : []),
+  );
+  const [abn, setAbn] = useState(saved?.abn ?? prefilled?.abn ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
 
   async function onSubmit(e: React.FormEvent) {
@@ -84,6 +101,15 @@ export function BusinessStepForm() {
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
+      {prefilled ? (
+        <p
+          className="mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          data-testid="business-prefill-note"
+        >
+          Filled in from your account. Change anything here; your account
+          details stay as they are.
+        </p>
+      ) : null}
       <Field
         id="tradingName"
         label={LABELS.tradingName}

@@ -30,6 +30,12 @@ import {
 } from "@/lib/questionnaire/schema";
 
 export type Answers = QuestionnaireDraft["answers"];
+export type AccountPrefill = {
+  tradingName: string;
+  structure: string;
+  states: string[];
+  abn: string;
+};
 export type SaveStatus = "idle" | "saved" | "unavailable";
 
 type QuestionnaireContext = {
@@ -38,6 +44,8 @@ type QuestionnaireContext = {
   mode: "local" | "server";
   /** The public contact address for the result page's question line (REQ-013 FR-9), or null until CONTACT_EMAIL is set. */
   contactEmail: string | null;
+  /** A signed-in owner's business details, so step 1 starts filled in (batch 23 item 3, D-1307); null when signed out. */
+  accountPrefill: AccountPrefill | null;
   answers: Answers;
   currentStep: StepId;
   saveStatus: SaveStatus;
@@ -58,6 +66,7 @@ export function QuestionnaireProvider({
   store,
   mode = "local",
   contactEmail = null,
+  accountPrefill = null,
   children,
 }: {
   groups: GroupOption[];
@@ -65,6 +74,7 @@ export function QuestionnaireProvider({
   /** Signed-in owners keep the draft on the server (REQ-004); otherwise on this device. */
   mode?: "local" | "server";
   contactEmail?: string | null;
+  accountPrefill?: AccountPrefill | null;
   children: ReactNode;
 }) {
   const storeRef = useRef<DraftStore>(
@@ -161,6 +171,7 @@ export function QuestionnaireProvider({
       ready,
       mode,
       contactEmail,
+      accountPrefill,
       answers,
       currentStep,
       saveStatus,
@@ -173,6 +184,7 @@ export function QuestionnaireProvider({
       ready,
       mode,
       contactEmail,
+      accountPrefill,
       answers,
       currentStep,
       saveStatus,

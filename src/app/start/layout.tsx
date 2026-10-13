@@ -15,6 +15,16 @@ export default async function StartLayout({ children }: LayoutProps<"/start">) {
       groups={groups}
       mode={mode}
       contactEmail={contactEmail()}
+      accountPrefill={
+        viewer?.account
+          ? {
+              tradingName: viewer.account.trading_name,
+              structure: viewer.account.business_structure,
+              states: viewer.account.states,
+              abn: viewer.account.abn ?? "",
+            }
+          : null
+      }
     >
       {children}
     </QuestionnaireProvider>
