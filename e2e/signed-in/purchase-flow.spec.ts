@@ -73,9 +73,11 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     await page.goto("/pricing");
     await expect(page.getByTestId("buy-button")).toBeVisible();
     await expect(page.getByTestId("sign-in-to-buy")).toHaveCount(0);
-    await expect(page.getByTestId("subscription-coming")).toContainText(
-      "AUD 39 a month, coming soon",
+    // REQ-009 Session C: in fake mode the registers subscription is offered.
+    await expect(page.getByTestId("subscription-offer")).toContainText(
+      "AUD 39 a month",
     );
+    await expect(page.getByTestId("subscribe-button")).toBeVisible();
     await checkWidths(page, "pricing (signed in)");
     await shot(page, "pricing-signed-in", project);
 

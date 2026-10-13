@@ -9,6 +9,7 @@ import "server-only";
 import Stripe from "stripe";
 import {
   FAKE_PRICE_ID,
+  FAKE_REGISTERS_PRICE_ID,
   fakeSecretKey,
   fakeWebhookSecret,
   isFakeStripeMode,
@@ -21,6 +22,8 @@ export const STRIPE_ENV_NAMES = {
   secretKey: "STRIPE_SECRET_KEY",
   webhookSecret: "STRIPE_WEBHOOK_SECRET",
   pricePack: "STRIPE_PRICE_PACK",
+  /** REQ-009 Session C: the recurring Price for the registers; optional until Haider creates it. */
+  priceRegisters: "STRIPE_PRICE_REGISTERS",
 } as const;
 
 export class StripeEnvError extends Error {
@@ -38,6 +41,8 @@ export type StripeEnv = {
   secretKey: string;
   webhookSecret: string;
   pricePack: string;
+  /** Null until STRIPE_PRICE_REGISTERS is set; the subscription button hides meanwhile. */
+  priceRegisters: string | null;
   /** True when Checkout is the local fake page and the webhook secret is the local one. */
   fake: boolean;
 };
@@ -49,11 +54,13 @@ export function readStripeEnv(
   const secretKey = source[STRIPE_ENV_NAMES.secretKey]?.trim();
   const webhookSecret = source[STRIPE_ENV_NAMES.webhookSecret]?.trim();
   const pricePack = source[STRIPE_ENV_NAMES.pricePack]?.trim();
+  const priceRegisters = source[STRIPE_ENV_NAMES.priceRegisters]?.trim();
   if (fake) {
     return {
       secretKey: secretKey || fakeSecretKey(),
       webhookSecret: fakeWebhookSecret(source),
       pricePack: pricePack || FAKE_PRICE_ID,
+      priceRegisters: priceRegisters || FAKE_REGISTERS_PRICE_ID,
       fake: true,
     };
   }
@@ -66,8 +73,21 @@ export function readStripeEnv(
     secretKey: secretKey!,
     webhookSecret: webhookSecret!,
     pricePack: pricePack!,
+    priceRegisters: priceRegisters || null,
     fake: false,
   };
+}
+
+/** True when a Subscribe button may be shown: Stripe is configured and the registers Price exists (or fake mode). */
+export function subscriptionAvailable(
+  source: Record<string, string | undefined> = process.env,
+): boolean {
+  try {
+    return Boolean(readStripeEnv(source).priceRegisters);
+  } catch (e) {
+    if (e instanceof StripeEnvError) return false;
+    throw e;
+  }
 }
 
 export function createStripeClient(secretKey: string): Stripe {

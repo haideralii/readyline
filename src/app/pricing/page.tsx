@@ -14,6 +14,8 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { BuyButton } from "@/app/documents/buy-button";
+import { SubscribeButton } from "@/app/account/subscribe-button";
+import { subscriptionAvailable } from "@/server/payments/stripe";
 
 export const metadata: Metadata = { title: "Pricing" };
 
@@ -65,6 +67,7 @@ export default async function PricingPage() {
   const pricing = readPricing();
   const promise = refundPromise();
   const docs = await documentsForVisitor();
+  const offered = subscriptionAvailable();
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
@@ -191,13 +194,38 @@ export default async function PricingPage() {
         <h2 id="sub-heading" className={h2}>
           {C.subscriptionHeading}
         </h2>
-        {/* PO review (D-051): "AUD 39 a month, coming soon", no buy button. */}
-        <p className={body} data-testid="subscription-coming">
-          {pricing.subscriptionPriceCents
-            ? `${C.subscriptionHeading}: ${formatAud(pricing.subscriptionPriceCents)} a month, coming soon. `
-            : `${C.subscriptionHeading}: coming soon. `}
-          {C.subscriptionComing}
-        </p>
+        {offered ? (
+          <>
+            {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee. */}
+            <p className={body} data-testid="subscription-offer">
+              {pricing.subscriptionPriceCents
+                ? `${formatAud(pricing.subscriptionPriceCents)} a month for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee, no instalments, no interest.`
+                : "A monthly subscription for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee."}
+            </p>
+            {docs.signedIn ? (
+              <SubscribeButton
+                label={
+                  pricing.subscriptionPriceCents
+                    ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
+                    : "Subscribe to the registers"
+                }
+                cancelPath="/pricing"
+              />
+            ) : (
+              <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Sign in to subscribe; the registers belong to your account.
+              </p>
+            )}
+          </>
+        ) : (
+          /* PO review (D-051): "AUD 39 a month, coming soon", no buy button until the Price exists. */
+          <p className={body} data-testid="subscription-coming">
+            {pricing.subscriptionPriceCents
+              ? `${C.subscriptionHeading}: ${formatAud(pricing.subscriptionPriceCents)} a month, coming soon. `
+              : `${C.subscriptionHeading}: coming soon. `}
+            {C.subscriptionComing}
+          </p>
+        )}
       </section>
 
       <p className="mt-10 text-sm text-zinc-600 dark:text-zinc-400">

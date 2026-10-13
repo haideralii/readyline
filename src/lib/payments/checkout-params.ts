@@ -10,6 +10,8 @@ export const CANCEL_PATHS = [
   "/pricing",
   "/start/result",
   "/documents",
+  "/account",
+  "/registers",
 ] as const;
 export type CancelPath = (typeof CANCEL_PATHS)[number];
 
@@ -27,6 +29,41 @@ export function safeCancelPath(path: string | undefined): CancelPath {
   return (CANCEL_PATHS as readonly string[]).includes(path ?? "")
     ? (path as CancelPath)
     : "/pricing";
+}
+
+export type SubscriptionCheckoutInput = {
+  priceId: string;
+  accountId: string;
+  email: string;
+  siteUrl: string;
+  cancelPath: string;
+};
+
+/**
+ * The registers subscription (REQ-009 Session C, PO answer 4; CLAUDE.md 5):
+ * subscription mode on one recurring Price, card only, no trial, no
+ * promotion codes, the account on the session and on the subscription's
+ * metadata so every later lifecycle event names it, and the success page
+ * being the registers.
+ */
+export function buildSubscriptionCheckoutParams(
+  input: SubscriptionCheckoutInput,
+): Stripe.Checkout.SessionCreateParams {
+  const site = input.siteUrl.replace(/\/$/, "");
+  const metadata = { account_id: input.accountId, kind: "subscription" };
+  return {
+    mode: "subscription",
+    allowed_payment_method_types: ["card"],
+    line_items: [{ price: input.priceId, quantity: 1 }],
+    customer_email: input.email,
+    client_reference_id: input.accountId,
+    metadata,
+    subscription_data: { metadata },
+    success_url: `${site}/registers?subscribed=1&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${site}${safeCancelPath(input.cancelPath)}`,
+    allow_promotion_codes: false,
+    locale: "auto",
+  };
 }
 
 export function buildCheckoutParams(

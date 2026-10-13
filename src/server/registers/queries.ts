@@ -170,6 +170,30 @@ export async function getPolicyReview(
   return (r.data as PolicyReviewListRow | null) ?? null;
 }
 
+/** The reference a reminder names (SR-4): INC-0004, CMP-0002, W-003, the policy's document id, or the business. */
+export async function reminderReference(
+  supabase: SupabaseClient,
+  r: { subject_table: string; subject_id: string },
+  tradingName: string,
+): Promise<string> {
+  if (r.subject_table === "accounts") return tradingName;
+  const column =
+    r.subject_table === "worker_clearances"
+      ? "worker_ref"
+      : r.subject_table === "policy_reviews"
+        ? "document_type_id"
+        : "reference";
+  const row = await supabase
+    .from(r.subject_table)
+    .select(column)
+    .eq("id", r.subject_id)
+    .maybeSingle();
+  return (
+    ((row.data as Record<string, string> | null)?.[column] ?? "") ||
+    r.subject_id.slice(0, 8)
+  );
+}
+
 /** The overdue counts for the index and the account page ready line (FR-5, batch 28 item 4). */
 export async function registerOverview(
   supabase: SupabaseClient,

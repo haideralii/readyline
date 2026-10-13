@@ -2103,6 +2103,62 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
+**D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
+batch 30, branch `req-009-session-c` from `req-011-content` with
+`req-009-session-b` merged in; REQ-009 FR-3, SR-4, AC-4).**
+`src/lib/registers/reminders.ts` turns plain rows and a date into the
+reminders due: worker checks at 90, 30 and 7 days before expiry and on
+the day; policy reviews at 60 and 14 days and on the day; an incident
+open 30 days with no event (from the last event's date, else the
+reported date); a complaint unacknowledged 2 business days after
+receipt; a reportable incident the morning after `notify_by`; the
+mid-term audit at months 12, 15 and 17 for certification only; renewal
+6 and 3 months before the three-year end for both kinds. A reminder is
+sent on its own date or within a seven-day catch-up window, so a missed
+night is recovered and an old date entered today does not flood the
+account. `/api/jobs/reminders` (CRON_SECRET, production only, `dryRun`,
+`today` for tests) inserts with "ignore duplicates" and emails each
+account once per run through the REQ-004 provider (log-only until
+D-013), naming the register and the reference only. Session B built the
+registers these rules read, so Session C merged its branch rather than
+re-creating them; the pull requests land in order.
+
+**D-911 The reminders key gained `send_on`.** The REQ's key (account,
+kind, subject, due_on) could hold one reminder per subject, but FR-3
+asks for four per expiry. A migration replaces the unique constraint
+with (account, kind, subject, send_on): `due_on` stays the date the
+reminder is about, `send_on` the day it goes out, and idempotency is per
+send day, which is what "a second run inserts nothing" needs.
+
+**D-912 The subscription in Stripe, test mode, code and names only.**
+`subscriptions` (one row per Stripe subscription, owner-readable,
+webhook-written) and `apply_stripe_subscription_event` (the subscription
+half of the event ledger, same idempotency as `apply_stripe_event`)
+carry the rule of D-056: revoke the `subscription` entitlement only on
+`canceled`, `unpaid` or `incomplete_expired`; `past_due` keeps it, so
+Stripe's retries are the grace period; a return to `active` after a
+revocation grants a fresh entitlement, which is how renewal restores
+writes. Checkout runs in subscription mode on `STRIPE_PRICE_REGISTERS`
+(a name in `.env.example` and the runbook; Haider creates the Price), card
+only, no trial, no promotion codes, the account on the subscription's
+metadata so every later event names it. The webhook maps
+`customer.subscription.created/updated/deleted` and
+`invoice.payment_failed`; the reducer in `entitlement.ts` mirrors the SQL
+so the rules are unit-tested with mocked events. The Billing portal opens
+from the account page for cancelling and card changes. Fake mode gained
+the subscription path: a subscription-mode fake session, Subscribe,
+Payment failed, Cancel and Renew buttons that post the events Stripe
+would, and a fake portal view. Until the Price exists the pricing page
+keeps "coming soon" and the account page says subscriptions open soon.
+
+**D-913 What the account page shows.** A "Registers subscription"
+section: Active (with the price and "cancel at any time; no fee, no
+notice period"), Active but retrying after a failed payment (records
+stay open), lapsed (the one-line read-only sentence), or not subscribed
+with the Subscribe button; and "Due soon" under Registers, read from the
+same `reminders` rows the emails are sent from, with "(emailed)" once
+sent.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

@@ -30,9 +30,13 @@ test.describe("pricing page (REQ-007 FR-1, AC-4)", () => {
     await expect(page.getByTestId("pricing-notice")).toContainText(
       /not legal advice/,
     );
-    await expect(page.getByTestId("subscription-coming")).toContainText(
-      /Coming after the document pack/,
+    // REQ-009 Session C: the e2e runs in fake Stripe mode, where the registers
+    // subscription is offered; signed out, the page asks for a sign-in.
+    await expect(page.getByTestId("subscription-offer")).toContainText(
+      /Cancel at any time; no notice period, no fee/,
     );
+    await expect(page.getByText(/Sign in to subscribe/)).toBeVisible();
+    await expect(page.getByTestId("subscribe-button")).toHaveCount(0);
     for (const [name, href] of [
       ["Terms of use", "/terms"],
       ["Privacy policy", "/privacy"],

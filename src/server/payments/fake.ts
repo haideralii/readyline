@@ -18,6 +18,7 @@ import { createStripeClient } from "./stripe";
 
 /** Falls back to the e2e display price when PACK_PRICE_AUD_CENTS is unset. */
 const FALLBACK_AMOUNT_CENTS = 39900;
+const FALLBACK_SUBSCRIPTION_CENTS = 3900;
 
 export class FakeCheckoutClient implements CheckoutClient {
   constructor(private readonly webhookSecret: string) {}
@@ -26,14 +27,19 @@ export class FakeCheckoutClient implements CheckoutClient {
       create: async (params: Stripe.Checkout.SessionCreateParams) => {
         const metadata = (params.metadata ?? {}) as Record<string, string>;
         const successUrl = params.success_url ?? "";
+        const subscription = params.mode === "subscription";
+        const pricing = readPricing();
         const data: FakeSessionData = {
           accountId: params.client_reference_id ?? metadata.account_id ?? "",
           assessmentId: metadata.assessment_id ?? "",
           packVersion: metadata.pack_version ?? "",
-          amountCents: readPricing().packPriceCents ?? FALLBACK_AMOUNT_CENTS,
+          amountCents: subscription
+            ? (pricing.subscriptionPriceCents ?? FALLBACK_SUBSCRIPTION_CENTS)
+            : (pricing.packPriceCents ?? FALLBACK_AMOUNT_CENTS),
           currency: "aud",
           successUrl,
           cancelUrl: params.cancel_url ?? "",
+          ...(subscription ? { mode: "subscription" as const } : {}),
         };
         const id = encodeFakeSession(data, this.webhookSecret);
         const origin = new URL(successUrl).origin;
