@@ -1186,3 +1186,26 @@ Backlog 6 (branch `req-005-recording-prep`): everything that can be done before 
 
 When the backlog is empty: run the full suite on every open branch, write a status, and stop.
 
+
+
+
+## Dev status (batch 42, written 14 Oct 2026, Dev; PO triage of the three-persona review)
+
+Delivered on **`req-019-review-fixes` fde906d** (one commit from the head of `req-005-house-style-v2` 450f863 with `main` 06b03f9 merged). CI paused; `npm run check` and `npm run build` green locally (100 test files, 715 tests passed, 4 skipped). No model calls; seven fixtures re-keyed under the two changed briefs, none re-recorded. Decisions D-546 to D-549.
+
+1. **Finding 9, Commission contact (D-546).** New fixed extra section "How to contact the Commission" (phone, hours, TTY, National Relay Service, email, website; source and read date in the fixed-text comment; `COMMISSION_CONTACT_STRINGS` is the one list the lint trusts and the watch re-checks) in the complaints and incident documents, before the register, unnumbered so every recorded outline still matches. New `contact-details` lint: Australian phone numbers, emails and web addresses in a tailored reply fail unless the normalised string is in the Commission list, the FACTS block or the STATE FACTS block. Gated with the version 2 lints (live only) and counted over the fixtures. Both procedure briefs refer to the block by its heading and forbid writing a number or address.
+2. **Findings 6 and 13, one naming table (D-547).** `src/lib/registers/names.ts`: canonical name, aliases and page for every register and record, plus the pack's forms. The record-name lint accepts only canonical spellings and offers the fix for an alias ("clearance register" → "Worker checks register"); `record-names.ts` derives from the table; the fixed records section maps the dataset's evidence titles through it. "Worker checks" stays the page title.
+3. **Findings 7 and 14 (D-547).** The self-assessment's "Items to prepare before the audit" is now the twelve audit-day records in the audit-day order from `AUDIT_DAY_RECORDS`, the insurances line pointing at the Insurances and vehicles register. Note for the merge: this branch does not contain `req-018-audit-day-systems`; its `audit-day-ask.ts` literal list should read from `AUDIT_DAY_RECORDS` when the branches meet (same twelve ids, names and order).
+4. **Finding 15 (D-548).** "Our position on restrictive practices" as fixed text in the safeguarding policy for every pack: no practice outside an authorised plan, the five kinds in plain words with the locked door and withheld item examples, the four emergency-use steps (keep safe, tell the owner same day and record, owner reports within 5 business days or 24 hours if harm, owner reviews into the improvement register), review every 12 months. UNVERIFIED: the Rules s 6 wording was not re-read this batch; flagged for the watch.
+5. **Finding 11.** The review pack skips retired types; the evidence render is 16 documents. (Not re-rendered this batch; `REVIEW_PACK=1` when the PO wants the files.)
+6. **Finding 1.** One line under "Your audit: …": "That is a desk check of your documents." / "That is a visit, with interviews." Copy-lint clean.
+7. **Findings 3 and 4.** Registers index in two groups, "Keep as things happen" (incidents, complaints) and "Keep current" (worker checks, policy reviews), one "How codes work" panel at `/registers#codes`, every code hint links to it. The REQ-018 rows slot into the same groups at merge (improvements and decisions under the first, the rest under the second).
+8. **Finding 17.** The review pack applies the sample owner facts before rendering, so document control is filled.
+9. **Findings 16, 2, 8, 10, 12** are the recording order in `fixtures/generation/README.md`, nothing else.
+
+**Lint counts over the 208 recorded replies (reported, not gated):** 68 with at least one finding (60 before this batch). By rule: indicator-restatement 36, vague-time 13, staff-actor 30, record-name 28 (11 before; aliases now fail), contact-details 1 (the complaints procedure, finding 9). Tests added: `names.test.ts` (6), `fixed-contact.test.ts` (7), three lint cases; skeleton snapshots updated for the new fixed sections; the committed complaints sample rewritten.
+
+**Merges.** `origin/main` merged into every open branch at the end of the batch (merge results in the next status line).
+
+**Next:** Standing backlog 1, `req-015-accessibility-pass`, from the head of `req-019-review-fixes`.
+
