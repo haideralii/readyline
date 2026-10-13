@@ -2,6 +2,41 @@ import { isValidElement, type ReactNode } from "react";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { draftNote, formatUpdated, type LegalPage } from "@/lib/legal/pages";
+import { DataTable } from "./data-table";
+
+/** A markdown table's header and body cells as text, from the hast node react-markdown passes to `table`. */
+type Hast = {
+  type?: string;
+  tagName?: string;
+  value?: string;
+  children?: Hast[];
+};
+function hastText(n: Hast | undefined): string {
+  if (!n) return "";
+  if (n.type === "text") return n.value ?? "";
+  return (n.children ?? []).map(hastText).join("");
+}
+function findAll(n: Hast | undefined, tag: string, out: Hast[] = []): Hast[] {
+  if (!n) return out;
+  if (n.tagName === tag) out.push(n);
+  for (const c of n.children ?? []) findAll(c, tag, out);
+  return out;
+}
+export function tableFromNode(node: unknown): {
+  columns: string[];
+  rows: string[][];
+} {
+  const n = node as Hast | undefined;
+  const trs = findAll(n, "tr");
+  const columns = trs.length
+    ? findAll(trs[0], "th").map((th) => hastText(th).trim())
+    : [];
+  const rows = trs
+    .slice(1)
+    .map((tr) => findAll(tr, "td").map((td) => hastText(td).trim()))
+    .filter((r) => r.length > 0);
+  return { columns, rows };
+}
 
 /**
  * Renders one legal or trust page (REQ-008 FR-1). Markdown becomes React
@@ -59,24 +94,14 @@ export const markdownComponents: Components = {
       {children}
     </a>
   ),
-  table: ({ children }) => (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full border-collapse text-sm">{children}</table>
-    </div>
-  ),
-  th: ({ children }) => (
-    <th
-      scope="col"
-      className="border-b border-zinc-300 py-2 pr-4 text-left font-semibold dark:border-zinc-700"
-    >
-      {children}
-    </th>
-  ),
-  td: ({ children }) => (
-    <td className="border-b border-zinc-200 py-2 pr-4 align-top dark:border-zinc-800">
-      {children}
-    </td>
-  ),
+  // REQ-013 batch 36: a markdown table becomes the shared DataTable (stacked
+  // rows on phones, no split words on wider screens), read from the syntax
+  // tree react-markdown hands over; cell text only, which is all the guides'
+  // tables carry.
+  table: ({ node }) => {
+    const { columns, rows } = tableFromNode(node);
+    return columns.length ? <DataTable columns={columns} rows={rows} /> : null;
+  },
   strong: ({ children }) => (
     <strong className="font-semibold">{children}</strong>
   ),
