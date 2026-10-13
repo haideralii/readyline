@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+﻿import { defineConfig, devices } from "@playwright/test";
 import { e2eCronSecret, loadLocalEnv } from "./e2e/helpers/env";
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -41,7 +41,7 @@ export default defineConfig({
       name: "iphone",
       use: { ...devices["iPhone 17 Pro"] },
       testMatch:
-        /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow))\.spec\.ts$/,
+        /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers))\.spec\.ts$/,
     },
   ],
   webServer: {

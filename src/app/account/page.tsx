@@ -6,7 +6,10 @@ import type {
   State,
 } from "@/lib/questionnaire/schema";
 import { ConfirmButton } from "@/components/confirm-button";
+import { ReadyLine } from "@/components/ready-line";
 import { formatAud } from "@/lib/payments/pricing";
+import { registersLine } from "@/lib/registers/overview";
+import { registerOverview } from "@/server/registers/queries";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
 import { listPurchases } from "@/server/payments/queries";
@@ -25,10 +28,12 @@ export default async function AccountPage() {
   if (!viewer.account) redirect("/account/setup");
   const a = viewer.account;
   // REQ-007 FR-7: the purchase rows with their receipt links.
-  const purchases = await listPurchases(
-    await createSupabaseServerClient(),
-    a.id,
-  );
+  const supabase = await createSupabaseServerClient();
+  const [purchases, overview] = await Promise.all([
+    listPurchases(supabase, a.id),
+    registerOverview(supabase, a.id),
+  ]);
+  const registers = registersLine(overview);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
@@ -39,6 +44,35 @@ export default async function AccountPage() {
         </Link>
         .
       </p>
+
+      {/* REQ-009 batch 28 item 4: the registers' state on the ready line, with the overdue counts in words. */}
+      <section
+        aria-labelledby="registers-heading"
+        className="mt-8"
+        data-testid="account-registers"
+      >
+        <h2 id="registers-heading" className="text-xl font-semibold">
+          Registers
+        </h2>
+        <div className="mt-3">
+          <ReadyLine
+            counts={{
+              done: registers.current,
+              toPrepare: registers.dueSoon,
+              remainder: registers.overdue,
+            }}
+            noun="register entries"
+            testId="account-registers-line"
+          />
+        </div>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          {registers.sentence}{" "}
+          <Link href="/registers" className="underline underline-offset-2">
+            Open the registers
+          </Link>
+          .
+        </p>
+      </section>
 
       <section aria-labelledby="details-heading" className="mt-8">
         <h2 id="details-heading" className="text-xl font-semibold">
