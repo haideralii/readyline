@@ -286,4 +286,50 @@ describe("customer-facing copy (REQ-015 FR-2)", () => {
         lintJson(join(ROOT, CONTENT_JSON_DIR, name), findings);
     expect(findings.map(format)).toEqual([]);
   });
+
+  it("guides (REQ-011): every paragraph and list item", () => {
+    const findings: Finding[] = [];
+    for (const name of readdirSync(join(ROOT, GUIDES_DIR)))
+      if (name.endsWith(".md"))
+        lintMarkdown(join(ROOT, GUIDES_DIR, name), findings);
+    expect(findings.map(format)).toEqual([]);
+  });
 });
+
+const GUIDES_DIR = "content/guides";
+
+/** Markdown paragraphs (blank-line separated); headings, tables, code fences, placeholders and front matter are skipped; a list is linted item by item. */
+function lintMarkdown(file: string, findings: Finding[]) {
+  const rel = relative(ROOT, file);
+  const raw = readFileSync(file, "utf8").replace(/^---[\s\S]*?\n---\n/, "");
+  const plain = (l: string) =>
+    l
+      .replace(/^\s*(?:[-*+]|\d+\.)\s+/, "")
+      .replace(/\*\*|__|`/g, "")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+  let inFence = false;
+  let n = 0;
+  for (const block of raw.split(/\n\s*\n/)) {
+    n += 1;
+    const lines = block.split("\n").filter((l) => {
+      if (/^\s*```/.test(l)) {
+        inFence = !inFence;
+        return false;
+      }
+      return !inFence;
+    });
+    const kept = lines.filter(
+      (l) =>
+        l.trim().length > 0 &&
+        !/^\s*#/.test(l) &&
+        !/^\s*\|/.test(l) &&
+        !/^\s*\{\{/.test(l),
+    );
+    if (kept.length === 0) continue;
+    const isList = kept.every((l) => /^\s*(?:[-*+]|\d+\.)\s+/.test(l));
+    const items = isList ? kept.map(plain) : [kept.map(plain).join(" ")];
+    for (const item of items)
+      for (const v of lintText(item, { block: true }))
+        findings.push({ file: rel, where: `paragraph ${n}`, violation: v });
+  }
+}

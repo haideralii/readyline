@@ -2021,6 +2021,53 @@ second server and a minute per page, and because axe covers the same
 rules on every commit. FR-18 (screen-reader passes) stays with the PO
 and Haider.
 
+**D-1101 Guides are markdown with the legal pages' convention, not MDX
+(Dev, 2026-10-13, batch 29, branch `req-011-content` from `main` 491e6fb
+with `req-015-plain-language` merged in; REQ-011 to be written by the
+PO).** `content/guides/<slug>.md` with the same scalar front matter the
+legal pages use (`title`, `slug`, `description`, `updated`, `reviewed`,
+`owner: po`, `status`), read on the server by `src/lib/guides/pages.ts`
+and rendered with the legal pages' markdown components, so the identity
+and the copy rules apply without a second renderer and no MDX toolchain
+or advisories join the build. Three placeholders are filled from live
+data at render time so a figure is never hand-typed twice:
+`{{registration-groups-table}}` (every group and its audit type from
+`data/standards.json`), `{{pack-price}}` (the configured price) and
+`{{cost-calculator}}` (the client calculator). The `## FAQ` section
+(`### question` then the answer) renders as disclosures and as `FAQPage`
+structured data; `## Sources` renders as the sources list; lines with
+`UNVERIFIED` are collected for the PO. The copy lint walks every
+paragraph and list item of the guides.
+
+**D-1102 Structured data and crawl surface.** `JsonLd` writes a JSON
+script (data, not code, so the nonce CSP allows it; `<` escaped).
+`Article` and `FAQPage` on each guide, `Organization` on the home page
+with the ABN only once `BUSINESS_ABN` is set. `sitemap.xml` lists the
+public pages and the guides with their updated dates; `robots.txt`
+disallows account, checklist, documents, registers, admin, API, dev and
+auth paths. Canonical URLs come from `NEXT_PUBLIC_SITE_URL`
+(`src/lib/site.ts`), localhost when unset.
+
+**D-1103 What the cost guide may claim.** Only figures the repository
+already holds with a source and a date: the audit ranges from the
+Provider+ 2026 cost article (a third party; the Commission does not set
+audit prices, D-106), the consultant, template-pack and software prices
+from the PO's research of 13 October 2026, and our own price from
+configuration. The application fee is marked UNVERIFIED (the research
+plan says free; no Commission page is held). The calculator reuses the
+questionnaire's rule (any certification group makes the whole
+registration certification) over the standards data, stores nothing and
+sends nothing.
+
+**D-1104 The which-audit guide's facts.** Verification and certification
+in practice from the PO's audit-type descriptions, the four cases the
+group list does not settle from the primer (restrictive practices, the
+SIL questions, early-childhood individuals, SDA-only), the mid-term audit
+rule from the standards data, and the three-year term. The compulsory
+registration dates (SIL and platforms from July 2026, personal care from
+July 2027, all by December 2030) come from the research document and are
+marked UNVERIFIED for the PO, as is the change-of-registration process.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

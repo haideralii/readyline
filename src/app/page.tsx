@@ -2,8 +2,11 @@ import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
 import { SampleDocument } from "@/components/sample-document";
 import { Testimonials, TrustCounters } from "@/components/trust-blocks";
+import { JsonLd } from "@/components/json-ld";
 import { BRAND } from "@/lib/brand";
 import { HOME_COPY as C, heroHeadline } from "@/lib/home-copy";
+import { businessAbn } from "@/lib/legal/config";
+import { siteUrl } from "@/lib/site";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
 
 /**
@@ -18,8 +21,30 @@ export default function Home() {
   const price = pricing.packPriceCents
     ? formatAud(pricing.packPriceCents)
     : null;
+  const abn = businessAbn();
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+      {/* REQ-011: Organization structured data; the ABN joins once BUSINESS_ABN is set. */}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: BRAND,
+          url: siteUrl(),
+          areaServed: "AU",
+          description:
+            "Registration-readiness documents and registers for small NDIS providers. General information, prepared for your review.",
+          ...(abn
+            ? {
+                identifier: {
+                  "@type": "PropertyValue",
+                  propertyID: "ABN",
+                  value: abn,
+                },
+              }
+            : {}),
+        }}
+      />
       <section className="max-w-2xl" data-testid="home-hero">
         <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
           {C.eyebrow}
