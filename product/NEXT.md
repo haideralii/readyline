@@ -1003,3 +1003,13 @@ Haider's phone findings fixed on **branch `req-013-phone-fixes` 4197d93** (from 
 - **Item 4.** Noted; nothing done.
 - **Screenshots.** iPhone project: `product/evidence/req-015/result-card-iphone.jpg` (the accessibility spec joined the iPhone project for it) and `product/evidence/req-013/sample-table-iphone.jpg` (a document table); the checklist People group shot (`checklist-people-iphone.jpg`) comes from CI's signed-in job, which cannot run here.
 - **Next:** batch 37 on `req-017-close-out` from `req-011-groups`.
+
+
+## Dev status (batch 41, written 14 Oct 2026, Dev; third unattended run, done before batch 37)
+
+Fix on **`req-009-session-c` 53e780d** (fix commit aa810b0, D-1009), merged up the stack and into the two batch branches: **`req-010-generation-kicker` 7bdcdf1, `req-016-document-standard` c9e91b8, `req-017-guided-path` 0402a0b, `req-011-groups` b6b4872, `req-013-phone-fixes` c93a5b0, `req-017-close-out` b6b4872** (no commits of its own yet). Every branch contains `main` 1341115. No model calls.
+
+- **Change.** `runRemindersJob` takes an optional `accountIds` list that limits the accounts it visits and the unsent rows it emails; the route never sets it. The test passes its own account on both runs and keeps the exact figures (5 inserted, 5 emailed, 0 and 0 on the second run), reads the row count back from the table for that account before and after, and checks the owner's outbox did not grow on the second run. The subscription-ledger test in the same file measured against a baseline already and was left alone.
+- **Proof here.** Type-check and lint clean on the two files; the integration file loads and skips without Supabase variables. The rows are CI's to prove on PR #28.
+- **Merges.** DECISIONS.md and NEXT.md conflicted at every stacked step (each branch appends at the same place); resolved keeping both sides, markdown only, each block present once, no markers.
+- **Next:** batch 37 on `req-017-close-out`.
