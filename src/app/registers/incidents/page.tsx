@@ -57,7 +57,7 @@ export default async function IncidentsPage() {
           id: r.id,
           href: `/registers/incidents/${r.id}`,
           title: `${r.reference}: ${CATEGORY_LABELS[r.category]}`,
-          detail: `${r.occurred_on}${r.participant_ref ? `, ${r.participant_ref}` : ""}. ${r.summary.slice(0, 80)}${r.summary.length > 80 ? "â€¦" : ""}`,
+          detail: `${r.occurred_on}${r.participant_ref ? `, ${r.participant_ref}` : ""}. ${r.summary.slice(0, 80)}${r.summary.length > 80 ? "…" : ""}`,
           status: incidentStatus(r),
         }))}
         filters={INCIDENT_FILTERS}

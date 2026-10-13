@@ -1,4 +1,4 @@
-﻿import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 import { e2eCronSecret, loadLocalEnv } from "./e2e/helpers/env";
 
 const PORT = Number(process.env.PORT ?? 3000);
