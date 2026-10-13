@@ -996,3 +996,21 @@ PO note for batch 39 (14 Oct 2026): REQ-018 gains FR-13, a document control regi
 ## Queue (written by PO, 14 Oct 2026, batch 41: PR #28 is still red after batch 38; do this FIRST, before whatever batch you are on, then return to it)
 The `server-only` fix worked: the Supabase job now loads all 12 files and runs the reminders test for real. It fails at `tests/integration/reminders-job.test.ts:140`: `expect(first.inserted).toBe(5)` received 9 (run 38418819924, job 115370344369). The kinds assertion just above it passed, so this account has exactly its 5 rows; the extra 4 come from other accounts seeded by the other integration files in the same stack, because `runRemindersJob` runs for every account and reports totals. Fix on `req-009-session-c`: scope the assertions to this account (count the rows with `.eq("account_id", accountId)` and assert 5; assert `first.inserted >= 5` and `first.emailed >= 5`, or better give `runRemindersJob` an optional `accountIds` filter used only by tests and keep the exact 5), make the second-run check count this account's rows again rather than the job's totals, and check the rest of the file for the same totals assumption. Merge up through `req-010-generation-kicker`, `req-016-document-standard`, `req-017-guided-path`, `req-011-groups` and any batch 36 or 37 branch you have started, push all, status with SHAs. STOP. The PO merges #28 to #31 in order once green.
 
+
+
+
+
+
+
+
+## Dev status (batch 36, written 14 Oct 2026, Dev; third unattended run)
+
+Haider's phone findings fixed on **branch `req-013-phone-fixes` 4197d93** (from `req-011-groups`; every open branch now carries `main` 7056024). No model calls. `npm run check` green (92 files, 669 tests + 3 skipped), `npm run build` green; public e2e on the three projects 96 passed with one WebKit flake that passed on retry (the groups index search on iPhone), plus the accessibility spec on iPhone 4 passed. Decision D-1310.
+
+- **Item 1, tables.** The cause was REQ-015's global `td { overflow-wrap: anywhere }`. One `DataTable` now renders every block table (sample viewer; the document reader, which uses the sample's block renderer instead of plain text) and every markdown table (read from react-markdown's syntax tree): stacked rows with the column header in small capitals under 640 px, a table with a minimum first column and space-only wrapping above; `td` and `dd` wrap at spaces (registers' detail lists included). `checkTables` in the e2e helpers wraps every word in a Range and fails when its rectangles sit on two lines, at the project width and at 360 and 390 px; it runs on the sample, the which-audit guide, the document review and the incident detail (the last two in CI's signed-in job).
+- **Item 2, the badge.** "Not confirmed by the Commission's text" is gone from the checklist and the result page; the customer reads "Check this against the Commission's page before you rely on it" under the item with its source link. The flag lives on `/admin` (computed over the three reference cases) and in `product/evidence/req-006/evidence-confidence.md`; copy-lint bans the phrase and "not asked about yet".
+- **Item 3, the result card.** Two segments (have / still to do) and one sentence: "You already have 0 of these. Readyline drafts the 15 documents for you; the 5 registers you keep as you go." The count line is gone; the link reads "Open your checklist (N things)"; the tags read "Readyline drafts this" and "You said you don't have this yet"; the home page example says the same sentence; the account page keeps the two-segment line for registers.
+- **Item 4.** Noted; nothing done.
+- **Screenshots.** iPhone project: `product/evidence/req-015/result-card-iphone.jpg` (the accessibility spec joined the iPhone project for it) and `product/evidence/req-013/sample-table-iphone.jpg` (a document table); the checklist People group shot (`checklist-people-iphone.jpg`) comes from CI's signed-in job, which cannot run here.
+- **Next:** batch 37 on `req-017-close-out` from `req-011-groups`.
+
