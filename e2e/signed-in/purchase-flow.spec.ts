@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { e2eCronSecret, hasSupabaseForE2e } from "../helpers/env";
+import { checkWidths } from "../helpers/width";
 import {
   createTenant,
   deleteTenant,
@@ -75,6 +76,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     await expect(page.getByTestId("subscription-coming")).toContainText(
       "AUD 39 a month, coming soon",
     );
+    await checkWidths(page, "pricing (signed in)");
     await shot(page, "pricing-signed-in", project);
 
     // Documents page before buying: price and Buy.
@@ -82,6 +84,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     await expect(page.getByTestId("purchase-none")).toBeVisible();
     await expect(page.getByTestId("pack-price")).toHaveText("AUD 399");
     await expect(page.getByRole("checkbox")).toHaveCount(0);
+    await checkWidths(page, "documents (signed in, before buying)");
     await shot(page, "documents-buy", project);
 
     // Buy: the server action creates the (fake) session and redirects to it.
@@ -138,6 +141,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     }
     expect(ready, "the set became ready").toBe(true);
     await expect(page.getByTestId("purchase-thanks")).toHaveCount(0);
+    await checkWidths(page, "documents (ready)");
     await expect(page.getByTestId("receipt-link")).toHaveAttribute(
       "href",
       /\/dev\/stripe-checkout\/cs_fake_.*receipt=1/,
@@ -175,6 +179,7 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     // The account page lists the purchase with its receipt.
     await page.goto("/account");
     await expect(page.getByTestId("purchases")).toContainText("AUD 399");
+    await checkWidths(page, "account (signed in)");
     await expect(
       page.getByRole("link", { name: "View receipt" }),
     ).toBeVisible();

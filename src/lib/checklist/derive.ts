@@ -108,11 +108,11 @@ function sourceRef(dataset: StandardsDataset, sourceId: string): SourceRef {
   };
 }
 
+// REQ-015 FR-2: the customer never sees a file path; the reason is the plain fact.
 const CONTENT_REF: SourceRef = {
   kind: "content",
   id: "document-sets",
-  title:
-    "Readyline document set mapping (data/readyline-content/document-sets.json)",
+  title: "Every registered provider needs this",
 };
 
 /** The standard that names a register as evidence, within the applicable modules. */

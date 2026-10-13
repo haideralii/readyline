@@ -159,7 +159,7 @@ export function SampleDocument() {
           disclosure needs no script and the sections stay in the document. */}
       <details className="mt-5">
         <summary
-          className="cursor-pointer text-sm font-medium underline underline-offset-2"
+          className="inline-flex min-h-11 cursor-pointer items-center text-sm font-medium underline underline-offset-2"
           data-testid="sample-more"
         >
           Show the other {doc.sections.length - SHOWN_FIRST} sections

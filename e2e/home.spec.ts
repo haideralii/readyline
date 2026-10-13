@@ -14,7 +14,11 @@ test.describe("home page", () => {
 
   test("first Tab lands on the skip link, which targets main content", async ({
     page,
+    browserName,
   }) => {
+    // Headless WebKit does not move keyboard focus onto links at all (Safari's
+    // "Press Tab to highlight each item" is off); the skip link is checked on Chromium.
+    test.skip(browserName === "webkit", "WebKit does not tab to links");
     await page.goto("/");
     await page.keyboard.press("Tab");
     const skip = page.getByRole("link", { name: /skip to main content/i });

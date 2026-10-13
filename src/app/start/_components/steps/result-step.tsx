@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
+import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
 import { readinessCounts } from "@/lib/questionnaire/readiness";
 import {
@@ -14,12 +16,33 @@ import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import { deriveResult, type DeriveResultResponse } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
 
-const HAVE_LABEL: Record<string, string> = {
-  yes: "You said you have this",
-  no: "You said you do not have this yet",
-  "not-sure": "You were not sure",
-  unknown: "To prepare",
-};
+/**
+ * The result page (REQ-015 Section B): the answer first, in one card that
+ * fits a phone screen, with one primary button; everything else folded into
+ * three disclosures whose state is remembered on this device (FR-4 to FR-7).
+ * The earlier REQ-013 and REQ-014 test ids are kept.
+ */
+
+/** "You said" as a small tag with an icon, never a second line (FR-5). */
+const HAVE_TAG: Record<string, { label: string; icon: string; tone: string }> =
+  {
+    yes: { label: "You have this", icon: "✓", tone: "text-moss border-moss" },
+    no: {
+      label: "You said: not yet",
+      icon: "○",
+      tone: "text-ochre border-ochre",
+    },
+    "not-sure": {
+      label: "You said: not sure",
+      icon: "?",
+      tone: "text-slate border-slate",
+    },
+    unknown: {
+      label: "To prepare",
+      icon: "○",
+      tone: "text-slate border-slate",
+    },
+  };
 
 type Fetch = {
   key: string;
@@ -103,6 +126,108 @@ export function ResultStep() {
   );
 }
 
+/* ---------- remembered disclosures (FR-7) ---------- */
+
+const OPEN_KEY = "readyline.result.open";
+
+function readOpen(): Set<string> {
+  try {
+    const raw = localStorage.getItem(OPEN_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return new Set(
+      Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+function useRememberedOpen() {
+  // ResultView mounts on the client only (after the result is fetched), so
+  // reading storage in the initialiser never differs from a server render.
+  const [open, setOpen] = useState<Set<string>>(readOpen);
+  const toggle = (id: string, isOpen: boolean) => {
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (isOpen) next.add(id);
+      else next.delete(id);
+      try {
+        localStorage.setItem(OPEN_KEY, JSON.stringify([...next]));
+      } catch {
+        // Storage can be blocked; the page still works.
+      }
+      return next;
+    });
+  };
+  return { open, toggle };
+}
+
+function Disclosure({
+  id,
+  summary,
+  open,
+  onToggle,
+  children,
+  nested = false,
+}: {
+  id: string;
+  summary: ReactNode;
+  open: boolean;
+  onToggle: (id: string, open: boolean) => void;
+  children: ReactNode;
+  nested?: boolean;
+}) {
+  return (
+    <details
+      open={open}
+      onToggle={(e) => onToggle(id, e.currentTarget.open)}
+      className={
+        nested
+          ? "mt-2 rounded-md border border-zinc-200 dark:border-zinc-800"
+          : "mt-4 rounded-md border border-zinc-300 dark:border-zinc-700"
+      }
+      data-testid={`result-section-${id}`}
+    >
+      <summary
+        className={
+          nested
+            ? "min-h-11 cursor-pointer px-3 py-2 text-base font-medium"
+            : "min-h-12 cursor-pointer px-4 py-3 text-lg font-semibold"
+        }
+      >
+        {summary}
+      </summary>
+      <div className={nested ? "px-3 pb-3" : "px-4 pb-4"}>{children}</div>
+    </details>
+  );
+}
+
+function HaveTag({ have }: { have: string }) {
+  const t = HAVE_TAG[have] ?? HAVE_TAG.unknown;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${t.tone}`}
+    >
+      <span aria-hidden="true">{t.icon}</span>
+      {t.label}
+    </span>
+  );
+}
+
+function haveCounts(items: readonly { have: string }[]) {
+  const c = { yes: 0, toPrepare: 0, notSure: 0 };
+  for (const i of items) {
+    if (i.have === "yes") c.yes += 1;
+    else if (i.have === "not-sure") c.notSure += 1;
+    else c.toPrepare += 1;
+  }
+  const parts: string[] = [];
+  if (c.yes) parts.push(`${c.yes} you have`);
+  if (c.toPrepare) parts.push(`${c.toPrepare} to prepare`);
+  if (c.notSure) parts.push(`${c.notSure} not sure`);
+  return parts.join(", ");
+}
+
 function ResultView({
   result,
   checklistTotal,
@@ -117,125 +242,120 @@ function ResultView({
   onStartAgain: () => void;
 }) {
   const r = result;
+  const router = useRouter();
+  const { open, toggle } = useRememberedOpen();
   const pathwayWord =
     r.pathway === "verification" ? "verification" : "certification";
+  const groups = documentGroupsContent.groups
+    .map((g) => ({
+      ...g,
+      items: r.documents.filter((d) => documentGroupId(d.id) === g.id),
+    }))
+    .filter((g) => g.items.length > 0);
+  const checklistHref = signedIn ? "/checklist" : "/sign-in?next=%2Fchecklist";
+
   return (
-    <div className="space-y-10" data-testid="result">
-      {/* REQ-013 FR-12: one summary block; the audit explanation lives here, not under a second heading. */}
+    <div className="space-y-6" data-testid="result">
+      {/* FR-4: the first screen is one card: the answer, one sentence, the counts, the line, one button. */}
       <section
         aria-labelledby="summary-heading"
         className="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
         data-testid="summary"
       >
-        <h2 id="summary-heading" className="text-xl font-semibold">
+        <h2 id="summary-heading" className="text-2xl font-semibold">
           Your audit: {pathwayWord}
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
-        <p className="mt-2 text-lg leading-8">
-          You will need <strong>{r.documents.length} documents</strong> and{" "}
-          <strong>{r.registers.length} registers</strong>. {BRAND} can draft the
-          documents and keep the registers.
+        <ul
+          className="mt-2 flex flex-wrap gap-1.5"
+          aria-label="Registration groups in scope"
+        >
+          {r.groups.map((g) => (
+            <li
+              key={g.code}
+              className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+            >
+              {g.name}{" "}
+              <span className="font-mono text-zinc-500 dark:text-zinc-400">
+                {g.code}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p
+          className="mt-3 text-base leading-7"
+          data-testid="pathway-description"
+        >
+          {r.pathway === "verification"
+            ? "An auditor reads your documents at their desk. Nobody visits."
+            : "An auditor visits you, talks to your workers and some participants, and reads your documents."}
         </p>
-        {/* REQ-014: the ready line; what you said you have against what is still to prepare. */}
-        <div className="mt-4">
+        <p className="mt-2 text-base leading-7">
+          You will need <strong>{r.documents.length} documents</strong> and{" "}
+          <strong>{r.registers.length} registers</strong>.
+        </p>
+        <div className="mt-3">
           <ReadyLine
             counts={readinessCounts(r)}
             noun="documents and registers"
             testId="result-ready-line"
           />
         </div>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-          {r.pathway === "verification"
-            ? "In practice: an auditor reviews your documents at their desk. Nobody visits, and nobody needs to speak to the people you support."
-            : "In practice: an auditor visits your business, talks to your workers and to some of the people you support, and reads your documents and registers."}
-        </p>
-        <p
-          className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
-          data-testid="pathway-description"
-        >
-          {r.pathwayDescription}
-        </p>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Groups in scope:{" "}
-          {r.groups.map((g) => `${g.code} ${g.name}`).join("; ")}
-        </p>
+        <div data-testid="checklist-teaser">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              href={checklistHref}
+              className="btn-primary"
+              data-testid={signedIn ? "checklist-link" : "checklist-sign-in"}
+            >
+              Open your checklist
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
+              data-testid="result-buy-link"
+            >
+              See the price
+            </Link>
+          </div>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            Your checklist has {checklistTotal} items
+            {signedIn ? "." : "; sign in to track them."}
+          </p>
+        </div>
+      </section>
+
+      {/* FR-5: three closed disclosures with counts in their summaries. */}
+      <Disclosure
+        id="why"
+        open={open.has("why")}
+        onToggle={toggle}
+        summary={`Why this result (${r.reasons.length} reason${r.reasons.length === 1 ? "" : "s"}, with sources)`}
+      >
         {r.flags.silExcluded ? (
           <p
-            className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+            className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
             data-testid="sil-excluded"
           >
-            Based on your answers, the service you described is not supported
-            independent living under the Commission&apos;s definition, so class
-            0138 and the SIL module are not in your result.
+            The service you described is not supported independent living under
+            the Commission&apos;s definition. Class 0138 and the SIL module are
+            not in your result.
           </p>
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
-          <p className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
+          <p className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
             You were not sure about restrictive practices, and at least one of
             your answers to the three helper questions pointed to yes, so we
-            included the implementing behaviour support plans module. If that is
-            wrong, change the answer on the restrictive practices step and the
-            module drops out.
+            included the implementing behaviour support plans module. Change the
+            answer on the restrictive practices step and the module drops out.
           </p>
         ) : null}
         {r.flags.largeProvider ? (
-          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Readyline focuses on providers with up to about 10 workers; the
+          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            {BRAND} focuses on providers with up to about 10 workers. The
             standards below still apply to you.
           </p>
         ) : null}
-      </section>
-
-      <section aria-labelledby="modules-heading">
-        <h2 id="modules-heading" className="text-xl font-semibold">
-          Practice Standards modules that apply ({r.modules.length})
-        </h2>
-        <ul className="mt-3 space-y-4">
-          {r.modules.map((m) => (
-            <li
-              key={m.id}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
-              data-testid={`module-${m.id}`}
-            >
-              <h3 className="text-base font-semibold">
-                {m.name}{" "}
-                <span className="font-normal text-zinc-600 dark:text-zinc-400">
-                  ({m.standardCount} standards)
-                </span>
-              </h3>
-              <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-                {m.description}
-              </p>
-              <details className="mt-2">
-                <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
-                  Explain this result: the standards in this module
-                </summary>
-                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
-                  {m.standards.map((s) => (
-                    <li key={s.id}>{s.name}</li>
-                  ))}
-                </ul>
-              </details>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="midterm-heading">
-        <h2 id="midterm-heading" className="text-xl font-semibold">
-          Mid-term audit
-        </h2>
-        <p className="mt-2 leading-7" data-testid="mid-term">
-          {r.midTermAudit.applies
-            ? `Applies: about ${r.midTermAudit.monthsAfterRegistration} months after registration, assessed against the provider governance and operational management standards. Start preparing from month ${r.midTermAudit.prepareFromMonth}.`
-            : `Does not apply. ${r.midTermAudit.exemptReason ?? ""}`}
-        </p>
-      </section>
-
-      <section aria-labelledby="why-heading">
-        <h2 id="why-heading" className="text-xl font-semibold">
-          Why
-        </h2>
         <ul className="mt-3 space-y-3">
           {r.reasons.map((x, i) => (
             <li
@@ -260,138 +380,140 @@ function ResultView({
             </li>
           ))}
         </ul>
-      </section>
+        <h3 className="mt-5 text-base font-semibold">
+          Practice Standards modules that apply ({r.modules.length})
+        </h3>
+        <ul className="mt-2 space-y-3">
+          {r.modules.map((m) => (
+            <li
+              key={m.id}
+              className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+              data-testid={`module-${m.id}`}
+            >
+              <p className="text-base font-medium">
+                {m.name}{" "}
+                <span className="font-normal text-zinc-600 dark:text-zinc-400">
+                  ({m.standardCount} standards)
+                </span>
+              </p>
+              <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                {m.description}
+              </p>
+              <details className="mt-1">
+                <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
+                  The standards in this module
+                </summary>
+                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
+                  {m.standards.map((s) => (
+                    <li key={s.id}>{s.name}</li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          ))}
+        </ul>
+        <h3 className="mt-5 text-base font-semibold">Mid-term audit</h3>
+        <p className="mt-1 text-sm leading-6" data-testid="mid-term">
+          {r.midTermAudit.applies
+            ? `Applies: about ${r.midTermAudit.monthsAfterRegistration} months after registration, against the provider governance and operational management standards. Start preparing from month ${r.midTermAudit.prepareFromMonth}.`
+            : `Does not apply. ${r.midTermAudit.exemptReason ?? ""}`}
+        </p>
+      </Disclosure>
 
-      <section aria-labelledby="documents-heading">
-        <h2 id="documents-heading" className="text-xl font-semibold">
-          Documents you will need ({r.documents.length})
-        </h2>
+      <Disclosure
+        id="documents"
+        open={open.has("documents")}
+        onToggle={toggle}
+        summary={`Documents you will need (${r.documents.length})`}
+      >
         <p
           className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
           data-testid="have-legend"
         >
-          A first-pass list from the modules above. &ldquo;You said&rdquo;
-          labels come from your answers in the last step; &ldquo;To
-          prepare&rdquo; means the questionnaire did not ask about that item.
+          Tags come from your answers in the last step. &ldquo;To prepare&rdquo;
+          means the questionnaire did not ask about that item.
         </p>
-        {documentGroupsContent.groups
-          .map((g) => ({
-            ...g,
-            items: r.documents.filter((d) => documentGroupId(d.id) === g.id),
-          }))
-          .filter((g) => g.items.length > 0)
-          .map((g) => (
-            <div key={g.id} className="mt-4" data-testid={`doc-group-${g.id}`}>
-              <h3 className="text-base font-semibold">
-                {g.title} ({g.items.length})
-              </h3>
-              <ul className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
-                {g.items.map((d) => (
-                  <li
-                    key={d.id}
-                    className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <span className="text-base">{d.title}</span>
-                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {HAVE_LABEL[d.have]}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}{" "}
-      </section>
+        {groups.map((g) => (
+          <Disclosure
+            key={g.id}
+            id={`doc-group-${g.id}`}
+            nested
+            open={open.has(`doc-group-${g.id}`)}
+            onToggle={toggle}
+            summary={
+              <>
+                {g.title} ({g.items.length}
+                {haveCounts(g.items) ? `: ${haveCounts(g.items)}` : ""})
+              </>
+            }
+          >
+            <ul
+              className="divide-y divide-zinc-200 dark:divide-zinc-800"
+              data-testid={`doc-group-${g.id}`}
+            >
+              {g.items.map((d) => (
+                <li
+                  key={d.id}
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2"
+                >
+                  <span className="text-base">{d.title}</span>
+                  <HaveTag have={d.have} />
+                </li>
+              ))}
+            </ul>
+          </Disclosure>
+        ))}
+      </Disclosure>
 
-      <section aria-labelledby="registers-heading">
-        <h2 id="registers-heading" className="text-xl font-semibold">
-          Registers to keep after registration
-        </h2>
+      <Disclosure
+        id="registers"
+        open={open.has("registers")}
+        onToggle={toggle}
+        summary={`Registers to keep (${r.registers.length})`}
+      >
         <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          Same labels as the documents list.
+          Kept after registration; an auditor samples them at the mid-term audit
+          and at renewal.
         </p>
-        <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
           {r.registers.map((x) => (
             <li
               key={x.id}
-              className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2"
             >
               <span className="text-base">{x.title}</span>
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                {HAVE_LABEL[x.have]}
-              </span>
+              <HaveTag have={x.have} />
             </li>
           ))}
         </ul>
-      </section>
-
-      {/* REQ-006 FR-5: the checklist teaser; nothing is stored before sign-in. */}
-      <section
-        aria-labelledby="checklist-heading"
-        className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
-        data-testid="checklist-teaser"
-      >
-        <h2 id="checklist-heading" className="text-xl font-semibold">
-          Your readiness checklist
-        </h2>
-        <p className="mt-2 leading-7">
-          Your checklist has {checklistTotal} items: the documents and registers
-          above, worker screening and orientation, your ABN and insurances, and
-          the audit itself.{" "}
-          {signedIn ? (
-            <Link
-              href="/checklist"
-              className="underline underline-offset-2"
-              data-testid="checklist-link"
-            >
-              Open your checklist
-            </Link>
-          ) : (
-            <Link
-              href="/sign-in?next=%2Fchecklist"
-              className="underline underline-offset-2"
-              data-testid="checklist-sign-in"
-            >
-              Sign in to track them
-            </Link>
-          )}
-          .
-        </p>
-      </section>
-
-      <p
-        className="rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
-        data-testid="result-notice"
-      >
-        {r.notice}
-      </p>
+      </Disclosure>
 
       <section
         aria-labelledby="next-heading"
         className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
         data-testid="what-next"
       >
-        <h2 id="next-heading" className="text-xl font-semibold">
+        <h2 id="next-heading" className="text-lg font-semibold">
           What happens next
         </h2>
-        <p className="mt-2 leading-7">
-          {BRAND} drafts these documents for you as a one-off pack, and the
-          registers follow as a subscription.{" "}
-          <Link
-            href="/pricing"
-            className="underline underline-offset-2"
-            data-testid="result-buy-link"
-          >
-            See the price and buy the document pack
-          </Link>
-          , or{" "}
+        <p className="mt-2 text-sm leading-6">
+          {BRAND} drafts these documents as a one-off pack; the registers follow
+          as a subscription.{" "}
           <Link href="/documents" className="underline underline-offset-2">
-            go to your documents
+            Go to your documents
           </Link>{" "}
           if you already have one.
         </p>
       </section>
 
-      {/* REQ-013 FR-9: a visible way to ask a question. */}
+      <p
+        className="text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        data-testid="result-notice"
+      >
+        {r.notice}
+      </p>
+
+      {/* REQ-013 FR-9, REQ-015 FR-6: one line, the address as a link. */}
       <p
         className="text-sm leading-6 text-zinc-700 dark:text-zinc-300"
         data-testid="result-contact"
@@ -399,7 +521,7 @@ function ResultView({
         Questions about your result?{" "}
         {contactEmail ? (
           <>
-            Email us at{" "}
+            Email{" "}
             <a
               href={`mailto:${contactEmail}`}
               className="underline underline-offset-2"
@@ -409,19 +531,22 @@ function ResultView({
             .
           </>
         ) : (
-          "Email us at the contact address in the footer."
+          "Email the contact address in the footer."
         )}{" "}
-        We answer questions about the product and the registration process in
-        general; we cannot give legal advice.
+        We answer product and process questions, not legal ones.
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Link href={stepHref("business")} className="btn-secondary">
-          Change my answers
-        </Link>
-        <Link href="/start" onClick={onStartAgain} className="btn-secondary">
-          Clear the draft on this device
-        </Link>
+        <ConfirmButton
+          label="Clear the draft on this device"
+          question="Clear your answers on this device? Your result goes with them."
+          confirmLabel="Yes, clear them"
+          onConfirm={() => {
+            onStartAgain();
+            router.push("/start");
+          }}
+          testId="clear-draft"
+        />
       </div>
     </div>
   );

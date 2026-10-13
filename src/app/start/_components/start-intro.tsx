@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { ConfirmButton } from "@/components/confirm-button";
 import { firstIncompleteStep, stepHref } from "@/lib/questionnaire/navigation";
 import { useQuestionnaire } from "./questionnaire-provider";
 
@@ -41,8 +42,8 @@ export function StartIntro() {
         data-testid="start-storage-note"
       >
         {mode === "server"
-          ? "You are signed in, so your answers are saved to your account after each step and you can continue from any device. Step 1 starts with the business details from your account. Do not enter any participant's details."
-          : "Nothing you type is sent anywhere until the last step. Your answers are kept as a draft on this device so you can come back later; sign in to keep them with your account instead. Do not enter any participant's details."}
+          ? "You are signed in. Your answers are saved to your account after each step, so you can continue from any device. Step 1 starts with your account's business details. Do not enter any participant's details."
+          : "Your answers stay on this device as a draft until the last step. Sign in to keep them with your account instead. Do not enter any participant's details."}
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -51,13 +52,13 @@ export function StartIntro() {
             <Link href={resume} className="btn-primary">
               Continue where you left off
             </Link>
-            <button
-              type="button"
-              onClick={() => void clearDraft()}
-              className="btn-secondary"
-            >
-              Start again and clear the draft
-            </button>
+            <ConfirmButton
+              label="Start again and clear the draft"
+              question="Clear your saved answers and start again?"
+              confirmLabel="Yes, clear them"
+              onConfirm={() => void clearDraft()}
+              testId="clear-draft"
+            />
           </>
         ) : (
           <Link href={stepHref("business")} className="btn-primary">

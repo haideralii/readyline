@@ -116,6 +116,65 @@ strong {
   outline-offset: 2px;
 }
 
+/*
+ * Feedback on every action (REQ-015 FR-13, FR-14): a pressed state that is a
+ * background shift, not only opacity, on every link, button and control; a
+ * tapped link keeps it (aria-busy) until the next page paints; and the top
+ * progress line that runs during route changes.
+ */
+a:active,
+a[aria-busy="true"],
+summary:active,
+label:active {
+  background-color: var(--mist);
+}
+button:active:not(:disabled),
+[role="button"]:active {
+  background-color: var(--mist);
+  transform: translateY(1px);
+}
+.btn-primary:active:not(:disabled),
+.btn-primary[aria-busy="true"] {
+  background-color: color-mix(in srgb, var(--ochre) 82%, var(--ink));
+  transform: translateY(1px);
+}
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--mist);
+  transform: translateY(1px);
+}
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--mist);
+  overflow: hidden;
+}
+.route-progress-bar {
+  height: 100%;
+  width: 40%;
+  background: var(--ochre);
+  animation: route-progress-slide 1.2s ease-in-out infinite;
+}
+@keyframes route-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+/* Long unbroken strings (addresses, references) wrap rather than widen the page (FR-16a). */
+p,
+li,
+dd,
+td,
+summary {
+  overflow-wrap: anywhere;
+}
+
 /* Buttons: one warm accent for the thing that matters on each screen. */
 @layer components {
   .btn-primary {
