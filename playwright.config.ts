@@ -42,6 +42,9 @@ export default defineConfig({
       use: { ...devices["iPhone 17 Pro"] },
       testMatch:
         /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers|guided-path))\.spec\.ts$/,
+
+        /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers))\.spec\.ts$/,
+
     },
   ],
   webServer: {
