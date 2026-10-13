@@ -813,3 +813,15 @@ Read `product/requirements/REQ-016-document-standard.md` whole. Branch `req-016-
 6. Fill the Dev response and Delivery evidence in REQ-016 with before/after screenshots of one document on a laptop and a phone. Status with the branch SHA. STOP.
 
 7. **Fill-in-the-blank placeholders (REQ-016 S-8, from Haider's read of the conflict of interest policy, which is otherwise good).** Today a missing fact becomes a separate yellow box with an instruction ("[Provider to complete: name the person who acts as our key person ... and the contact details ...]"). Instead, the generator writes the complete sentence and leaves only the missing piece as a highlighted blank inside it: "Our key person for conflict of interest decisions is [name]. Workers declare a conflict to them by [phone or email]." Rules: the blank is at most four words naming the fact ([name], [role], [phone or email], [date], [state]); the sentence around it is complete and final; the blank is a Word highlighted run in one consistent colour (a light tint of our ochre, readable when printed in black and white, with square brackets so the highlight is not the only cue); never an instruction, never a question. The same rule for the three-dot fallback sections from FR-0b. The readiness summary PDF and a "Finish your pack" page in the set view list every blank by document, section and page, so the provider works through them top to bottom and sees the count fall as they fill them (this is the "sections marked for your review" number, now honest). Lint: no placeholder longer than six words, none containing a verb in the imperative.
+
+
+## Queue (written by PO, 13 Oct 2026, late: batch 34, REQ-017 the guided path; run after batch 33, before batch 31)
+Read `product/requirements/REQ-017-guided-path.md` whole, and add its principle paragraph to `CLAUDE.md` section 1 as a product rule. Branch `req-017-guided-path` from the batch 33 branch.
+1. FR-1 the "Your next step" strip, driven by one pure function over the account state with a unit test per state.
+2. Steps 2 and 3 of the path (the before-you-buy screen and the while-we-draft screen), reusing batch 32's copy.
+3. FR-2 Finish your pack: the blanks recorded by REQ-016 S-8 become a one-question-per-screen form; answers saved as account facts; documents re-rendered with them; confirmation line.
+4. FR-3 the Adopt screens and the audit-day page, printable.
+5. FR-4 resumability and FR-5 the one-button rule, enforced by a test over the path's pages.
+6. e2e on the three projects: a fresh account walks result to audit day; screenshots under `product/evidence/req-017/`. Status with the branch SHA. STOP.
+
+Order for the dev from here: batch 30 (in progress) → 31 item 0 → 32 → 33 → 34 → 31. The PO merges PR #25 and the stacked PRs as soon as item 0 lands.
