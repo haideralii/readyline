@@ -825,3 +825,14 @@ Read `product/requirements/REQ-017-guided-path.md` whole, and add its principle 
 6. e2e on the three projects: a fresh account walks result to audit day; screenshots under `product/evidence/req-017/`. Status with the branch SHA. STOP.
 
 Order for the dev from here: batch 30 (in progress) → 31 item 0 → 32 → 33 → 34 → 31. The PO merges PR #25 and the stacked PRs as soon as item 0 lands.
+
+
+## Dev status (batch 31 item 0, written 13 Oct 2026, Dev; second unattended run)
+
+Text corruption repaired and guarded; every open PR is conflict-free against `main` (99a29e4). No model calls (cost table: none).
+
+- **Cause (D-1507).** Dev's PowerShell conflict-resolution scripts read files without a byte-order mark as Windows-1252 and wrote them back as UTF-8 with a mark, so each non-ASCII character they touched was encoded twice (the nonce line in `DECISIONS.md` three times). The damage was wider than the two files named: REQ-004, REQ-009, the supports step's disclosure glyphs, the generator prompt's ellipsis, two register pages, the sample document, the Playwright config and two evidence files carried marks or double-encoded runs.
+- **Repair, never retyped.** `scripts/ops/repair-mojibake.ts` (backed by `src/lib/text/encoding.ts`, unit-tested) strips the mark and reverses the round trip however many times it was applied; it ran on every flagged file on each branch. `tests/text-encoding.test.ts` is in `npm test` and fails on a mark or a double-encoded run in any text file (markdown, source, content, data, tests, workflows) outside `data/sources`. `.editorconfig` already says `charset = utf-8`.
+- **Branches.** `req-015-plain-language` ec76a0f: `main` merged (D-901 to D-906 kept before D-1501 to D-1506), repair and guard added, `npm run check` green (78 files, 553 tests + 2 skipped). Then merged into `req-009-session-b` c376849, `req-011-content` 8aea635 and `req-009-session-c` e06f692 (both conflict blocks in `DECISIONS.md` resolved keeping each side's decisions in order; the guard test and typecheck green on each). PR #25 and the stacked PRs should now merge cleanly in order.
+- **Still on `main`:** the corrupted lines in `DECISIONS.md`, `product/NEXT.md` and REQ-004 stay until PR #25 merges (D-030: Dev does not edit `main` beyond the statuses the PO asks for). This status is appended without touching them.
+- **Next, per the PO's order:** batch 32 on `req-010-generation-kicker` (from `req-009-session-c`, the fullest stack, so 33, 34 and 31 stack linearly behind it), then 33, 34, 31.
