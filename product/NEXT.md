@@ -759,3 +759,21 @@ No model calls (cost table: none). **Branch `req-011-content` 8d7db12**, from `m
   - ndis-registration-cost: the application fee (the research plan records it as free; no Commission page held), stated in the table and in the first FAQ; the audit ranges are a third party's (Provider+, 2026) and say so.
   - Both guides carry `status: draft` so the page shows the draft banner until the PO clears the markers and sets the status.
 - **Open for the PO:** the REQ-011 text; whether the guides should be linked from the home page and the footer now (not done, to keep the home page as reviewed in batch 26; one line in `LEGAL_NAV` or a home section would do it); a real domain for the canonical URL.
+
+## PO note (13 Oct 2026, late): second unattended run, batches 30 and 31
+Batches 27 to 29 received; PR #25 (REQ-015) opened by the PO, Session B and content follow once it is merged. Same unattended rules as before: one branch per batch, branched from `req-011-content` (it carries REQ-015 and Session A; rebase is not needed, a merge of `main` is fine when `main` moves), never merge to `main`, status after each batch, nothing needing an account, a secret or a hosted model call; Stripe work is code and env names only, Haider creates the subscription price in the dashboard later.
+
+## Queue (written by PO, 13 Oct 2026, batch 30: REQ-009 Session C, reminders, lapse and the subscription)
+Branch `req-009-session-c`.
+1. Reminder rules per REQ-009 FR-3, as a pure module with unit tests over every rule and boundary (90/30/7, 60/14, 30-day open incident, 2 business days, the morning after `notify_by`, months 12/15/17 for certification only, 6 and 3 months before `registration_date + 3 years`). A nightly `/api/jobs/reminders` route behind `CRON_SECRET` (same pattern as the purge route, production-only guard), idempotent on `(account_id, kind, subject_id, due_on)`; a second run inserts nothing. Email through the REQ-004 provider (log-only until D-013), the message naming register and reference only (SR-4). The account page "Due soon" list reads the same rows.
+2. Subscription in Stripe test mode: a `subscription` entitlement kind created by Checkout in subscription mode against `STRIPE_PRICE_REGISTERS` (name only in `.env.example` and the runbook; Haider creates the price), the webhook handling `customer.subscription.created/updated/deleted` and `invoice.payment_failed`, revoking only on `canceled` or `unpaid` (D-056), never on `past_due`; Stripe Billing portal link on the account page for cancel and card update. No trial period, no proration games, no fee of any kind. Unit tests with mocked events; the fake-Stripe mode used by the e2e gains the subscription path.
+3. Lapse behaviour end to end: integration test that a revoked subscription freezes writes (RLS) and the pages show the one-line read-only message; renewal restores writes.
+4. AC-4 test from REQ-009: a forced job run on a seeded account produces exactly the expected reminder rows, twice run, no duplicates.
+5. Fill the Dev response and Delivery evidence (Session C). Status with the branch SHA. STOP.
+
+## Queue (written by PO, 13 Oct 2026, batch 31: REQ-011 generated pages)
+Branch `req-011-groups` from `req-009-session-c` (or from `req-011-content` if batch 30 is blocked).
+1. Per registration-group pages at `/guides/registration-groups/<slug>` for all 38 groups, generated from `standards.json` and the document-set mapping (never hand-typed): the group's plain name and code, audit type with the rule and source, modules, the document list the pack produces, registers, the price composed from config, an FAQ (same four questions per group with the group's values), the questionnaire CTA with the group pre-selected, and `FAQPage` data. One template, one test over all 38 that every page renders, passes copy-lint and the width check, and links to the sources.
+2. An index page of the 38 groups under the everyday headings from REQ-013 FR-3, searchable with the same synonyms.
+3. Sitemap and the guides index gain the new pages; guides linked from the footer (`LEGAL_NAV` or a "Guides" entry) and one line on the home page under the mission section ("Read the guides"), nothing else on the home page moves.
+4. Draft banner stays on the two written guides until the PO clears them. Status with the branch SHA. STOP.
