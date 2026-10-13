@@ -124,12 +124,123 @@ test.describe("guides (REQ-011)", () => {
     await shot(page, "cost", testInfo.project.name);
   });
 
+  // REQ-011 batch 31: the 38 generated registration-group pages.
+  test("registration groups index: everyday headings, synonym search, links to every group", async ({
+    page,
+  }, testInfo) => {
+    await page.goto("/guides/registration-groups");
+    await expect(page.getByTestId("groups-count")).toHaveText(
+      "38 registration groups.",
+    );
+    await expect(
+      page.getByTestId("groups-category-personal-care"),
+    ).toBeVisible();
+    expect(
+      await page.getByRole("link", { name: /\(class|^[A-Z]/ }).count(),
+    ).toBeGreaterThan(30);
+    await page.getByLabel(/Search by what you do/).fill("cleaning");
+    await expect(page.getByTestId("groups-count")).toContainText(/of 38/);
+    await expect(
+      page.getByRole("link", { name: "Household tasks", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByTestId("groups-category-personal-care")).toHaveCount(
+      0,
+    );
+    await checkWidths(page, "registration groups index");
+    await axeClean(page, "registration groups index");
+    await shot(page, "groups-index", testInfo.project.name);
+  });
+
+  test("a group page: audit with its rule and source, modules, documents, price, FAQ data, CTA with the group ticked", async ({
+    page,
+  }, testInfo) => {
+    await page.goto("/guides/registration-groups/household-tasks");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "Household tasks",
+    );
+    await expect(page.getByTestId("group-audit")).toContainText(
+      "Your audit: verification",
+    );
+    await expect(
+      page
+        .getByTestId("group-audit")
+        .getByRole("link", { name: /Source:/ })
+        .first(),
+    ).toHaveAttribute("href", /ndiscommission\.gov\.au/);
+    await expect(page.getByTestId("group-modules")).toContainText(
+      "Verification module",
+    );
+    expect(
+      await page.getByTestId("group-documents").getByRole("listitem").count(),
+    ).toBeGreaterThan(12);
+    await expect(page.getByTestId("group-price")).toContainText("AUD 399");
+    await expect(page.getByTestId("group-cta")).toHaveAttribute(
+      "href",
+      "/start?group=0120",
+    );
+    expect(await page.getByTestId("group-faq").locator("details").count()).toBe(
+      4,
+    );
+    const ld = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    )
+      .map((t) => JSON.parse(t))
+      .flat();
+    expect(
+      ld.find((d: { "@type"?: string }) => d["@type"] === "FAQPage")
+        ?.mainEntity,
+    ).toHaveLength(4);
+    await expect(
+      page.getByTestId("group-sources").getByRole("link").first(),
+    ).toHaveAttribute("href", /gov\.au/);
+    expect(await page.locator("body").textContent()).not.toMatch(
+      /data\/|\.json|Never restate/,
+    );
+    await checkWidths(page, "group page");
+    await axeClean(page, "group page");
+    await shot(page, "group-page", testInfo.project.name);
+
+    // The SDA-only note comes from the rules, with its source.
+    await page.goto(
+      "/guides/registration-groups/specialist-disability-accommodation",
+    );
+    await expect(page.getByTestId("group-note").first()).toContainText(
+      "without the core module",
+    );
+    await expect(page.getByTestId("group-modules")).not.toContainText(
+      "Core module",
+    );
+  });
+
+  test("the CTA pre-selects the group in the questionnaire", async ({
+    page,
+  }) => {
+    await page.goto("/start?group=0120");
+    await expect(page.getByTestId("start-preselect")).toContainText(
+      "household tasks (class 0120)",
+    );
+    await page.getByRole("link", { name: "Start the questionnaire" }).click();
+    await page.getByLabel("Trading name").fill("Sunrise Supports");
+    await page.getByRole("radio", { name: "Sole trader" }).check();
+    await page.getByRole("checkbox", { name: "NSW" }).check();
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await expect(page.getByTestId("groups-chosen")).toContainText(
+      "1 chosen: Household tasks",
+    );
+    await expect(page.locator("#group-0120")).toBeChecked();
+  });
+
   test("sitemap and robots", async ({ request }) => {
     const sm = await request.get("/sitemap.xml");
     expect(sm.status()).toBe(200);
     const xml = await sm.text();
     expect(xml).toContain("/guides/which-ndis-audit");
     expect(xml).toContain("/guides/ndis-registration-cost");
+    expect(xml).toContain("/guides/registration-groups</loc>");
+    expect(xml).toContain("/guides/registration-groups/household-tasks");
+    expect(
+      xml.match(/\/guides\/registration-groups\/[a-z0-9-]+<\/loc>/g),
+    ).toHaveLength(38);
     expect(xml).toContain("/pricing");
     const rb = await request.get("/robots.txt");
     expect(rb.status()).toBe(200);

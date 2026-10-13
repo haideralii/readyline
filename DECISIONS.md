@@ -2325,6 +2325,23 @@ test.ts` reads the path pages' source and fails a screen with more than one
 primary button, more than one h1, or more than three paragraphs above the
 control, measuring one rendered branch at a time.
 
+**D-1105 The 38 registration-group pages are generated, never written
+(Dev, 2026-10-14, batch 31, REQ-011).** `src/lib/guides/groups.ts` builds
+each page from `standards.json`, `deriveApplicability` for that one group
+delivered by a sole trader (0138 taken as meeting the SIL definition; 0118's
+modified certification and 0131's core exemption come out of the rules as
+notes with their sources) and `deriveDocumentSet`, so a page can only say
+what the questionnaire would say. The four questions are the same on every
+page with the group's values; the module and document answers stay short
+(names and counts) so every generated string passes the 60-word paragraph
+rule, which the unit test over all 38 enforces with the claims lint. The
+slug is the Commission's name in kebab case; the price comes from config;
+the CTA is `/start?group=<code>`, which the questionnaire intro keeps in
+session storage (this tab only) and the supports step ticks until the
+provider touches the list. "Guides" joined the footer's nav list; the home
+page gained one line under the mission section; the sitemap carries the
+index and the 38 pages. The two written guides keep their draft banner.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

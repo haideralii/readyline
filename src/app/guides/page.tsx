@@ -20,6 +20,17 @@ export default function GuidesPage() {
         Plain answers to the questions providers search for, each with its
         sources and the date we last checked them.
       </p>
+      {/* REQ-011 batch 31: the 38 registration-group pages have their own index. */}
+      <p className="mt-4 leading-7" data-testid="guides-groups-link">
+        <Link
+          href="/guides/registration-groups"
+          className="underline underline-offset-2"
+        >
+          Registration groups: which audit and which documents each of the 38
+          classes needs
+        </Link>
+        .
+      </p>
       <ul
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
         data-testid="guides-list"

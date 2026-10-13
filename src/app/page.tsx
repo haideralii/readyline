@@ -187,6 +187,16 @@ export default function Home() {
             More about {BRAND}
           </Link>
         </p>
+        {/* REQ-011 batch 31 item 3: one line to the guides; nothing else on this page moves. */}
+        <p className="mt-2 text-sm">
+          <Link
+            href="/guides"
+            className="underline underline-offset-2"
+            data-testid="home-guides-link"
+          >
+            Read the guides
+          </Link>
+        </p>
       </section>
 
       <section className="mt-12 max-w-2xl" aria-labelledby="what-heading">

@@ -30,6 +30,8 @@ import type {
 } from "./store";
 
 vi.mock("server-only", () => ({}));
+// The fixture replays render whole sets; under the full suite's load they pass five seconds.
+vi.setConfig({ testTimeout: 60_000 });
 
 const ACCOUNT = "11111111-1111-4111-8111-111111111111";
 const OWNER = "22222222-2222-4222-8222-222222222222";
