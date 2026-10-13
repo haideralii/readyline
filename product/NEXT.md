@@ -854,3 +854,11 @@ Generation finishes without a watcher. No model calls (cost table: none). **Bran
 
 ## PO note (14 Oct 2026, standing rule for stacked branches)
 PRs #25 and #26 are merged. PR #27 (`req-011-content`) now conflicts with `main` on `DECISIONS.md` and `playwright.config.ts` because the stacked branches each carry their own copy of the shared files. Standing rule from now on: **at the end of every batch, before writing the status, merge `origin/main` into every open branch of yours (`req-011-content`, `req-009-session-c`, `req-010-generation-kicker`, the current batch branch) and push them**, resolving `DECISIONS.md` by keeping both sides in order. Do that now for the three branches named, then continue the current batch. The PO merges in order: #27, then Session C, then the kicker, then the batch 33 and 34 branches.
+
+
+## Queue (written by PO, 14 Oct 2026, batch 35: NDIS watch changes, approved; run after batch 31)
+The two NDIS-watch queue sections (13 Oct, and the addendum) sit in the dev's working tree uncommitted; commit them with the next status. The PO approves every VERIFIED item in both lists: items 1, 2, 3, 4 (incident row only), 5, 6, 7, 8, 10, 12, and A1 to A7, A10 and A12 (A12 with the ABLIS citation and the exact wording given, nothing stronger). Branch `req-018-ndis-watch-1`.
+1. Apply each approved item exactly as the report words it, with the source URL and date in the commit message and, where fixed text changes, in the fixed-text file's comment. Primer and competitor-doc edits are prose; `state-reference.json` (A1) is data with a test that every state has every field and a source; prompt changes (A1 STATE FACTS block) get a fixture replay showing the three state-tailored briefs now use the block.
+2. Clear the matching UNVERIFIED markers in the two guides and the primer (items 1, 3, A10), and set the two guides from `status: draft` to published only after the PO reads them once more (leave them draft; the PO flips the flag).
+3. Anything in the reports that is not in the approved list stays out; list what you skipped in the status.
+4. `npm run check`, copy-lint, the docx lint. Status with the branch SHA. STOP.
