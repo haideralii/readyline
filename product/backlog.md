@@ -14,7 +14,7 @@ Ordered. Status mirrors the REQ file. Phases follow `CLAUDE.md` section 7.
 | REQ-006 | Readiness checklist | 4 | must | accepted 13 Oct; merged (PR #17) |
 | REQ-007 | Payments: one-off pack, entitlements, download flow, refunds (subscription in REQ-009) | 4 | must | accepted 13 Oct (A, B, C); merged (PR #15); live webhook at deploy |
 | REQ-008 | Legal and trust pages: terms, privacy, refunds, AI disclosure, about, footer | 4 | must | accepted 12 Oct; PRs #12, #13 merged; lawyer check before launch |
-| REQ-009 | Registers: incidents, complaints, worker clearances, policy reviews, reminders | 5 | must | draft |
+| REQ-009 | Registers: incidents, complaints, worker clearances, policy reviews, reminders | 5 | must | written 13 Oct (D-056); Session A next |
 | REQ-010 | Operations: backups, monitoring, incident response runbook, data export and deletion | 5 | must | part 1 accepted 13 Oct (PR #20); deploy by Haider next; part 2 draft |
 | REQ-011 | Content system and first ten SEO articles | 6 | should | draft |
 | REQ-012 | Launch readiness review (security re-test, a11y audit, claims audit, performance) | 6 | must | draft |

@@ -1905,3 +1905,11 @@ Items asserted in code or copy that still need a primary source.
   site. Config traps and the generation-chain stall are batch 23. Haider's
   `.env.local` Stripe key must be replaced by the Readyline account's test
   key (the one now in Vercel); the sandbox key is retired.
+- D-056 (PO, 2026-10-13): REQ-009 written from the Dev proposal. Commission
+  vocabulary for the six reportable incident kinds with a generated
+  `notify_by` (24 hours; 5 business days for unauthorised restrictive
+  practice, UNVERIFIED until Dev cites the Rules); reminders by email only
+  plus a "Due soon" list; no clearance numbers stored; on a lapsed
+  subscription writes freeze and reads stay, with Stripe's retry window as
+  the only grace (revoke on `canceled`/`unpaid`, never on `past_due`); no
+  fee, no penalty. Session A (data) may start once PR #21 is merged.
