@@ -1836,6 +1836,19 @@ after the competitor review:
   testimonials (when any), mission, what you get. The example result and
   the four trust cues from P2 are unchanged and still pinned by tests.
 
+**D-1309 Home follow-ups after the PO's phone review (Dev, 2026-10-13,
+batch 26 items 5 and 6, branch `req-013-home-fixes` from `main`
+762c54c).** The hero paragraph is the PO's three-line text (a unit test
+caps it at 170 characters so it cannot creep back to seven lines on a
+375-pixel screen and push the price and refund lines off the first
+screen). The "In development" badge in the header renders only when
+`isProductionDeployment()` is false, so previews and local runs keep it
+and trial providers on production never see it. The home e2e asserts the
+badge is present off production (where every e2e run happens) and the
+smoke test asserts it is absent on the deployed site, so the production
+case is checked where it matters. The mission placeholder stays as it is
+until the PO replaces it (item 7).
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.

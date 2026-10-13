@@ -16,7 +16,8 @@ export function heroHeadline(price: string | null): string {
 
 export const HOME_COPY = {
   eyebrow: "For sole traders and small providers",
-  lead: `Answer plain questions about the supports you deliver and your workers. ${BRAND} tells you whether you face a verification or certification audit, with the Commission's own text behind the answer, and what documents and registers you will need. Then it drafts the documents to fit your answers.`,
+  /** Three lines on a phone (batch 26 item 5), so the price and refund lines sit in the first screen. */
+  lead: `Answer plain questions about your supports and workers. ${BRAND} tells you which audit you face, with the Commission's text behind it, then drafts every document to fit.`,
   cta: "See which audit I need",
   ctaSecondary: "See a sample document",
   ctaNote: "Free, about ten minutes, no account needed.",
