@@ -101,7 +101,7 @@ export async function POST(request: Request) {
           : stripeReceiptLookup(stripe);
         keepAlive(async () => {
           if (payment) await attachReceipt(lookup, store, payment);
-          await continueGeneration(AFTER_BUDGET_MS);
+          await continueGeneration(AFTER_BUDGET_MS, "webhook");
         });
       }
     } else log.warn("stripe.webhook.rejected", { error: result.body.error });

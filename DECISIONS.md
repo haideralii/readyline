@@ -2173,6 +2173,33 @@ test` on a mark or a double-encoded run in any text file outside
 Dev: edit files through Node or the editor tools, and never through
 `Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
 
+**D-1006 Generation finishes without a watcher: an external kicker, a
+five-minute function, and the path recorded (Dev, 2026-10-13, batch 32,
+branch `req-010-generation-kicker`).** The field result D-057 showed the
+chain progresses only while a request is in flight, so the guarantee moves
+off the platform: `.github/workflows/generate-kick.yml` calls
+`/api/jobs/generate?kick=kicker` with the bearer every five minutes (and
+by hand) until the route answers `more: false` or four minutes pass; the
+loop is `scripts/ops/kick-generation.mjs`, unit-tested against a stub
+route; an overlapping kick claims nothing because `claim_generation_job`
+is skip-locked and leased (`job.test.ts`). The route declares
+`maxDuration = 300`, the Hobby maximum with Fluid compute (Vercel docs,
+"Configuring Maximum Duration", limits table: Hobby default and maximum
+300 s, Pro 800 s; page updated 24 Aug 2026), with a 290-second budget; the
+job starts a document, and a section, only when the last one's duration
+with half again still fits (`elapsed + last × 1.5 ≤ budget`), so one call
+drafts several documents and hands back before the cut-off. The self-kick
+and the page nudge stay as accelerators. The `payments.generation.tick`
+line carries `kicked_by` (`self`, `page`, `kicker`, `manual`, plus
+`cron` and `webhook`, which are real paths too), `budgetMs` and
+`elapsedMs`. The documents page no longer promises an email (none can be
+sent, D-013): "You can close this page. Come back in about 20 minutes and
+your documents will be here." Flag for the PO: a scheduled run costs at
+least one runner minute, so `*/5` is about 8,600 minutes a month against
+the 2,000 free for a private repository; the schedule runs only from
+`main`, so nothing is spent until the PO merges and chooses (public
+repository, `*/30`, or the overage).
+
 
 ## Open questions for Haider
 

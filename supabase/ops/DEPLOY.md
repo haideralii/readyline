@@ -201,6 +201,39 @@ by hand from your machine:
 (Hobby runs cron at most daily, D-053; the paid job is carried by the
 webhook's own run and the route's self-kick, the cron is the backstop.)
 
+### 8a. The GitHub Actions kicker (batch 32, D-1006)
+
+The chain only progressed while a browser was open (D-057), so
+`.github/workflows/generate-kick.yml` now calls `/api/jobs/generate` every
+five minutes with the bearer until the route answers `"more": false` or
+four minutes have passed. It needs two values in the GitHub repository
+(Settings → Secrets and variables → Actions):
+
+1. **Variable** `PROD_URL`: `https://<domain>` with no trailing slash
+   (the same value as `NEXT_PUBLIC_SITE_URL`).
+2. **Secret** `CRON_SECRET`: the same value as the Vercel variable. Copy it
+   from Vercel (Settings → Environment Variables → reveal) and paste it as
+   the secret; nobody else sees it.
+
+Until both exist the workflow skips with a notice. To confirm it works:
+Actions → "Kick paid generation" → run it by hand (`workflow_dispatch`)
+while a pack is generating; the log shows one line per call
+(`kick 1: runs=1 more=true`) and the Vercel function log shows
+`payments.generation.tick` with `kicked_by: "kicker"`. Scheduled workflows
+pause after 60 days without a push to the repository; a push resumes them.
+
+**Minutes.** Each scheduled run costs at least one runner minute, so
+`*/5` is about 8,600 minutes a month; GitHub's free allowance for a
+private repository is 2,000. The PO decides before enabling: make the
+repository public (unlimited minutes), or widen the schedule (`*/30` is
+about 1,400 minutes), or accept the overage.
+
+**Function duration.** The generate route declares `maxDuration = 300`,
+Hobby's maximum with Fluid compute (Vercel docs, "Configuring Maximum
+Duration", duration limits table, updated 24 Aug 2026). Check Settings →
+Functions → **Fluid compute** is on; without it Hobby stops at 60 seconds
+and the deploy refuses the value.
+
 ## 9. Smoke test (PO runs it; you can too)
 
     npm run smoke -- --base https://<domain>

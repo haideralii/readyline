@@ -825,3 +825,27 @@ Read `product/requirements/REQ-017-guided-path.md` whole, and add its principle 
 6. e2e on the three projects: a fresh account walks result to audit day; screenshots under `product/evidence/req-017/`. Status with the branch SHA. STOP.
 
 Order for the dev from here: batch 30 (in progress) → 31 item 0 → 32 → 33 → 34 → 31. The PO merges PR #25 and the stacked PRs as soon as item 0 lands.
+
+
+## Queue (NDIS watch, 2026-10-13)
+From `product/research/ndis-watch/2026-10-13.md`. Only the VERIFIED items; the PO approves these into a dev batch. Item numbers refer to the report.
+- Item 1: primer step 2, replace PRODA with myID and RAM and the Applications Portal, add the 60-day application limit, remove the UNVERIFIED tag.
+- Item 2: primer step 7 and the governance policy brief, the 1 July 2026 notification condition (s 13A) and the change-of-ownership audit within 3 months (s 13BA).
+- Item 3: primer reportable incidents bullet, unauthorised restrictive practice moves to 5 business days (s 21), add the 7-year record (s 25), remove the UNVERIFIED tag.
+- Item 4 (incident row only): retention-schedule fixed text, reportable incident records kept 7 years from notification; claims row waits for the Act text.
+- Item 5: worker screening procedure and clearance-register fixed text, database linking, 90-day renewal window, immediate stop on expiry; primer clearance wording.
+- Item 6: complaints procedure brief, actions the Commission requires are done, recorded and reported back.
+- Item 7: standards.meta.json, add F2026N00443 as the legislative source for the SIL module.
+- Item 8: primer and competitor doc, 1 October 2026 SIL deadline in past tense, platform conditions and worker screening from 1 January 2027.
+- Item 10: privacy policy fixed text, one sentence on automated decision-making transparency (APP 1.7 to 1.9, from 10 December 2026).
+- Item 12: primer, one sentence that the core Practice Standards review is under way and nothing revised is published.
+
+## Queue (NDIS watch, 2026-10-13, addendum from the second run)
+From the addendum at the end of `product/research/ndis-watch/2026-10-13.md` (full second-run report in `2026-10-13-run2.md`). VERIFIED items only; the PO approves these into a dev batch alongside the queue above.
+- Item A1: new `data/state-reference.json` (restrictive practice authoriser and instrument per state, with source URL and date) injected into `prompts.ts` as a STATE FACTS block; the three state-tailored briefs use only that block and otherwise write the [state] blank.
+- Item A2: clearance-register fixed text, one paragraph on the combined cards in Queensland, the ACT and Tasmania.
+- Item A3: AI policy fixed section and `fixed-extras.ts` line 297, name the Commission's February 2026 position statement and its two rules.
+- Item A4: amend the item 3 primer bullet so unauthorised restrictive practice that caused harm is a 24-hour notification.
+- Item A5: primer step 6, mid-term audit "must start no later than 18 months into the registration period".
+- Item A6: conflict of interest policy statement, the no-payment-for-participants-or-referrals sentence (section number and date stay out until read from the Act).
+- Item A7: Victoria state page and induction notes, WWC Child Safety Training required from 19 October 2026.

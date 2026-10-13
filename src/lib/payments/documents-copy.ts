@@ -17,14 +17,15 @@ export const DOCUMENTS_COPY = {
   thanks:
     "Thank you. Your payment went through and we are preparing your documents now.",
   preparingHeading: "Preparing your documents",
+  /** Batch 32 item 3: no email provider exists yet (D-013), so the page promises only what is true. */
   preparing:
-    "Preparing your documents (usually 10 to 20 minutes). This page refreshes on its own; we also email you when the set is ready.",
+    "Preparing your documents (usually 10 to 20 minutes). You can close this page. Come back in about 20 minutes and your documents will be here.",
   preparingProgress: (done: number) =>
     done === 1
       ? "1 document drafted so far."
       : `${done} documents drafted so far.`,
   delayed:
-    "We are preparing your documents and will email you when they are ready. This is taking longer than usual; you do not need to do anything.",
+    "We are still preparing your documents. This is taking longer than usual; you do not need to do anything. Come back later and they will be here.",
   readyHeading: "Your document pack",
   readyLead:
     "Your set is ready. Download everything as a zip, the readiness summary on its own, or open each document to review the tailored sections.",
