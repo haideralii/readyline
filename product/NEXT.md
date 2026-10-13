@@ -1017,3 +1017,13 @@ NDIS-watch items applied on **`req-018-ndis-watch-1` 265f9bf** (cut from the hea
 - **Skipped, as the queue says:** item 9 (wave 2 class lists), item 11 (superseded by A1), item 13 (s 73VA number and date stay UNVERIFIED), item 14 (no change), A8 (competitor notes), A9 (not approved), A11 (dates stay as the guide has them, still UNVERIFIED), A13 (covered by item 1's wording). A10 names a reportable-incident guide that does not exist on any branch; its wording went into the primer bullet (item 3) and no guide marker was there to drop.
 - **Proof here.** npm run check and npm run build green on the branch (96 test files, 688 tests passing, 4 skipped); standards:verify 27 sources. Copy-lint and the docx lint are inside `npm test`; the docx replay figures are above.
 - **Next:** batch 39 (REQ-018 audit-day systems). PRs #28 to #31 are still open, so per Haider's instruction the branch is cut from the head of `req-011-groups`.
+
+
+## Dev status (batch 39 Session A, written 14 Oct 2026, Dev; third unattended run)
+
+REQ-018 Session A on **`req-018-audit-day-systems` 83c9279** (cut from the head of `req-011-groups` 0d5f59b, as Haider's instruction says while PRs #28 to #31 are open). No model calls. Decisions D-1901 to D-1903.
+
+- **Migration** `20261014100000_audit_day_registers.sql`: corporate risks (nine areas, starter flag), participant risks (codes only, plus the support plan review date for FR-10), conflicts of interest, delegations, insurances and vehicles (dates only, SR-3), improvements, decisions (append only), staff matrix (training and clearance expiries from the worker checks table by worker code, which gains manual handling and medication kinds), onboarding checklists with append-only ticks (FR-9's tables are in this one migration so Session B has them), and one shared append-only `register_events` trail (D-1902). RLS and grants as REQ-009; update revoked on the three append-only tables; status views for review, expiry, supervision and appraisal states.
+- **Starter rows (FR-1):** `starterCorporateRisks` derives nine plain-words rows from the questionnaire; the unit test runs the copy and claims lints over every sentence of the three reference cases.
+- **Proof:** `tests/integration/audit-day-rls.test.ts` asserts tenancy, the 42501 refusals on the append-only tables, the NDIS-number and code CHECKs, the status views and owner-only delete. No Postgres on the Dev machine: CI's Supabase job proves the migration. Unit tests and lint green on the branch.
+- **Next:** Session B (pages) now, on the same branch.
