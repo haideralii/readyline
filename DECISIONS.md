@@ -1872,3 +1872,8 @@ Items asserted in code or copy that still need a primary source.
   (prose only; both sides kept where both carried content). REQ-010 part 1
   (first deploy on Vercel Hobby, runbook for Haider, env check, smoke test)
   is the next build; parts of REQ-010 that need a live site wait for it.
+- D-055 (PO, 2026-10-13): first deploy done on Vercel Hobby at
+  readyline-zeta.vercel.app; REQ-010 AC-3 and AC-4 passed on the hosted
+  site. Config traps and the generation-chain stall are batch 23. Haider's
+  `.env.local` Stripe key must be replaced by the Readyline account's test
+  key (the one now in Vercel); the sandbox key is retired.
