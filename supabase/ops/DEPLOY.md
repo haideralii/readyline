@@ -67,6 +67,23 @@ Leave **"Expose to the browser" / "Sensitive"** as Vercel suggests: every
 name without the `NEXT_PUBLIC_` prefix is server-only and must stay
 unexposed.
 
+**Three traps found at the first deploy (batch 23):**
+
+- Vercel refuses to save a `NEXT_PUBLIC_*` variable whose type is
+  **Secret** (the edit silently never saves), and the "paste a whole .env
+  file" flow marks every row Secret. Add the public names
+  (`NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_BRAND_NAME`,
+  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) one
+  at a time with type **Config**, or change the type per row before saving.
+- Stripe **sandboxes are separate accounts** with their own keys, Prices and
+  webhooks. `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PACK` and the webhook
+  endpoint must all come from the same account in the same mode. The check:
+  in the Stripe dashboard the account name in the top-left is "Readyline"
+  and the page title carries "[Test]" on every page you copy from.
+- The Supabase redirect allow-list matches the **full** redirect URL
+  including the query string, so an exact `/auth/callback` entry does not
+  match `/auth/callback?next=…`. Step 5 below uses the trailing `*`.
+
 | Name                                   | Where the value comes from                                                                                                                           | Exposure    |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `NEXT_PUBLIC_SITE_URL`                 | `https://<domain>` with no trailing slash                                                                                                            | public      |
@@ -105,11 +122,12 @@ Vercel for this deploy.
 Supabase dashboard → Authentication → URL Configuration.
 
 1. **Site URL**: `https://<domain>`.
-2. **Redirect URLs**, add both:
-   - `https://<domain>/auth/callback`
-   - `https://*-haideralii.vercel.app/auth/callback` (the Vercel preview
+2. **Redirect URLs**, add both, each with the trailing `*` (the list is
+   matched against the whole URL including `?next=…`):
+   - `https://<domain>/auth/callback*`
+   - `https://*-haideralii.vercel.app/auth/callback*` (the Vercel preview
      pattern; use the pattern Vercel shows for your account if different).
-3. Keep `http://localhost:3000/auth/callback` for now; the PO removes it
+3. Keep `http://localhost:3000/auth/callback*` for now; the PO removes it
    after the first successful hosted sign-in (REQ-010 SR-2).
 4. The magic-link email template is already the any-device one
    (`supabase/ops/magic-link-template.html`); nothing to change.

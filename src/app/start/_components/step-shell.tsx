@@ -19,7 +19,7 @@ export function StepShell({
   step: StepId;
   children: ReactNode;
 }) {
-  const { answers, saveStatus, ready } = useQuestionnaire();
+  const { answers, saveStatus, ready, mode } = useQuestionnaire();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const index = stepIndex(step);
   // REQ-013 FR-7: completed earlier steps stay one tap away; nothing wraps.
@@ -73,11 +73,17 @@ export function StepShell({
         role="status"
         data-testid="draft-status"
       >
-        {saveStatus === "saved"
-          ? "Draft saved locally on this device."
-          : saveStatus === "unavailable"
-            ? "Could not save a draft on this device; your answers stay in this tab."
-            : "Your draft will be saved locally on this device after each step."}
+        {mode === "server"
+          ? saveStatus === "saved"
+            ? "Draft saved to your account."
+            : saveStatus === "unavailable"
+              ? "Could not save to your account just now; your answers stay in this tab."
+              : "Your draft is saved to your account after each step."
+          : saveStatus === "saved"
+            ? "Draft saved locally on this device."
+            : saveStatus === "unavailable"
+              ? "Could not save a draft on this device; your answers stay in this tab."
+              : "Your draft will be saved locally on this device after each step."}
       </p>
     </div>
   );

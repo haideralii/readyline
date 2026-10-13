@@ -1,11 +1,16 @@
 import "server-only";
 /**
- * Running the paid generation job outside a request (REQ-007 FR-5, D-707).
- * `runQueuedGeneration` does as much as its budget allows in this process;
- * `kickGenerationRoute` asks the job route for another budgeted run, so a
- * long set is carried by a chain of short invocations rather than by a cron
- * that Vercel's Hobby plan only runs daily.
+ * Running the paid generation job outside a request (REQ-007 FR-5, D-707,
+ * D-1005). `runQueuedGeneration` does as much as its budget allows in this
+ * process; `kickGenerationRoute` asks the job route for another budgeted
+ * run, so a long set is carried by a chain of short invocations rather than
+ * by a cron that Vercel's Hobby plan only runs daily. `keepAlive` hands that
+ * work to the platform's `waitUntil` so the invocation is not frozen before
+ * the next request has been sent (the first hosted run stalled with Next's
+ * `after()` alone), and falls back to `after()` off Vercel.
  */
+import { waitUntil } from "@vercel/functions";
+import { after } from "next/server";
 import { createModelClient } from "@/lib/generator/model-client";
 import { log } from "@/lib/logging/logger";
 import { getStandardsDataset } from "@/lib/standards/dataset";
@@ -38,6 +43,31 @@ export async function runQueuedGeneration(
   });
 }
 
+/** True when Vercel's request context (and so a working `waitUntil`) is present. */
+export function hasPlatformWaitUntil(): boolean {
+  const holder = (
+    globalThis as unknown as Record<
+      symbol,
+      { get?: () => { waitUntil?: unknown } | undefined } | undefined
+    >
+  )[Symbol.for("@vercel/request-context")];
+  return typeof holder?.get?.()?.waitUntil === "function";
+}
+
+/**
+ * Keeps work running after the response has gone out. On Vercel the
+ * request context's `waitUntil` holds the invocation open until the promise
+ * settles; elsewhere Next's `after()` runs it once the response is sent.
+ * Must be called inside a request (route handler or server action).
+ */
+export function keepAlive(work: () => Promise<void>): void {
+  if (hasPlatformWaitUntil()) {
+    waitUntil(work());
+    return;
+  }
+  after(work);
+}
+
 /**
  * Starts another run of the job route without waiting for it. The request is
  * sent before the short timeout fires; the route keeps working after this
@@ -65,7 +95,7 @@ export async function kickGenerationRoute(): Promise<void> {
   }
 }
 
-/** The webhook's after() hook and the job route share this: work now, then hand on if there is more. */
+/** The webhook's hook, the job route and the nudge share this: work now, then hand on if there is more. */
 export async function continueGeneration(budgetMs: number): Promise<void> {
   // REQ-010 FR-6: a preview deployment never generates against the shared database.
   if (!mayRunScheduledJobs()) {

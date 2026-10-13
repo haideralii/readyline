@@ -18,7 +18,7 @@ export const DOCUMENTS_COPY = {
     "Thank you. Your payment went through and we are preparing your documents now.",
   preparingHeading: "Preparing your documents",
   preparing:
-    "Preparing your documents (usually under 10 minutes). This page refreshes on its own; we also email you when the set is ready.",
+    "Preparing your documents (usually 10 to 20 minutes). This page refreshes on its own; we also email you when the set is ready.",
   preparingProgress: (done: number) =>
     done === 1
       ? "1 document drafted so far."
