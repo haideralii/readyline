@@ -22,9 +22,14 @@ describe("guides (REQ-011)", () => {
   });
 
   it("lists the UNVERIFIED lines for the PO", () => {
+    // Batch 35 (NDIS watch item A12): the application-fee lines now carry the ABLIS citation and no marker.
     const cost = loadGuide("ndis-registration-cost");
-    expect(cost.unverified.length).toBeGreaterThanOrEqual(2);
-    expect(cost.unverified.join("\n")).toMatch(/application/i);
+    expect(cost.unverified.join("\n")).not.toMatch(/application/i);
+    expect(cost.markdown).toMatch(/No application fee/);
+    expect(cost.faq.map((f) => f.answer).join("\n")).toMatch(
+      /does not charge an application fee/,
+    );
+    // The compulsory-registration dates (item A11) were not approved and keep their marker.
     const audit = loadGuide("which-ndis-audit");
     expect(audit.unverified.length).toBeGreaterThanOrEqual(2);
   });

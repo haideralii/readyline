@@ -1,0 +1,257 @@
+{
+  "note": "State and territory facts the generator may state about worker screening, children's checks, restrictive practice authorisation and mandatory reporting (NDIS watch 13 October 2026, items A1, A2, A5, A7; batch 35, D-1801). Every fact carries its source and the day it was read; status verified means a state government, Commission or legislation page was read that day, unverified means a secondary summary. The prompt shows the provider's states only, and the model may not name a body or law that is not here.",
+  "readAt": "2026-10-13",
+  "national": {
+    "ndisCheck": {
+      "text": "The NDIS Worker Screening Check is national: a clearance from any state or territory is valid across Australia for up to five years from the outcome date. The first clearances began expiring in February 2026; a renewal can be lodged up to 90 days before expiry, and a worker whose clearance has expired must be removed from risk-assessed roles immediately. Providers link each screened worker to their record in the NDIS Worker Screening Database and unlink workers who leave.",
+      "status": "verified",
+      "source": {
+        "title": "NDIS Commission, FAQs: NDIS Worker Screening Check renewal cycle (January 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx",
+        "readAt": "2026-10-13"
+      }
+    }
+  },
+  "states": {
+    "NSW": {
+      "name": "New South Wales",
+      "workerScreening": {
+        "text": "NDIS Worker Check, applied for through Service NSW and assessed by the Office of the Children's Guardian; valid up to five years; separate from the Working With Children Check.",
+        "status": "verified",
+        "source": {
+          "title": "Service NSW, NDIS Worker Check",
+          "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Working With Children Check (WWCC) from the Office of the Children's Guardian; valid five years.",
+        "status": "verified",
+        "source": {
+          "title": "Service NSW, NDIS Worker Check",
+          "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised by a Restrictive Practices Authorisation (RPA) Panel convened by the implementing provider under the Department of Communities and Justice RPA Policy; the framework is policy-based, not a statute; a senior manager may give an interim authorisation for up to six months.",
+        "status": "verified",
+        "source": {
+          "title": "NSW Department of Communities and Justice, Restrictive Practices Authorisation portal",
+          "url": "https://dcj.nsw.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "VIC": {
+      "name": "Victoria",
+      "workerScreening": {
+        "text": "NDIS Worker Screening Check from the NDIS Worker Screening Unit, applied for through Service Victoria; valid up to five years; it does not replace the Working with Children Check.",
+        "status": "verified",
+        "source": {
+          "title": "Victorian Government, NDIS Worker Screening Check",
+          "url": "https://www.vic.gov.au/ndis-worker-screening-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Working with Children Check from the Social Services Regulator; valid five years. From 19 October 2026 an applicant must complete the free WWC Child Safety Training before applying.",
+        "status": "verified",
+        "source": {
+          "title": "Victorian Government, Working with Children Check",
+          "url": "https://www.vic.gov.au/working-with-children-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised under the Disability Act 2006 (Vic) Part 7 as amended in 2023: the provider's Authorised Program Officer for chemical and environmental restraint, and the Victorian Senior Practitioner (Department of Families, Fairness and Housing) for seclusion, physical and mechanical restraint.",
+        "status": "verified",
+        "source": {
+          "title": "Department of Families, Fairness and Housing, Victorian Senior Practitioner",
+          "url": "https://www.dffh.vic.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "QLD": {
+      "name": "Queensland",
+      "workerScreening": {
+        "text": "NDIS worker screening clearance from Worker Screening Queensland (Disability Worker Screening); it can be applied for together with the Blue Card as one combined application; valid up to five years. Record the NDIS clearance number and expiry separately from the Blue Card.",
+        "status": "verified",
+        "source": {
+          "title": "Worker Screening Queensland, fees for workers",
+          "url": "https://www.workerscreening.qld.gov.au/workers/fees",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Blue Card from Blue Card Services; valid three years.",
+        "status": "unverified",
+        "source": {
+          "title": "Worker Screening Queensland, fees for workers",
+          "url": "https://www.workerscreening.qld.gov.au/workers/fees",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised under the Disability Services Act 2006 (Qld): short-term approvals from the Department of Families, Seniors, Disability Services and Child Safety; the Public Guardian and QCAT for containment and seclusion.",
+        "status": "verified",
+        "source": {
+          "title": "Queensland Department of Families, Seniors, Disability Services and Child Safety, positive behaviour support and restrictive practices resources",
+          "url": "https://www.families.qld.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "WA": {
+      "name": "Western Australia",
+      "workerScreening": {
+        "text": "NDIS Worker Screening Check from the Screening Unit of the Department of Communities; valid up to five years; separate from the Working with Children Check.",
+        "status": "verified",
+        "source": {
+          "title": "WA Department of Communities, NDIS Worker Screening Check",
+          "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Working with Children Check from the Department of Communities; valid three years.",
+        "status": "verified",
+        "source": {
+          "title": "WA Department of Communities, NDIS Worker Screening Check",
+          "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised by a Quality Assurance Panel (a senior manager of the provider plus an independent practitioner) under the Authorisation of Restrictive Practices in Funded Disability Services Policy 2020; the framework is policy-based.",
+        "status": "verified",
+        "source": {
+          "title": "WA Department of Communities, authorisation of restrictive practices",
+          "url": "https://www.wa.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "SA": {
+      "name": "South Australia",
+      "workerScreening": {
+        "text": "NDIS Worker Check from the Department of Human Services Screening Unit; valid up to five years; separate from the Working With Children Check.",
+        "status": "verified",
+        "source": {
+          "title": "SA Department of Human Services Screening Unit",
+          "url": "https://www.sa.gov.au",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Working With Children Check from the Department of Human Services Screening Unit; valid five years.",
+        "status": "verified",
+        "source": {
+          "title": "SA Department of Human Services Screening Unit",
+          "url": "https://www.sa.gov.au",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised under the Disability Inclusion Act 2018 (SA) Part 6A: the Senior Authorising Officer in the Restrictive Practices Unit, with provider Authorised Program Officers for level 1 practices; an interim authorisation lasts up to 8 months and a comprehensive one up to 15.",
+        "status": "verified",
+        "source": {
+          "title": "SA Government, Restrictive Practices Unit; restrictive practices authorisation frameworks table",
+          "url": "https://www.sa.gov.au/__data/assets/pdf_file/0010/851689/Restrictive-practices-authorisation-frameworks-table.pdf",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "TAS": {
+      "name": "Tasmania",
+      "workerScreening": {
+        "text": "The NDIS clearance is issued inside Registration to Work with Vulnerable People (RWVP) from the Department of Justice; valid up to five years or for the registration term. Record the NDIS clearance number and expiry separately from the registration card.",
+        "status": "verified",
+        "source": {
+          "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
+          "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Registration to Work with Vulnerable People (child-related) from the Department of Justice; valid five years.",
+        "status": "unverified",
+        "source": {
+          "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
+          "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised by the Senior Practitioner in the Department of Premier and Cabinet under the Disability Rights, Inclusion and Safeguarding Act 2024 (Tas), in force from 1 July 2025, which replaced TASCAT approvals under the 2011 Act; an authorisation lasts up to 12 months.",
+        "status": "verified",
+        "source": {
+          "title": "TASCAT, changes to restrictive intervention applications",
+          "url": "https://www.tascat.tas.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "ACT": {
+      "name": "Australian Capital Territory",
+      "workerScreening": {
+        "text": "The NDIS clearance is issued on the Working with Vulnerable People (WWVP) registration from Access Canberra; valid five years when applied for together, otherwise it expires with the WWVP registration. Record the NDIS clearance number and expiry separately from the registration card.",
+        "status": "verified",
+        "source": {
+          "title": "Access Canberra, WWVP and the NDIS",
+          "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Working with Vulnerable People registration from Access Canberra; valid five years.",
+        "status": "verified",
+        "source": {
+          "title": "Access Canberra, WWVP and the NDIS",
+          "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised under the Senior Practitioner Act 2018 (ACT): a positive behaviour support plan is approved by a panel and registered with the ACT Senior Practitioner; a registration lapses after 12 months.",
+        "status": "verified",
+        "source": {
+          "title": "ACT Government, get a restrictive practice approved",
+          "url": "https://www.act.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    },
+    "NT": {
+      "name": "Northern Territory",
+      "workerScreening": {
+        "text": "NDIS Worker Screening Clearance from SAFE NT; valid up to five years; separate from the Ochre Card.",
+        "status": "verified",
+        "source": {
+          "title": "NT Police, Fire and Emergency Services, SAFE NT: NDIS Worker Screening Check",
+          "url": "https://pfes.nt.gov.au/NDISCheck",
+          "readAt": "2026-10-13"
+        }
+      },
+      "childrenCheck": {
+        "text": "Ochre Card (Working with Children Clearance) from SAFE NT; valid two years; new forms are being introduced under the national reform program.",
+        "status": "verified",
+        "source": {
+          "title": "Northern Territory Government, changes to working with children clearances",
+          "url": "https://nt.gov.au/emergency/child-safety/wwcc-changes",
+          "readAt": "2026-10-13"
+        }
+      },
+      "restrictivePractice": {
+        "text": "Restrictive practices are authorised by the NT Senior Practitioner in the Department of Health under the NT Restrictive Practices Authorisation Framework and the NDIS (Authorisations) Act 2019 (NT).",
+        "status": "verified",
+        "source": {
+          "title": "NT Department of Health, restrictive practices authorisation",
+          "url": "https://health.nt.gov.au",
+          "readAt": "2026-10-13"
+        }
+      }
+    }
+  }
+}

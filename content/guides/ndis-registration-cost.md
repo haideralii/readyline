@@ -16,15 +16,15 @@ Every figure below says where it comes from and when it was read. Prices change;
 
 ## What you pay, line by line
 
-| Item                                          | Typical range                                     | Source and date                                                                                                                    |
-| --------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Application to the Commission                 | No fee for the application itself                 | UNVERIFIED: our market research of 13 October 2026 records the application as free; confirm on the Commission's registration pages |
-| Verification audit (desk review)              | About AUD 900 to 1,800                            | Provider+ cost guide, 2026, a third party; the Commission does not set audit prices                                                |
-| Certification audit (site visit)              | About AUD 2,800 to 12,000 and more                | Provider+ cost guide, 2026, a third party; the Commission does not set audit prices                                                |
-| Document template packs                       | AUD 65 to 1,960 for a one-off pack                | Sellers' own pages read on 13 October 2026 (Bluetail AUD 65; Provider Audit Ready AUD 649 to 1,095; Provider360 AUD 670 to 1,960)  |
-| Consultant: documents and application support | AUD 2,500 to 8,000 over 2 to 4 weeks              | Consultants' own pages read on 13 October 2026                                                                                     |
-| Compliance software                           | AUD 59 to 899 a month, or AUD 695 to 1,500 a year | Vendors' own pages read on 13 October 2026 (ONDIS, Auditly)                                                                        |
-| Readyline document pack                       | {{pack-price}} one-off                            | This site, today's configured price                                                                                                |
+| Item                                          | Typical range                                     | Source and date                                                                                                                   |
+| --------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Application to the Commission                 | No application fee                                | Australian Government ABLIS entry for NDIS provider registration, read 13 October 2026 (a government source, not the Commission)  |
+| Verification audit (desk review)              | About AUD 900 to 1,800                            | Provider+ cost guide, 2026, a third party; the Commission does not set audit prices                                               |
+| Certification audit (site visit)              | About AUD 2,800 to 12,000 and more                | Provider+ cost guide, 2026, a third party; the Commission does not set audit prices                                               |
+| Document template packs                       | AUD 65 to 1,960 for a one-off pack                | Sellers' own pages read on 13 October 2026 (Bluetail AUD 65; Provider Audit Ready AUD 649 to 1,095; Provider360 AUD 670 to 1,960) |
+| Consultant: documents and application support | AUD 2,500 to 8,000 over 2 to 4 weeks              | Consultants' own pages read on 13 October 2026                                                                                    |
+| Compliance software                           | AUD 59 to 899 a month, or AUD 695 to 1,500 a year | Vendors' own pages read on 13 October 2026 (ONDIS, Auditly)                                                                       |
+| Readyline document pack                       | {{pack-price}} one-off                            | This site, today's configured price                                                                                               |
 
 Auditors quote per provider, so your own quotes will differ. Get at least two.
 
@@ -50,7 +50,7 @@ Auditors quote per provider, so your own quotes will differ. Get at least two.
 
 ### Is there a fee to apply to the Commission?
 
-Our research of 13 October 2026 records no application fee; the cost is the audit and the preparation. UNVERIFIED until the PO confirms it on the Commission's pages.
+The Commission does not charge an application fee. You pay the approved quality auditor you choose; the Commission does not set audit prices. (Source: the Australian Government's ABLIS entry for NDIS provider registration, https://ablis.business.gov.au/service/ag/ndis-provider-registration/40940, read 13 October 2026. That is a government page rather than the Commission's own, which does not mention a fee either way.)
 
 ### Why do audit quotes vary so much?
 

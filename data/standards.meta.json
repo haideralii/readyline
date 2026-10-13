@@ -1,7 +1,7 @@
 {
   "$comment": "Hand-maintained inputs for scripts/standards/build.mjs. Outcome and indicator text is NOT here; it is parsed from data/sources. Evidence items are Readyline guidance (draft until the PO reviews them), not Commission text.",
-  "version": "1.1.0",
-  "generatedAt": "2026-10-12",
+  "version": "1.2.0",
+  "generatedAt": "2026-10-14",
   "checkedAt": "2026-10-11",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
   "evidenceReview": {
@@ -19,6 +19,11 @@
       "version": "1.1.0",
       "date": "2026-10-12",
       "note": "Evidence items reviewed by the product owner: all approved, draft flags cleared, reviewedBy and reviewedAt recorded. Three additions: signed Code of Conduct acknowledgement record under core and verification human resource management; worker screening clearance register under verification human resource management. No change to Commission text or sources."
+    },
+    {
+      "version": "1.2.0",
+      "date": "2026-10-14",
+      "note": "NDIS watch 13 October 2026 (batch 35, items 7 and 8): the SIL quality indicators are also in the amending instrument F2026N00443 (Part 8A, Module 5A, ss 72A to 72E, commenced 1 July 2026), added as a source for the SIL module and class 0138; the 0138 note puts the 1 October 2026 application deadline in the past tense. No change to Commission text, standards or evidence items."
     }
   ],
   "sources": [
@@ -256,6 +261,15 @@
       "effectiveFrom": null,
       "fetchedAt": "2026-10-11",
       "snapshotPath": "data/sources/aqa-expectations.txt"
+    },
+    {
+      "id": "sil-qi-guidelines",
+      "title": "NDIS (Quality Indicators for NDIS Practice Standards) Amendment (Supported Independent Living) Guidelines 2026 (F2026N00443, PDF)",
+      "url": "https://www.legislation.gov.au/F2026N00443/asmade/2026-06-24/text/original/pdf",
+      "versionLabel": "F2026N00443, made 23 June 2026, registered 24 June 2026; inserts Part 8A (Module 5A, ss 72A to 72E) into the 2018 Guidelines",
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-14",
+      "snapshotPath": "data/sources/sil-qi-guidelines.txt"
     }
   ],
   "modules": [
@@ -424,7 +438,8 @@
         "sil-module",
         "sil-ps",
         "mandatory-sil",
-        "legislation-rules-toc"
+        "legislation-rules-toc",
+        "sil-qi-guidelines"
       ],
       "pages": [
         {
@@ -1823,13 +1838,14 @@
       "moduleIds": ["sil"],
       "requiresCore": true,
       "mandatoryFrom": "2026-07-01",
-      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL who have not applied for registration by 1 October 2026 must stop providing SIL supports. Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
+      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports; a new SIL entrant cannot provide SIL while an application is pending (Commission explanatory document, June 2026, read 13 October 2026). Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
       "sourceIds": [
         "registration-groups",
         "mandatory-registration",
         "mandatory-sil",
         "sil-ps",
-        "legislation-rules-toc"
+        "legislation-rules-toc",
+        "sil-qi-guidelines"
       ]
     }
   ],

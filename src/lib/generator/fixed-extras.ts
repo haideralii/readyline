@@ -14,6 +14,24 @@ const NO_PARTICIPANT_DETAILS =
 
 type Extra = (ctx: FixedContext) => Block[];
 
+/**
+ * NDIS watch 13 Oct 2026 item A3 (batch 35): the Commission's only published
+ * position on providers' use of AI, named rather than alluded to. Source:
+ * "Position statement: Use of artificial intelligence in development of
+ * behaviour support plans" (February 2026), read 13 October 2026.
+ */
+export const AI_POSITION_STATEMENT =
+  "The Commission's position statement on AI in behaviour support plans (February 2026) says no participant personal information should go into an AI system and that a person, not the tool, makes every decision about a participant. We apply that rule to every AI and digital tool we use.";
+
+/**
+ * NDIS watch 13 Oct 2026 item 10 (batch 35): Privacy Act APP 1.7 to 1.9
+ * (Privacy and Other Legislation Amendment Act 2024) from 10 December 2026.
+ * Source: OAIC fact sheet, September 2026, read 13 October 2026,
+ * https://www.oaic.gov.au/__data/assets/pdf_file/0021/269013/APP-1.7-1.9-Transparency-Obligation-Fact-Sheet.PDF
+ */
+export const AUTOMATED_DECISIONS_SENTENCE =
+  "If we use a computer program, including an AI tool, to make or help make a decision that could significantly affect a person, this policy says what personal information it uses and what kinds of decisions it is used for.";
+
 export const FIXED_EXTRAS: Record<string, Extra> = {
   "risk-register": () => [
     {
@@ -103,7 +121,13 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       columns: ["Record", "Kept for", "Where"],
       rows: [
         ["Service agreements and support plans", "[period]", "[Location]"],
-        ["Incident and complaint records", "[period]", "[Location]"],
+        // NDIS watch 13 Oct 2026 item 4 (batch 35): Incident Rules F2018L00633 s 25(2), read 13 October 2026, https://www.legislation.gov.au/F2018L00633/latest/text.
+        [
+          "Reportable incident records",
+          "7 years from the date we notified the Commission (Incident Rules s 25)",
+          "[Location]",
+        ],
+        ["Other incident and complaint records", "[period]", "[Location]"],
         [
           "Worker files, screening and training records",
           "[period]",
@@ -160,9 +184,16 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     },
   ],
   "clearance-register": (ctx) => [
+    // NDIS watch 13 Oct 2026 items 5 and A2 (batch 35): the Commission's renewal-cycle FAQ (January 2026,
+    // https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx)
+    // and the Queensland, ACT and Tasmanian screening pages, all read 13 October 2026.
     {
       type: "paragraph",
-      text: `${ctx.facts.tradingName} checks this register each month and renews every clearance before it expires. A worker in a risk-assessed role does not work until their clearance is current.`,
+      text: `${ctx.facts.tradingName} links every screened worker to our record in the NDIS Worker Screening Database and unlinks workers who leave. We check this register each month and start each renewal at least 90 days before the clearance expires. If a clearance expires, the worker stops risk-assessed work that day until a new clearance is issued.`,
+    },
+    {
+      type: "paragraph",
+      text: "In Queensland, the ACT and Tasmania the NDIS clearance is issued with, or inside, the state's children's or vulnerable-people card; record the NDIS clearance number and expiry separately from the card.",
     },
     {
       type: "table",
@@ -272,9 +303,11 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       type: "paragraph",
       text: "We do not put a participant's personal, health or disability information into any AI tool. If a tool is needed for a participant task, we first remove every identifier and have the participant's consent, and a worker checks the output before it is used.",
     },
+    // NDIS watch 13 Oct 2026 item A3 (batch 35): the Commission's position statement PDF (February 2026,
+    // https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf), read 13 October 2026.
     {
       type: "paragraph",
-      text: "The Commission has published a position on the use of AI by providers; we keep its current statement with this policy and follow it.",
+      text: AI_POSITION_STATEMENT,
     },
   ],
   "de-identification": () => [
@@ -330,7 +363,11 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     },
     {
       type: "paragraph",
-      text: "A mistake with a tool, such as participant information entered by accident, is recorded in the incident register the same day and handled under our incident management procedure. The Commission has published a position on the use of AI by providers; we keep its current statement with this policy and follow it.",
+      text: `A mistake with a tool, such as participant information entered by accident, is recorded in the incident register the same day and handled under our incident management procedure. ${AI_POSITION_STATEMENT}`,
+    },
+    {
+      type: "paragraph",
+      text: AUTOMATED_DECISIONS_SENTENCE,
     },
   ],
   "use-register": () => [

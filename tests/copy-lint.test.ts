@@ -245,11 +245,12 @@ function lintJson(file: string, findings: Finding[]) {
     } else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${path}[${i}]`));
     else if (v && typeof v === "object")
       for (const [k, x] of Object.entries(v)) {
-        // Notes to the PO, source URLs and the generator's briefs (model
-        // instructions, never shown to the customer) are not customer copy.
+        // Notes to the PO, source URLs and the generator's briefs and brief
+        // additions (model instructions, never shown to the customer) are not customer copy.
         if (
           /note$/i.test(k) ||
           k === "brief" ||
+          k === "briefAdditions" ||
           k === "url" ||
           k === "sourceUrl" ||
           k === "sha256"

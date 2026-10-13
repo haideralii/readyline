@@ -661,6 +661,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
           "paragraph",
           "bullets",
           "paragraph",
+          "paragraph",
         ],
         "heading": "Appendix: AI and digital tools",
         "id": "ai-and-digital-tools",
@@ -1202,6 +1203,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "table",
         ],
@@ -3823,6 +3825,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
           "paragraph",
           "bullets",
           "paragraph",
+          "paragraph",
         ],
         "heading": "Appendix: AI and digital tools",
         "id": "ai-and-digital-tools",
@@ -4364,6 +4367,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "table",
         ],
@@ -6827,6 +6831,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
           "paragraph",
           "bullets",
           "paragraph",
+          "paragraph",
         ],
         "heading": "Appendix: AI and digital tools",
         "id": "ai-and-digital-tools",
@@ -7367,6 +7372,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "table",
         ],
