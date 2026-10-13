@@ -301,11 +301,23 @@ function ResultView({
             testId="result-ready-line"
           />
         </div>
+        {/* REQ-017 step 1: one button that starts the path; the checklist and the price stay as plain links. */}
         <div data-testid="checklist-teaser">
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
-              href={checklistHref}
+              href={
+                signedIn
+                  ? "/path/before-you-buy"
+                  : "/sign-in?next=%2Fpath%2Fbefore-you-buy"
+              }
               className="btn-primary"
+              data-testid="start-getting-ready"
+            >
+              Start getting ready
+            </Link>
+            <Link
+              href={checklistHref}
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
               data-testid={signedIn ? "checklist-link" : "checklist-sign-in"}
             >
               Open your checklist

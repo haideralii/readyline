@@ -10,6 +10,7 @@ You are the lead engineer and product partner on this project. Read this whole b
 - Goal: a product that is built once and sold and delivered entirely online. No in-person sales, no meetings with customers, no custom consulting.
 - Business will initially trade as a sole trader (ABN registered once there is something to sell), later a Pty Ltd if revenue justifies it.
 - The business must be shariah-compliant in how it earns money (see section 6). Customers can be anyone.
+- *(v2.7, REQ-017, Haider's product principle, 13 Oct 2026)* **Product rule: one step at a time.** Our customer is a support worker who does not like paperwork, is not technical and may not have done well at school. The site must work for that person. After the questionnaire they do not want options; they want to be taken by the hand, one step at a time, told exactly what to do next and shown when it is done. Every screen after the result answers one question: "What do I do now?" Anything that makes them read, decide or search is a cost we pay for in lost customers.
 
 ## 2. The problem being solved
 

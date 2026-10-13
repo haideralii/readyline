@@ -84,6 +84,16 @@ export class SupabaseJobBackend implements JobBackend {
     });
     if (!parsed.success) return { error: "questionnaire incomplete" };
     const assessmentId = `${ANSWERS_VERSION}:${answersHash(parsed.data)}`;
+    // REQ-017 AC-2: the facts given on an earlier pack fill this one's blanks.
+    const factRows = await this.admin
+      .from("account_facts")
+      .select("key, value")
+      .eq("account_id", job.account_id)
+      .limit(200);
+    const facts: Record<string, string> = {};
+    for (const f of (factRows.data as
+      { key: string; value: string }[] | null) ?? [])
+      facts[f.key] = f.value;
     return {
       answers: parsed.data,
       tradingName: account.data.trading_name as string,
@@ -92,6 +102,7 @@ export class SupabaseJobBackend implements JobBackend {
       entitlementRevoked,
       assessmentMatches:
         !job.assessment_id || job.assessment_id === assessmentId,
+      facts,
     };
   }
 

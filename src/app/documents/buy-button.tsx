@@ -13,7 +13,8 @@ export function BuyButton({
   testId = "buy-button",
 }: {
   label: string;
-  cancelPath: "/pricing" | "/documents" | "/start/result";
+  cancelPath:
+    "/pricing" | "/documents" | "/start/result" | "/path/before-you-buy";
   testId?: string;
 }) {
   const [state, action, pending] = useActionState(buyAction, null);

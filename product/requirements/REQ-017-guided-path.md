@@ -27,10 +27,24 @@ Our customer is a support worker who does not like paperwork, is not technical a
 - AC-3 The next-step strip is right in every account state (unit test over the state table).
 
 ## Dev response
-(Dev fills in.)
+**14 Oct 2026, batch 34 (branch `req-017-guided-path`, from `req-016-document-standard`). No model calls.** Decisions D-1701 to D-1703; the principle paragraph is in `CLAUDE.md` section 1 (v2.7).
+
+- **FR-1.** `nextStep(state)` is a pure state table (eight rows, first match wins) with a unit test per row (AC-3); `NextStepStrip` in the root layout reads the state once per signed-in page and renders one sentence and one button; nothing signed out.
+- **Step 2.** `/path/before-you-buy`: three lines (what you get with the real document count, the price from config, the first paragraph of the refund promise from `refunds.md`), one button (the existing Buy action with its own cancel path), the sample link. A paid provider is sent on.
+- **Step 3.** The documents page's preparing state from batch 32 ("You can close this page…" with the document count); the strip says the same.
+- **FR-2.** `/documents/<set>/finish` is the form: one question per fact across the whole set (the "[name]" asked for in thirty documents is one question), with an example under each, one per screen on a phone with Back and Next, grouped by topic on desktop; the participant-data warning once; every answer saved to `account_facts` as it is given; the last screen re-renders every document (new versions, fresh summary and zip) and reads "Done. Your N documents are complete." The job fills a new pack from the same facts (AC-2 in `job.test.ts`).
+- **FR-3.** `/path/adopt/<group>`: one screen per group in audit order, names with the catalogue purpose as the two-line summary, names as links, one button; adopting marks checklist Done, sets the adopted date, seeds the policy review register, saves the approval date and re-renders. `/path/audit-day`: the auditor's questions in order with a tick each, the pack download, the summary; both pages print.
+- **FR-4.** Every path page derives from the same state and the strip always points at the current step; the finish form resumes at the first unanswered question; the adopt door lands on the first group left.
+- **FR-5.** `tests/path-screens.test.ts` fails a path screen with more than one primary button, one h1, or three paragraphs above the control.
+- **Not done here, for the PO:** the checklist items rewritten as instructions ("Ask each worker for…") is REQ-006 copy for thirty items; I left the titles and opened the checklist as REQ-015 built it. AC-1 (Haider's test on a phone) is his to run. The e2e that walks the path on the three projects needs this branch's migrations, so it runs in CI's Supabase job.
 
 ## Delivery evidence
-(Dev fills in.)
+**14 Oct 2026, batch 34, branch `req-017-guided-path`** (SHA in the NEXT.md status).
+
+- `npm run check` and `npm run build` green (outputs in the NEXT.md status). Unit: the state table (`next-step.test.ts`, AC-3), the fact mapping and filling (`facts-fill.test.ts`), the job filling a later pack from saved facts (`job.test.ts`, AC-2), the screen rule over every path page (`tests/path-screens.test.ts`, FR-5), copy-lint over the new screens.
+- Migration `20261014000000_account_facts.sql` (owner-scoped facts; `migrate.yml` applies it on merge).
+- `e2e/signed-in/guided-path.spec.ts` on the three projects (desktop, small Android, iPhone): a fresh account from the result to the audit-day page with the strip checked at every stage, screenshots under `product/evidence/req-017/` (`before-you-buy`, `while-we-draft`, `finish-pack`, `finish-done`, `adopt-group`, `checklist`, `audit-day`) with `EVIDENCE=1`. It runs in CI's Supabase job; the hosted project lacks this stack's migrations, so it cannot run on the Dev machine yet.
+- AC-1 is Haider's walk on his phone once the branch is deployed.
 
 ## PO review
 (PO fills in.)

@@ -12,6 +12,7 @@ export const CANCEL_PATHS = [
   "/documents",
   "/account",
   "/registers",
+  "/path/before-you-buy",
 ] as const;
 export type CancelPath = (typeof CANCEL_PATHS)[number];
 

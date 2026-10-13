@@ -2285,6 +2285,46 @@ model; the zip keeps the draft files.
 
 
 
+**D-1701 One sentence and one button, from a state table (Dev, 2026-10-14,
+batch 34, REQ-017 FR-1).** `src/lib/path/next-step.ts` is a pure function
+from the account's state (questionnaire done, paid, drafting, ready set,
+blanks left, groups to adopt, checklist left, registration date) to the
+step: the first row that holds wins, so the strip never shows two things.
+`src/server/path/state.ts` gathers the state with the owner's session and
+stops at the first concern that decides it, so a signed-in page costs a few
+small reads. The strip is a server component in the root layout under the
+header; it renders nothing signed out or before the account exists. The
+registration date joined the owned-account read for this. A unit test walks
+every row of the table (AC-3).
+
+**D-1702 Blanks become account facts, asked once (REQ-017 FR-2, AC-2).** A
+blank names a fact ("[name]", "[phone or email]"); `facts-fill.ts` maps the
+closed list to a question a support worker can answer, with an example, and
+keys an unknown blank from its own text; signatures, register rows and
+whole-section placeholders are never facts. The form asks one question per
+screen on a phone (Back and Next only) and groups them by topic on a wider
+screen; each answer is saved to `account_facts` as it is given (FR-4), and
+the last screen re-renders every document (`rerender.ts`: a new version per
+changed document, a fresh summary and zip) and says "Done. Your N documents
+are complete." The job applies the facts to a new pack before rendering, so
+a second pack carries them (AC-2, `job.test.ts`). The "details to fill in"
+count on the set page falls to zero after the finish because the blanks are
+gone from the text, not because the provider ticked them.
+
+**D-1703 Adopt, audit day and the screen rule (REQ-017 FR-3, FR-5).** One
+screen per document group in audit order; "These are our policies" marks
+the group's checklist items Done, sets each policy review's adopted date,
+seeds the register, saves today as the approval-date fact when none was
+given, and re-renders so the control table carries it; the download then
+serves the documents without the draft marks (D-058). The audit-day page
+walks the checklist groups as the auditor's questions ("Show me: …") with a
+tick for each, the pack download and the summary, and prints. The checklist
+item titles stay as REQ-006 wrote them: rewriting thirty items as
+instructions is PO copy, listed in the Dev response. `tests/path-screens.
+test.ts` reads the path pages' source and fails a screen with more than one
+primary button, more than one h1, or more than three paragraphs above the
+control, measuring one rendered branch at a time.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
