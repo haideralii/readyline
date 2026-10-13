@@ -1793,6 +1793,64 @@ storage sentence and the step footer's draft line now say where the draft
 lives: the account for a signed-in owner, this device otherwise. Account
 details are never changed by the questionnaire.
 
+**D-901 Registers Session A shape (Dev, 2026-10-13, batch 25, branch
+`req-009-registers` after merging `main` ec262cb; REQ-009 FR-1, FR-2, FR-4,
+SR-1 to SR-3).** One migration, `20261013000000_registers.sql`: eight
+tables (`incidents`, `incident_events`, `complaints`, `complaint_events`,
+`worker_clearances`, `policy_reviews`, `reminders`, `register_sequences`),
+three `security_invoker` status views, four immutable or stable helper
+functions, `next_register_reference()`, and the two FR-4 columns on
+`accounts`. Row types and vocabularies in `src/lib/registers/types.ts`;
+the pure rules in `src/lib/registers/status.ts` (`registerStatus`). No UI,
+no routes, no reminder job (Sessions B and C). Rate limits and audit-log
+lines (SR-3) belong to the routes and come with Session B.
+
+**D-902 Reportable-incident windows and what `notify_by` counts from.**
+The Rules' section 20 (24 hours) and section 21 (5 business days) were
+read from legislation.gov.au this session; the Commission's own page would
+not load from the build machine, so the category split is from its indexed
+text and the 2019 detailed guidance and stays `UNVERIFIED` in part until
+the PO glances at the live page (the migration comment carries the URLs).
+`notify_by` is a stored generated column from `occurred_on` as the REQ
+says, and null unless the provider has ticked `reportable`; the Rules
+count from awareness, which the register does not hold separately
+(`reported_on` is the nearest), so the date can only be early, never late.
+A restrictive practice that caused harm is entered under the harm's own
+category and so gets the 24-hour date. Business days skip Saturday and
+Sunday only; public holidays differ by state and are not modelled, which
+again errs early.
+
+**D-903 References come from the database.** A `before insert` trigger
+fills `incidents.reference` (`INC-0001`) and `complaints.reference`
+(`CMP-0001`) from `next_register_reference(account, register)`, a
+security-definer upsert on `register_sequences` that takes the row lock, so
+two concurrent inserts get consecutive distinct numbers. The function
+checks membership (or the service role) itself; clients have no privilege
+on the sequences table. A rolled-back insert leaves a gap, which an auditor
+can live with and the trail explains; the test asserts order and
+distinctness, not the absence of gaps across failures.
+
+**D-904 Entitlement gate as a function in the policies.**
+`has_active_subscription(account)` (security definer over
+`entitlements.kind = 'subscription' and revoked_at is null`) is ANDed with
+`is_member` in every insert and update policy of the four registers and
+the two event tables; select needs only membership; delete needs the
+owner. The event tables have no update policy and no update privilege
+(append-only). `reminders` is read-only for clients; the job writes it
+with the secret key. All grants are explicit in the same migration (D-052)
+and `anon` is revoked from every new relation.
+
+**D-905 Status vocabulary beyond FR-2.** The clearance and review rules
+are as written (expired after the date, expiring or due-soon from 90 or 60
+days before through the day itself). Two additions: a `policy_reviews`
+row with no `adopted_on` reads `not-adopted` rather than `current`, so an
+unadopted policy is never shown as in date; and `incidents_status` exposes
+`notification-due` beside FR-2's `overdue-notification` so a page can say
+"Notify the Commission by …" before the date passes. `expires_on` null
+means no expiry (the orientation module) and is always `valid`. The
+TypeScript rules and the SQL views are the same arithmetic; the unit tests
+pin the boundaries and the integration test checks the views.
+
 ## Open questions for Haider
 
 1. ~~Brand name~~ Resolved: Readyline (D-020). Pending Haider's ABN, business name and domain registrations.
