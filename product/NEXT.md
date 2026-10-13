@@ -588,3 +588,22 @@ Rules: branch from `main` after #20 merges (check for the REQ-010 merge commit; 
 3. **Status** with the branch SHA, and whether anything in the runbook changed after the PO's review.
 
 4. STOP.
+
+## Queue (written by PO, 13 Oct 2026, batch 23: findings from the first deploy)
+
+**Deployed:** `https://readyline-zeta.vercel.app` (Vercel Hobby, syd1, Node 22, team "Readyline"). Supabase Site URL and redirect list set; Stripe webhook `readyline-production` created in the Readyline account (test mode) and verified with a resent `checkout.session.completed` (200). Smoke test green (AC-3). First hosted walk-through (AC-4) done by the PO on a sole-trader, Household-tasks (verification) case: any-device magic link opened on a phone, account created and read back, questionnaire to result, Stripe Checkout with the test card, webhook → entitlement → generation running. Findings below are the queue; each is small. No model calls needed (cost table: none).
+
+0. **Push `main`** if the PO's commit is local only.
+
+1. **`.env.example` / runbook, three real traps found at deploy** (REQ-010 runbook update, same branch as 2 to 4, `req-010-part1-fixes` from `main`):
+   - Vercel rejects a `NEXT_PUBLIC_*` variable saved as type "Secret" (edits never save); the paste-the-env-file flow marks everything Secret. Runbook: add the four public names as type **Config** separately, or set the type per row before saving.
+   - Stripe "sandboxes" are separate accounts with their own keys: the key must come from the same account and mode as the Price and the webhook. Runbook: say it, and name the check (`Dashboard → the account name in the top-left, and "[Test]" in the page title`).
+   - Supabase redirect allow-list is pattern-matched against the full `emailRedirectTo` including the query string; the exact `/auth/callback` entry does not match `/auth/callback?next=…`. Runbook step 5: the entries are `https://<domain>/auth/callback*` (trailing `*`) plus the preview pattern with the same `*`.
+
+2. **Buy button must not 500.** A Stripe error on `createCheckoutSession` (wrong key, missing price) rendered Next's generic "This page couldn't load" page. Catch it in the action, log the Stripe code (no key material), and show the pricing page with "Buying is not available right now; nothing was charged" (the message the runbook already promises). Unit test with a mocked Stripe error.
+
+3. **Copy drift for signed-in users.** `/start` still says "nothing is stored on our servers in this version … kept as a draft on this device" after the account exists, and the account-setup form's answers (trading name, structure, states) are not carried into questionnaire step 1, so the user types them twice. Fix both: a signed-in variant of the `/start` intro, and prefill step 1 from the account (REQ-013 scope; D-13xx entry).
+
+4. **Generation time copy.** The documents page promises "usually under 10 minutes"; the first hosted run drafted 4 documents in about 3 minutes, so a 17-document set is 12 to 15 minutes on Hobby. Either make it true (two documents per function run if the 60 s limit allows) or change the copy to "usually 10 to 20 minutes". Record the measured time per document from the hosted run's logs in the Dev response and choose.
+
+5. **Status** with the branch SHA and the measured per-document time. STOP.
