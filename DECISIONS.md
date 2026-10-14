@@ -2313,6 +2313,16 @@ proven by CI's Supabase job (the "wait" step after the fake payment is
 given 30 seconds, since the webhook writes the purchase after the
 checkout response, D-053).
 
+**D-1509 The keyboard walk treats the wrap to the skip link as the end of
+the page (Dev, 2026-10-14, batch 43 item 3).** After the footer's last
+link a Tab lands on the body and the next one returns to "Skip to main
+content" at the top; WebKit does this a stop earlier than Chromium, and
+the walk read the return as a backwards move. The helper now stops the
+walk there with the trail and a message that the target was never
+reached, which is the true failure (the target was missing, as on the
+iPhone run of PR #39 where the form chunk had not yet arrived; the spec
+now waits for the live form first).
+
 **D-1006 Generation finishes without a watcher: an external kicker, a
 five-minute function, and the path recorded (Dev, 2026-10-13, batch 32,
 branch `req-010-generation-kicker`).** The field result D-057 showed the

@@ -303,6 +303,19 @@ export async function resetFocusTrail(page: Page) {
 export type KeyboardWalk = { steps: string[] };
 
 /**
+ * After the last focusable element, a Tab lands on the body and the next one
+ * wraps to the skip link at the top. That is the end of the page, not a
+ * backwards move (batch 43 item 3): the walk stops there with the trail.
+ */
+function endOfPage(walk: KeyboardWalk, info: FocusInfo, label: string) {
+  const previous = walk.steps[walk.steps.length - 2];
+  if (previous === "body" && /Skip to main content/.test(info.description))
+    throw new Error(
+      `${label}: reached the end of the page without the target (focus wrapped from the body to the skip link); trail: ${walk.steps.slice(-10).join(" > ")}`,
+    );
+}
+
+/**
  * Presses Tab until the locator is focused. Every stop on the way must show
  * a visible focus ring and lie after the previous stop in document order
  * (a logical order, no trap); a date input may keep focus for its own
@@ -322,6 +335,7 @@ export async function tabUntil(
     const info = await focusInfo(page);
     if (info.tag === "nextjs-portal") continue;
     walk.steps.push(info.description);
+    endOfPage(walk, info, options.label ?? "keyboard");
     const isTarget = await target.evaluate(
       (el) => el === document.activeElement,
     );
@@ -373,6 +387,7 @@ export async function pickRadio(
     const info = await focusInfo(page);
     if (info.tag === "nextjs-portal") continue;
     walk.steps.push(info.description);
+    endOfPage(walk, info, label);
     expect(
       info.tag === "body" || info.visibleRing,
       `${label}: no visible focus ring on ${info.description}`,
