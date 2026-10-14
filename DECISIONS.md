@@ -2275,6 +2275,28 @@ first-paint budget. Scores vary by two to four
 points run to run on this machine, which also runs an editor and two
 other test servers; CI's runner is the gate.
 
+**D-1013 The Lighthouse budget is advisory in CI until it has gone green
+on the runner, and a failed run prints Lighthouse's own error (Dev,
+2026-10-14, batch 45a).** The first real CI runs failed the budget step
+on every branch that carries backlog 2 with `output: [null, null, null]`
+and nothing else, because the Lighthouse call ran with its output
+discarded and, on the runner, the Chrome flags did not reach Chrome as
+one argument. `scripts/ops/lighthouse-budget.test.ts` now passes
+`--chrome-flags="--headless=new --no-sandbox --disable-gpu
+--disable-dev-shm-usage"` as one quoted argument, keeps `--quiet` off CI,
+captures stdout and stderr, and on a non-zero exit fails the test with
+the command, the Chrome path (Playwright's Chromium unless `CHROME_PATH`
+is set) and the last forty lines of Lighthouse's stderr. In `ci.yml` the
+four public pages moved from the main job into their own
+`performance-budget` job (build, Playwright Chromium, the budget, the
+report artefact) with `continue-on-error: true`, and the signed-in
+documents-page step in the Supabase job carries the same flag, so a red
+budget no longer blocks a merge while the cause is read from the runner.
+**Flip back to required by 21 October 2026**, or sooner once a run is
+green: remove the two `continue-on-error` lines and the "advisory" words
+in the names. The budget itself (D-1012) is unchanged.
+
+
 **D-1508 The accessibility pass is a page check and a keyboard walk, run
 on all three projects (Dev, 2026-10-14, standing backlog 1, REQ-015
 Section E).** `e2e/helpers/a11y.ts` holds the one page pass every page

@@ -12,7 +12,9 @@
  *   LIGHTHOUSE_BUDGET=1 npx vitest run scripts/ops/lighthouse-budget.test.ts
  * Needs `npm run build` first; it starts `next start` on port 3100 itself
  * unless LIGHTHOUSE_BASE_URL points at a running server. Chrome is
- * Playwright's Chromium unless CHROME_PATH is set. Options:
+ * Playwright's Chromium unless CHROME_PATH is set; a failed Lighthouse run
+ * fails the test with the command and Lighthouse's stderr (batch 45a,
+ * D-1013). Options:
  *   LIGHTHOUSE_PAGES="/,/pricing"   the pages (default: all five)
  *   LIGHTHOUSE_RUNS=3               runs per page; the median counts (default 1)
  *   LIGHTHOUSE_EVIDENCE=1           also write product/evidence/req-010/lighthouse/summary.md
@@ -165,6 +167,12 @@ function runLighthouse(
   chrome: string,
   cookie: string | null,
 ) {
+  // Batch 45a (D-1013): on a runner the flags must reach Chrome as one
+  // argument, quoted, and the call runs with its output captured so a
+  // failure prints Lighthouse's own words, never a null. `--quiet` is kept
+  // off CI only; on a laptop the progress lines are noise.
+  const chromeFlags =
+    "--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage";
   const args = [
     "--yes",
     `lighthouse@${LIGHTHOUSE_VERSION}`,
@@ -172,14 +180,14 @@ function runLighthouse(
     "--only-categories=performance",
     "--output=json",
     `--output-path=${outPath}`,
-    "--quiet",
+    ...(process.env.CI ? [] : ["--quiet"]),
     // Applied throttling, not simulated (D-1012): against a local server the
     // HTML arrives before the first frame, so the observed first paint waits
     // for the scripts to run and the simulation then ties the largest paint
     // to the JavaScript; with the mobile profile applied for real the HTML
     // paints before the scripts arrive, as on a phone.
     "--throttling-method=devtools",
-    "--chrome-flags=--headless=new --no-sandbox",
+    `--chrome-flags="${chromeFlags}"`,
   ];
   if (cookie) {
     // A JSON argument does not survive the Windows shell; Lighthouse also takes a file path.
@@ -187,12 +195,29 @@ function runLighthouse(
     writeFileSync(headersPath, JSON.stringify({ Cookie: cookie }));
     args.push(`--extra-headers=${headersPath}`);
   }
-  execFileSync("npx", args, {
-    stdio: "ignore",
-    env: { ...process.env, CHROME_PATH: chrome },
-    shell: true,
-    timeout: 240_000,
-  });
+  try {
+    execFileSync("npx", args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, CHROME_PATH: chrome },
+      shell: true,
+      timeout: 240_000,
+      maxBuffer: 16 * 1024 * 1024,
+    });
+  } catch (e) {
+    const err = e as { status?: number; stderr?: Buffer; stdout?: Buffer };
+    const tail = (b?: Buffer) =>
+      (b ? b.toString("utf8") : "").trim().split("\n").slice(-40).join("\n");
+    throw new Error(
+      [
+        `Lighthouse exited with ${err.status ?? "a signal"} for ${url} (Chrome: ${chrome}).`,
+        `Command: npx ${args.join(" ")}`,
+        tail(err.stderr) ? `stderr:\n${tail(err.stderr)}` : "stderr: (empty)",
+        tail(err.stdout) ? `stdout:\n${tail(err.stdout)}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+  }
   const report = JSON.parse(readFileSync(outPath, "utf8")) as {
     categories: { performance: { score: number | null } };
     audits: Record<string, Audit>;
