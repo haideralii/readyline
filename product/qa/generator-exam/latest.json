@@ -1,0 +1,291 @@
+{
+  "date": "2026-10-14",
+  "promptVersion": "2026-10-14.2",
+  "model": "claude-sonnet-5-5",
+  "mode": "replay",
+  "caseId": "verification-sole-trader",
+  "questions": 60,
+  "passed": 52,
+  "failed": 6,
+  "notApplicable": 2,
+  "mustPassFailed": [],
+  "byGroup": {
+    "time-frames": {
+      "passed": 8,
+      "failed": 1,
+      "notApplicable": 1
+    },
+    "definitions": {
+      "passed": 8,
+      "failed": 0,
+      "notApplicable": 0
+    },
+    "names": {
+      "passed": 8,
+      "failed": 0,
+      "notApplicable": 0
+    },
+    "state-facts": {
+      "passed": 4,
+      "failed": 0,
+      "notApplicable": 1
+    },
+    "contact": {
+      "passed": 5,
+      "failed": 1,
+      "notApplicable": 0
+    },
+    "refusals": {
+      "passed": 10,
+      "failed": 1,
+      "notApplicable": 0
+    },
+    "consistency": {
+      "passed": 9,
+      "failed": 3,
+      "notApplicable": 0
+    }
+  },
+  "results": [
+    {
+      "id": "Q01",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q02",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q03",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q04",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q05",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q06",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q07",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q08",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q09",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q10",
+      "outcome": "not-applicable"
+    },
+    {
+      "id": "Q11",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q12",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q13",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q14",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q15",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q16",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q17",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q18",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q19",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q20",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q21",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q22",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q23",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q24",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q25",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q26",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q27",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q28",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q29",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q30",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q31",
+      "outcome": "not-applicable"
+    },
+    {
+      "id": "Q32",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q33",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q34",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q35",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q36",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q37",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q38",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q39",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q40",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q41",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q42",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q43",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q44",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q45",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q46",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q47",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q48",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q49",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q50",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q51",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q52",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q53",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q54",
+      "outcome": "fail"
+    },
+    {
+      "id": "Q55",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q56",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q57",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q58",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q59",
+      "outcome": "pass"
+    },
+    {
+      "id": "Q60",
+      "outcome": "pass"
+    }
+  ]
+}

@@ -1,0 +1,1069 @@
+{
+  "$comment": "The generator exam (standing backlog 9, D-552): sixty questions a generated pack must answer, each mapped to a lint or a fixture assertion with the official source beside it. Runs over the replayed sole-trader pack in CI (no model call) and over a live pack on the monthly workflow or by hand. mustPass true blocks a prompt-version bump when it fails; mustPass false is reported (a known gap in the recorded replies, with the note saying which recording group fixes it, or a gap in the fixed text for the PO). The NDIS watch adds a question when a rule changes and names the watch change id. {{tradingName}} is replaced with the pack's trading name.",
+  "questions": [
+    {
+      "id": "Q01",
+      "group": "time-frames",
+      "question": "A reportable incident is notified to the Commission within 24 hours of becoming aware of it.",
+      "scope": {
+        "documents": ["incident-management-policy-and-register"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["Within 24 hours of becoming aware (Incident Rules s 20)"]
+      },
+      "mapsTo": "fixed text: escalation-pathway (D-545)",
+      "source": {
+        "title": "NDIS (Incident Management and Reportable Incidents) Rules 2018, s 20",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q02",
+      "group": "time-frames",
+      "question": "The full report of a reportable incident follows within 5 business days.",
+      "scope": {
+        "documents": ["incident-management-policy-and-register"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["with the full report within 5 business days"]
+      },
+      "mapsTo": "fixed text: escalation-pathway (D-545)",
+      "source": {
+        "title": "Incident Rules 2018, s 20",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q03",
+      "group": "time-frames",
+      "question": "An unauthorised restrictive practice is notified within 5 business days, in writing.",
+      "scope": {
+        "documents": ["incident-management-policy-and-register"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["Within 5 business days, in writing (Incident Rules s 21)"]
+      },
+      "mapsTo": "fixed text: escalation-pathway (D-545)",
+      "source": {
+        "title": "Incident Rules 2018, s 21",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q04",
+      "group": "time-frames",
+      "question": "Reportable incident records are kept for 7 years from the notification.",
+      "scope": {
+        "documents": ["records-management-policy"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "7 years from the date we notified the Commission (Incident Rules s 25)"
+        ]
+      },
+      "mapsTo": "fixed text: retention-schedule (watch item 4)",
+      "source": {
+        "title": "Incident Rules 2018, s 25",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": false,
+      "note": "Gap found by the exam on 14 Oct 2026: the records policy's retention schedule is a tailored section, so the fixed row the watch added (D-1801 batch 35, item 4) is never rendered, and the recorded reply predates the rule. PO: either make the brief require the seven-year row (recording group 3) or render the fixed table under the tailored text. Must pass once fixed.",
+      "watchChangeId": "wc-2026-10-14-04"
+    },
+    {
+      "id": "Q05",
+      "group": "time-frames",
+      "question": "Every policy says it is reviewed every 12 months.",
+      "scope": {
+        "documents": [
+          "governance-policy",
+          "risk-management-policy-and-register",
+          "conflict-of-interest-policy",
+          "privacy-and-information-management-policy",
+          "records-management-policy",
+          "complaints-management-policy-and-register",
+          "incident-management-policy-and-register",
+          "participant-rights-and-choice-policy",
+          "safeguarding-policy"
+        ],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["We review this document every 12 months"],
+        "where": "every"
+      },
+      "mapsTo": "fixed text: review section (REQ-016 S-2)",
+      "source": {
+        "title": "NDIS Practice Standards, Governance and operational management (quality management)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q06",
+      "group": "time-frames",
+      "question": "Every document carries its next review date.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": { "kind": "regex", "pattern": "Next review", "where": "every" },
+      "mapsTo": "fixed text: document control table (REQ-016 S-2)",
+      "source": {
+        "title": "NDIS Practice Standards, Governance and operational management (quality management)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q07",
+      "group": "time-frames",
+      "question": "A worker screening renewal starts at least 90 days before the clearance expires.",
+      "scope": {
+        "documents": ["worker-screening-and-recruitment-procedure"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["at least 90 days before the clearance expires"]
+      },
+      "mapsTo": "fixed text: clearance-register (watch item 5)",
+      "source": {
+        "title": "NDIS Commission, FAQs: NDIS Worker Screening Check renewal cycle (January 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx"
+      },
+      "mustPass": true,
+      "watchChangeId": "wc-2026-10-14-05"
+    },
+    {
+      "id": "Q08",
+      "group": "time-frames",
+      "question": "A worker whose clearance has expired stops risk-assessed work that day.",
+      "scope": {
+        "documents": ["worker-screening-and-recruitment-procedure"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "the worker stops risk-assessed work that day until a new clearance is issued"
+        ]
+      },
+      "mapsTo": "fixed text: clearance-register (watch item 5)",
+      "source": {
+        "title": "NDIS Commission, FAQs: NDIS Worker Screening Check renewal cycle (January 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q09",
+      "group": "time-frames",
+      "question": "No tailored section restates a statutory time frame; the fixed escalation table is the single source.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "timeframes" },
+      "mapsTo": "lint: lintTimeframes (R-7, D-041)",
+      "source": {
+        "title": "Incident Rules 2018, ss 20 and 21",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q10",
+      "group": "time-frames",
+      "question": "The support plan is reviewed at least every 12 months, or sooner when needs change.",
+      "scope": {
+        "documents": ["support-planning-and-transitions-procedure"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "review it at least every 12 months, or sooner when their needs change"
+        ]
+      },
+      "mapsTo": "fixed text: support-plan-template",
+      "source": {
+        "title": "NDIS Practice Standards, Provision of supports (support planning)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provision-supports"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q11",
+      "group": "definitions",
+      "question": "The reportable incident categories are named in full.",
+      "scope": {
+        "documents": ["incident-management-policy-and-register"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "death, serious injury, abuse or neglect, unlawful sexual or physical contact, sexual misconduct"
+        ]
+      },
+      "mapsTo": "fixed text: escalation-pathway (D-545)",
+      "source": {
+        "title": "Incident Rules 2018, s 16",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q12",
+      "group": "definitions",
+      "question": "The five kinds of restrictive practice are named: seclusion, chemical, mechanical, physical and environmental.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "seclusion",
+          "chemical",
+          "mechanical",
+          "physical",
+          "environmental"
+        ]
+      },
+      "mapsTo": "fixed text: restrictive-practice-position (D-546)",
+      "source": {
+        "title": "NDIS Practice Standards, Implementing behaviour support plans module",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-implementing-behaviour-support"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q13",
+      "group": "definitions",
+      "question": "A risk-assessed role is defined where worker screening is explained.",
+      "scope": {
+        "documents": ["worker-screening-and-recruitment-procedure"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "regex",
+        "pattern": "risk-assessed role",
+        "flags": "i"
+      },
+      "mapsTo": "fixture: the worker screening procedure's roles section (recording plan group 3)",
+      "source": {
+        "title": "NDIS Commission, worker screening",
+        "url": "https://www.ndiscommission.gov.au/workforce/worker-screening"
+      },
+      "mustPass": false,
+      "note": "The fixed definitions do not define a risk-assessed role; the tailored roles section names it when recorded. PO: decide whether the fixed definitions should carry it, with the Worker Screening Rules as the source."
+    },
+    {
+      "id": "Q14",
+      "group": "definitions",
+      "question": "Key personnel are defined.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "Key personnel: the people who own, run or make decisions for the business."
+        ]
+      },
+      "mapsTo": "fixed text: definitions",
+      "source": {
+        "title": "NDIS Act 2013, s 11A (key personnel)",
+        "url": "https://www.legislation.gov.au/C2013A00020/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q15",
+      "group": "definitions",
+      "question": "A participant is defined.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "Participant: a person who receives supports from us under the NDIS."
+        ]
+      },
+      "mapsTo": "fixed text: definitions",
+      "source": {
+        "title": "NDIS Practice Standards and Quality Indicators",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q16",
+      "group": "definitions",
+      "question": "A worker is defined to include the owner, employees, contractors and volunteers.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "Worker: anyone who delivers or supports the delivery of our services, including the owner, people we employ, contractors and volunteers."
+        ]
+      },
+      "mapsTo": "fixed text: definitions",
+      "source": {
+        "title": "NDIS Commission, worker screening (who is a worker)",
+        "url": "https://www.ndiscommission.gov.au/workforce/worker-screening"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q17",
+      "group": "definitions",
+      "question": "A restrictive practice is defined before the five kinds are listed.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "A restrictive practice is anything that limits a person's rights or freedom of movement."
+        ]
+      },
+      "mapsTo": "fixed text: restrictive-practice-position (D-546)",
+      "source": {
+        "title": "NDIS Practice Standards, Implementing behaviour support plans module",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/supplementary-module-implementing-behaviour-support"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q18",
+      "group": "definitions",
+      "question": "The Commission is defined as the body that registers and regulates providers.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "The Commission: the NDIS Quality and Safeguards Commission, which registers and regulates providers."
+        ]
+      },
+      "mapsTo": "fixed text: definitions",
+      "source": {
+        "title": "NDIS Commission, about registration",
+        "url": "https://www.ndiscommission.gov.au/provider-registration/about-registration"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q19",
+      "group": "names",
+      "question": "The regulator is named in full as the NDIS Quality and Safeguards Commission.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "contains",
+        "values": ["NDIS Quality and Safeguards Commission"]
+      },
+      "mapsTo": "fixed text: definitions",
+      "source": {
+        "title": "NDIS Commission",
+        "url": "https://www.ndiscommission.gov.au/"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q20",
+      "group": "names",
+      "question": "The regulator is never misnamed.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "NDIS Safeguards Commission|Quality and Safeguarding Commission|NDIS Quality Commission|NDIS Safeguarding Commission",
+        "flags": "i"
+      },
+      "mapsTo": "lint: terminology (names)",
+      "source": {
+        "title": "NDIS Commission",
+        "url": "https://www.ndiscommission.gov.au/"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q21",
+      "group": "names",
+      "question": "The auditor is an approved quality auditor, never a certifier or an assessor.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "\\b(certifier|certifying body|registration assessor|NDIS assessor)\\b",
+        "flags": "i"
+      },
+      "mapsTo": "lint: terminology (names)",
+      "source": {
+        "title": "NDIS Commission, approved quality auditors",
+        "url": "https://www.ndiscommission.gov.au/providers/registered-ndis-providers/approved-quality-auditors"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q22",
+      "group": "names",
+      "question": "If the accreditor is named, it is JAS-ANZ, spelt that way.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "\\bJAS ?ANZ\\b|\\bJASANZ\\b|Jas-Anz"
+      },
+      "mapsTo": "lint: terminology (names)",
+      "source": {
+        "title": "NDIS Commission, approved quality auditors",
+        "url": "https://www.ndiscommission.gov.au/providers/registered-ndis-providers/approved-quality-auditors"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q23",
+      "group": "names",
+      "question": "The Code is named as the NDIS Code of Conduct.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": { "kind": "contains", "values": ["NDIS Code of Conduct"] },
+      "mapsTo": "fixed text: code-of-conduct-acknowledgement",
+      "source": {
+        "title": "NDIS Commission, NDIS Code of Conduct",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q24",
+      "group": "names",
+      "question": "The standards are named as the NDIS Practice Standards.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": { "kind": "contains", "values": ["NDIS Practice Standards"] },
+      "mapsTo": "fixed text: purpose line",
+      "source": {
+        "title": "NDIS Practice Standards and Quality Indicators",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q25",
+      "group": "names",
+      "question": "Registration and audits are never attributed to the NDIA.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "NDIA registers|registered with the NDIA|NDIA audit|audited by the NDIA|the Agency registers",
+        "flags": "i"
+      },
+      "mapsTo": "lint: terminology (names)",
+      "source": {
+        "title": "NDIS Commission, about registration",
+        "url": "https://www.ndiscommission.gov.au/provider-registration/about-registration"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q26",
+      "group": "names",
+      "question": "The screening check is named as the NDIS Worker Screening Check (or Worker Check).",
+      "scope": {
+        "documents": ["worker-screening-and-recruitment-procedure"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "regex",
+        "pattern": "NDIS Worker (Screening )?(Check|Database)"
+      },
+      "mapsTo": "fixed text: clearance-register",
+      "source": {
+        "title": "NDIS Commission, worker screening",
+        "url": "https://www.ndiscommission.gov.au/workforce/worker-screening"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q27",
+      "group": "state-facts",
+      "question": "No body or card from a state the provider does not work in is named in a tailored section (New South Wales pack).",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": {
+        "kind": "absent",
+        "pattern": "Service Victoria|Worker Screening Queensland|SAFE NT|Access Canberra|Ochre Card|Blue card|Blue Card|DHS Screening Unit|Registration to Work with Vulnerable People",
+        "flags": ""
+      },
+      "mapsTo": "state facts block (D-1801): the prompt carries the provider's states only",
+      "source": {
+        "title": "Readyline state reference (data/state-reference.json, read 13 October 2026)",
+        "url": "https://www.ndiscommission.gov.au/workforce/worker-screening"
+      },
+      "mustPass": true,
+      "note": "Written for the sole-trader reference pack (NSW); a live run on another case needs the pattern for that case's states."
+    },
+    {
+      "id": "Q28",
+      "group": "state-facts",
+      "question": "No state law or body is cited from memory in a tailored section: an Act is named only where the state facts carry it.",
+      "scope": {
+        "documents": [
+          "induction-and-training-procedure-and-register",
+          "records-management-policy"
+        ],
+        "sections": "tailored"
+      },
+      "check": {
+        "kind": "absent",
+        "pattern": "Disability Act 2006|Disability Services Act|Senior Practitioner Act|Disability Inclusion Act"
+      },
+      "mapsTo": "state facts block (D-1801)",
+      "source": {
+        "title": "Readyline state reference (data/state-reference.json)",
+        "url": "https://www.ndiscommission.gov.au/workforce/worker-screening"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q29",
+      "group": "state-facts",
+      "question": "Workers are linked to the NDIS Worker Screening Database and unlinked when they leave.",
+      "scope": {
+        "documents": ["worker-screening-and-recruitment-procedure"],
+        "sections": "all"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "NDIS Worker Screening Database",
+          "unlinks workers who leave"
+        ]
+      },
+      "mapsTo": "fixed text: clearance-register (watch item 5)",
+      "source": {
+        "title": "NDIS Commission, FAQs: NDIS Worker Screening Check renewal cycle (January 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q30",
+      "group": "state-facts",
+      "question": "The pack never says a clearance lasts longer than five years.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "clearance (is valid|lasts) for (ten|10|seven|7|six|6) years|clearance does not expire|clearance never expires",
+        "flags": "i"
+      },
+      "mapsTo": "state facts: national renewal cycle (D-1801)",
+      "source": {
+        "title": "NDIS Commission, FAQs: NDIS Worker Screening Check renewal cycle (January 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q31",
+      "group": "state-facts",
+      "question": "Where a state's restrictive practice authorisation is named, the pack says to confirm it with the authorising body (unverified rows).",
+      "scope": {
+        "documents": [
+          "restrictive-practice-authorisation-and-reporting-procedure"
+        ],
+        "sections": ["state-authorisation"]
+      },
+      "check": {
+        "kind": "regex",
+        "pattern": "confirm with the authorising body|confirm with",
+        "flags": "i"
+      },
+      "mapsTo": "state facts block (D-1801, watch item 11)",
+      "source": {
+        "title": "WA Department of Communities, state and territory authorisation frameworks matrix (August 2025)",
+        "url": "https://www.wa.gov.au/system/files/2025-08/state_and_territory_authorisation_frameworks_matrix2025.pdf"
+      },
+      "mustPass": false,
+      "note": "Not applicable to the sole-trader pack; applies to a live run on the behaviour-support case."
+    },
+    {
+      "id": "Q32",
+      "group": "contact",
+      "question": "The Commission's phone number is given as 1800 035 544 in the complaints and incident documents.",
+      "scope": {
+        "documents": [
+          "complaints-management-policy-and-register",
+          "incident-management-policy-and-register"
+        ],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["1800 035 544"],
+        "where": "every"
+      },
+      "mapsTo": "fixed text: commission-contact (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us (read 14 October 2026)",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q33",
+      "group": "contact",
+      "question": "The relay service number 133 677 is given beside the phone number.",
+      "scope": {
+        "documents": [
+          "complaints-management-policy-and-register",
+          "incident-management-policy-and-register"
+        ],
+        "sections": "fixed"
+      },
+      "check": { "kind": "contains", "values": ["133 677"], "where": "every" },
+      "mapsTo": "fixed text: commission-contact (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q34",
+      "group": "contact",
+      "question": "The Commission's email is contactcentre@ndiscommission.gov.au.",
+      "scope": {
+        "documents": [
+          "complaints-management-policy-and-register",
+          "incident-management-policy-and-register"
+        ],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["contactcentre@ndiscommission.gov.au"],
+        "where": "every"
+      },
+      "mapsTo": "fixed text: commission-contact (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q35",
+      "group": "contact",
+      "question": "The Commission's website is ndiscommission.gov.au.",
+      "scope": {
+        "documents": [
+          "complaints-management-policy-and-register",
+          "incident-management-policy-and-register"
+        ],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["ndiscommission.gov.au"],
+        "where": "every"
+      },
+      "mapsTo": "fixed text: commission-contact (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q36",
+      "group": "contact",
+      "question": "The complaints policy says anyone can contact the Commission directly, at any time, without telling the provider first.",
+      "scope": {
+        "documents": ["complaints-management-policy-and-register"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "Anyone can contact the NDIS Quality and Safeguards Commission directly, at any time, without telling us first."
+        ]
+      },
+      "mapsTo": "fixed text: commission-contact (D-546)",
+      "source": {
+        "title": "NDIS (Complaints Management and Resolution) Rules 2018, s 8",
+        "url": "https://www.legislation.gov.au/F2018L00634/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q37",
+      "group": "contact",
+      "question": "No tailored section carries a phone number, email or address the pack did not supply.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "contact-details" },
+      "mapsTo": "lint: lintContactDetails (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": false,
+      "note": "The recorded complaints procedure quotes a number from memory (finding 9); recording group 1 fixes it. Must pass once re-recorded."
+    },
+    {
+      "id": "Q38",
+      "group": "refusals",
+      "question": "No participant is named with a title and surname anywhere in the pack.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "\\b(Mr|Mrs|Ms|Miss|Mx)\\.? [A-Z][a-z]+\\b"
+      },
+      "mapsTo": "fixture: participant-data rule (CLAUDE.md 4.5)",
+      "source": {
+        "title": "NDIS Commission, position statement on AI in behaviour support plans (February 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q39",
+      "group": "refusals",
+      "question": "No NDIS participant number appears anywhere in the pack.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": { "kind": "absent", "pattern": "\\b43\\d{7}\\b" },
+      "mapsTo": "fixture: participant-data rule (CLAUDE.md 4.5); database CHECK looks_like_ndis_number",
+      "source": {
+        "title": "NDIS Commission, position statement on AI in behaviour support plans (February 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q40",
+      "group": "refusals",
+      "question": "The pack never guarantees registration or an audit outcome.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "guarantee|audit-proof|100%|100 per cent|pass rate",
+        "flags": "i"
+      },
+      "mapsTo": "lint: findProhibitedClaims (CLAUDE.md 4.3)",
+      "source": {
+        "title": "Australian Consumer Law, misleading or deceptive conduct (CLAUDE.md 4.3)",
+        "url": "https://www.legislation.gov.au/C2004A00109/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q41",
+      "group": "refusals",
+      "question": "The pack never claims the Commission approved or endorsed it.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "approved by the (NDIS )?Commission|Commission[- ]approved|endorsed by the (NDIS )?Commission|NDIS approved|NDIS-approved",
+        "flags": "i"
+      },
+      "mapsTo": "lint: findProhibitedClaims (CLAUDE.md 4.1, 4.3)",
+      "source": {
+        "title": "NDIA, trade mark and use of the NDIS logo",
+        "url": "https://www.ndis.gov.au/contact/trademark-and-use-logo"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q42",
+      "group": "refusals",
+      "question": "The prohibited-claims checker finds nothing in any section.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": { "kind": "lint", "lint": "claims" },
+      "mapsTo": "lint: findProhibitedClaims",
+      "source": {
+        "title": "CLAUDE.md 4.3 (honest claims)",
+        "url": "https://www.legislation.gov.au/C2004A00109/latest/text"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q43",
+      "group": "refusals",
+      "question": "No tailored section carries an instruction to the generator inside a sentence.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "absent", "pattern": "\\[Provider to complete:" },
+      "mapsTo": "lint: docx-lint fr0a-instruction; recording plan group 4 (D-542)",
+      "source": {
+        "title": "REQ-016 document standard, FR-0a and S-8",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": false,
+      "note": "88 recorded replies predate the blank rule (D-542); recording group 4 fixes them. Must pass once re-recorded."
+    },
+    {
+      "id": "Q44",
+      "group": "refusals",
+      "question": "No template leftovers such as 'insert organisation' or '[Organisation Name]'.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "insert (organisation|organization|company|your name)|\\[Organisation Name\\]|\\[Company Name\\]|\\bXYZ\\b|Lorem ipsum",
+        "flags": "i"
+      },
+      "mapsTo": "lint: docx-lint s8-blank; tailoring score (REQ-005)",
+      "source": {
+        "title": "REQ-005 tailoring rule (CLAUDE.md section 7, Phase 3)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q45",
+      "group": "refusals",
+      "question": "No AI product is named as a decision maker.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "ChatGPT|Copilot|Gemini|Claude decides|the AI decides",
+        "flags": "i"
+      },
+      "mapsTo": "fixed text: AI position statement (AI_POSITION_STATEMENT)",
+      "source": {
+        "title": "NDIS Commission, position statement on AI in behaviour support plans (February 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q46",
+      "group": "refusals",
+      "question": "The provider is never called a registered NDIS provider before registration.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "we are a registered NDIS provider|{{tradingName}} is a registered NDIS provider",
+        "flags": "i"
+      },
+      "mapsTo": "lint: findProhibitedClaims (CLAUDE.md 4.1)",
+      "source": {
+        "title": "NDIA, trade mark and use of the NDIS logo",
+        "url": "https://www.ndis.gov.au/contact/trademark-and-use-logo"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q47",
+      "group": "refusals",
+      "question": "No tailored section links to a website other than the Commission's.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": {
+        "kind": "absent",
+        "pattern": "https?://(?!(www\\.)?ndiscommission\\.gov\\.au)",
+        "flags": "i"
+      },
+      "mapsTo": "lint: lintContactDetails (D-546)",
+      "source": {
+        "title": "NDIS Commission, contact us",
+        "url": "https://www.ndiscommission.gov.au/contact-us"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q48",
+      "group": "refusals",
+      "question": "The general-information notice is not inside the documents (it lives at the point of delivery).",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "absent",
+        "pattern": "general information and templates for your own review|not legal advice",
+        "flags": "i"
+      },
+      "mapsTo": "fixed text: notices at delivery (D-058)",
+      "source": {
+        "title": "CLAUDE.md 4.2 (not legal advice, D-058)",
+        "url": "https://www.lawsociety.com.au/sites/default/files/2018-05/LS1138_LPUL-fact-sheet_2018_Unqualified-practice%20%28002%29.pdf"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q49",
+      "group": "consistency",
+      "question": "Every document names the provider.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "contains",
+        "values": ["{{tradingName}}"],
+        "where": "every"
+      },
+      "mapsTo": "tailoring score (REQ-005 Phase 3 rule)",
+      "source": {
+        "title": "CLAUDE.md section 7, Phase 3 (tailoring score)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q50",
+      "group": "consistency",
+      "question": "Every document carries a document control table with its version.",
+      "scope": { "documents": "all", "sections": "fixed" },
+      "check": { "kind": "regex", "pattern": "Version", "where": "every" },
+      "mapsTo": "fixed text: document control table (REQ-016 S-2)",
+      "source": {
+        "title": "NDIS Practice Standards, Governance and operational management (quality management)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q51",
+      "group": "consistency",
+      "question": "Every record a tailored section names is a register, form or document the pack provides, by its canonical name.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "record-names" },
+      "mapsTo": "lint: lintRecordNames (D-544, D-547)",
+      "source": {
+        "title": "Readyline naming table (src/lib/registers/names.ts)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": false,
+      "note": "28 recorded findings predate the canonical-name rule; recording groups 4 and 5 fix them. Must pass once re-recorded."
+    },
+    {
+      "id": "Q52",
+      "group": "consistency",
+      "question": "Every cross-reference in a tailored section lands on a real section of its document.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "cross-references" },
+      "mapsTo": "lint: lintCrossReferences",
+      "source": {
+        "title": "REQ-016 document standard (S-2)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q53",
+      "group": "consistency",
+      "question": "No tailored section uses a vague time such as 'as soon as possible' where a number belongs.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "vague-time" },
+      "mapsTo": "lint: lintVagueTime (house style v2, D-544)",
+      "source": {
+        "title": "NDIS Practice Standards, Incident management (quality indicators)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational"
+      },
+      "mustPass": false,
+      "note": "13 recorded findings; recording group 3 and 5 fix them. Must pass once re-recorded."
+    },
+    {
+      "id": "Q54",
+      "group": "consistency",
+      "question": "No tailored section makes 'staff' the actor where a role must act.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "staff-actor" },
+      "mapsTo": "lint: lintStaffActor (house style v2, D-544)",
+      "source": {
+        "title": "NDIS Practice Standards, Governance and operational management (roles and responsibilities)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards/core-module-provider-governance-and-operational"
+      },
+      "mustPass": false,
+      "note": "30 recorded findings; recording group 5 fixes them. Must pass once re-recorded."
+    },
+    {
+      "id": "Q55",
+      "group": "consistency",
+      "question": "Tailored sections use Australian spelling and the house terminology.",
+      "scope": { "documents": "all", "sections": "tailored" },
+      "check": { "kind": "lint", "lint": "terminology" },
+      "mapsTo": "lint: lintText errors (house style)",
+      "source": {
+        "title": "Readyline house style (product/domain/house-style.md)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q56",
+      "group": "consistency",
+      "question": "The Practice Standards self-assessment is in the set.",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "document-present",
+        "documentTypeId": "practice-standards-self-assessment"
+      },
+      "mapsTo": "fixture: the job adds the self-assessment to every set",
+      "source": {
+        "title": "NDIS Commission, types of audits (the self-assessment and evidence)",
+        "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q57",
+      "group": "consistency",
+      "question": "The two AI documents are not in a new set (their content lives in the privacy policy, S-6).",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": {
+        "kind": "document-absent",
+        "documentTypeId": "ai-use-and-governance-policy"
+      },
+      "mapsTo": "fixture: catalogue retired flag (REQ-016 S-6)",
+      "source": {
+        "title": "REQ-016 document standard (S-6)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q58",
+      "group": "consistency",
+      "question": "No section ships undrafted (a placeholder with no text).",
+      "scope": { "documents": "all", "sections": "all" },
+      "check": { "kind": "no-placeholder-sections" },
+      "mapsTo": "fixture: FR-0c (no document ships undrafted)",
+      "source": {
+        "title": "REQ-016 document standard (FR-0c)",
+        "url": "https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards"
+      },
+      "mustPass": true
+    },
+    {
+      "id": "Q59",
+      "group": "consistency",
+      "question": "The privacy policy says what an automated program, including an AI tool, is used for (APP 1.7 to 1.9).",
+      "scope": {
+        "documents": ["privacy-and-information-management-policy"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": [
+          "If we use a computer program, including an AI tool, to make or help make a decision that could significantly affect a person"
+        ]
+      },
+      "mapsTo": "fixed text: AUTOMATED_DECISIONS_SENTENCE (watch item 10)",
+      "source": {
+        "title": "OAIC, APP 1.7 to 1.9 transparency obligation fact sheet (September 2026)",
+        "url": "https://www.oaic.gov.au/__data/assets/pdf_file/0021/269013/APP-1.7-1.9-Transparency-Obligation-Fact-Sheet.PDF"
+      },
+      "mustPass": true,
+      "watchChangeId": "wc-2026-10-14-06"
+    },
+    {
+      "id": "Q60",
+      "group": "consistency",
+      "question": "The Commission's AI position is stated as the rule the provider applies to every AI and digital tool.",
+      "scope": {
+        "documents": ["privacy-and-information-management-policy"],
+        "sections": "fixed"
+      },
+      "check": {
+        "kind": "contains",
+        "values": ["We apply that rule to every AI and digital tool we use."]
+      },
+      "mapsTo": "fixed text: AI_POSITION_STATEMENT",
+      "source": {
+        "title": "NDIS Commission, position statement on AI in behaviour support plans (February 2026)",
+        "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-02/Position%20statement%20-%20Use%20of%20artificial%20intelligence%20in%20development%20of%20behaviour%20support%20plans.pdf"
+      },
+      "mustPass": true
+    }
+  ]
+}

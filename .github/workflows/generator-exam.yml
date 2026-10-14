@@ -1,0 +1,50 @@
+name: Generator exam (live, monthly)
+
+# Standing backlog 9 (D-552): the sixty-question exam over a pack written by
+# the live model, on the first of each month and by hand. It costs about one
+# sole-trader pack (about a dollar at cached rates, D-046) and needs the
+# ANTHROPIC_API_KEY repository secret; without it the job reports that it
+# skipped and nothing is spent. The replay exam runs in every CI run through
+# `npm test`; this is the one that proves the live model still answers.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 1 * *" # 06:00 Sydney on the first of the month (AEST)
+
+jobs:
+  live-exam:
+    name: Live exam over the sole-trader pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Skip without the key
+        id: gate
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::ANTHROPIC_API_KEY is not set; the live exam did not run and nothing was spent."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run the exam with the live model
+        if: steps.gate.outputs.skip == 'false'
+        run: npm run generator:exam:live
+        env:
+          GENERATION_EXAM_LIVE: "1"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: claude-sonnet-5-5
+      - name: Upload the exam report
+        if: steps.gate.outputs.skip == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: generator-exam-live
+          path: out/generator-exam/
+          retention-days: 90

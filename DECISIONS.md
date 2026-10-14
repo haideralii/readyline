@@ -2954,6 +2954,39 @@ migrations; the unit tests, the integration file and the typed pages are
 the evidence, and the PO sees the flag on any pack drafted before 14
 October 2026 once the branch is deployed.
 
+**D-552 The generator exam: sixty fixed questions over a generated pack,
+each on a lint or a fixture assertion with its source, run on every
+prompt change by construction and monthly against the live model (Dev,
+2026-10-14, standing backlog 9, REQ-005).** `data/generator-exam.json`
+holds the questions in seven groups (time frames, definitions, names,
+state facts, the Commission's contact details, refusals, consistency);
+each has a scope (documents and fixed, tailored or named sections), a
+check (contains, regex, absent, a named lint, a document present or
+absent, no undrafted section), the lint or fixture it stands on, the
+official source, and `mustPass`. `src/lib/generator/exam.ts` builds the
+pack the way the job does (skeleton plus tailored sections through the
+model client given) and answers every question; `exam.test.ts` runs it in
+`npm test` over the replayed sole-trader pack with no model call, fails on
+any must-pass failure, writes `product/qa/generator-exam/<date>.md` and
+`latest.json` with `EXAM_REPORT=1`, and fails when `latest.json` is for an
+older prompt version, so a prompt-version bump without a re-run exam is
+blocked. `exam-live.test.ts` (`npm run generator:exam:live`,
+`GENERATION_EXAM_LIVE=1` and the Anthropic variables) writes the pack with
+the live model into `out/generator-exam` and answers the same questions;
+`.github/workflows/generator-exam.yml` runs it on the first of each month
+and by hand, skips without the `ANTHROPIC_API_KEY` secret, and costs about
+one pack. Reported, not blocking, with a note each: the five known
+recording gaps (a number from memory in the complaints procedure,
+placeholder instructions in 88 replies, record names, vague time, staff as
+actor) and one gap the exam found on its first run: the records policy's
+retention schedule is a tailored section, so the seven-year row the watch
+added to its fixed extra is never rendered (Q04; the PO decides between
+the brief and the fixed table). First run: 52 passed, 6 reported, 2 not
+applicable to the sole-trader pack. The NDIS watch adds a question and
+names the watch change id when a rule changes.
+
+
+
 
 
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
