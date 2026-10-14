@@ -1289,3 +1289,5 @@ Delivered on **`req-004-admin-hardening` 5026fd0** (one commit from the head of 
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 6, `req-005-recording-prep`, from the head of `req-004-admin-hardening`.
+
+Backlog 10 (written by PO, 14 Oct 2026; branch `req-021-writing-indicator`, may be taken before backlog 7 to 9 because it is small and Haider asked for it): REQ-021 in `product/requirements/REQ-021-writing-indicator.md`. One component, five honest phases, the twelve scenarios S1 to S12, the tests listed, no new dependency, no model calls. The job status endpoint gains the current section index and `last_progress_at`. Status with the SHA and screenshots of the five phases on the iphone project. STOP.
