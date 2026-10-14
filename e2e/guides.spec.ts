@@ -91,9 +91,8 @@ test.describe("guides (REQ-011)", () => {
         .getByTestId("guide-cta")
         .getByRole("link", { name: "See which audit I need" }),
     ).toHaveAttribute("href", "/start");
-    expect(await page.locator("body").textContent()).not.toMatch(
-      /data\/|\.json/,
-    );
+    // Visible text only: the dev server's inline payload carries module paths (".../metadata/...").
+    expect(await page.locator("body").innerText()).not.toMatch(/data\/|\.json/);
     await checkWidths(page, "which-audit guide");
     await axeClean(page, "which-audit guide");
     await shot(page, "which-audit", testInfo.project.name);
@@ -193,7 +192,7 @@ test.describe("guides (REQ-011)", () => {
     await expect(
       page.getByTestId("group-sources").getByRole("link").first(),
     ).toHaveAttribute("href", /gov\.au/);
-    expect(await page.locator("body").textContent()).not.toMatch(
+    expect(await page.locator("body").innerText()).not.toMatch(
       /data\/|\.json|Never restate/,
     );
     await checkWidths(page, "group page");

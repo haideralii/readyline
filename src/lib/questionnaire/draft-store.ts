@@ -7,7 +7,7 @@
  * windows, blocked storage and quota errors must never break the
  * questionnaire, only the "saved on this device" note.
  */
-import { QuestionnaireDraft } from "./schema";
+import type { QuestionnaireDraft } from "./schema";
 
 export type DraftStore = {
   load(): Promise<QuestionnaireDraft | null>;
@@ -47,6 +47,8 @@ export function createLocalDraftStore(
       }
       if (!raw) return null;
       try {
+        // The schema (and zod) load only when there is a draft to check (D-1012).
+        const { QuestionnaireDraft } = await import("./schema");
         const parsed = QuestionnaireDraft.safeParse(JSON.parse(raw));
         // An unreadable or older-version draft is discarded rather than trusted.
         return parsed.success ? parsed.data : null;

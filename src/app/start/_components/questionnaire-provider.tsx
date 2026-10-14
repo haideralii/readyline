@@ -22,12 +22,12 @@ import {
 } from "@/lib/questionnaire/draft-store";
 import type { GroupOption } from "@/lib/questionnaire/groups";
 import { createServerDraftStore } from "./server-draft-store";
+import type { QuestionnaireDraft } from "@/lib/questionnaire/schema";
 import {
   ANSWERS_VERSION,
   type AnswerStepId,
-  type QuestionnaireDraft,
   type StepId,
-} from "@/lib/questionnaire/schema";
+} from "@/lib/questionnaire/steps";
 
 export type Answers = QuestionnaireDraft["answers"];
 export type AccountPrefill = {

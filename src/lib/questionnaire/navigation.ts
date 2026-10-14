@@ -2,13 +2,13 @@
  * Step order, titles and the gate that keeps the result unreachable until the
  * required answers are valid (REQ-003 FR-4).
  */
+import type { QuestionnaireDraft } from "./schema";
 import {
   ANSWER_STEP_IDS,
   STEP_IDS,
   type AnswerStepId,
-  type QuestionnaireDraft,
   type StepId,
-} from "./schema";
+} from "./steps";
 
 export const STEP_TITLES: Record<StepId, string> = {
   business: "About your business",

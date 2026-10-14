@@ -11,7 +11,7 @@ import {
   documentGroupsContent,
 } from "@/lib/questionnaire/content";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import { ANSWERS_VERSION } from "@/lib/questionnaire/schema";
+import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import { deriveResult, type DeriveResultResponse } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";

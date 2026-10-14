@@ -2198,6 +2198,70 @@ test` on a mark or a double-encoded run in any text file outside
 Dev: edit files through Node or the editor tools, and never through
 `Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
 
+**D-1012 Performance budgets are a Lighthouse run in the applied mobile
+profile, gated in CI, and what they found (Dev, 2026-10-14, standing
+backlog 2, REQ-010).** `scripts/ops/lighthouse-budget.test.ts` (run with
+`LIGHTHOUSE_BUDGET=1`, `npm run perf:budget`) starts the production build
+on its own port, runs Lighthouse 12.8.2 on the home, pricing, start,
+questionnaire-step and documents pages, and fails on a median under
+performance 90, a largest contentful paint over 2.5 s, a layout shift over
+0.1, or more than 250 kB of JavaScript on the questionnaire; the documents
+page is measured signed in through a throwaway tenant's session cookie
+when the Supabase variables are present and skipped with a note when they
+are not. Throttling is applied (`devtools`), not simulated: against a
+local server the HTML arrives before the first frame, the first paint
+then waits for the scripts, and the simulation ties the largest paint to
+the JavaScript (3 s on every page); with the same mobile profile applied
+for real the HTML paints before the scripts arrive, as on a phone. CI runs
+the public pages in the main job and the documents page in the Supabase
+job, the median of three runs each, and uploads the report. What the
+first run found and what changed: both fonts loaded with `display: swap`,
+so the largest text painted twice (fallback, then the font) and the
+second paint was the measured LCP; they now use `display: optional`, the
+first paint is the final one, and the self-hosted font applies on every
+visit after the first and on a fast first visit. The questionnaire step's
+server HTML was a one-line placeholder until the draft loaded, so the form
+arrived with hydration (a 4 s LCP and a 0.57 layout shift from the footer
+jumping); the step's form is now in the server HTML, inert until the draft
+has loaded, and remounts with the answers. The documents and checklist
+loading states were one line, so the footer jumped when the page streamed
+in (0.4); the documents loading state now carries the page's heading and
+intro and both keep a page's height. The session user and the viewer are
+read once per request with React `cache` (the header, the next-step strip
+and the page each asked the auth server). The questionnaire's first load
+no longer carries zod, the five schemas or the other four steps' forms:
+the step ids, option lists and the restrictive-practice rule moved to a
+schema-free `steps.ts` (which `schema.ts` builds its enums from and
+re-exports), the draft store loads the schema only when there is a draft
+to check, each form validates through `parseStep`, which loads the schema
+on the first submit, and `step-page.tsx` loads one form per step with
+`next/dynamic` (still rendered on the server); that took the step page's
+main-thread time down enough to clear the score. A browserslist of current
+browsers (Chrome and Edge 109, Firefox 115, Safari and iOS 16) is set;
+Next still ships 14 kB of its own polyfills in the framework chunk, which
+Lighthouse keeps flagging and which is left alone. Route-level caching
+stays off (D-003, D-202: the nonce CSP needs every HTML response per
+request); there are no raster images; the docx, PDF and model code never
+reach the client bundle, checked by scanning the built chunks. The
+heading font is no longer preloaded: its 68 kB competed with the
+render-blocking stylesheet on the throttled link and held the first
+paint back on every page; being `optional`, it applies from the next
+page on and on a fast first visit, and the very first page of a slow
+visit shows the metric-matched fallback (one flag to revert if the PO
+prefers the font on every first view at the cost of the budget). The
+runner warms each page with one plain request before measuring, since
+a route's first render fills server caches a phone never pays for.
+Measured on this machine after the changes, medians of three: home 92,
+pricing 94, start 92, the business step 91, documents 95; LCP 1.8 to
+2.0 s; no layout shift; 149 and 155 kB of JavaScript on the two
+questionnaire pages (183 and 205 before). The step's form is a disabled
+fieldset until the draft loads (a test waits on "disabled" before it
+types; `inert` it would not), and the next step's chunk is fetched on
+the first focus in the form, not on mount, so it stays out of the
+first-paint budget. Scores vary by two to four
+points run to run on this machine, which also runs an editor and two
+other test servers; CI's runner is the gate.
+
 **D-1508 The accessibility pass is a page check and a keyboard walk, run
 on all three projects (Dev, 2026-10-14, standing backlog 1, REQ-015
 Section E).** `e2e/helpers/a11y.ts` holds the one page pass every page

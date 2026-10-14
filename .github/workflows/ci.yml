@@ -53,6 +53,22 @@ jobs:
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 
+      - name: Performance budgets, mobile profile, public pages (REQ-010, backlog 2, D-1012)
+        run: npm run perf:budget
+        env:
+          LIGHTHOUSE_BUDGET: "1"
+          LIGHTHOUSE_RUNS: "3"
+          LIGHTHOUSE_PAGES: "/,/pricing,/start,/start/business"
+
+      - name: Upload the Lighthouse budget report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-budget
+          path: out/lighthouse-budget.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: End-to-end tests (desktop, small Android viewport, iPhone WebKit)
         run: npm run test:e2e
         env:
@@ -125,6 +141,22 @@ jobs:
 
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
+
+      - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012)
+        run: npm run perf:budget
+        env:
+          LIGHTHOUSE_BUDGET: "1"
+          LIGHTHOUSE_RUNS: "3"
+          LIGHTHOUSE_PAGES: "/documents"
+
+      - name: Upload the signed-in Lighthouse budget report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-budget-signed-in
+          path: out/lighthouse-budget.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Signed-in end-to-end specs against the local stack (three projects)
         run: npx playwright test e2e/signed-in

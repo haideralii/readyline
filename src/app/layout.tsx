@@ -8,19 +8,32 @@ import { RouteProgress } from "@/components/route-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
+// Backlog 2 (D-1012): both fonts use `display: optional`. With `swap`, the
+// largest text on every page painted once in the fallback and again when
+// the font arrived, which Lighthouse's mobile profile measured as a 3 s
+// largest contentful paint; with `optional` the first paint is the final one
+// (the metric-matched fallback shows on a slow first visit, the self-hosted
+// font on every visit after), and nothing shifts.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "optional",
 });
 
 // REQ-014: the heading serif, self-hosted at build time by next/font so no
 // external origin is added to the CSP (AC-2). Variable weight with the
 // optical-size axis; the stylesheet sets weight 500 and opsz 48 on headings.
+// Not preloaded (D-1012): its 68 kB competed with the render-blocking
+// stylesheet on a throttled link and held the first paint back by about
+// half a second on every page. With `optional` it is fetched after the first
+// paint and applies from the next page on (and on a fast first visit); the
+// very first page view of a slow visit shows the metric-matched fallback.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   axes: ["opsz"],
-  display: "swap",
+  display: "optional",
+  preload: false,
 });
 
 export const metadata: Metadata = {
