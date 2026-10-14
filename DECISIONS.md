@@ -2181,6 +2181,19 @@ with the Subscribe button; and "Due soon" under Registers, read from the
 same `reminders` rows the emails are sent from, with "(emailed)" once
 sent.
 
+**D-914 The fake subscription id carries its session id (Dev, 2026-10-14,
+batch 43 item 1).** The fake billing portal is the fake checkout page
+opened with the subscription's session id, but the subscription id Stripe
+would have been given was a hash of that session, which the page could
+not turn back, so the portal answered 404 and the lifecycle part of the
+subscription spec timed out in CI on every branch (locally the spec had
+only ever been run through its first test). A fake subscription id is now
+`sub_fake_` plus the session id after its own prefix, the portal reverses
+it, and a Stripe id being opaque text the length is no concern; the
+customer id stays a hash. The spec waits a minute for the portal's
+first control before pressing it, so a missing control fails there and
+not at the test's cap.
+
 
 
 

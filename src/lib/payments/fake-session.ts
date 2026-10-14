@@ -147,9 +147,24 @@ export function fakeCompletedEvent(
   };
 }
 
-/** The subscription and customer ids a fake subscription session stands for. */
+/**
+ * The subscription and customer ids a fake subscription session stands for.
+ * The subscription id carries the session id itself after its prefix (batch
+ * 43, D-914): the fake billing portal is the fake checkout page, which can
+ * only decode a session id, and a hash of it could not be turned back; a
+ * Stripe id is opaque text, so the length is no concern.
+ */
 export function fakeSubscriptionId(sessionId: string): string {
-  return `sub_fake_${createHash("sha256").update(`sub:${sessionId}`).digest("hex").slice(0, 24)}`;
+  return `sub_fake_${sessionId.replace(/^cs_fake_/, "")}`;
+}
+
+/** The session id a fake subscription id was made from, or null for a real one. */
+export function fakeSessionIdForSubscription(
+  subscriptionId: string,
+): string | null {
+  return subscriptionId.startsWith("sub_fake_")
+    ? `cs_fake_${subscriptionId.slice("sub_fake_".length)}`
+    : null;
 }
 export function fakeCustomerId(sessionId: string): string {
   return `cus_fake_${createHash("sha256").update(`cus:${sessionId}`).digest("hex").slice(0, 24)}`;
