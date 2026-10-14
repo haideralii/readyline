@@ -452,8 +452,13 @@ th {
     opacity: 1;
   }
 }
-/* S9: reduced motion keeps the icon still; a phase change is a soft opacity pulse and nothing else moves. */
+/* S9: reduced motion keeps the icon still. The five phases keep their text
+   and colour change and lose every movement; the 600 ms opacity pulse that
+   used to mark a phase change here was the one animation left on the
+   documents page under reduce (#44, run 38645705696: the helper's longest
+   duration read 0.6 s against the 0.02 s the rest of the app keeps to). */
 @media (prefers-reduced-motion: reduce) {
+  .wi-icon,
   .wi-icon .wi-line,
   .wi-icon .wi-pen,
   .wi-icon .wi-page-back,
@@ -464,17 +469,5 @@ th {
   .wi-icon[data-moving="true"] .wi-line {
     opacity: 1;
     transform: scaleX(1);
-  }
-  .wi-icon {
-    animation: wi-pulse 600ms ease-out 1 !important;
-    animation-duration: 600ms !important;
-  }
-  @keyframes wi-pulse {
-    from {
-      opacity: 0.4;
-    }
-    to {
-      opacity: 1;
-    }
   }
 }
