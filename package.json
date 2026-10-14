@@ -36,7 +36,9 @@
     "standards:report": "node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/standards/report.ts",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "check:env-files": "node scripts/ci/check-env-files.mjs",
-    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test"
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test",
+    "generator:exam": "vitest run src/lib/generator/exam.test.ts",
+    "generator:exam:live": "vitest run src/lib/generator/exam-live.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

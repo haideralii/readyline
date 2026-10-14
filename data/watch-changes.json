@@ -48,7 +48,7 @@
       "sectionId": "retention-schedule",
       "oldSentence": "Incident and complaint records | [Provider to confirm]",
       "newSentence": "Reportable incident records | 7 years from the date we notified the Commission (Incident Rules s 25)",
-      "why": "Incident Management and Reportable Incidents Rules 2018 s 25: keep the record of a reportable incident for seven years from the notification.",
+      "why": "Incident Management and Reportable Incidents Rules 2018 s 25: keep the record of a reportable incident for seven years from the notification. (The generator exam, 14 Oct 2026, found that this row sits in a fixed extra the tailored retention schedule does not render; open for the PO, exam Q04.)",
       "source": "https://www.legislation.gov.au/F2018L00633/latest/text",
       "watchReport": "product/research/ndis-watch/2026-10-13.md, item 4 (batch 35)"
     },
