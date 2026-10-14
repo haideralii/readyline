@@ -71,7 +71,7 @@ export function RegisterList({
             <label
               key={f.key}
               // The radio is invisible, so the label shows its focus (WCAG 2.4.7; backlog 1, D-1508).
-              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm whitespace-nowrap has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
+              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
             >
               <input
                 type="radio"
