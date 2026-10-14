@@ -285,7 +285,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         await page.getByTestId("adopt-done").getByRole("link").click();
       } else if (i === 0) {
         // Backlog 1 (D-1508): the first group is adopted with the keyboard
-        // only; the button enables on hydration (D-1704), so the walk waits.
+        // only; the button enables on hydration (D-1706), so the walk waits.
         await expect(page.getByTestId("adopt-group")).toBeEnabled();
         const walk: KeyboardWalk = { steps: [] };
         await resetFocusTrail(page);
