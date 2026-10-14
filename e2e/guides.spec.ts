@@ -128,7 +128,13 @@ test.describe("guides (REQ-011)", () => {
       await expect(page.getByTestId("guide-reviewed")).toContainText(
         /Last reviewed/,
       );
-      await expect(page.getByRole("table").first()).toContainText(guide.body);
+      // A guide's table is the shared data table (batch 36): cards on a phone,
+      // a table from sm up, both in the DOM; the wrapper's text is the same on
+      // every viewport, where the table role is only on the wider layout
+      // (#40, run 38637072132).
+      await expect(page.getByTestId("data-table").first()).toContainText(
+        guide.body,
+      );
       const faq = page.getByTestId("guide-faq");
       expect(await faq.locator("details").count()).toBe(6);
       const ld = await page
