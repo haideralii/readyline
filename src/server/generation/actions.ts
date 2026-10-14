@@ -132,7 +132,10 @@ export async function regenerateSectionAction(
   const viewer = await getViewer();
   if (!viewer) redirect("/sign-in?next=%2Fdocuments");
   if (!isGenerationEnabled())
-    return { ok: false, message: "Document generation is coming soon." };
+    return {
+      ok: false,
+      message: "Document generation is not switched on in this environment.",
+    };
   if (!viewer.account)
     return { ok: false, message: "Create your account first." };
 

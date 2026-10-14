@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { countEvent } from "@/server/metrics/counters";
 import { StartIntro } from "./_components/start-intro";
 
 export const metadata: Metadata = {
@@ -8,5 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default function StartPage() {
+  // Batch 45 item 12 (D-2002): a first-party count of starts, nothing per user.
+  countEvent("start-view");
   return <StartIntro />;
 }

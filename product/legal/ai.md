@@ -25,6 +25,10 @@ We use Claude, a model made by Anthropic. When we draft a document, we send the 
 
 Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as "guaranteed" or "audit-proof", and refer to the fixed sections for legal timeframes rather than restating them. A section that fails these checks is redrafted once; if it still fails, you see a clear marker asking you to complete that section yourself.
 
+## Your own statement on AI and digital tools
+
+Your pack does not carry a separate AI policy. Your statement on AI and digital tools, which tools you allow and for what, that no participant information goes into public tools, and who reviews what a tool produces, is an appendix to the privacy policy in your pack, so an auditor finds it with your privacy commitments. You find it with your other documents on [your documents page](/documents).
+
 ## What you must do
 
 The documents are drafts for your review. You are responsible for reading them, changing anything that is not true for your business, and adopting them. Readyline does not give legal advice and does not guarantee that you will pass an audit or be registered.

@@ -103,7 +103,7 @@ test.describe("registers (REQ-009 Session B)", () => {
       page.getByRole("heading", { level: 1, name: "Add an incident" }),
     ).toBeVisible();
     await page.getByLabel("Date it happened").fill("2026-10-09");
-    await page.getByLabel("Date it was reported to you").fill("2026-10-09");
+    await page.getByLabel("Date it was reported").fill("2026-10-09");
     await page
       .getByLabel("What happened", { exact: true })
       .selectOption("restrictive-practice-unauthorised");
@@ -134,6 +134,20 @@ test.describe("registers (REQ-009 Session B)", () => {
       "Notify by 2026-10-16",
     );
     await expect(page.getByTestId("events-trail")).toContainText("Recorded");
+
+    // Batch 45 item 5: the account page says the same words as the registers
+    // index, pluralised, and "Due soon" leads with the incident's notify-by date.
+    const incidentUrl = page.url();
+    await page.goto("/account");
+    await expect(page.getByTestId("account-registers")).toContainText(
+      "1 entry, all current.",
+    );
+    await expect(
+      page.getByTestId("due-soon").getByRole("listitem").first(),
+    ).toContainText(
+      "Notify the Commission about incident INC-0001 by 2026-10-16.",
+    );
+    await page.goto(incidentUrl);
 
     // A note joins the trail.
     await page.getByTestId("add-note").click();

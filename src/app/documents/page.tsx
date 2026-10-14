@@ -131,10 +131,8 @@ function PurchaseSection({
             <p className="mt-3">
               <span className="text-3xl font-semibold" data-testid="pack-price">
                 {formatAud(pricing.packPriceCents)}
-              </span>
-              <span className="ml-2 text-zinc-600 dark:text-zinc-400">
-                one-off
-              </span>
+              </span>{" "}
+              <span className="text-zinc-600 dark:text-zinc-400">one-off</span>
               {pricing.gstLine ? (
                 <span className="block text-sm text-zinc-600 dark:text-zinc-400">
                   {pricing.gstLine}
@@ -312,12 +310,15 @@ export default async function DocumentsPage({
         {C.intro}
       </p>
 
-      <PurchaseSection
-        state={state}
-        thanks={thanks}
-        email={email}
-        writing={writing}
-      />
+      {/* Batch 45 item 2: with generation off and nothing bought, no Buy box; the one line below says why. */}
+      {enabled || state.kind !== "none" ? (
+        <PurchaseSection
+          state={state}
+          thanks={thanks}
+          email={email}
+          writing={writing}
+        />
+      ) : null}
       {state.kind === "ready" || state.kind === "preparing" ? (
         <DocumentsNotices />
       ) : null}

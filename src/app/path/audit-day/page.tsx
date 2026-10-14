@@ -124,38 +124,43 @@ export default async function AuditDayPage() {
         </p>
       ) : null}
 
-      {shown.groups.map((g) => (
-        <section
-          key={g.id}
-          aria-labelledby={`ask-${g.id}`}
-          className="mt-10"
-          data-testid="audit-day-group"
-        >
-          <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
-            {ASK[g.id] ?? g.title}
-          </h2>
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
-            {g.items.map((i) => {
-              const t = tick(i);
-              return (
-                <li key={i.id} className="flex gap-3 py-3 leading-7">
-                  <span aria-hidden="true" className="w-5 shrink-0">
-                    {t.mark}
-                  </span>
-                  <span>
-                    <span className="font-medium">
-                      &quot;Show me: {i.title}.&quot;
-                    </span>{" "}
-                    <span className="text-zinc-700 dark:text-zinc-300">
-                      {t.word}
+      {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
+      {[...shown.groups]
+        .sort(
+          (a, b) =>
+            Object.keys(ASK).indexOf(a.id) - Object.keys(ASK).indexOf(b.id),
+        )
+        .map((g) => (
+          <section
+            key={g.id}
+            aria-labelledby={`ask-${g.id}`}
+            className="mt-10"
+            data-testid="audit-day-group"
+          >
+            <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
+              {ASK[g.id] ?? g.title}
+            </h2>
+            <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+              {g.items.map((i) => {
+                const t = tick(i);
+                return (
+                  <li key={i.id} className="flex gap-3 py-3 leading-7">
+                    <span aria-hidden="true" className="w-5 shrink-0">
+                      {t.mark}
                     </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+                    <span>
+                      {/* Batch 45 item 4: what the auditor says, never the provider's instruction. */}
+                      <span className="font-medium">&quot;{i.ask}&quot;</span>{" "}
+                      <span className="text-zinc-700 dark:text-zinc-300">
+                        {t.word}
+                      </span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
 
       {groups.length ? (
         <section

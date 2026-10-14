@@ -20,6 +20,8 @@ export const BANNED_WORDS: readonly RegExp[] = [
   /\bin order to\b/i,
   /\bpursuant\b/i,
   /\bN\/A\b/,
+  // Batch 45 item 2: a promise with no date; an environment fact is said as one.
+  /\bcoming soon\b/i,
 ];
 
 /** An internal path or file name has no place in customer-facing text (FR-2). */

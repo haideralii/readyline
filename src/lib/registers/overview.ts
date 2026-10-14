@@ -64,7 +64,7 @@ export function registersLine(o: RegisterOverview): {
     total === 0
       ? "No register entries yet."
       : parts.length === 0
-        ? `${total} entries, all current.`
+        ? `${total} ${total === 1 ? "entry" : "entries"}, all current.`
         : `${parts.join(", ")}.`;
   return { current, dueSoon, overdue, sentence };
 }

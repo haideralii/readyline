@@ -287,6 +287,29 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await page.goto("/path/audit-day");
     await expect(page.getByTestId("audit-day-summary")).toContainText(/ready/);
     await expect(page.getByTestId("audit-day-group").first()).toBeVisible();
+    // Batch 45 items 3 and 4: the groups in the order the auditor asks, and
+    // every quoted line is what the auditor says, never the provider's instruction.
+    await expect(
+      page.getByTestId("audit-day-group").getByRole("heading", { level: 2 }),
+    ).toHaveText([
+      "First they check who you are",
+      "Then they ask to see your policies",
+      "Then they ask for your records",
+      "Then they ask about your workers",
+      "Then they talk about the audit itself",
+    ]);
+    const asks = await page
+      .getByTestId("audit-day-group")
+      .locator("li > span > span.font-medium")
+      .allTextContents();
+    expect(asks.length).toBeGreaterThan(10);
+    for (const ask of asks)
+      expect(
+        ask,
+        `an instruction leaked into the auditor's words: ${ask}`,
+      ).not.toMatch(
+        /Read your|Start your|adopt it|Ask your|Get |Book your|Choose an|Tell your|Put your/,
+      );
     await expect(page.getByTestId("audit-day-download")).toHaveAttribute(
       "href",
       /download\?file=set\.zip$/,

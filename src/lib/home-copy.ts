@@ -21,7 +21,12 @@ export const HOME_COPY = {
   cta: "See which audit I need",
   ctaSecondary: "See a sample document",
   ctaNote: "Free, about ten minutes, no account needed.",
+  keepsEyebrow: "What keeps you audit-ready",
   /** The first screen says what it costs and what the deal is (batch 24 item 1). */
+  /** Batch 45 item 9 (D-2001): the subscription first, as what keeps a provider audit-ready; the pack second, as where they start. */
+  subscriptionLine: (price: string) =>
+    `${price} a month keeps you audit-ready: the registers, the reminders and the mid-term audit countdown, with the evidence already in place at renewal. Cancel at any time.`,
+  startLine: "Where you start:",
   priceLine: (price: string) =>
     `${price} one-off for the document pack. No subscription needed, no instalments, no interest.`,
   refundLine:
@@ -66,12 +71,17 @@ export const HOME_COPY = {
   },
   missionHeading: "Why one price, and who is behind it",
   /**
-   * Batch 24 item 3: 120 words in the style of product/legal/about.md. A Dev
-   * draft for the PO to replace; the name and ABN are placeholders until the
-   * business is registered.
+   * Batch 24 item 3: 120 words in the style of product/legal/about.md. Batch
+   * 45 item 1: the registered name and ABN join the first paragraph only
+   * once both are set (BUSINESS_NAME, BUSINESS_ABN), the way the footer
+   * shows the ABN; until then the paragraph ends one sentence earlier.
    */
+  missionOpen: `${BRAND} is built and run by one person in Sydney, a software quality engineer who tests systems for a living.`,
+  missionRegistered: (name: string, abn: string) =>
+    `It is registered as ${name}, ABN ${abn}.`,
+  missionWhy:
+    "It exists because a sole trader facing their first audit is choosing between a consultant at several thousand dollars and a template pack that describes someone else's business.",
   mission: [
-    `${BRAND} is built and run by one person in Sydney, a software quality engineer who tests systems for a living. [Name and ABN to be added when registered.] It exists because a sole trader facing their first audit is choosing between a consultant at several thousand dollars and a template pack that describes someone else's business.`,
     "One fixed price, paid once, because the pack is something you need once. No instalments and no interest, because debt is not a service we want to sell. No subscription is needed to use what you bought. The registers are a separate, optional subscription you can cancel at any time.",
     "Every document is a draft for your review. The audit decision is the auditor's and the Commission's, not ours.",
   ],

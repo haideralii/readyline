@@ -3252,6 +3252,18 @@ file cannot run against the hosted project (its migrations are behind the
 branches); CI's Supabase job is the gate.
 
 
+**D-2001 No bundling and no discount between the pack and the subscription (PO, 2026-10-14, batch 45 item 9).** AUD 399 once and AUD 39 a month stay separate and honest; the pack is not included in month one. The pricing page, the home page and the result page show the two as halves of equal weight, the subscription first as what keeps a provider audit-ready, with one line on what it saves at renewal, and the pack second as where they start. Dev note: the words live in `src/lib/payments/copy.ts` and `src/lib/home-copy.ts` so the claims lint reads them; no price is composed in the browser.
+
+**D-2002 First-party counters, no cookies, no third party, nothing per person (PO, 2026-10-14, batch 45 item 12).** Five events are counted per Sydney day: a start-page view, a result shown, a buy click, a subscribe click, a pack finished. Dev implementation: `public.daily_counters` (day, event, count) with no anonymous or authenticated grant at all and a `bump_counter` function the service key alone may run (migration `20261015000000_first_party_counters.sql`); the server bumps after the response (`src/server/metrics/counters.ts`, never throws, never blocks a page); `/admin` shows the five sums for the last 30 days. Nothing per user, no identifier, no referrer, no path beyond the five names.
+
+**D-2003 The three guides are published (PO, 2026-10-14, batch 45).** "What happens at an NDIS audit", "The registers an auditor asks for" and the updated "Which NDIS audit" leave `draft` status (backlog 3). Dev note: done in Session B of batch 45 with the content items; the guides index lists them.
+
+**D-2004 The watch's apply step refuses without a ledger entry (PO, 2026-10-14, batch 45).** Every NDIS watch item applied to fixed text, a brief or the standards data (a D-18xx application) must have a row in `data/watch-changes.json`; a test requires it (backlog 8, D-551). Dev note: the test lands with Session B.
+
+**D-2005 Dependabot off until launch (PO, 2026-10-14, batch 45).** GitHub's security alerts stay on; the research agent reports advisories. Dev note: `.github/dependabot.yml` is removed in Session B; the audit step in CI (`npm audit --audit-level=high`) is unchanged.
+
+**D-2006 The writing indicator's idle cost is measured with Playwright, not Lighthouse (PO, 2026-10-14, batch 45).** Lighthouse cannot measure idle CPU for one state; the check is Playwright CDP `Performance.getMetrics`, the TaskDuration delta over 10 seconds of the Writing phase under 0.5 seconds on the android-small project (backlog 10). Dev note: the spec lands with Session B.
+
 **D-2101 The writing indicator reads the job row, never a timer; the row
 carries the phase, the document and section in flight and the time of the
 last progress; a document that keeps failing waits for the owner (Dev,

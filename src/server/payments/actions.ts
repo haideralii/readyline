@@ -26,6 +26,7 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { checkCheckoutAllowed } from "@/server/auth/rate-limit";
+import { countEvent } from "@/server/metrics/counters";
 import { answersHash } from "@/server/generation/run";
 import { createCheckoutSession, type CheckoutClient } from "./checkout";
 import { FakeCheckoutClient } from "./fake";
@@ -195,6 +196,7 @@ export async function subscribeAction(
   formData: FormData,
 ): Promise<CheckoutActionResult | null> {
   const cancelPath = formData.get("cancelPath");
+  countEvent("subscribe-click");
   return createSubscriptionAction(
     typeof cancelPath === "string" ? { cancelPath } : {},
   );
@@ -262,6 +264,8 @@ export async function buyAction(
   formData: FormData,
 ): Promise<CheckoutActionResult | null> {
   const cancelPath = formData.get("cancelPath");
+  // Batch 45 item 12 (D-2002): the click is counted per day, nothing per user.
+  countEvent("buy-click");
   return createCheckoutAction(
     typeof cancelPath === "string" ? { cancelPath } : {},
   );

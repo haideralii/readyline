@@ -108,6 +108,42 @@ function inlineText(
   return decode(text);
 }
 
+/**
+ * Batch 45 item 7 (WCAG 1.3.2): two inline elements rendered back to back
+ * with no whitespace between them read as one word ("AUD 399one-off"). The
+ * check is at the boundary only: the last character of one child is a digit
+ * and the first character of the next is a letter, with nothing rendered
+ * between them (JSX drops whitespace that holds a newline).
+ */
+function boundaryJoins(
+  children: ts.NodeArray<ts.JsxChild>,
+  sf: ts.SourceFile,
+): string[] {
+  const rendered = (c: ts.JsxChild): string | null => {
+    if (ts.isJsxText(c)) {
+      // The full text: a JSX text node's leading whitespace is trivia to getText().
+      const raw = c.getFullText(sf);
+      if (/^\s*$/.test(raw)) return raw.includes("\n") ? "" : " ";
+      return raw.replace(/\s*\n\s*/g, " ");
+    }
+    if (ts.isJsxExpression(c))
+      return c.expression ? expressionText(c.expression, sf) || "X" : "";
+    if (ts.isJsxElement(c)) return inlineText(c.children, sf).trim();
+    return null;
+  };
+  const out: string[] = [];
+  let prev: string | null = null;
+  for (const c of children) {
+    const text = rendered(c);
+    if (text === null) continue;
+    if (text === "") continue;
+    if (prev !== null && /\d$/.test(prev) && /^[A-Za-z]/.test(text))
+      out.push(`"${prev.slice(-12)}" runs into "${text.slice(0, 12)}"`);
+    prev = text;
+  }
+  return out;
+}
+
 /** Static strings inside a JSX expression: literals, template parts, both arms of a conditional. */
 function expressionText(e: ts.Expression, sf: ts.SourceFile): string {
   if (ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e))
@@ -161,6 +197,15 @@ function lintTsx(file: string, findings: Finding[]) {
     if (ts.isJsxElement(node)) {
       const tag = tagName(node.openingElement);
       const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+      for (const join of boundaryJoins(node.children, sf))
+        findings.push({
+          file: rel,
+          where: `<${tag}> line ${line}`,
+          violation: {
+            rule: "banned-word",
+            detail: `a number runs into a word across two elements with no space between: ${join}`,
+          },
+        });
       if (BLOCK_TAGS.has(tag)) {
         const text = inlineText(node.children, sf);
         for (const v of lintText(text, { block: true }))

@@ -19,6 +19,7 @@ import {
   listLatestDocuments,
 } from "@/server/generation/queries";
 import { rerenderSetWithFacts } from "@/server/generation/rerender";
+import { countEvent } from "@/server/metrics/counters";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -88,6 +89,8 @@ export async function finishPackAction(
     set,
     facts,
   });
+  // Batch 45 item 12 (D-2002): a pack finished, counted per day, nothing per user.
+  if (out.blanksLeft === 0) countEvent("finish-completed");
   return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
 }
 

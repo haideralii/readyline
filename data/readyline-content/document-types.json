@@ -683,6 +683,12 @@
           "heading": "Worker screening clearance register",
           "mode": "fixed",
           "brief": "Columns: role, clearance type, number, expiry, next check."
+        },
+        {
+          "id": "first-recruit",
+          "heading": "Who these steps apply to",
+          "mode": "fixed",
+          "brief": "Batch 45 item 15 (provider review): the recruitment and referee steps are written for workers; for the owner with no workers, one sentence says they apply to the first person recruited."
         }
       ],
       "basis": "practice-standard"

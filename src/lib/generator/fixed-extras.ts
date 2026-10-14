@@ -326,6 +326,18 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       ],
     },
   ],
+  // Batch 45 item 15 (provider review): the recruitment and referee steps are
+  // written for workers; the owner with no workers is told, in one sentence,
+  // whom they apply to, rather than reading them as if they had a team.
+  "first-recruit": (ctx) => [
+    {
+      type: "paragraph",
+      text:
+        ctx.facts.workerCountBand === "sole"
+          ? "Until we employ anyone, these steps apply to the first person we recruit."
+          : "These steps apply to every worker and key person we recruit, and to the referees we contact about them.",
+    },
+  ],
   "training-register": () => [
     {
       type: "table",

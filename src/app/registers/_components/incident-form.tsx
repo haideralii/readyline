@@ -32,7 +32,7 @@ import {
 
 const LABELS: Record<string, string> = {
   occurredOn: "Date it happened",
-  reportedOn: "Date it was reported to you",
+  reportedOn: "Date it was reported",
   category: "What happened",
   severity: "How serious",
   participantRef: "Participant code",
