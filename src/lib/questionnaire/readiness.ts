@@ -1,22 +1,38 @@
 /**
- * What the ready line shows for a result (REQ-014 motif): done is what the
- * provider said they have, to prepare is what they said they lack or were
- * unsure about, the remainder is what the questionnaire did not ask.
+ * What the ready line says for a result (REQ-014 motif; REQ-013 batch 36
+ * item 3, D-1310): how many of the documents and registers the provider
+ * already has, how many documents the pack drafts, and how many registers
+ * they keep as they go. One sentence in the customer's words; the line
+ * shows two segments (have / still to do) and nothing else.
  */
+import { BRAND } from "@/lib/brand";
+import type { ReadyLineCounts } from "@/components/ready-line";
 import type { QuestionnaireResult } from "./result";
 
 export type ReadinessCounts = {
-  done: number;
-  toPrepare: number;
-  remainder: number;
+  /** Items the provider said they have. */
+  have: number;
+  documents: number;
+  registers: number;
 };
 
 export function readinessCounts(r: QuestionnaireResult): ReadinessCounts {
   const items = [...r.documents, ...r.registers];
   return {
-    done: items.filter((i) => i.have === "yes").length,
-    toPrepare: items.filter((i) => i.have === "no" || i.have === "not-sure")
-      .length,
-    remainder: items.filter((i) => i.have === "unknown").length,
+    have: items.filter((i) => i.have === "yes").length,
+    documents: r.documents.length,
+    registers: r.registers.length,
   };
+}
+
+export function readyLineCounts(c: ReadinessCounts): ReadyLineCounts {
+  return { done: c.have, todo: c.documents + c.registers - c.have };
+}
+
+export function readinessSentence(c: ReadinessCounts): string {
+  const registers =
+    c.registers === 1
+      ? "the 1 register you keep as you go"
+      : `the ${c.registers} registers you keep as you go`;
+  return `You already have ${c.have} of these. ${BRAND} drafts the ${c.documents} documents for you; ${registers}.`;
 }
