@@ -5,6 +5,7 @@ import "server-only";
  * reminders due soon for the account page's "Due soon" list.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fakeSessionIdForSubscription } from "@/lib/payments/fake-session";
 import type { ReminderRow } from "@/lib/registers/types";
 
 export type SubscriptionView = {
@@ -34,13 +35,11 @@ export async function getSubscription(
     .maybeSingle();
   const row = (r.data as SubscriptionView | null) ?? null;
   if (!row) return null;
-  // In fake mode the subscription id carries the session id's hash only; the
-  // fake portal link is the fake checkout page keyed by the subscription id.
+  // In fake mode the subscription id carries the session id (D-914), and the
+  // fake portal is the fake checkout page opened with that session id.
   return {
     ...row,
-    fake_session_id: row.stripe_subscription_id.startsWith("sub_fake_")
-      ? row.stripe_subscription_id
-      : null,
+    fake_session_id: fakeSessionIdForSubscription(row.stripe_subscription_id),
   };
 }
 

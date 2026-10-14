@@ -6,6 +6,8 @@ import {
   fakeCompletedEvent,
   fakePaymentIntentId,
   fakeRefundedEvent,
+  fakeSessionIdForSubscription,
+  fakeSubscriptionId,
   fakeWebhookSecret,
   isFakeStripeMode,
   type FakeSessionData,
@@ -80,5 +82,31 @@ describe("fake Stripe mode (REQ-007 Q5, D-709)", () => {
     expect(charge.amount_refunded).toBe(39900);
     expect(JSON.stringify([completed, refunded])).not.toMatch(/@/);
     expect(completed.id).not.toBe(refunded.id);
+  });
+});
+
+describe("fake subscription ids carry the session (batch 43, D-914)", () => {
+  it("turns a subscription id back into the session id the fake portal needs, and leaves a real id alone", () => {
+    const data = {
+      accountId: "a",
+      assessmentId: "b",
+      packVersion: "1",
+      amountCents: 3900,
+      currency: "aud" as const,
+      successUrl: "http://localhost:3000/registers?subscribed=1",
+      cancelUrl: "http://localhost:3000/pricing",
+      mode: "subscription" as const,
+    };
+    const sessionId = encodeFakeSession(data, "whsec_test");
+    const subscriptionId = fakeSubscriptionId(sessionId);
+    expect(subscriptionId.startsWith("sub_fake_")).toBe(true);
+    expect(fakeSessionIdForSubscription(subscriptionId)).toBe(sessionId);
+    expect(
+      decodeFakeSession(
+        fakeSessionIdForSubscription(subscriptionId)!,
+        "whsec_test",
+      ),
+    ).toEqual(data);
+    expect(fakeSessionIdForSubscription("sub_1AbCdEf")).toBeNull();
   });
 });
