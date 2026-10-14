@@ -86,6 +86,7 @@ export default async function AdminPage() {
         </h2>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
+            <caption className="sr-only">Recent audit log</caption>
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-800">
                 <th scope="col" className="py-2 pr-3">

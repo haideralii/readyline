@@ -2198,6 +2198,44 @@ test` on a mark or a double-encoded run in any text file outside
 Dev: edit files through Node or the editor tools, and never through
 `Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
 
+**D-1508 The accessibility pass is a page check and a keyboard walk, run
+on all three projects (Dev, 2026-10-14, standing backlog 1, REQ-015
+Section E).** `e2e/helpers/a11y.ts` holds the one page pass every page
+gets: axe over the WCAG 2.0, 2.1 and 2.2 A and AA rules failing on serious
+and critical; every visible control with an accessible name computed the
+way a screen reader hears it, every table with a caption or label and
+every register list labelled by its heading; the longest animation or
+transition under `prefers-reduced-motion: reduce` effectively zero; and
+200 percent text at the project's own width (the iPhone included) with no
+sideways scroll and no element outside the viewport. The keyboard walk
+presses Tab and keys only: every stop must show a visible focus ring (on
+the label when the input is invisible), lie after the previous stop in
+document order, and never hold focus twice except a date input's own
+segments; radios are chosen with the arrow keys, selects with the arrows
+or type-ahead, and the one link on the intro is focused directly because
+headless WebKit never tabs onto links. Walked: the questionnaire from the
+intro to the result (public spec), the incident form to its saved detail
+page (signed-in spec), and the first screen of Finish your pack and the
+first Adopt group (inside the guided-path spec, which already holds a
+purchased set). Fixes the pass found in source: the register list and the
+registers index groups are labelled by their headings, the events trail by
+its heading, the admin audit-log table has a caption, the register
+filter chips show focus on the label because their radio is invisible,
+the sample document's tables and every markdown table carry a name built
+from their header cells, and the Buy button uses the identity's
+`btn-primary` class like every other primary action (the guided-path
+spec's "two primary buttons" check had never been able to pass on this
+lineage). The iPhone project now runs the two pass specs. Limits:
+headless WebKit neither tabs onto links nor follows one on Enter, checks
+a radio on Space rather than on the arrow, and resolves a navigation
+before a client redirect finishes; the helper works around each and says
+so. The Finish and Adopt walks live in the guided-path spec, which needs
+a ready set; on this machine the hosted project lacks the open branches'
+REQ-016 migration column, so that spec stops at "ready" here and is
+proven by CI's Supabase job (the "wait" step after the fake payment is
+given 30 seconds, since the webhook writes the purchase after the
+checkout response, D-053).
+
 **D-1006 Generation finishes without a watcher: an external kicker, a
 five-minute function, and the path recorded (Dev, 2026-10-13, batch 32,
 branch `req-010-generation-kicker`).** The field result D-057 showed the

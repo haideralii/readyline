@@ -1,5 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
+import {
+  pagePass,
+  resetFocusTrail,
+  tabUntil,
+  type KeyboardWalk,
+} from "../helpers/a11y";
 import { e2eCronSecret, hasSupabaseForE2e } from "../helpers/env";
 import { checkWidths } from "../helpers/width";
 import {
@@ -41,8 +47,12 @@ async function shot(page: Page, name: string, project: string) {
   });
 }
 
-async function expectStep(page: Page, id: string) {
-  await expect(page.getByTestId("next-step")).toHaveAttribute("data-step", id);
+async function expectStep(page: Page, id: string, timeout?: number) {
+  await expect(page.getByTestId("next-step")).toHaveAttribute(
+    "data-step",
+    id,
+    timeout ? { timeout } : undefined,
+  );
   await expect(page.getByTestId("next-step-button")).toHaveCount(1);
 }
 
@@ -90,9 +100,12 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page).toHaveURL(/\/dev\/stripe-checkout\/cs_fake_/);
     await page.getByTestId("fake-pay").click();
 
-    // Step 3: while we draft.
+    // Step 3: while we draft. The purchase is written by the webhook after
+    // the fake checkout's response (D-053), so the strip may lag the landing
+    // by a few seconds; a dev server compiling the webhook route lags more.
     await expect(page).toHaveURL(/\/documents\?purchase=success/);
-    await expectStep(page, "wait");
+    await page.reload();
+    await expectStep(page, "wait", 30_000);
     await expect(page.getByRole("status")).toContainText(
       "You can close this page",
     );
@@ -130,6 +143,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page).toHaveURL(/\/documents\/[0-9a-f-]{36}\/finish$/);
     await expect(page.getByTestId("finish-form")).toBeVisible();
     await checkWidths(page, "finish your pack");
+    await pagePass(page, "finish your pack");
     await shot(page, "finish-pack", project);
     const answersByKey: Record<string, string> = {
       name: "Jane Citizen",
@@ -138,6 +152,32 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       date: "14 October 2026",
       period: "7 years",
     };
+    // Backlog 1 (D-1508): the first screen is answered with the keyboard only
+    // (one question on a phone, every question of the topic groups on a
+    // wider screen): Tab to each field, type, Tab to the button, Enter.
+    {
+      const walk: KeyboardWalk = { steps: [] };
+      await resetFocusTrail(page);
+      const inputs = page
+        .getByTestId("finish-form")
+        .locator("input[type=text]");
+      const n = await inputs.count();
+      for (let k = 0; k < n; k += 1) {
+        const input = inputs.nth(k);
+        if (!(await input.evaluate((el) => el === document.activeElement)))
+          await tabUntil(page, input, walk, { label: "finish your pack" });
+        const key = (await input.getAttribute("name")) ?? "";
+        if (!(await input.inputValue()).trim())
+          await page.keyboard.type(answersByKey[key] ?? "Example");
+      }
+      await tabUntil(page, page.getByTestId("finish-next"), walk, {
+        label: "finish your pack",
+      });
+      await page.keyboard.press("Enter");
+      await expect(
+        page.getByTestId("finish-progress").or(page.getByTestId("finish-done")),
+      ).not.toContainText("Question 1 of", { timeout: 15_000 });
+    }
     for (let i = 0; i < 40; i += 1) {
       const inputs = page
         .getByTestId("finish-form")
@@ -181,9 +221,16 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       await expect(page.getByTestId("adopt-list")).toBeVisible();
       if (i === 0) {
         await checkWidths(page, "adopt a group");
+        await pagePass(page, "adopt a group");
         await shot(page, "adopt-group", project);
-      }
-      await page.getByTestId("adopt-group").click();
+        // Backlog 1 (D-1508): the first group is adopted with the keyboard only.
+        const walk: KeyboardWalk = { steps: [] };
+        await resetFocusTrail(page);
+        await tabUntil(page, page.getByTestId("adopt-group"), walk, {
+          label: "adopt a group",
+        });
+        await page.keyboard.press("Enter");
+      } else await page.getByTestId("adopt-group").click();
       await expect(page.getByTestId("adopt-group")).toHaveCount(0, {
         timeout: 60_000,
       });
@@ -233,6 +280,12 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     );
     await expect(page.getByTestId("audit-day-pack")).toContainText("(adopted)");
     await checkWidths(page, "audit day");
+    await pagePass(page, "audit day with a pack");
     await shot(page, "audit-day", project);
+    // Backlog 1 (D-1508): the documents page with a ready set and the checklist after adoption.
+    await page.goto("/documents");
+    await pagePass(page, "documents with a ready set");
+    await page.goto("/checklist");
+    await pagePass(page, "checklist after adoption");
   });
 });

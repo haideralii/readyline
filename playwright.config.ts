@@ -40,8 +40,9 @@ export default defineConfig({
       // home page, the result, the checklist and the purchase path.
       name: "iphone",
       use: { ...devices["iPhone 17 Pro"] },
+      // Backlog 1 (D-1508): the accessibility pass runs on all three projects.
       testMatch:
-        /(req-015-width|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers|guided-path))\.spec\.ts$/,
+        /(req-015-width|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers|guided-path|accessibility-pass))\.spec\.ts$/,
     },
   ],
   webServer: {

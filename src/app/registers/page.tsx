@@ -111,7 +111,10 @@ export default async function RegistersPage() {
             <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
               {g.intro}
             </p>
-            <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ul
+              className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800"
+              aria-labelledby={`${g.id}-heading`}
+            >
               {g.rows.map((r) => (
                 <li key={r.href}>
                   <Link

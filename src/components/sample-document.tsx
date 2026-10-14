@@ -57,7 +57,10 @@ function Blocks({ blocks }: { blocks: readonly Block[] }) {
                 aria-label={`Table: ${b.columns.join(", ")}`}
                 tabIndex={0}
               >
-                <table className="w-full border-collapse text-sm">
+                <table
+                  className="w-full border-collapse text-sm"
+                  aria-label={`Table: ${b.columns.join(", ")}`}
+                >
                   <thead>
                     <tr>
                       {b.columns.map((c) => (
