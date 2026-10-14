@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  AUDIT_DAY_META,
+  type AuditDaySlug,
+} from "@/lib/registers/audit-day-forms";
+import { documentControlSentence } from "@/lib/registers/document-control";
+import { auditDayOverview } from "@/server/registers/audit-day-queries";
+import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
@@ -13,16 +20,55 @@ type Row = {
   urgent: boolean;
 };
 
+/** The REQ-018 registers you add to as things happen, in the order an auditor follows them. */
+const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
+  "improvements",
+  "decisions",
+  "onboarding",
+];
+/** The REQ-018 registers you keep current: a date changes, the row changes. */
+const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
+  "corporate-risks",
+  "participant-risks",
+  "conflicts-of-interest",
+  "delegations",
+  "insurances",
+  "staff-matrix",
+];
+
 /**
  * The registers with what needs attention (REQ-009 FR-5, batch 28 item 1):
  * one row each, the overdue counts in words, never colour alone. Batch 42
  * item 7 (D-549): two headings, the registers you add to as things happen
  * and the ones you keep current, and one "How codes work" panel that every
- * code hint links to.
+ * code hint links to. REQ-018 Session B adds the nine audit-day registers
+ * to those two groups, and FR-13 puts the document control register, built
+ * from the pack with nothing to type, first on the page (backlog 4 merge).
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const o = await registerOverview(ctx.supabase, ctx.viewer.account.id);
+  const [o, a, dc] = await Promise.all([
+    registerOverview(ctx.supabase, ctx.viewer.account.id),
+    auditDayOverview(ctx.supabase, ctx.viewer.account.id),
+    documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
+  ]);
+  const auditDayRow = (slug: AuditDaySlug): Row => ({
+    href: `/registers/${slug}`,
+    title: AUDIT_DAY_META[slug].title,
+    total: a[slug].total,
+    attention: a[slug].attentionLabel,
+    urgent: a[slug].attentionLabel.endsWith("overdue"),
+  });
+  // REQ-018 FR-13: the document control register, generated from the pack, shown first.
+  const fromYourPack: Row[] = [
+    {
+      href: "/registers/document-control",
+      title: "Document control",
+      total: dc.rows.length,
+      attention: documentControlSentence(dc.rows).replace(/\.$/, ""),
+      urgent: dc.rows.some((r) => r.state === "overdue"),
+    },
+  ];
   const asThingsHappen: Row[] = [
     {
       href: "/registers/incidents",
@@ -46,6 +92,7 @@ export default async function RegistersPage() {
           : "Nothing open",
       urgent: false,
     },
+    ...AUDIT_DAY_AS_THINGS_HAPPEN.map(auditDayRow),
   ];
   const keepCurrent: Row[] = [
     {
@@ -74,8 +121,16 @@ export default async function RegistersPage() {
               : "All current",
       urgent: o.policyReviews.overdue > 0,
     },
+    ...AUDIT_DAY_KEEP_CURRENT.map(auditDayRow),
   ];
   const groups = [
+    {
+      id: "from-your-pack",
+      heading: "From your pack",
+      intro:
+        "Built from the documents you adopt. Nothing to type; an auditor reads it for versions and review dates.",
+      rows: fromYourPack,
+    },
     {
       id: "as-things-happen",
       heading: "Keep as things happen",

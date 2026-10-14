@@ -87,6 +87,12 @@ export default async function AdoptGroupPage({
           setId={setId}
           group={groupSlug(group.title)}
           nextHref={nextHref}
+          today={new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Australia/Sydney",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(new Date())}
         />
       )}
       <p className="mt-8 flex flex-wrap gap-x-6 text-sm print:hidden">
