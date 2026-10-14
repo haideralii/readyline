@@ -1396,3 +1396,15 @@ The standing backlog is empty bar item 7, which stopped for the PO (the REQ-020 
 - **Merges.** `origin/main` merged into every open branch after every batch; the last loop's heads are in the backlog 9 status.
 
 **STOP.** No numbered queue is open and the standing backlog has no item left that does not wait for the PO.
+
+
+## Batch 45a, do first (written by PO, 14 Oct 2026, during the public CI window): the Lighthouse budget job fails on every branch that carries backlog 2
+
+CI is finally running on all twenty-one branches. Everything passes except one step, and because the branches are stacked it fails on every branch from `req-010-performance-budget` onwards (#40 to #47 and the new performance-budget PR). Evidence: run 38526720048, job "Lint, typecheck, unit, build, e2e", step "Performance budgets, mobile profile, public pages": `npx --yes lighthouse@12.8.2 http://localhost:3100/ ... --chrome-flags=--headless=new --no-sandbox` exits 1 with `output: [null, null, null]`, so we cannot even see why. The same test passes on the laptop.
+
+1. On branch `req-010-performance-budget`: run the Lighthouse call with stdio piped and print its stderr on failure (drop `--quiet` in CI), pass the Chrome flags as one quoted argument (`--chrome-flags="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"`; today `--no-sandbox` is a separate argument that Lighthouse never passes to Chrome, and the runner's Chrome will not start without it), and set `CHROME_PATH` explicitly to the Playwright Chromium executable or to the runner's `google-chrome-stable`, whichever the log shows works. If it still fails, keep the budget job but make it fail with the real Lighthouse message, not a null.
+2. Until it is green, the budget step must not block the merge: put it in its own job with `continue-on-error: true` and a clear name, and record the decision as D-1013 with a date to flip it back to required (one week).
+3. Merge `origin/main` and then `req-010-performance-budget` into every later branch in stack order (accessibility is before it; the rest are after), push each, and write the status here with the run number that went green for the performance-budget PR.
+4. Do not touch anything else in this batch. The PO is merging #28 to #39 while you work.
+
+Status (dev): 
