@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { unverifiedChecklistItems } from "@/lib/checklist/confidence";
 import { requireAdmin, writeAdminAudit } from "@/server/admin/access";
 import { RETENTION_DAYS } from "@/server/accounts/purge";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
@@ -78,6 +79,24 @@ export default async function AdminPage() {
             </div>
           ))}
         </dl>
+      </section>
+
+      {/* REQ-013 batch 36 item 2: the evidence-confidence flag lives here and in the evidence files, never on a customer page. */}
+      <section aria-labelledby="confidence-heading" className="mt-10">
+        <h2 id="confidence-heading" className="text-xl font-semibold">
+          Evidence confidence: checklist items the Commission&apos;s text does
+          not state
+        </h2>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          Readyline&apos;s own evidence items across the three reference cases.
+          The customer sees a plain &quot;check this&quot; sentence with the
+          source link instead of this flag.
+        </p>
+        <ul className="mt-3 list-disc pl-5 text-sm leading-6">
+          {unverifiedChecklistItems().map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
       </section>
 
       <section aria-labelledby="audit-heading" className="mt-10">

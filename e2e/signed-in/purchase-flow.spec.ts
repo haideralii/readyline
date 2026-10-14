@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { e2eCronSecret, hasSupabaseForE2e } from "../helpers/env";
-import { checkWidths } from "../helpers/width";
+import { checkTables, checkWidths } from "../helpers/width";
 import {
   createTenant,
   deleteTenant,
@@ -229,6 +229,8 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
       "Governance policy",
     );
     await checkWidths(page, "document review");
+    // REQ-013 batch 36 item 1: the document's tables stack on phones and never split a word.
+    await checkTables(page, "document review");
     await shot(page, "document-review", project);
     await page.goBack();
 

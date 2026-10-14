@@ -2,6 +2,41 @@ import { isValidElement, type ReactNode } from "react";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { draftNote, formatUpdated, type LegalPage } from "@/lib/legal/pages";
+import { DataTable } from "./data-table";
+
+/** A markdown table's header and body cells as text, from the hast node react-markdown passes to `table`. */
+type Hast = {
+  type?: string;
+  tagName?: string;
+  value?: string;
+  children?: Hast[];
+};
+function hastText(n: Hast | undefined): string {
+  if (!n) return "";
+  if (n.type === "text") return n.value ?? "";
+  return (n.children ?? []).map(hastText).join("");
+}
+function findAll(n: Hast | undefined, tag: string, out: Hast[] = []): Hast[] {
+  if (!n) return out;
+  if (n.tagName === tag) out.push(n);
+  for (const c of n.children ?? []) findAll(c, tag, out);
+  return out;
+}
+export function tableFromNode(node: unknown): {
+  columns: string[];
+  rows: string[][];
+} {
+  const n = node as Hast | undefined;
+  const trs = findAll(n, "tr");
+  const columns = trs.length
+    ? findAll(trs[0], "th").map((th) => hastText(th).trim())
+    : [];
+  const rows = trs
+    .slice(1)
+    .map((tr) => findAll(tr, "td").map((td) => hastText(td).trim()))
+    .filter((r) => r.length > 0);
+  return { columns, rows };
+}
 
 /**
  * Renders one legal or trust page (REQ-008 FR-1). Markdown becomes React
@@ -27,29 +62,6 @@ function slugify(text: string): string {
 }
 
 const body = "leading-7 text-zinc-700 dark:text-zinc-300";
-
-const Th: NonNullable<Components["th"]> = ({ children }) => (
-  <th
-    scope="col"
-    className="border-b border-zinc-300 py-2 pr-4 text-left font-semibold dark:border-zinc-700"
-  >
-    {children}
-  </th>
-);
-
-/** The header cells of a markdown table, so the table can carry its name (backlog 1, D-1508). */
-function headerCells(node: ReactNode, out: string[] = []): string[] {
-  if (Array.isArray(node)) {
-    for (const n of node) headerCells(n, out);
-    return out;
-  }
-  if (isValidElement<{ children?: ReactNode }>(node)) {
-    if (node.type === Th || node.type === "th")
-      out.push(textOf(node.props.children).trim());
-    else headerCells(node.props.children, out);
-  }
-  return out;
-}
 
 /** The markdown renderers; the guides (REQ-011) reuse them so every page reads the same. */
 export const markdownComponents: Components = {
@@ -82,25 +94,15 @@ export const markdownComponents: Components = {
       {children}
     </a>
   ),
-  table: ({ children }) => {
-    const cols = headerCells(children);
-    return (
-      <div className="mt-4 overflow-x-auto">
-        <table
-          className="w-full border-collapse text-sm"
-          aria-label={cols.length ? `Table: ${cols.join(", ")}` : "Table"}
-        >
-          {children}
-        </table>
-      </div>
-    );
+  // REQ-013 batch 36: a markdown table becomes the shared DataTable (stacked
+  // rows on phones, no split words on wider screens), read from the syntax
+  // tree react-markdown hands over; cell text only, which is all the guides'
+  // tables carry. The table carries its name from its header cells (backlog
+  // 1, D-1508) inside DataTable.
+  table: ({ node }) => {
+    const { columns, rows } = tableFromNode(node);
+    return columns.length ? <DataTable columns={columns} rows={rows} /> : null;
   },
-  th: Th,
-  td: ({ children }) => (
-    <td className="border-b border-zinc-200 py-2 pr-4 align-top dark:border-zinc-800">
-      {children}
-    </td>
-  ),
   strong: ({ children }) => (
     <strong className="font-semibold">{children}</strong>
   ),
