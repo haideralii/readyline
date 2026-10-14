@@ -287,6 +287,7 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
     };
     await new Promise((resolve) => setTimeout(resolve, 50));
     const evidence =
+      `document.hasFocus=${document.hasFocus()} ` +
       `focus=${seen.focus} focus-visible=${seen.focusVisible} ` +
       `outline=${seen.outlineStyle} ${seen.outlineWidth} ${seen.outlineColor} ` +
       `box-shadow=${seen.boxShadow} opacity=${seen.opacity} visibility=${seen.visibility} ` +
@@ -320,8 +321,18 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
   });
 }
 
-/** Forgets the last focused element, so the first Tab on a new page is not compared with the old one. */
+/**
+ * Forgets the last focused element, so the first Tab on a new page is not
+ * compared with the old one, and brings the page to the front: in Chromium
+ * `:focus` and `:focus-visible` match only while the document has focus,
+ * and a page that stopped being the front page of its context (a second
+ * page opened earlier in the journey) keeps `document.activeElement` but
+ * loses the pseudo-classes, so every ring read false (#39, run 38630031853:
+ * `focus=false … active-after-50ms=true`). WebKit keeps matching on a
+ * background page, which is why the iPhone project never saw it.
+ */
 export async function resetFocusTrail(page: Page) {
+  await page.bringToFront();
   await page.evaluate(() => {
     (window as unknown as { __lastFocused?: Element | null }).__lastFocused =
       null;
@@ -358,6 +369,8 @@ export async function tabUntil(
 ): Promise<number> {
   const max = options.max ?? 60;
   let same = 0;
+  // The front page of its context, so the focus pseudo-classes match (see resetFocusTrail).
+  await page.bringToFront();
   for (let i = 1; i <= max; i += 1) {
     await page.keyboard.press("Tab");
     const info = await focusInfo(page);
@@ -407,7 +420,8 @@ export async function pickRadio(
   const id = (await target.getAttribute("id")) ?? "radio";
   const name = await target.getAttribute("name");
   const group = page.locator(`input[type="radio"][name="${name}"]`);
-  // Tab until any radio of the group holds focus.
+  // Tab until any radio of the group holds focus (the front page first, see resetFocusTrail).
+  await page.bringToFront();
   const max = 60;
   let reached = false;
   for (let i = 0; i < max; i += 1) {
