@@ -402,3 +402,82 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
     expect(h.store.sets).toHaveLength(2);
   });
 });
+
+/** Every section call costs a fixed time on a clock the test owns (batch 32 item 2). */
+function slowHarness(sectionMs: number, budgetMs: number) {
+  const store = new MemoryStore();
+  const backend = new MemoryBackend(store);
+  const email = new LogOnlyEmailProvider();
+  let t = 1_760_000_000_000;
+  const now = () => new Date(t);
+  class SlowClient extends EchoClient {
+    async complete(request: Parameters<FakeClient["complete"]>[0]) {
+      t += sectionMs;
+      return super.complete(request);
+    }
+  }
+  const client = new SlowClient(soleTrader.answers.business.tradingName);
+  const tick = () =>
+    runGenerationTick({
+      backend,
+      store,
+      client,
+      modelId: "fake",
+      dataset,
+      email,
+      siteUrl: "https://readyline.example/",
+      now,
+      budgetMs,
+    });
+  return { store, backend, client, tick, elapsed: () => t - 1_760_000_000_000 };
+}
+
+describe("budget loop (batch 32 item 2, D-1006)", () => {
+  it("starts a document only when the last one's duration, with half again, still fits the budget", async () => {
+    // Sections cost 5 s; the budget is 40 s. The tick drafts whole documents
+    // and hands back before the budget is spent, not after.
+    const h = slowHarness(5_000, 40_000);
+    h.backend.enqueue();
+    const r = await h.tick();
+    if (!r.claimed) throw new Error("job lost");
+    expect(r.outcome).toBe("more");
+    expect(r.documentsDone).toBeGreaterThanOrEqual(1);
+    expect(r.documentsDone).toBeLessThan(expectedTypeIds.length);
+    // Handed back by the fit rule: time remained, but not enough for another document of the last size.
+    expect(h.elapsed()).toBeLessThan(40_000);
+    expect(h.store.documents).toHaveLength(r.documentsDone);
+    expect(h.backend.jobs[0].next_document_index).toBe(r.documentsDone);
+    expect(h.backend.jobs[0].status).toBe("queued");
+  });
+
+  it("the same rule guards each section: a 30-second section in a 40-second budget runs once, then hands back", async () => {
+    const h = slowHarness(30_000, 40_000);
+    h.backend.enqueue();
+    const r = await h.tick();
+    if (!r.claimed) throw new Error("job lost");
+    expect(r.outcome).toBe("more");
+    expect(r.sectionsGenerated).toBe(1);
+    expect(h.elapsed()).toBe(30_000);
+  });
+
+  it("a run that overlaps a live chain claims nothing and reports no more work (the kicker's no-op)", async () => {
+    const h = harness();
+    h.backend.enqueue();
+    // Another invocation holds the lease.
+    const held = await h.backend.claim();
+    expect(held?.status).toBe("running");
+    const out = await runGenerationTicks({
+      backend: h.backend,
+      store: h.store,
+      client: h.client,
+      modelId: "fake",
+      dataset,
+      email: h.email,
+      siteUrl: "https://readyline.example",
+      now: h.now,
+      budgetMs: 10 * 60_000,
+    });
+    expect(out).toEqual({ reports: [{ claimed: false }], more: false });
+    expect(h.client.calls).toBe(0);
+  });
+});

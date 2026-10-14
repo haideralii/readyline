@@ -37,6 +37,6 @@ export async function nudgeGenerationAction(
     accountId: viewer.account.id,
     documentsDone: stalled.nextDocumentIndex,
   });
-  keepAlive(() => continueGeneration(NUDGE_BUDGET_MS));
+  keepAlive(() => continueGeneration(NUDGE_BUDGET_MS, "page"));
   return { ok: true, nudged: true };
 }

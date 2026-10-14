@@ -1,9 +1,11 @@
 /**
- * Runs queued paid generation jobs (REQ-007 FR-5, D-706, D-707). Vercel Cron
- * calls it with `Authorization: Bearer <CRON_SECRET>` as a backstop; the
- * webhook's after() hook and this route itself call it to carry a long set
- * through a chain of short runs. Anything unauthorised gets 404 so the route
- * is invisible. Answers with what each run did, never with document content.
+ * Runs queued paid generation jobs (REQ-007 FR-5, D-706, D-707, D-1006).
+ * Vercel Cron calls it daily as a backstop; the GitHub Actions kicker calls
+ * it every five minutes until it answers `more: false`; the webhook's hook
+ * and this route itself call it to carry a long set through a chain; a
+ * person can call it with the bearer. Anything unauthorised gets 404 so the
+ * route is invisible. Answers with what each run did, never with document
+ * content.
  */
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -16,18 +18,29 @@ import {
 import {
   keepAlive,
   kickGenerationRoute,
-  runQueuedGeneration,
+  runGenerationAndLog,
 } from "@/server/generation/kick";
+import { kickedByFrom } from "@/server/jobs/kicked-by";
 import { SupabaseEnvError } from "@/server/supabase/env";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+/**
+ * D-1006: the largest duration Vercel allows a Hobby function with Fluid
+ * compute, 300 seconds ("Duration limits", vercel.com/docs/functions/
+ * configuring-functions/duration, last updated 24 Aug 2026: Hobby default
+ * and maximum 300 s). The project must have Fluid compute enabled
+ * (Settings, Functions), otherwise Hobby stops at 60 s and the deploy
+ * refuses this value.
+ */
+export const maxDuration = 300;
 
-/** Leaves room inside maxDuration for the summary, the zip and the hand-on. */
-const ROUTE_BUDGET_MS = 40_000;
+/** The job stops starting documents when the next would not finish ten seconds before the platform cuts the function off. */
+const ROUTE_BUDGET_MS = maxDuration * 1000 - 10_000;
 
-const Query = strictObject({ kick: z.enum(["0", "1"]).optional() });
+const Query = strictObject({
+  kick: z.enum(["0", "1", "self", "kicker", "manual"]).optional(),
+});
 
 export async function GET(request: Request) {
   if (
@@ -47,15 +60,24 @@ export async function GET(request: Request) {
   );
   if (!query.ok)
     return NextResponse.json({ error: "invalid query" }, { status: 400 });
+  const kickedBy = kickedByFrom(
+    query.data.kick,
+    request.headers.get("user-agent"),
+  );
   try {
-    const { reports, more } = await runQueuedGeneration(ROUTE_BUDGET_MS);
+    const { reports, more } = await runGenerationAndLog(
+      ROUTE_BUDGET_MS,
+      kickedBy,
+    );
     log.info("jobs.generate.ran", {
-      kick: query.data.kick === "1",
+      kicked_by: kickedBy,
       runs: reports.length,
       more,
     });
     // More to do: ask for another run once this response has gone out; the
-    // platform keeps this invocation alive until the request is sent (D-1005).
+    // platform keeps this invocation alive until the request is sent
+    // (D-1005). The kicker and the cron are the guarantee; this is the
+    // accelerator.
     if (more) keepAlive(() => kickGenerationRoute());
     return NextResponse.json({
       runs: reports.map((r) =>

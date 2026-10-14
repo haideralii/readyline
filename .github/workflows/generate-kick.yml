@@ -1,0 +1,65 @@
+name: Kick paid generation
+
+# Batch 32 item 1 (D-1006): the paid document chain on Vercel Hobby only
+# progresses while something calls /api/jobs/generate (Hobby cron is daily
+# and `waitUntil` does not carry the self-kick reliably, D-057). This job
+# calls the route with the bearer every five minutes until it answers
+# `"more": false` or four minutes have passed. The route refuses without
+# the bearer (404) and claims jobs behind a skip-locked lease, so a kick
+# that overlaps a live chain is a no-op (scripts/ops/kick-generation.test.ts).
+#
+# Needs: repository variable PROD_URL (https://<domain>, no trailing slash)
+# and repository secret CRON_SECRET (the same value as the Vercel variable;
+# Haider pastes it, see supabase/ops/DEPLOY.md section 8). Until both exist
+# the job skips with a notice.
+#
+# Dry run (act is not installed on the Dev machine): the YAML is parsed and
+# its shape asserted by scripts/ci/workflows.test.ts; the loop itself is
+# scripts/ops/kick-generation-lib.mjs, unit-tested against a stub route;
+# the command is run by hand with `PROD_URL=http://localhost:3000
+# CRON_SECRET=<local value> node scripts/ops/kick-generation.mjs` against
+# `npm run start`. Note: GitHub pauses scheduled workflows after 60 days
+# without a push, and a scheduled run costs at least one runner minute.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: generate-kick
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  kick:
+    name: Call /api/jobs/generate until drained
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PROD_URL: ${{ vars.PROD_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      KICK_MAX_SECONDS: "240"
+    steps:
+      - name: Check that the variable and the secret exist
+        id: gate
+        run: |
+          if [ -z "$PROD_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "::notice title=Kick skipped::PROD_URL (repository variable) or CRON_SECRET (repository secret) is not set; nothing was called."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::add-mask::$CRON_SECRET"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          sparse-checkout: scripts/ops
+          sparse-checkout-cone-mode: false
+
+      - name: Kick the generation route until it reports nothing more to do
+        if: steps.gate.outputs.ready == 'true'
+        run: node scripts/ops/kick-generation.mjs

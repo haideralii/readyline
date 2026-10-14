@@ -144,8 +144,20 @@ export async function runGenerationTick(input: {
   const job = await backend.claim(Math.ceil(budgetMs / 1000) + 60);
   if (!job) return { claimed: false };
   const started = now().getTime();
-  const over = () => now().getTime() - started >= budgetMs;
+  const elapsed = () => now().getTime() - started;
+  const over = () => elapsed() >= budgetMs;
+  // D-1006: a document or a section is started only when the last one's
+  // duration, with half again, still fits the budget; the first of a tick
+  // has nothing to measure against and starts while the budget is open.
+  let lastDocumentMs: number | null = null;
+  let lastSectionMs: number | null = null;
   let sectionsGenerated = 0;
+  let documentsThisTick = 0;
+  // A tick always does at least one unit of work, so a chain of short ticks
+  // cannot stall on a budget smaller than one section.
+  const fits = (lastMs: number | null) =>
+    (sectionsGenerated === 0 && documentsThisTick === 0) ||
+    (lastMs === null ? !over() : elapsed() + lastMs * 1.5 <= budgetMs);
   let documentsTotal = 0;
   let index = job.next_document_index;
 
@@ -243,6 +255,8 @@ export async function runGenerationTick(input: {
         index++;
         continue;
       }
+      if (!fits(lastDocumentMs)) return await handBack();
+      const documentStarted = now().getTime();
       if (progress.typeId !== typeId)
         progress = { typeId, sections: {}, logs: [] };
       const skeleton = buildSkeleton({
@@ -256,7 +270,8 @@ export async function runGenerationTick(input: {
       for (const section of skeleton.sections) {
         if (!isTailoredSection(type, section) || progress.sections[section.id])
           continue;
-        if (over()) return await handBack();
+        if (!fits(lastSectionMs)) return await handBack();
+        const sectionStarted = now().getTime();
         const out = await generateTailoredSection({
           section,
           type,
@@ -271,6 +286,7 @@ export async function runGenerationTick(input: {
         progress.logs.push(out.log);
         sectionsGenerated++;
         await backend.update(job.id, { progress });
+        lastSectionMs = now().getTime() - sectionStarted;
       }
       const model: DocumentModel = {
         ...skeleton,
@@ -302,6 +318,9 @@ export async function runGenerationTick(input: {
         next_document_index: index,
         progress: {},
       });
+      // A resumed document measures only its remainder; the section rule still guards each call.
+      lastDocumentMs = now().getTime() - documentStarted;
+      documentsThisTick++;
       if (index < typeIds.length && over()) return await handBack();
     }
 

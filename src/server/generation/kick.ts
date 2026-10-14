@@ -16,6 +16,7 @@ import { log } from "@/lib/logging/logger";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { createEmailProvider } from "@/server/email/provider";
 import { mayRunScheduledJobs } from "@/server/jobs/cron-auth";
+import type { KickedBy } from "@/server/jobs/kicked-by";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { runGenerationTicks, type TickReport } from "./job";
 import { SupabaseJobBackend } from "./job-backend";
@@ -95,29 +96,50 @@ export async function kickGenerationRoute(): Promise<void> {
   }
 }
 
-/** The webhook's hook, the job route and the nudge share this: work now, then hand on if there is more. */
-export async function continueGeneration(budgetMs: number): Promise<void> {
+/**
+ * One budgeted run with the measurement of record (D-1006): the
+ * `payments.generation.tick` line says who kicked it, what each report did
+ * and whether more remains. The job route uses it directly; the hook and
+ * the nudge use `continueGeneration`, which adds the hand-on.
+ */
+export async function runGenerationAndLog(
+  budgetMs: number,
+  kickedBy: KickedBy,
+): Promise<{ reports: TickReport[]; more: boolean }> {
+  const started = Date.now();
+  const { reports, more } = await runQueuedGeneration(budgetMs);
+  log.info("payments.generation.tick", {
+    kicked_by: kickedBy,
+    budgetMs,
+    elapsedMs: Date.now() - started,
+    reports: reports.map((r) =>
+      r.claimed
+        ? {
+            jobId: r.jobId,
+            outcome: r.outcome,
+            documentsDone: r.documentsDone,
+            documentsTotal: r.documentsTotal,
+            sections: r.sectionsGenerated,
+          }
+        : { claimed: false },
+    ),
+    more,
+  });
+  return { reports, more };
+}
+
+/** The webhook's hook and the nudge share this: work now, then hand on if there is more. */
+export async function continueGeneration(
+  budgetMs: number,
+  kickedBy: KickedBy,
+): Promise<void> {
   // REQ-010 FR-6: a preview deployment never generates against the shared database.
   if (!mayRunScheduledJobs()) {
     log.info("payments.generation.skipped", { reason: "not-production" });
     return;
   }
   try {
-    const { reports, more } = await runQueuedGeneration(budgetMs);
-    log.info("payments.generation.tick", {
-      reports: reports.map((r) =>
-        r.claimed
-          ? {
-              jobId: r.jobId,
-              outcome: r.outcome,
-              documentsDone: r.documentsDone,
-              documentsTotal: r.documentsTotal,
-              sections: r.sectionsGenerated,
-            }
-          : { claimed: false },
-      ),
-      more,
-    });
+    const { more } = await runGenerationAndLog(budgetMs, kickedBy);
     if (more) await kickGenerationRoute();
   } catch (e) {
     log.error("payments.generation.tick-failed", { error: e });
