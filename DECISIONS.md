@@ -487,7 +487,6 @@ guide, a 404 and an API route, not only on `/`. The production audit on
 14 October 2026 finds 0 vulnerabilities. The ASVS level 1 table with the
 evidence per control is `product/security/asvs-l1-check-2026-10-14.md`.
 
-
 **D-301 Branch stacked on REQ-002 (D-031).** `req-003-questionnaire` was
 rebased onto `req-002-security-baseline` because the questionnaire uses the
 validation layer, logging rule and CSP from REQ-002; it is rebased onto `main`
@@ -853,7 +852,6 @@ one, that the webhook refuses unsigned and badly signed bodies, and that
 the health route answers a loop with 429. Next's own origin check is the
 CSRF control for every form (no custom token); `form-action 'self'` in
 the CSP is the second layer.
-
 
 **D-501 Closed block schema for model output (Dev, 2026-10-11).** Tailored
 sections are JSON with five block types (paragraph, bullets, steps, table,
@@ -2103,8 +2101,6 @@ review never changes the checklist. A delete button is not in Session B:
 owners can delete through RLS, but a wrong entry is edited or closed, and
 a delete with confirm is one component away if the PO wants it.
 
-
-
 **D-1101 Guides are markdown with the legal pages' convention, not MDX
 (Dev, 2026-10-13, batch 29, branch `req-011-content` from `main` 491e6fb
 with `req-015-plain-language` merged in; REQ-011 to be written by the
@@ -2152,8 +2148,6 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
-
-
 **D-907 Register pages (Dev, 2026-10-13, batch 28, branch
 `req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
 `req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
@@ -2170,7 +2164,6 @@ redirects the add and edit routes when the subscription is not active.
 The REQ-015 branch was merged in because the pages are built on its
 patterns (ConfirmButton, the width check, the iPhone project), so the
 Session B pull request lands after REQ-015's.
-
 
 **D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
 batch 30, branch `req-009-session-c` from `req-011-content` with
@@ -2240,9 +2233,6 @@ it, and a Stripe id being opaque text the length is no concern; the
 customer id stays a hash. The spec waits a minute for the portal's
 first control before pressing it, so a missing control fails there and
 not at the test's cap.
-
-
-
 
 **D-1507 The text corruption on `main` came from Dev's conflict-resolution
 scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
@@ -2343,7 +2333,6 @@ budget no longer blocks a merge while the cause is read from the runner.
 green: remove the two `continue-on-error` lines and the "advisory" words
 in the names. The budget itself (D-1012) is unchanged.
 
-
 **D-1508 The accessibility pass is a page check and a keyboard walk, run
 on all three projects (Dev, 2026-10-14, standing backlog 1, REQ-015
 Section E).** `e2e/helpers/a11y.ts` holds the one page pass every page
@@ -2418,7 +2407,6 @@ least one runner minute, so `*/5` is about 8,600 minutes a month against
 the 2,000 free for a private repository; the schedule runs only from
 `main`, so nothing is spent until the PO merges and chooses (public
 repository, `*/30`, or the overage).
-
 
 **D-540 Why every section of Haider's AI procedure shipped undrafted, and
 what the log can and cannot say (Dev, 2026-10-14, batch 33 item 1, REQ-016
@@ -2498,9 +2486,6 @@ that hold them); the sole-trader set is 16 documents, not the 22 the REQ
 guessed. Adoption (checklist Done) makes the download serve the document
 without the draft footer and the section marks, rendered from the stored
 model; the zip keeps the draft files.
-
-
-
 
 **D-1701 One sentence and one button, from a state table (Dev, 2026-10-14,
 batch 34, REQ-017 FR-1).** `src/lib/path/next-step.ts` is a pure function
@@ -2587,15 +2572,7 @@ no REQ-011 file in `product/requirements` (the backlog row lists it as
 draft), so the delivery evidence is in the batch status. Publishing is the
 PO's.
 
-
-
 **D-1706 Adopting a pack writes the policy review rows with the admin client (Dev, 2026-10-15, batch 45b item 2, run 38575465593).** The signed-in guided-path journey was red at Adopt on every project: after "These are our policies" the group never read as adopted. Cause: `policy_reviews_insert_subscribed` and `policy_reviews_update_subscribed` (migration `20261013000000_registers.sql`) require `has_active_subscription`, written for the register page, which is locked to subscribers; but REQ-017's Adopt step and REQ-009 FR-7's checklist tick record adoption in the same table for a provider who has bought the pack and not subscribed, and under the owner's session the seed failed on RLS (logged, not thrown) and the dated update matched no row. Decision: `adoptGroupAction` and `saveChecklistItemAction` pass the admin client to `seedPolicyReviews` and `markAdopted` after the set and the item are proven to be the account's, the way the adopt re-render already uses it; the register's own pages and actions keep the owner's session and its policies, so a subscriber's register writes are unchanged and a non-subscriber still cannot write through the register. Not chosen: loosening the policies to members, because the register's write gate is the subscription's product boundary (REQ-009) and the two adoption writes are the only ones a pack buyer makes. Also from the same run: the adopt button is disabled until hydration (the account form's guard, 147ccad), and the spec waits to leave the group it is on rather than for the button to vanish, since on success the next group's page carries its own button.
-
-
-
-
-
-
 
 **D-1008 The integration suite aliases Next's `server-only` guard (Dev,
 2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
@@ -2609,9 +2586,6 @@ project now resolves it to an empty module for every file
 of what that suite is: server code driven against a real database. Proven
 locally by loading every integration file without Supabase variables (they
 skip, and no longer throw); CI's job proves the rows.
-
-
-
 
 **D-1310 Haider's phone findings (Dev, 2026-10-14, batch 36, REQ-013).**
 (1) Tables: the global `td { overflow-wrap: anywhere }` from REQ-015 was
@@ -2638,9 +2612,6 @@ you don't have this yet"; the home page example uses the same sentence; the
 account page's register line keeps the two-segment component with its own
 noun. The live result page still shows the AI documents until REQ-016
 merges (item 4, nothing to do).
-
-
-
 
 **D-1009 The reminders job takes a test-only account filter (Dev,
 2026-10-14, batch 41).** With the guard aliased, PR #28's Supabase job ran
@@ -2944,7 +2915,6 @@ carries the six commands. Today's plan: 81 calls, about $0.66 at cached
 rates ($0.91 uncached); 3 sections have no fixture for the current prompt.
 No recording without the PO's go-ahead.
 
-
 **D-551 Living policies: a ledger of applied watch changes in the repo,
 a pure match against each adopted document's stored text, and two
 answers for the owner (Dev, 2026-10-14, standing backlog 8, REQ-005
@@ -2983,10 +2953,6 @@ exercised end to end on this machine: the hosted project is behind the
 migrations; the unit tests, the integration file and the typed pages are
 the evidence, and the PO sees the flag on any pack drafted before 14
 October 2026 once the branch is deployed.
-
-
-
-
 
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
@@ -3106,60 +3072,6 @@ on the audit-day page as the plain-words glossary; there is no separate
 glossary page in the product, so the audit-day page is where the REQ's
 "glossary" lives. The pricing page gains FR-12's sentence beside the
 subscription.
-
-
-
-**D-1010 The app dispatches the kicker workflow; the schedule is the safety
-net (Dev, 2026-10-14, batch 37, implementing the PO's D-059).** The
-workflow runs on `*/30` and on a `repository_dispatch` event of type
-`generate`, and loops for up to twenty minutes (`KICK_MAX_SECONDS` 1200,
-`timeout-minutes` 25, under the schedule). `continueGeneration` sends the
-dispatch first, before its own budgeted run, so the chain is carried even
-when the invocation is frozen (D-057); both the webhook and the nudge go
-through it, and the kicker and the cron do not, so a dispatched run never
-dispatches again. The call needs `GITHUB_DISPATCH_TOKEN` (optional; listed
-in `OPTIONAL` in `src/lib/env.ts` and named by the prebuild check when
-absent) and is skipped with one log line without it. The repository is a
-constant in `src/server/generation/dispatch.ts`. **Permission:** the PO
-wrote "Actions write"; GitHub's "Permissions required for fine-grained
-personal access tokens" lists `POST /repos/{owner}/{repo}/dispatches` under
-Contents, write, so the runbook asks for Contents: read and write on this
-repository alone and nothing else. Minutes: about 1,440 a month for the
-schedule (one call when idle) plus dispatched runs only while a pack is
-generating.
-
-
-
-
-
-
-**D-1705 Checklist items are instructions with one tap to do them (Dev,
-2026-10-14, batch 37, REQ-017 step 6).** Every title starts with a verb in
-the customer's voice ("Ask your 1 key person for their NDIS Worker
-Screening clearance, and type each expiry date here"; "Read your
-Complaints management policy and register and adopt it"; "Get public
-liability insurance and keep the certificate of currency"); the `why`
-lines and item ids are unchanged, so stored statuses and the e2e test ids
-carry over. `ChecklistItem.action` is an in-app route and label: the four
-registers with pages, the clearance item (add a clearance) and the ABN
-item (the account page); a document item's link is built by the page from
-the newest ready set (`latestReadySet`). No external links are added: the
-source line already carries the Commission's page. `derive.test.ts` runs
-the copy lint over every derived title, reason and label of the three
-reference cases and checks each title starts with an instruction verb.
-The batch 36 branch (`req-013-phone-fixes`) also edits
-`checklist-view.tsx`: it replaces the evidence badge with a "Check this
-against the Commission's page" sentence inserted at the same point of the
-panel where this batch inserts the action link, so the two branches
-conflict there (checked with a throwaway merge, 14 Oct 2026). The
-resolution is to keep both, the check sentence first and the action link
-after it; DECISIONS.md conflicts as usual and the prose resolver handles
-it. Whichever PR the PO merges second carries that one-hunk resolution.
-
-
-
-
-
 
 ## Open questions for Haider
 
@@ -3309,7 +3221,6 @@ only in the three signed-in specs whose race is written above the
 configure call (purchase flow, guided path, subscription). The integration
 file cannot run against the hosted project (its migrations are behind the
 branches); CI's Supabase job is the gate.
-
 
 **D-2101 The writing indicator reads the job row, never a timer; the row
 carries the phase, the document and section in flight and the time of the
