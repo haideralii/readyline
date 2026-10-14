@@ -121,44 +121,47 @@ export default async function DocumentSetPage({
         <h2 id="docs-heading" className="text-xl font-semibold">
           Documents, in audit order
         </h2>
-        {groups.map((g) => (
-          <div key={g.title} className="mt-4" data-testid="set-group">
-            <h3 className="text-base font-semibold text-zinc-700 dark:text-zinc-300">
-              {g.title}
-            </h3>
-            <ol
-              className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800"
-              data-testid="set-list"
-            >
-              {g.documents.map((d) => {
-                return (
-                  <li
-                    key={d.id}
-                    className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <span>
-                      <span className="mr-2 text-zinc-500 tabular-nums">
-                        {d.n}.
+        {/* Batch 45b item 1: one "set-list" wrapper; each group's list has its own id, so a locator is never ambiguous. */}
+        <div data-testid="set-list">
+          {groups.map((g) => (
+            <div key={g.title} className="mt-4" data-testid="set-group">
+              <h3 className="text-base font-semibold text-zinc-700 dark:text-zinc-300">
+                {g.title}
+              </h3>
+              <ol
+                className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800"
+                data-testid="set-group-list"
+              >
+                {g.documents.map((d) => {
+                  return (
+                    <li
+                      key={d.id}
+                      className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <span>
+                        <span className="mr-2 text-zinc-500 tabular-nums">
+                          {d.n}.
+                        </span>
+                        <Link
+                          href={`/documents/${set.id}/${d.document_type_id}`}
+                          className="underline-offset-4 hover:underline"
+                        >
+                          {d.model.title}
+                        </Link>
                       </span>
-                      <Link
-                        href={`/documents/${set.id}/${d.document_type_id}`}
-                        className="underline-offset-4 hover:underline"
-                      >
-                        {d.model.title}
-                      </Link>
-                    </span>
-                    <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {d.status === "ready"
-                        ? "Drafted"
-                        : "Drafted, with generic text to make yours"}{" "}
-                      · version {d.version}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-        ))}
+                      <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                        {d.status === "ready"
+                          ? "Drafted"
+                          : "Drafted, with generic text to make yours"}{" "}
+                        · version {d.version}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ))}
+        </div>
       </section>
       <DocumentsNotices />
     </div>
