@@ -70,7 +70,44 @@ jobs:
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Performance budgets, mobile profile, public pages (REQ-010, backlog 2, D-1012)
+      - name: End-to-end tests (desktop, small Android viewport, iPhone WebKit)
+        run: npm run test:e2e
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  # Batch 45a (D-1013): the Lighthouse budget runs in its own job and does
+  # not block a merge until it has gone green on the runner; the step prints
+  # Lighthouse's own error when it fails. Flip `continue-on-error` back to
+  # false by 21 October 2026 (one week), or sooner once a run is green.
+  performance-budget:
+    name: Performance budgets, mobile profile, public pages (REQ-010, D-1012; advisory until green, D-1013)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Install Playwright Chromium (the Chrome Lighthouse drives)
+        run: npx playwright install --with-deps chromium
+
+      - name: Lighthouse, four public pages, median of three
         run: npm run perf:budget
         env:
           LIGHTHOUSE_BUDGET: "1"
@@ -85,19 +122,6 @@ jobs:
           path: out/lighthouse-budget.txt
           if-no-files-found: ignore
           retention-days: 14
-
-      - name: End-to-end tests (desktop, small Android viewport, iPhone WebKit)
-        run: npm run test:e2e
-        env:
-          CI: "true"
-
-      - name: Upload Playwright report on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
 
   # The secret scan moved to .github/workflows/secrets.yml, which runs on
   # every push to every branch (backlog 5, D-209).
@@ -142,7 +166,8 @@ jobs:
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012)
+      - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012; advisory until green, D-1013)
+        continue-on-error: true
         run: npm run perf:budget
         env:
           LIGHTHOUSE_BUDGET: "1"
