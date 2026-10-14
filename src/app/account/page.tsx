@@ -7,15 +7,26 @@ import type {
 } from "@/lib/questionnaire/schema";
 import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
-import { formatAud } from "@/lib/payments/pricing";
+import { formatAud, readPricing } from "@/lib/payments/pricing";
 import { registersLine } from "@/lib/registers/overview";
-import { registerOverview } from "@/server/registers/queries";
+import { reminderLine } from "@/lib/registers/reminders";
+import {
+  hasActiveSubscription,
+  registerOverview,
+  reminderReference,
+} from "@/server/registers/queries";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
 import { listPurchases } from "@/server/payments/queries";
+import { subscriptionAvailable } from "@/server/payments/stripe";
+import {
+  getSubscription,
+  listUpcomingReminders,
+} from "@/server/payments/subscription-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
+import { BillingPortalButton, SubscribeButton } from "./subscribe-button";
 
 export const metadata: Metadata = { title: "Your account" };
 
@@ -29,11 +40,35 @@ export default async function AccountPage() {
   const a = viewer.account;
   // REQ-007 FR-7: the purchase rows with their receipt links.
   const supabase = await createSupabaseServerClient();
-  const [purchases, overview] = await Promise.all([
-    listPurchases(supabase, a.id),
-    registerOverview(supabase, a.id),
-  ]);
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+  const [purchases, overview, subscription, subscribed, reminders] =
+    await Promise.all([
+      listPurchases(supabase, a.id),
+      registerOverview(supabase, a.id),
+      getSubscription(supabase, a.id),
+      hasActiveSubscription(supabase, a.id),
+      listUpcomingReminders(supabase, a.id, today),
+    ]);
   const registers = registersLine(overview);
+  const pricing = readPricing();
+  const subscriptionOffered = subscriptionAvailable();
+  const dueSoon = await Promise.all(
+    reminders.map(async (r) => ({
+      id: r.id,
+      line: reminderLine(
+        r.kind,
+        await reminderReference(supabase, r, a.trading_name),
+        r.due_on,
+      ),
+      sent: Boolean(r.sent_at),
+      sendOn: r.send_on,
+    })),
+  );
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
@@ -72,6 +107,85 @@ export default async function AccountPage() {
           </Link>
           .
         </p>
+        {/* REQ-009 FR-3: the same rows the reminder emails are sent from. */}
+        <h3 className="mt-4 text-base font-semibold">Due soon</h3>
+        {dueSoon.length === 0 ? (
+          <p
+            className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
+            data-testid="due-soon-empty"
+          >
+            Nothing due in the next 30 days.
+          </p>
+        ) : (
+          <ul
+            className="mt-1 list-disc space-y-1 pl-5 text-sm leading-6"
+            data-testid="due-soon"
+          >
+            {dueSoon.map((d) => (
+              <li key={d.id}>
+                {d.line}
+                {d.sent ? (
+                  <span className="text-zinc-600 dark:text-zinc-400">
+                    {" "}
+                    (emailed)
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* REQ-009 Session C: the registers subscription, its state and the billing portal. */}
+      <section
+        aria-labelledby="subscription-heading"
+        className="mt-8"
+        data-testid="account-subscription"
+      >
+        <h2 id="subscription-heading" className="text-xl font-semibold">
+          Registers subscription
+        </h2>
+        {subscribed ? (
+          <>
+            <p
+              className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              data-testid="subscription-status"
+            >
+              {subscription?.status === "past_due"
+                ? "Active. Your last payment did not go through; Stripe is retrying. Update your card below if it keeps failing. Your records stay open meanwhile."
+                : `Active. ${pricing.subscriptionPriceCents ? `${formatAud(pricing.subscriptionPriceCents)} a month, ` : ""}cancel at any time; no fee, no notice period.`}
+            </p>
+            <BillingPortalButton />
+          </>
+        ) : (
+          <>
+            <p
+              className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              data-testid="subscription-status"
+            >
+              {subscription
+                ? "Your subscription has lapsed; your records are safe and read-only. Renew to add to them."
+                : "Not subscribed. The registers are read-only without a subscription."}
+            </p>
+            {subscriptionOffered ? (
+              <SubscribeButton
+                label={
+                  pricing.subscriptionPriceCents
+                    ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
+                    : "Subscribe to the registers"
+                }
+                cancelPath="/account"
+              />
+            ) : (
+              <p
+                className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+                data-testid="subscription-coming"
+              >
+                Subscriptions open soon.
+              </p>
+            )}
+          </>
+        )}
       </section>
 
       <section aria-labelledby="details-heading" className="mt-8">

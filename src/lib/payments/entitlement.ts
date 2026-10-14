@@ -34,6 +34,55 @@ export type PaymentEvent = {
   currency?: string | null;
   receiptUrl?: string | null;
   occurredAt: string;
+  /** REQ-009 Session C: present on subscription events and on a subscription-mode checkout. */
+  subscriptionId?: string | null;
+  customerId?: string | null;
+  /** Stripe's subscription status when the event carries one. */
+  subscriptionStatus?: SubscriptionStatus | null;
+  periodEnd?: string | null;
+};
+
+export type SubscriptionStatus =
+  | "incomplete"
+  | "incomplete_expired"
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "paused";
+
+export const SUBSCRIPTION_STATUSES: readonly SubscriptionStatus[] = [
+  "incomplete",
+  "incomplete_expired",
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+  "unpaid",
+  "paused",
+];
+
+/** The statuses that end the entitlement (D-056): never past_due. */
+export const REVOKING_STATUSES: readonly SubscriptionStatus[] = [
+  "canceled",
+  "unpaid",
+  "incomplete_expired",
+];
+/** The statuses under which a subscription entitlement must exist and be unrevoked. */
+export const ENTITLED_STATUSES: readonly SubscriptionStatus[] = [
+  "active",
+  "trialing",
+  "past_due",
+];
+
+export type Subscription = {
+  id: string;
+  accountId: string;
+  stripeSubscriptionId: string;
+  customerId: string | null;
+  status: SubscriptionStatus;
+  entitlementId: string | null;
 };
 
 export type Purchase = {
@@ -63,6 +112,7 @@ export type Ledger = {
   seenEventIds: readonly string[];
   purchases: readonly Purchase[];
   entitlements: readonly Entitlement[];
+  subscriptions: readonly Subscription[];
 };
 
 export type ApplyOutcome =
@@ -73,13 +123,108 @@ export type ApplyOutcome =
   | "refunded_before_completion"
   | "refund_recorded"
   | "already_paid"
-  | "invalid";
+  | "invalid"
+  | "subscription_granted"
+  | "subscription_updated"
+  | "subscription_revoked";
 
 export const EMPTY_LEDGER: Ledger = {
   seenEventIds: [],
   purchases: [],
   entitlements: [],
+  subscriptions: [],
 };
+
+const SUBSCRIPTION_TYPES = new Set<string>([
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "invoice.payment_failed",
+]);
+
+/** The status an event implies when it carries none of its own. */
+function impliedStatus(event: PaymentEvent): SubscriptionStatus | null {
+  if (COMPLETION_TYPES.has(event.type))
+    return event.subscriptionStatus ?? "active";
+  if (event.type === "customer.subscription.deleted") return "canceled";
+  if (event.type === "invoice.payment_failed")
+    return event.subscriptionStatus ?? "past_due";
+  if (SUBSCRIPTION_TYPES.has(event.type))
+    return event.subscriptionStatus ?? null;
+  return null;
+}
+
+/**
+ * The subscription rules (REQ-009 Session C, D-056), mirrored by the SQL
+ * function `apply_stripe_subscription_event`: record what Stripe said; revoke
+ * the entitlement only on canceled, unpaid or incomplete_expired; under
+ * active, trialing or past_due make sure one unrevoked subscription
+ * entitlement exists (a return to active after a revocation grants a new one).
+ */
+function applySubscriptionEvent(
+  seen: Ledger,
+  event: PaymentEvent,
+  newId: () => string,
+): { ledger: Ledger; outcome: ApplyOutcome } {
+  const existing = seen.subscriptions.find(
+    (s) => s.stripeSubscriptionId === event.subscriptionId,
+  );
+  const accountId = event.accountId ?? existing?.accountId ?? null;
+  if (!accountId) return { ledger: seen, outcome: "invalid" };
+  const status = impliedStatus(event);
+  if (!status) return { ledger: seen, outcome: "ignored" };
+  let sub: Subscription = existing
+    ? {
+        ...existing,
+        status,
+        customerId: event.customerId ?? existing.customerId,
+      }
+    : {
+        id: newId(),
+        accountId,
+        stripeSubscriptionId: event.subscriptionId!,
+        customerId: event.customerId ?? null,
+        status,
+        entitlementId: null,
+      };
+  let entitlements = seen.entitlements;
+  let outcome: ApplyOutcome = "subscription_updated";
+  if (REVOKING_STATUSES.includes(status)) {
+    if (sub.entitlementId) {
+      const live = entitlements.find(
+        (e) => e.id === sub.entitlementId && !e.revokedAt,
+      );
+      if (live) {
+        entitlements = entitlements.map((e) =>
+          e === live ? { ...e, revokedAt: event.occurredAt } : e,
+        );
+        outcome = "subscription_revoked";
+      }
+    }
+  } else if (ENTITLED_STATUSES.includes(status)) {
+    const live = sub.entitlementId
+      ? entitlements.find((e) => e.id === sub.entitlementId && !e.revokedAt)
+      : undefined;
+    if (!live) {
+      const entitlement: Entitlement = {
+        id: newId(),
+        accountId,
+        kind: "subscription",
+        assessmentId: null,
+        sourcePurchaseId: null,
+        grantedAt: event.occurredAt,
+        revokedAt: null,
+      };
+      entitlements = [...entitlements, entitlement];
+      sub = { ...sub, entitlementId: entitlement.id };
+      outcome = "subscription_granted";
+    }
+  }
+  const subscriptions = existing
+    ? seen.subscriptions.map((s) => (s === existing ? sub : s))
+    : [...seen.subscriptions, sub];
+  return { ledger: { ...seen, entitlements, subscriptions }, outcome };
+}
 
 const COMPLETION_TYPES = new Set<string>([
   "checkout.session.completed",
@@ -95,6 +240,11 @@ export function applyStripeEvent(
   if (ledger.seenEventIds.includes(event.id))
     return { ledger, outcome: "duplicate" };
   const seen = { ...ledger, seenEventIds: [...ledger.seenEventIds, event.id] };
+
+  // A subscription-mode checkout and the subscription lifecycle events (Session C).
+  if (event.subscriptionId) return applySubscriptionEvent(seen, event, newId);
+  if (SUBSCRIPTION_TYPES.has(event.type))
+    return { ledger: seen, outcome: "invalid" };
 
   if (COMPLETION_TYPES.has(event.type)) {
     if (!event.sessionId || !event.accountId)
@@ -203,6 +353,17 @@ export function applyStripeEvent(
   }
 
   return { ledger: seen, outcome: "ignored" };
+}
+
+/** True when the account holds a subscription entitlement that has not been revoked (REQ-009). */
+export function hasActiveSubscription(
+  ledger: Pick<Ledger, "entitlements">,
+  accountId: string,
+): boolean {
+  return ledger.entitlements.some(
+    (e) =>
+      e.accountId === accountId && e.kind === "subscription" && !e.revokedAt,
+  );
 }
 
 /** True when the account holds a pack entitlement that has not been revoked. */

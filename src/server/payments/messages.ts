@@ -14,6 +14,13 @@ export const CHECKOUT_NEEDS_ANSWERS =
 /** Stripe refused or failed while the session was being created (batch 23 item 2); nothing was charged. */
 export const CHECKOUT_FAILED =
   "Buying is not available right now; nothing was charged. Please try again in a few minutes, or email us at the contact address in the footer.";
+/** REQ-009 Session C: the registers subscription. */
+export const SUBSCRIPTION_UNAVAILABLE =
+  "The registers subscription is not available in this environment yet.";
+export const SUBSCRIPTION_ALREADY_ACTIVE =
+  "Your registers subscription is already active.";
+export const PORTAL_UNAVAILABLE =
+  "Billing settings are not available right now. Email us at the contact address in the footer and we will sort it out.";
 
 /**
  * What to log when Stripe fails: the SDK's error type and code, never the

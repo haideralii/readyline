@@ -18,12 +18,36 @@ const OUTCOMES = new Set<ApplyOutcome>([
   "refund_recorded",
   "already_paid",
   "invalid",
+  "subscription_granted",
+  "subscription_updated",
+  "subscription_revoked",
 ]);
 
 export class SupabasePaymentStore implements PaymentStore {
   constructor(private readonly admin: SupabaseClient) {}
 
   async applyEvent(event: PaymentEvent): Promise<ApplyOutcome> {
+    // REQ-009 Session C: the subscription half of the ledger.
+    if (event.subscriptionId) {
+      const s = await this.admin.rpc("apply_stripe_subscription_event", {
+        p_event_id: event.id,
+        p_type: event.type,
+        p_subscription_id: event.subscriptionId,
+        p_customer_id: event.customerId ?? null,
+        p_account_id: event.accountId ?? null,
+        p_status: event.subscriptionStatus ?? null,
+        p_period_end: event.periodEnd ?? null,
+        p_occurred_at: event.occurredAt,
+      });
+      if (s.error)
+        throw new Error(`apply_stripe_subscription_event: ${s.error.message}`);
+      const outcome = s.data as string;
+      if (!OUTCOMES.has(outcome as ApplyOutcome))
+        throw new Error(
+          `apply_stripe_subscription_event: unknown outcome ${outcome}`,
+        );
+      return outcome as ApplyOutcome;
+    }
     const r = await this.admin.rpc("apply_stripe_event", {
       p_event_id: event.id,
       p_type: event.type,

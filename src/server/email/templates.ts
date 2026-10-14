@@ -57,6 +57,31 @@ export function documentsReadyEmail(input: {
   };
 }
 
+/**
+ * The register reminders (REQ-009 FR-3, SR-4): one message per account per
+ * run, each line naming the register and the reference only, never the
+ * summary text or anything about a participant.
+ */
+export function remindersEmail(input: {
+  to: string;
+  tradingName: string;
+  lines: string[];
+}): EmailMessage {
+  return {
+    to: input.to,
+    subject: `${BRAND}: ${input.lines.length === 1 ? "a register reminder" : `${input.lines.length} register reminders`}`,
+    text: [
+      `Reminders for ${input.tradingName}:`,
+      "",
+      ...input.lines.map((l) => `- ${l}`),
+      "",
+      "Sign in and open Registers to update them.",
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
 export function accountPurgedEmail(input: {
   to: string;
   tradingName: string;

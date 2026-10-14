@@ -49,7 +49,10 @@ describe("Checkout params (REQ-007 FR-2, AC-3, SR-3)", () => {
         .cancel_url,
     ).toBe("https://readyline.example/pricing");
     expect(safeCancelPath(undefined)).toBe("/pricing");
-    expect(safeCancelPath("/account")).toBe("/pricing");
+    // REQ-009 Session C: the account and registers pages may cancel back to themselves.
+    expect(safeCancelPath("/account")).toBe("/account");
+    expect(safeCancelPath("/registers")).toBe("/registers");
+    expect(safeCancelPath("/admin")).toBe("/pricing");
     expect(safeCancelPath("/documents")).toBe("/documents");
   });
 });

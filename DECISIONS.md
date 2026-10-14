@@ -2021,6 +2021,43 @@ second server and a minute per page, and because axe covers the same
 rules on every commit. FR-18 (screen-reader passes) stays with the PO
 and Haider.
 
+**D-907 Register pages (Dev, 2026-10-13, batch 28, branch
+`req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
+`req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
+One list component for the four registers (rows with a text-and-icon
+status tag, a filter by status, 44 px targets), one page shell that
+resolves the signed-in owner and the subscription state, and forms built
+from shared inputs (select, date, reference code, free text with the
+participant-data detector). Lists read the Session A status views so the
+tag and the filter use the database's own arithmetic. Events for status
+changes, reportable flags, notification, acknowledgement and resolution
+are written by the server action, never typed. The gate is the database's
+(42501 becomes the lapse sentence); the UI hides Add and Edit and
+redirects the add and edit routes when the subscription is not active.
+The REQ-015 branch was merged in because the pages are built on its
+patterns (ConfirmButton, the width check, the iPhone project), so the
+Session B pull request lands after REQ-015's.
+
+**D-908 Exports and limits.** CSV with a byte-order mark and CRLF for
+Excel, dates as stored, formula-leading cells prefixed with an apostrophe;
+incidents and complaints as a zip of two files joined by reference. Five
+exports an hour per account and sixty writes a minute per user through
+the existing rate-limit function. Every route takes its own empty strict
+schema so the boundary guard sees the validation import where the route
+lives.
+
+**D-909 Policy reviews are seeded once and adopted from the checklist.**
+The first visit to the policy-reviews register by a subscribed account
+with a ready set and no rows inserts one row per document in the set
+(cycle 3 months for a register document, 12 otherwise), through an upsert
+that ignores duplicates so a race cannot double-seed. A checklist item
+set to Done on a document sets `adopted_on` on its review when empty; the
+review never changes the checklist. A delete button is not in Session B:
+owners can delete through RLS, but a wrong entry is edited or closed, and
+a delete with confirm is one component away if the PO wants it.
+
+
+
 **D-1101 Guides are markdown with the legal pages' convention, not MDX
 (Dev, 2026-10-13, batch 29, branch `req-011-content` from `main` 491e6fb
 with `req-015-plain-language` merged in; REQ-011 to be written by the
@@ -2068,6 +2105,8 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
+
+
 **D-907 Register pages (Dev, 2026-10-13, batch 28, branch
 `req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
 `req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
@@ -2085,23 +2124,77 @@ The REQ-015 branch was merged in because the pages are built on its
 patterns (ConfirmButton, the width check, the iPhone project), so the
 Session B pull request lands after REQ-015's.
 
-**D-908 Exports and limits.** CSV with a byte-order mark and CRLF for
-Excel, dates as stored, formula-leading cells prefixed with an apostrophe;
-incidents and complaints as a zip of two files joined by reference. Five
-exports an hour per account and sixty writes a minute per user through
-the existing rate-limit function. Every route takes its own empty strict
-schema so the boundary guard sees the validation import where the route
-lives.
 
-**D-909 Policy reviews are seeded once and adopted from the checklist.**
-The first visit to the policy-reviews register by a subscribed account
-with a ready set and no rows inserts one row per document in the set
-(cycle 3 months for a register document, 12 otherwise), through an upsert
-that ignores duplicates so a race cannot double-seed. A checklist item
-set to Done on a document sets `adopted_on` on its review when empty; the
-review never changes the checklist. A delete button is not in Session B:
-owners can delete through RLS, but a wrong entry is edited or closed, and
-a delete with confirm is one component away if the PO wants it.
+**D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
+batch 30, branch `req-009-session-c` from `req-011-content` with
+`req-009-session-b` merged in; REQ-009 FR-3, SR-4, AC-4).**
+`src/lib/registers/reminders.ts` turns plain rows and a date into the
+reminders due: worker checks at 90, 30 and 7 days before expiry and on
+the day; policy reviews at 60 and 14 days and on the day; an incident
+open 30 days with no event (from the last event's date, else the
+reported date); a complaint unacknowledged 2 business days after
+receipt; a reportable incident the morning after `notify_by`; the
+mid-term audit at months 12, 15 and 17 for certification only; renewal
+6 and 3 months before the three-year end for both kinds. A reminder is
+sent on its own date or within a seven-day catch-up window, so a missed
+night is recovered and an old date entered today does not flood the
+account. `/api/jobs/reminders` (CRON_SECRET, production only, `dryRun`,
+`today` for tests) inserts with "ignore duplicates" and emails each
+account once per run through the REQ-004 provider (log-only until
+D-013), naming the register and the reference only. Session B built the
+registers these rules read, so Session C merged its branch rather than
+re-creating them; the pull requests land in order.
+
+**D-911 The reminders key gained `send_on`.** The REQ's key (account,
+kind, subject, due_on) could hold one reminder per subject, but FR-3
+asks for four per expiry. A migration replaces the unique constraint
+with (account, kind, subject, send_on): `due_on` stays the date the
+reminder is about, `send_on` the day it goes out, and idempotency is per
+send day, which is what "a second run inserts nothing" needs.
+
+**D-912 The subscription in Stripe, test mode, code and names only.**
+`subscriptions` (one row per Stripe subscription, owner-readable,
+webhook-written) and `apply_stripe_subscription_event` (the subscription
+half of the event ledger, same idempotency as `apply_stripe_event`)
+carry the rule of D-056: revoke the `subscription` entitlement only on
+`canceled`, `unpaid` or `incomplete_expired`; `past_due` keeps it, so
+Stripe's retries are the grace period; a return to `active` after a
+revocation grants a fresh entitlement, which is how renewal restores
+writes. Checkout runs in subscription mode on `STRIPE_PRICE_REGISTERS`
+(a name in `.env.example` and the runbook; Haider creates the Price), card
+only, no trial, no promotion codes, the account on the subscription's
+metadata so every later event names it. The webhook maps
+`customer.subscription.created/updated/deleted` and
+`invoice.payment_failed`; the reducer in `entitlement.ts` mirrors the SQL
+so the rules are unit-tested with mocked events. The Billing portal opens
+from the account page for cancelling and card changes. Fake mode gained
+the subscription path: a subscription-mode fake session, Subscribe,
+Payment failed, Cancel and Renew buttons that post the events Stripe
+would, and a fake portal view. Until the Price exists the pricing page
+keeps "coming soon" and the account page says subscriptions open soon.
+
+**D-913 What the account page shows.** A "Registers subscription"
+section: Active (with the price and "cancel at any time; no fee, no
+notice period"), Active but retrying after a failed payment (records
+stay open), lapsed (the one-line read-only sentence), or not subscribed
+with the Subscribe button; and "Due soon" under Registers, read from the
+same `reminders` rows the emails are sent from, with "(emailed)" once
+sent.
+
+**D-914 The fake subscription id carries its session id (Dev, 2026-10-14,
+batch 43 item 1).** The fake billing portal is the fake checkout page
+opened with the subscription's session id, but the subscription id Stripe
+would have been given was a hash of that session, which the page could
+not turn back, so the portal answered 404 and the lifecycle part of the
+subscription spec timed out in CI on every branch (locally the spec had
+only ever been run through its first test). A fake subscription id is now
+`sub_fake_` plus the session id after its own prefix, the portal reverses
+it, and a Stripe id being opaque text the length is no concern; the
+customer id stays a hash. The spec waits a minute for the portal's
+first control before pressing it, so a missing control fails there and
+not at the test's cap.
+
+
 
 
 **D-1507 The text corruption on `main` came from Dev's conflict-resolution
@@ -2118,6 +2211,31 @@ test` on a mark or a double-encoded run in any text file outside
 Dev: edit files through Node or the editor tools, and never through
 `Get-Content`/`Set-Content` without an explicit UTF-8 encoding.
 
+
+**D-1008 The integration suite aliases Next's `server-only` guard (Dev,
+2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
+`tests/integration/reminders-job.test.ts` imports the reminders job, the
+email provider and the admin client, all marked `import "server-only"`, and
+Next's guard throws outside a Next server bundle. The unit project mocks
+the guard per file (`vi.mock("server-only", () => ({}))`); the integration
+project now resolves it to an empty module for every file
+(`resolve.alias` in `vitest.integration.config.mts`,
+`tests/integration/server-only-stub.ts`), which is the honest statement
+of what that suite is: server code driven against a real database. Proven
+locally by loading every integration file without Supabase variables (they
+skip, and no longer throw); CI's job proves the rows.
+
+**D-1009 The reminders job takes a test-only account filter (Dev,
+2026-10-14, batch 41).** With the guard aliased, PR #28's Supabase job ran
+the reminders test for real and `first.inserted` came back 9 against the
+expected 5: the other integration files seed accounts into the same stack,
+and the job runs for every account and reports totals. `runRemindersJob`
+now accepts an optional `accountIds` list that limits both the accounts it
+visits and the unsent rows it emails; the route never sets it. The test
+passes its own account on both runs and keeps the exact figures, reads the
+row count back from the table for that account, and checks the outbox for
+that owner did not grow on the second run. The subscription-ledger test
+already measured against a baseline and needed nothing.
 
 ## Open questions for Haider
 

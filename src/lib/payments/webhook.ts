@@ -44,15 +44,58 @@ export function toPaymentEvent(event: Stripe.Event): PaymentEvent {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const s = event.data.object as Stripe.Checkout.Session;
+    const accountId = s.client_reference_id ?? s.metadata?.account_id ?? null;
+    // REQ-009 Session C: a subscription-mode checkout grants the registers.
+    if (s.mode === "subscription") {
+      return {
+        id: event.id,
+        type: event.type,
+        sessionId: s.id,
+        accountId,
+        subscriptionId: idOf(s.subscription),
+        customerId: idOf(s.customer),
+        occurredAt,
+      };
+    }
     return {
       id: event.id,
       type: event.type,
       sessionId: s.id,
       paymentIntentId: idOf(s.payment_intent),
-      accountId: s.client_reference_id ?? s.metadata?.account_id ?? null,
+      accountId,
       assessmentId: s.metadata?.assessment_id ?? null,
       amountCents: s.amount_total ?? null,
       currency: s.currency ?? null,
+      occurredAt,
+    };
+  }
+  if (
+    event.type === "customer.subscription.created" ||
+    event.type === "customer.subscription.updated" ||
+    event.type === "customer.subscription.deleted"
+  ) {
+    const sub = event.data.object as Stripe.Subscription;
+    const periodEnd = sub.items?.data?.[0]?.current_period_end;
+    return {
+      id: event.id,
+      type: event.type,
+      subscriptionId: sub.id,
+      customerId: idOf(sub.customer),
+      accountId: sub.metadata?.account_id ?? null,
+      subscriptionStatus: sub.status as PaymentEvent["subscriptionStatus"],
+      periodEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      occurredAt,
+    };
+  }
+  if (event.type === "invoice.payment_failed") {
+    const inv = event.data.object as Stripe.Invoice;
+    const parent = inv.parent?.subscription_details;
+    return {
+      id: event.id,
+      type: event.type,
+      subscriptionId: idOf(parent?.subscription ?? null),
+      customerId: idOf(inv.customer),
+      accountId: parent?.metadata?.account_id ?? null,
       occurredAt,
     };
   }
@@ -97,7 +140,7 @@ export async function handleStripeWebhook(input: {
     status: 200,
     body: { ok: true, outcome },
     event: { id: event.id, type: event.type },
-    ...(mapped.sessionId
+    ...(mapped.sessionId && !mapped.subscriptionId
       ? {
           payment: {
             sessionId: mapped.sessionId,

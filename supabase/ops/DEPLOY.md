@@ -165,10 +165,32 @@ Stripe dashboard (test mode) → Developers → Webhooks → **Add endpoint**.
    `{"ok":true,"outcome":"invalid"}` (a test event carries no account),
    which proves the signature check passed. A wrong secret answers 400.
 
+### 7a. Registers subscription (REQ-009 Session C)
+
+1. Products → **Add product**: "Readyline registers", recurring, monthly,
+   AUD, the price in `SUBSCRIPTION_PRICE_AUD_CENTS` (test mode for the
+   trial). No trial, no setup fee. Copy the Price id (`price_…`) into
+   Vercel as `STRIPE_PRICE_REGISTERS` (Production); until it is set the
+   Subscribe button is hidden and the pricing page says "coming".
+2. Webhook endpoint (section 7): add the events
+   `customer.subscription.created`, `customer.subscription.updated`,
+   `customer.subscription.deleted` and `invoice.payment_failed`.
+3. Settings → Billing → **Subscriptions and emails** → retry schedule:
+   retry failed payments for **7 days**, then mark the subscription
+   **unpaid** (D-056: the app revokes only on `canceled` or `unpaid`,
+   never on `past_due`, so Stripe's retries are the grace period). No
+   late fees anywhere.
+4. Settings → Billing → **Customer portal**: enable cancelling (immediately
+   or at period end, your choice) and updating the payment method; the
+   return URL is `https://<domain>/account`. The app opens the portal
+   from the account page's "Manage billing" button.
+
 ## 8. Cron
 
-Vercel reads `vercel.json` and creates two cron jobs (`/api/jobs/purge`
-daily at 16:00 UTC, `/api/jobs/generate` daily at 16:30 UTC). It sends
+Vercel reads `vercel.json` and creates three cron jobs (`/api/jobs/purge`
+daily at 16:00 UTC, `/api/jobs/generate` daily at 16:30 UTC,
+`/api/jobs/reminders` daily at 20:00 UTC, which is 06:00 or 07:00 in
+Sydney so the register reminders arrive in the morning). It sends
 `Authorization: Bearer <CRON_SECRET>` itself. To confirm a run: Vercel
 project → **Cron Jobs** tab shows the schedule and the last run; the
 function log for `/api/jobs/generate` shows `jobs.generate.ran`. To run one

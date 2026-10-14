@@ -12,6 +12,8 @@ import {
   decodeFakeSession,
   fakeCompletedEvent,
   fakeRefundedEvent,
+  fakeSubscribedEvent,
+  fakeSubscriptionStatusEvent,
 } from "@/lib/payments/fake-session";
 import { parseInput, strictObject } from "@/lib/validation";
 import { signFakeEvent } from "@/server/payments/fake";
@@ -19,7 +21,14 @@ import { readStripeEnv } from "@/server/payments/stripe";
 
 const Input = strictObject({
   id: z.string().min(16).max(4096),
-  action: z.enum(["pay", "refund"]),
+  action: z.enum([
+    "pay",
+    "refund",
+    "subscribe",
+    "payment-failed",
+    "cancel-subscription",
+    "renew",
+  ]),
 });
 
 export async function fakeCheckoutAction(formData: FormData): Promise<void> {
@@ -33,10 +42,43 @@ export async function fakeCheckoutAction(formData: FormData): Promise<void> {
   const data = decodeFakeSession(parsed.data.id, env.webhookSecret);
   if (!data) redirect("/");
   const origin = new URL(data.successUrl).origin;
-  const event =
-    parsed.data.action === "pay"
-      ? fakeCompletedEvent(parsed.data.id, data, new Date())
-      : fakeRefundedEvent(parsed.data.id, data, origin, new Date());
+  const now = new Date();
+  const id = parsed.data.id;
+  const event = (() => {
+    switch (parsed.data.action) {
+      case "pay":
+        return fakeCompletedEvent(id, data, now);
+      case "refund":
+        return fakeRefundedEvent(id, data, origin, now);
+      // REQ-009 Session C: the subscription lifecycle, each one the event Stripe would send.
+      case "subscribe":
+        return fakeSubscribedEvent(id, data, now);
+      case "payment-failed":
+        return fakeSubscriptionStatusEvent(
+          id,
+          data,
+          "past_due",
+          "invoice.payment_failed",
+          now,
+        );
+      case "cancel-subscription":
+        return fakeSubscriptionStatusEvent(
+          id,
+          data,
+          "canceled",
+          "customer.subscription.deleted",
+          now,
+        );
+      case "renew":
+        return fakeSubscriptionStatusEvent(
+          id,
+          data,
+          "active",
+          "customer.subscription.updated",
+          now,
+        );
+    }
+  })();
   const payload = JSON.stringify(event);
   const response = await fetch(`${origin}/api/stripe/webhook`, {
     method: "POST",
@@ -51,7 +93,8 @@ export async function fakeCheckoutAction(formData: FormData): Promise<void> {
     action: parsed.data.action,
     status: response.status,
   });
-  if (parsed.data.action === "pay")
+  if (parsed.data.action === "pay" || parsed.data.action === "subscribe")
     redirect(data.successUrl.replace("{CHECKOUT_SESSION_ID}", parsed.data.id));
-  redirect("/documents");
+  if (parsed.data.action === "refund") redirect("/documents");
+  redirect("/account");
 }
