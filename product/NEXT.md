@@ -1399,3 +1399,18 @@ Backlog 7 says the PO writes REQ-020 before the item starts and, if it is not th
 
 **Next:** Standing backlog 8, `req-005-living-policies`, from the head of `req-021-writing-indicator` (it does not depend on REQ-020), then backlog 9 prepared without model calls (the question set, the lint and fixture mapping, the runner and the report format; the live run waits for the PO's go-ahead).
 
+
+
+
+## Dev status (standing backlog 8, written 14 Oct 2026, Dev; living policies, REQ-005 and REQ-018 FR-13)
+
+Delivered on **`req-005-living-policies` 3d0c60a** (one commit from the head of `req-021-writing-indicator` 5053796). `npm run check` green (110 files, 798 tests, 5 skipped). Decision D-551; REQ-005 delivery evidence appended. No model calls. CI still paused; pushed.
+
+- **A ledger, not a guess.** `data/watch-changes.json` records every NDIS watch item applied to fixed text, a brief or the standards data: the day, the scope, the exact sentence replaced (or that one was added), the new sentence, why, the source and the report. Seeded with the seven batch 35 applications; a unit test checks every scope against the catalogue. From now on the watch appends an entry when it applies an item (D-551), which is the whole mechanism: no scanning of documents for drift, no model.
+- **The flag.** An adopted document drafted before a change, in scope and not carrying the new sentence, is "review needed" in the document control register (a new state after overdue), with the old and the new sentence side by side, why, and the source; "certain" when the old sentence is still in the text, "likely" when only the date says so. The registers index and the audit-day page say "N to check after a rule change"; the document page shows the same changes above its sections.
+- **Two answers.** "Re-generate this section" uses the existing regenerate action (a new version drafted after the change clears the flag; fixed text is not offered a model call, the next version simply carries it); "I have checked it" records the owner's check in a new append-only table (owner insert, unique per document and change). Three ways the flag clears are unit-tested; the table's rules are in the integration suite (CI's Supabase job).
+- **Not shown end to end.** Every e2e set is drafted at test time, so nothing predates the seeded changes and no screenshot of a flagged row exists; the PO will see it on any pack drafted before 14 October 2026 once deployed. **PO call:** whether the watch's "apply" step should refuse to merge without a ledger entry (a test could require every D-18xx application to have one).
+- **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
+
+**Next:** Standing backlog 9, `req-005-generator-exam`, from the head of `req-005-living-policies`: the question set, the lint and fixture mapping, the runner and the report format, prepared without a model call; the live run waits for the PO's go-ahead.
+
