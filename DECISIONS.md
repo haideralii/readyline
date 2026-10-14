@@ -3109,6 +3109,53 @@ subscription.
 
 
 
+**D-1010 The app dispatches the kicker workflow; the schedule is the safety
+net (Dev, 2026-10-14, batch 37, implementing the PO's D-059).** The
+workflow runs on `*/30` and on a `repository_dispatch` event of type
+`generate`, and loops for up to twenty minutes (`KICK_MAX_SECONDS` 1200,
+`timeout-minutes` 25, under the schedule). `continueGeneration` sends the
+dispatch first, before its own budgeted run, so the chain is carried even
+when the invocation is frozen (D-057); both the webhook and the nudge go
+through it, and the kicker and the cron do not, so a dispatched run never
+dispatches again. The call needs `GITHUB_DISPATCH_TOKEN` (optional; listed
+in `OPTIONAL` in `src/lib/env.ts` and named by the prebuild check when
+absent) and is skipped with one log line without it. The repository is a
+constant in `src/server/generation/dispatch.ts`. **Permission:** the PO
+wrote "Actions write"; GitHub's "Permissions required for fine-grained
+personal access tokens" lists `POST /repos/{owner}/{repo}/dispatches` under
+Contents, write, so the runbook asks for Contents: read and write on this
+repository alone and nothing else. Minutes: about 1,440 a month for the
+schedule (one call when idle) plus dispatched runs only while a pack is
+generating.
+
+
+
+
+
+
+**D-1705 Checklist items are instructions with one tap to do them (Dev,
+2026-10-14, batch 37, REQ-017 step 6).** Every title starts with a verb in
+the customer's voice ("Ask your 1 key person for their NDIS Worker
+Screening clearance, and type each expiry date here"; "Read your
+Complaints management policy and register and adopt it"; "Get public
+liability insurance and keep the certificate of currency"); the `why`
+lines and item ids are unchanged, so stored statuses and the e2e test ids
+carry over. `ChecklistItem.action` is an in-app route and label: the four
+registers with pages, the clearance item (add a clearance) and the ABN
+item (the account page); a document item's link is built by the page from
+the newest ready set (`latestReadySet`). No external links are added: the
+source line already carries the Commission's page. `derive.test.ts` runs
+the copy lint over every derived title, reason and label of the three
+reference cases and checks each title starts with an instruction verb.
+The batch 36 branch (`req-013-phone-fixes`) also edits
+`checklist-view.tsx`: it replaces the evidence badge with a "Check this
+against the Commission's page" sentence inserted at the same point of the
+panel where this batch inserts the action link, so the two branches
+conflict there (checked with a throwaway merge, 14 Oct 2026). The
+resolution is to keep both, the check sentence first and the action link
+after it; DECISIONS.md conflicts as usual and the prose resolver handles
+it. Whichever PR the PO merges second carries that one-hunk resolution.
+
 
 
 
