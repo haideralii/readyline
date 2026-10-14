@@ -21,11 +21,13 @@ export function BuyButton({
   return (
     <form action={action} className="mt-4">
       <input type="hidden" name="cancelPath" value={cancelPath} />
+      {/* The house primary button (REQ-014), the same as the next-step strip's:
+          on "before you buy" this is the screen's one button (REQ-017, D-1703). */}
       <button
         type="submit"
         disabled={pending}
         data-testid={testId}
-        className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className="btn-primary"
       >
         {pending ? "Taking you to the payment page…" : label}
       </button>
