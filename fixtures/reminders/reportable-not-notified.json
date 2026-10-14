@@ -1,0 +1,35 @@
+{
+  "kind": "reportable-not-notified",
+  "today": "2026-10-13",
+  "note": "A reportable incident whose notify-by date was yesterday and no notification recorded: fires the morning after.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [
+      {
+        "id": "inc2",
+        "status": "open",
+        "reportable": true,
+        "notify_by": "2026-10-12",
+        "reportable_notified_on": null,
+        "last_activity_on": "2026-10-11"
+      }
+    ],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "reportable-not-notified",
+      "subject_table": "incidents",
+      "subject_id": "inc2",
+      "due_on": "2026-10-12",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

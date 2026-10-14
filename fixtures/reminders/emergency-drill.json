@@ -1,0 +1,27 @@
+{
+  "kind": "emergency-drill",
+  "today": "2026-10-13",
+  "note": "The last emergency drill was six months ago: the drill is due today; the 14-day warning is behind the window.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "lastEmergencyDrillOn": "2026-04-13"
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "emergency-drill",
+      "subject_table": "accounts",
+      "subject_id": "acc",
+      "due_on": "2026-10-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

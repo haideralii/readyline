@@ -1,0 +1,33 @@
+{
+  "kind": "complaint-unacknowledged",
+  "today": "2026-10-13",
+  "note": "A complaint received on Thursday 8 October and not acknowledged: due two business days later (Monday 12 October), still inside the catch-up window today.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [
+      {
+        "id": "cmp1",
+        "status": "received",
+        "received_on": "2026-10-08",
+        "acknowledged_on": null
+      }
+    ],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "complaint-unacknowledged",
+      "subject_table": "complaints",
+      "subject_id": "cmp1",
+      "due_on": "2026-10-12",
+      "send_on": "2026-10-12"
+    }
+  ]
+}

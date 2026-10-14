@@ -58,7 +58,15 @@ async function expectStep(page: Page, id: string, timeout?: number) {
 
 test.describe("the guided path, result to audit day (REQ-017)", () => {
   test.skip(!enabled, "needs the Supabase variables");
-  test.describe.configure({ mode: "serial", timeout: 300_000 });
+  // Backlog 4: one retry in CI for a documented race only. The "wait" step
+  // is written by the webhook after the checkout response; the test reloads
+  // and waits 30 s, but on a cold runner the generation job route can still
+  // be compiling when the webhook fires. A second failure is a defect.
+  test.describe.configure({
+    mode: "serial",
+    timeout: 300_000,
+    retries: process.env.CI ? 1 : 0,
+  });
 
   let tenant: TestTenant;
 

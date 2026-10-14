@@ -1,0 +1,31 @@
+{
+  "kind": "clearance-expiry",
+  "today": "2026-10-13",
+  "note": "A worker check expiring in 7 days: the 7-day reminder fires today; the 90 and 30 day ones are behind the window and the on-the-day one is ahead.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [
+      {
+        "id": "wc1",
+        "expires_on": "2026-10-20"
+      }
+    ],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "clearance-expiry",
+      "subject_table": "worker_clearances",
+      "subject_id": "wc1",
+      "due_on": "2026-10-20",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

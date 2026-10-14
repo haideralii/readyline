@@ -3050,3 +3050,32 @@ Items asserted in code or copy that still need a primary source.
   subscription writes freeze and reads stay, with Stripe's retry window as
   the only grace (revoke on `canceled`/`unpaid`, never on `past_due`); no
   fee, no penalty. Session A (data) may start once PR #21 is merged.
+
+**D-1908 Backlog 4: register tests on a branch that merges REQ-018 into
+the guides lineage; one fixture per reminder kind; the 16-document lint
+pinned in CI; no blanket Playwright retries (Dev, 2026-10-14, backlog 4,
+REQ-018).** The REQ-018 registers live on `req-018-audit-day-systems`,
+which is not on the lineage the standing backlog stacks on, so
+`req-018-register-tests` starts from `req-011-guides-2` with that branch
+merged in. Two code conflicts: the iPhone project's spec list is the union
+of both sides; the registers index keeps batch 42's two groups (D-549)
+and the codes panel, sorts the nine REQ-018 registers into them
+(improvements, decisions and onboarding under "as things happen"; the
+rest under "keep current") and shows the document control register first
+under a third heading, "From your pack", so FR-13's "shown first" holds
+without putting a generated register among the ones you add to. Tests:
+`tests/integration/audit-day-rls.test.ts` gains the owner-update versus
+other-tenant-update case on every editable register (zero rows, no error,
+read back with the admin key), read scope on the three append-only tables,
+and the starter rows seeded once for a fresh tenant (nine, one per area,
+all marked starter, a second seed inserts nothing);
+`fixtures/reminders/<kind>.json` holds one fixture per `REMINDER_KINDS`
+entry with fixed dates and the exact rows, checked by
+`src/lib/registers/reminder-fixtures.test.ts`; `docx-lint.test.ts` pins
+the sole-trader pack at 16 documents and the main CI job runs it by name
+with the report uploaded. Playwright: `retries: 0` everywhere; one CI retry
+only in the three signed-in specs whose race is written above the
+configure call (purchase flow, guided path, subscription). The integration
+file cannot run against the hosted project (its migrations are behind the
+branches); CI's Supabase job is the gate.
+

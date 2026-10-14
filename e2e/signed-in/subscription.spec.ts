@@ -39,7 +39,15 @@ async function shot(page: Page, name: string, project: string) {
 
 test.describe("registers subscription in fake Stripe mode (REQ-009 Session C)", () => {
   test.skip(!enabled, "needs the Supabase variables");
-  test.describe.configure({ mode: "serial", timeout: 180_000 });
+  // Backlog 4: one retry in CI for a documented race only. The fake
+  // payment-failed event and the subscription webhook are applied by the
+  // real route after the page has moved on; the test already waits 60 s
+  // for the ledger to catch up. A second failure is a defect.
+  test.describe.configure({
+    mode: "serial",
+    timeout: 180_000,
+    retries: process.env.CI ? 1 : 0,
+  });
 
   let tenant: TestTenant;
   let portalUrl = "";

@@ -1,0 +1,32 @@
+{
+  "kind": "support-plan-review",
+  "today": "2026-10-13",
+  "note": "A participant's support plan review in 7 days: the 7-day reminder fires today.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "participantRisks": [
+      {
+        "id": "p1",
+        "support_plan_review_on": "2026-10-20"
+      }
+    ]
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "support-plan-review",
+      "subject_table": "participant_risks",
+      "subject_id": "p1",
+      "due_on": "2026-10-20",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

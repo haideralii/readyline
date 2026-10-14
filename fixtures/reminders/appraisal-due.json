@@ -1,0 +1,33 @@
+{
+  "kind": "appraisal-due",
+  "today": "2026-10-13",
+  "note": "A worker last appraised 365 days ago: the appraisal is due today; the 30-day warning is behind the window.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "staff": [
+      {
+        "id": "s2",
+        "last_supervision_on": null,
+        "last_appraisal_on": "2025-10-13"
+      }
+    ]
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "appraisal-due",
+      "subject_table": "staff_matrix",
+      "subject_id": "s2",
+      "due_on": "2026-10-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}
