@@ -1,80 +1,36 @@
 "use client";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   canOpenStep,
   firstIncompleteStep,
-  nextStep,
   stepHref,
 } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
 import { useQuestionnaire } from "./questionnaire-provider";
 import { StepShell } from "./step-shell";
 
-/** While a step's own chunk arrives on a client-side move between steps; a step's height, so nothing jumps. */
-function StepLoading() {
-  return (
-    <p className="min-h-[70vh] text-zinc-600 dark:text-zinc-400" role="status">
-      Loading…
-    </p>
-  );
-}
-
-// Backlog 2 (D-1012): one chunk per step, rendered on the server as before,
-// so a step page carries its own form and not the other four (the result,
-// which also carries the content tables, only when it is the step). The
-// options are written out each time: next/dynamic reads them at build time.
-const BusinessStepForm = dynamic(
-  () => import("./steps/business-step").then((m) => m.BusinessStepForm),
-  { loading: StepLoading },
-);
-const SupportsStepForm = dynamic(
-  () => import("./steps/supports-step").then((m) => m.SupportsStepForm),
-  { loading: StepLoading },
-);
-const PracticesStepForm = dynamic(
-  () => import("./steps/practices-step").then((m) => m.PracticesStepForm),
-  { loading: StepLoading },
-);
-const WorkforceStepForm = dynamic(
-  () => import("./steps/workforce-step").then((m) => m.WorkforceStepForm),
-  { loading: StepLoading },
-);
-const ExistingStepForm = dynamic(
-  () => import("./steps/existing-step").then((m) => m.ExistingStepForm),
-  { loading: StepLoading },
-);
-const ResultStep = dynamic(
-  () => import("./steps/result-step").then((m) => m.ResultStep),
-  { loading: StepLoading },
-);
-
-/** The same modules as above, so the next step's chunk is fetched while this step is filled in. */
-const PRELOAD: Record<StepId, () => Promise<unknown>> = {
-  business: () => import("./steps/business-step"),
-  supports: () => import("./steps/supports-step"),
-  practices: () => import("./steps/practices-step"),
-  workforce: () => import("./steps/workforce-step"),
-  existing: () => import("./steps/existing-step"),
-  result: () => import("./steps/result-step"),
-};
-
-export function StepPage({ step }: { step: StepId }) {
+/**
+ * The shell around one step. The step's own component arrives as `children`
+ * from the server page, which picks it per step (D-1012: one chunk per step,
+ * because the payload references only the client module it renders). It
+ * used to be chosen here through `next/dynamic`, which rendered it on the
+ * server inside a streamed Suspense segment: the segment arrives hidden at
+ * the end of the body and an inline script moves it into place, and on a
+ * slow runner the `ready` flip below rendered the form on the client before
+ * that script ran, leaving two copies of every control with the same ids
+ * in the DOM (#40, run 38637072132). In the first HTML there is one copy.
+ */
+export function StepPage({
+  step,
+  children,
+}: {
+  step: StepId;
+  children: ReactNode;
+}) {
   const router = useRouter();
   const { ready, answers, touchStep } = useQuestionnaire();
   const allowed = ready && canOpenStep(step, answers);
-
-  // Fetch the next step's form the moment this one is first touched, so
-  // the move between steps never shows the loading line; on first focus,
-  // not on mount, so it stays out of the page's first-paint budget.
-  const preloaded = useRef(false);
-  const preloadNext = () => {
-    if (preloaded.current) return;
-    preloaded.current = true;
-    const next = nextStep(step);
-    if (next) void PRELOAD[next]().catch(() => undefined);
-  };
 
   // FR-4: a later step is unreachable until the earlier ones are valid.
   useEffect(() => {
@@ -88,18 +44,9 @@ export function StepPage({ step }: { step: StepId }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, allowed, step]);
 
-  const form =
-    step === "business" ? (
-      <BusinessStepForm />
-    ) : step === "supports" ? (
-      <SupportsStepForm />
-    ) : step === "practices" ? (
-      <PracticesStepForm />
-    ) : step === "workforce" ? (
-      <WorkforceStepForm />
-    ) : step === "existing" ? (
-      <ExistingStepForm />
-    ) : null;
+  // The result needs the answers, so it gets a placeholder of a step's
+  // height until they are ready; a form is in the HTML from the start.
+  const form = step === "result" ? null : children;
 
   if (!ready) {
     // Backlog 2 (D-1012): the step's form is in the server HTML, inert until
@@ -145,10 +92,8 @@ export function StepPage({ step }: { step: StepId }) {
       <fieldset
         key={hasDraftAnswers ? "ready" : "loading"}
         className="m-0 min-w-0 border-0 p-0"
-        onFocusCapture={preloadNext}
       >
-        {form}
-        {step === "result" && <ResultStep />}
+        {children}
       </fieldset>
     </StepShell>
   );
