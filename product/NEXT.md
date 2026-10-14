@@ -1435,27 +1435,27 @@ The standing backlog is empty bar item 7, which stopped for the PO (the REQ-020 
 
 | Branch | Head | Check | Unit files | Unit tests |
 | --- | --- | --- | --- | --- |
-| `req-009-session-c` | 98c964b | green | 84 passed (84) | 617 passed | 2 skipped (619) |
-| `req-010-generation-kicker` | cca65cd | green | 87 passed (87) | 629 passed | 2 skipped (631) |
-| `req-016-document-standard` | fc9f15f | green | 88 passed | 1 skipped (89) | 642 passed | 3 skipped (645) |
-| `req-017-guided-path` | f0fd68a | green | 91 passed | 1 skipped (92) | 665 passed | 3 skipped (668) |
-| `req-011-groups` | ff71165 | green | 92 passed | 1 skipped (93) | 670 passed | 3 skipped (673) |
-| `req-013-phone-fixes` | 26703a4 | green | 92 passed | 1 skipped (93) | 670 passed | 3 skipped (673) |
-| `req-017-close-out` | 365d01c | green | 94 passed | 1 skipped (95) | 682 passed | 3 skipped (685) |
-| `req-018-audit-day-systems` | 07f1de9 | green | 97 passed | 1 skipped (98) | 696 passed | 3 skipped (699) |
-| `req-018-ndis-watch-1` | d91871e | green | 96 passed | 1 skipped (97) | 689 passed | 4 skipped (693) |
-| `req-005-house-style-v2` | ae9db71 | green | 98 passed | 1 skipped (99) | 699 passed | 4 skipped (703) |
-| `req-019-review-fixes` | f96f17c | green | 100 passed | 1 skipped (101) | 716 passed | 4 skipped (720) |
-| `req-015-accessibility-pass` | 1078c99 | green | 100 passed | 1 skipped (101) | 716 passed | 4 skipped (720) |
-| `req-010-performance-budget` | dedbb20 | green | 101 passed | 1 skipped (102) | 717 passed | 5 skipped (722) |
-| `req-011-guides-2` | 4d3332c | green | 101 passed | 1 skipped (102) | 717 passed | 5 skipped (722) |
-| `req-018-register-tests` | d71b46b | green | 107 passed | 1 skipped (108) | 757 passed | 5 skipped (762) |
-| `req-004-admin-hardening` | 2455d7d | green | 107 passed | 1 skipped (108) | 759 passed | 5 skipped (764) |
-| `req-005-recording-prep` | c4c954a | green | 108 passed | 1 skipped (109) | 768 passed | 5 skipped (773) |
-| `req-021-writing-indicator` | 0243d54 | green | 109 passed | 1 skipped (110) | 792 passed | 5 skipped (797) |
-| `req-020-registers-audit-pack` | f4ec5ce | green | 109 passed | 1 skipped (110) | 792 passed | 5 skipped (797) |
-| `req-005-living-policies` | 9188947 | green | 110 passed | 1 skipped (111) | 798 passed | 5 skipped (803) |
-| `req-005-generator-exam` | ba4e5cb | green | 112 passed | 1 skipped (113) | 803 passed | 6 skipped (809) |
+| `req-009-session-c` | 98c964b | green | 84 passed (84) | 617 passed, 2 skipped (619) |
+| `req-010-generation-kicker` | cca65cd | green | 87 passed (87) | 629 passed, 2 skipped (631) |
+| `req-016-document-standard` | fc9f15f | green | 88 passed, 1 skipped (89) | 642 passed, 3 skipped (645) |
+| `req-017-guided-path` | f0fd68a | green | 91 passed, 1 skipped (92) | 665 passed, 3 skipped (668) |
+| `req-011-groups` | ff71165 | green | 92 passed, 1 skipped (93) | 670 passed, 3 skipped (673) |
+| `req-013-phone-fixes` | 26703a4 | green | 92 passed, 1 skipped (93) | 670 passed, 3 skipped (673) |
+| `req-017-close-out` | 365d01c | green | 94 passed, 1 skipped (95) | 682 passed, 3 skipped (685) |
+| `req-018-audit-day-systems` | 07f1de9 | green | 97 passed, 1 skipped (98) | 696 passed, 3 skipped (699) |
+| `req-018-ndis-watch-1` | d91871e | green | 96 passed, 1 skipped (97) | 689 passed, 4 skipped (693) |
+| `req-005-house-style-v2` | ae9db71 | green | 98 passed, 1 skipped (99) | 699 passed, 4 skipped (703) |
+| `req-019-review-fixes` | f96f17c | green | 100 passed, 1 skipped (101) | 716 passed, 4 skipped (720) |
+| `req-015-accessibility-pass` | 1078c99 | green | 100 passed, 1 skipped (101) | 716 passed, 4 skipped (720) |
+| `req-010-performance-budget` | dedbb20 | green | 101 passed, 1 skipped (102) | 717 passed, 5 skipped (722) |
+| `req-011-guides-2` | 4d3332c | green | 101 passed, 1 skipped (102) | 717 passed, 5 skipped (722) |
+| `req-018-register-tests` | d71b46b | green | 107 passed, 1 skipped (108) | 757 passed, 5 skipped (762) |
+| `req-004-admin-hardening` | 2455d7d | green | 107 passed, 1 skipped (108) | 759 passed, 5 skipped (764) |
+| `req-005-recording-prep` | c4c954a | green | 108 passed, 1 skipped (109) | 768 passed, 5 skipped (773) |
+| `req-021-writing-indicator` | 0243d54 | green | 109 passed, 1 skipped (110) | 792 passed, 5 skipped (797) |
+| `req-020-registers-audit-pack` | f4ec5ce | green | 109 passed, 1 skipped (110) | 792 passed, 5 skipped (797) |
+| `req-005-living-policies` | 9188947 | green | 110 passed, 1 skipped (111) | 798 passed, 5 skipped (803) |
+| `req-005-generator-exam` | ba4e5cb | green | 112 passed, 1 skipped (113) | 803 passed, 6 skipped (809) |
 
 21 of 21 branches green.
 
