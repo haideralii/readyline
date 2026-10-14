@@ -5,7 +5,7 @@ description: "The twelve records NDIS auditors ask to see, what each one proves 
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
-status: draft (Dev first draft, 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's; the "where Readyline keeps it" column describes the registers that exist today and the ones being built; the PO reviews before publishing)
+status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's)
 ---
 
 # The registers an auditor asks for, and what each one proves

@@ -89,6 +89,18 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "bullets",
         ],
         "heading": "Records and evidence to retain",
@@ -612,6 +624,16 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -760,13 +782,14 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -1236,6 +1259,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "paragraph",
           "table",
@@ -3310,6 +3334,18 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "bullets",
         ],
         "heading": "Records and evidence to retain",
@@ -3833,6 +3869,16 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -3981,13 +4027,14 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -4457,6 +4504,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "paragraph",
           "table",
@@ -6377,6 +6425,18 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "paragraph",
         ],
         "heading": "Records and evidence to retain",
@@ -6897,6 +6957,16 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -7044,13 +7114,14 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -7519,6 +7590,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "paragraph",
           "table",

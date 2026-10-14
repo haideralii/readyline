@@ -34,6 +34,7 @@ export const DEMO_SCENARIOS = [
   "happy",
   "quiet",
   "long",
+  "steady",
   "failed",
   "ready",
   "offline",
@@ -125,6 +126,21 @@ export function demoStatus(input: {
       sectionCount: 0,
       lastProgressAt: new Date(now - 5000).toISOString(),
       documents: list(total, null, failedIds),
+    };
+  }
+  // D-2006 (batch 45): a feed that stays in Writing with fresh progress for
+  // as long as a test needs, so the animation's cost can be measured over
+  // ten seconds (the happy script's Writing phase lasts four).
+  if (scenario === "steady") {
+    return {
+      ...base,
+      phase: "writing",
+      done: 1,
+      currentDocument: { ...documents[1], position: 2 },
+      currentSection: 1 + (Math.floor((now - t0) / 3000) % 6),
+      sectionCount: 6,
+      lastProgressAt: new Date(now).toISOString(),
+      documents: list(1, 1),
     };
   }
   if (scenario === "quiet" || scenario === "long") {

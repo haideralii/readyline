@@ -63,6 +63,7 @@ export const CSV_COLUMNS = {
     "worker_ref",
     "role_label",
     "clearance_kind",
+    "clearance_number",
     "issued_on",
     "expires_on",
     "state",

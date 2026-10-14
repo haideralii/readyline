@@ -141,6 +141,13 @@ export const WorkerCheckForm = strictObject({
     "Enter the role, such as support worker",
   ),
   clearanceKind: z.enum(CLEARANCE_KINDS, { error: "Choose the kind of check" }),
+  // Batch 45 item 22: the check number the Worker Screening Rules s 18(3)(d) want on the provider's list; optional, never a name.
+  clearanceNumber: z
+    .string()
+    .trim()
+    .max(40, "The check number is 40 characters at most")
+    .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only")
+    .default(""),
   issuedOn: dateField("date it was issued"),
   expiresOn: optionalDate("expiry date"),
   state: z

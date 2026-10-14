@@ -6,8 +6,17 @@
  * "Items to prepare before the audit" uses, in the same order.
  */
 import { describe, expect, it } from "vitest";
+import { documentTypeById } from "@/lib/generator/catalogue";
+import { buildProviderFacts } from "@/lib/generator/facts";
+import { fixedExtra } from "@/lib/generator/fixed-extras";
+import type { FixedContext } from "@/lib/generator/fixed-text";
+import { loadReferenceCases } from "@/lib/generator/reference-cases";
+import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
   AUDIT_DAY_RECORDS,
+  CLEARANCE_COLUMNS,
+  COMPLAINT_COLUMNS,
+  INCIDENT_COLUMNS,
   PACK_FORM_NAMES,
   RECORD_NAMES,
   canonicalRecordName,
@@ -81,5 +90,55 @@ describe("the twelve records an auditor asks for", () => {
         expect(items[i]).toMatch(/expiry date/);
       } else expect(items[i]).toBe(r.ask);
     });
+  });
+});
+
+describe("the paper registers carry the app's columns (batch 45 item 17)", () => {
+  const dataset = getStandardsDataset();
+  const reference = loadReferenceCases().find(
+    (c) => c.id === "verification-sole-trader",
+  )!;
+  const ctx: FixedContext = {
+    type: documentTypeById("incident-management-policy-and-register")!,
+    facts: buildProviderFacts(reference.answers, reference.result),
+    standards: [],
+    documents: [],
+    registers: [],
+    version: "1",
+    generatedAt: "2026-10-15",
+    reviewDueAt: "2027-10-15",
+  };
+  void dataset;
+
+  it("the incident register template's columns are the app's incident columns, with INC-0001 as the example", () => {
+    const blocks = fixedExtra("incident-register", ctx)!;
+    const table = blocks.find((b) => b.type === "table") as {
+      columns: string[];
+      rows: string[][];
+    };
+    expect(table.columns).toEqual(Object.values(INCIDENT_COLUMNS));
+    expect(table.rows[0][0]).toBe("INC-0001");
+    expect(table.rows[0]).toHaveLength(table.columns.length);
+  });
+
+  it("the complaints register template's columns are the app's complaint columns, with CMP-0001 as the example", () => {
+    const blocks = fixedExtra("complaints-register", ctx)!;
+    const table = blocks.find((b) => b.type === "table") as {
+      columns: string[];
+      rows: string[][];
+    };
+    expect(table.columns).toEqual(Object.values(COMPLAINT_COLUMNS));
+    expect(table.rows[0][0]).toBe("CMP-0001");
+    expect(table.rows[0]).toHaveLength(table.columns.length);
+  });
+
+  it("every column name is sentence case and never a database column", () => {
+    for (const name of [
+      ...Object.values(INCIDENT_COLUMNS),
+      ...Object.values(COMPLAINT_COLUMNS),
+      ...Object.values(CLEARANCE_COLUMNS),
+    ]) {
+      expect(name).toMatch(/^[A-Z][^_]*$/);
+    }
   });
 });

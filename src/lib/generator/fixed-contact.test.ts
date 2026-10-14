@@ -126,7 +126,10 @@ describe("Our position on restrictive practices (D-548)", () => {
       expect(text).toContain(kind);
     expect(text).toMatch(/locked door/);
     expect(text).toMatch(/withheld/);
-    expect(text).toMatch(/within 5 business days, or within 24 hours/);
+    // Batch 45 item 19: the two windows as the Incident Rules ss 20 and 21 set them.
+    expect(text).toMatch(
+      /within 5 business days; within 24 hours if the use of a restrictive practice also caused serious injury or is itself abuse or neglect/,
+    );
     expect(text).toMatch(/the same day/);
     expect(text).toMatch(/every 12 months/);
     // The steps name only canonical records.

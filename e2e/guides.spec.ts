@@ -113,13 +113,15 @@ test.describe("guides (REQ-011)", () => {
       body: "Complaints register",
     },
   ]) {
-    test(`${guide.slug}: draft note, tables, FAQ structured data, Commission sources, CTA`, async ({
+    test(`${guide.slug}: published (no draft note), tables, FAQ structured data, Commission sources, CTA`, async ({
       page,
     }, testInfo) => {
       await page.goto(`/guides/${guide.slug}`);
       await expect(page.getByRole("heading", { level: 1 })).toContainText(
         guide.h1,
       );
+      // D-2003 (batch 45): published on the PO's decision, so no draft note.
+      await expect(page.getByTestId("guide-draft-note")).toHaveCount(0);
       await expect(page.getByTestId("guide-reviewed")).toContainText(
         /Last reviewed/,
       );

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getIncident } from "@/server/registers/queries";
 import { CATEGORY_LABELS } from "@/lib/registers/labels";
+import { INCIDENT_COLUMNS } from "@/lib/registers/names";
 import { EventsTrail } from "../../_components/events-trail";
 import { StatusTag } from "../../_components/register-list";
 import { RegisterPage, registerContext } from "../../_components/shell";
@@ -23,18 +24,24 @@ export default async function IncidentPage({
   if (!found) notFound();
   const r = found.row;
   const rows: [string, string][] = [
-    ["What happened", CATEGORY_LABELS[r.category]],
-    ["How serious", SEVERITY[r.severity]],
-    ["Date it happened", r.occurred_on],
-    ["Date reported to you", r.reported_on],
+    // Batch 45 item 17: the same words as the paper register in the pack (names.ts).
+    [INCIDENT_COLUMNS.category, CATEGORY_LABELS[r.category]],
+    [INCIDENT_COLUMNS.severity, SEVERITY[r.severity]],
+    [INCIDENT_COLUMNS.occurred_on, r.occurred_on],
+    [INCIDENT_COLUMNS.reported_on, r.reported_on],
     ["Participant", r.participant_ref ?? "Not recorded"],
     ["Worker", r.worker_ref ?? "Not recorded"],
-    ["Reportable", r.reportable ? "Yes" : "No"],
+    [INCIDENT_COLUMNS.reportable, r.reportable ? "Yes" : "No"],
     ...(r.notify_by
       ? [["Notify the Commission by", r.notify_by] as [string, string]]
       : []),
     ...(r.reportable_notified_on
-      ? [["Commission told on", r.reportable_notified_on] as [string, string]]
+      ? [
+          [
+            INCIDENT_COLUMNS.reportable_notified_on,
+            r.reportable_notified_on,
+          ] as [string, string],
+        ]
       : []),
     ...(r.closed_on ? [["Closed on", r.closed_on] as [string, string]] : []),
   ];

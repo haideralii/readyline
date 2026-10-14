@@ -145,7 +145,7 @@ export function IncidentFormView({
       <SelectField
         id="severity"
         label={LABELS.severity}
-        help="For an unauthorised restrictive practice: 5 business days to notify the Commission, or 24 hours if the participant was harmed (medium or high)."
+        help="For an unauthorised restrictive practice: within 5 business days; within 24 hours if the use of a restrictive practice also caused serious injury or is itself abuse or neglect (Incident Rules ss 20 and 21). Medium or high here means harm."
         errors={errorsFor(errors, "severity")}
         value={v.severity}
         onChange={(x) => set("severity", x as IncidentFormValues["severity"])}

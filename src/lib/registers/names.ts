@@ -300,3 +300,65 @@ export function itemsToPrepareBeforeAudit(): string[] {
       : r.ask,
   );
 }
+
+/**
+ * Batch 45 item 17 (field, auditor and Commission reviews): the columns of
+ * the paper incident and complaints registers in the pack and of the app's
+ * pages, one list, so the two never drift. Keys are the database columns;
+ * values are the words the pages and the paper show. A unit test holds the
+ * pack's tables to these lists.
+ */
+export const INCIDENT_COLUMNS = {
+  reference: "Reference",
+  occurred_on: "Date it happened",
+  reported_on: "Date it was reported",
+  category: "What happened",
+  severity: "How serious",
+  reportable: "Reportable",
+  reportable_notified_on: "Commission told on",
+  status: "Status",
+} as const;
+
+export const INCIDENT_EXAMPLE_ROW: readonly string[] = [
+  "INC-0001",
+  "[Date]",
+  "[Date]",
+  "[What happened, in a sentence]",
+  "[Low, medium or high]",
+  "[Yes or no]",
+  "[Date, or not needed]",
+  "[Open, under review or closed]",
+];
+
+export const COMPLAINT_COLUMNS = {
+  reference: "Reference",
+  received_on: "Date received",
+  from_ref: "Who (code)",
+  summary: "What",
+  actions: "What we did",
+  outcome: "Outcome",
+  improvement: "Improvement",
+  resolved_on: "Closed on",
+} as const;
+
+export const COMPLAINT_EXAMPLE_ROW: readonly string[] = [
+  "CMP-0001",
+  "[Date]",
+  "[Code, never a name]",
+  "[The complaint, in a sentence]",
+  "[What we did]",
+  "[Outcome]",
+  "[What we changed]",
+  "[Date]",
+];
+
+/** Batch 45 item 22: the worker checks register's columns, the app's fields in the app's words. */
+export const CLEARANCE_COLUMNS = {
+  worker_ref: "Worker code",
+  role_label: "Role",
+  clearance_kind: "Kind of check",
+  clearance_number: "Check number",
+  issued_on: "Date issued",
+  expires_on: "Expiry date",
+  next_check: "Next check",
+} as const;

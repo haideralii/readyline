@@ -408,6 +408,7 @@ export async function saveWorkerCheckAction(
     worker_ref: v.workerRef,
     role_label: v.roleLabel,
     clearance_kind: v.clearanceKind,
+    clearance_number: v.clearanceNumber,
     issued_on: v.issuedOn,
     expires_on: v.expiresOn,
     state: v.state,

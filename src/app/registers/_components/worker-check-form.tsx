@@ -14,6 +14,7 @@ import {
   type WorkerCheckFormValues,
 } from "@/lib/registers/forms";
 import { CLEARANCE_LABELS } from "@/lib/registers/labels";
+import { CLEARANCE_COLUMNS } from "@/lib/registers/names";
 import { AU_STATES, CLEARANCE_KINDS, TEXT_CAPS } from "@/lib/registers/types";
 import { parseInput } from "@/lib/validation";
 import { saveWorkerCheckAction } from "@/server/registers/actions";
@@ -26,11 +27,12 @@ import {
 } from "./inputs";
 
 const LABELS: Record<string, string> = {
-  workerRef: "Worker code",
-  roleLabel: "Role",
-  clearanceKind: "Kind of check",
-  issuedOn: "Date issued",
-  expiresOn: "Expiry date",
+  workerRef: CLEARANCE_COLUMNS.worker_ref,
+  roleLabel: CLEARANCE_COLUMNS.role_label,
+  clearanceKind: CLEARANCE_COLUMNS.clearance_kind,
+  clearanceNumber: CLEARANCE_COLUMNS.clearance_number,
+  issuedOn: CLEARANCE_COLUMNS.issued_on,
+  expiresOn: CLEARANCE_COLUMNS.expires_on,
   state: "State or territory",
   note: "Note",
   form: "Worker check",
@@ -49,6 +51,7 @@ export function WorkerCheckFormView({
       workerRef: "",
       roleLabel: "",
       clearanceKind: "" as WorkerCheckFormValues["clearanceKind"],
+      clearanceNumber: "",
       issuedOn: "",
       expiresOn: "",
       state: "",
@@ -155,6 +158,25 @@ export function WorkerCheckFormView({
           label: CLEARANCE_LABELS[k],
         }))}
       />
+      {/* Batch 45 item 22: the check number the Worker Screening Rules s 18(3)(d) want on the list; optional, never a name. */}
+      <Field
+        id="clearanceNumber"
+        label={`${LABELS.clearanceNumber} (optional)`}
+        help="The NDIS worker screening check number, or the application number while it is pending. Never a name or a participant number."
+        errors={errorsFor(errors, "clearanceNumber")}
+      >
+        {(describedBy, invalid) => (
+          <TextInput
+            id="clearanceNumber"
+            name="clearanceNumber"
+            value={v.clearanceNumber ?? ""}
+            onChange={(x) => set("clearanceNumber", x)}
+            describedBy={describedBy}
+            invalid={invalid}
+            maxLength={40}
+          />
+        )}
+      </Field>
       <DateField
         id="issuedOn"
         label={LABELS.issuedOn}

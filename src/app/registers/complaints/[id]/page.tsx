@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getComplaint } from "@/server/registers/queries";
 import { COMPLAINT_STATUS_LABELS } from "@/lib/registers/labels";
+import { COMPLAINT_COLUMNS } from "@/lib/registers/names";
 import { EventsTrail } from "../../_components/events-trail";
 import { StatusTag } from "../../_components/register-list";
 import { RegisterPage, registerContext } from "../../_components/shell";
@@ -30,12 +31,13 @@ export default async function ComplaintPage({
   if (!found) notFound();
   const r = found.row;
   const rows: [string, string][] = [
-    ["Received", r.received_on],
+    // Batch 45 item 17: the same words as the paper register in the pack (names.ts).
+    [COMPLAINT_COLUMNS.received_on, r.received_on],
     ["How it arrived", CHANNEL[r.channel] ?? r.channel],
-    ["Raised by", r.from_ref ?? "Not recorded"],
+    [COMPLAINT_COLUMNS.from_ref, r.from_ref ?? "Not recorded"],
     ["Status", COMPLAINT_STATUS_LABELS[r.status]],
     ["Acknowledged", r.acknowledged_on ?? "Not yet"],
-    ["Resolved", r.resolved_on ?? "Not yet"],
+    [COMPLAINT_COLUMNS.resolved_on, r.resolved_on ?? "Not yet"],
   ];
   return (
     <RegisterPage

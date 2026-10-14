@@ -286,6 +286,8 @@ export type WorkerClearanceRow = {
   worker_ref: string;
   role_label: string;
   clearance_kind: ClearanceKind;
+  /** Batch 45 item 22: the check (or application) number, optional; Worker Screening Rules s 18(3)(d). */
+  clearance_number: string;
   issued_on: string;
   /** Null means no expiry (the orientation module). */
   expires_on: string | null;
@@ -299,7 +301,12 @@ export type WorkerClearanceInsert = Pick<
   WorkerClearanceRow,
   "account_id" | "worker_ref" | "role_label" | "clearance_kind" | "issued_on"
 > &
-  Partial<Pick<WorkerClearanceRow, "expires_on" | "state" | "note">>;
+  Partial<
+    Pick<
+      WorkerClearanceRow,
+      "expires_on" | "state" | "note" | "clearance_number"
+    >
+  >;
 
 export type PolicyReviewRow = {
   id: string;

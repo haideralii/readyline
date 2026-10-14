@@ -3,7 +3,7 @@
 Case: verification-sole-trader (Sunrise Supports, sole trader, New South Wales; classes 0120; verification).
 Rendered 2026-10-14 from recorded fixtures only (replay client, no model call); model id in the fixtures: claude-sonnet-5-5; 16 documents.
 Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lint and readability gates; sections marked fallback show the marker the provider would see, with the reason the pipeline gave (no fixture recorded, readability fail after the retry, or a reply cut at the output cap).
-Tailored sections: 80 with model text, 3 with a fallback marker.
+Tailored sections: 79 with model text, 3 with a fallback marker.
 
 ## Governance policy (governance-policy.docx)
 
@@ -84,6 +84,7 @@ Tailored sections: 80 with model text, 3 with a fallback marker.
   > A sole trader cannot review their own decisions in the usual way. To cover this, the owner records significant decisions in writing and checks them at each scheduled review of this policy. If a decision involves a conflict of interest, the owner writes down the conflict and the reason for the decision.
   > [Provider to complete: name of the owner and the date this structure was last confirmed.]
 
+- Telling the Commission about changes: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
@@ -398,6 +399,7 @@ Tailored sections: 80 with model text, 3 with a fallback marker.
   > Because we work alone, no one else sees participant information unless the participant has agreed to it. That makes it our duty to keep it safe at every step.
   > [Provider to complete: name of any person who covers for the owner when the owner is unavailable, if there is one.]
 
+- The law we follow: fixed text.
 - 7 Consent form: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
@@ -471,23 +473,7 @@ Tailored sections: 80 with model text, 3 with a fallback marker.
   > Any worker we engage in future | Reads this policy before they start. Records only what is needed. Keeps records secure. Tells the owner at once if a record is lost or seen by the wrong person. | Before starting work, then every day they work
   > The records we must keep, and how long we keep them, are set out in section 7 Retention schedule and section 8 Records and evidence to retain. We do not repeat them here.
 
-- 7 Retention schedule: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Registration groups (audit type derived) (step 2); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 7.4.
-
-  > This table shows how long Sunrise Supports keeps each type of record. We provide 0120 Household tasks in New South Wales as a sole trader, so we list only the records that apply to our work.
-  > Where a period comes from a law, a Commission rule or the NDIS Practice Standards, the source is named. Where we have not confirmed the period, the table says so. We do not destroy a record early or keep it past its period without a reason.
-  > Record type | How long we keep it | Source or status
-  > Service agreements and participant plan details | [Provider to complete: retention period] | [Provider to confirm against the NDIS Practice Standards, NDIS Rules and NSW requirements]
-  > Records of supports delivered and shift notes | [Provider to complete: retention period] | [Provider to confirm against the NDIS Rules and NSW requirements]
-  > Complaints and their outcomes | [Provider to complete: retention period] | [Provider to confirm against the NDIS Complaints Management and Resolution Rules]
-  > Incident records and notifications to the Commission | [Provider to complete: retention period] | [Provider to confirm against the NDIS Incident Management and Reportable Incidents Rules]
-  > Worker screening checks, identity and qualification checks | [Provider to complete: retention period] | [Provider to confirm against the NDIS Worker Screening Rules]
-  > Worker training and induction records | [Provider to complete: retention period] | [Provider to confirm against the NDIS Practice Standards]
-  > Invoices, claims and financial records | [Provider to complete: retention period] | [Provider to confirm against Australian tax law and the NDIS Pricing Arrangements]
-  > Policy review register and document control records | Until the policy is replaced, then [provider to complete: retention period] | [Provider to confirm]
-  > We keep records for the longer of the periods above or any period set by law, and the longest period applies where two rules differ. We do not use restrictive practices, so we hold no restrictive practice records.
-  > [Provider to complete: confirm each retention period with your accountant or a legal adviser, then replace the placeholders in the table.]
-  > When a record reaches the end of its period, we check that no complaint, investigation or legal matter needs it. If none does, we destroy it as set out in section 5 How we put this into practice.
-
+- 7 Retention schedule: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
