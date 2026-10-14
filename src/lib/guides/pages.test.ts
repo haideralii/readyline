@@ -4,10 +4,12 @@ import { loadGuide, loadGuides, parseFaq, parseSources } from "./pages";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 
 describe("guides (REQ-011)", () => {
-  it("loads both guides with valid front matter, six FAQ entries each and sources", () => {
+  it("loads the four guides with valid front matter, six FAQ entries each and sources", () => {
     const guides = loadGuides();
     expect(guides.map((g) => g.slug)).toEqual([
       "ndis-registration-cost",
+      "registers-an-auditor-asks-for",
+      "what-happens-at-an-ndis-audit",
       "which-ndis-audit",
     ]);
     for (const g of guides) {
@@ -29,9 +31,24 @@ describe("guides (REQ-011)", () => {
     expect(cost.faq.map((f) => f.answer).join("\n")).toMatch(
       /does not charge an application fee/,
     );
-    // The compulsory-registration dates (item A11) were not approved and keep their marker.
+    // The later compulsory-registration dates (item A11) were not approved and keep their marker;
+    // the "add a service later" answer now cites the Commission's out-of-cycle audit (backlog 3).
     const audit = loadGuide("which-ndis-audit");
-    expect(audit.unverified.length).toBeGreaterThanOrEqual(2);
+    expect(audit.unverified.length).toBeGreaterThanOrEqual(1);
+    expect(audit.faq.map((f) => f.answer).join("\n")).toMatch(/out of cycle/);
+    // The two new guides label the sector-webinar material as practice and cite the Commission.
+    for (const slug of [
+      "what-happens-at-an-ndis-audit",
+      "registers-an-auditor-asks-for",
+    ]) {
+      const g = loadGuide(slug);
+      expect(g.draft).toBe(true);
+      expect(
+        g.sources.filter((s) => s.url?.includes("ndiscommission.gov.au"))
+          .length,
+      ).toBeGreaterThanOrEqual(2);
+      expect(g.markdown).toMatch(/not a rule|not rules/);
+    }
   });
 
   it("parses FAQ and sources blocks", () => {

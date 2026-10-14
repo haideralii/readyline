@@ -2490,6 +2490,35 @@ provider touches the list. "Guides" joined the footer's nav list; the home
 page gained one line under the mission section; the sitemap carries the
 index and the 38 pages. The two written guides keep their draft banner.
 
+**D-1106 Backlog 3: the two audit guides and the which-audit update are
+written from the Commission's types-of-audits page, with sector-webinar
+material labelled as practice (Dev, 2026-10-14, backlog 3, REQ-011).**
+`content/guides/what-happens-at-an-ndis-audit.md` (the five kinds, what the
+auditor reads, the interviews, the ratings and report times, how the money
+works) and `content/guides/registers-an-auditor-asks-for.md` (the twelve
+records in three tiers: the two the Rules require, the five the standards
+expect, the five auditors ask for in practice; a "where to keep it" column
+that names the four live registers on this lineage, the pack templates and
+the provider's own folder, and says which registers are being added) are
+first drafts in `draft` status. The Commission's page
+(`data/sources/types-of-audits.txt`, manifest entry) is the only source for
+anything stated as a rule. The daily-rate pricing, the AUD 5,000 to 7,000
+renewal quotes, "auditors expect the full participant list" and the list of
+twelve come from `product/research/webinars/2026-10-14-what-auditors-look-for.md`,
+and every such line says "practice, not a rule". The two Rules are cited by
+name through the governance standard that names them, not by a
+legislation.gov.au id I could not verify from a stored copy.
+`content/guides/which-ndis-audit.md` gained the certification stages, the
+three other kinds with a link, the ratings and report times, the mid-term
+exclusions and the 12-month preparation line; the 1 July 2026 wave now cites
+the reform hub and the 2027 and 2030 dates keep their UNVERIFIED line, so
+`src/lib/guides/pages.test.ts` expects at least one marker (was two), and
+the "add a service later" answer now names the out of cycle audit. There is
+no REQ-011 file in `product/requirements` (the backlog row lists it as
+draft), so the delivery evidence is in the batch status. Publishing is the
+PO's.
+
+
 **D-1008 The integration suite aliases Next's `server-only` guard (Dev,
 2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
 `tests/integration/reminders-job.test.ts` imports the reminders job, the
