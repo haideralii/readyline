@@ -30,6 +30,9 @@ export const PRICING_COPY = {
   ],
   refundHeading: "Refunds",
   aiHeading: "How the drafts are made",
+  /** REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies (CLAUDE.md 4.3: no audit-proof, no compliant). */
+  aiHonest:
+    "Consultants warn that AI-written policies are vague, generic and unfinished. Ours are built from your own answers. Every step names a role, a time and a record. Vague wording and leftover blanks are rejected before a document reaches you. You read and adopt each document before it counts.",
   aiDisclosure: AI_DISCLOSURE,
   notLegalAdvice: GENERAL_INFORMATION_STATEMENT,
   subscriptionHeading: "Audit-ready subscription",

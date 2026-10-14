@@ -1069,6 +1069,17 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "Who tells whom, and by when",
+        "id": "escalation-pathway",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
           "callout",
         ],
         "heading": "Incident procedure",
@@ -4233,6 +4244,17 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "Who tells whom, and by when",
+        "id": "escalation-pathway",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
           "callout",
         ],
         "heading": "Incident procedure",
@@ -7234,6 +7256,17 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "id": "reportable-incidents",
         "mode": "fixed",
         "number": "7",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "Who tells whom, and by when",
+        "id": "escalation-pathway",
+        "mode": "fixed",
+        "number": "",
         "status": "fixed",
       },
       {

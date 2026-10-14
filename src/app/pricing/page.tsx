@@ -182,6 +182,10 @@ export default async function PricingPage() {
         <h2 id="ai-heading" className={h2}>
           {C.aiHeading}
         </h2>
+        {/* REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies. */}
+        <p className={body} data-testid="pricing-ai-honest">
+          {C.aiHonest}
+        </p>
         <p className={body} data-testid="pricing-ai-disclosure">
           {C.aiDisclosure}
         </p>

@@ -30,8 +30,12 @@ import { STATE_FACT_SECTIONS, stateFactsFor } from "./state-facts";
  * section prompt of the state-tailored sections, and per-document brief
  * additions; fixtures re-keyed, the affected sections' replies predate the
  * change and are listed for the next recording session.
+ * 2026-10-14.2 (batch 40, D-544): house style version 2 in the system
+ * prompt, the audit test sentence on every tailored brief, and the new
+ * section briefs; fixtures re-keyed under the new prompts, replies
+ * unchanged and listed for recording.
  */
-export const PROMPT_VERSION = "2026-10-14.1";
+export const PROMPT_VERSION = "2026-10-14.2";
 
 const FactsSchema = strictObject({
   tradingName: z.string().min(1).max(120),
@@ -139,11 +143,19 @@ export function briefWithCycles(
  * purpose and policy-statement briefs name the obligation the document rests
  * on instead of a standard, so the model never asks the provider for one.
  */
+/**
+ * House style version 2 (batch 40, D-544): every tailored brief ends with
+ * the audit test, so the model writes steps that leave records behind.
+ */
+export const AUDIT_TEST_SENTENCE =
+  "Audit test: if a worker followed this exactly, the records named below would exist.";
+
 export function briefFor(
   section: SectionSpec,
   type: DocumentTypeSpec,
   standardsCount: number,
   cycles: { policyMonths: number; registerMonths: number },
+  options: { auditTest?: boolean } = {},
 ): string {
   const noStandard = standardsCount === 0 && type.basis !== "practice-standard";
   const reason = type.basisReason ?? "";
@@ -155,6 +167,9 @@ export function briefFor(
   // Batch 35 (D-1802): a document-specific sentence on a shared outline brief.
   const addition = type.briefAdditions?.[section.id];
   if (addition) brief = `${brief} ${addition}`;
+  // Batch 40 (D-544): the audit test closes every tailored brief; the re-key tool turns it off to rebuild a previous brief.
+  if (options.auditTest !== false && section.mode === "tailored")
+    brief = `${brief} ${AUDIT_TEST_SENTENCE}`;
   return briefWithCycles(brief, cycles);
 }
 

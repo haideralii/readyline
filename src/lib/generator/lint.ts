@@ -417,6 +417,193 @@ function reviewObjects(raw: string): Subjects {
   return out;
 }
 
+/* ---------- house style version 2 (batch 40, D-544) ---------- */
+
+/** Sentences of a text, in document order with their offsets (tables split per cell). */
+function sentencesOf(text: string): { text: string; index: number }[] {
+  const out: { text: string; index: number }[] = [];
+  const re = /[^.!?\n|]+[.!?]?/g;
+  for (const m of text.matchAll(re)) {
+    const s = m[0].trim();
+    if (s.length > 0) out.push({ text: s, index: m.index ?? 0 });
+  }
+  return out;
+}
+
+const STOP_WORDS = new Set([
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "of",
+  "to",
+  "in",
+  "on",
+  "for",
+  "with",
+  "by",
+  "is",
+  "are",
+  "be",
+  "that",
+  "this",
+  "their",
+  "our",
+  "we",
+  "its",
+  "as",
+  "at",
+  "each",
+  "all",
+  "any",
+  "it",
+  "they",
+  "them",
+  "from",
+  "has",
+  "have",
+  "will",
+]);
+
+function contentWords(s: string): string[] {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9' -]/g, " ")
+    .split(/\s+/)
+    .map((w) => w.replace(/^'+|'+$/g, ""))
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
+}
+
+/**
+ * Version 2 (a): a generated sentence that shares 80 percent or more of its
+ * content words with a quality indicator sentence restates the indicator
+ * instead of saying what we do ("no work done" to a policy auditor).
+ */
+export function lintIndicatorRestatement(
+  text: string,
+  indicators: readonly string[],
+  threshold = 0.8,
+): LintFinding[] {
+  const findings: LintFinding[] = [];
+  const indicatorSets = indicators
+    .flatMap((i) => sentencesOf(i).map((s) => contentWords(s.text)))
+    .filter((w) => w.length >= 5)
+    .map((w) => new Set(w));
+  if (indicatorSets.length === 0) return findings;
+  for (const s of sentencesOf(text)) {
+    const words = contentWords(s.text);
+    if (words.length < 5) continue;
+    for (const set of indicatorSets) {
+      const shared = words.filter((w) => set.has(w)).length;
+      if (shared / words.length >= threshold) {
+        findings.push({
+          rule: "indicator-restatement",
+          severity: "error",
+          match: s.text.slice(0, 80),
+          index: s.index,
+          why: "restates a quality indicator; say what we do, which role, by when, on which record",
+        });
+        break;
+      }
+    }
+  }
+  return findings;
+}
+
+const VAGUE_TIME =
+  /\b(?:timely|promptly|as\s+soon\s+as\s+practicable|as\s+soon\s+as\s+possible|regularly|periodically|appropriate(?:ly)?|without\s+delay|in\s+good\s+time)\b/gi;
+const NUMBER_NEAR =
+  /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve|twenty|thirty)\b|\b(?:same\s+day|end\s+of\s+(?:the\s+)?shift|before\s+the\s+end)\b/i;
+
+/**
+ * Version 2 (c): a vague time word without a number within six words either
+ * side fails; "within 24 hours", "every 12 months", "the same day" pass.
+ */
+export function lintVagueTime(text: string): LintFinding[] {
+  const findings: LintFinding[] = [];
+  for (const m of text.matchAll(VAGUE_TIME)) {
+    const at = m.index ?? 0;
+    const before = text.slice(0, at).split(/\s+/).slice(-6).join(" ");
+    const after = text
+      .slice(at + m[0].length)
+      .split(/\s+/)
+      .slice(0, 7)
+      .join(" ");
+    if (NUMBER_NEAR.test(before) || NUMBER_NEAR.test(after)) continue;
+    findings.push({
+      rule: "vague-time",
+      severity: "error",
+      match: m[0],
+      index: at,
+      why: 'give a number: "within 24 hours", "before the end of the shift", "every 12 months"',
+    });
+  }
+  return findings;
+}
+
+/**
+ * Version 2 (b): "staff" as an actor fails; "staff" inside a name the pack
+ * uses (the staff matrix, a class name passed as an allowed phrase) passes.
+ */
+export function lintStaffActor(
+  text: string,
+  options: { allowedPhrases?: readonly string[] } = {},
+): LintFinding[] {
+  let scrubbed = text.replace(/\bstaff\s+matrix\b/gi, (m) =>
+    " ".repeat(m.length),
+  );
+  for (const phrase of options.allowedPhrases ?? []) {
+    if (!phrase) continue;
+    const re = new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    scrubbed = scrubbed.replace(re, (m) => " ".repeat(m.length));
+  }
+  const findings: LintFinding[] = [];
+  for (const m of scrubbed.matchAll(/\b(?:staff|the\s+team|someone)\b/gi)) {
+    findings.push({
+      rule: "staff-actor",
+      severity: "error",
+      match: m[0],
+      index: m.index ?? 0,
+      why: "name the role from the responsibilities table (the owner, the worker on shift, the team leader), never staff, the team or someone",
+    });
+  }
+  return findings;
+}
+
+/**
+ * Version 2 (d): a named record ("the X register", "the Y form", "the Z
+ * checklist") must be one the pack or the Readyline registers hold, by its
+ * exact name (case does not matter). The known list comes from the
+ * catalogue's document titles, the registers list and the fixed forms.
+ */
+export function lintRecordNames(
+  text: string,
+  known: readonly string[],
+): LintFinding[] {
+  const set = new Set(known.map((k) => k.toLowerCase().trim()));
+  const findings: LintFinding[] = [];
+  // The name runs from the nearest determiner to the keyword; a word that is itself a determiner ends the search.
+  const re =
+    /\b(?:the|our|a|an|this|each|its)\s+((?:(?!(?:the|our|a|an|this|each|its)\s)[a-z][\w'-]*\s+){0,6}?(?:register|form|checklist|matrix|log|record of decisions|template))\b/gi;
+  for (const m of text.matchAll(re)) {
+    const name = m[1].toLowerCase().replace(/\s+/g, " ").trim();
+    if (/^(?:register|form|checklist|matrix|log|template)$/.test(name))
+      continue;
+    // Accept any known name that the phrase ends with ("our incident register" holds "incident register").
+    const ok = [...set].some((k) => name === k || name.endsWith(` ${k}`));
+    if (ok) continue;
+    findings.push({
+      rule: "record-name",
+      severity: "error",
+      match: m[1],
+      index: (m.index ?? 0) + m[0].length - m[1].length,
+      why: "name only a register, form or document that exists in this pack or in the Readyline registers, by its exact name",
+    });
+  }
+  return findings;
+}
+
 export function lintReviewCycles(
   text: string,
   cycles: ReviewCycles,

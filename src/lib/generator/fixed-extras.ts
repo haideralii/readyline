@@ -160,6 +160,48 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       ],
     },
   ],
+  // Batch 40 item 3 (D-545): the escalation pathway as fixed text, so the
+  // Commission's windows are quoted once, from the primer (Incident Rules
+  // F2018L00633 ss 20, 21, read 13 October 2026), and the tailored procedure
+  // refers to this table (R-7).
+  "escalation-pathway": (ctx) => [
+    {
+      type: "paragraph",
+      text: `This is who tells whom at ${ctx.facts.tradingName}, and by when, for every incident. The role names match the responsibilities table.`,
+    },
+    {
+      type: "table",
+      columns: ["Who", "Tells whom", "By when"],
+      rows: [
+        [
+          "The worker on shift",
+          "The key person on duty",
+          "Straight away, and before the end of the shift in the incident register",
+        ],
+        ["The key person on duty", "The owner", "The same day"],
+        [
+          "The owner",
+          "The Commission, for death, serious injury, abuse or neglect, unlawful sexual or physical contact, sexual misconduct, or an unauthorised restrictive practice that caused harm",
+          "Within 24 hours of becoming aware (Incident Rules s 20), with the full report within 5 business days",
+        ],
+        [
+          "The owner",
+          "The Commission, for an unauthorised restrictive practice that caused no harm",
+          "Within 5 business days, in writing (Incident Rules s 21)",
+        ],
+        [
+          "The owner",
+          "The participant and the people they choose",
+          "The same day, with the open-disclosure words in this procedure",
+        ],
+        [
+          "The owner",
+          "The improvement register",
+          "Within 5 business days of closing the incident",
+        ],
+      ],
+    },
+  ],
   "reportable-incidents": () => [
     {
       type: "paragraph",

@@ -459,7 +459,7 @@
           "id": "risk-areas",
           "heading": "Risk areas we manage",
           "mode": "tailored",
-          "brief": "The risk areas the standard lists, each with a sentence on how it shows up for the supports delivered."
+          "brief": "The risk areas the standard lists, each with a sentence on how it shows up for the supports delivered, naming participants as one area of the corporate risk register. State that risk is managed at two levels: the corporate risk register, and the participant risk register with one row per participant and a review date; name both registers exactly."
         },
         {
           "id": "risk-register",
@@ -592,7 +592,7 @@
           "id": "procedure",
           "heading": "Complaints procedure",
           "mode": "tailored",
-          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Say that if the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
+          "brief": "Numbered steps with our own resolution time frames as a table (acknowledge, assess, resolve, tell the complainant), each step naming the role that acts and the record it writes to; one step that says how feedback differs from a complaint and where each is recorded; how a participant can complain to the Commission; a short \"Words we use\" callout with the exact sentences a worker says when a complaint is made. Say that if the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
         },
         {
           "id": "register",
@@ -624,10 +624,16 @@
           "brief": "The reportable incident categories and notification timeframes with the Commission source cited; no paraphrase."
         },
         {
+          "id": "escalation-pathway",
+          "heading": "Who tells whom, and by when",
+          "mode": "fixed",
+          "brief": "Fixed table: who tells whom and by when for every incident, with the Commission's 24-hour and 5-business-day windows from the primer, cited; no paraphrase."
+        },
+        {
           "id": "procedure",
           "heading": "Incident procedure",
           "mode": "tailored",
-          "brief": "Numbered steps sized to the business. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
+          "brief": "Numbered steps sized to the business, each naming the role that acts, the time frame as a number and the record it writes to; at least one \"If X happens, do Y\" step for a medical emergency and for a restrictive practice used in an emergency; a short \"Words we use\" callout with the exact open-disclosure sentences. For who tells whom and by when, refer to the fixed escalation table by its number and title in the outline. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
         },
         {
           "id": "register",
@@ -658,7 +664,7 @@
           "id": "risk-assessed-roles",
           "heading": "Our risk-assessed roles",
           "mode": "tailored",
-          "brief": "Lists the roles from the workforce answers and whether each is risk-assessed; sole-trader wording when there are no workers."
+          "brief": "Lists the roles from the workforce answers and whether each is risk-assessed; sole-trader wording when there are no workers. End with one sentence that our records match this procedure: the staff matrix shows each worker's role, risk-assessed flag, screening clearance and training expiry, and the worker checks register holds the dates."
         },
         {
           "id": "clearance-register",
@@ -927,7 +933,10 @@
           "brief": "Checklist for planned and unplanned transitions, including handover of records with consent."
         }
       ],
-      "basis": "practice-standard"
+      "basis": "practice-standard",
+      "briefAdditions": {
+        "steps": "Include a step that each participant's support plan carries a medical emergency list with the agreed action for each item, and an \"If a medical emergency on the participant's list happens, do Y\" step naming the role that acts and the record it writes to."
+      }
     },
     {
       "id": "medication-management-procedure",
