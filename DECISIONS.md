@@ -2954,6 +2954,8 @@ migrations; the unit tests, the integration file and the typed pages are
 the evidence, and the PO sees the flag on any pack drafted before 14
 October 2026 once the branch is deployed.
 
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
