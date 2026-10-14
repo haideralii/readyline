@@ -2985,6 +2985,10 @@ the brief and the fixed table). First run: 52 passed, 6 reported, 2 not
 applicable to the sole-trader pack. The NDIS watch adds a question and
 names the watch change id when a rule changes.
 
+
+
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
@@ -3264,6 +3268,8 @@ branches); CI's Supabase job is the gate.
 **D-2005 Dependabot off until launch (PO, 2026-10-14, batch 45).** GitHub's security alerts stay on; the research agent reports advisories. Dev note: `.github/dependabot.yml` is removed in Session B; the audit step in CI (`npm audit --audit-level=high`) is unchanged.
 
 **D-2006 The writing indicator's idle cost is measured with Playwright, not Lighthouse (PO, 2026-10-14, batch 45).** Lighthouse cannot measure idle CPU for one state; the check is Playwright CDP `Performance.getMetrics`, the TaskDuration delta over 10 seconds of the Writing phase under 0.5 seconds on the android-small project (backlog 10). Dev note: the spec lands with Session B.
+
+
 
 **D-2101 The writing indicator reads the job row, never a timer; the row
 carries the phase, the document and section in flight and the time of the
