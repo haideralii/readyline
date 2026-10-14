@@ -72,8 +72,8 @@ const GATES: readonly RegExp[] = [
   /\bauth\.signOut\(/,
   // The sign-in callback consumes a single-use token issued by Supabase.
   /\bverifyOtp\(/,
-  // The fake Checkout page is inert outside fake mode (redirects home first).
-  /if \(!env\.fake\) redirect\(/,
+  // The fake Checkout action and the scripted writing feed are inert outside fake mode.
+  /if \(!env\.fake\)/,
   // The register export routes delegate to one handler that reads the viewer and hits the export limiter.
   /\bmakeExportHandler\(/,
 ];
