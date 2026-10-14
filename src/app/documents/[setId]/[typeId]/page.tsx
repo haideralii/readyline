@@ -4,6 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { diffLines } from "@/lib/generator/diff";
 import { describeFactSources } from "@/lib/generator/fact-sources";
 import { blocksToText } from "@/lib/generator/section-schema";
+import {
+  changesForDocument,
+  describeChange,
+  loadWatchChanges,
+} from "@/lib/registers/living-policies";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
@@ -34,6 +39,18 @@ export default async function ReviewDocumentPage({
   const current = versions[0];
   const previous = versions[1] ?? null;
   const changedSection = typeof sp.changed === "string" ? sp.changed : null;
+  // Backlog 8 (D-551): rule changes applied since this version was drafted that it does not carry.
+  const ruleChanges = changesForDocument(
+    {
+      typeId,
+      createdAt: current.created_at,
+      sections: current.model.sections.map((s) => ({
+        id: s.id,
+        text: blocksToText(s.blocks),
+      })),
+    },
+    loadWatchChanges(),
+  );
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
@@ -62,6 +79,36 @@ export default async function ReviewDocumentPage({
         Each tailored section shows which of your answers it used. Regenerating
         a section records a new version of this document and shows what changed.
       </p>
+      {ruleChanges.length ? (
+        <div
+          className="border-ochre mt-4 rounded-md border p-3 text-sm leading-6"
+          data-testid="rule-changes"
+        >
+          <p className="font-medium">
+            {ruleChanges.length === 1
+              ? "A rule changed since this version was drafted."
+              : `${ruleChanges.length} rules changed since this version was drafted.`}
+          </p>
+          <ul className="mt-1 list-disc pl-5">
+            {ruleChanges.map((c) => (
+              <li key={c.changeId}>
+                {c.sectionId ? `Section "${c.sectionId}": ` : ""}
+                {describeChange(c)} Now: &ldquo;{c.newSentence}&rdquo;
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1">
+            Re-generate the section below, or record your check on the{" "}
+            <Link
+              href="/registers/document-control"
+              className="underline underline-offset-2"
+            >
+              document control register
+            </Link>
+            .
+          </p>
+        </div>
+      ) : null}
 
       <ol className="mt-8 space-y-6">
         {current.model.sections.map((s) => {

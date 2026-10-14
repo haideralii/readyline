@@ -1,0 +1,92 @@
+{
+  "$comment": "Living policies (standing backlog 8, D-551): one entry per NDIS watch item applied to fixed text, a brief or the standards data. The register marks an adopted document 'review needed' when it was drafted before appliedOn, is in scope, and does not yet carry newSentence; oldSentence is the exact text replaced (null when a sentence was added). The NDIS watch appends an entry whenever it applies an item; src/lib/registers/living-policies.test.ts checks every scope against the catalogue.",
+  "changes": [
+    {
+      "id": "wc-2026-10-14-01",
+      "appliedOn": "2026-10-14",
+      "where": "brief",
+      "documentTypeIds": ["governance-policy"],
+      "sectionId": "policy-statement",
+      "oldSentence": null,
+      "newSentence": "We tell the Commission about changes and events in its approved form as soon as we know they will happen.",
+      "why": "Provider Registration Rules s 13A (in force 1 July 2026): notify the Commission of events and changes in the approved form as soon as you know they will happen.",
+      "source": "https://www.legislation.gov.au/F2026L00802/asmade/text",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md, item 2 (batch 35, D-1802)"
+    },
+    {
+      "id": "wc-2026-10-14-02",
+      "appliedOn": "2026-10-14",
+      "where": "brief",
+      "documentTypeIds": ["complaints-management-policy-and-register"],
+      "sectionId": "procedure",
+      "oldSentence": null,
+      "newSentence": "If the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done.",
+      "why": "Complaints Rules amended 27 January 2026 (F2026L00044): the Commissioner may require the provider to take actions on a complaint (s 16) and complainants are told what was required (s 23B).",
+      "source": "https://www.legislation.gov.au/F2026L00044/asmade/text",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md, item 6 (batch 35, D-1802)"
+    },
+    {
+      "id": "wc-2026-10-14-03",
+      "appliedOn": "2026-10-14",
+      "where": "brief",
+      "documentTypeIds": [
+        "conflict-of-interest-policy",
+        "conflict-of-interest-in-coordination-procedure"
+      ],
+      "sectionId": null,
+      "oldSentence": null,
+      "newSentence": "We do not offer or accept any payment, gift or benefit to attract or keep a participant, or in return for a referral.",
+      "why": "The Commission's media release on the Securing the NDIS for Future Generations Act 2026 names kickbacks and inducements as a new offence (no section number or start date is stated until the Act's text is read).",
+      "source": "product/research/ndis-watch/2026-10-13.md, item 13 and A6",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md (batch 35, D-1802)"
+    },
+    {
+      "id": "wc-2026-10-14-04",
+      "appliedOn": "2026-10-14",
+      "where": "fixed-text",
+      "documentTypeIds": ["records-management-policy"],
+      "sectionId": "retention-schedule",
+      "oldSentence": "Incident and complaint records | [Provider to confirm]",
+      "newSentence": "Reportable incident records | 7 years from the date we notified the Commission (Incident Rules s 25)",
+      "why": "Incident Management and Reportable Incidents Rules 2018 s 25: keep the record of a reportable incident for seven years from the notification.",
+      "source": "https://www.legislation.gov.au/F2018L00633/latest/text",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md, item 4 (batch 35)"
+    },
+    {
+      "id": "wc-2026-10-14-05",
+      "appliedOn": "2026-10-14",
+      "where": "fixed-text",
+      "documentTypeIds": ["worker-screening-and-recruitment-procedure"],
+      "sectionId": "clearance-register",
+      "oldSentence": null,
+      "newSentence": "We check this register each month and start each renewal at least 90 days before the clearance expires. If a clearance expires, the worker stops risk-assessed work that day until a new clearance is issued.",
+      "why": "The Commission's worker screening renewal-cycle FAQ (January 2026): clearances last up to five years, renewals are accepted up to 90 days before expiry, and an expired worker must be removed from risk-assessed roles immediately.",
+      "source": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md, item 5 (batch 35)"
+    },
+    {
+      "id": "wc-2026-10-14-06",
+      "appliedOn": "2026-10-14",
+      "where": "fixed-text",
+      "documentTypeIds": ["privacy-and-information-management-policy"],
+      "sectionId": "ai-and-digital-tools",
+      "oldSentence": null,
+      "newSentence": "If we use a computer program, including an AI tool, to make or help make a decision that could significantly affect a person, this policy says what personal information it uses and what kinds of decisions it is used for.",
+      "why": "Australian Privacy Principles 1.7 to 1.9 (Privacy and Other Legislation Amendment Act 2024) apply from 10 December 2026: a privacy policy must say what personal information an automated program uses and what decisions it makes or helps make.",
+      "source": "https://www.oaic.gov.au/__data/assets/pdf_file/0021/269013/APP-1.7-1.9-Transparency-Obligation-Fact-Sheet.PDF",
+      "watchReport": "product/research/ndis-watch/2026-10-13.md, item 10 (batch 35)"
+    },
+    {
+      "id": "wc-2026-10-14-07",
+      "appliedOn": "2026-10-14",
+      "where": "brief",
+      "documentTypeIds": ["support-planning-and-transitions-procedure"],
+      "sectionId": "steps",
+      "oldSentence": null,
+      "newSentence": "Each participant's support plan carries a medical emergency list with the agreed action for each item.",
+      "why": "Sector practice from the auditors' webinar: the auditor asks for the participant's medical emergency list and the agreed action; the step names the role that acts and the record it writes to.",
+      "source": "product/research/webinars/2026-10-14-what-auditors-look-for.md",
+      "watchReport": "batch 35, D-1802 (brief addition)"
+    }
+  ]
+}

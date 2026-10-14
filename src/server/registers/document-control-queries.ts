@@ -8,6 +8,7 @@ import "server-only";
  * and the re-render read with the admin client for a set they already own.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { blocksToText } from "@/lib/generator/section-schema";
 import {
   documentControlRows,
   type DocumentControlRow,
@@ -29,22 +30,30 @@ export async function documentControlForSet(
   accountId: string,
   setId: string,
 ): Promise<DocumentControlRow[]> {
-  const [docs, reviews, circulations, facts] = await Promise.all([
-    listLatestDocuments(supabase, setId),
-    supabase
-      .from("policy_reviews")
-      .select(
-        "document_type_id, adopted_on, review_cycle_months, last_reviewed_on, next_review_on",
-      )
-      .eq("account_id", accountId)
-      .limit(500),
-    supabase
-      .from("policy_circulations")
-      .select("document_type_id, circulated_on, worker_refs")
-      .eq("account_id", accountId)
-      .limit(2000),
-    loadFacts(supabase, accountId),
-  ]);
+  const [docs, reviews, circulations, facts, changeReviews] = await Promise.all(
+    [
+      listLatestDocuments(supabase, setId),
+      supabase
+        .from("policy_reviews")
+        .select(
+          "document_type_id, adopted_on, review_cycle_months, last_reviewed_on, next_review_on",
+        )
+        .eq("account_id", accountId)
+        .limit(500),
+      supabase
+        .from("policy_circulations")
+        .select("document_type_id, circulated_on, worker_refs")
+        .eq("account_id", accountId)
+        .limit(2000),
+      loadFacts(supabase, accountId),
+      // Backlog 8: the checks the owner has recorded against rule changes.
+      supabase
+        .from("document_change_reviews")
+        .select("document_type_id, change_id")
+        .eq("account_id", accountId)
+        .limit(2000),
+    ],
+  );
   return documentControlRows(
     {
       documents: docs.map((d) => ({
@@ -52,7 +61,15 @@ export async function documentControlForSet(
         title: d.model.title,
         version: d.version,
         created_at: d.created_at,
+        version_id: d.id,
+        sections: d.model.sections.map((s) => ({
+          id: s.id,
+          text: blocksToText(s.blocks),
+        })),
       })),
+      changeReviews:
+        (changeReviews.data as
+          { document_type_id: string; change_id: string }[] | null) ?? [],
       reviews:
         (reviews.data as
           | {

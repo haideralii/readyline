@@ -68,6 +68,8 @@ describe("audit-day ask list (REQ-018 FR-11)", () => {
           next_review_on: "2027-10-12",
           circulated: { on: "2026-10-12", workers: 1 },
           state: "adopted",
+          version_id: null,
+          reviewNeeded: [],
         },
       ],
     });
