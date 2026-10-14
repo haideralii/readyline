@@ -13,6 +13,12 @@
  * - GENERATION_MODEL_OVERRIDE=<model> records on another model into a
  *   model-keyed fixture directory with its own report (D-046 comparison);
  *   production never reads that directory.
+ * - GENERATION_RECORD_GROUP=<n> (backlog 6, D-550) records one group of the
+ *   recording plan (recording-plan.ts, the runbook's order) and re-records
+ *   those sections even where a fixture exists, because the plan's groups
+ *   are re-recordings by definition.
+ * - GENERATION_RECORD_SECTIONS="typeId/sectionId,..." names sections to
+ *   re-record, with or without a group.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
@@ -26,10 +32,21 @@ import {
   inferStopReason,
   readFixture,
   THINKING_SETTING,
-  type ModelUsage,
 } from "./model-client";
 import { buildModelRequest } from "./prompts";
+import {
+  approvedRecordings,
+  buildRecordingPlan,
+  dollarsFor,
+  planSelection,
+  PRICES,
+  CACHE_READ_FACTOR,
+  CACHE_WRITE_FACTOR,
+  renderRecordingPlan,
+} from "./recording-plan";
 import { loadReferenceCases } from "./reference-cases";
+
+export { PRICES, dollarsFor };
 
 /** Loads only the generation variables from .env.local when the shell did not set them. */
 function loadLocalEnv() {
@@ -47,50 +64,15 @@ const enabled =
   Boolean(process.env.ANTHROPIC_API_KEY?.trim()) &&
   Boolean(process.env.ANTHROPIC_MODEL?.trim());
 
-/**
- * List prices in dollars per million tokens. Sonnet 5.5 per D-037; Haiku 5.5
- * is the Dev's assumption for the D-046 comparison (UNVERIFIED against the
- * price list; the PO corrects it if wrong). Cache writes cost 1.25x the input
- * price, cache reads 0.1x (D-046).
- */
-export const PRICES: Record<string, { inputPerM: number; outputPerM: number }> =
-  {
-    "claude-sonnet-5-5": { inputPerM: 2, outputPerM: 10 },
-    "claude-haiku-5-5": { inputPerM: 1, outputPerM: 5 },
-  };
-const CACHE_WRITE_FACTOR = 1.25;
-const CACHE_READ_FACTOR = 0.1;
-
-export function priceFor(model: string) {
-  return PRICES[model] ?? PRICES["claude-sonnet-5-5"];
-}
-
-/** Dollars for one call at the cached rates, and what the same tokens would cost uncached. */
-export function dollarsFor(
-  model: string,
-  usage: ModelUsage | null,
-): { cached: number; uncached: number } {
-  if (!usage) return { cached: 0, uncached: 0 };
-  const p = priceFor(model);
-  const write = usage.cacheCreationInputTokens ?? 0;
-  const read = usage.cacheReadInputTokens ?? 0;
-  const cached =
-    (usage.inputTokens * p.inputPerM +
-      write * p.inputPerM * CACHE_WRITE_FACTOR +
-      read * p.inputPerM * CACHE_READ_FACTOR +
-      usage.outputTokens * p.outputPerM) /
-    1_000_000;
-  const uncached =
-    ((usage.inputTokens + write + read) * p.inputPerM +
-      usage.outputTokens * p.outputPerM) /
-    1_000_000;
-  return {
-    cached: Number(cached.toFixed(4)),
-    uncached: Number(uncached.toFixed(4)),
-  };
-}
-
 const override = process.env.GENERATION_MODEL_OVERRIDE?.trim() || null;
+const groupEnv = process.env.GENERATION_RECORD_GROUP?.trim();
+const planGroup = groupEnv ? Number(groupEnv) : null;
+const planSections = (process.env.GENERATION_RECORD_SECTIONS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+/** A group or a section list means re-record: the fixture that exists is the one being replaced. */
+const forceRerecord = planGroup !== null || planSections.length > 0;
 const FIXTURES_DIR = override
   ? `${DEFAULT_FIXTURES_DIR}-${override}`
   : DEFAULT_FIXTURES_DIR;
@@ -102,94 +84,6 @@ const REVIEW_PACK_DOCUMENTS = [
   "complaints-management-policy-and-register",
   "practice-standards-self-assessment",
 ];
-
-type Recording = {
-  batch: number;
-  caseId: string;
-  typeId: string;
-  sectionId: string;
-};
-
-/**
- * Every recording the PO has approved. Batch 16 (D-039 to D-046): every
- * tailored section of every document in the sole-trader set, plus the three
- * behaviour-support sub-sections. Earlier batches' entries are subsets of
- * these and are kept by their batch number for the report.
- */
-function approvedRecordings(): Recording[] {
-  const cases = loadReferenceCases();
-  const soleTrader = cases.find((c) => c.id === "verification-sole-trader")!;
-  const earlier: Recording[] = [
-    {
-      batch: 10,
-      caseId: "verification-sole-trader",
-      typeId: "incident-management-policy-and-register",
-      sectionId: "policy-statement",
-    },
-    ...[
-      "purpose",
-      "scope",
-      "how-we-do-this",
-      "responsibilities",
-      "procedure",
-    ].map((sectionId) => ({
-      batch: 12,
-      caseId: "verification-sole-trader",
-      typeId: "incident-management-policy-and-register",
-      sectionId,
-    })),
-    ...[
-      "steps-getting-the-plan",
-      "steps-putting-the-plan-into-practice",
-      "steps-monitoring-reporting-and-review",
-    ].map((sectionId) => ({
-      batch: 12,
-      caseId: "behaviour-support-company",
-      typeId: "behaviour-support-plan-implementation-procedure",
-      sectionId,
-    })),
-    ...[
-      "purpose",
-      "scope",
-      "policy-statement",
-      "how-we-do-this",
-      "responsibilities",
-      "procedure",
-    ].map((sectionId) => ({
-      batch: 13,
-      caseId: "verification-sole-trader",
-      typeId: "complaints-management-policy-and-register",
-      sectionId,
-    })),
-    ...["summary", "how-we-meet"].map((sectionId) => ({
-      batch: 13,
-      caseId: "verification-sole-trader",
-      typeId: "practice-standards-self-assessment",
-      sectionId,
-    })),
-  ];
-  const seen = new Set(
-    earlier.map((r) => `${r.caseId}/${r.typeId}/${r.sectionId}`),
-  );
-  const fullSet: Recording[] = [];
-  for (const doc of soleTrader.result.documents) {
-    const type = documentTypeById(doc.id);
-    if (!type) continue;
-    for (const section of sectionsFor(type)) {
-      if (section.mode !== "tailored") continue;
-      const key = `${soleTrader.id}/${type.id}/${section.id}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      fullSet.push({
-        batch: 16,
-        caseId: soleTrader.id,
-        typeId: type.id,
-        sectionId: section.id,
-      });
-    }
-  }
-  return [...earlier, ...fullSet];
-}
 
 type ReportRow = Record<string, unknown> & {
   caseId: string;
@@ -232,7 +126,21 @@ describe.skipIf(!enabled)(
       const cases = loadReferenceCases();
 
       const onlyCase = process.env.GENERATION_RECORD_CASE?.trim();
-      const pending = approvedRecordings()
+      // Backlog 6: a plan group or a section list narrows the run and forces the re-record.
+      const selected = forceRerecord
+        ? planSelection(
+            buildRecordingPlan({ model, fixturesDir: FIXTURES_DIR }),
+            {
+              group: planGroup,
+              sections: planSections,
+            },
+          )
+        : approvedRecordings();
+      if (forceRerecord)
+        process.stdout.write(
+          `Recording plan selection: group ${planGroup ?? "any"}, sections ${planSections.length ? planSections.join(",") : "all in the group"}: ${selected.length} section(s), re-recorded even where a fixture exists.\n`,
+        );
+      const pending = selected
         .filter((r) => !onlyCase || r.caseId === onlyCase)
         // On another model only the three review-pack documents are recorded (D-046).
         .filter(
@@ -257,10 +165,12 @@ describe.skipIf(!enabled)(
             ...r,
             pack,
             request,
-            exists: fixtureStillValid(request, {
-              documentTypeId: r.typeId,
-              sectionId: r.sectionId,
-            }),
+            exists:
+              !forceRerecord &&
+              fixtureStillValid(request, {
+                documentTypeId: r.typeId,
+                sectionId: r.sectionId,
+              }),
           };
         })
         .filter((p) => !p.exists);
@@ -407,6 +317,13 @@ describe.skipIf(enabled)("record model fixtures (skipped)", () => {
       cached: 0,
       uncached: 0,
     });
+  });
+
+  it("the dry run of the plan is available without a key (backlog 6)", () => {
+    const plan = buildRecordingPlan();
+    const md = renderRecordingPlan(plan, "2026-10-14");
+    expect(md).toContain("## Group 0");
+    expect(plan.totals.calls).toBeGreaterThan(0);
   });
 
   it("lists every tailored section of the sole-trader set once", () => {

@@ -2857,6 +2857,37 @@ rendering so document control is filled as a customer's account would
 fill it. Findings 16, 2, 8, 10 and 12 wait for the recording session and
 are listed in the recording order in `fixtures/generation/README.md`.
 
+**D-550 Backlog 6: the recording plan is computed, grouped in the
+runbook's order, priced without a model call, and the recorder takes a
+group or a section list and re-records (Dev, 2026-10-14, backlog 6,
+REQ-005).** `src/lib/generator/recording-plan.ts` builds today's request
+for every approved recording (the list moved out of the recorder's test
+file, unchanged), looks for the fixture under the current key, reads the
+live reply's state (placeholder instructions, version 2 lint findings
+through the new shared `lint-v2-fixture.ts`, truncation, re-key marks)
+and sorts each section into the first group of the runbook's order it
+qualifies for: 0 no fixture for the current prompt (replay falls back to
+generic), 1 the complaints procedure, 2 the first three tailored sections
+of every document, 3 the batch 40 briefs (D-545), 4 replies with
+"[Provider to complete" instructions, 5 replies the version 2 lints flag;
+the other reasons a section qualifies for are kept beside it. Every entry
+is priced at the cached rates the way D-046 bills: the system prompt and
+the document block written once per document and read for its other
+sections, output tokens from the live fixture or 650, capped; the
+uncached figure sits beside it, and the report's mean attempts per section
+says how much retries add. The fixture-key diff counts live, missing and
+orphan files per document from the folders. `RECORDING_PLAN=1` writes
+`out/recording-plan.md`; the copy for the PO is
+`product/evidence/req-005/recording-plan-2026-10-14.md`. The recorder
+gains `GENERATION_RECORD_GROUP=<n>` and `GENERATION_RECORD_SECTIONS=...`;
+either means re-record even where a fixture exists, because the groups
+are re-recordings by definition, and the existing "skip what exists"
+default is unchanged. The runbook (`fixtures/generation/README.md`)
+carries the six commands. Today's plan: 81 calls, about $0.66 at cached
+rates ($0.91 uncached); 3 sections have no fixture for the current prompt.
+No recording without the PO's go-ahead.
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
