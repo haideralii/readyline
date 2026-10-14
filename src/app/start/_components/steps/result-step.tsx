@@ -159,7 +159,13 @@ function useRememberedOpen() {
   // The latest set is mirrored in a ref so two toggles in one task (the
   // mount-time toggle events of several open disclosures) never drop one.
   const latest = useRef(open);
-  const toggle = (id: string, isOpen: boolean) => {
+  // Writes the remembered set without touching React state: the click
+  // handler calls it in the click's own task (#40, run 38637072132: a reload
+  // issued between the click and the later toggle task lost the state once
+  // in ten runs). It must not set state, because React would commit the new
+  // `open` before the browser's default action, which would then toggle the
+  // element straight back.
+  const remember = (id: string, isOpen: boolean) => {
     const next = new Set(latest.current);
     if (isOpen) next.add(id);
     else next.delete(id);
@@ -169,9 +175,12 @@ function useRememberedOpen() {
     } catch {
       // Storage can be blocked; the page still works.
     }
-    setOpen(next);
+    return next;
   };
-  return { open, toggle };
+  const toggle = (id: string, isOpen: boolean) => {
+    setOpen(remember(id, isOpen));
+  };
+  return { open, toggle, remember };
 }
 
 function Disclosure({
@@ -179,6 +188,7 @@ function Disclosure({
   summary,
   open,
   onToggle,
+  onRemember,
   children,
   nested = false,
 }: {
@@ -186,6 +196,7 @@ function Disclosure({
   summary: ReactNode;
   open: boolean;
   onToggle: (id: string, open: boolean) => void;
+  onRemember: (id: string, open: boolean) => void;
   children: ReactNode;
   nested?: boolean;
 }) {
@@ -193,6 +204,20 @@ function Disclosure({
     <details
       open={open}
       onToggle={(e) => onToggle(id, e.currentTarget.open)}
+      // A details element flips `open` on the click itself and fires `toggle`
+      // in a later task; a reload issued between the two lost the remembered
+      // state once in ten runs (#40, run 38637072132, after 45b item 3 had
+      // moved the write out of the state updater). The click handler records
+      // the state the click produces, in the click's own task, without
+      // setting React state (a commit before the default action would make
+      // the browser toggle the element straight back); the toggle handler
+      // then sets the state and records the same value again.
+      onClick={(e) => {
+        // Only this element's own summary: a nested disclosure's click bubbles here too.
+        const summary = (e.target as HTMLElement).closest("summary");
+        if (!summary || summary.parentElement !== e.currentTarget) return;
+        onRemember(id, !e.currentTarget.open);
+      }}
       className={
         nested
           ? "mt-2 rounded-md border border-zinc-200 dark:border-zinc-800"
@@ -255,7 +280,7 @@ function ResultView({
 }) {
   const r = result;
   const router = useRouter();
-  const { open, toggle } = useRememberedOpen();
+  const { open, toggle, remember } = useRememberedOpen();
   const pathwayWord =
     r.pathway === "verification" ? "verification" : "certification";
   const groups = documentGroupsContent.groups
@@ -411,6 +436,7 @@ function ResultView({
         id="why"
         open={open.has("why")}
         onToggle={toggle}
+        onRemember={remember}
         summary={`Why this result (${r.reasons.length} reason${r.reasons.length === 1 ? "" : "s"}, with sources)`}
       >
         {r.flags.silExcluded ? (
@@ -504,6 +530,7 @@ function ResultView({
         id="documents"
         open={open.has("documents")}
         onToggle={toggle}
+        onRemember={remember}
         summary={`Documents you will need (${r.documents.length})`}
       >
         <p
@@ -520,6 +547,7 @@ function ResultView({
             nested
             open={open.has(`doc-group-${g.id}`)}
             onToggle={toggle}
+            onRemember={remember}
             summary={
               <>
                 {g.title} ({g.items.length}
@@ -549,6 +577,7 @@ function ResultView({
         id="registers"
         open={open.has("registers")}
         onToggle={toggle}
+        onRemember={remember}
         summary={`Registers to keep (${r.registers.length})`}
       >
         <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
