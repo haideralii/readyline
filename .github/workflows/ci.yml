@@ -146,7 +146,8 @@ jobs:
   supabase-integration:
     name: Supabase local stack, migrations and RLS tests (REQ-004 SR-1, SR-6)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Batch 45b item 2: the signed-in suites now run the guided path to the end on three projects; run 595 was cut at 20 minutes.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
