@@ -2544,6 +2544,10 @@ PO's.
 
 
 
+
+
+
+
 **D-1008 The integration suite aliases Next's `server-only` guard (Dev,
 2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
 `tests/integration/reminders-job.test.ts` imports the reminders job, the
