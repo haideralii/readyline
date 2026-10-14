@@ -134,8 +134,14 @@ export async function adoptGroupAction(
     year: "numeric",
   }).format(new Date());
 
-  // The policy review register exists from the first adoption on (REQ-009 FR-7).
-  await seedPolicyReviews(supabase, accountId);
+  // The policy review register exists from the first adoption on (REQ-009
+  // FR-7). Its rows are written with the admin client (D-1704): the table's
+  // insert and update policies need an active subscription, and a provider
+  // adopting a pack they have only bought has none, so the owner's session
+  // would seed nothing and date nothing, without an error. The set is
+  // proven to be the account's above, and the writes carry its id.
+  const admin = createSupabaseAdminClient();
+  await seedPolicyReviews(admin, accountId);
   const facts = await loadFacts(supabase, accountId);
   if (!facts.date) {
     const r = await saveFact(supabase, accountId, "date", todayWords);
@@ -163,13 +169,9 @@ export async function adoptGroupAction(
           code: up.error.code,
         });
     }
-    await markAdopted(supabase, accountId, d.document_type_id, today);
+    await markAdopted(admin, accountId, d.document_type_id, today);
   }
-  const out = await rerenderSetWithFacts({
-    admin: createSupabaseAdminClient(),
-    set,
-    facts,
-  });
+  const out = await rerenderSetWithFacts({ admin, set, facts });
   log.info("path.adopt.group", {
     accountId,
     versionSetId: set.id,

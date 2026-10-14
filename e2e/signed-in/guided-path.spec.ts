@@ -262,35 +262,52 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expectStep(page, "adopt");
     await page.getByTestId("next-step-button").click();
     await expect(page).toHaveURL(/\/path\/adopt\//);
-    for (let i = 0; i < 6; i += 1) {
+    // Four content groups, "Other" and the self-assessment at most. On
+    // success the button moves to the next group (its page has its own
+    // button) or, after the last, to the checklist; "Adopted" with a link
+    // shows only on a revisit. So each turn waits to leave the group it is
+    // on, and a group that is somehow already adopted is passed by its link.
+    const adoptStart = Date.now();
+    for (let i = 0; i < 8; i += 1) {
       await expect(page.getByTestId("adopt-list")).toBeVisible();
       if (i === 0) {
         await checkWidths(page, "adopt a group");
         await pagePass(page, "adopt a group");
         await shot(page, "adopt-group", project);
-        // Backlog 1 (D-1508): the first group is adopted with the keyboard only.
-        const walk: KeyboardWalk = { steps: [] };
-        await resetFocusTrail(page);
-        await tabUntil(page, page.getByTestId("adopt-group"), walk, {
-          label: "adopt a group",
-        });
-        await page.keyboard.press("Enter");
-      } else await page.getByTestId("adopt-group").click();
-      await expect(page.getByTestId("adopt-group")).toHaveCount(0, {
-        timeout: 60_000,
-      });
-      if (!/\/path\/adopt\//.test(page.url())) break;
+      }
+      const here = page.url();
       if (
         await page
           .getByTestId("adopt-done")
           .isVisible()
           .catch(() => false)
       ) {
-        const link = page.getByTestId("adopt-done").getByRole("link");
-        await link.click();
+        await page.getByTestId("adopt-done").getByRole("link").click();
+      } else if (i === 0) {
+        // Backlog 1 (D-1508): the first group is adopted with the keyboard
+        // only; the button enables on hydration (D-1704), so the walk waits.
+        await expect(page.getByTestId("adopt-group")).toBeEnabled();
+        const walk: KeyboardWalk = { steps: [] };
+        await resetFocusTrail(page);
+        await tabUntil(page, page.getByTestId("adopt-group"), walk, {
+          label: "adopt a group",
+        });
+        await page.keyboard.press("Enter");
+      } else {
+        await page.getByTestId("adopt-group").click();
       }
+      await expect
+        .poll(() => page.url(), {
+          message: `leaving ${here} after adopting group ${i + 1}`,
+          timeout: 60_000,
+        })
+        .not.toBe(here);
       if (!/\/path\/adopt\//.test(page.url())) break;
     }
+    testInfo.annotations.push({
+      type: "timing",
+      description: `adopt done after ${Math.round((Date.now() - adoptStart) / 1000)} s`,
+    });
     await expect(page).toHaveURL(/\/checklist$/);
 
     // Step 6: the checklist, and the strip now points at it; each item is an
