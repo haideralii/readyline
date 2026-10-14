@@ -58,7 +58,12 @@ async function expectStep(page: Page, id: string, timeout?: number) {
 
 test.describe("the guided path, result to audit day (REQ-017)", () => {
   test.skip(!enabled, "needs the Supabase variables");
-  test.describe.configure({ mode: "serial", timeout: 300_000 });
+  // One journey, serial, with no retry (batch 45b item 2): a red costs one
+  // run, and every slow step has its own wait below, so a stall is reported
+  // at the step that stalled rather than at the end of the budget. The
+  // budget fits the whole journey on a shared runner: the generation wait,
+  // the finish re-render of the whole set, and adopt.
+  test.describe.configure({ mode: "serial", timeout: 480_000, retries: 0 });
 
   let tenant: TestTenant;
 
@@ -110,6 +115,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       "You can close this page",
     );
     await shot(page, "while-we-draft", project);
+    const generationStart = Date.now();
     const deadline = Date.now() + 240_000;
     let ready = false;
     while (Date.now() < deadline) {
@@ -125,6 +131,10 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       await page.waitForTimeout(2000);
     }
     expect(ready, "the set became ready").toBe(true);
+    testInfo.annotations.push({
+      type: "timing",
+      description: `generation ready after ${Math.round((Date.now() - generationStart) / 1000)} s`,
+    });
 
     // D-541 as amended (batch 37): the owner's name and role are account
     // facts the documents fill in; the finish form never asks for them.
@@ -152,6 +162,32 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       date: "14 October 2026",
       period: "7 years",
     };
+    // Each click saves one fact on a phone, or every fact on a wider screen,
+    // and on the last question re-renders the whole set; the page then
+    // refreshes to "Every blank is filled in" with no form. So after each
+    // click, wait for that click's end: the next question, the done line, or
+    // the refreshed page; never a fixed pause, and never a click on a busy
+    // button (batch 45b item 2: run 595 spent its whole budget there).
+    const finishStart = Date.now();
+    const summary = page.getByTestId("finish-summary");
+    const finished = async () =>
+      /Every blank is filled in/.test((await summary.textContent()) ?? "") ||
+      (await page.getByTestId("finish-done").isVisible());
+    const settle = () =>
+      expect
+        .poll(
+          async () =>
+            (await finished())
+              ? "done"
+              : (await page
+                    .getByTestId("finish-next")
+                    .isEnabled()
+                    .catch(() => false))
+                ? "next"
+                : "busy",
+          { timeout: 120_000, intervals: [250, 500, 1000] },
+        )
+        .not.toBe("busy");
     // Backlog 1 (D-1508): the first screen is answered with the keyboard only
     // (one question on a phone, every question of the topic groups on a
     // wider screen): Tab to each field, type, Tab to the button, Enter.
@@ -174,34 +210,43 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         label: "finish your pack",
       });
       await page.keyboard.press("Enter");
-      await expect(
-        page.getByTestId("finish-progress").or(page.getByTestId("finish-done")),
-      ).not.toContainText("Question 1 of", { timeout: 15_000 });
+      await settle();
     }
     for (let i = 0; i < 40; i += 1) {
+      if (await finished()) break;
+      const next = page.getByTestId("finish-next");
+      await expect(next).toBeEnabled({ timeout: 120_000 });
       const inputs = page
         .getByTestId("finish-form")
         .locator("input[type=text]");
       const n = await inputs.count();
-      if (n === 0) break;
       for (let k = 0; k < n; k += 1) {
         const input = inputs.nth(k);
         const key = (await input.getAttribute("name")) ?? "";
         if ((await input.inputValue()).trim()) continue;
         await input.fill(answersByKey[key] ?? "Example");
       }
-      await page.getByTestId("finish-next").click();
-      if (
-        await page
-          .getByTestId("finish-done")
-          .isVisible({ timeout: 15_000 })
-          .catch(() => false)
-      )
-        break;
+      await next.click();
+      await expect
+        .poll(
+          async () =>
+            (await finished())
+              ? "done"
+              : (await next.isEnabled().catch(() => false))
+                ? "next"
+                : "busy",
+          { timeout: 120_000, intervals: [250, 500, 1000] },
+        )
+        .not.toBe("busy");
     }
-    await expect(page.getByTestId("finish-done")).toContainText(
-      /Done\. Your \d+ documents are complete\./,
+    await expect(summary).toContainText(
+      /Every blank is filled in\. Your \d+ documents are complete\./,
+      { timeout: 60_000 },
     );
+    testInfo.annotations.push({
+      type: "timing",
+      description: `finish step ${Math.round((Date.now() - finishStart) / 1000)} s`,
+    });
     await shot(page, "finish-done", project);
 
     // AC-2: the re-rendered document carries the answers and the owner's name
