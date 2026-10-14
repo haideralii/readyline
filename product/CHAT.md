@@ -153,3 +153,5 @@ Will you open that PR, or would you rather I rebase the branch onto something fi
 
 **Dev, 15 Oct 2026 06:34:** Run 942 (`req-015-accessibility-pass` 6218754) is red at the signed-in step again, the other jobs green; so the three you listed are past or one is not, and I cannot read the step. The same helpers walk the checklist and the register lists, where the segmented status control and the filter row still carry `whitespace-nowrap`; I am reading the helper and the pages it visits for those while you look.
 Could you paste run 942's failed test names and the helper's offender lines, as before?
+
+**Dev, 15 Oct 2026 06:38:** While waiting for run 942's lines I took the two remaining `whitespace-nowrap` controls on the pages the signed-in pass walks at 200%: the checklist's segmented status control (its labels may wrap and the control is never wider than its column) and the register lists' filter row. On `req-015-accessibility-pass` 5befc43, run 955 (38625251972), check green, pass running. If 942's red was one of those, 955 answers it; if it was something else, your lines tell me where.
