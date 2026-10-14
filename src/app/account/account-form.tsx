@@ -19,6 +19,7 @@ import {
 import { parseInput } from "@/lib/validation";
 import {
   createAccountAction,
+  saveOwnerAction,
   saveServerDraft,
   updateAccountAction,
 } from "@/server/accounts/actions";
@@ -49,6 +50,8 @@ const LABELS = {
   structure: "Business structure",
   states: "States and territories",
   abn: "ABN",
+  ownerName: "Your name",
+  ownerRole: "Your role",
   form: "Account",
 };
 
@@ -57,6 +60,9 @@ type Initial = {
   structure?: BusinessStructureAnswer;
   states: State[];
   abn: string;
+  /** D-541 as amended: the approver on every document; account facts, not business columns. */
+  ownerName: string;
+  ownerRole: string;
 };
 
 export function AccountForm({
@@ -68,7 +74,13 @@ export function AccountForm({
 }) {
   const router = useRouter();
   const [values, setValues] = useState<Initial>(
-    initial ?? { tradingName: "", states: [], abn: "" },
+    initial ?? {
+      tradingName: "",
+      states: [],
+      abn: "",
+      ownerName: "",
+      ownerRole: "",
+    },
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
@@ -94,12 +106,13 @@ export function AccountForm({
       .then((draft) => {
         if (cancelled || !draft?.answers.business) return;
         const b = draft.answers.business;
-        setValues({
+        setValues((v) => ({
+          ...v,
           tradingName: b.tradingName,
           structure: b.structure,
           states: b.states,
           abn: b.abn ?? "",
-        });
+        }));
         setPrefilled(true);
       })
       .catch(() => undefined);
@@ -110,7 +123,12 @@ export function AccountForm({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseInput(BusinessStep, values);
+    // The owner's name and role are facts, not business columns (D-1704), and
+    // `BusinessStep` is a strict object: parsed with them in, every save
+    // failed on "Unexpected field" before any action ran (#34, run
+    // 38591057870), so the business fields go to the schema on their own.
+    const { ownerName, ownerRole, ...business } = values;
+    const parsed = parseInput(BusinessStep, business);
     if (!parsed.ok) {
       setErrors({
         ...parsed.fieldErrors,
@@ -129,6 +147,18 @@ export function AccountForm({
         setErrors({
           ...r.fieldErrors,
           ...(r.formErrors.length ? { form: r.formErrors } : {}),
+        });
+        return;
+      }
+      // D-541 as amended: the owner's name and role are account facts the documents fill in.
+      const owner = await saveOwnerAction({
+        name: ownerName.trim(),
+        role: ownerRole.trim(),
+      });
+      if (!owner.ok) {
+        setErrors({
+          ...owner.fieldErrors,
+          ...(owner.formErrors.length ? { form: owner.formErrors } : {}),
         });
         return;
       }
@@ -219,6 +249,45 @@ export function AccountForm({
             invalid={invalid}
             inputMode="numeric"
             maxLength={14}
+          />
+        )}
+      </Field>
+      {/* D-541 as amended: the approver on every document and the change-log author; optional, asked once here. */}
+      <Field
+        id="ownerName"
+        label={`${LABELS.ownerName} (optional)`}
+        help="Goes on the approval line of every document, for example Jane Citizen."
+        errors={errorsFor(errors, "name")}
+      >
+        {(describedBy, invalid) => (
+          <TextInput
+            id="ownerName"
+            name="ownerName"
+            value={values.ownerName}
+            onChange={(v) => setValues({ ...values, ownerName: v })}
+            describedBy={describedBy}
+            invalid={invalid}
+            autoComplete="name"
+            maxLength={120}
+          />
+        )}
+      </Field>
+      <Field
+        id="ownerRole"
+        label={`${LABELS.ownerRole} (optional)`}
+        help="For example Owner, or Director."
+        errors={errorsFor(errors, "role")}
+      >
+        {(describedBy, invalid) => (
+          <TextInput
+            id="ownerRole"
+            name="ownerRole"
+            value={values.ownerRole}
+            onChange={(v) => setValues({ ...values, ownerRole: v })}
+            describedBy={describedBy}
+            invalid={invalid}
+            autoComplete="organization-title"
+            maxLength={60}
           />
         )}
       </Field>

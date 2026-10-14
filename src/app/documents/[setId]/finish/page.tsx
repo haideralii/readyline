@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { collectBlanks } from "@/lib/generator/blanks";
-import { questionsFor } from "@/lib/generator/facts-fill";
+import {
+  factKeyFor,
+  formQuestionsFor,
+  isAccountFactKey,
+} from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { getViewer } from "@/server/accounts/queries";
 import {
@@ -38,8 +42,15 @@ export default async function FinishPackPage({
     await listLatestDocuments(supabase, set.id),
   ).flatMap((g) => g.documents);
   const blanks = documents.flatMap((d) => collectBlanks(d.model));
-  const questions = questionsFor(blanks);
+  // D-541 as amended: the owner's name, role and the approval date are
+  // account facts (account page; adoption), never questions here.
+  const questions = formQuestionsFor(blanks);
   const facts = await loadFacts(supabase, viewer.account.id);
+  const ownerBlank = blanks.some((b) => {
+    const key = factKeyFor(b.blank);
+    return key !== null && isAccountFactKey(key) && key !== "date";
+  });
+  const dateBlank = blanks.some((b) => factKeyFor(b.blank) === "date");
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
@@ -54,10 +65,27 @@ export default async function FinishPackPage({
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         Finish your pack
       </h1>
+      {ownerBlank ? (
+        <p className="mt-3 leading-7" data-testid="finish-owner">
+          Your name and role go on the approval line of every document.{" "}
+          <Link href="/account" className="underline underline-offset-2">
+            Add them on your account page
+          </Link>{" "}
+          and we fill them in.
+        </p>
+      ) : null}
+      {dateBlank ? (
+        <p className="mt-3 leading-7" data-testid="finish-date">
+          The approval date fills in on the day you adopt each group of
+          documents.
+        </p>
+      ) : null}
       {questions.length === 0 ? (
         <p className="mt-3 leading-7" data-testid="finish-summary">
-          Every blank is filled in. Your {documents.length} documents are
-          complete.{" "}
+          {ownerBlank || dateBlank
+            ? "Nothing else to answer here."
+            : "Every blank is filled in."}{" "}
+          Your {documents.length} documents are complete.{" "}
           <Link href="/path/adopt" className="underline underline-offset-2">
             Adopt them next
           </Link>

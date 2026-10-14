@@ -123,6 +123,17 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       description: `generation ready after ${Math.round((Date.now() - generationStart) / 1000)} s`,
     });
 
+    // D-541 as amended (batch 37): the owner's name and role are account
+    // facts the documents fill in; the finish form never asks for them.
+    await page.goto("/account");
+    await page.locator("#ownerName").fill("Jane Citizen");
+    await page.locator("#ownerRole").fill("Owner");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(
+      page.getByRole("status").filter({ hasText: "Saved." }),
+    ).toBeVisible();
+    await page.goto("/documents");
+
     // Step 4: finish your pack, one question at a time on a phone, grouped on desktop.
     await expectStep(page, "finish");
     await page.getByTestId("next-step-button").click();
@@ -130,6 +141,9 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page.getByTestId("finish-form")).toBeVisible();
     await checkWidths(page, "finish your pack");
     await shot(page, "finish-pack", project);
+    // The owner's name, role and the approval date are account facts (D-541
+    // as amended, batch 37), so the form never asks for them; the keys stay
+    // here only so an older page would still be answered.
     const answersByKey: Record<string, string> = {
       name: "Jane Citizen",
       role: "Owner",
@@ -139,14 +153,18 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     };
     // Each click saves one fact on a phone, or every fact on a wider screen,
     // and on the last question re-renders the whole set; the page then
-    // refreshes to "Every blank is filled in" with no form. So after each
-    // click, wait for that click's end: the next question, the done line, or
-    // the refreshed page; never a fixed pause, and never a click on a busy
-    // button (batch 45b item 2: run 595 spent its whole budget there).
+    // refreshes to the summary with no form. So after each click, wait for
+    // that click's end: the next question, the done line, or the refreshed
+    // page; never a fixed pause, and never a click on a busy button (batch
+    // 45b item 2: run 595 spent its whole budget there). With the approval
+    // date left for adoption, the summary reads "Nothing else to answer
+    // here." rather than "Every blank is filled in." (run 794 waited 120 s
+    // for the second wording).
     const finishStart = Date.now();
     const summary = page.getByTestId("finish-summary");
+    const SUMMARY = /(Every blank is filled in|Nothing else to answer here)\./;
     const finished = async () =>
-      /Every blank is filled in/.test((await summary.textContent()) ?? "") ||
+      SUMMARY.test((await summary.textContent()) ?? "") ||
       (await page.getByTestId("finish-done").isVisible());
     for (let i = 0; i < 40; i += 1) {
       if (await finished()) break;
@@ -176,21 +194,22 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         .not.toBe("busy");
     }
     await expect(summary).toContainText(
-      /Every blank is filled in\. Your \d+ documents are complete\./,
+      /(Every blank is filled in|Nothing else to answer here)\. Your \d+ documents are complete\./,
       { timeout: 60_000 },
     );
+    // The date is the one blank left, and the page says where it fills in.
+    await expect(page.getByTestId("finish-date")).toBeVisible();
     testInfo.annotations.push({
       type: "timing",
       description: `finish step ${Math.round((Date.now() - finishStart) / 1000)} s`,
     });
     await shot(page, "finish-done", project);
 
-    // AC-2: the set shows no blanks and the re-rendered document carries the answers.
+    // AC-2: the re-rendered document carries the answers and the owner's name
+    // from the account; the approval date fills in on adoption (D-541), so the
+    // "no blanks" check comes after step 5.
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
-    await expect(page.getByTestId("set-summary")).toContainText(
-      "No blanks to fill in",
-    );
     await page.getByTestId("set-list").getByRole("link").first().click();
     // The control table renders twice (batch 36's data table: cards on a
     // phone, a table from sm up) and the hidden copy comes first in the DOM,
@@ -241,9 +260,27 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     });
     await expect(page).toHaveURL(/\/checklist$/);
 
-    // Step 6: the checklist, and the strip now points at it.
+    // Step 6: the checklist, and the strip now points at it; each item is an
+    // instruction with one tap to do it where the app can (batch 37).
     await expectStep(page, "checklist");
+    await expect(
+      page.getByTestId("checklist-next").getByRole("listitem").first(),
+    ).toHaveText(/^(Ask|Get|Read|Start|Type|Book|Choose|Tell|Put)\b/);
+    const registersGroup = page.getByTestId("checklist-group-registers");
+    if (!(await registersGroup.evaluate((e) => (e as HTMLDetailsElement).open)))
+      await registersGroup.locator("summary").click();
+    await page.getByTestId("checklist-row-registers-incidents").click();
+    await expect(
+      page.getByTestId("checklist-action-registers-incidents"),
+    ).toHaveAttribute("href", "/registers/incidents");
     await shot(page, "checklist", project);
+
+    // AC-2 (D-541): adoption filled the approval date, so the set has no blanks left.
+    await page.goto("/documents");
+    await page.getByTestId("open-set").click();
+    await expect(page.getByTestId("set-summary")).toContainText(
+      "No blanks to fill in",
+    );
 
     // Step 7: the audit-day page, printable, with the pack download.
     await page.goto("/path/audit-day");

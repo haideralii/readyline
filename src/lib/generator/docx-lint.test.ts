@@ -15,6 +15,7 @@ import { buildContextPack } from "./context-pack";
 import { buildSkeleton, type DocumentModel } from "./document-model";
 import { lintDocx, lintSetOrder } from "./docx-lint";
 import { buildProviderFacts } from "./facts";
+import { applyFacts } from "./facts-fill";
 import { generateSection } from "./generate-section";
 import { ReplayClient } from "./model-client";
 import { loadReferenceCases } from "./reference-cases";
@@ -159,14 +160,32 @@ describe("the lint catches drift (AC-2)", () => {
   });
 });
 
+/**
+ * D-541 as amended: with the owner's name on the account (name, role, and
+ * the approval date from adoption) the three fixed blanks in every document
+ * are gone, and the sole-trader set replayed through the fixtures must have
+ * fact blanks in under 10 percent of its sections. The figure before the
+ * account facts is reported beside it.
+ */
+const OWNER_FACTS = {
+  name: "Jane Citizen",
+  role: "Owner",
+  "owner-role": "Owner",
+  date: "14 October 2026",
+};
+const MAX_BLANK_SECTION_SHARE = 0.1;
+
 describe("the sole-trader set replayed through the recorded fixtures (FR-0c)", () => {
-  it("ships with zero undrafted sections and passes the lint", async () => {
+  it("ships with zero undrafted sections, passes the lint, and with the owner's name has fact blanks in under 10 percent of sections (D-541)", async () => {
     const c = cases.find((x) => x.id === "verification-sole-trader")!;
     const facts = buildProviderFacts(c.answers, c.result);
     const client = new ReplayClient();
     let sections = 0;
     let blanks = 0;
     let generic = 0;
+    const perDocument: string[] = [];
+    let withOwner = { sections: 0, factBlanks: 0, sectionsWithFactBlanks: 0 };
+    let withoutOwner = { sections: 0, sectionsWithFactBlanks: 0 };
     for (const m of modelsFor(c.id)) {
       const type = documentTypeById(m.typeId)!;
       const filled = { ...m, sections: [...m.sections] };
@@ -204,13 +223,41 @@ describe("the sole-trader set replayed through the recorded fixtures (FR-0c)", (
         r.findings.map((f) => `${f.rule}: ${f.detail}`),
         m.typeId,
       ).toEqual([]);
+      expect(r.blanks.sections, m.typeId).toBe(filled.sections.length);
+      withoutOwner = {
+        sections: withoutOwner.sections + r.blanks.sections,
+        sectionsWithFactBlanks:
+          withoutOwner.sectionsWithFactBlanks + r.blanks.sectionsWithFactBlanks,
+      };
+      // The same document once the account holds the owner's name (D-541 as amended).
+      const owned = lintDocx(
+        new Uint8Array(await renderDocx(applyFacts(filled, OWNER_FACTS))),
+        { title: filled.title, expectedSections: filled.sections.length },
+      );
+      expect(owned.findings, m.typeId).toEqual([]);
+      withOwner = {
+        sections: withOwner.sections + owned.blanks.sections,
+        factBlanks: withOwner.factBlanks + owned.blanks.factBlanks,
+        sectionsWithFactBlanks:
+          withOwner.sectionsWithFactBlanks +
+          owned.blanks.sectionsWithFactBlanks,
+      };
+      perDocument.push(
+        `  ${m.typeId}: ${owned.blanks.sectionsWithFactBlanks} of ${owned.blanks.sections} sections with a fact blank (${owned.blanks.factBlanks} blanks) once the owner's name is on the account; ${r.blanks.sectionsWithFactBlanks} before`,
+      );
       void facts;
     }
+    const share = withOwner.sectionsWithFactBlanks / withOwner.sections;
     report.push(
-      `verification-sole-trader replay: ${sections} sections, ${blanks} with a blank for the provider (${Math.round((100 * blanks) / sections)}%), ${generic} generic`,
+      `verification-sole-trader replay: ${sections} sections, ${blanks} with any blank (${Math.round((100 * blanks) / sections)}%), ${generic} generic; fact blanks in ${withoutOwner.sectionsWithFactBlanks} sections (${Math.round((100 * withoutOwner.sectionsWithFactBlanks) / withoutOwner.sections)}%) before the owner's name, ${withOwner.sectionsWithFactBlanks} (${Math.round(100 * share)}%) after`,
+      ...perDocument,
     );
-    // Reported, not gated, until the PO reads the figure: see the Dev response (AC under FR-0c).
     expect(generic).toBeLessThanOrEqual(sections);
+    // D-541 as amended: under 10 percent of sections with a fact blank once the account has the owner's name.
+    expect(
+      share,
+      `sections with a fact blank after the owner's name: ${withOwner.sectionsWithFactBlanks} of ${withOwner.sections}\n${perDocument.join("\n")}`,
+    ).toBeLessThan(MAX_BLANK_SECTION_SHARE);
   }, 120_000);
 });
 
