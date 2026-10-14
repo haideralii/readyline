@@ -91,7 +91,7 @@ export function AdoptButton({
           type="date"
           value={on}
           onChange={(e) => setOn(e.target.value)}
-          className="mt-1 block min-h-11 rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+          className="mt-1 block min-h-11 rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
         />
       </div>
       <button
