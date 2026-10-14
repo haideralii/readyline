@@ -16,6 +16,7 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { markAdopted } from "@/server/registers/seed";
+import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 const Input = strictObject({
@@ -68,12 +69,15 @@ export async function saveChecklistItemAction(
     });
     return { ok: false, message: "We could not save that just now." };
   }
-  // REQ-009 FR-7: "Done" on a document sets the policy review's adopted date when it is still empty.
+  // REQ-009 FR-7: "Done" on a document sets the policy review's adopted date
+  // when it is still empty. With the admin client (D-1704): the policy
+  // reviews' update policy needs an active subscription, which a pack buyer
+  // ticking Done need not have; the account id is the viewer's own.
   if (parsed.data.status === "have") {
     const item = checklist.items.find((i) => i.id === parsed.data.itemId);
     if (item?.documentTypeId)
       await markAdopted(
-        supabase,
+        createSupabaseAdminClient(),
         viewer.account.id,
         item.documentTypeId,
         new Date().toISOString().slice(0, 10),
