@@ -7,7 +7,7 @@ import { adoptGroupAction } from "@/server/path/actions";
  * "These are our policies" (REQ-017 step 5): one button, pending text while
  * the documents are re-rendered, the message in place when it fails, and
  * the next screen on success. Disabled until hydration (batch 45b item 2,
- * D-1704): a click in the server-HTML window would otherwise do nothing,
+ * D-1706): a click in the server-HTML window would otherwise do nothing,
  * and a click that waits for the button to enable always reaches the
  * action.
  */
