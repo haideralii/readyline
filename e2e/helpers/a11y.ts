@@ -229,11 +229,13 @@ type FocusInfo = {
   forward: boolean | null;
   tag: string;
   type: string;
+  /** What the ring test saw, for the failure message: focus state, outline, shadow, and whether the element was still active 50 ms later. */
+  evidence: string;
 };
 
 /** Describes the active element, whether its focus is visible, and whether it follows the element focused before. */
 export async function focusInfo(page: Page): Promise<FocusInfo> {
-  return page.evaluate(() => {
+  return page.evaluate(async () => {
     const w = window as unknown as { __lastFocused?: Element | null };
     const el = document.activeElement;
     if (!el || el === document.body)
@@ -243,6 +245,7 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
         forward: null,
         tag: "body",
         type: "",
+        evidence: "",
       };
     // The Next.js development overlay is not part of the product; a production build has no such element.
     if (el.tagName.toLowerCase() === "nextjs-portal")
@@ -252,6 +255,7 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
         forward: null,
         tag: "nextjs-portal",
         type: "",
+        evidence: "",
       };
     const ring = (target: Element) => {
       const s = getComputedStyle(target);
@@ -266,6 +270,29 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
     const host = hidden ? (el.closest("label") ?? el) : el;
     const visibleRing =
       ring(host) && getComputedStyle(host).visibility !== "hidden";
+    // The evidence behind a failed ring test (#39, run 38626572687): the
+    // focus pseudo-classes, the outline and shadow as computed on the host,
+    // and whether the same node is still the active element 50 ms later (a
+    // form that re-renders can replace the input the ring was read from).
+    const hs = getComputedStyle(host);
+    const seen = {
+      focus: el.matches(":focus"),
+      focusVisible: el.matches(":focus-visible"),
+      outlineStyle: hs.outlineStyle,
+      outlineWidth: hs.outlineWidth,
+      outlineColor: hs.outlineColor,
+      boxShadow: hs.boxShadow === "none" ? "none" : "set",
+      opacity: hs.opacity,
+      visibility: hs.visibility,
+    };
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const evidence =
+      `focus=${seen.focus} focus-visible=${seen.focusVisible} ` +
+      `outline=${seen.outlineStyle} ${seen.outlineWidth} ${seen.outlineColor} ` +
+      `box-shadow=${seen.boxShadow} opacity=${seen.opacity} visibility=${seen.visibility} ` +
+      `host=${host === el ? "self" : "label"} ` +
+      `active-after-50ms=${document.activeElement === el} connected=${el.isConnected} ` +
+      `ring-after-50ms=${ring(host)}`;
     const prev = w.__lastFocused ?? null;
     const forward =
       prev && prev !== el
@@ -288,6 +315,7 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
       forward,
       tag: el.tagName.toLowerCase(),
       type: (el as HTMLInputElement).type ?? "",
+      evidence,
     };
   });
 }
@@ -352,7 +380,7 @@ export async function tabUntil(
     } else same = 0;
     expect(
       info.tag === "body" || info.visibleRing,
-      `${options.label ?? "keyboard"}: no visible focus ring on ${info.description}`,
+      `${options.label ?? "keyboard"}: no visible focus ring on ${info.description} (${info.evidence})`,
     ).toBe(true);
     if (info.forward === false)
       expect(
@@ -390,7 +418,7 @@ export async function pickRadio(
     endOfPage(walk, info, label);
     expect(
       info.tag === "body" || info.visibleRing,
-      `${label}: no visible focus ring on ${info.description}`,
+      `${label}: no visible focus ring on ${info.description} (${info.evidence})`,
     ).toBe(true);
     if (
       await group.evaluateAll((els) =>
