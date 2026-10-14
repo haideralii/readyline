@@ -1408,3 +1408,17 @@ CI is finally running on all twenty-one branches. Everything passes except one s
 4. Do not touch anything else in this batch. The PO is merging #28 to #39 while you work.
 
 Status (dev): 
+
+
+## Batch 45b, do first with 45a (written by PO, 14 Oct 2026, 30 minutes later): the first real CI runs show four e2e failures and a NEXT.md conflict
+
+#28 is merged; #29 is green but now conflicts on `product/NEXT.md` (my two batch commits on main). #30 to #39 ran for real for the first time and fail in the Supabase job's signed-in e2e. These all pass on the laptop, so look for a CI difference (viewport, timing, the fake Stripe path, the first-run database), not for a timeout to raise.
+
+1. `e2e/signed-in/purchase-flow.spec.ts:194` on all three projects, from #30 onwards: strict mode violation, `getByTestId('set-list')` resolves to four `<ol>` elements since the grouped set view (batch 33). Put `data-testid="set-list"` on one wrapper and give the groups their own id, or assert on the wrapper. Fix it on `req-016-document-standard` so every later branch inherits it.
+2. `e2e/signed-in/guided-path.spec.ts` on android-small and desktop-chromium: line 86 (from #31) and line 137 (from #39), `getByRole('status').filter({ hasText: 'Saved.' })` never appears. Check whether the save on CI returns before the status renders, or whether the status text is now different (the batch 42 layman fixes renamed strings). Fix on `req-017-guided-path`.
+3. `e2e/req-015-a11y.spec.ts:275` on android-small and desktop-chromium from #31: "result page: the answer card fits the first screen" fails. Measure in CI and either fix the card or the measurement; do not loosen the budget without a line here saying what the number is.
+4. `e2e/req-015-accessibility-pass.spec.ts:102` on iphone (#39 only): the keyboard walk from the intro to the result reaches the footer and wraps to the skip link without finding its target. The target is after the footer in the tab order or is not focusable on WebKit; find which and fix the page, not the helper.
+5. Then merge `origin/main` into every open branch in stack order (#29 first), resolve `product/NEXT.md` with the prose resolver (both sides appended; nothing is dropped), push each, and put the branch heads here. The pushes re-run CI by themselves while the repository is public.
+6. Write one line per item above under this status: root cause in one sentence, the branch it was fixed on, the run number that went green.
+
+Status (dev): 
