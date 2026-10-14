@@ -185,18 +185,35 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     const summary = page.getByTestId("finish-summary");
     const SUMMARY = /(Every blank is filled in|Nothing else to answer here)\./;
     const finished = async () =>
-      SUMMARY.test((await summary.textContent()) ?? "") ||
-      (await page.getByTestId("finish-done").isVisible());
+      SUMMARY.test((await summary.textContent().catch(() => "")) ?? "") ||
+      (await page
+        .getByTestId("finish-done")
+        .isVisible()
+        .catch(() => false));
+    const next = page.getByTestId("finish-next");
+    // After the last save the client replaces the page (the done line, then
+    // the refreshed summary), and for a moment neither the form nor the done
+    // line is in the DOM; a sample taken then reads "not finished" and the
+    // loop waits 120 s for a form that never comes back (run 38606911755,
+    // desktop, where the whole-set re-render and the refresh follow one
+    // click). So the loop waits for one of the two states before deciding.
+    const either = next
+      .or(page.getByTestId("finish-done"))
+      .or(summary.filter({ hasText: SUMMARY }));
+    const state = async (): Promise<"done" | "form"> => {
+      for (;;) {
+        if (await finished()) return "done";
+        if (await next.isVisible().catch(() => false)) return "form";
+        await either.first().waitFor({ state: "visible", timeout: 120_000 });
+      }
+    };
     const settle = () =>
       expect
         .poll(
           async () =>
             (await finished())
               ? "done"
-              : (await page
-                    .getByTestId("finish-next")
-                    .isEnabled()
-                    .catch(() => false))
+              : (await next.isEnabled().catch(() => false))
                 ? "next"
                 : "busy",
           { timeout: 120_000, intervals: [250, 500, 1000] },
@@ -227,8 +244,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       await settle();
     }
     for (let i = 0; i < 40; i += 1) {
-      if (await finished()) break;
-      const next = page.getByTestId("finish-next");
+      if ((await state()) === "done") break;
       await expect(next).toBeEnabled({ timeout: 120_000 });
       const inputs = page
         .getByTestId("finish-form")
