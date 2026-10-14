@@ -10,9 +10,18 @@ import { openResultSections } from "./helpers/result";
  * the draft gate on a fresh load, so this is the per-step evidence; Lighthouse
  * covers the pages reachable without a draft.
  */
-async function scan(page: Page, label: string) {
-  // Client navigation can update <title> a tick after the heading renders.
-  await page.waitForFunction(() => document.title.length > 0);
+async function scan(page: Page, label: string, heading: string) {
+  // On a client navigation Next streams a dynamic page's metadata after its
+  // content, so for about ten milliseconds the old <title> is gone and the
+  // new one not yet there (measured on the Android project; axe's
+  // document-title rule saw that moment on the business step, CI run 571,
+  // once the step's form rendered at first paint). Waiting for any title
+  // passed on the previous page's, so wait for this page's heading and the
+  // title it gives itself; the new title arrives once and stays.
+  await expect(
+    page.getByRole("heading", { level: 1, name: heading }),
+  ).toBeVisible();
+  await page.waitForFunction((h) => document.title.includes(h), heading);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
@@ -31,14 +40,23 @@ test("every questionnaire step has no serious or critical accessibility violatio
 }) => {
   const summary: Record<string, string[]> = {};
   await page.goto("/start");
-  summary.intro = await scan(page, "intro");
+  summary.intro = await scan(
+    page,
+    "intro",
+    "Find out what registration needs from you",
+  );
 
   await page.getByRole("link", { name: "Start the questionnaire" }).click();
-  summary.business = await scan(page, "business (empty)");
+  summary.business = await scan(
+    page,
+    "business (empty)",
+    "About your business",
+  );
   await page.getByRole("button", { name: "Save and continue" }).click();
   summary["business-errors"] = await scan(
     page,
     "business (with validation errors)",
+    "About your business",
   );
   await page.getByLabel("Trading name").fill("Sunrise Supports");
   await page.getByRole("radio", { name: "Sole trader" }).check();
@@ -50,7 +68,11 @@ test("every questionnaire step has no serious or critical accessibility violatio
   ).toBeVisible();
   await tickGroup(page, "0138");
   await tickGroup(page, "0107");
-  summary.supports = await scan(page, "supports (with SIL questions)");
+  summary.supports = await scan(
+    page,
+    "supports (with SIL questions)",
+    "The supports you deliver",
+  );
   await page.locator("#silEligibility\\.fewHoursOnly-no").check();
   await page
     .locator("#silEligibility\\.participantManagesOwnWorkers-no")
@@ -60,11 +82,12 @@ test("every questionnaire step has no serious or critical accessibility violatio
   await expect(
     page.getByRole("heading", { level: 1, name: "Restrictive practices" }),
   ).toBeVisible();
-  summary.practices = await scan(page, "practices");
+  summary.practices = await scan(page, "practices", "Restrictive practices");
   await page.locator("#restrictivePractices-not-sure").check();
   summary["practices-helper"] = await scan(
     page,
     "practices (not-sure helper open)",
+    "Restrictive practices",
   );
   await page.locator("#notSureHelper\\.locksOrBarriers-yes").check();
   await page.locator("#notSureHelper\\.holdsOrRestraint-no").check();
@@ -78,7 +101,11 @@ test("every questionnaire step has no serious or critical accessibility violatio
   await page.getByLabel("Number of key personnel").fill("2");
   await page.locator("#hasRiskAssessedRoles-yes").check();
   await page.locator("#allRiskAssessedScreened-no").check();
-  summary.workforce = await scan(page, "workforce (with large-provider note)");
+  summary.workforce = await scan(
+    page,
+    "workforce (with large-provider note)",
+    "Your workforce",
+  );
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   await expect(
@@ -93,13 +120,21 @@ test("every questionnaire step has no serious or critical accessibility violatio
   ]) {
     await page.locator(`#${key}-not-sure`).check();
   }
-  summary.existing = await scan(page, "existing");
+  summary.existing = await scan(page, "existing", "What you already have");
   await page.getByRole("button", { name: "See my result" }).click();
 
   await expect(page.getByTestId("result")).toBeVisible();
-  summary["result-card"] = await scan(page, "result (card only)");
+  summary["result-card"] = await scan(
+    page,
+    "result (card only)",
+    "Your result",
+  );
   await openResultSections(page);
-  summary.result = await scan(page, "result (every disclosure open)");
+  summary.result = await scan(
+    page,
+    "result (every disclosure open)",
+    "Your result",
+  );
 
   test.info().annotations.push({
     type: "axe-summary",
