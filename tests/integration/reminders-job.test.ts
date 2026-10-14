@@ -104,6 +104,44 @@ describe.skipIf(!enabled)(
         }),
       ]);
       for (const s of seeds) if (s.error) throw s.error;
+      // REQ-018 Session C (AC-3): one row per new reminder kind with a fixed date that fires today.
+      const drill = await admin
+        .from("accounts")
+        .update({ last_emergency_drill_on: addMonths(TODAY, -6) })
+        .eq("id", accountId);
+      if (drill.error) throw drill.error;
+      const auditDaySeeds = await Promise.all([
+        admin.from("insurance_items").insert({
+          account_id: accountId,
+          kind: "public-liability",
+          label: "Insurer A",
+          expires_on: addDays(TODAY, 7),
+        }),
+        admin.from("staff_matrix").insert({
+          account_id: accountId,
+          worker_ref: "W-1",
+          role_label: "support worker",
+          last_supervision_on: addDays(TODAY, -31),
+          last_appraisal_on: addDays(TODAY, -365),
+        }),
+        admin.from("participant_risks").insert({
+          account_id: accountId,
+          participant_ref: "P-1",
+          risk: "Falls when tired.",
+          controls: "Two workers in the afternoon.",
+          review_on: addDays(TODAY, 90),
+          support_plan_review_on: addDays(TODAY, 30),
+        }),
+        admin.from("conflicts_of_interest").insert({
+          account_id: accountId,
+          who_ref: "W-1",
+          conflict: "Related to a participant's plan manager.",
+          managed_by: "Does not handle that plan.",
+          declared_on: addDays(TODAY, -100),
+          review_on: addDays(TODAY, 14),
+        }),
+      ]);
+      for (const s of auditDaySeeds) if (s.error) throw s.error;
     });
 
     afterAll(async () => {
@@ -141,11 +179,18 @@ describe.skipIf(!enabled)(
           `reportable-not-notified@${TODAY}`,
           "complaint-unacknowledged@2026-10-12",
           `mid-term-audit@${TODAY}`,
+          // REQ-018 Session C (AC-3): the six new kinds, each from the fixed date seeded above.
+          `insurance-expiry@${TODAY}`,
+          `supervision-due@${TODAY}`,
+          `appraisal-due@${TODAY}`,
+          `support-plan-review@${TODAY}`,
+          `register-review@${TODAY}`,
+          `emergency-drill@${TODAY}`,
         ].sort(),
       );
-      expect(rows.data?.length).toBe(5);
-      expect(first.inserted).toBe(5);
-      expect(first.emailed).toBe(5);
+      expect(rows.data?.length).toBe(11);
+      expect(first.inserted).toBe(11);
+      expect(first.emailed).toBe(11);
       expect((rows.data ?? []).every((r) => r.sent_at)).toBe(true);
       // SR-4: the message names registers and references, never the summary text.
       const sent = provider.sent.find((m) => m.to === email);
@@ -170,7 +215,7 @@ describe.skipIf(!enabled)(
         .from("reminders")
         .select("id", { count: "exact", head: true })
         .eq("account_id", accountId);
-      expect(again.count).toBe(5);
+      expect(again.count).toBe(11);
       expect(provider.sent.filter((m) => m.to === email).length).toBe(
         sentBefore,
       );

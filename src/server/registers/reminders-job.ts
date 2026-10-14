@@ -31,6 +31,8 @@ type AccountRow = {
   trading_name: string;
   registration_date: string | null;
   registration_kind: "certification" | "verification" | null;
+  /** REQ-018 FR-10: the last emergency drill, recorded on the audit-day page. */
+  last_emergency_drill_on: string | null;
 };
 
 async function accountsWithRegisters(
@@ -42,6 +44,12 @@ async function accountsWithRegisters(
     "complaints",
     "worker_clearances",
     "policy_reviews",
+    // REQ-018 Session C: the audit-day registers that send reminders (D-1905).
+    "insurance_items",
+    "staff_matrix",
+    "participant_risks",
+    "corporate_risks",
+    "conflicts_of_interest",
   ]) {
     const r = await admin.from(table).select("account_id").limit(10_000);
     for (const row of (r.data as { account_id: string }[] | null) ?? [])
@@ -50,7 +58,7 @@ async function accountsWithRegisters(
   const dated = await admin
     .from("accounts")
     .select("id")
-    .not("registration_date", "is", null)
+    .or("registration_date.not.is.null,last_emergency_drill_on.not.is.null")
     .is("deleted_at", null)
     .limit(10_000);
   for (const row of (dated.data as { id: string }[] | null) ?? [])
@@ -58,7 +66,9 @@ async function accountsWithRegisters(
   if (ids.size === 0) return [];
   const r = await admin
     .from("accounts")
-    .select("id, trading_name, registration_date, registration_kind")
+    .select(
+      "id, trading_name, registration_date, registration_kind, last_emergency_drill_on",
+    )
     .in("id", [...ids])
     .is("deleted_at", null);
   return (r.data as AccountRow[] | null) ?? [];
@@ -70,6 +80,62 @@ export async function computeAccountReminders(
   account: AccountRow,
   today: string,
 ): Promise<ReminderDue[]> {
+  // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
+  const [insurance, staff, participants, corporate, conflicts] =
+    await Promise.all([
+      admin
+        .from("insurance_items")
+        .select("id, expires_on")
+        .eq("account_id", account.id),
+      admin
+        .from("staff_matrix")
+        .select("id, last_supervision_on, last_appraisal_on")
+        .eq("account_id", account.id),
+      admin
+        .from("participant_risks")
+        .select("id, support_plan_review_on, review_on")
+        .eq("account_id", account.id),
+      admin
+        .from("corporate_risks")
+        .select("id, review_on")
+        .eq("account_id", account.id),
+      admin
+        .from("conflicts_of_interest")
+        .select("id, review_on")
+        .eq("account_id", account.id),
+    ]);
+  const rows = <T>(r: { data: unknown }) => (r.data as T[] | null) ?? [];
+  const auditDay = {
+    insuranceItems: rows<{ id: string; expires_on: string }>(insurance),
+    staff: rows<{
+      id: string;
+      last_supervision_on: string | null;
+      last_appraisal_on: string | null;
+    }>(staff),
+    participantRisks: rows<{
+      id: string;
+      support_plan_review_on: string | null;
+      review_on: string;
+    }>(participants),
+    reviewRows: [
+      ...rows<{ id: string; review_on: string }>(corporate).map((r) => ({
+        id: r.id,
+        table: "corporate_risks" as const,
+        review_on: r.review_on,
+      })),
+      ...rows<{ id: string; review_on: string }>(conflicts).map((r) => ({
+        id: r.id,
+        table: "conflicts_of_interest" as const,
+        review_on: r.review_on,
+      })),
+      ...rows<{ id: string; review_on: string }>(participants).map((r) => ({
+        id: r.id,
+        table: "participant_risks" as const,
+        review_on: r.review_on,
+      })),
+    ],
+    lastEmergencyDrillOn: account.last_emergency_drill_on,
+  };
   const [inc, ev, comp, checks, reviews] = await Promise.all([
     admin
       .from("incidents")
@@ -137,6 +203,7 @@ export async function computeAccountReminders(
     policyReviews:
       (reviews.data as
         { id: string; next_review_on: string | null }[] | null) ?? [],
+    ...auditDay,
   });
 }
 
@@ -147,12 +214,22 @@ async function referenceFor(
   tradingName: string,
 ): Promise<string> {
   if (r.subject_table === "accounts") return tradingName;
+  // REQ-018 Session C: the audit-day registers' references (a code, a label or an area), never content (SR-4).
   const column =
-    r.subject_table === "worker_clearances"
+    r.subject_table === "worker_clearances" ||
+    r.subject_table === "staff_matrix"
       ? "worker_ref"
       : r.subject_table === "policy_reviews"
         ? "document_type_id"
-        : "reference";
+        : r.subject_table === "insurance_items"
+          ? "label"
+          : r.subject_table === "participant_risks"
+            ? "participant_ref"
+            : r.subject_table === "corporate_risks"
+              ? "area"
+              : r.subject_table === "conflicts_of_interest"
+                ? "who_ref"
+                : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)

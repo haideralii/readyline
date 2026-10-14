@@ -5,6 +5,8 @@ import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import { deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
 import { orderDocuments } from "@/lib/generator/set-order";
+import { auditKindsContent } from "@/lib/questionnaire/content";
+import { auditDayAskList } from "@/lib/registers/audit-day-ask";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { getViewer } from "@/server/accounts/queries";
 import {
@@ -12,7 +14,11 @@ import {
   listDraftedDocumentTypeIds,
 } from "@/server/checklist/queries";
 import { loadPathContext } from "@/server/path/state";
+import { auditDayOverview } from "@/server/registers/audit-day-queries";
+import { documentControlForAccount } from "@/server/registers/document-control-queries";
+import { registerOverview } from "@/server/registers/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { DrillForm } from "./drill-form";
 
 export const metadata: Metadata = { title: "Audit day" };
 
@@ -50,10 +56,28 @@ export default async function AuditDayPage() {
   });
   if (!ctx.result || !ctx.answers) redirect("/start");
   const dataset = getStandardsDataset();
-  const [stored, drafted] = await Promise.all([
-    listChecklistItems(supabase, viewer.account.id),
-    listDraftedDocumentTypeIds(supabase, viewer.account.id),
-  ]);
+  const [stored, drafted, registers, auditDay, documentControl, drill] =
+    await Promise.all([
+      listChecklistItems(supabase, viewer.account.id),
+      listDraftedDocumentTypeIds(supabase, viewer.account.id),
+      registerOverview(supabase, viewer.account.id),
+      auditDayOverview(supabase, viewer.account.id),
+      documentControlForAccount(supabase, viewer.account.id),
+      supabase
+        .from("accounts")
+        .select("last_emergency_drill_on")
+        .eq("id", viewer.account.id)
+        .maybeSingle(),
+    ]);
+  // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
+  const asks = auditDayAskList({
+    registers,
+    auditDay,
+    documentControl: documentControl.rows,
+  });
+  const lastDrill =
+    (drill.data as { last_emergency_drill_on: string | null } | null)
+      ?.last_emergency_drill_on ?? null;
   const shown = mergeChecklist({
     checklist: deriveChecklist(ctx.result, ctx.answers, dataset),
     stored,
@@ -157,6 +181,83 @@ export default async function AuditDayPage() {
           ))}
         </section>
       ) : null}
+      {/* REQ-018 FR-11, AC-4: the twelve records, each with its live state and a tap to fix it. */}
+      <section
+        aria-labelledby="ask-records-heading"
+        className="mt-10"
+        data-testid="audit-day-ask"
+      >
+        <h2 id="ask-records-heading" className="text-xl font-semibold">
+          What the auditor will ask to see
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          Policies are one third of an audit. The rest is records: a register
+          with every field filled and a review date on every row.
+        </p>
+        <ol className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          {asks.map((a) => (
+            <li
+              key={a.id}
+              className="flex gap-3 py-3 leading-7"
+              data-testid={`ask-${a.id}`}
+              data-state={a.state}
+            >
+              <span aria-hidden="true" className="w-5 shrink-0">
+                {a.state === "filled" ? "✓" : a.state === "overdue" ? "!" : "○"}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="font-medium">
+                  &quot;Show me: {a.ask}.&quot;
+                </span>{" "}
+                <span className="text-zinc-700 dark:text-zinc-300">
+                  {a.word}
+                </span>{" "}
+                <Link
+                  href={a.href}
+                  className="underline underline-offset-2 print:hidden"
+                  data-testid={`ask-link-${a.id}`}
+                >
+                  {a.action}
+                </Link>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* REQ-018 FR-10: the emergency drill date the reminder counts from. */}
+      <section aria-labelledby="drill-heading" className="mt-10">
+        <h2 id="drill-heading" className="text-xl font-semibold">
+          Your emergency drill
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          {lastDrill
+            ? `Last drill ${lastDrill}. Run one every six months and record it here.`
+            : "No drill recorded yet. Walk through your emergency plan with your workers, then record the date here."}
+        </p>
+        <DrillForm last={lastDrill} />
+      </section>
+
+      {/* REQ-018 FR-11, AC-4: the five kinds of audit in plain words. */}
+      <section
+        aria-labelledby="kinds-heading"
+        className="mt-10"
+        data-testid="audit-kinds"
+      >
+        <h2 id="kinds-heading" className="text-xl font-semibold">
+          The kinds of audit, in plain words
+        </h2>
+        <dl className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          {auditKindsContent.items.map((k) => (
+            <div key={k.id} className="py-3" data-testid={`audit-kind-${k.id}`}>
+              <dt className="font-medium">{k.name}</dt>
+              <dd className="leading-7 text-zinc-700 dark:text-zinc-300">
+                {k.description}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
       <p className="mt-10 text-xs text-zinc-600 dark:text-zinc-400">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
