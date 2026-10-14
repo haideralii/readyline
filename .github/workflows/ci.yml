@@ -141,7 +141,7 @@ jobs:
 
       - run: npm ci
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           # Pinned (D-038): 'latest' asks the GitHub API anonymously and shared runners hit the rate limit.
           version: 2.120.0
