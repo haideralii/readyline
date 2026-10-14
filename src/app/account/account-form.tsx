@@ -123,7 +123,12 @@ export function AccountForm({
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseInput(BusinessStep, values);
+    // The owner's name and role are facts, not business columns (D-1704), and
+    // `BusinessStep` is a strict object: parsed with them in, every save
+    // failed on "Unexpected field" before any action ran (#34, run
+    // 38591057870), so the business fields go to the schema on their own.
+    const { ownerName, ownerRole, ...business } = values;
+    const parsed = parseInput(BusinessStep, business);
     if (!parsed.ok) {
       setErrors({
         ...parsed.fieldErrors,
@@ -147,8 +152,8 @@ export function AccountForm({
       }
       // D-541 as amended: the owner's name and role are account facts the documents fill in.
       const owner = await saveOwnerAction({
-        name: values.ownerName.trim(),
-        role: values.ownerRole.trim(),
+        name: ownerName.trim(),
+        role: ownerRole.trim(),
       });
       if (!owner.ok) {
         setErrors({
