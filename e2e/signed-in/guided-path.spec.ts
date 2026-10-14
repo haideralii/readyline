@@ -371,6 +371,31 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       /download\?file=set\.zip$/,
     );
     await expect(page.getByTestId("audit-day-pack")).toContainText("(adopted)");
+    // REQ-018 FR-11, AC-4: the twelve records with live states, and the five audit kinds in plain words.
+    await expect(
+      page.getByTestId("audit-day-ask").getByRole("listitem"),
+    ).toHaveCount(12);
+    await expect(page.getByTestId("ask-document-control")).toHaveAttribute(
+      "data-state",
+      /filled|missing|overdue/,
+    );
+    await expect(page.getByTestId("ask-link-corporate-risks")).toHaveAttribute(
+      "href",
+      "/registers/corporate-risks",
+    );
+    await expect(page.getByTestId("audit-kinds").locator("dt")).toHaveCount(5);
+    // REQ-018 FR-13, AC-5: the document control register is complete once the pack is adopted.
+    await page.goto("/registers/document-control");
+    await expect(page.getByTestId("document-control-sentence")).toContainText(
+      /^\d+ of \d+ adopted/,
+    );
+    await expect(
+      page
+        .getByTestId("document-control-list")
+        .locator("li[data-state='not-adopted']"),
+    ).toHaveCount(0);
+    await checkWidths(page, "document control");
+    await page.goto("/path/audit-day");
     await checkWidths(page, "audit day");
     await pagePass(page, "audit day with a pack");
     await shot(page, "audit-day", project);
