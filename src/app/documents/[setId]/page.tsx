@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
 import { collectBlanks } from "@/lib/generator/blanks";
+import { factKeyFor } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { getViewer } from "@/server/accounts/queries";
 import {
