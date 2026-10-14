@@ -106,6 +106,11 @@ test.describe("registers subscription in fake Stripe mode (REQ-009 Session C)", 
     await page.goto("/account");
     await page.getByTestId("billing-portal-button").click();
     await expect(page).toHaveURL(/\/dev\/stripe-checkout\/.*portal=1/);
+    // The portal page must render its controls; a missing one fails here in
+    // a minute rather than at the test's own cap (batch 43).
+    await expect(page.getByTestId("fake-payment-failed")).toBeVisible({
+      timeout: 60_000,
+    });
     await page.getByTestId("fake-payment-failed").click();
     await expect(page).toHaveURL(/\/account$/);
     await expect(page.getByTestId("subscription-status")).toContainText(
