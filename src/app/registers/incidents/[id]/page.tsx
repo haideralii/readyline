@@ -77,6 +77,23 @@ export default async function IncidentPage({
           <p className="mt-1 leading-7">{r.actions_taken}</p>
         </>
       ) : null}
+      {ctx.canWrite && r.status === "closed" ? (
+        // REQ-018 FR-6, AC-2: one tap to turn a closed incident into an improvement row, source pre-filled.
+        <p
+          className="border-ochre mt-5 rounded-md border p-3 text-sm leading-6"
+          data-testid="improvement-offer"
+        >
+          What did you learn from this one?{" "}
+          <Link
+            href={`/registers/improvements/new?source_kind=incident&source_ref=${encodeURIComponent(r.reference)}`}
+            className="underline underline-offset-2"
+            data-testid="improvement-link"
+          >
+            Add it to the improvement register
+          </Link>
+          .
+        </p>
+      ) : null}
       {ctx.canWrite ? (
         <p className="mt-5">
           <Link

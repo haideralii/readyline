@@ -1,0 +1,98 @@
+// @vitest-environment node
+/**
+ * "What the auditor will ask to see" (REQ-018 FR-11, AC-4; D-1907): twelve
+ * lines, each with a live state and a tap, in plain words that pass the
+ * copy lint; a missing register says so and offers the add; an overdue one
+ * says fix it.
+ */
+import { describe, expect, it } from "vitest";
+import { findProhibitedClaims } from "@/lib/claims";
+import { lintText } from "@/lib/copy-lint/rules";
+import type { AuditDayOverview } from "@/server/registers/audit-day-queries";
+import { ASK_COUNT, auditDayAskList } from "./audit-day-ask";
+import { AUDIT_DAY_SLUGS } from "./audit-day-forms";
+
+const empty = Object.fromEntries(
+  AUDIT_DAY_SLUGS.map((s) => [
+    s,
+    { total: 0, attention: 0, attentionLabel: "Nothing recorded" },
+  ]),
+) as AuditDayOverview;
+
+const registersEmpty = {
+  incidents: { total: 0, open: 0, overdueNotification: 0 },
+  complaints: { total: 0, unresolved: 0 },
+  workerChecks: { total: 0, expiring: 0, expired: 0 },
+  policyReviews: { total: 0, dueSoon: 0, overdue: 0, notAdopted: 0 },
+};
+
+describe("audit-day ask list (REQ-018 FR-11)", () => {
+  it("lists the twelve items with a tap each, all missing on an empty account, every word plain", () => {
+    const lines = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: empty,
+      documentControl: [],
+    });
+    expect(lines).toHaveLength(ASK_COUNT);
+    expect(new Set(lines.map((l) => l.id)).size).toBe(ASK_COUNT);
+    for (const l of lines) {
+      expect(l.state, l.id).toBe("missing");
+      expect(l.href, l.id).toMatch(/^\/registers\//);
+      expect(l.action.length, l.id).toBeGreaterThan(2);
+      for (const t of [l.ask, l.word, l.action]) {
+        expect(lintText(t, { block: true }), `${l.id}: ${t}`).toEqual([]);
+        expect(findProhibitedClaims(t), `${l.id}: ${t}`).toEqual([]);
+      }
+    }
+  });
+
+  it("a filled register reads as filled, an overdue one as overdue with Fix it, and the document control line follows its rows", () => {
+    const lines = auditDayAskList({
+      registers: {
+        ...registersEmpty,
+        incidents: { total: 3, open: 1, overdueNotification: 1 },
+        complaints: { total: 2, unresolved: 0 },
+      },
+      auditDay: {
+        ...empty,
+        decisions: { total: 4, attention: 0, attentionLabel: "All current" },
+        insurances: { total: 3, attention: 1, attentionLabel: "1 overdue" },
+      },
+      documentControl: [
+        {
+          document_type_id: "governance-policy",
+          title: "Governance policy",
+          version: "1",
+          adopted_on: "2026-10-12",
+          adopted_by: "Owner",
+          next_review_on: "2027-10-12",
+          circulated: { on: "2026-10-12", workers: 1 },
+          state: "adopted",
+        },
+      ],
+    });
+    const by = (id: string) => lines.find((l) => l.id === id)!;
+    expect(by("decisions")).toMatchObject({
+      state: "filled",
+      word: "4 entries; all current.",
+      action: "Open",
+    });
+    expect(by("insurances")).toMatchObject({
+      state: "overdue",
+      action: "Fix it",
+    });
+    expect(by("incidents")).toMatchObject({
+      state: "overdue",
+      word: "1 overdue to notify the Commission.",
+    });
+    expect(by("complaints")).toMatchObject({
+      state: "filled",
+      word: "2 entries; 0 unresolved.",
+    });
+    expect(by("document-control")).toMatchObject({
+      state: "filled",
+      word: "1 of 1 adopted, 1 circulated to workers.",
+      href: "/registers/document-control",
+    });
+  });
+});

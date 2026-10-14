@@ -78,6 +78,24 @@ export default async function ComplaintPage({
           <p className="mt-1 leading-7">{r.outcome}</p>
         </>
       ) : null}
+      {ctx.canWrite &&
+      (r.status === "resolved" || r.status === "escalated-to-commission") ? (
+        // REQ-018 FR-6, AC-2: one tap to turn a closed complaint into an improvement row, source pre-filled.
+        <p
+          className="border-ochre mt-5 rounded-md border p-3 text-sm leading-6"
+          data-testid="improvement-offer"
+        >
+          What did you learn from this one?{" "}
+          <Link
+            href={`/registers/improvements/new?source_kind=complaint&source_ref=${encodeURIComponent(r.reference)}`}
+            className="underline underline-offset-2"
+            data-testid="improvement-link"
+          >
+            Add it to the improvement register
+          </Link>
+          .
+        </p>
+      ) : null}
       {ctx.canWrite ? (
         <p className="mt-5">
           <Link
