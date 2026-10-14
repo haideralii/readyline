@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
 import { hasSupabaseForE2e } from "../helpers/env";
-import { checkWidths } from "../helpers/width";
+import { checkTables, checkWidths } from "../helpers/width";
 import {
   createTenant,
   deleteTenant,
@@ -176,11 +176,23 @@ test.describe("readiness checklist, signed in (REQ-006 AC-2)", () => {
       page.getByTestId("checklist-item-business-abn").getByRole("textbox"),
     ).toHaveValue("ABN confirmed with the accountant");
 
-    // Unverified items carry the badge; sources link out (inside the opened row).
+    // REQ-013 batch 36 item 2: the internal confidence flag never shows; the
+    // customer reads a plain "check this" sentence in the opened row, with the link.
     await page.getByTestId("checklist-group-people").locator("summary").click();
+    await expect(page.locator("body")).not.toContainText(
+      "Not confirmed by the Commission",
+    );
+    const screening = page.getByTestId(
+      "checklist-item-people-worker-screening-clearances",
+    );
+    await screening
+      .getByTestId("checklist-row-people-worker-screening-clearances")
+      .click();
     await expect(
-      page.getByTestId("checklist-item-people-worker-screening-clearances"),
-    ).toContainText("Not confirmed by the Commission's text");
+      page.getByTestId("checklist-check-people-worker-screening-clearances"),
+    ).toContainText("Check this against the Commission's page");
+    await checkTables(page, "checklist People group");
+    await shot(page, "checklist-people", testInfo.project.name);
     const orientation = page.getByTestId(
       "checklist-item-people-worker-orientation-module",
     );

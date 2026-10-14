@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
-import { checkWidths } from "./helpers/width";
+import { checkTables, checkWidths } from "./helpers/width";
 
 /**
  * REQ-011 batch 29 on all three projects: the guides index, both guides
@@ -66,14 +66,16 @@ test.describe("guides (REQ-011)", () => {
       /Last reviewed/,
     );
     // The table comes from standards.json: 38 groups, household tasks is verification, personal care certification.
-    const table = page.getByRole("table");
+    // Batch 36: stacked rows on phones, a table on wider screens; the same cells either way.
+    const table = page.getByTestId("data-table").first();
     await expect(table).toContainText("0120");
-    await expect(table.getByRole("row", { name: /0120/ })).toContainText(
-      "Verification",
-    );
-    await expect(table.getByRole("row", { name: /0107/ })).toContainText(
-      "Certification",
-    );
+    const phone = (page.viewportSize()?.width ?? 1280) < 640;
+    const row = (code: string) =>
+      phone
+        ? table.getByRole("listitem").filter({ hasText: code })
+        : table.getByRole("row", { name: new RegExp(code) });
+    await expect(row("0120")).toContainText("Verification");
+    await expect(row("0107")).toContainText("Certification");
     await expect(page.getByText(/38 groups:/)).toBeVisible();
     const faq = page.getByTestId("guide-faq");
     expect(await faq.locator("details").count()).toBe(6);
@@ -96,6 +98,9 @@ test.describe("guides (REQ-011)", () => {
     // Visible text only: the dev server's inline payload carries module paths (".../metadata/...").
     expect(await page.locator("body").innerText()).not.toMatch(/data\/|\.json/);
     await checkWidths(page, "which-audit guide");
+    // REQ-013 batch 36 item 1: the registration-groups table stacks on phones; no word splits.
+    expect(await page.getByTestId("data-table").count()).toBeGreaterThan(0);
+    await checkTables(page, "which-audit guide");
     await axeClean(page, "which-audit guide");
     await shot(page, "which-audit", testInfo.project.name);
   });
@@ -161,7 +166,9 @@ test.describe("guides (REQ-011)", () => {
     page,
   }, testInfo) => {
     await page.goto("/guides/ndis-registration-cost");
-    await expect(page.getByRole("table").first()).toContainText("AUD 399");
+    await expect(page.getByTestId("data-table").first()).toContainText(
+      "AUD 399",
+    );
     const calc = page.getByTestId("cost-calculator");
     await calc.getByLabel("Find your support types").fill("household");
     // Names carry the code, so the code is the stable handle.
