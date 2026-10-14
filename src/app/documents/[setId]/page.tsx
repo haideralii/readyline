@@ -64,7 +64,13 @@ export default async function DocumentSetPage({
     documents: g.documents.map((d) => ({ ...d, n: ++counter })),
   }));
   // REQ-016 FR-0c: what the page counts is the provider's own blanks, never generator failures.
-  const blanks = documents.flatMap((d) => collectBlanks(d.model));
+  // Batch 45b item 2: and only the blanks the Finish page can ask for (a fact such
+  // as a name, a role or a date), the same count the next-step strip uses; the
+  // example cells of a register template ([Owner], [Risk]) are the paper form's
+  // own and are not details to fill in before adoption (CI run 635 counted 46).
+  const blanks = documents.flatMap((d) =>
+    collectBlanks(d.model).filter((b) => factKeyFor(b.blank)),
+  );
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
