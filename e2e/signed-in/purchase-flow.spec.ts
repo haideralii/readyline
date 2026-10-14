@@ -216,7 +216,9 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
       await expect(
         page.getByRole("heading", { level: 1, name: "Finish your pack" }),
       ).toBeVisible();
-      await expect(page.getByTestId("finish-document").first()).toBeVisible();
+      // REQ-017 step 4: the finish page is one form (a question at a time on
+      // a phone, grouped on desktop); the per-document rows of REQ-016 are gone.
+      await expect(page.getByTestId("finish-form")).toBeVisible();
       await checkWidths(page, "finish your pack");
       await shot(page, "finish-pack", project);
       await page.goBack();
