@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { diffLines } from "@/lib/generator/diff";
 import { describeFactSources } from "@/lib/generator/fact-sources";
 import { blocksToText } from "@/lib/generator/section-schema";
+import { Blocks } from "@/components/sample-document";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
@@ -95,9 +96,10 @@ export default async function ReviewDocumentPage({
                     .join("; ")}
                 </p>
               ) : null}
-              <pre className="mt-3 font-sans text-sm leading-6 whitespace-pre-wrap">
-                {blocksToText(s.blocks)}
-              </pre>
+              {/* REQ-013 batch 36 item 1: the same block renderer as the sample, so tables stack on phones. */}
+              <div className="mt-3 text-sm">
+                <Blocks blocks={s.blocks} />
+              </div>
               {diff ? (
                 <div
                   className="mt-3 rounded-md bg-zinc-50 p-3 text-sm dark:bg-zinc-900"
