@@ -2563,6 +2563,32 @@ skip, and no longer throw); CI's job proves the rows.
 
 
 
+**D-1310 Haider's phone findings (Dev, 2026-10-14, batch 36, REQ-013).**
+(1) Tables: the global `td { overflow-wrap: anywhere }` from REQ-015 was
+splitting short words letter by letter in narrow first columns. It is now
+`break-word` with hyphens off, and one `DataTable` component renders every
+block table (the sample viewer, the document reader, which now uses the
+sample's block renderer instead of plain text) and every markdown table
+(read from the syntax tree react-markdown passes, cell text only): stacked
+rows with the column header in small capitals under 640 px, a table with a
+minimum first-column width above it. `checkTables` in the e2e helpers wraps
+every word in a Range and fails when its rectangles sit on more than one
+line, at the project width and at 360 and 390 px. (2) The evidence-confidence
+flag ("Not confirmed by the Commission's text") left the checklist and the
+result page; the customer reads "Check this against the Commission's page
+before you rely on it" with the existing source link; the flag lives on the
+admin page (computed over the three reference cases) and in
+`product/evidence/req-006/evidence-confidence.md`; copy-lint bans the phrase
+and "not asked about yet". (3) The result card's line is two segments (have
+and still to do) and one sentence, "You already have N of these. Readyline
+drafts the D documents for you; the R registers you keep as you go."; the
+checklist link says what it opens ("Open your checklist (46 things)") and
+the count line is gone; the tags read "Readyline drafts this" and "You said
+you don't have this yet"; the home page example uses the same sentence; the
+account page's register line keeps the two-segment component with its own
+noun. The live result page still shows the AI documents until REQ-016
+merges (item 4, nothing to do).
+
 
 
 
@@ -2837,6 +2863,9 @@ documents a customer gets, and applies the sample owner facts before
 rendering so document control is filled as a customer's account would
 fill it. Findings 16, 2, 8, 10 and 12 wait for the recording session and
 are listed in the recording order in `fixtures/generation/README.md`.
+
+
+
 
 ## Open questions for Haider
 
