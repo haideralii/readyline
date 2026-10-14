@@ -267,7 +267,28 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
     const s = getComputedStyle(el);
     const hidden =
       parseFloat(s.opacity) === 0 || el.classList.contains("sr-only");
-    const host = hidden ? (el.closest("label") ?? el) : el;
+    let host = hidden ? (el.closest("label") ?? el) : el;
+    // A date or time input focuses a segment inside its shadow tree, and on
+    // the runner's Chromium the host then matches neither :focus nor
+    // :focus-visible (#39, run 38633590513: hasFocus=true, focus=false,
+    // outline none); the ring may then sit on the closest ancestor that
+    // carries one (focus-within). Only for those two input types: every
+    // other control must ring itself.
+    const inputType = (el as HTMLInputElement).type ?? "";
+    let hostKind: "self" | "label" | "ancestor" =
+      host === el ? "self" : "label";
+    if (
+      !ring(host) &&
+      el.tagName.toLowerCase() === "input" &&
+      (inputType === "date" || inputType === "time")
+    ) {
+      let up: Element | null = el.parentElement;
+      while (up && up !== document.body && !ring(up)) up = up.parentElement;
+      if (up && up !== document.body) {
+        host = up;
+        hostKind = "ancestor";
+      }
+    }
     const visibleRing =
       ring(host) && getComputedStyle(host).visibility !== "hidden";
     // The evidence behind a failed ring test (#39, run 38626572687): the
@@ -291,7 +312,7 @@ export async function focusInfo(page: Page): Promise<FocusInfo> {
       `focus=${seen.focus} focus-visible=${seen.focusVisible} ` +
       `outline=${seen.outlineStyle} ${seen.outlineWidth} ${seen.outlineColor} ` +
       `box-shadow=${seen.boxShadow} opacity=${seen.opacity} visibility=${seen.visibility} ` +
-      `host=${host === el ? "self" : "label"} ` +
+      `host=${hostKind}${hostKind === "ancestor" ? `:${host.tagName.toLowerCase()}${host.getAttribute("data-testid") ? `[${host.getAttribute("data-testid")}]` : ""}` : ""} ` +
       `active-after-50ms=${document.activeElement === el} connected=${el.isConnected} ` +
       `ring-after-50ms=${ring(host)}`;
     const prev = w.__lastFocused ?? null;
