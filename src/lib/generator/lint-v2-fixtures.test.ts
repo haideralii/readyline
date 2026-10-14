@@ -11,51 +11,22 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getStandardsDataset } from "@/lib/standards/dataset";
-import { COMMISSION_CONTACT_STRINGS } from "./fixed-extras";
 import {
-  contactStringsIn,
-  lintContactDetails,
-  lintIndicatorRestatement,
-  lintRecordNames,
-  lintStaffActor,
-  lintVagueTime,
-} from "./lint";
+  anyFinding,
+  emptyCounts,
+  lintV2Counts,
+  LINT_V2_RULES,
+  type LintV2Counts,
+} from "./lint-v2-fixture";
 import { DEFAULT_FIXTURES_DIR, type Fixture } from "./model-client";
 import { knownRecordNames } from "./record-names";
-import { TailoredSection, blocksToText } from "./section-schema";
 
 const DIRS = [
   DEFAULT_FIXTURES_DIR,
   join("fixtures", "generation-claude-haiku-5-5"),
 ];
 
-/** The quality indicator sentences the fixture's own STANDARDS block carried. */
-function indicatorsOf(user: string): string[] {
-  const block =
-    /<<<STANDARDS>>>\n([\s\S]*?)<<<END STANDARDS>>>/.exec(user)?.[1] ?? "";
-  return [...block.matchAll(/^\d+\. (.+)$/gm)].map((m) => m[1]);
-}
-
-export type LintV2Counts = Record<
-  | "indicator-restatement"
-  | "vague-time"
-  | "staff-actor"
-  | "record-name"
-  | "contact-details",
-  number
->;
-
-/** The FACTS and STATE FACTS blocks of a recorded prompt: the contact strings a reply may quote (D-546). */
-function allowedContactsOf(user: string): string[] {
-  const blocks = [
-    /<<<FACTS>>>\n([\s\S]*?)<<<END FACTS>>>/.exec(user)?.[1] ?? "",
-    /<<<STATE FACTS>>>\n([\s\S]*?)<<<END STATE FACTS>>>/.exec(user)?.[1] ?? "",
-  ].join("\n");
-  return [
-    ...COMMISSION_CONTACT_STRINGS,
-    ...contactStringsIn(blocks).map((c) => c.value),
-  ];
-}
+export type { LintV2Counts };
 
 export function lintV2OverFixtures(): {
   fixtures: number;
@@ -66,13 +37,7 @@ export function lintV2OverFixtures(): {
   const dataset = getStandardsDataset();
   const allowed = dataset.registrationGroups.map((g) => g.name);
   const known = knownRecordNames();
-  const byRule: LintV2Counts = {
-    "indicator-restatement": 0,
-    "vague-time": 0,
-    "staff-actor": 0,
-    "record-name": 0,
-    "contact-details": 0,
-  };
+  const byRule = emptyCounts();
   const bySection: Record<string, LintV2Counts> = {};
   let fixtures = 0;
   let failing = 0;
@@ -91,45 +56,20 @@ export function lintV2OverFixtures(): {
           const fx = JSON.parse(
             readFileSync(join(dir, typeId, sectionId, file), "utf8"),
           ) as Fixture;
-          let blocks: unknown;
-          try {
-            blocks = (JSON.parse(fx.reply) as { blocks: unknown }).blocks;
-          } catch {
-            continue;
-          }
-          const parsed = TailoredSection.shape.blocks.safeParse(blocks);
-          if (!parsed.success) continue;
-          fixtures += 1;
-          const text = blocksToText(parsed.data);
-          const counts: LintV2Counts = {
-            "indicator-restatement": lintIndicatorRestatement(
-              text,
-              indicatorsOf(fx.request.user),
-            ).length,
-            "vague-time": lintVagueTime(text).length,
-            "staff-actor": lintStaffActor(text, { allowedPhrases: allowed })
-              .length,
-            "record-name": lintRecordNames(text, known).length,
-            "contact-details": lintContactDetails(
-              text,
-              allowedContactsOf(fx.request.user),
-            ).length,
-          };
-          const key = `${typeId}/${sectionId}`;
-          const section = (bySection[key] ??= {
-            "indicator-restatement": 0,
-            "vague-time": 0,
-            "staff-actor": 0,
-            "record-name": 0,
-            "contact-details": 0,
+          // Backlog 6: the per-fixture lint lives in lint-v2-fixture.ts, shared with the recording plan.
+          const counts = lintV2Counts(fx, {
+            allowedPhrases: allowed,
+            knownRecordNames: known,
           });
-          let any = false;
-          for (const k of Object.keys(counts) as (keyof LintV2Counts)[]) {
+          if (!counts) continue;
+          fixtures += 1;
+          const key = `${typeId}/${sectionId}`;
+          const section = (bySection[key] ??= emptyCounts());
+          for (const k of LINT_V2_RULES) {
             byRule[k] += counts[k];
             section[k] += counts[k];
-            if (counts[k] > 0) any = true;
           }
-          if (any) failing += 1;
+          if (anyFinding(counts)) failing += 1;
         }
       }
     }
