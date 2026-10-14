@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
+import { checkTables } from "./helpers/width";
 
 /**
  * Home page v2 (batch 24) on both projects: the hero asks the audit question
@@ -64,7 +65,7 @@ test.describe("home page v2 (batch 24)", () => {
   test("sample: a real document with tailored sections marked and a Word download (item 2)", async ({
     page,
     request,
-  }) => {
+  }, testInfo) => {
     await page.goto("/");
     await page.getByTestId("home-cta-sample").click();
     const sample = page.getByTestId("sample-document");
@@ -83,6 +84,10 @@ test.describe("home page v2 (batch 24)", () => {
     await expect(procedure).toBeHidden();
     await page.getByTestId("sample-more").click();
     await expect(procedure).toBeVisible();
+    // REQ-013 batch 36 item 1: tables stack on phones and never split a word.
+    expect(await sample.getByTestId("data-table").count()).toBeGreaterThan(0);
+    await checkTables(page, "sample document");
+    await shot(page, "sample-table", testInfo.project.name);
     const docx = await request.get("/sample/complaints-policy.docx");
     expect(docx.status()).toBe(200);
     expect(docx.headers()["content-type"]).toContain("wordprocessingml");
