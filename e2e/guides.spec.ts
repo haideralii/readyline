@@ -40,13 +40,15 @@ async function axeClean(page: Page, label: string) {
 }
 
 test.describe("guides (REQ-011)", () => {
-  test("index lists both guides with their reviewed dates", async ({
+  test("index lists the four guides with their reviewed dates", async ({
     page,
   }, testInfo) => {
     await page.goto("/guides");
     const list = page.getByTestId("guides-list");
     await expect(list).toContainText("Verification or certification");
     await expect(list).toContainText("NDIS registration cost");
+    await expect(list).toContainText("What happens at an NDIS audit");
+    await expect(list).toContainText("The registers an auditor asks for");
     await expect(list).toContainText(/Last reviewed \d+ \w+ 2026/);
     await checkWidths(page, "guides index");
     await axeClean(page, "guides index");
@@ -103,6 +105,67 @@ test.describe("guides (REQ-011)", () => {
     await shot(page, "which-audit", testInfo.project.name);
   });
 
+  // Backlog 3 (14 Oct 2026): the two audit guides, written from the Commission's types-of-audits page.
+  for (const guide of [
+    {
+      slug: "what-happens-at-an-ndis-audit",
+      h1: "What happens at an NDIS audit",
+      body: "Out of cycle",
+    },
+    {
+      slug: "registers-an-auditor-asks-for",
+      h1: "The registers an auditor asks for",
+      body: "Complaints register",
+    },
+  ]) {
+    test(`${guide.slug}: draft note, tables, FAQ structured data, Commission sources, CTA`, async ({
+      page,
+    }, testInfo) => {
+      await page.goto(`/guides/${guide.slug}`);
+      await expect(page.getByRole("heading", { level: 1 })).toContainText(
+        guide.h1,
+      );
+      await expect(page.getByTestId("guide-reviewed")).toContainText(
+        /Last reviewed/,
+      );
+      // A guide's table is the shared data table (batch 36): cards on a phone,
+      // a table from sm up, both in the DOM; the wrapper's text is the same on
+      // every viewport, where the table role is only on the wider layout
+      // (#40, run 38637072132).
+      await expect(page.getByTestId("data-table").first()).toContainText(
+        guide.body,
+      );
+      const faq = page.getByTestId("guide-faq");
+      expect(await faq.locator("details").count()).toBe(6);
+      const ld = await page
+        .locator('script[type="application/ld+json"]')
+        .allTextContents();
+      const faqLd = ld
+        .map((t) => JSON.parse(t))
+        .flat()
+        .find((d: { "@type"?: string }) => d["@type"] === "FAQPage");
+      expect(faqLd?.mainEntity).toHaveLength(6);
+      await expect(
+        page.getByTestId("guide-sources").getByRole("link").first(),
+      ).toHaveAttribute(
+        "href",
+        /ndiscommission\.gov\.au\/provider-registration\/apply-registration\/types-audits/,
+      );
+      await expect(
+        page
+          .getByTestId("guide-cta")
+          .getByRole("link", { name: "See which audit I need" }),
+      ).toHaveAttribute("href", "/start");
+      const text = await page.locator("body").innerText();
+      expect(text).not.toMatch(/data\/|\.json/);
+      // Sector-webinar material is labelled as practice, never stated as a rule.
+      expect(text).toMatch(/not a rule|not rules/);
+      await checkWidths(page, guide.slug);
+      await axeClean(page, guide.slug);
+      await shot(page, guide.slug, testInfo.project.name);
+    });
+  }
+
   test("cost guide: the price from config and the calculator's audit rule", async ({
     page,
   }, testInfo) => {
@@ -144,8 +207,14 @@ test.describe("guides (REQ-011)", () => {
     expect(
       await page.getByRole("link", { name: /\(class|^[A-Z]/ }).count(),
     ).toBeGreaterThan(30);
-    await page.getByLabel(/Search by what you do/).fill("cleaning");
-    await expect(page.getByTestId("groups-count")).toContainText(/of 38/);
+    // WebKit can accept the typing before React has hydrated the controlled
+    // input, and hydration then resets it: type again until the count reacts.
+    await expect(async () => {
+      await page.getByLabel(/Search by what you do/).fill("cleaning");
+      await expect(page.getByTestId("groups-count")).toContainText(/of 38/, {
+        timeout: 1_500,
+      });
+    }).toPass({ timeout: 20_000 });
     await expect(
       page.getByRole("link", { name: "Household tasks", exact: true }),
     ).toBeVisible();
@@ -242,6 +311,8 @@ test.describe("guides (REQ-011)", () => {
     const xml = await sm.text();
     expect(xml).toContain("/guides/which-ndis-audit");
     expect(xml).toContain("/guides/ndis-registration-cost");
+    expect(xml).toContain("/guides/what-happens-at-an-ndis-audit");
+    expect(xml).toContain("/guides/registers-an-auditor-asks-for");
     expect(xml).toContain("/guides/registration-groups</loc>");
     expect(xml).toContain("/guides/registration-groups/household-tasks");
     expect(

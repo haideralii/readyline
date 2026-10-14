@@ -2,10 +2,10 @@
 title: "Verification or certification: which NDIS audit do you need?"
 slug: which-ndis-audit
 description: "Which NDIS audit you face depends on the support types you register for. See the full list of registration groups by audit type, what each audit involves, and the mid-term audit rule."
-updated: 2026-10-13
-reviewed: 2026-10-13
+updated: 2026-10-14
+reviewed: 2026-10-14
 owner: po
-status: draft (Dev first draft, 13 Oct 2026; the PO reviews the wording and the UNVERIFIED lines)
+status: draft (Dev first draft, 13 Oct 2026; updated 14 Oct 2026 with the Commission's types-of-audits page: the five kinds, stages, report times and ratings; the PO reviews the wording and the UNVERIFIED line)
 ---
 
 # Verification or certification: which NDIS audit do you need?
@@ -18,7 +18,9 @@ You do not choose. An auditor does not choose either. The list below is the Comm
 
 **Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management. Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
 
-**Certification** is a full audit. The auditor reads your documents against the core module (and any supplementary modules your groups add), visits your business, and talks to your workers and to some participants. Certified providers also face a mid-term audit about 18 months after registration.
+**Certification** is a full audit in two stages. Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add. Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
+
+The Commission names three more kinds: the mid-term audit for certified providers, a condition audit the Commission can require, and an out of cycle audit you arrange to change your registration. Our guide [What happens at an NDIS audit](/guides/what-happens-at-an-ndis-audit) walks through all five.
 
 ## Every registration group by audit type
 
@@ -37,15 +39,23 @@ Mixed groups resolve to certification: one certification group among five verifi
 
 The questionnaire asks about each of these, so the result covers them.
 
+## What the audit report says
+
+Each Practice Standard and quality indicator gets a rating from 3 (conforms with elements of best practice) down to 0 (major non-conformity). A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have. A minor non-conformity gives you longer, and the process continues.
+
+The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit. The Commission, not the auditor, makes the registration decision.
+
 ## The mid-term audit
 
-If your audit is certification, the Commission requires a mid-term audit about 18 months after registration. It covers the governance and operational management part of the core module, plus any standard that had a corrective action at your first audit. Start preparing from month 12. Verification registrations have no mid-term audit.
+If your audit is certification, the Commission requires a mid-term audit about 18 months after registration. It covers the governance and operational management part of the core module, plus any standard that had a corrective action at your first audit. The Commission says to start preparing 12 months after your registration date. Verification registrations have no mid-term audit.
+
+The mid-term audit does not apply to an individual or partnership certified only for early childhood supports, or to a provider registered only for specialist disability accommodation.
 
 ## When registration becomes compulsory
 
-Registration is becoming compulsory in waves. Supported independent living and digital platform providers were first, from 1 July 2026. Providers of higher-risk activities such as personal care are next, from 1 July 2027, with every in-scope provider registered by December 2030.
+Registration is becoming compulsory in waves. The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026. Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030.
 
-UNVERIFIED: these dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of. Check the Commission's registration pages before relying on them.
+UNVERIFIED: the 2027 and 2030 dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of. Check the Commission's registration pages before relying on them.
 
 ## FAQ
 
@@ -67,7 +77,7 @@ Three years. A renewal audit happens before it expires. Certified providers also
 
 ### What happens if I add a service later?
 
-Tell the Commission through a change to your registration. If the new group is higher-risk and your registration was verification, expect a certification audit. UNVERIFIED: the exact change process; check the Commission's "change your registration" guidance.
+You apply to change your registration, and the Commission calls the audit that supports it an out of cycle audit: you arrange it with an approved auditor at any time. If the new group is higher-risk and your registration was verification, expect a certification audit.
 
 ### Who does the audit?
 
@@ -75,7 +85,9 @@ An approved quality auditor, chosen and paid by you, from the Commission's list.
 
 ## Sources
 
-- [NDIS Quality and Safeguards Commission: registration groups (classes of support)](https://www.ndiscommission.gov.au/providers/registered-ndis-providers/registration-groups-or-classes-support)
+- [NDIS Quality and Safeguards Commission: registration groups (classes of support)](https://www.ndiscommission.gov.au/provider-registration/apply-registration/registration-groups-or-classes-support)
+- [NDIS Quality and Safeguards Commission: types of audits, audit outcome ratings and report timeframes](https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits) (read 11 October 2026)
+- [NDIS Quality and Safeguards Commission: mandatory registration (reform hub)](https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration) (read 11 October 2026)
 - [NDIS Practice Standards and Quality Indicators](https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards)
 - [Mid-term audits](https://www.ndiscommission.gov.au/providers/registered-ndis-providers/mid-term-audits)
-- Readyline market research, 13 October 2026 (compulsory registration dates; marked UNVERIFIED above)
+- Readyline market research, 13 October 2026 (the later compulsory registration dates; marked UNVERIFIED above)
