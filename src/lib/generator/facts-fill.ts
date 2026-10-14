@@ -135,11 +135,31 @@ export function isAccountFactKey(key: string): boolean {
   return ACCOUNT_FACT_KEYS.has(key);
 }
 
+/**
+ * The key of a blank the Finish form asks for, or null: a fact blank whose
+ * key the account does not hold. One rule for the form's questions, the
+ * next-step strip's count and the set page's count, so they can never
+ * disagree (run 38599190033: the strip counted the approval date, which
+ * waits for adoption, and held the step at finish after the form had
+ * nothing left to ask).
+ */
+export function formFactKeyFor(blank: string): string | null {
+  const key = factKeyFor(blank);
+  return key !== null && !isAccountFactKey(key) ? key : null;
+}
+
+/** The blanks the Finish form can ask for, in order, from a set's blanks. */
+export function formBlanks<T extends { blank: string }>(
+  blanks: readonly T[],
+): T[] {
+  return blanks.filter((b) => formFactKeyFor(b.blank) !== null);
+}
+
 /** The form's questions: every fact except the ones the account holds. */
 export function formQuestionsFor(
   blanks: readonly DocumentBlank[],
 ): FactQuestion[] {
-  return questionsFor(blanks).filter((q) => !isAccountFactKey(q.key));
+  return questionsFor(formBlanks(blanks));
 }
 
 export function factKeyFor(blank: string): string | null {
