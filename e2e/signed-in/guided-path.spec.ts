@@ -116,6 +116,11 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page.getByRole("status")).toContainText(
       "You can close this page",
     );
+    // REQ-021 S1 through the real job: the indicator reads the job row and names a real phase.
+    await expect(page.getByTestId("writing-indicator")).toHaveAttribute(
+      "data-phase",
+      /preparing|writing|checking|assembling|ready/,
+    );
     await shot(page, "while-we-draft", project);
     const generationStart = Date.now();
     const deadline = Date.now() + 240_000;

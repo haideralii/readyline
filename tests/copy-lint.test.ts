@@ -69,6 +69,8 @@ const COPY_MODULES = [
   "src/lib/payments/copy.ts",
   "src/lib/payments/documents-copy.ts",
   "src/server/payments/messages.ts",
+  // REQ-021: every line the writing indicator can show.
+  "src/lib/generation/writing-state.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";
 

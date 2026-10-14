@@ -2917,6 +2917,8 @@ No recording without the PO's go-ahead.
 
 
 
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
@@ -3184,4 +3186,50 @@ only in the three signed-in specs whose race is written above the
 configure call (purchase flow, guided path, subscription). The integration
 file cannot run against the hosted project (its migrations are behind the
 branches); CI's Supabase job is the gate.
+
+**D-2101 The writing indicator reads the job row, never a timer; the row
+carries the phase, the document and section in flight and the time of the
+last progress; a document that keeps failing waits for the owner (Dev,
+2026-10-14, standing backlog 10, REQ-021).** Migration
+`20261014300000_writing_indicator.sql` adds to `generation_jobs` a
+`phase` (preparing, writing, checking, assembling, ready, attention,
+failed), `document_total`, `current_document_type_id`,
+`current_section_index` (1-based), `section_count`, `last_progress_at`
+and `failed_documents` (jsonb), and a fifth status, `attention`, that the
+claim function never picks up. The loop writes the phase and the time
+with every progress update: `preparing` when the set is created,
+`writing` before each section call with the section index, `checking`
+before the generic-section rule, `assembling` before the render, `ready`
+at the end. S4: a document whose write throws is retried once at the tick
+level with backoff as before (most causes are transient); on the second
+tick it is recorded as `error`, nothing is stored for it and the rest
+continue; a document still over the generic-section cap after its one
+redraft is stored as it is and recorded as `degraded`. When every
+document has been tried and any is listed, the job goes to `attention`
+instead of ready: no set finish, no email, no hand-over. The owner's two
+server actions (`attention-actions.ts`) answer it: "Try again" clears the
+entry, puts the document on `progress.retry` so the loop regenerates it
+as a new version while skipping every document already stored, and
+queues a run; "Continue without it" (or "Keep it as it is" for degraded)
+drops the entry and, when none remain, queues the run that finishes the
+set. The status route `GET /api/generation/status` builds the pure
+`WritingStatus` (`src/lib/generation/writing-state.ts`: phase mapping,
+the words, the quiet rule at 90 seconds and 5 minutes, the away sentence,
+the usual time as the median of the last 50 packs rounded up to 5 minutes
+and absent under 20) with the owner's session; the component polls it
+every 5 seconds while the page is visible, once at once on return, keeps
+the last state with a reconnecting dot on failure and says it cannot
+reach the server after three; pause detection uses the server's clock
+through the skew learned on each poll. The Ready state leads with the
+guided path's next step (`nextStepFor`) and Download second. The
+scenarios that cannot be driven through a real job without a model run
+on `/dev/writing-indicator` and `/api/dev/writing-status`, fake mode
+only (404 otherwise), from a scripted feed with a fixed start time; the
+Playwright spec covers S1, S2, S3, S4, S6, S7, S9 and S10 on the three
+projects, S1 also runs through the real job in the guided-path spec
+(CI's Supabase job), and S8 and S11 are by construction (server state
+only; a `single` prop). The documents page keeps its status line under
+the indicator for the existing specs and the screen-reader role. Not
+measured: the Lighthouse CPU-idle figure while animating; the budget
+runner does not take the dev page, noted in the evidence.
 
