@@ -1,11 +1,11 @@
-"use server";
 /**
  * The fake Checkout page's buttons (REQ-007 Q5, D-709). Each one builds the
  * event Stripe would send, signs it with the local webhook secret and posts
  * it to the real webhook route on this origin, so everything after the
- * signature check is the production path. Inert outside fake mode.
+ * signature check is the production path. Inert outside fake mode. Called
+ * by the page's route handler (batch 45b item 2), which answers with a 303
+ * so the return to the site is a full page load, as Stripe's own return is.
  */
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import {
@@ -19,7 +19,7 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { signFakeEvent } from "@/server/payments/fake";
 import { readStripeEnv } from "@/server/payments/stripe";
 
-const Input = strictObject({
+export const FakeCheckoutInput = strictObject({
   id: z.string().min(16).max(4096),
   action: z.enum([
     "pay",
@@ -31,16 +31,22 @@ const Input = strictObject({
   ]),
 });
 
-export async function fakeCheckoutAction(formData: FormData): Promise<void> {
+export type FakeCheckoutInputData = z.infer<typeof FakeCheckoutInput>;
+
+/**
+ * Posts the event for the pressed button (already validated at the route)
+ * and returns the path the browser goes to next, or null when the request
+ * is not one the fake page makes (outside fake mode, a malformed session).
+ */
+export async function runFakeCheckout(
+  input: FakeCheckoutInputData,
+): Promise<string | null> {
   const env = readStripeEnv();
-  if (!env.fake) redirect("/");
-  const parsed = parseInput(Input, {
-    id: formData.get("id"),
-    action: formData.get("action"),
-  });
-  if (!parsed.ok) redirect("/");
+  if (!env.fake) return null;
+  const parsed = parseInput(FakeCheckoutInput, input);
+  if (!parsed.ok) return null;
   const data = decodeFakeSession(parsed.data.id, env.webhookSecret);
-  if (!data) redirect("/");
+  if (!data) return null;
   const origin = new URL(data.successUrl).origin;
   const now = new Date();
   const id = parsed.data.id;
@@ -94,7 +100,7 @@ export async function fakeCheckoutAction(formData: FormData): Promise<void> {
     status: response.status,
   });
   if (parsed.data.action === "pay" || parsed.data.action === "subscribe")
-    redirect(data.successUrl.replace("{CHECKOUT_SESSION_ID}", parsed.data.id));
-  if (parsed.data.action === "refund") redirect("/documents");
-  redirect("/account");
+    return data.successUrl.replace("{CHECKOUT_SESSION_ID}", id);
+  if (parsed.data.action === "refund") return "/documents";
+  return "/account";
 }
