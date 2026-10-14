@@ -8,6 +8,31 @@
  * tables; the markdown tables in guides use the same rules through
  * legal-article.tsx.
  */
+
+const EMAIL = /([^\s@]+@)([^\s@]+\.[^\s@]+)/g;
+
+/**
+ * A cell's text with one allowed break inside an email address, after the
+ * "@": at 360 px "contactcentre@ndiscommission.gov.au" (the fixed contact
+ * block, D-546) is wider than a card and would otherwise break mid-word
+ * (#38, run 38612013599). A `<wbr>` splits the text node, so the width check
+ * sees two whole words, never one broken one.
+ */
+function cellText(cell: string) {
+  if (!cell) return "—";
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  let n = 0;
+  for (const m of cell.matchAll(EMAIL)) {
+    const at = m.index ?? 0;
+    if (at > last) parts.push(cell.slice(last, at));
+    parts.push(m[1], <wbr key={`wbr-${n++}`} />, m[2]);
+    last = at + m[0].length;
+  }
+  if (last < cell.length) parts.push(cell.slice(last));
+  return parts.length === 1 ? parts[0] : parts;
+}
+
 export function DataTable({
   columns,
   rows,
@@ -35,7 +60,7 @@ export function DataTable({
                     {columns[ci]}
                   </dt>
                   <dd className="leading-6 break-normal [overflow-wrap:normal]">
-                    {cell || "—"}
+                    {cellText(cell)}
                   </dd>
                 </div>
               ))}
@@ -67,7 +92,7 @@ export function DataTable({
                     key={ci}
                     className="border-b border-zinc-200 py-1 pr-3 align-top break-normal [overflow-wrap:normal] dark:border-zinc-800"
                   >
-                    {cell}
+                    {cellText(cell)}
                   </td>
                 ))}
               </tr>
