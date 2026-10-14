@@ -135,7 +135,7 @@ export async function adoptGroupAction(
   }).format(new Date());
 
   // The policy review register exists from the first adoption on (REQ-009
-  // FR-7). Its rows are written with the admin client (D-1704): the table's
+  // FR-7). Its rows are written with the admin client (D-1706): the table's
   // insert and update policies need an active subscription, and a provider
   // adopting a pack they have only bought has none, so the owner's session
   // would seed nothing and date nothing, without an error. The set is
