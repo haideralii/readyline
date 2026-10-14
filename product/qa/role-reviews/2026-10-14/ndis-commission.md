@@ -1,0 +1,60 @@
+# Role review 7 of 7: NDIS Commission (the regulator's seat)
+
+- **Review date:** 14 October 2026. The law moves; every "would act" below cites an instrument and section, and where I could not re-read the operative text today I say so and the finding is downgraded to "would ask", as the pipeline requires.
+- **Environment, SHA, devices, account:** as in `qa.md`; the pack is the fresh fixture render of the sole-trader set; the pages as captured on desktop and Android; one incident row in the app.
+- **Sources reached today:** legislation.gov.au gave the tables of contents of F2018L00633 (Incident Rules: s 20 "within 24 hours", s 21 "within 5 business days", s 12 and s 25 record keeping) and F2018L00634 (Complaints Rules: s 10 record keeping, ss 16, 17, 20 dealing with and closing complaints); the Commission's contact page and reportable-incidents page timed out, so I rely on the PO's read of the contact page this morning (D-546) and the repository's stored Commission pages (read 11 Oct 2026, `data/sources/manifest.json`).
+- **Read first:** the six earlier files. I agree with the auditor's grading of the incident register template and with the domain expert's 1; I disagree with the provider that the home page placeholder is a Commission matter (it is a consumer-law and trust matter, not a registration one) and with the field specialist that the two Commission number lists would make me act: the sourced block is correct, the other is the provider's drafting problem.
+- **Severity scale:** would act / would ask / would note.
+
+## 1. Conditions of registration
+
+- **Would note:** the pack commits the provider to the Code of Conduct (acknowledgement signed), the Practice Standards that apply (self-assessment section 3), an incident management system (incident policy, "We follow the National Disability Insurance Scheme (Incident Management and Reportable Incidents) Rules 2018"), a complaints system ("meets the National Disability Insurance Scheme (Complaints Management and Resolution) Rules 2018"), worker screening for risk-assessed roles (worker screening procedure section 5: "we treat the owner role as a risk-assessed role"), record keeping (records policy), and the restrictive practice position. The governance policy commits to "Keeping our registration details current and telling the Commission about changes we must report".
+- **Would ask:** which changes the provider has committed to notify and by when. The governance policy says "changes we must report" and the continuity plan says "Tells participants, and any person or body they use to manage their funding, if the business changes hands or closes" but neither names the Commission's notification of changes (key personnel, ceasing supports, change of ownership). Instrument: the conditions of registration under the NDIS Act 2013 s 73F and the Provider Registration and Practice Standards Rules 2018 (section not re-read today; UNVERIFIED, hence "ask", not "act"). What would close it: a fixed "Telling the Commission about changes" paragraph with the events and the form, sourced.
+- **Would ask:** "cooperating with the Commission" appears only as "We tell participants ... they can contact the Commission at any time, and we do not discourage them". One sentence that the provider will give the Commission information and access when asked would complete the set.
+
+## 2. Notifications and time frames
+
+- **Would ask (not act):** the app's help text and the safeguarding position say the 24-hour window applies to an unauthorised restrictive practice "if the participant was harmed (medium or high)". The Rules split by incident kind (s 20 kinds within 24 hours; s 21 other reportable incidents, which include unauthorised restrictive practice, within 5 business days). As worded, the provider would notify sooner than the Rules require in some cases, never later, so no participant is harmed by it; but the wording states a rule the Rules do not state. I could not re-read s 20 today, so: would ask the provider to show me the clause. (Domain expert 1.)
+- **Would note:** the escalation table's windows and section references (s 20 within 24 hours with the full report in 5 business days; s 21 within 5 business days in writing) match the headings confirmed today and the watch's read of 13 Oct 2026; the app computes "Notify by 2026-10-16" for a 9 Oct report at low severity, which is five business days. Correct.
+- **Would ask:** the incident policy's fixed section 7 says the provider keeps "the Commission's guidance ... with this procedure" but the pack does not include or link the Commission's reportable incidents page. I would ask to see what the provider actually keeps. What would close it: the page URL and read date in fixed text (domain expert 8).
+- **Would ask:** the pack's paper incident register template cannot record whether an incident was reportable or when it was notified (auditor, Stage 1). If the provider used the paper template and not the app, a compliance check would find the record incomplete against s 12 (heading confirmed; content UNVERIFIED today).
+
+## 3. Worker screening
+
+- **Would note:** risk-assessed roles identified (the owner's role, delivering household tasks in participants' homes); "A worker in a risk-assessed role does not work until their clearance is current"; the Worker Orientation Module before the first participant support; records named. The induction procedure's "If a training date passes without the refresher being done, we stop rostering that worker" is good practice.
+- **Would ask:** what the provider does while a clearance application is pending and on an exclusion or interim bar (the Worker Screening Rules allow supervised work in defined circumstances for some jurisdictions; nothing in the pack says what Sunrise does). Instrument: NDIS (Practice Standards: Worker Screening) Rules 2018 (not re-read today). What would close it: one fixed sentence in the screening procedure: "A worker whose clearance is pending does not work unsupervised; a worker who is excluded or barred does not work with participants at all."
+- **Would ask:** the pack's register template asks for the clearance number and the app does not store it; at a compliance check I verify clearances by number in the database. Which record will the provider show me?
+
+## 4. Complaints
+
+- **Would note:** participants told how to complain and that they can complain to the Commission "at any time ... They do not have to complain to us first"; support to complain (interpreter, easy read, advocate); no reprisal ("No one is treated worse for making a complaint"); records with reference codes; the service agreement's easy-read summary carries the same. The fixed "How to contact the Commission" block matches the contact page as read by the PO this morning (1800 035 544, hours, TTY 133 677, National Relay Service, contactcentre@ndiscommission.gov.au, website).
+- **Would ask:** the drafted procedure also prints "interpreter service on 131 450" and a different, hours-less version of the Commission's number. Both lists are true as far as I know; a participant with two cards would ask which is current. (Field specialist 3, domain expert 2.)
+- **Would ask:** the provider's own complaints contact details are a blank in three documents; until filled, participants are not told how to complain to the provider. Closed by the Finish step; I would want to see the filled version.
+
+## 5. Code of Conduct and participant rights
+
+- **Would note:** the Code's seven elements are present in the acknowledgement with concrete examples for in-home work ("We do not read mail, open drawers or cupboards"); dignity of risk is in the rights policy ("We tell the participant about the risks of a choice. We then support them to make it"); privacy of participant information is handled by reference code everywhere in the pack and the app ("never a name, date of birth, NDIS number, address or health detail"); the "How codes work" panel is the right design for a small provider.
+- **Would note:** the restrictive practice position in the safeguarding policy (the five kinds in plain words, "A locked door, a withheld phone or snack, or a held arm can be a restrictive practice even when nobody meant it to be", the emergency-use steps and the reporting windows) is better than most sole-trader packs I see. Instrument: NDIS (Restrictive Practices and Behaviour Support) Rules 2018 s 6 (the five kinds; not re-read today, as the dataset holds them).
+- **Would ask:** the incident policy says "We do not use restrictive practices. If we ever need to, we will update this policy and our other documents first" while the safeguarding position says an emergency use is possible and tells the worker what to do. Both can be true; I would ask the owner to say it in one breath: "we do not use them; if one happens in an emergency, this is what we do".
+
+## 6. Market conduct and claims
+
+- **Would note:** nothing on the home, pricing, result, documents or audit-day pages, and nothing in the pack, says or implies Commission approval, endorsement, certification by Readyline or a guaranteed outcome. The pricing page says "Buying the pack does not mean you will be registered. The auditor and the Commission decide that." Every page carries "Independent of the NDIA and the NDIS Quality and Safeguards Commission" and the trade mark line; every document carries the general-information statement and the AI disclosure ("First drafts of your documents are generated with AI from your questionnaire answers"). The AI appendix in the privacy policy cites the Commission's February 2026 position statement correctly as to its substance ("no participant personal information should go into an AI system and ... a person, not the tool, makes every decision").
+- **Would ask:** the `/ai` page (captured) and the pricing page do not say that the AI governance content a provider needs for their own operations lives in the privacy policy's appendix (manager 7). Not a conduct matter; a clarity one.
+- **Would note:** the home page's "[Name and ABN to be added when registered.]" is not a registration matter for the Commission; it is the trader's own consumer-law exposure (provider 1).
+
+## 7. Mandatory registration and reform
+
+- **Would note:** none of the captured pages states a mandatory-registration date or cohort; the guides were not in scope today beyond the index and the which-audit guide, which describes verification versus certification consistently with the Commission's types-of-audits page (read 11 Oct 2026). Nothing stated as fact that is still consultation.
+
+## What the Commission would want at a compliance check that the registers do not hold (this lineage)
+
+1. A record of notifications made to the Commission (reference, date, which incident): the incident row has a "notified on" date on edit, not a notification reference.
+2. The improvement actions arising from incidents and complaints (the pack commits to an improvement register; the app has none here).
+3. Worker screening clearance numbers or the database check record (the app stores none by design; the pack's template asks for them).
+4. A record of changes notified to the Commission (key personnel, ceasing supports).
+5. Evidence of circulation: which worker was told about which policy version and when (the review tables commit to it; no record exists).
+
+## Nothing found in
+
+The claims language across pages and documents; the Code of Conduct coverage; the complaints pathway to the Commission in every participant-facing document (service agreement easy-read, rights policy, complaints policy); the participant-data design of the registers; the AI disclosure on every page; the Commission's and the NDIA's names and the trade mark statement; the reportable-incident categories in the app's form (the Rules' six kinds in the Commission's words, then the provider's own operational kinds, correctly separated by "The first six categories are reportable when they happened in connection with your supports").
