@@ -10,7 +10,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist } from "@/lib/checklist/state";
 import { collectBlanks } from "@/lib/generator/blanks";
-import { factKeyFor } from "@/lib/generator/facts-fill";
+import { formBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
 import {
   EMPTY_PATH_STATE,
@@ -92,11 +92,16 @@ export async function listAdoptedTypeIds(
   );
 }
 
-/** Blanks still open in the set's latest documents, counting only fact blanks (not signatures or register rows). */
+/**
+ * Blanks still open in the set's latest documents that the Finish form can
+ * ask for: fact blanks (not signatures or register rows) whose key the
+ * account does not hold (D-1704: the owner's name and role come from the
+ * account page, the approval date from adoption). The same rule as the
+ * form and the set page, so the strip leaves "finish" when the form has
+ * nothing left to ask.
+ */
 export function openBlanks(documents: readonly DocumentVersionRow[]): number {
-  return documents
-    .flatMap((d) => collectBlanks(d.model))
-    .filter((b) => Boolean(factKeyFor(b.blank))).length;
+  return formBlanks(documents.flatMap((d) => collectBlanks(d.model))).length;
 }
 
 /** Groups of the set (in audit order) with at least one document not yet adopted. */
