@@ -1428,3 +1428,43 @@ Delivered on **`req-005-generator-exam` a1e5ea9** (one commit from the head of `
 
 **Backlog state at STOP:** items 1 to 6, 8, 9 and 10 delivered; 7 stopped for the PO (REQ-020 draft on its branch). The standing backlog is empty bar that, so the next step is the backlog's closing rule: the full suite on every open branch and a final status.
 
+
+
+
+## Dev status (standing backlog closed, written 14 Oct 2026, Dev; the full check on every open branch, and STOP)
+
+The standing backlog is empty bar item 7, which stopped for the PO (the REQ-020 draft on `req-020-registers-audit-pack`). Per the backlog's closing rule, `npm run check` (lint, Prettier, typecheck, the unit suite) ran on every open branch in turn on this machine, each at its current head carrying `main` dadcdf6. CI is still paused; nothing merged to `main`; every branch pushed.
+
+| Branch | Head | Check | Unit files | Unit tests |
+| --- | --- | --- | --- | --- |
+| `req-009-session-c` | 98c964b | green | 84 passed (84) | 617 passed | 2 skipped (619) |
+| `req-010-generation-kicker` | cca65cd | green | 87 passed (87) | 629 passed | 2 skipped (631) |
+| `req-016-document-standard` | fc9f15f | green | 88 passed | 1 skipped (89) | 642 passed | 3 skipped (645) |
+| `req-017-guided-path` | f0fd68a | green | 91 passed | 1 skipped (92) | 665 passed | 3 skipped (668) |
+| `req-011-groups` | ff71165 | green | 92 passed | 1 skipped (93) | 670 passed | 3 skipped (673) |
+| `req-013-phone-fixes` | 26703a4 | green | 92 passed | 1 skipped (93) | 670 passed | 3 skipped (673) |
+| `req-017-close-out` | 365d01c | green | 94 passed | 1 skipped (95) | 682 passed | 3 skipped (685) |
+| `req-018-audit-day-systems` | 07f1de9 | green | 97 passed | 1 skipped (98) | 696 passed | 3 skipped (699) |
+| `req-018-ndis-watch-1` | d91871e | green | 96 passed | 1 skipped (97) | 689 passed | 4 skipped (693) |
+| `req-005-house-style-v2` | ae9db71 | green | 98 passed | 1 skipped (99) | 699 passed | 4 skipped (703) |
+| `req-019-review-fixes` | f96f17c | green | 100 passed | 1 skipped (101) | 716 passed | 4 skipped (720) |
+| `req-015-accessibility-pass` | 1078c99 | green | 100 passed | 1 skipped (101) | 716 passed | 4 skipped (720) |
+| `req-010-performance-budget` | dedbb20 | green | 101 passed | 1 skipped (102) | 717 passed | 5 skipped (722) |
+| `req-011-guides-2` | 4d3332c | green | 101 passed | 1 skipped (102) | 717 passed | 5 skipped (722) |
+| `req-018-register-tests` | d71b46b | green | 107 passed | 1 skipped (108) | 757 passed | 5 skipped (762) |
+| `req-004-admin-hardening` | 2455d7d | green | 107 passed | 1 skipped (108) | 759 passed | 5 skipped (764) |
+| `req-005-recording-prep` | c4c954a | green | 108 passed | 1 skipped (109) | 768 passed | 5 skipped (773) |
+| `req-021-writing-indicator` | 0243d54 | green | 109 passed | 1 skipped (110) | 792 passed | 5 skipped (797) |
+| `req-020-registers-audit-pack` | f4ec5ce | green | 109 passed | 1 skipped (110) | 792 passed | 5 skipped (797) |
+| `req-005-living-policies` | 9188947 | green | 110 passed | 1 skipped (111) | 798 passed | 5 skipped (803) |
+| `req-005-generator-exam` | ba4e5cb | green | 112 passed | 1 skipped (113) | 803 passed | 6 skipped (809) |
+
+21 of 21 branches green.
+
+- **What the local run covers and what it does not.** The check is the main CI job's first half. The Playwright suites ran per batch on the branch that changed them (the guides, questionnaire, abuse, headers and writing-indicator specs on the three projects); the signed-in suites and the integration suites cannot run against the hosted project (it is behind the branches' migrations), so CI's Supabase job remains the gate for REQ-018, REQ-021, backlog 4, backlog 8 and the REQ-020 work to come. The Lighthouse budget ran once on the performance branch's build.
+- **Open PRs to make.** New since the PO's last batch, in stack order: `req-010-performance-budget` already has #39; then `req-011-guides-2`, `req-018-register-tests` (carries `req-018-audit-day-systems` merged in), `req-004-admin-hardening`, `req-005-recording-prep`, `req-021-writing-indicator`, `req-020-registers-audit-pack` (the REQ draft only), `req-005-living-policies`, `req-005-generator-exam`. Each is one commit on the previous head plus the merge loop's commits.
+- **Decisions awaiting the PO, gathered from the batch statuses:** publishing the three guides (backlog 3); the role-review pipeline's three fixes for batch 45; the recording session with a go-ahead per group (backlog 6: 81 calls, about $0.66); Dependabot on or off until launch (backlog 5); REQ-020's status and the four Dev answers (backlog 7); the ledger rule for the watch's apply step (backlog 8); the live exam's key and go-ahead, Q04 and Q13 (backlog 9); the Lighthouse CPU figure for the writing indicator (backlog 10); the three orphan generation jobs on the hosted project noted in batch 44.
+- **Merges.** `origin/main` merged into every open branch after every batch; the last loop's heads are in the backlog 9 status.
+
+**STOP.** No numbered queue is open and the standing backlog has no item left that does not wait for the PO.
+
