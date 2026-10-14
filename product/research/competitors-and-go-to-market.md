@@ -1,3 +1,15 @@
+
+
+## EnableUs (enableus.com.au), read by the PO on 14 Oct 2026
+
+What they are: a registration consultancy, not software. They sell "audit-ready" document sets by module with a handover guide and a training session, plus "EnableUs Concierge" services (marketing, loans, recruitment, legal referrals, internal audits, document editing) and 43 profession pages. Home-page prices, each "40% OFF" against a struck-through figure with an EOFY countdown: Verification $899 (was $1,499), Core $1,999 (was $3,330), Specialist $2,499 (was $4,165), SDA $1,099 (was $1,830). AfterPay offered. Claims: "NDIS Registration Made Easy - Fast, Guaranteed & Affordable", "Australia's Most Trusted NDIS Registration Group", "Trusted by 3,000+ providers" (2,500+ elsewhere on the site), "100% NDIS Success Rate", "Lowest Price Guaranteed", "Audit-Ready Docs in 24 Hours", "Risk Free". No refund or revision terms, no sources on the audit explainer, auditor fees not stated, only the certification audit named.
+
+What we take from it:
+1. Price anchor for the pricing page, without naming them: consultant document sets usually cost $900 to $2,500 and arrive as a folder; ours is AUD 399 from the provider's own answers and keeps working after the audit at AUD 39 a month.
+2. Claims we never make: guaranteed, 100% success, risk free, audit-ready as a promise, countdown timers, strike-through prices, buy-now-pay-later (CLAUDE.md 4.3 plus the shariah position). Add "no artificial urgency, no strike-through pricing, no BNPL" to the marketing rules.
+3. Their real differentiator is a human handover and training call; our Adopt step is the self-serve version. Consider an optional 20-minute walkthrough call at the pack tier if trial customers ask for a human.
+4. Their SEO is profession pages; our 38 group pages cover the same ground from the Commission's registration groups. Backlog: a profession-to-group finder ("I am a cleaner, which group am I?").
+5. Our sourced audit guide (five kinds, verification versus certification) beats their unsourced explainer; publish it first.
 # Competitors and go-to-market (PO research, 13 Oct 2026)
 
 Sources are public pages read on 13 Oct 2026; prices are as shown that day (most ex GST unless stated). Claims like "3,000+ providers" are the competitors' own.
