@@ -1,0 +1,22 @@
+# Backlog 5 (threat model, "Dependency audit in CI; Dependabot or Renovate
+# weekly"; D-209): one grouped pull request a week for npm, so the
+# production audit gate has something to merge rather than a surprise.
+# GitHub Actions versions are checked monthly. No paid service.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Australia/Sydney
+    open-pull-requests-limit: 3
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

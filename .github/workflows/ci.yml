@@ -123,25 +123,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-  secrets:
-    name: Secret scan (gitleaks, REQ-002 AC-2)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_ENABLE_SUMMARY: "true"
-          # PR comments need write permission we do not grant (D-205).
-          GITLEAKS_ENABLE_COMMENTS: "false"
-          # Config: .gitleaks.toml (default rules; allow-list scoped to data/sources/ only).
+  # The secret scan moved to .github/workflows/secrets.yml, which runs on
+  # every push to every branch (backlog 5, D-209).
 
   supabase-integration:
     name: Supabase local stack, migrations and RLS tests (REQ-004 SR-1, SR-6)

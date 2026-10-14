@@ -469,6 +469,24 @@ evidence rather than installing a tool mid-session.
 
 Decision numbers D-3xx on this branch.
 
+**D-209 Backlog 5: the secret scan runs on every branch from its own
+workflow; Dependabot opens one grouped npm pull request a week; the
+header test covers every kind of route (Dev, 2026-10-14, backlog 5,
+REQ-002).** `.github/workflows/secrets.yml` carries the gitleaks job
+(same action, config, permissions and D-205 comment setting) and runs on
+`push` to every branch, on pull requests and by hand; the job is removed
+from `ci.yml`, whose push trigger is `main` only, so a feature branch
+without a pull request was never scanned before. `.github/dependabot.yml`
+asks for weekly npm updates in two groups (production, development) and
+monthly GitHub Actions updates; it is a GitHub feature, not a paid
+service, and its pull requests simply queue while Actions is paused.
+`e2e/security-headers.spec.ts` gains a second test that asserts the five
+static headers, the CSP's `frame-ancestors` and `object-src`, and the
+absence of `X-Powered-By` on a content page, the questionnaire, sign-in, a
+guide, a 404 and an API route, not only on `/`. The production audit on
+14 October 2026 finds 0 vulnerabilities. The ASVS level 1 table with the
+evidence per control is `product/security/asvs-l1-check-2026-10-14.md`.
+
 **D-301 Branch stacked on REQ-002 (D-031).** `req-003-questionnaire` was
 rebased onto `req-002-security-baseline` because the questionnaire uses the
 validation layer, logging rule and CSP from REQ-002; it is rebased onto `main`
@@ -807,6 +825,33 @@ any device."
 ## REQ-005: document generator (branch `req-005-generator`, Dev response stage)
 
 Decision numbers D-5xx on this branch.
+
+**D-424 Backlog 5: every boundary file must be gated, enforced by a test;
+the public questionnaire action gets a per-address limiter; the
+cross-site and abuse checks are an e2e spec (Dev, 2026-10-14, backlog 5,
+REQ-004).** The inventory on this branch: route handlers are the Stripe
+webhook (signature), three cron routes (bearer secret, 404 otherwise),
+the auth callback (single-use token), two exports and the document
+download (session plus a database limiter), the health route and the
+sample document (in-memory per-address limiter). Server actions are all
+behind `getViewer`, `getOwnedAccount` or the admin context, with database
+limiters on register writes, checkout and generation, except
+`deriveResult` in `src/app/start/actions.ts`, which is public by design
+(the questionnaire works signed out and stores nothing) and had no limit.
+It now refuses the 121st call per address per minute with a plain
+message, using the same in-memory fixed window as the health route; the
+counter is per instance, which is acceptable for a pure-compute action
+that must work without a database. `src/lib/validation/handlers.test.ts`
+gains "boundaries are gated": every route handler and `"use server"`
+file must contain a session gate, a secret or signature check, or a
+limiter call, so a new boundary without one fails the unit suite; a second
+case pins the limiter on the three public files. `e2e/csrf-and-abuse.spec.ts`
+proves the framework refuses a server action posted from another origin,
+that the three job routes answer 404 without the secret and with a wrong
+one, that the webhook refuses unsigned and badly signed bodies, and that
+the health route answers a loop with 429. Next's own origin check is the
+CSRF control for every form (no custom token); `form-action 'self'` in
+the CSP is the second layer.
 
 **D-501 Closed block schema for model output (Dev, 2026-10-11).** Tailored
 sections are JSON with five block types (paragraph, bullets, steps, table,

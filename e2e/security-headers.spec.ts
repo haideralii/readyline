@@ -77,4 +77,40 @@ test.describe("security headers", () => {
     );
     expect(violations).toEqual([]);
   });
+
+  // Backlog 5 (ASVS L1 re-check, D-209): the same headers on every kind of
+  // route, not only the home page: a content page, the questionnaire, the
+  // sign-in form, a guide, a missing page and an API route.
+  test("the threat-model headers are on every kind of route, including 404 and the API", async ({
+    request,
+  }) => {
+    const paths = [
+      "/pricing",
+      "/start",
+      "/sign-in",
+      "/guides/which-ndis-audit",
+      "/this-page-does-not-exist",
+      "/api/health",
+    ];
+    for (const path of paths) {
+      const res = await request.get(path, { maxRedirects: 0 });
+      const h = res.headers();
+      expect(h["strict-transport-security"], path).toBe(
+        "max-age=63072000; includeSubDomains; preload",
+      );
+      expect(h["x-content-type-options"], path).toBe("nosniff");
+      expect(h["referrer-policy"], path).toBe(
+        "strict-origin-when-cross-origin",
+      );
+      expect(h["permissions-policy"], path).toBe(
+        "camera=(), microphone=(), geolocation=(), payment=()",
+      );
+      expect(h["x-frame-options"], path).toBe("DENY");
+      expect(h["x-powered-by"], path).toBeUndefined();
+      const csp = h["content-security-policy"];
+      expect(csp, `${path} CSP`).toContain("frame-ancestors 'none'");
+      expect(csp, `${path} CSP`).toContain("object-src 'none'");
+      expect(csp, `${path} CSP`).not.toContain("'unsafe-inline' 'strict");
+    }
+  });
 });
