@@ -1,39 +1,40 @@
 /**
- * The ready line with segments (REQ-014 motif): how ready a provider is.
- * Moss for what is done, ochre for what is still to prepare, mist (the
- * track) for the remainder. Shared by the result summary now and the
- * registers dashboard later (REQ-009); the questionnaire's step indicator is
- * the single-fill form in progress-line.tsx. An SVG whose geometry is
- * attributes, not inline styles, so the nonce-only CSP holds. The visual is
- * decorative; the sentence beneath carries the numbers for everyone.
+ * The ready line with two segments (REQ-014 motif; REQ-013 batch 36 item 3):
+ * how ready a provider is. Moss for what is done, mist (the track) for what
+ * is still to do. Shared by the result summary, the home example and the
+ * registers line; the questionnaire's step indicator is the single-fill
+ * form in progress-line.tsx. An SVG whose geometry is attributes, not inline
+ * styles, so the nonce-only CSP holds. The visual is decorative; the
+ * sentence beneath carries the numbers for everyone, in the caller's words.
  */
 export type ReadyLineCounts = {
   done: number;
-  toPrepare: number;
-  remainder: number;
+  /** Still to do, whoever does it. */
+  todo: number;
 };
 
 export function readyLineSentence(c: ReadyLineCounts, noun: string): string {
-  const total = c.done + c.toPrepare + c.remainder;
-  const parts = [`${c.done} of ${total} ${noun} in place`];
-  if (c.toPrepare) parts.push(`${c.toPrepare} to prepare`);
-  if (c.remainder) parts.push(`${c.remainder} not asked about yet`);
-  return `${parts.join(", ")}.`;
+  const total = c.done + c.todo;
+  return c.todo
+    ? `${c.done} of ${total} ${noun} in place, ${c.todo} still to do.`
+    : `${c.done} of ${total} ${noun} in place.`;
 }
 
 export function ReadyLine({
   counts,
   noun,
+  sentence,
   testId = "ready-line",
 }: {
   counts: ReadyLineCounts;
-  /** "documents and registers", "items", "registers". */
-  noun: string;
+  /** "register entries", "documents and registers"; used by the default sentence. */
+  noun?: string;
+  /** The sentence under the line; the default counts the noun. */
+  sentence?: string;
   testId?: string;
 }) {
-  const total = Math.max(counts.done + counts.toPrepare + counts.remainder, 1);
+  const total = Math.max(counts.done + counts.todo, 1);
   const done = (counts.done / total) * 100;
-  const toPrepare = (counts.toPrepare / total) * 100;
   return (
     <div data-testid={testId}>
       <div className="ready-line" aria-hidden="true">
@@ -52,6 +53,7 @@ export function ReadyLine({
             height="6"
             rx="3"
             className="fill-mist"
+            data-testid={`${testId}-todo`}
           />
           {done > 0 ? (
             <rect
@@ -63,20 +65,10 @@ export function ReadyLine({
               data-testid={`${testId}-done`}
             />
           ) : null}
-          {toPrepare > 0 ? (
-            <rect
-              x={done}
-              y="0"
-              width={toPrepare}
-              height="6"
-              className="ready-line-fill fill-ochre"
-              data-testid={`${testId}-to-prepare`}
-            />
-          ) : null}
         </svg>
       </div>
       <p className="text-slate mt-2 text-sm" data-testid={`${testId}-text`}>
-        {readyLineSentence(counts, noun)}
+        {sentence ?? readyLineSentence(counts, noun ?? "things")}
       </p>
     </div>
   );

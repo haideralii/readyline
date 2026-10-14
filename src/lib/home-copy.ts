@@ -61,7 +61,7 @@ export const HOME_COPY = {
       { label: "Mid-term audit", value: "Does not apply" },
     ],
     /** The ready line for this example: what the reference case said it has (REQ-014 FR-2); pinned by a test. */
-    line: { done: 0, toPrepare: 6, remainder: 14 },
+    line: { have: 0, documents: 15, registers: 5 },
     note: "Add personal care and the result changes to a certification audit with the core module, a site visit and a mid-term audit. The questionnaire shows the reason and the source for each change.",
   },
   missionHeading: "Why one price, and who is behind it",
