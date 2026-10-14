@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  AUDIT_DAY_META,
+  AUDIT_DAY_SLUGS,
+} from "@/lib/registers/audit-day-forms";
+import { documentControlSentence } from "@/lib/registers/document-control";
+import { auditDayOverview } from "@/server/registers/audit-day-queries";
+import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
@@ -14,15 +21,44 @@ type Row = {
 };
 
 /**
- * The registers with what needs attention (REQ-009 FR-5, batch 28 item 1):
- * one row each, the overdue counts in words, never colour alone. Batch 42
- * item 7 (D-549): two headings, the registers you add to as things happen
- * and the ones you keep current, and one "How codes work" panel that every
- * code hint links to.
+ * The registers with what needs attention (REQ-009 FR-5, batch 28 item 1;
+ * REQ-018 Session B adds the nine audit-day registers and the document
+ * control register): one row each, the overdue counts in words, never
+ * colour alone. Batch 42 item 7 (D-549): two headings, the registers you add
+ * to as things happen and the ones you keep current, and one "How codes
+ * work" panel that every code hint links to; the REQ-018 registers take the
+ * same two headings (improvements and decisions under the first, document
+ * control and the rest under the second).
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const o = await registerOverview(ctx.supabase, ctx.viewer.account.id);
+  const [o, a, dc] = await Promise.all([
+    registerOverview(ctx.supabase, ctx.viewer.account.id),
+    auditDayOverview(ctx.supabase, ctx.viewer.account.id),
+    documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
+  ]);
+  // REQ-018 FR-13: the document control register, generated from the pack, shown first of the kept-current ones.
+  const documentControlRow: Row = {
+    href: "/registers/document-control",
+    title: "Document control",
+    total: dc.rows.length,
+    attention: documentControlSentence(dc.rows).replace(/\.$/, ""),
+    urgent: dc.rows.some((r) => r.state === "overdue"),
+  };
+  const auditDayRows: Row[] = AUDIT_DAY_SLUGS.map((slug) => ({
+    href: `/registers/${slug}`,
+    title: AUDIT_DAY_META[slug].title,
+    total: a[slug].total,
+    attention: a[slug].attentionLabel,
+    urgent: a[slug].attentionLabel.endsWith("overdue"),
+  }));
+  const ADDED_AS_THINGS_HAPPEN = new Set(["improvements", "decisions"]);
+  const auditDayAsThingsHappen = auditDayRows.filter((r) =>
+    ADDED_AS_THINGS_HAPPEN.has(r.href.split("/").pop() ?? ""),
+  );
+  const auditDayKeepCurrent = auditDayRows.filter(
+    (r) => !ADDED_AS_THINGS_HAPPEN.has(r.href.split("/").pop() ?? ""),
+  );
   const asThingsHappen: Row[] = [
     {
       href: "/registers/incidents",
@@ -46,8 +82,10 @@ export default async function RegistersPage() {
           : "Nothing open",
       urgent: false,
     },
+    ...auditDayAsThingsHappen,
   ];
   const keepCurrent: Row[] = [
+    documentControlRow,
     {
       href: "/registers/worker-checks",
       title: "Worker checks",
@@ -74,6 +112,7 @@ export default async function RegistersPage() {
               : "All current",
       urgent: o.policyReviews.overdue > 0,
     },
+    ...auditDayKeepCurrent,
   ];
   const groups = [
     {

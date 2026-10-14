@@ -94,6 +94,22 @@ export async function finishPackAction(
 const GroupInput = strictObject({
   setId: z.string().uuid(),
   group: z.string().regex(/^[a-z][a-z0-9-]{0,40}$/),
+  /** REQ-018 FR-14: which workers were walked through the group's documents, and when. Optional; codes only. */
+  circulation: strictObject({
+    worker_refs: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(
+        /^((W|KP)-?[0-9]{1,6})([ ,]+(W|KP)-?[0-9]{1,6})*$/,
+        "Use worker codes like W-1 W-2, never names",
+      )
+      .transform((v) => v.split(/[ ,]+/).filter(Boolean).join(" ")),
+    circulated_on: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the date you walked them through"),
+    how: z.string().trim().max(200).optional(),
+  }).optional(),
 });
 
 /**
@@ -170,6 +186,23 @@ export async function adoptGroupAction(
         });
     }
     await markAdopted(admin, accountId, d.document_type_id, today);
+  }
+  // REQ-018 FR-14: the circulation record, one row per document in the group (append only; codes only).
+  const circulation = parsed.data.circulation;
+  if (circulation) {
+    const rows = group.documents.map((d) => ({
+      account_id: accountId,
+      document_type_id: d.document_type_id,
+      circulated_on: circulation.circulated_on,
+      worker_refs: circulation.worker_refs,
+      how: circulation.how ?? "",
+    }));
+    const ins = await supabase.from("policy_circulations").insert(rows);
+    if (ins.error)
+      log.warn("path.adopt.circulation-failed", {
+        accountId,
+        code: ins.error.code,
+      });
   }
   const out = await rerenderSetWithFacts({ admin, set, facts });
   log.info("path.adopt.group", {

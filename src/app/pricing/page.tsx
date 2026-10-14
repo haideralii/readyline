@@ -206,6 +206,12 @@ export default async function PricingPage() {
                 ? `${formatAud(pricing.subscriptionPriceCents)} a month for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee, no instalments, no interest.`
                 : "A monthly subscription for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee."}
             </p>
+            {/* REQ-018 FR-12: what the registers do that a spreadsheet does not. */}
+            <p className={body} data-testid="registers-linked">
+              The registers are linked: an incident becomes an improvement row,
+              a worker check becomes a staff matrix row, and the reminders go
+              out by email, which a spreadsheet does not do.
+            </p>
             {docs.signedIn ? (
               <SubscribeButton
                 label={

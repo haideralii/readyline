@@ -12,9 +12,20 @@
  * that enters an old date.
  */
 import { addBusinessDays, addDays, daysBetween } from "./status";
-import type { RegistrationKind, ReminderKind } from "./types";
+import type {
+  RegistrationKind,
+  ReminderKind,
+  ReminderSubjectTable,
+} from "./types";
 
 export const CATCH_UP_DAYS = 7;
+// REQ-018 Session C (FR-5, FR-8, FR-10; D-1905).
+export const INSURANCE_OFFSETS = [30, 7, 0] as const;
+export const SUPERVISION_EVERY_DAYS = 31;
+export const APPRAISAL_EVERY_DAYS = 365;
+export const SUPPORT_PLAN_OFFSETS = [30, 7, 0] as const;
+export const DRILL_EVERY_MONTHS = 6;
+export const REGISTER_REVIEW_OFFSETS = [14, 0] as const;
 export const CLEARANCE_OFFSETS = [90, 30, 7, 0] as const;
 export const REVIEW_OFFSETS = [60, 14, 0] as const;
 export const INCIDENT_OPEN_DAYS = 30;
@@ -48,17 +59,30 @@ export type ReminderInput = {
   }[];
   workerChecks: { id: string; expires_on: string | null }[];
   policyReviews: { id: string; next_review_on: string | null }[];
+  /** REQ-018 FR-5: insurances and vehicles by expiry. */
+  insuranceItems?: { id: string; expires_on: string }[];
+  /** REQ-018 FR-8: each worker's last supervision and appraisal dates. */
+  staff?: {
+    id: string;
+    last_supervision_on: string | null;
+    last_appraisal_on: string | null;
+  }[];
+  /** REQ-018 FR-10: the support plan review date per participant. */
+  participantRisks?: { id: string; support_plan_review_on: string | null }[];
+  /** REQ-018 FR-10: every register row with a review date. */
+  reviewRows?: {
+    id: string;
+    table: "corporate_risks" | "participant_risks" | "conflicts_of_interest";
+    review_on: string;
+  }[];
+  /** REQ-018 FR-10: the last emergency drill, recorded on the audit-day page. */
+  lastEmergencyDrillOn?: string | null;
 };
 
 export type ReminderDue = {
   account_id: string;
   kind: ReminderKind;
-  subject_table:
-    | "incidents"
-    | "complaints"
-    | "worker_clearances"
-    | "policy_reviews"
-    | "accounts";
+  subject_table: ReminderSubjectTable;
   subject_id: string;
   due_on: string;
   send_on: string;
@@ -182,6 +206,67 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
     }
   }
 
+  // REQ-018 FR-5: insurances and vehicles, 30 and 7 days before expiry and on the day.
+  for (const i of input.insuranceItems ?? [])
+    for (const days of INSURANCE_OFFSETS)
+      push(
+        "insurance-expiry",
+        "insurance_items",
+        i.id,
+        i.expires_on,
+        addDays(i.expires_on, -days),
+      );
+
+  // REQ-018 FR-8: supervision at least monthly, appraisal at least yearly; a worker with no date is due from the day the row was made (the job passes the row's created date as the last date).
+  for (const s of input.staff ?? []) {
+    if (s.last_supervision_on) {
+      const due = addDays(s.last_supervision_on, SUPERVISION_EVERY_DAYS);
+      push("supervision-due", "staff_matrix", s.id, due, due);
+    }
+    if (s.last_appraisal_on) {
+      const due = addDays(s.last_appraisal_on, APPRAISAL_EVERY_DAYS);
+      push("appraisal-due", "staff_matrix", s.id, due, addDays(due, -30));
+      push("appraisal-due", "staff_matrix", s.id, due, due);
+    }
+  }
+
+  // REQ-018 FR-10: the support plan review per participant, 30 and 7 days before and on the day.
+  for (const p of input.participantRisks ?? []) {
+    if (!p.support_plan_review_on) continue;
+    for (const days of SUPPORT_PLAN_OFFSETS)
+      push(
+        "support-plan-review",
+        "participant_risks",
+        p.id,
+        p.support_plan_review_on,
+        addDays(p.support_plan_review_on, -days),
+      );
+  }
+
+  // REQ-018 FR-10: each register row's review date, 14 days before and on the day.
+  for (const r of input.reviewRows ?? [])
+    for (const days of REGISTER_REVIEW_OFFSETS)
+      push(
+        "register-review",
+        r.table,
+        r.id,
+        r.review_on,
+        addDays(r.review_on, -days),
+      );
+
+  // REQ-018 FR-10: an emergency drill every six months, counted from the last one.
+  if (input.lastEmergencyDrillOn) {
+    const due = addMonths(input.lastEmergencyDrillOn, DRILL_EVERY_MONTHS);
+    push(
+      "emergency-drill",
+      "accounts",
+      input.account.id,
+      due,
+      addDays(due, -14),
+    );
+    push("emergency-drill", "accounts", input.account.id, due, due);
+  }
+
   return out;
 }
 
@@ -206,5 +291,17 @@ export function reminderLine(
       return `Your mid-term audit is due around ${dueOn}. Start preparing.`;
     case "renewal":
       return `Your registration ends on ${dueOn}. Plan the renewal audit.`;
+    case "insurance-expiry":
+      return `${reference} expires on ${dueOn}. Renew it and type the new expiry into the insurances register.`;
+    case "supervision-due":
+      return `Worker ${reference} is due for supervision by ${dueOn}. Hold it and type the date into the staff matrix.`;
+    case "appraisal-due":
+      return `Worker ${reference} is due for an appraisal by ${dueOn}. Hold it and type the date into the staff matrix.`;
+    case "support-plan-review":
+      return `Participant ${reference}'s support plan review is due on ${dueOn}.`;
+    case "emergency-drill":
+      return `Your emergency drill is due by ${dueOn}. Run it and record the date on the audit-day page.`;
+    case "register-review":
+      return `Register row ${reference} is due for review on ${dueOn}. Open it and tap Reviewed today.`;
   }
 }
