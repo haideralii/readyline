@@ -2915,6 +2915,47 @@ carries the six commands. Today's plan: 81 calls, about $0.66 at cached
 rates ($0.91 uncached); 3 sections have no fixture for the current prompt.
 No recording without the PO's go-ahead.
 
+**D-551 Living policies: a ledger of applied watch changes in the repo,
+a pure match against each adopted document's stored text, and two
+answers for the owner (Dev, 2026-10-14, standing backlog 8, REQ-005
+and REQ-018 FR-13).** `data/watch-changes.json` holds one entry per NDIS
+watch item applied to fixed text, a brief or the standards data: the day
+it entered the generator, the documents and section in scope, the exact
+sentence replaced (null when one was added), the new sentence, why, the
+source and the watch report; the watch appends an entry whenever it
+applies an item, and a unit test checks every scope against the
+catalogue. Seeded with the seven batch 35 applications (s 13A in the
+governance statement, the Commission-required actions in the complaints
+procedure, the inducement rule in the two conflict-of-interest
+documents, the seven-year retention row, the renewal paragraph in the
+clearance register, the APP 1.7 to 1.9 sentence in the privacy policy,
+the medical emergency list in the support planning steps).
+`changesForDocument` in `src/lib/registers/living-policies.ts` flags a
+stored document for a change when the document is in scope, was drafted
+before the change's day, does not already carry the new sentence, and the
+owner has not recorded a check; the finding is "certain" when the old
+sentence is still in the text and "likely" otherwise; a scoped section
+absent from the document is not a finding. The document control register
+reads each adopted document's stored model, gains the state
+"review-needed" (after overdue, before review-due), lists the changes on
+the row with the old and the new sentence side by side, and offers
+"Re-generate this section" (the existing regenerate action: a new
+version drafted after the change clears the flag by date; not offered
+for fixed text, which a new version carries without a model call) and "I
+have checked it", which writes `document_change_reviews` (append-only,
+owner insert, member select, unique per document and change; migration
+`20261014400000_living_policies.sql`). The sentence on the registers
+index and the audit-day page says "N to check after a rule change". The
+document page shows the same changes above its sections. The register
+text is never read and the model is never called by the match; the
+owner's re-generate is the customer's own call under the usual quota. Not
+exercised end to end on this machine: the hosted project is behind the
+migrations; the unit tests, the integration file and the typed pages are
+the evidence, and the PO sees the flag on any pack drafted before 14
+October 2026 once the branch is deployed.
+
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:

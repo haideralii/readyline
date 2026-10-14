@@ -163,3 +163,112 @@ describe("document control register (REQ-018 FR-13)", () => {
     expect(rows[0].circulated).toEqual({ on: "2026-10-11", workers: 3 });
   });
 });
+
+/** Backlog 8 (D-551): an adopted document drafted before a rule change it does not carry is "review needed" until re-generated or checked. */
+describe("living policies in the document control register (backlog 8)", () => {
+  const change = {
+    id: "wc-2026-10-14-01",
+    appliedOn: "2026-10-14",
+    where: "brief" as const,
+    documentTypeIds: ["governance-policy"],
+    sectionId: "policy-statement",
+    oldSentence: null,
+    newSentence:
+      "We tell the Commission about changes and events in its approved form as soon as we know they will happen.",
+    why: "Provider Registration Rules s 13A.",
+    source: "https://example.test/s13a",
+    watchReport: "test",
+  };
+  const base = {
+    reviews: docs.map((d) => ({
+      document_type_id: d.document_type_id,
+      adopted_on: "2026-10-12",
+      review_cycle_months: 12,
+      last_reviewed_on: null,
+      next_review_on: null,
+    })),
+    circulations: docs.map((d) => ({
+      document_type_id: d.document_type_id,
+      circulated_on: "2026-10-12",
+      worker_refs: "W-1",
+    })),
+    adoptedByRole: "Owner",
+    changes: [change],
+  };
+  const withText = (text: string) =>
+    docs.map((d) => ({
+      ...d,
+      version_id: `v-${d.document_type_id}`,
+      sections: [{ id: "policy-statement", text }],
+    }));
+
+  it("flags the adopted governance policy drafted before the change, with the sentences, and the sentence and gaps say so", () => {
+    const rows = documentControlRows(
+      { ...base, documents: withText("What we do: we keep records.") },
+      TODAY,
+    );
+    const gov = rows.find((r) => r.document_type_id === "governance-policy")!;
+    expect(gov.state).toBe("review-needed");
+    expect(gov.version_id).toBe("v-governance-policy");
+    expect(gov.reviewNeeded).toHaveLength(1);
+    expect(gov.reviewNeeded[0]).toMatchObject({
+      changeId: change.id,
+      sectionId: "policy-statement",
+      certainty: "likely",
+      newSentence: change.newSentence,
+    });
+    const complaints = rows.find(
+      (r) => r.document_type_id !== "governance-policy",
+    )!;
+    expect(complaints.state).toBe("adopted");
+    expect(documentControlSentence(rows)).toBe(
+      "2 of 2 adopted, 2 circulated to workers, 1 to check after a rule change.",
+    );
+    expect(documentControlGaps(rows)).toEqual([
+      "Governance policy: a rule changed since it was drafted",
+    ]);
+  });
+
+  it("is cleared by a version that carries the sentence, by a version drafted after the change, or by the owner's check; a document not adopted is never flagged", () => {
+    const carries = documentControlRows(
+      { ...base, documents: withText(`What we do. ${change.newSentence}`) },
+      TODAY,
+    );
+    expect(carries.every((r) => r.state === "adopted")).toBe(true);
+    const later = documentControlRows(
+      {
+        ...base,
+        documents: withText("x").map((d) => ({
+          ...d,
+          created_at: "2026-10-15T03:00:00Z",
+        })),
+      },
+      TODAY,
+    );
+    expect(later.every((r) => r.state === "adopted")).toBe(true);
+    const checked = documentControlRows(
+      {
+        ...base,
+        documents: withText("x"),
+        changeReviews: [
+          { document_type_id: "governance-policy", change_id: change.id },
+        ],
+      },
+      TODAY,
+    );
+    expect(checked.every((r) => r.state === "adopted")).toBe(true);
+    const notAdopted = documentControlRows(
+      {
+        ...base,
+        documents: withText("x"),
+        reviews: base.reviews.map((r) => ({ ...r, adopted_on: null })),
+      },
+      TODAY,
+    );
+    expect(
+      notAdopted.every(
+        (r) => r.state === "not-adopted" && r.reviewNeeded.length === 0,
+      ),
+    ).toBe(true);
+  });
+});

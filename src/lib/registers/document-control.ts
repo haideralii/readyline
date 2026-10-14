@@ -7,6 +7,12 @@
  * register out; the page and the readiness summary's first page both
  * render it.
  */
+import {
+  changesForDocument,
+  loadWatchChanges,
+  type ReviewNeeded,
+  type WatchChange,
+} from "./living-policies";
 import { addMonths } from "./reminders";
 
 export type DocumentControlInput = {
@@ -15,7 +21,15 @@ export type DocumentControlInput = {
     title: string;
     version: number;
     created_at: string;
+    /** The stored version's id, so the page can re-generate a section (backlog 8). */
+    version_id?: string;
+    /** Section texts from the stored model, for the living-policies match (backlog 8). */
+    sections?: { id: string; text: string }[];
   }[];
+  /** The watch's applied changes (backlog 8); the ledger by default, a list in tests. */
+  changes?: readonly WatchChange[];
+  /** Changes the owner has checked per document (backlog 8). */
+  changeReviews?: { document_type_id: string; change_id: string }[];
   reviews: {
     document_type_id: string;
     adopted_on: string | null;
@@ -41,8 +55,12 @@ export type DocumentControlRow = {
   next_review_on: string | null;
   /** The latest circulation at or after the document's current version, if any. */
   circulated: { on: string; workers: number } | null;
-  /** The row's one-word state for the list and the audit-day page. */
-  state: "adopted" | "not-adopted" | "review-due" | "overdue";
+  /** The row's one-word state for the list and the audit-day page; "review-needed" when a rule change applies (backlog 8). */
+  state: "adopted" | "not-adopted" | "review-due" | "overdue" | "review-needed";
+  /** The stored version's id when known. */
+  version_id: string | null;
+  /** Rule changes this adopted document still needs checked for (backlog 8). */
+  reviewNeeded: ReviewNeeded[];
 };
 
 export const DEFAULT_REVIEW_MONTHS = 12;
@@ -54,9 +72,29 @@ export function documentControlRows(
   const reviewByType = new Map(
     input.reviews.map((r) => [r.document_type_id, r]),
   );
+  const changes = input.changes ?? loadWatchChanges();
+  const checked = new Map<string, Set<string>>();
+  for (const r of input.changeReviews ?? []) {
+    const set = checked.get(r.document_type_id) ?? new Set<string>();
+    set.add(r.change_id);
+    checked.set(r.document_type_id, set);
+  }
   return input.documents.map((d) => {
     const review = reviewByType.get(d.document_type_id);
     const adopted = review?.adopted_on ?? null;
+    // Backlog 8: an adopted document drafted before a rule change it does not carry needs a look.
+    const reviewNeeded =
+      adopted && d.sections
+        ? changesForDocument(
+            {
+              typeId: d.document_type_id,
+              createdAt: d.created_at,
+              sections: d.sections,
+            },
+            changes,
+            checked.get(d.document_type_id),
+          )
+        : [];
     const nextReview =
       review?.next_review_on ??
       (adopted
@@ -78,9 +116,11 @@ export function documentControlRows(
       ? "not-adopted"
       : nextReview && nextReview < today
         ? "overdue"
-        : nextReview && nextReview <= addMonths(today, 1)
-          ? "review-due"
-          : "adopted";
+        : reviewNeeded.length > 0
+          ? "review-needed"
+          : nextReview && nextReview <= addMonths(today, 1)
+            ? "review-due"
+            : "adopted";
     return {
       document_type_id: d.document_type_id,
       title: d.title,
@@ -95,6 +135,8 @@ export function documentControlRows(
           }
         : null,
       state,
+      version_id: d.version_id ?? null,
+      reviewNeeded,
     };
   });
 }
@@ -106,6 +148,8 @@ export function documentControlGaps(rows: DocumentControlRow[]): string[] {
     if (!r.adopted_on) out.push(`${r.title}: not adopted`);
     else if (!r.next_review_on) out.push(`${r.title}: no review date`);
     else if (!r.circulated) out.push(`${r.title}: not circulated to workers`);
+    else if (r.reviewNeeded.length > 0)
+      out.push(`${r.title}: a rule changed since it was drafted`);
   }
   return out;
 }
@@ -116,11 +160,13 @@ export function documentControlSentence(rows: DocumentControlRow[]): string {
   const adopted = rows.filter((r) => r.adopted_on).length;
   const circulated = rows.filter((r) => r.circulated).length;
   const overdue = rows.filter((r) => r.state === "overdue").length;
+  const needReview = rows.filter((r) => r.reviewNeeded.length > 0).length;
   const parts = [
     `${adopted} of ${rows.length} adopted`,
     `${circulated} circulated to workers`,
   ];
   if (overdue)
     parts.push(`${overdue} review${overdue === 1 ? "" : "s"} overdue`);
+  if (needReview) parts.push(`${needReview} to check after a rule change`);
   return `${parts.join(", ")}.`;
 }

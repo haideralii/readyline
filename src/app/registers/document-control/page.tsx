@@ -6,6 +6,7 @@ import {
 } from "@/lib/registers/document-control";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { RegisterPage, registerContext } from "../_components/shell";
+import { ChangeReview } from "./change-review";
 
 export const metadata: Metadata = { title: "Document control register" };
 
@@ -26,7 +27,7 @@ export default async function DocumentControlPage() {
   return (
     <RegisterPage
       title="Document control"
-      intro="Every policy with its version, when you adopted it, who adopted it, when it is next reviewed and whether your workers were walked through it. Built from your pack: there is nothing to type here. The readiness summary carries it as its first page."
+      intro="Every policy with its version, when you adopted it, who adopted it, when it is next reviewed and whether your workers were walked through it. Built from your pack: there is nothing to type here. When a rule changes after a document was drafted, the row says so and shows the old and the new sentence."
       canWrite={ctx.canWrite}
       back={{ href: "/registers", label: "Registers" }}
     >
@@ -97,6 +98,17 @@ export default async function DocumentControlPage() {
                   </div>
                 ))}
               </dl>
+              {/* Backlog 8 (D-551): a rule changed since this document was drafted. */}
+              {r.reviewNeeded.map((c) => (
+                <ChangeReview
+                  key={c.changeId}
+                  documentTypeId={r.document_type_id}
+                  title={r.title}
+                  versionId={r.version_id}
+                  setId={setId}
+                  change={c}
+                />
+              ))}
             </li>
           ))}
         </ol>
