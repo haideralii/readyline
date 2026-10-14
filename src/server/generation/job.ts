@@ -40,7 +40,25 @@ import {
 import { objectPath } from "./storage";
 import type { DocumentVersionRow, GenerationStore } from "./store";
 
-export type JobStatus = "queued" | "running" | "ready" | "failed";
+/** "attention" (REQ-021 S4, D-2101): every document was tried, one or more need another go, and the owner decides. */
+export type JobStatus = "queued" | "running" | "ready" | "failed" | "attention";
+
+/** The phase the provider sees (REQ-021); written by the loop beside every progress update. */
+export type JobPhase =
+  | "preparing"
+  | "writing"
+  | "checking"
+  | "assembling"
+  | "ready"
+  | "attention"
+  | "failed";
+
+/** A document that needs another go (REQ-021 S4): nothing stored for an error; stored but weak for degraded. */
+export type FailedDocumentEntry = {
+  typeId: string;
+  kind: "error" | "degraded";
+  detail: string;
+};
 
 export type GenerationJobRow = {
   id: string;
@@ -57,6 +75,14 @@ export type GenerationJobRow = {
   next_run_at: string;
   created_at: string;
   updated_at: string;
+  // REQ-021 (D-2101): the writing indicator's fields; optional so rows and fixtures from before the migration still type.
+  phase?: JobPhase;
+  document_total?: number | null;
+  current_document_type_id?: string | null;
+  current_section_index?: number;
+  section_count?: number;
+  last_progress_at?: string;
+  failed_documents?: FailedDocumentEntry[] | unknown;
 };
 
 /** The document in flight: finished tailored sections by id and their log rows. */
@@ -66,6 +92,10 @@ export type JobProgress = {
   logs?: SectionLog[];
   /** How many times each document was redrafted from scratch for too many generic sections (REQ-016 FR-0b). */
   redrafts?: Record<string, number>;
+  /** REQ-021 S4: how many ticks each document has thrown in; the second time it is recorded as failed and skipped. */
+  docAttempts?: Record<string, number>;
+  /** REQ-021 S4: a document the owner asked to try again; regenerated even though a version of it is stored. */
+  retry?: string[];
 };
 
 export type JobPatch = Partial<
@@ -78,8 +108,30 @@ export type JobPatch = Partial<
     | "progress"
     | "last_error"
     | "next_run_at"
+    | "phase"
+    | "document_total"
+    | "current_document_type_id"
+    | "current_section_index"
+    | "section_count"
+    | "last_progress_at"
+    | "failed_documents"
   >
 >;
+
+/** The failed-documents column as a typed list (tolerant of the pre-migration shape). */
+export function parseFailedDocuments(value: unknown): FailedDocumentEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (f): f is FailedDocumentEntry =>
+      Boolean(f) &&
+      typeof (f as FailedDocumentEntry).typeId === "string" &&
+      ((f as FailedDocumentEntry).kind === "error" ||
+        (f as FailedDocumentEntry).kind === "degraded"),
+  );
+}
+
+/** A document that throws in this many ticks is recorded as needing another go and skipped (REQ-021 S4). */
+export const MAX_DOCUMENT_ATTEMPTS = 2;
 
 export type JobContext = {
   answers: QuestionnaireAnswers;
@@ -125,7 +177,8 @@ export type TickReport =
   | {
       claimed: true;
       jobId: string;
-      outcome: "ready" | "more" | "retry" | "failed";
+      /** "attention": every document was tried and one or more need another go (REQ-021 S4). */
+      outcome: "ready" | "more" | "retry" | "failed" | "attention";
       documentsDone: number;
       documentsTotal: number;
       sectionsGenerated: number;
@@ -144,6 +197,23 @@ function parseProgress(value: unknown): Required<JobProgress> {
     sections: p.sections && typeof p.sections === "object" ? p.sections : {},
     logs: Array.isArray(p.logs) ? p.logs : [],
     redrafts: p.redrafts && typeof p.redrafts === "object" ? p.redrafts : {},
+    docAttempts:
+      p.docAttempts && typeof p.docAttempts === "object" ? p.docAttempts : {},
+    retry: Array.isArray(p.retry)
+      ? p.retry.filter((x): x is string => typeof x === "string")
+      : [],
+  };
+}
+
+/** The parts of the progress that outlive a document (REQ-016 redrafts, REQ-021 attempts and retries). */
+function carried(p: Required<JobProgress>): Required<JobProgress> {
+  return {
+    typeId: "",
+    sections: {},
+    logs: [],
+    redrafts: p.redrafts,
+    docAttempts: p.docAttempts,
+    retry: p.retry,
   };
 }
 
@@ -187,9 +257,16 @@ export async function runGenerationTick(input: {
   let documentsTotal = 0;
   let index = job.next_document_index;
 
+  // REQ-021 (D-2101): every progress write carries the phase and the time, so
+  // the indicator reads the truth from the row and never from a timer.
+  const progressFields = (
+    fields: Omit<JobPatch, "last_progress_at">,
+  ): JobPatch => ({ ...fields, last_progress_at: now().toISOString() });
+
   const failPermanently = async (reason: string, alert: boolean) => {
     await backend.update(job.id, {
       status: "failed",
+      phase: "failed",
       last_error: reason.slice(0, 500),
       next_run_at: now().toISOString(),
     });
@@ -252,23 +329,36 @@ export async function runGenerationTick(input: {
       });
       versionSetId = set.id;
       await backend.quotaHit(job.account_id);
-      await backend.update(job.id, { version_set_id: versionSetId });
+      await backend.update(
+        job.id,
+        progressFields({
+          version_set_id: versionSetId,
+          document_total: documentsTotal,
+          phase: "preparing",
+        }),
+      );
     }
     const setId = versionSetId;
 
     let progress = parseProgress(job.progress);
+    const failedDocuments = parseFailedDocuments(job.failed_documents);
+    // REQ-021 S4: a document already stored is not written again, unless the owner asked for another go.
+    const stored = new Set(
+      (await backend.listDocuments(setId)).map((d) => d.document_type_id),
+    );
     const handBack = async (): Promise<TickReport> => {
       await backend.update(job.id, {
         status: "queued",
         next_document_index: index,
         progress,
+        failed_documents: failedDocuments,
         next_run_at: now().toISOString(),
       });
       return {
         claimed: true,
         jobId: job.id,
         outcome: "more",
-        documentsDone: index,
+        documentsDone: index - failedDocuments.length,
         documentsTotal,
         sectionsGenerated,
         failures,
@@ -279,19 +369,15 @@ export async function runGenerationTick(input: {
     while (index < typeIds.length) {
       const typeId = typeIds[index];
       const type = documentTypeById(typeId);
-      if (!type) {
+      const retrying = progress.retry.includes(typeId);
+      if (!type || (stored.has(typeId) && !retrying)) {
         index++;
         continue;
       }
       if (!fits(lastDocumentMs)) return await handBack();
       const documentStarted = now().getTime();
       if (progress.typeId !== typeId)
-        progress = {
-          typeId,
-          sections: {},
-          logs: [],
-          redrafts: progress.redrafts,
-        };
+        progress = { ...carried(progress), typeId };
       const skeleton = buildSkeleton({
         type,
         facts,
@@ -300,53 +386,125 @@ export async function runGenerationTick(input: {
         version: "1",
         generatedAt,
       });
-      for (const section of skeleton.sections) {
-        if (!isTailoredSection(type, section) || progress.sections[section.id])
-          continue;
-        if (!fits(lastSectionMs)) return await handBack();
-        const sectionStarted = now().getTime();
-        const out = await generateTailoredSection({
-          section,
-          type,
-          facts,
-          result,
-          dataset,
-          client: input.client,
-          modelId: input.modelId,
-          allowedPhrases: allowed,
-        });
-        progress.sections[section.id] = out.section;
-        progress.logs.push(out.log);
-        if (out.failure)
-          failures.push({
-            typeId,
-            sectionId: section.id,
-            kind: out.failure.kind,
-            detail: out.failure.detail,
-            refusal: out.failure.refusal,
+      const tailored = skeleton.sections.filter((s) =>
+        isTailoredSection(type, s),
+      );
+      const sectionDone = () =>
+        tailored.filter((s) => progress.sections[s.id]).length;
+      let model: DocumentModel;
+      try {
+        await backend.update(
+          job.id,
+          progressFields({
+            phase: "writing",
+            current_document_type_id: typeId,
+            current_section_index: sectionDone() + 1,
+            section_count: tailored.length,
+            progress,
+          }),
+        );
+        for (const section of tailored) {
+          if (progress.sections[section.id]) continue;
+          if (!fits(lastSectionMs)) return await handBack();
+          const sectionStarted = now().getTime();
+          const out = await generateTailoredSection({
+            section,
+            type,
+            facts,
+            result,
+            dataset,
+            client: input.client,
+            modelId: input.modelId,
+            allowedPhrases: allowed,
           });
-        sectionsGenerated++;
-        await backend.update(job.id, { progress });
-        lastSectionMs = now().getTime() - sectionStarted;
+          progress.sections[section.id] = out.section;
+          progress.logs.push(out.log);
+          if (out.failure)
+            failures.push({
+              typeId,
+              sectionId: section.id,
+              kind: out.failure.kind,
+              detail: out.failure.detail,
+              refusal: out.failure.refusal,
+            });
+          sectionsGenerated++;
+          await backend.update(
+            job.id,
+            progressFields({
+              progress,
+              phase: "writing",
+              current_section_index: Math.min(
+                tailored.length,
+                sectionDone() + 1,
+              ),
+            }),
+          );
+          lastSectionMs = now().getTime() - sectionStarted;
+        }
+        // REQ-017 AC-2: facts the provider gave on an earlier pack fill this one's blanks too.
+        model = applyFacts(
+          {
+            ...skeleton,
+            sections: skeleton.sections.map(
+              (s) => progress.sections[s.id] ?? s,
+            ),
+          },
+          ctx.facts,
+        );
+      } catch (e) {
+        // REQ-021 S4: a document that throws twice is recorded as needing
+        // another go and the rest continue; the first time the tick retries
+        // with backoff as before, because most causes are transient.
+        const attempts = (progress.docAttempts[typeId] ?? 0) + 1;
+        progress = {
+          ...carried(progress),
+          docAttempts: { ...progress.docAttempts, [typeId]: attempts },
+        };
+        if (attempts < MAX_DOCUMENT_ATTEMPTS) {
+          await backend.update(job.id, { progress });
+          throw e;
+        }
+        const detail = (e instanceof Error ? e.message : String(e)).slice(
+          0,
+          200,
+        );
+        failedDocuments.push({ typeId, kind: "error", detail });
+        log.warn("payments.generation.document-failed", {
+          jobId: job.id,
+          accountId: job.account_id,
+          documentTypeId: typeId,
+          attempts,
+          error: detail,
+        });
+        index++;
+        progress = {
+          ...carried(progress),
+          retry: progress.retry.filter((t) => t !== typeId),
+        };
+        await backend.update(
+          job.id,
+          progressFields({
+            next_document_index: index,
+            progress,
+            failed_documents: failedDocuments,
+          }),
+        );
+        documentsThisTick++;
+        continue;
       }
-      // REQ-017 AC-2: facts the provider gave on an earlier pack fill this one's blanks too.
-      const model: DocumentModel = applyFacts(
-        {
-          ...skeleton,
-          sections: skeleton.sections.map((s) => progress.sections[s.id] ?? s),
-        },
-        ctx.facts,
+      await backend.update(
+        job.id,
+        progressFields({ phase: "checking", progress }),
       );
       // REQ-016 FR-0b: a document with too many generic sections is redrafted
       // from scratch once (the next tick takes it again with a fresh set of
-      // calls); after that it ships as it is, with the reason on the log.
+      // calls); after that it ships as it is and is listed as needing
+      // another go (REQ-021 S4, "degraded"), with the reason on the log.
       const generic = documentStatus(model).fallbackSections;
       const redrafts = progress.redrafts?.[typeId] ?? 0;
       if (generic > MAX_GENERIC_SECTIONS && redrafts < MAX_DOCUMENT_REDRAFTS) {
         progress = {
-          typeId: "",
-          sections: {},
-          logs: [],
+          ...carried(progress),
           redrafts: { ...progress.redrafts, [typeId]: redrafts + 1 },
         };
         redrafted.push(typeId);
@@ -359,7 +517,8 @@ export async function runGenerationTick(input: {
         });
         return await handBack();
       }
-      if (generic > MAX_GENERIC_SECTIONS)
+      const degraded = generic > MAX_GENERIC_SECTIONS;
+      if (degraded)
         log.error("payments.generation.document-degraded", {
           jobId: job.id,
           accountId: job.account_id,
@@ -367,6 +526,10 @@ export async function runGenerationTick(input: {
           genericSections: generic,
           failures: failures.filter((f) => f.typeId === typeId),
         });
+      await backend.update(
+        job.id,
+        progressFields({ phase: "assembling", progress }),
+      );
       const docx = await renderDocx(model);
       const path = objectPath(job.account_id, setId, `${typeId}.docx`);
       await store.putObject(path, new Uint8Array(docx), DOCX_TYPE);
@@ -375,7 +538,11 @@ export async function runGenerationTick(input: {
         version_set_id: setId,
         account_id: job.account_id,
         document_type_id: typeId,
-        version: 1,
+        version: retrying
+          ? (await backend.listDocuments(setId)).filter(
+              (d) => d.document_type_id === typeId,
+            ).length + 1
+          : 1,
         status,
         storage_path: path,
         model,
@@ -387,24 +554,82 @@ export async function runGenerationTick(input: {
           version_set_id: setId,
         })),
       );
+      stored.add(typeId);
+      if (degraded)
+        failedDocuments.push({
+          typeId,
+          kind: "degraded",
+          detail: `${generic} sections could not be drafted`,
+        });
       index++;
       progress = {
-        typeId: "",
-        sections: {},
-        logs: [],
-        redrafts: progress.redrafts,
+        ...carried(progress),
+        retry: progress.retry.filter((t) => t !== typeId),
       };
-      await backend.update(job.id, {
-        next_document_index: index,
-        progress: { redrafts: progress.redrafts },
-      });
+      await backend.update(
+        job.id,
+        progressFields({
+          next_document_index: index,
+          progress: {
+            redrafts: progress.redrafts,
+            docAttempts: progress.docAttempts,
+            retry: progress.retry,
+          },
+          failed_documents: failedDocuments,
+        }),
+      );
       // A resumed document measures only its remainder; the section rule still guards each call.
       lastDocumentMs = now().getTime() - documentStarted;
       documentsThisTick++;
       if (index < typeIds.length && over()) return await handBack();
     }
 
+    // REQ-021 S4: every document was tried; the ones that need another go wait for the owner.
+    if (failedDocuments.length > 0) {
+      await backend.update(
+        job.id,
+        progressFields({
+          status: "attention",
+          phase: "attention",
+          next_document_index: index,
+          current_document_type_id: null,
+          current_section_index: 0,
+          section_count: 0,
+          progress: {
+            redrafts: progress.redrafts,
+            docAttempts: progress.docAttempts,
+          },
+          failed_documents: failedDocuments,
+          next_run_at: now().toISOString(),
+        }),
+      );
+      log.warn("payments.generation.attention", {
+        jobId: job.id,
+        accountId: job.account_id,
+        failed: failedDocuments.map((f) => `${f.typeId}:${f.kind}`),
+      });
+      return {
+        claimed: true,
+        jobId: job.id,
+        outcome: "attention",
+        documentsDone: index - failedDocuments.length,
+        documentsTotal,
+        sectionsGenerated,
+        failures,
+        redrafted,
+      };
+    }
+
     // Every document exists: the summary, the zip and the hand-over.
+    await backend.update(
+      job.id,
+      progressFields({
+        phase: "assembling",
+        current_document_type_id: null,
+        current_section_index: 0,
+        section_count: 0,
+      }),
+    );
     const rows = await backend.listDocuments(setId);
     const docs = typeIds
       .map((id) => rows.find((r) => r.document_type_id === id))
@@ -462,11 +687,16 @@ export async function runGenerationTick(input: {
     if (job.entitlement_id)
       await backend.setEntitlementVersionSet(job.entitlement_id, setId);
     await backend.audit(job.account_id, setId);
-    await backend.update(job.id, {
-      status: "ready",
-      progress: {},
-      next_run_at: now().toISOString(),
-    });
+    await backend.update(
+      job.id,
+      progressFields({
+        status: "ready",
+        phase: "ready",
+        progress: {},
+        failed_documents: [],
+        next_run_at: now().toISOString(),
+      }),
+    );
     if (ctx.ownerEmail)
       await input.email.send(
         documentsReadyEmail({
@@ -538,6 +768,6 @@ export async function runGenerationTicks(
     reports.push(report);
     if (!report.claimed) return { reports, more: false };
     if (report.outcome === "more") return { reports, more: true };
-    // ready, failed or retry: look for the next runnable job within the budget.
+    // ready, attention, failed or retry: look for the next runnable job within the budget.
   }
 }

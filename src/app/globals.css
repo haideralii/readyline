@@ -289,3 +289,171 @@ summary {
     scroll-behavior: auto !important;
   }
 }
+
+/* The writing indicator (REQ-021, D-2101): transforms and opacity only; the
+   animation runs only while the feed is live (data-moving="true"), pauses
+   when the feed is quiet, and never runs once the set is ready. */
+.wi-icon .wi-line {
+  opacity: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.wi-icon .wi-tick {
+  opacity: 0;
+  transform-origin: center;
+  transform: scale(0.6);
+}
+.wi-icon .wi-page-back {
+  opacity: 0;
+  transform: translate(-5px, 6px);
+}
+.wi-icon .wi-pen {
+  transform-origin: 30px 46px;
+  transition: transform 300ms ease;
+}
+/* Writing: lines appear one by one and the nib moves along the current line. */
+.wi-icon[data-phase="writing"][data-moving="true"] .wi-line {
+  animation: wi-draw 4.8s ease-in-out infinite;
+}
+.wi-icon[data-phase="writing"][data-moving="true"] .wi-line:nth-child(2) {
+  animation-delay: 1.2s;
+}
+.wi-icon[data-phase="writing"][data-moving="true"] .wi-line:nth-child(3) {
+  animation-delay: 2.4s;
+}
+.wi-icon[data-phase="writing"][data-moving="true"] .wi-line:nth-child(4) {
+  animation-delay: 3.6s;
+}
+.wi-icon[data-phase="writing"][data-moving="true"] .wi-pen {
+  animation: wi-nib 4.8s ease-in-out infinite;
+}
+/* Quiet feed (S3): the lines stay as they are and the pen lifts. */
+.wi-icon[data-phase="writing"][data-moving="false"] .wi-line {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.wi-icon[data-phase="writing"][data-moving="false"] .wi-pen,
+.wi-icon[data-phase="checking"] .wi-pen,
+.wi-icon[data-phase="assembling"] .wi-pen,
+.wi-icon[data-phase="ready"] .wi-pen,
+.wi-icon[data-phase="attention"] .wi-pen,
+.wi-icon[data-phase="delayed"] .wi-pen {
+  transform: translate(4px, -8px) rotate(-12deg);
+}
+/* Checking: the lines are written and a tick appears. */
+.wi-icon[data-phase="checking"] .wi-line,
+.wi-icon[data-phase="assembling"] .wi-line,
+.wi-icon[data-phase="ready"] .wi-line,
+.wi-icon[data-phase="attention"] .wi-line,
+.wi-icon[data-phase="delayed"] .wi-line {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.wi-icon[data-phase="checking"] .wi-tick,
+.wi-icon[data-phase="ready"] .wi-tick {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+/* Assembling and ready: the pages stack. */
+.wi-icon[data-phase="assembling"] .wi-page-back,
+.wi-icon[data-phase="ready"] .wi-page-back {
+  opacity: 1;
+  transform: translate(0, 0);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+.wi-icon[data-phase="assembling"][data-moving="true"] .wi-page-back {
+  animation: wi-stack 1.6s ease-in-out infinite alternate;
+}
+.wi-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--slate);
+  animation: wi-blink 1.2s ease-in-out infinite;
+}
+@keyframes wi-draw {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  20%,
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+@keyframes wi-nib {
+  0% {
+    transform: translate(-16px, -28px);
+  }
+  25% {
+    transform: translate(0, -28px);
+  }
+  25.1% {
+    transform: translate(-16px, -22px);
+  }
+  50% {
+    transform: translate(2px, -22px);
+  }
+  50.1% {
+    transform: translate(-16px, -16px);
+  }
+  75% {
+    transform: translate(-2px, -16px);
+  }
+  75.1% {
+    transform: translate(-16px, -10px);
+  }
+  100% {
+    transform: translate(1px, -10px);
+  }
+}
+@keyframes wi-stack {
+  from {
+    transform: translate(-5px, 6px);
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+@keyframes wi-blink {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* S9: reduced motion keeps the icon still; a phase change is a soft opacity pulse and nothing else moves. */
+@media (prefers-reduced-motion: reduce) {
+  .wi-icon .wi-line,
+  .wi-icon .wi-pen,
+  .wi-icon .wi-page-back,
+  .wi-dot {
+    animation: none !important;
+    transition: none !important;
+  }
+  .wi-icon[data-moving="true"] .wi-line {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  .wi-icon {
+    animation: wi-pulse 600ms ease-out 1 !important;
+    animation-duration: 600ms !important;
+  }
+  @keyframes wi-pulse {
+    from {
+      opacity: 0.4;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

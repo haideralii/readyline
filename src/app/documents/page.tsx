@@ -23,6 +23,9 @@ import {
   listPurchases,
 } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { WritingIndicator } from "@/components/writing-indicator";
+import type { WritingStatus } from "@/lib/generation/writing-state";
+import { writingStatusFor } from "@/server/generation/writing-status";
 import { AutoRefresh } from "./auto-refresh";
 import { BuyButton } from "./buy-button";
 import { GenerateButton } from "./generate-button";
@@ -101,10 +104,13 @@ function PurchaseSection({
   state,
   thanks,
   email,
+  writing,
 }: {
   state: DocumentsState;
   thanks: boolean;
   email: string | null;
+  /** REQ-021: the writing indicator's status for the active job, when there is one. */
+  writing: WritingStatus | null;
 }) {
   const pricing = readPricing();
   switch (state.kind) {
@@ -157,20 +163,26 @@ function PurchaseSection({
     case "preparing":
       return (
         <section
-          aria-labelledby="preparing-heading"
+          aria-label="Preparing your documents"
           className={box}
           data-testid="purchase-preparing"
         >
           <AutoRefresh lastChangeAt={state.job?.updatedAt ?? null} />
-          <h2 id="preparing-heading" className="text-xl font-semibold">
-            {C.preparingHeading}
-          </h2>
           {thanks ? (
-            <p className="mt-2 leading-7" data-testid="purchase-thanks">
+            <p className="mb-3 leading-7" data-testid="purchase-thanks">
               {C.thanks}
             </p>
           ) : null}
-          <p role="status" className="mt-2 leading-7">
+          {writing ? (
+            // REQ-021: the five honest phases from the job row; the words below stay for the status role.
+            <WritingIndicator initial={writing} />
+          ) : (
+            <h2 className="text-xl font-semibold">{C.preparingHeading}</h2>
+          )}
+          <p
+            role="status"
+            className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          >
             {C.preparing} {C.preparingProgress(state.documentsDone)}
           </p>
           <PurchaseLinks purchase={state.purchase} email={email} />
@@ -199,9 +211,14 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-ready"
         >
-          <h2 id="ready-heading" className="text-xl font-semibold">
-            {C.readyHeading}
-          </h2>
+          {writing && writing.phase === "ready" ? (
+            // REQ-021 S6, AC-3: the Ready state at once, leading with the next step of the guided path.
+            <WritingIndicator initial={writing} />
+          ) : (
+            <h2 id="ready-heading" className="text-xl font-semibold">
+              {C.readyHeading}
+            </h2>
+          )}
           <p className="mt-2 leading-7">{C.readyLead}</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <a
@@ -272,6 +289,16 @@ export default async function DocumentsPage({
     listVersionSets(supabase, accountId),
   ]);
   const state = deriveDocumentsState({ purchases, entitlements, jobs });
+  // REQ-021: the writing indicator's status while a pack is being written and once it is ready.
+  const writing =
+    state.kind === "preparing" || state.kind === "ready"
+      ? await writingStatusFor(
+          supabase,
+          viewer as typeof viewer & {
+            account: NonNullable<typeof viewer.account>;
+          },
+        )
+      : null;
   const email = contactEmail();
   // The paid set is shown above; the list below is for regenerated or dev sets.
   const otherSets = sets.filter(
@@ -285,7 +312,12 @@ export default async function DocumentsPage({
         {C.intro}
       </p>
 
-      <PurchaseSection state={state} thanks={thanks} email={email} />
+      <PurchaseSection
+        state={state}
+        thanks={thanks}
+        email={email}
+        writing={writing}
+      />
       {state.kind === "ready" || state.kind === "preparing" ? (
         <DocumentsNotices />
       ) : null}

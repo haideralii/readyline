@@ -549,3 +549,168 @@ describe("account facts fill a later pack (REQ-017 FR-2, AC-2)", () => {
     );
   }, 60_000);
 });
+
+/** REQ-021 (D-2101): the job row carries what the writing indicator shows, and a document that keeps failing waits for the owner (S4). */
+describe("the writing indicator's fields and the attention state (REQ-021)", () => {
+  it("records the phase, the document and section in flight, the set size and the time of every progress write", async () => {
+    const h = harness({ stepMs: 10 });
+    const job = h.backend.enqueue();
+    const seen: {
+      phase?: string;
+      section?: number;
+      count?: number;
+      doc?: string | null;
+    }[] = [];
+    const update = h.backend.update.bind(h.backend);
+    h.backend.update = async (id, patch) => {
+      if (patch.phase || patch.current_section_index !== undefined)
+        seen.push({
+          phase: patch.phase,
+          section: patch.current_section_index,
+          count: patch.section_count,
+          doc: patch.current_document_type_id,
+        });
+      if (patch.phase && !patch.last_progress_at)
+        throw new Error("a phase write without last_progress_at");
+      return update(id, patch);
+    };
+    const report = await h.tick();
+    expect(report).toMatchObject({ claimed: true, outcome: "ready" });
+    const row = h.backend.jobs[0];
+    expect(row.phase).toBe("ready");
+    expect(row.document_total).toBe(expectedTypeIds.length);
+    expect(row.failed_documents).toEqual([]);
+    expect(typeof row.last_progress_at).toBe("string");
+    const phases = seen.map((s) => s.phase).filter(Boolean);
+    expect(phases[0]).toBe("preparing");
+    expect(phases).toContain("writing");
+    expect(phases).toContain("checking");
+    expect(phases).toContain("assembling");
+    expect(phases.at(-1)).toBe("ready");
+    // Section index is 1-based and never above the document's tailored count.
+    const writing = seen.filter((s) => s.phase === "writing" && s.count);
+    expect(writing.length).toBeGreaterThan(0);
+    for (const w of writing) {
+      expect(w.section).toBeGreaterThanOrEqual(1);
+      expect(w.section).toBeLessThanOrEqual(w.count!);
+    }
+    expect(seen.some((s) => s.doc === expectedTypeIds[0])).toBe(true);
+    expect(job.id).toBe(row.id);
+  });
+
+  it("a document the model cannot draft is redrafted once, then listed as needing another go (degraded, still stored) and the job waits for the owner (S4)", async () => {
+    const h = harness();
+    h.backend.enqueue();
+    const broken = expectedTypeIds[2];
+    const complete = h.client.complete.bind(h.client);
+    // The user prompt names the document by its title: Document: "<title>" (<kind>).
+    const marker = `Document: "${documentTypeById(broken)!.title}"`;
+    h.client.complete = async (request) => {
+      if (request.user.includes(marker))
+        throw new Error("model refused this document");
+      return complete(request);
+    };
+    // Every section falls back, so the document is redrafted once (REQ-016 FR-0b): a hand-back.
+    const first = await h.tick();
+    expect(first).toMatchObject({ claimed: true, outcome: "more" });
+    h.backend.jobs[0].next_run_at = "2026-10-12T00:00:00.000Z";
+    const second = await h.tick();
+    expect(second).toMatchObject({
+      claimed: true,
+      outcome: "attention",
+      documentsDone: expectedTypeIds.length - 1,
+      documentsTotal: expectedTypeIds.length,
+    });
+    const row = h.backend.jobs[0];
+    expect(row.status).toBe("attention");
+    expect(row.phase).toBe("attention");
+    expect(row.failed_documents).toMatchObject([
+      { typeId: broken, kind: "degraded" },
+    ]);
+    // The weak document is stored (nothing is lost); the rest are written once each.
+    expect(h.store.documents.map((d) => d.document_type_id)).toEqual(
+      expectedTypeIds,
+    );
+    // Not ready: no set finished, no email, the entitlement not handed over.
+    expect(h.store.sets[0].status).toBe("generating");
+    expect(h.email.sent).toHaveLength(0);
+    expect(h.backend.entitlementVersionSets.size).toBe(0);
+    // An attention job is not claimable.
+    expect(await h.tick()).toEqual({ claimed: false });
+
+    // The owner tries again: only that document is regenerated (a new version), and the set finishes.
+    h.client.complete = complete;
+    const callsBefore = h.client.calls;
+    const progress = row.progress as { redrafts?: Record<string, number> };
+    Object.assign(row, {
+      status: "queued",
+      next_run_at: "2026-10-12T00:00:00.000Z",
+      next_document_index: 0,
+      failed_documents: [],
+      progress: {
+        redrafts: { ...progress.redrafts, [broken]: 0 },
+        retry: [broken],
+      },
+    });
+    const third = await h.tick();
+    expect(third).toMatchObject({ claimed: true, outcome: "ready" });
+    const versions = h.store.documents.filter(
+      (d) => d.document_type_id === broken,
+    );
+    expect(versions.map((v) => v.version)).toEqual([1, 2]);
+    expect(versions[1].status).toBe("ready");
+    const tailoredInBroken = h.store.logs.filter(
+      (l) => l.document_type_id === broken && l.status === "generated",
+    ).length;
+    expect(h.client.calls - callsBefore).toBe(tailoredInBroken);
+    expect(h.backend.jobs[0].status).toBe("ready");
+    expect(h.email.sent).toHaveLength(1);
+  });
+
+  it("a document whose write throws twice is recorded as an error, nothing stored for it, and the owner can continue without it", async () => {
+    const h = harness();
+    h.backend.enqueue();
+    const broken = expectedTypeIds[1];
+    const update = h.backend.update.bind(h.backend);
+    let throws = 0;
+    h.backend.update = async (id, patch) => {
+      // The first progress write of the broken document fails, twice (two ticks).
+      if (
+        patch.current_document_type_id === broken &&
+        patch.phase === "writing" &&
+        throws < 2
+      ) {
+        throws += 1;
+        throw new Error("boom");
+      }
+      return update(id, patch);
+    };
+    const first = await h.tick();
+    // The first time is a tick-level retry with backoff, as for any transient error.
+    expect(first).toMatchObject({ claimed: true, outcome: "retry" });
+    expect(h.backend.jobs[0].attempts).toBe(1);
+    h.backend.jobs[0].next_run_at = "2026-10-12T00:00:00.000Z";
+    const second = await h.tick();
+    expect(second).toMatchObject({ claimed: true, outcome: "attention" });
+    const row = h.backend.jobs[0];
+    expect(row.failed_documents).toEqual([
+      { typeId: broken, kind: "error", detail: "boom" },
+    ]);
+    expect(h.store.documents.map((d) => d.document_type_id)).toEqual(
+      expectedTypeIds.filter((t) => t !== broken),
+    );
+    // Continue without it: the set finishes with the rest.
+    Object.assign(row, {
+      status: "queued",
+      next_run_at: "2026-10-12T00:00:00.000Z",
+      failed_documents: [],
+    });
+    const done = await h.tick();
+    expect(done).toMatchObject({ claimed: true, outcome: "ready" });
+    expect(h.store.sets[0].status).toBe("ready");
+    expect(h.store.sets[0].document_count).toBe(expectedTypeIds.length - 1);
+    expect(h.store.documents.map((d) => d.document_type_id)).toEqual(
+      expectedTypeIds.filter((t) => t !== broken),
+    );
+  });
+});

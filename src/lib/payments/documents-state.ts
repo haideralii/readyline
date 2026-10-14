@@ -24,7 +24,8 @@ export type EntitlementView = {
 
 export type JobView = {
   entitlementId: string | null;
-  status: "queued" | "running" | "ready" | "failed";
+  /** "attention" (REQ-021 S4): one or more documents need another go and the owner decides. */
+  status: "queued" | "running" | "ready" | "failed" | "attention";
   nextDocumentIndex: number;
   versionSetId: string | null;
   /** When the job row last changed; the page uses it to notice a stalled chain (batch 23 item 4). */
