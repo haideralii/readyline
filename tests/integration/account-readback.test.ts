@@ -60,6 +60,8 @@ describe.skipIf(!enabled)("account read-back (REQ-004 FR-10)", () => {
       business_structure: "sole-trader",
       states: ["NSW", "VIC"],
       abn: null,
+      // The read-back carries the registration date since the guided path (batch 34, D-1703); null until the owner sets it.
+      registration_date: null,
     });
   });
 });
