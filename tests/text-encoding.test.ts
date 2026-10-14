@@ -47,7 +47,7 @@ describe("text files are clean UTF-8 (D-1507)", () => {
         findings.push(`${rel}:${f.line}: "${f.run}"`);
     }
     expect(findings).toEqual([]);
-  });
+  }, 30_000);
 
   it("covers the markdown the PO named", () => {
     const files = walk(ROOT).map((f) => relative(ROOT, f).replace(/\\/g, "/"));

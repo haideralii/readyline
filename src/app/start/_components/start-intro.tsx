@@ -1,8 +1,35 @@
 "use client";
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
 import { firstIncompleteStep, stepHref } from "@/lib/questionnaire/navigation";
 import { useQuestionnaire } from "./questionnaire-provider";
+
+/**
+ * REQ-011 batch 31: a group page's CTA arrives as `/start?group=<code>`. The
+ * code is kept for the supports step in session storage (this tab only) so
+ * the group is ticked when the provider gets there. Read through an
+ * external-store subscription so the server and the first client render
+ * agree (nothing on the server), as the supports step does for the viewport.
+ */
+export const PRESELECT_KEY = "readyline.start.group";
+
+function subscribeNothing() {
+  return () => {};
+}
+
+function readPreselect(): string | null {
+  try {
+    const code = new URLSearchParams(window.location.search).get("group");
+    if (code && /^\d{4}$/.test(code)) {
+      window.sessionStorage.setItem(PRESELECT_KEY, code);
+      return code;
+    }
+    return window.sessionStorage.getItem(PRESELECT_KEY);
+  } catch {
+    return null;
+  }
+}
 
 const STEPS = [
   "About your business: trading name, structure, states, ABN (optional).",
@@ -13,9 +40,16 @@ const STEPS = [
 ];
 
 export function StartIntro() {
-  const { ready, answers, saveStatus, clearDraft, mode } = useQuestionnaire();
+  const { ready, answers, saveStatus, clearDraft, mode, groups } =
+    useQuestionnaire();
   const hasDraft = Object.keys(answers).length > 0;
   const resume = stepHref(firstIncompleteStep(answers));
+  const preselectCode = useSyncExternalStore(
+    subscribeNothing,
+    readPreselect,
+    () => null,
+  );
+  const preselect = groups.find((g) => g.code === preselectCode) ?? null;
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
@@ -45,6 +79,16 @@ export function StartIntro() {
           ? "You are signed in. Your answers are saved to your account after each step, so you can continue from any device. Step 1 starts with your account's business details. Do not enter any participant's details."
           : "Your answers stay on this device as a draft until the last step. Sign in to keep them with your account instead. Do not enter any participant's details."}
       </p>
+
+      {preselect && !hasDraft ? (
+        <p
+          className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+          data-testid="start-preselect"
+        >
+          We will tick {preselect.name.toLowerCase()} (class {preselect.code})
+          for you in step 2. Add anything else you deliver there.
+        </p>
+      ) : null}
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         {ready && hasDraft ? (

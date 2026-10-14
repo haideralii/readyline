@@ -1,18 +1,30 @@
 import type { MetadataRoute } from "next";
+import { buildGroupPages } from "@/lib/guides/groups";
 import { listGuideSlugs, loadGuide } from "@/lib/guides/pages";
 import { LEGAL_NAV } from "@/lib/legal/nav";
 import { siteUrl } from "@/lib/site";
+import { getStandardsDataset } from "@/lib/standards/dataset";
 
-/** The public pages and the guides (REQ-011); signed-in pages are left out and disallowed in robots. */
+/** The public pages, the guides and the 38 registration-group pages (REQ-011); signed-in pages are left out and disallowed in robots. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();
+  const dataset = getStandardsDataset();
   const fixed = [
-    "/",
-    "/start",
-    "/pricing",
-    "/guides",
-    ...LEGAL_NAV.map((l) => l.href),
+    ...new Set([
+      "/",
+      "/start",
+      "/pricing",
+      "/guides",
+      "/guides/registration-groups",
+      ...LEGAL_NAV.map((l) => l.href),
+    ]),
   ];
+  const groups = buildGroupPages(dataset).map((p) => ({
+    url: `${base}/guides/registration-groups/${p.slug}`,
+    lastModified: dataset.generatedAt.slice(0, 10),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
   const guides = listGuideSlugs().map((slug) => {
     const g = loadGuide(slug);
     return {
@@ -29,5 +41,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: p === "/" ? 1 : 0.6,
     })),
     ...guides,
+    ...groups,
   ];
 }

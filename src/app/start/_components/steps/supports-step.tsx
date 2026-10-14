@@ -26,6 +26,19 @@ import {
   type FieldErrors,
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
+import { PRESELECT_KEY } from "../start-intro";
+
+/** REQ-011 batch 31: the group a guide page asked to tick, kept by the intro in session storage; cleared once used. */
+function subscribeNothing() {
+  return () => {};
+}
+function readPreselect(): string | null {
+  try {
+    return window.sessionStorage.getItem(PRESELECT_KEY);
+  } catch {
+    return null;
+  }
+}
 
 const LABELS = {
   groups: GROUP_QUESTION,
@@ -65,6 +78,21 @@ export function SupportsStepForm() {
   const { answers, groups, saveStep } = useQuestionnaire();
   const saved = answers.supports;
   const [selected, setSelected] = useState<string[]>(saved?.groups ?? []);
+  // REQ-011 batch 31: a guide page's group is ticked until the provider touches the list.
+  const preselectCode = useSyncExternalStore(
+    subscribeNothing,
+    readPreselect,
+    () => null,
+  );
+  const [touched, setTouched] = useState(false);
+  const seed =
+    !touched &&
+    !saved?.groups?.length &&
+    preselectCode &&
+    groups.some((g) => g.code === preselectCode)
+      ? preselectCode
+      : null;
+  const current = seed && selected.length === 0 ? [seed] : selected;
   const [fewHours, setFewHours] = useState<YesNo | undefined>(
     saved?.silEligibility
       ? saved.silEligibility.fewHoursOnly
@@ -108,22 +136,23 @@ export function SupportsStepForm() {
     for (const c of CATEGORIES) map.set(c.id, groupsInCategory(filtered, c.id));
     return map;
   }, [filtered]);
-  const silChosen = selected.includes(SIL_CODE);
-  const sdaOnly = selected.length === 1 && selected[0] === "0131";
+  const silChosen = current.includes(SIL_CODE);
+  const sdaOnly = current.length === 1 && current[0] === "0131";
   const warnings = detectParticipantData(note);
   const nameOf = (code: string) =>
     groups.find((g) => g.code === code)?.name ?? code;
 
-  const toggle = (code: string) =>
-    setSelected((prev) =>
-      prev.includes(code)
-        ? prev.filter((c) => c !== code)
-        : [...prev, code].sort(),
+  const toggle = (code: string) => {
+    setTouched(true);
+    setSelected(
+      current.includes(code)
+        ? current.filter((c) => c !== code)
+        : [...current, code].sort(),
     );
+  };
   const applyHint = () => {
-    setSelected((prev) =>
-      [...new Set([...prev, ...GROUP_HINT.selects])].sort(),
-    );
+    setTouched(true);
+    setSelected([...new Set([...current, ...GROUP_HINT.selects])].sort());
     // The hint's classes become visible in their open headings.
     setToggled((prev) => {
       const next = new Map(prev);
@@ -137,7 +166,7 @@ export function SupportsStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const values: Record<string, unknown> = { groups: selected };
+    const values: Record<string, unknown> = { groups: current };
     if (note.trim()) values.servicesNote = note;
     if (silChosen) {
       if (fewHours && selfManaged) {
@@ -162,6 +191,11 @@ export function SupportsStepForm() {
     setErrors({});
     setPending(true);
     await saveStep("supports", parsed.data, "practices");
+    try {
+      window.sessionStorage.removeItem(PRESELECT_KEY);
+    } catch {
+      // Storage blocked: the key was never there.
+    }
     router.push(stepHref("practices"));
   }
 
@@ -173,7 +207,7 @@ export function SupportsStepForm() {
         type="checkbox"
         name="groups"
         value={g.code}
-        checked={selected.includes(g.code)}
+        checked={current.includes(g.code)}
         onChange={() => toggle(g.code)}
         label={g.name}
         secondary={g.code}
@@ -251,9 +285,9 @@ export function SupportsStepForm() {
           aria-live="polite"
           data-testid="groups-chosen"
         >
-          {selected.length === 0
+          {current.length === 0
             ? "Nothing chosen yet."
-            : `${selected.length} chosen: ${selected.map(nameOf).join("; ")}`}
+            : `${current.length} chosen: ${current.map(nameOf).join("; ")}`}
         </p>
         <div id="groups" className="mt-3 space-y-3">
           {CATEGORIES.map((c) => {
@@ -263,7 +297,7 @@ export function SupportsStepForm() {
             // A search opens every heading that has a match (FR-11).
             const open = searching || isOpen(c.id);
             const all = groupsInCategory(groups, c.id);
-            const ticked = all.filter((g) => selected.includes(g.code));
+            const ticked = all.filter((g) => current.includes(g.code));
             return (
               <div
                 key={c.id}
