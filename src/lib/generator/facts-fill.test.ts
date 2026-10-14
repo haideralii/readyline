@@ -9,6 +9,8 @@ import {
   applyFacts,
   factKeyFor,
   fillText,
+  formBlanks,
+  formFactKeyFor,
   formQuestionsFor,
   isAccountFactKey,
   questionsFor,
@@ -42,6 +44,36 @@ describe("account facts stay off the Finish form (D-541 as amended, batch 37)", 
     expect(form).not.toContain("role");
     expect(form).not.toContain("date");
     expect(form).toEqual(all.filter((k) => !isAccountFactKey(k)));
+  });
+
+  it("one rule counts the blanks the form can ask for: the strip and the set page count what the form asks (run 38599190033)", () => {
+    expect(formFactKeyFor("[Date]")).toBeNull();
+    expect(formFactKeyFor("[name]")).toBeNull();
+    expect(formFactKeyFor("[owner role]")).toBeNull();
+    expect(formFactKeyFor("[phone or email]")).toBe("phone-or-email");
+    expect(formFactKeyFor("[Signature]")).toBeNull();
+    const blanks = collectBlanks(governance);
+    expect(
+      new Set(formBlanks(blanks).map((b) => formFactKeyFor(b.blank))),
+    ).toEqual(new Set(formQuestionsFor(blanks).map((q) => q.key)));
+    // A set whose only open blanks are account facts (the skeleton's fixed
+    // approver, approval date and change-log author) has nothing left for
+    // the form, so the strip must not hold the step at finish.
+    const accountOnly = blanks.filter((b) =>
+      ["name", "role", "owner-role", "date"].includes(
+        factKeyFor(b.blank) ?? "",
+      ),
+    );
+    expect(accountOnly.length).toBeGreaterThan(0);
+    expect(formBlanks(accountOnly)).toEqual([]);
+    // One form blank among them is the one the count sees.
+    const withPhone = [
+      ...accountOnly,
+      { ...accountOnly[0], blank: "[phone or email]" },
+    ];
+    expect(formBlanks(withPhone).map((b) => b.blank)).toEqual([
+      "[phone or email]",
+    ]);
   });
 
   it("the three fixed blanks fill from the account facts: approver, approval date, change-log author", () => {
