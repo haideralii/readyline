@@ -201,32 +201,52 @@ by hand from your machine:
 (Hobby runs cron at most daily, D-053; the paid job is carried by the
 webhook's own run and the route's self-kick, the cron is the backstop.)
 
-### 8a. The GitHub Actions kicker (batch 32, D-1006)
+### 8a. The GitHub Actions kicker (batch 32, D-1006; schedule and dispatch per D-059)
 
 The chain only progressed while a browser was open (D-057), so
-`.github/workflows/generate-kick.yml` now calls `/api/jobs/generate` every
-five minutes with the bearer until the route answers `"more": false` or
-four minutes have passed. It needs two values in the GitHub repository
-(Settings → Secrets and variables → Actions):
+`.github/workflows/generate-kick.yml` calls `/api/jobs/generate` with the
+bearer until the route answers `"more": false` or twenty minutes have
+passed. It starts two ways: the app dispatches it the moment a pack is
+paid for or the documents page nudges a stalled job (needs the token in
+step 3), and a schedule every thirty minutes is the safety net. It needs
+two values in the GitHub repository (Settings → Secrets and variables →
+Actions) and one in Vercel:
 
 1. **Variable** `PROD_URL`: `https://<domain>` with no trailing slash
    (the same value as `NEXT_PUBLIC_SITE_URL`).
 2. **Secret** `CRON_SECRET`: the same value as the Vercel variable. Copy it
    from Vercel (Settings → Environment Variables → reveal) and paste it as
    the secret; nobody else sees it.
+3. **Vercel variable** `GITHUB_DISPATCH_TOKEN` (server only, optional): a
+   fine-grained personal access token. GitHub → your profile → Settings →
+   Developer settings → Personal access tokens → Fine-grained tokens →
+   Generate new token. Resource owner: you. Repository access: **Only
+   select repositories**, this one alone. Repository permissions:
+   **Contents: Read and write**, nothing else (the `repository_dispatch`
+   endpoint is listed under Contents, write, in GitHub's "Permissions
+   required for fine-grained personal access tokens"; Actions: write does
+   not cover it). Set an expiry (a year) and note the date in the
+   calendar. Paste it into Vercel as `GITHUB_DISPATCH_TOKEN`, server only,
+   and redeploy. Without it the app logs
+   `payments.generation.dispatch-skipped` once per kick and the schedule
+   picks the job up within thirty minutes, which the documents page copy
+   already allows for.
 
-Until both exist the workflow skips with a notice. To confirm it works:
-Actions → "Kick paid generation" → run it by hand (`workflow_dispatch`)
-while a pack is generating; the log shows one line per call
-(`kick 1: runs=1 more=true`) and the Vercel function log shows
-`payments.generation.tick` with `kicked_by: "kicker"`. Scheduled workflows
-pause after 60 days without a push to the repository; a push resumes them.
+Until the first two exist the workflow skips with a notice. To confirm it
+works: Actions → "Kick paid generation" → run it by hand
+(`workflow_dispatch`) while a pack is generating; the log shows one line
+per call (`kick 1: runs=1 more=true`) and the Vercel function log shows
+`payments.generation.tick` with `kicked_by: "kicker"`. To confirm the
+dispatch: buy a pack in test mode and look for a run whose trigger reads
+`repository_dispatch` and a Vercel log line `payments.generation.dispatched`
+with `kicked_by: "webhook"`. Scheduled workflows pause after 60 days
+without a push to the repository; a push resumes them.
 
-**Minutes.** Each scheduled run costs at least one runner minute, so
-`*/5` is about 8,600 minutes a month; GitHub's free allowance for a
-private repository is 2,000. The PO decides before enabling: make the
-repository public (unlimited minutes), or widen the schedule (`*/30` is
-about 1,400 minutes), or accept the overage.
+**Minutes.** A scheduled run with nothing to do makes one call and ends,
+about one runner minute, so `*/30` is about 1,440 minutes a month against
+GitHub's 2,000 free for a private repository; a dispatched run costs only
+while a pack is generating. If the trial shows more than about 60 packs a
+month, Vercel Pro and its one-minute cron replace all of this (D-053).
 
 **Function duration.** The generate route declares `maxDuration = 300`,
 Hobby's maximum with Fluid compute (Vercel docs, "Configuring Maximum

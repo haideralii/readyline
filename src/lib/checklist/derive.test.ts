@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { lintText } from "@/lib/copy-lint/rules";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
@@ -24,6 +25,54 @@ const behaviour = byId["behaviour-support-company"];
 function ids(c: Checklist, group: string) {
   return c.items.filter((i) => i.group === group).map((i) => i.id);
 }
+
+describe("checklist items as instructions (REQ-017 step 6, batch 37)", () => {
+  const items = Object.values(byId).flatMap((c) => c.checklist.items);
+
+  it("every title is an instruction in the customer's voice and passes the copy lint", () => {
+    for (const item of items) {
+      // An instruction starts with a verb in the imperative: ask, get, read, start, type, book, choose, tell, put.
+      expect(item.title, item.id).toMatch(
+        /^(Ask|Get|Read|Start|Type|Book|Choose|Tell|Put)\b/,
+      );
+      expect(lintText(item.title, { block: true }), item.id).toEqual([]);
+      expect(lintText(item.why, { block: true }), item.id).toEqual([]);
+      if (item.action) {
+        expect(lintText(item.action.label, { block: true }), item.id).toEqual(
+          [],
+        );
+        expect(item.action.href, item.id).toMatch(/^\/[a-z-]+(\/[a-z-]+)*$/);
+      }
+    }
+  });
+
+  it("registers with a page, the clearance item and the ABN item open their page in one tap; documents are marked for the set link", () => {
+    const action = (id: string) => items.find((i) => i.id === id)?.action?.href;
+    expect(action("registers:incidents")).toBe("/registers/incidents");
+    expect(action("registers:complaints")).toBe("/registers/complaints");
+    expect(action("registers:worker-clearances")).toBe(
+      "/registers/worker-checks",
+    );
+    expect(action("registers:policy-reviews")).toBe(
+      "/registers/policy-reviews",
+    );
+    expect(action("registers:restrictive-practices")).toBeUndefined();
+    expect(action("people:worker-screening-clearances")).toBe(
+      "/registers/worker-checks/new",
+    );
+    expect(action("business:abn")).toBe("/account");
+    for (const d of items.filter((i) => i.group === "documents")) {
+      expect(d.documentTypeId, d.id).toBeTruthy();
+      expect(d.title, d.id).toMatch(/^Read your .+ and adopt it$/);
+    }
+    const screening = soleTrader.checklist.items.find(
+      (i) => i.id === "people:worker-screening-clearances",
+    )!;
+    expect(screening.title).toMatch(
+      /^Ask your 1 key person( and every worker in a risk-assessed role)? for their NDIS Worker Screening clearance, and type each expiry date here$/,
+    );
+  });
+});
 
 describe("deriveChecklist (REQ-006 AC-1)", () => {
   it("lists every document and register of each reference case exactly once, in groups", () => {

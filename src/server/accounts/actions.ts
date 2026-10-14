@@ -11,9 +11,62 @@ import { parseInput } from "@/lib/validation";
 import { BusinessStep, QuestionnaireDraft } from "@/lib/questionnaire/schema";
 import { createEmailProvider } from "@/server/email/provider";
 import { accountDeletedEmail } from "@/server/email/templates";
+import { z } from "zod";
+import { strictObject } from "@/lib/validation";
+import { saveFact } from "@/server/path/facts";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { RETENTION_DAYS } from "./purge";
 import { getOwnedAccount, type Account } from "./queries";
+
+const OwnerInput = strictObject({
+  name: z.string().trim().max(120),
+  role: z.string().trim().max(60),
+});
+
+/**
+ * The owner's name and role (D-541 as amended, batch 37): account facts
+ * the documents fill in on the approval line and the change log, so the
+ * Finish your pack form never asks for them. An empty value removes
+ * nothing; the facts keep what was given before.
+ */
+export async function saveOwnerAction(
+  input: unknown,
+): Promise<{ ok: true } | ActionFailure> {
+  const parsed = parseInput(OwnerInput, input);
+  if (!parsed.ok)
+    return {
+      ok: false,
+      fieldErrors: parsed.fieldErrors,
+      formErrors: parsed.formErrors,
+    };
+  const supabase = await createSupabaseServerClient();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return NOT_SIGNED_IN;
+  const account = await getOwnedAccount(supabase, auth.user.id);
+  if (!account) return NOT_SIGNED_IN;
+  const pairs: [string, string][] = [];
+  if (parsed.data.name) pairs.push(["name", parsed.data.name]);
+  if (parsed.data.role) {
+    pairs.push(["role", parsed.data.role]);
+    // The "[owner role]" blank in the AI documents is the same fact.
+    pairs.push(["owner-role", parsed.data.role]);
+  }
+  for (const [key, value] of pairs) {
+    const r = await saveFact(supabase, account.id, key, value);
+    if (!r.ok) {
+      log.warn("account.owner.save-failed", {
+        accountId: account.id,
+        code: r.code,
+      });
+      return {
+        ok: false,
+        fieldErrors: {},
+        formErrors: ["We could not save your name just now. Try again."],
+      };
+    }
+  }
+  return { ok: true };
+}
 
 export type ActionFailure = {
   ok: false;

@@ -10,7 +10,11 @@
  *   node --experimental-strip-types scripts/ops/check-env.ts
  */
 import nextEnv from "@next/env";
-import { isProductionDeployment, validateEnv } from "../../src/lib/env.ts";
+import {
+  OPTIONAL,
+  isProductionDeployment,
+  validateEnv,
+} from "../../src/lib/env.ts";
 
 // CommonJS module: the named export is not available to an ES import.
 nextEnv.loadEnvConfig(process.cwd(), false, {
@@ -30,3 +34,7 @@ if (!result.ok) {
 console.log(
   `check-env ok (${production ? "production" : "basic"} list; values not shown)`,
 );
+// Optional variables: named when absent so the choice is visible; never valued.
+for (const v of OPTIONAL)
+  if (!process.env[v.name]?.trim())
+    console.log(`  optional, not set: ${v.name} (${v.from}; ${v.without})`);

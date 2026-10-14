@@ -1,15 +1,16 @@
 /**
  * Kicks the paid generation job route until it reports nothing more to do
  * (batch 32 item 1, D-1006). The GitHub Actions kicker
- * (.github/workflows/generate-kick.yml) runs this every five minutes; it
- * needs no dependencies, only Node 22's fetch.
+ * (.github/workflows/generate-kick.yml) runs this every thirty minutes and
+ * whenever the app dispatches it (D-059); it needs no dependencies, only
+ * Node 22's fetch.
  *
  *   PROD_URL=https://<domain> CRON_SECRET=... node scripts/ops/kick-generation.mjs
  *
  * Each call runs for up to the route's own budget and answers
  * `{"more": true|false}`; the loop stops on `more: false`, on an error, or
- * when KICK_MAX_SECONDS (default 240) have passed, so one run never
- * overlaps the next schedule. Exit code 0 when the chain is idle or
+ * when KICK_MAX_SECONDS (default 240; the workflow sets 1200) have passed,
+ * so one run never overlaps the next schedule. Exit code 0 when the chain is idle or
  * drained, 1 on a refused or failed request, 2 when the variables are
  * missing. Nothing secret is printed.
  */

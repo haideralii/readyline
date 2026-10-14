@@ -18,6 +18,7 @@ import { createEmailProvider } from "@/server/email/provider";
 import { mayRunScheduledJobs } from "@/server/jobs/cron-auth";
 import type { KickedBy } from "@/server/jobs/kicked-by";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
+import { dispatchGenerateWorkflow } from "./dispatch";
 import { runGenerationTicks, type TickReport } from "./job";
 import { SupabaseJobBackend } from "./job-backend";
 import { SupabaseGenerationStore } from "./store";
@@ -131,7 +132,11 @@ export async function runGenerationAndLog(
   return { reports, more };
 }
 
-/** The webhook's hook and the nudge share this: work now, then hand on if there is more. */
+/**
+ * The webhook's hook and the nudge share this: tell GitHub Actions there is
+ * work (D-059; it carries the chain for up to twenty minutes), work now,
+ * then hand on if there is more.
+ */
 export async function continueGeneration(
   budgetMs: number,
   kickedBy: KickedBy,
@@ -142,6 +147,8 @@ export async function continueGeneration(
     return;
   }
   try {
+    // Dispatched first so the chain is carried even if this invocation is frozen (D-057).
+    await dispatchGenerateWorkflow({ reason: kickedBy });
     const { more } = await runGenerationAndLog(budgetMs, kickedBy);
     if (more) await kickGenerationRoute();
   } catch (e) {
