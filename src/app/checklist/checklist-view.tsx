@@ -450,7 +450,7 @@ function ChecklistRow({
         <fieldset className="mt-3" aria-describedby={whyId}>
           <legend className="text-sm font-medium">Status</legend>
           <div
-            className="mt-1 inline-flex overflow-hidden rounded-md border border-zinc-400 dark:border-zinc-600"
+            className="mt-1 inline-flex max-w-full overflow-hidden rounded-md border border-zinc-400 dark:border-zinc-600"
             role="radiogroup"
             aria-label={`Status for ${item.title}`}
           >
@@ -461,7 +461,7 @@ function ChecklistRow({
                 <label
                   key={s}
                   htmlFor={id}
-                  className={`relative inline-flex min-h-11 min-w-16 cursor-pointer items-center justify-center px-3 text-sm whitespace-nowrap ${
+                  className={`relative inline-flex min-h-11 min-w-16 cursor-pointer items-center justify-center px-3 text-sm ${
                     i > 0 ? "border-l border-zinc-400 dark:border-zinc-600" : ""
                   } ${checked ? "bg-ink text-paper" : "hover:bg-mist"} has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2`}
                 >
