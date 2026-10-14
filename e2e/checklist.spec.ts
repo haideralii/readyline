@@ -45,7 +45,9 @@ test.describe("readiness checklist, signed out (REQ-006 FR-5)", () => {
   }) => {
     await fillToResult(page);
     const teaser = page.getByTestId("checklist-teaser");
-    await expect(teaser).toContainText(/Your checklist has \d+ items/);
+    // REQ-013 batch 36 item 3: the link says what it opens; no separate count line.
+    await expect(teaser).toContainText(/Open your checklist \(\d+ things\)/);
+    await expect(teaser).not.toContainText("Your checklist has");
     await expect(page.getByTestId("checklist-sign-in")).toHaveAttribute(
       "href",
       "/sign-in?next=%2Fchecklist",
