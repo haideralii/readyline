@@ -383,14 +383,8 @@ function ChecklistRow({
         className="flex min-h-12 w-full items-center justify-between gap-3 rounded-md py-2 text-left"
         data-testid={`checklist-row-${b}`}
       >
-        <span className="min-w-0 text-base font-medium">
-          {item.title}
-          {item.unverified ? (
-            <span className="ml-2 rounded-full border border-amber-700 px-2 py-0.5 text-xs font-medium text-amber-800 dark:border-amber-400 dark:text-amber-300">
-              Not confirmed by the Commission&apos;s text
-            </span>
-          ) : null}
-        </span>
+        {/* REQ-013 batch 36 item 2: the evidence-confidence flag is for the admin view, never the customer. */}
+        <span className="min-w-0 text-base font-medium">{item.title}</span>
         <span className="flex shrink-0 items-center gap-2">
           <StatusTag status={status} />
           <span aria-hidden="true" className="text-zinc-500">
@@ -421,6 +415,15 @@ function ChecklistRow({
             </a>
           )}
         </p>
+        {item.unverified ? (
+          <p
+            className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+            data-testid={`checklist-check-${b}`}
+          >
+            Check this against the Commission&apos;s page before you rely on it;
+            the link above is the place to look.
+          </p>
+        ) : null}
         {action ? (
           <p className="mt-2">
             <Link

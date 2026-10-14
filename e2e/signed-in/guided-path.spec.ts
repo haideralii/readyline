@@ -255,7 +255,12 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
     await page.getByTestId("set-list").getByRole("link").first().click();
-    await expect(page.getByText("Jane Citizen").first()).toBeVisible();
+    // The control table renders twice (batch 36's data table: cards on a
+    // phone, a table from sm up) and the hidden copy comes first in the DOM,
+    // so the assertion takes the copy this viewport shows.
+    await expect(
+      page.getByText("Jane Citizen").filter({ visible: true }).first(),
+    ).toBeVisible();
 
     // Step 5: adopt, one group per screen.
     await page.goto("/documents");
