@@ -1,0 +1,33 @@
+{
+  "kind": "register-review",
+  "today": "2026-10-13",
+  "note": "A corporate risk row with a review date in 14 days: the 14-day reminder fires today.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "reviewRows": [
+      {
+        "id": "cr1",
+        "table": "corporate_risks",
+        "review_on": "2026-10-27"
+      }
+    ]
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "register-review",
+      "subject_table": "corporate_risks",
+      "subject_id": "cr1",
+      "due_on": "2026-10-27",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

@@ -58,11 +58,13 @@ async function expectStep(page: Page, id: string, timeout?: number) {
 
 test.describe("the guided path, result to audit day (REQ-017)", () => {
   test.skip(!enabled, "needs the Supabase variables");
-  // One journey, serial, with no retry (batch 45b item 2): a red costs one
-  // run, and every slow step has its own wait below, so a stall is reported
-  // at the step that stalled rather than at the end of the budget. The
-  // budget fits the whole journey on a shared runner: the generation wait,
-  // the finish re-render of the whole set, and adopt.
+  // One journey, serial, with no retry (batch 45b item 2, replacing backlog
+  // 4's one CI retry for the webhook race, which the fake Checkout's full
+  // page return has closed): a red costs one run, and every slow step has
+  // its own wait below, so a stall is reported at the step that stalled
+  // rather than at the end of the budget. The budget fits the whole journey
+  // on a shared runner: the generation wait, the finish re-render of the
+  // whole set, and adopt.
   test.describe.configure({ mode: "serial", timeout: 480_000, retries: 0 });
 
   let tenant: TestTenant;

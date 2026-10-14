@@ -1,0 +1,35 @@
+{
+  "kind": "incident-open",
+  "today": "2026-10-13",
+  "note": "An incident open with no event for 30 days fires today.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [
+      {
+        "id": "inc1",
+        "status": "open",
+        "reportable": false,
+        "notify_by": null,
+        "reportable_notified_on": null,
+        "last_activity_on": "2026-09-13"
+      }
+    ],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "incident-open",
+      "subject_table": "incidents",
+      "subject_id": "inc1",
+      "due_on": "2026-10-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

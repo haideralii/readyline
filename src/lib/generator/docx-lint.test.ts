@@ -174,10 +174,13 @@ const OWNER_FACTS = {
   date: "14 October 2026",
 };
 const MAX_BLANK_SECTION_SHARE = 0.1;
+/** Backlog 4: the sole-trader pack is the full 16-document pack (15 documents and the self-assessment); the CI step names it, so the count is pinned here. */
+const SOLE_TRADER_PACK_SIZE = 16;
 
 describe("the sole-trader set replayed through the recorded fixtures (FR-0c)", () => {
   it("ships with zero undrafted sections, passes the lint, and with the owner's name has fact blanks in under 10 percent of sections (D-541)", async () => {
     const c = cases.find((x) => x.id === "verification-sole-trader")!;
+    expect(modelsFor(c.id)).toHaveLength(SOLE_TRADER_PACK_SIZE);
     const facts = buildProviderFacts(c.answers, c.result);
     const client = new ReplayClient();
     let sections = 0;

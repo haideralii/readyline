@@ -12,7 +12,12 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
+  // Backlog 4 flake triage: no blanket retries. A spec earns a retry only
+  // where it documents a real race it cannot wait out (the signed-in specs
+  // that depend on the Stripe webhook and the job route landing in order);
+  // every WebKit race found so far is handled in the test (gotoSettled,
+  // the tap and fill retries, endOfPage), so a red run means a real defect.
+  retries: 0,
   workers: isCI ? 1 : undefined,
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {

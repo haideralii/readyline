@@ -1,0 +1,32 @@
+{
+  "kind": "insurance-expiry",
+  "today": "2026-10-13",
+  "note": "An insurance policy expiring in 30 days: the 30-day reminder fires today.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "insuranceItems": [
+      {
+        "id": "ins1",
+        "expires_on": "2026-11-12"
+      }
+    ]
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "insurance-expiry",
+      "subject_table": "insurance_items",
+      "subject_id": "ins1",
+      "due_on": "2026-11-12",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

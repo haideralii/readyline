@@ -46,6 +46,23 @@ jobs:
 
       - run: npm test
 
+      - name: Document standard lint over the full 16-document sole-trader pack, replayed from the fixtures (REQ-016 FR-1; backlog 4)
+        run: |
+          mkdir -p out
+          npx vitest run src/lib/generator/docx-lint.test.ts
+          cat out/docx-lint-report.txt
+        env:
+          DOCX_REPORT: "1"
+
+      - name: Upload the docx lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docx-lint-report
+          path: out/docx-lint-report.txt
+          retention-days: 14
+          if-no-files-found: ignore
+
       - run: npm run build
       - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
         run: node scripts/ci/check-client-bundle.mjs

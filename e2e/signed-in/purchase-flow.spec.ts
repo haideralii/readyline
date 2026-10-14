@@ -42,7 +42,16 @@ async function shot(page: Page, name: string, project: string) {
 
 test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
   test.skip(!enabled, "needs the Supabase variables");
-  test.describe.configure({ mode: "serial", timeout: 240_000 });
+  // Backlog 4: one retry in CI for a documented race only. The signed
+  // checkout.session.completed event reaches the real webhook and the job
+  // route is driven after it; on the CI runner the webhook's after() hook
+  // and the job can land in either order, which no wait in the test can
+  // settle. A second failure is a defect.
+  test.describe.configure({
+    mode: "serial",
+    timeout: 240_000,
+    retries: process.env.CI ? 1 : 0,
+  });
 
   let tenant: TestTenant;
   let checkoutUrl = "";

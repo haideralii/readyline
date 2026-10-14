@@ -2056,8 +2056,6 @@ review never changes the checklist. A delete button is not in Session B:
 owners can delete through RLS, but a wrong entry is edited or closed, and
 a delete with confirm is one component away if the PO wants it.
 
-
-
 **D-1101 Guides are markdown with the legal pages' convention, not MDX
 (Dev, 2026-10-13, batch 29, branch `req-011-content` from `main` 491e6fb
 with `req-015-plain-language` merged in; REQ-011 to be written by the
@@ -2105,8 +2103,6 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
-
-
 **D-907 Register pages (Dev, 2026-10-13, batch 28, branch
 `req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
 `req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
@@ -2123,7 +2119,6 @@ redirects the add and edit routes when the subscription is not active.
 The REQ-015 branch was merged in because the pages are built on its
 patterns (ConfirmButton, the width check, the iPhone project), so the
 Session B pull request lands after REQ-015's.
-
 
 **D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
 batch 30, branch `req-009-session-c` from `req-011-content` with
@@ -2193,9 +2188,6 @@ it, and a Stripe id being opaque text the length is no concern; the
 customer id stays a hash. The spec waits a minute for the portal's
 first control before pressing it, so a missing control fails there and
 not at the test's cap.
-
-
-
 
 **D-1507 The text corruption on `main` came from Dev's conflict-resolution
 scripts (Dev, 2026-10-13, batch 31 item 0).** Windows PowerShell 5.1 reads
@@ -2296,7 +2288,6 @@ budget no longer blocks a merge while the cause is read from the runner.
 green: remove the two `continue-on-error` lines and the "advisory" words
 in the names. The budget itself (D-1012) is unchanged.
 
-
 **D-1508 The accessibility pass is a page check and a keyboard walk, run
 on all three projects (Dev, 2026-10-14, standing backlog 1, REQ-015
 Section E).** `e2e/helpers/a11y.ts` holds the one page pass every page
@@ -2371,7 +2362,6 @@ least one runner minute, so `*/5` is about 8,600 minutes a month against
 the 2,000 free for a private repository; the schedule runs only from
 `main`, so nothing is spent until the PO merges and chooses (public
 repository, `*/30`, or the overage).
-
 
 **D-540 Why every section of Haider's AI procedure shipped undrafted, and
 what the log can and cannot say (Dev, 2026-10-14, batch 33 item 1, REQ-016
@@ -2451,9 +2441,6 @@ that hold them); the sole-trader set is 16 documents, not the 22 the REQ
 guessed. Adoption (checklist Done) makes the download serve the document
 without the draft footer and the section marks, rendered from the stored
 model; the zip keeps the draft files.
-
-
-
 
 **D-1701 One sentence and one button, from a state table (Dev, 2026-10-14,
 batch 34, REQ-017 FR-1).** `src/lib/path/next-step.ts` is a pure function
@@ -2540,12 +2527,7 @@ no REQ-011 file in `product/requirements` (the backlog row lists it as
 draft), so the delivery evidence is in the batch status. Publishing is the
 PO's.
 
-
-
 **D-1706 Adopting a pack writes the policy review rows with the admin client (Dev, 2026-10-15, batch 45b item 2, run 38575465593).** The signed-in guided-path journey was red at Adopt on every project: after "These are our policies" the group never read as adopted. Cause: `policy_reviews_insert_subscribed` and `policy_reviews_update_subscribed` (migration `20261013000000_registers.sql`) require `has_active_subscription`, written for the register page, which is locked to subscribers; but REQ-017's Adopt step and REQ-009 FR-7's checklist tick record adoption in the same table for a provider who has bought the pack and not subscribed, and under the owner's session the seed failed on RLS (logged, not thrown) and the dated update matched no row. Decision: `adoptGroupAction` and `saveChecklistItemAction` pass the admin client to `seedPolicyReviews` and `markAdopted` after the set and the item are proven to be the account's, the way the adopt re-render already uses it; the register's own pages and actions keep the owner's session and its policies, so a subscriber's register writes are unchanged and a non-subscriber still cannot write through the register. Not chosen: loosening the policies to members, because the register's write gate is the subscription's product boundary (REQ-009) and the two adoption writes are the only ones a pack buyer makes. Also from the same run: the adopt button is disabled until hydration (the account form's guard, 147ccad), and the spec waits to leave the group it is on rather than for the button to vanish, since on success the next group's page carries its own button.
-
-
-
 
 **D-1008 The integration suite aliases Next's `server-only` guard (Dev,
 2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
@@ -2559,9 +2541,6 @@ project now resolves it to an empty module for every file
 of what that suite is: server code driven against a real database. Proven
 locally by loading every integration file without Supabase variables (they
 skip, and no longer throw); CI's job proves the rows.
-
-
-
 
 **D-1310 Haider's phone findings (Dev, 2026-10-14, batch 36, REQ-013).**
 (1) Tables: the global `td { overflow-wrap: anywhere }` from REQ-015 was
@@ -2589,9 +2568,6 @@ account page's register line keeps the two-segment component with its own
 noun. The live result page still shows the AI documents until REQ-016
 merges (item 4, nothing to do).
 
-
-
-
 **D-1009 The reminders job takes a test-only account filter (Dev,
 2026-10-14, batch 41).** With the guard aliased, PR #28's Supabase job ran
 the reminders test for real and `first.inserted` came back 9 against the
@@ -2603,125 +2579,6 @@ passes its own account on both runs and keeps the exact figures, reads the
 row count back from the table for that account, and checks the outbox for
 that owner did not grow on the second run. The subscription-ledger test
 already measured against a baseline and needed nothing.
-
-**D-1901 The audit-day registers follow the REQ-009 shape, one migration
-(Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
-SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
-`corporate_risks` (nine fixed areas, likelihood, controls, owner role,
-review date, a `starter` flag), `participant_risks` (participant code
-only, plus the support plan review date for FR-10), `conflicts_of_interest`
-(W-, KP-, P-, FAM- or OTH- codes), `delegations` (six fixed roles plus
-other, holder and backup as W- or KP- codes), `insurance_items` (insurances
-and vehicles as dates and labels, never a certificate, SR-3),
-`improvements` (source kind and reference such as INC-0003, learned,
-changed, owner role, due and done), `decisions` (append only: a decision is
-not rewritten), `staff_matrix` (one row per worker code; training and
-clearance expiries come from `worker_clearances` by the same code, which
-gained `manual-handling` and `medication` kinds), `onboarding_checklists`
-with append-only `onboarding_ticks` (item id, date, who ticked). Members
-read; members with an unrevoked subscription insert and update; owners
-delete; every free-text column is capped and refuses an NDIS-number shape;
-explicit grants per D-052; status views compute review, expiry,
-supervision (31 days) and appraisal (365 days) states at read time.
-`tests/integration/audit-day-rls.test.ts` proves the tenancy, the 42501
-refusals, the CHECKs and the views on the stack; no Postgres runs on the
-Dev machine, so CI's Supabase job is the proof.
-
-**D-1902 One shared append-only event table for the new registers (Dev,
-2026-10-14, batch 39 Session A).** `register_events` (register name, row
-id, kind, note) replaces one trail table per register: the same policy
-shape, update revoked so an edit fails with 42501 (D-906), and the pages
-read a row's trail by (register, row id). The REQ-009 trails stay as they
-are.
-
-**D-1903 Starter rows for the corporate risk register come from the
-questionnaire (Dev, 2026-10-14, batch 39 Session A, FR-1).**
-`starterCorporateRisks(answers, result, today)` gives one row per area in
-plain words that follow the answers (the states by name, the structure and
-worker count, the pathway for the mid-term audit line, restrictive
-practices in the compliance line), owner role from the structure, review
-date six months out, all marked `starter`; the unit test runs the copy and
-claims lints over every sentence of the three reference cases. Session B
-seeds them on the register's first open and shows "check this and change
-it" until a row is edited.
-
-**D-1904 One form, one list page and one detail page serve all nine
-audit-day registers from data (Dev, 2026-10-14, batch 39 Session B,
-REQ-018 FR-1 to FR-9, AC-1, AC-2).** `src/lib/registers/audit-day-forms.ts`
-holds, per register, the zod schema (keys are the column names), the field
-specs the generic form renders with the REQ-009 inputs, the words (title,
-intro, add label, empty state) and three small functions for the list
-(title, detail, status tag); the route files are one line each and the
-page builders in `audit-day-pages.tsx` do the rest. `saveAuditDayRowAction`
-validates with the register's schema, writes with the caller's session
-(RLS and the subscription gate), adds a `register_events` line (D-1902),
-and marks an edited starter row as the provider's own; `markReviewedAction`
-is the one-tap "Reviewed today, next review on" for the three registers
-with a review date; decisions have no edit path (append only, the page
-says to add a new one). The corporate risk register seeds its nine starter
-rows on first open when the questionnaire is answered (FR-1). A closed
-incident or a resolved complaint shows one tap to the improvement form
-with the source kind and reference pre-filled through the query string
-(FR-6, AC-2; the new page accepts only field names the register knows). The
-onboarding checklists (FR-9) are two fixed item lists in the instruction
-voice; a tick records the date and who ticked it and cannot be undone by a
-member; when every item is ticked the checklist completes and a worker's
-staff-matrix row takes the onboarding date. The registers index lists the
-nine with their counts and attention words. `audit-day-forms.test.ts` runs
-the copy and claims lints over every title, intro, label, help, option and
-onboarding line, checks fields match schema keys, and exercises the code
-and NDIS-number refusals; `e2e/signed-in/audit-day-registers.spec.ts` walks
-the starter rows, the forms, the ticks, the one-tap improvement and the
-index on the three projects with the width check and axe (AC-1), in CI's
-Supabase job. Not done: FR-11 to FR-14 and the reminders are Session C.
-
-**D-1905 Six reminder kinds for the audit-day registers, pure rules in the
-same module (Dev, 2026-10-14, batch 39 Session C, REQ-018 FR-5, FR-8,
-FR-10, AC-3).** `insurance-expiry` 30 and 7 days before and on the day;
-`supervision-due` 31 days after the last supervision; `appraisal-due` 365
-days after the last appraisal with a 30-day warning (a worker with no date
-gets no reminder: the staff matrix shows the gap instead); `support-plan-
-review` 30 and 7 days before and on the day; `register-review` 14 days
-before and on the day for every corporate risk, participant risk and
-conflict row; `emergency-drill` six months after the last drill, recorded
-on the audit-day page in `accounts.last_emergency_drill_on`, with a 14-day
-warning. The reminders table's kind and subject CHECKs take the new
-values; the job reads the five tables and names a reminder by the row's
-code, label or area, never its content (SR-4). `reminders-audit-day.test.ts`
-pins every rule with fixed dates and `reminders-job.test.ts` seeds one row
-per new kind on the stack (AC-3).
-
-**D-1906 The document control register is derived from the pack, with the
-Adopt step's circulation tick as its last column (Dev, 2026-10-14, batch
-39 Session C, REQ-018 FR-13, FR-14, AC-5).** No table of its own:
-`documentControlRows` folds the newest ready set's documents, the policy
-reviews (adopted on, next review from the database's generated column or
-adoption plus the cycle), the owner's role from the account facts (D-1704)
-and the `policy_circulations` rows (append only, worker codes only, written
-by any member from the Adopt step, which every pack buyer walks). A
-circulation counts for a document only when it is on or after the day of
-the document's current version, so a re-generated document shows "not
-yet" until it is walked through again. The register is first on the
-registers page, has its own read-only page with the gaps and the tap to
-the Adopt step, and is the first page of the readiness summary when the
-set is re-rendered at Finish or Adopt; the first generation's summary has
-no page because nothing is adopted yet. The Adopt step asks "Who did you
-walk these through?" (codes, optional) and the date.
-
-**D-1907 "What the auditor will ask to see" is twelve records with live
-states, and the audit kinds are content (Dev, 2026-10-14, batch 39 Session
-C, REQ-018 FR-11, AC-4).** The list is section B of the auditor research:
-document control, decisions, corporate risks, participant risks, conflicts
-of interest, delegations, insurances and vehicles, improvements, staff
-matrix, onboarding checklists, incidents, complaints; each line carries
-filled, missing or overdue from the register's counts and one tap (add,
-open or fix). The five audit kinds (provisional, first with participants,
-mid-term, renewal, conditional) live in
-`data/readyline-content/audit-kinds.json` as PO-owned draft content, shown
-on the audit-day page as the plain-words glossary; there is no separate
-glossary page in the product, so the audit-day page is where the REQ's
-"glossary" lives. The pricing page gains FR-12's sentence beside the
-subscription.
 
 **D-1010 The app dispatches the kicker workflow; the schedule is the safety
 net (Dev, 2026-10-14, batch 37, implementing the PO's D-059).** The
@@ -2983,9 +2840,124 @@ rendering so document control is filled as a customer's account would
 fill it. Findings 16, 2, 8, 10 and 12 wait for the recording session and
 are listed in the recording order in `fixtures/generation/README.md`.
 
+**D-1901 The audit-day registers follow the REQ-009 shape, one migration
+(Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
+SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
+`corporate_risks` (nine fixed areas, likelihood, controls, owner role,
+review date, a `starter` flag), `participant_risks` (participant code
+only, plus the support plan review date for FR-10), `conflicts_of_interest`
+(W-, KP-, P-, FAM- or OTH- codes), `delegations` (six fixed roles plus
+other, holder and backup as W- or KP- codes), `insurance_items` (insurances
+and vehicles as dates and labels, never a certificate, SR-3),
+`improvements` (source kind and reference such as INC-0003, learned,
+changed, owner role, due and done), `decisions` (append only: a decision is
+not rewritten), `staff_matrix` (one row per worker code; training and
+clearance expiries come from `worker_clearances` by the same code, which
+gained `manual-handling` and `medication` kinds), `onboarding_checklists`
+with append-only `onboarding_ticks` (item id, date, who ticked). Members
+read; members with an unrevoked subscription insert and update; owners
+delete; every free-text column is capped and refuses an NDIS-number shape;
+explicit grants per D-052; status views compute review, expiry,
+supervision (31 days) and appraisal (365 days) states at read time.
+`tests/integration/audit-day-rls.test.ts` proves the tenancy, the 42501
+refusals, the CHECKs and the views on the stack; no Postgres runs on the
+Dev machine, so CI's Supabase job is the proof.
 
+**D-1902 One shared append-only event table for the new registers (Dev,
+2026-10-14, batch 39 Session A).** `register_events` (register name, row
+id, kind, note) replaces one trail table per register: the same policy
+shape, update revoked so an edit fails with 42501 (D-906), and the pages
+read a row's trail by (register, row id). The REQ-009 trails stay as they
+are.
 
+**D-1903 Starter rows for the corporate risk register come from the
+questionnaire (Dev, 2026-10-14, batch 39 Session A, FR-1).**
+`starterCorporateRisks(answers, result, today)` gives one row per area in
+plain words that follow the answers (the states by name, the structure and
+worker count, the pathway for the mid-term audit line, restrictive
+practices in the compliance line), owner role from the structure, review
+date six months out, all marked `starter`; the unit test runs the copy and
+claims lints over every sentence of the three reference cases. Session B
+seeds them on the register's first open and shows "check this and change
+it" until a row is edited.
 
+**D-1904 One form, one list page and one detail page serve all nine
+audit-day registers from data (Dev, 2026-10-14, batch 39 Session B,
+REQ-018 FR-1 to FR-9, AC-1, AC-2).** `src/lib/registers/audit-day-forms.ts`
+holds, per register, the zod schema (keys are the column names), the field
+specs the generic form renders with the REQ-009 inputs, the words (title,
+intro, add label, empty state) and three small functions for the list
+(title, detail, status tag); the route files are one line each and the
+page builders in `audit-day-pages.tsx` do the rest. `saveAuditDayRowAction`
+validates with the register's schema, writes with the caller's session
+(RLS and the subscription gate), adds a `register_events` line (D-1902),
+and marks an edited starter row as the provider's own; `markReviewedAction`
+is the one-tap "Reviewed today, next review on" for the three registers
+with a review date; decisions have no edit path (append only, the page
+says to add a new one). The corporate risk register seeds its nine starter
+rows on first open when the questionnaire is answered (FR-1). A closed
+incident or a resolved complaint shows one tap to the improvement form
+with the source kind and reference pre-filled through the query string
+(FR-6, AC-2; the new page accepts only field names the register knows). The
+onboarding checklists (FR-9) are two fixed item lists in the instruction
+voice; a tick records the date and who ticked it and cannot be undone by a
+member; when every item is ticked the checklist completes and a worker's
+staff-matrix row takes the onboarding date. The registers index lists the
+nine with their counts and attention words. `audit-day-forms.test.ts` runs
+the copy and claims lints over every title, intro, label, help, option and
+onboarding line, checks fields match schema keys, and exercises the code
+and NDIS-number refusals; `e2e/signed-in/audit-day-registers.spec.ts` walks
+the starter rows, the forms, the ticks, the one-tap improvement and the
+index on the three projects with the width check and axe (AC-1), in CI's
+Supabase job. Not done: FR-11 to FR-14 and the reminders are Session C.
+
+**D-1905 Six reminder kinds for the audit-day registers, pure rules in the
+same module (Dev, 2026-10-14, batch 39 Session C, REQ-018 FR-5, FR-8,
+FR-10, AC-3).** `insurance-expiry` 30 and 7 days before and on the day;
+`supervision-due` 31 days after the last supervision; `appraisal-due` 365
+days after the last appraisal with a 30-day warning (a worker with no date
+gets no reminder: the staff matrix shows the gap instead); `support-plan-
+review` 30 and 7 days before and on the day; `register-review` 14 days
+before and on the day for every corporate risk, participant risk and
+conflict row; `emergency-drill` six months after the last drill, recorded
+on the audit-day page in `accounts.last_emergency_drill_on`, with a 14-day
+warning. The reminders table's kind and subject CHECKs take the new
+values; the job reads the five tables and names a reminder by the row's
+code, label or area, never its content (SR-4). `reminders-audit-day.test.ts`
+pins every rule with fixed dates and `reminders-job.test.ts` seeds one row
+per new kind on the stack (AC-3).
+
+**D-1906 The document control register is derived from the pack, with the
+Adopt step's circulation tick as its last column (Dev, 2026-10-14, batch
+39 Session C, REQ-018 FR-13, FR-14, AC-5).** No table of its own:
+`documentControlRows` folds the newest ready set's documents, the policy
+reviews (adopted on, next review from the database's generated column or
+adoption plus the cycle), the owner's role from the account facts (D-1704)
+and the `policy_circulations` rows (append only, worker codes only, written
+by any member from the Adopt step, which every pack buyer walks). A
+circulation counts for a document only when it is on or after the day of
+the document's current version, so a re-generated document shows "not
+yet" until it is walked through again. The register is first on the
+registers page, has its own read-only page with the gaps and the tap to
+the Adopt step, and is the first page of the readiness summary when the
+set is re-rendered at Finish or Adopt; the first generation's summary has
+no page because nothing is adopted yet. The Adopt step asks "Who did you
+walk these through?" (codes, optional) and the date.
+
+**D-1907 "What the auditor will ask to see" is twelve records with live
+states, and the audit kinds are content (Dev, 2026-10-14, batch 39 Session
+C, REQ-018 FR-11, AC-4).** The list is section B of the auditor research:
+document control, decisions, corporate risks, participant risks, conflicts
+of interest, delegations, insurances and vehicles, improvements, staff
+matrix, onboarding checklists, incidents, complaints; each line carries
+filled, missing or overdue from the register's counts and one tap (add,
+open or fix). The five audit kinds (provisional, first with participants,
+mid-term, renewal, conditional) live in
+`data/readyline-content/audit-kinds.json` as PO-owned draft content, shown
+on the audit-day page as the plain-words glossary; there is no separate
+glossary page in the product, so the audit-day page is where the REQ's
+"glossary" lives. The pricing page gains FR-12's sentence beside the
+subscription.
 
 ## Open questions for Haider
 
@@ -3107,3 +3079,32 @@ Items asserted in code or copy that still need a primary source.
   subscription writes freeze and reads stay, with Stripe's retry window as
   the only grace (revoke on `canceled`/`unpaid`, never on `past_due`); no
   fee, no penalty. Session A (data) may start once PR #21 is merged.
+
+**D-1908 Backlog 4: register tests on a branch that merges REQ-018 into
+the guides lineage; one fixture per reminder kind; the 16-document lint
+pinned in CI; no blanket Playwright retries (Dev, 2026-10-14, backlog 4,
+REQ-018).** The REQ-018 registers live on `req-018-audit-day-systems`,
+which is not on the lineage the standing backlog stacks on, so
+`req-018-register-tests` starts from `req-011-guides-2` with that branch
+merged in. Two code conflicts: the iPhone project's spec list is the union
+of both sides; the registers index keeps batch 42's two groups (D-549)
+and the codes panel, sorts the nine REQ-018 registers into them
+(improvements, decisions and onboarding under "as things happen"; the
+rest under "keep current") and shows the document control register first
+under a third heading, "From your pack", so FR-13's "shown first" holds
+without putting a generated register among the ones you add to. Tests:
+`tests/integration/audit-day-rls.test.ts` gains the owner-update versus
+other-tenant-update case on every editable register (zero rows, no error,
+read back with the admin key), read scope on the three append-only tables,
+and the starter rows seeded once for a fresh tenant (nine, one per area,
+all marked starter, a second seed inserts nothing);
+`fixtures/reminders/<kind>.json` holds one fixture per `REMINDER_KINDS`
+entry with fixed dates and the exact rows, checked by
+`src/lib/registers/reminder-fixtures.test.ts`; `docx-lint.test.ts` pins
+the sole-trader pack at 16 documents and the main CI job runs it by name
+with the report uploaded. Playwright: `retries: 0` everywhere; one CI retry
+only in the three signed-in specs whose race is written above the
+configure call (purchase flow, guided path, subscription). The integration
+file cannot run against the hosted project (its migrations are behind the
+branches); CI's Supabase job is the gate.
+

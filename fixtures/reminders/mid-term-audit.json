@@ -1,0 +1,26 @@
+{
+  "kind": "mid-term-audit",
+  "today": "2026-10-13",
+  "note": "Certification registered 12 months ago: the first mid-term reminder fires today, due at 18 months; the renewal reminders are two years away.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": "2025-10-13",
+      "registration_kind": "certification"
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "mid-term-audit",
+      "subject_table": "accounts",
+      "subject_id": "acc",
+      "due_on": "2027-04-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

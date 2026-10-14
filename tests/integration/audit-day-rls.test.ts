@@ -11,9 +11,24 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadReferenceCases } from "@/lib/generator/reference-cases";
+import { RISK_AREAS } from "@/lib/registers/audit-day-types";
+import { seedCorporateRisks } from "@/server/registers/audit-day-queries";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
 
 const enabled = hasSupabaseEnv();
+
+/** Backlog 4: one harmless edit per editable register, to prove the owner's update lands and another tenant's does not. */
+const EDITABLE_PATCH: Record<string, Record<string, unknown>> = {
+  corporate_risks: { controls: "Claims match the notes and the roster." },
+  participant_risks: { controls: "Two workers for every outing." },
+  conflicts_of_interest: { managed_by: "Another worker handles that plan." },
+  delegations: { backup_may: "Report to the Commission and sign claims." },
+  insurance_items: { label: "Insurer B" },
+  improvements: { changed: "Mop at the end of the visit; sign out." },
+  staff_matrix: { role_label: "team leader" },
+  onboarding_checklists: { subject_ref: "W-3" },
+};
 
 type Tenant = { userId: string; client: SupabaseClient; accountId: string };
 
@@ -61,9 +76,11 @@ describe.skipIf(!enabled)(
     let anon: SupabaseClient;
     let a: Tenant;
     let b: Tenant;
+    let c: Tenant | undefined;
+    let env: ReturnType<typeof readSupabaseAdminEnv>;
 
     beforeAll(async () => {
-      const env = readSupabaseAdminEnv();
+      env = readSupabaseAdminEnv();
       admin = createClient(env.url, env.secretKey, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
@@ -81,7 +98,7 @@ describe.skipIf(!enabled)(
     });
 
     afterAll(async () => {
-      for (const t of [a, b])
+      for (const t of [a, b, c])
         if (t?.userId)
           await admin.auth.admin.deleteUser(t.userId).catch(() => undefined);
     });
@@ -341,6 +358,108 @@ describe.skipIf(!enabled)(
         .select("worker_ref")
         .eq("account_id", a.accountId);
       expect(hidden.data ?? []).toEqual([]);
+    });
+
+    // Backlog 4: the three cases the PO asked for on every REQ-018 register.
+    it("every editable register takes the owner's update and gives another tenant's update nothing, with no error to probe", async () => {
+      for (const [table, patch] of Object.entries(EDITABLE_PATCH)) {
+        const row = await a.client
+          .from(table)
+          .select("id")
+          .eq("account_id", a.accountId)
+          .limit(1)
+          .single();
+        expect(row.error, table).toBeNull();
+        const theirs = await b.client
+          .from(table)
+          .update(patch)
+          .eq("id", row.data!.id)
+          .select("id");
+        // RLS hides the row from the other tenant: zero rows, not a refusal that confirms it exists.
+        expect(theirs.error, table).toBeNull();
+        expect(theirs.data ?? [], table).toEqual([]);
+        const mine = await a.client
+          .from(table)
+          .update(patch)
+          .eq("id", row.data!.id)
+          .select("id");
+        expect(mine.error, table).toBeNull();
+        expect(mine.data?.length, table).toBe(1);
+        const [[column, value]] = Object.entries(patch);
+        const reread = await admin
+          .from(table)
+          .select(column)
+          .eq("id", row.data!.id)
+          .single();
+        const stored = (reread.data ?? {}) as Record<string, unknown>;
+        expect(stored[column], table).toBe(value);
+      }
+    });
+
+    it("the append-only registers are read by their own tenant only; another tenant and the anonymous key see nothing", async () => {
+      for (const table of [
+        "decisions",
+        "onboarding_ticks",
+        "register_events",
+      ]) {
+        const mine = await a.client
+          .from(table)
+          .select("id")
+          .eq("account_id", a.accountId);
+        expect(mine.error, table).toBeNull();
+        expect(mine.data?.length, table).toBeGreaterThanOrEqual(1);
+        const theirs = await b.client
+          .from(table)
+          .select("id")
+          .eq("account_id", a.accountId);
+        expect(theirs.data ?? [], table).toEqual([]);
+        const none = await anon.from(table).select("id");
+        expect(none.data ?? [], table).toEqual([]);
+      }
+    });
+
+    it("the corporate risk starter rows are seeded once: nine rows, one per area, all marked starter, and a second seed inserts nothing", async () => {
+      c = await signUpTenant(admin, env.url, env.publishableKey, "c");
+      const ent = await admin
+        .from("entitlements")
+        .insert({ account_id: c.accountId, kind: "subscription" });
+      if (ent.error) throw ent.error;
+      const sole = loadReferenceCases().find(
+        (x) => x.id === "verification-sole-trader",
+      )!;
+      const first = await seedCorporateRisks(
+        c.client,
+        c.accountId,
+        sole.answers,
+        sole.result,
+        day(0),
+      );
+      expect(first).toBe(RISK_AREAS.length);
+      const second = await seedCorporateRisks(
+        c.client,
+        c.accountId,
+        sole.answers,
+        sole.result,
+        day(0),
+      );
+      expect(second).toBe(0);
+      const rows = await c.client
+        .from("corporate_risks")
+        .select("area, starter, review_on, owner_role")
+        .eq("account_id", c.accountId)
+        .order("area");
+      expect(rows.error).toBeNull();
+      expect(rows.data?.map((r) => r.area).sort()).toEqual(
+        [...RISK_AREAS].sort(),
+      );
+      expect(rows.data?.every((r) => r.starter === true)).toBe(true);
+      expect(rows.data?.every((r) => r.owner_role === "Owner")).toBe(true);
+      // Another tenant never sees the starter rows, and a lapsed account (no entitlement) cannot seed.
+      const theirs = await b.client
+        .from("corporate_risks")
+        .select("id")
+        .eq("account_id", c.accountId);
+      expect(theirs.data ?? []).toEqual([]);
     });
 
     it("the owner deletes a row; another account cannot", async () => {
