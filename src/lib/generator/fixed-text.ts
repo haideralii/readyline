@@ -16,6 +16,10 @@ import type { StandardSummary } from "./document-model";
 import type { Block } from "./section-schema";
 import { fixedExtra } from "./fixed-extras";
 import { placeholderFor } from "./placeholders";
+import {
+  canonicalRecordName,
+  itemsToPrepareBeforeAudit,
+} from "@/lib/registers/names";
 
 export type FixedContext = {
   type: DocumentTypeSpec;
@@ -117,7 +121,12 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
     case "definitions":
       return [DEFINITIONS];
     case "records-and-evidence": {
-      const titles = uniqueTitles(ctx.standards.flatMap((s) => s.evidence));
+      // Batch 42 item 2 (D-547): the dataset's evidence titles by their canonical register names.
+      const titles = uniqueTitles(
+        ctx.standards
+          .flatMap((s) => s.evidence)
+          .map((e) => ({ title: canonicalRecordName(e.title) ?? e.title })),
+      );
       if (titles.length === 0)
         // D-045: no standard for this case is not a gap to fill; say why the document is kept.
         return [
@@ -229,18 +238,14 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
         },
       ];
     case "gaps":
+      // Batch 42 item 3 (D-547): the twelve records an auditor asks for, in
+      // the order the audit-day page asks for them, from the one list.
       return [
         {
           type: "paragraph",
-          text: "The documents and registers listed below are part of our registration evidence. We mark each one as ready or still to prepare before we book the audit.",
+          text: "The records listed below are what an auditor asks to see, in the order they ask. We mark each one as ready or still to prepare before we book the audit.",
         },
-        {
-          type: "bullets",
-          items: [
-            ...ctx.documents.map((d) => d.title),
-            ...ctx.registers.map((r) => r.title),
-          ].slice(0, 12),
-        },
+        { type: "bullets", items: itemsToPrepareBeforeAudit() },
       ];
     case "standards-table": {
       // The Commission's outcome stays verbatim (CLAUDE.md 4.6); tables hold at most 20 rows (D-501).

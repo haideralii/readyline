@@ -6,6 +6,10 @@
  * house style allows ("except in the Commission's own class names").
  */
 import { findProhibitedClaims } from "@/lib/claims";
+import {
+  canonicalRecordName,
+  isCanonicalRecordName,
+} from "@/lib/registers/names";
 
 export type LintSeverity = "error" | "warn";
 export type LintFinding = {
@@ -590,18 +594,109 @@ export function lintRecordNames(
     const name = m[1].toLowerCase().replace(/\s+/g, " ").trim();
     if (/^(?:register|form|checklist|matrix|log|template)$/.test(name))
       continue;
-    // Accept any known name that the phrase ends with ("our incident register" holds "incident register").
-    const ok = [...set].some((k) => name === k || name.endsWith(` ${k}`));
-    if (ok) continue;
+    // Batch 42 item 2 (D-547): the canonical spelling only. A phrase that
+    // ends with a known name passes ("our own incident register") unless
+    // that name is a listed alias, which fails with the fix in the reason;
+    // an unknown name fails with the general rule.
+    const known = tail(name, set);
+    if (
+      known !== null &&
+      (isCanonicalRecordName(known) || canonicalRecordName(known) === null)
+    )
+      continue;
+    const fix = canonicalRecordName(known ?? name);
     findings.push({
       rule: "record-name",
       severity: "error",
       match: m[1],
       index: (m.index ?? 0) + m[0].length - m[1].length,
-      why: "name only a register, form or document that exists in this pack or in the Readyline registers, by its exact name",
+      why: fix
+        ? `write "${fix}", the name this pack and the Readyline registers use`
+        : "name only a register, form or document that exists in this pack or in the Readyline registers, by its exact name",
     });
   }
   return findings;
+}
+
+/** The longest known name a phrase ends with, or null. */
+function tail(name: string, set: ReadonlySet<string>): string | null {
+  let best: string | null = null;
+  for (const k of set)
+    if (
+      (name === k || name.endsWith(` ${k}`)) &&
+      (!best || k.length > best.length)
+    )
+      best = k;
+  return best;
+}
+
+/**
+ * Australian phone numbers as prose writes them: 10 digits starting with 0
+ * (02 9999 9999, 0412 345 678, (02) 9999 9999), +61 forms, 1800 and 1300
+ * numbers, and 13 xx xx numbers. A class code (0115), a year or an ABN
+ * without a leading 0 or 61 do not match.
+ */
+const PHONE =
+  /\(0\d\)[\s-]?\d{4}[\s-]?\d{4}\b|\b0\d(?:[\s-]?\d){8}\b|\+61[\s-]?\d(?:[\s-]?\d){8}\b|\b1[38]00[\s-]?\d{3}[\s-]?\d{3}\b|\b13[\s-]?\d{1,2}[\s-]?\d{2,3}\b/g;
+const EMAIL = /\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b/g;
+const URL =
+  /\b(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:gov\.au|com\.au|org\.au|net\.au|edu\.au|com|org|net|au|gov)(?:\/[^\s)]*)?\b/gi;
+
+type ContactKind = "phone" | "email" | "url";
+
+/** The same string, written for comparison: no spaces, brackets or dashes, no scheme, no www, no trailing slash, lower case. */
+function normaliseContact(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/[\s\-()]+/g, "")
+    .replace(/\/+$/, "");
+}
+
+/** Every phone number, email address and web address in a text, in order, without overlaps. */
+export function contactStringsIn(
+  text: string,
+): { kind: ContactKind; value: string; index: number }[] {
+  const all: { kind: ContactKind; value: string; index: number }[] = [];
+  for (const [kind, re] of [
+    ["email", EMAIL],
+    ["url", URL],
+    ["phone", PHONE],
+  ] as const)
+    for (const m of text.matchAll(new RegExp(re.source, re.flags)))
+      all.push({ kind, value: m[0], index: m.index ?? 0 });
+  all.sort((a, b) => a.index - b.index || b.value.length - a.value.length);
+  const out: typeof all = [];
+  let end = -1;
+  for (const c of all) {
+    if (c.index < end) continue;
+    out.push(c);
+    end = c.index + c.value.length;
+  }
+  return out;
+}
+
+/**
+ * Batch 42 item 1 (D-546): a tailored section may not carry a phone number,
+ * an email address or a web address unless the same string is in the pack's
+ * fixed text or the FACTS block; the Commission's details live in the fixed
+ * contact block and a recorded reply once quoted them from memory.
+ */
+export function lintContactDetails(
+  text: string,
+  allowed: readonly string[],
+): LintFinding[] {
+  const ok = new Set(allowed.map(normaliseContact));
+  return contactStringsIn(text)
+    .filter((c) => !ok.has(normaliseContact(c.value)))
+    .map((c) => ({
+      rule: "contact-details",
+      severity: "error" as const,
+      match: c.value,
+      index: c.index,
+      why: `a ${c.kind === "url" ? "web address" : c.kind === "email" ? "email address" : "phone number"} the pack does not supply; refer to the fixed section "How to contact the Commission" by its heading, or leave a [phone or email] blank for the provider's own`,
+    }));
 }
 
 export function lintReviewCycles(

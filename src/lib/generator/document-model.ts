@@ -71,6 +71,10 @@ const UNNUMBERED = new Set([
   "change-log",
   // Batch 40 (D-545): the incident escalation table, added after the recordings.
   "escalation-pathway",
+  // Batch 42 (D-546, D-548): the Commission's contact block and the
+  // restrictive practice position, both fixed and added after the recordings.
+  "commission-contact",
+  "restrictive-practice-position",
 ]);
 
 /** Section numbers as the rendered document shows them (front and back matter unnumbered). */

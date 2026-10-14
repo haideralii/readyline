@@ -404,6 +404,36 @@
       ]
     },
     {
+      "id": "commission-contact",
+      "number": "",
+      "heading": "How to contact the Commission",
+      "mode": "fixed",
+      "status": "fixed",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Anyone can contact the NDIS Quality and Safeguards Commission directly, at any time, without telling us first."
+        },
+        {
+          "type": "table",
+          "columns": ["How", "Detail"],
+          "rows": [
+            [
+              "Phone",
+              "1800 035 544, Monday to Friday, 9 am to 5 pm (Western Australia 7:30 am to 3:30 pm), closed on public holidays"
+            ],
+            ["TTY", "133 677"],
+            [
+              "National Relay Service",
+              "Call the relay service and ask for 1800 035 544"
+            ],
+            ["Email", "contactcentre@ndiscommission.gov.au"],
+            ["Website", "ndiscommission.gov.au"]
+          ]
+        }
+      ]
+    },
+    {
       "id": "register",
       "number": "8",
       "heading": "Complaints register",

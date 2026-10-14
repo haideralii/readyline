@@ -927,6 +927,17 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
           "paragraph",
           "table",
         ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
         "heading": "Complaints register",
         "id": "register",
         "mode": "fixed",
@@ -1087,6 +1098,17 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "mode": "tailored",
         "number": "8",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -1847,6 +1869,20 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "mode": "tailored",
         "number": "7",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "paragraph",
+          "paragraph",
+          "steps",
+          "paragraph",
+        ],
+        "heading": "Our position on restrictive practices",
+        "id": "restrictive-practice-position",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -4102,6 +4138,17 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
           "paragraph",
           "table",
         ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
         "heading": "Complaints register",
         "id": "register",
         "mode": "fixed",
@@ -4262,6 +4309,17 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "mode": "tailored",
         "number": "8",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -5022,6 +5080,20 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "mode": "tailored",
         "number": "7",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "paragraph",
+          "paragraph",
+          "steps",
+          "paragraph",
+        ],
+        "heading": "Our position on restrictive practices",
+        "id": "restrictive-practice-position",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -7118,6 +7190,17 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
           "paragraph",
           "table",
         ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
         "heading": "Complaints register",
         "id": "register",
         "mode": "fixed",
@@ -7278,6 +7361,17 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "mode": "tailored",
         "number": "8",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+        ],
+        "heading": "How to contact the Commission",
+        "id": "commission-contact",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -8037,6 +8131,20 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "mode": "tailored",
         "number": "7",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "paragraph",
+          "paragraph",
+          "steps",
+          "paragraph",
+        ],
+        "heading": "Our position on restrictive practices",
+        "id": "restrictive-practice-position",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [

@@ -2740,6 +2740,84 @@ roles, and the support planning steps on a case that has it), plus the 60
 recordings the version 2 lints flag, at about one call each at the
 current model price; no recording without the PO's go-ahead.
 
+**D-546 The Commission's contact details are fixed text, and a tailored
+section may not carry a contact detail the pack did not supply (Dev,
+2026-10-14, batch 42 item 1, finding 9).** A new fixed extra section, "How
+to contact the Commission", holds the phone (1800 035 544, Monday to
+Friday 9 am to 5 pm, Western Australia 7:30 am to 3:30 pm, closed on
+public holidays), TTY 133 677, the National Relay Service, the email
+contactcentre@ndiscommission.gov.au and the website, as the PO read them
+from ndiscommission.gov.au/contact-us on 14 October 2026; the source and
+read date sit in the fixed-text comment and `COMMISSION_CONTACT_STRINGS`
+is the list the lint trusts, so the NDIS watch re-checks one place. The
+block sits in the complaints and incident documents before the register,
+unnumbered (D-542) so every recorded prompt's outline still matches. The
+new `contact-details` lint finds Australian phone numbers (10 digits from
+0, +61, 1800 and 1300, 13 xx xx), email addresses and web addresses in a
+tailored reply and rejects any whose normalised string is not in the
+Commission list, the FACTS block or the STATE FACTS block (an ABN, a
+state source URL); it is gated with the version 2 lints (live replies
+only, counted over the fixtures). The two procedure briefs now say to
+refer to the fixed section by its heading and never write a number or an
+address; both sections' fixtures were re-keyed under the new brief as in
+D-1802. The recorded complaints procedure that quoted 131 450 from memory
+is on the recording list.
+
+**D-547 One naming table for every register and record (Dev, 2026-10-14,
+batch 42 items 2 and 3, findings 6, 7, 13 and 14).**
+`src/lib/registers/names.ts` holds the canonical display name, the known
+aliases and the page of every register (REQ-009 and REQ-018) and record,
+plus the pack's form and template names. The version 2 record-name lint
+now accepts only the canonical spelling: a known alias ("clearance
+register", "risk register", "training matrix") fails with the fix in the
+reason, an unknown name fails with the general rule, and a catalogue
+document whose title ends in "register" passes by its title.
+`record-names.ts` derives its lists from the table; the fixed records
+section maps the dataset's evidence titles through the table; "Worker
+checks" stays the page title and the pack calls it the Worker checks
+register. The same file holds the twelve records an auditor asks for, in
+the audit-day order, and the self-assessment's "Items to prepare before
+the audit" is now that list verbatim (the insurances line points at the
+Insurances and vehicles register with its expiries) instead of the first
+twelve document titles. The audit-day page on this branch lists the
+checklist's register items; the REQ-018 branch's literal twelve-record
+list should read from `AUDIT_DAY_RECORDS` when the branches meet, which
+is noted for the PO's merge.
+
+**D-548 Every pack states its restrictive practice position as fixed text
+(Dev, 2026-10-14, batch 42 item 4, finding 15).** The safeguarding policy
+gains an unnumbered fixed section "Our position on restrictive
+practices": no restrictive practice outside an authorised behaviour
+support plan; the five regulated practices (seclusion, chemical,
+mechanical, physical and environmental restraint) in plain words with the
+locked door, locked cupboard and withheld item examples; a locked door or
+a held arm counts even when unintended; four emergency-use steps (keep the
+person safe and stop, tell the owner the same day and record it in the
+incident register before the end of the shift, the owner reports to the
+Commission within 5 business days or 24 hours if harmed, the owner
+reviews within 5 business days into the improvement register); the owner
+reviews the position every 12 months. The five kinds follow the NDIS
+(Restrictive Practices and Behaviour Support) Rules 2018 s 6 as the
+dataset's primer summarises them and the windows are the Incident Rules
+ss 20 and 21 already quoted in the escalation table; UNVERIFIED: the s 6
+wording itself was not re-read from legislation.gov.au in this batch, so
+the NDIS watch should confirm it.
+
+**D-549 Small fixes from the three-persona review (Dev, 2026-10-14, batch
+42 items 5 to 9, findings 1, 3, 4, 11 and 17).** The result card carries
+one line under "Your audit: …" ("That is a desk check of your documents."
+or "That is a visit, with interviews."). The registers index has two
+headings, "Keep as things happen" (incidents, complaints) and "Keep
+current" (worker checks, policy reviews), and one "How codes work" panel
+at `/registers#codes` that every reference-code hint links to; the REQ-018
+registers slot into the same two groups (improvements and decisions under
+the first, the rest under the second) when that branch merges. The review
+pack skips retired document types, so the evidence render is the 16
+documents a customer gets, and applies the sample owner facts before
+rendering so document control is filled as a customer's account would
+fill it. Findings 16, 2, 8, 10 and 12 wait for the recording session and
+are listed in the recording order in `fixtures/generation/README.md`.
+
 
 
 

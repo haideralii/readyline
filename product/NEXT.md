@@ -1200,6 +1200,8 @@ Backlog 6 (branch `req-005-recording-prep`): everything that can be done before 
 When the backlog is empty: run the full suite on every open branch, write a status, and stop.
 
 
+
+
 ## Dev status (batch 42, written 14 Oct 2026, Dev; PO triage of the three-persona review)
 
 Delivered on **`req-019-review-fixes` fde906d** (one commit from the head of `req-005-house-style-v2` 450f863 with `main` 06b03f9 merged). CI paused; `npm run check` and `npm run build` green locally (100 test files, 715 tests passed, 4 skipped). No model calls; seven fixtures re-keyed under the two changed briefs, none re-recorded. Decisions D-546 to D-549.

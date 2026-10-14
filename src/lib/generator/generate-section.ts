@@ -9,6 +9,8 @@
  * complete" marker. Nothing here touches the network directly.
  */
 import {
+  contactStringsIn,
+  lintContactDetails,
   lintCrossReferences,
   lintErrors,
   lintIndicatorRestatement,
@@ -23,6 +25,7 @@ import {
 } from "./lint";
 import type { ContextPack } from "./context-pack";
 import { genericFallbackBlocks } from "./fallback-text";
+import { COMMISSION_CONTACT_STRINGS } from "./fixed-extras";
 import { knownRecordNames } from "./record-names";
 import type { FixtureLabels, ModelClient, ModelUsage } from "./model-client";
 import { buildModelRequest, requestHash } from "./prompts";
@@ -258,10 +261,31 @@ export function validateReply(
       ...lintRecordNames(text, knownRecordNames()).map(
         (f) => `names a record that does not exist ("${f.match}"): ${f.why}`,
       ),
+      // Batch 42 item 1 (D-546): contact details come from the fixed text or the facts, never from memory.
+      ...lintContactDetails(text, allowedContactStrings(pack)).map(
+        (f) => `contact detail ("${f.match}"): ${f.why}`,
+      ),
     ];
     if (v2.length) return { ok: false, problems: v2.slice(0, 4) };
   }
   return { ok: true, section: result.data, findings, readability: score };
+}
+
+/**
+ * The contact strings a tailored section may quote (D-546): the
+ * Commission's details from the fixed contact block, and any phone, email
+ * or web address the FACTS and STATE FACTS blocks carry (an ABN, a state
+ * source URL). The pack's other fixed text holds no contact details.
+ */
+export function allowedContactStrings(pack: ContextPack): string[] {
+  const facts = [
+    JSON.stringify(pack.facts),
+    ...(pack.stateFacts ?? []).flatMap((s) => s.lines),
+  ].join("\n");
+  return [
+    ...COMMISSION_CONTACT_STRINGS,
+    ...contactStringsIn(facts).map((c) => c.value),
+  ];
 }
 
 function rejection(problems: readonly string[]): string {

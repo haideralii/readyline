@@ -278,6 +278,15 @@ function ResultView({
           Your audit: {pathwayWord}
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
+        {/* Batch 42 item 6 (D-549): what the word means, in one line under the heading. */}
+        <p
+          className="mt-1 text-sm text-zinc-700 dark:text-zinc-300"
+          data-testid="audit-kind"
+        >
+          {r.pathway === "verification"
+            ? "That is a desk check of your documents."
+            : "That is a visit, with interviews."}
+        </p>
         <ul
           className="mt-2 flex flex-wrap gap-1.5"
           aria-label="Registration groups in scope"
@@ -294,20 +303,23 @@ function ResultView({
             </li>
           ))}
         </ul>
+        {/* Batch 42 item 5 added the audit-kind line; the phone spacing below is
+            16 px tighter than the wider layout so the one button still ends
+            inside the first screen on a 681 px iPhone (REQ-015 FR-4). */}
         <p
-          className="mt-3 text-base leading-7"
+          className="mt-2 text-base leading-7 sm:mt-3"
           data-testid="pathway-description"
         >
           {r.pathway === "verification"
             ? "An auditor reads your documents at their desk. Nobody visits."
             : "An auditor visits you, talks to your workers and some participants, and reads your documents."}
         </p>
-        <p className="mt-2 text-base leading-7">
+        <p className="mt-1 text-base leading-7 sm:mt-2">
           You will need <strong>{r.documents.length} documents</strong> and{" "}
           <strong>{r.registers.length} registers</strong>.
         </p>
         {/* REQ-013 batch 36 item 3: two segments (have / still to do) and one sentence in the customer's words. */}
-        <div className="mt-3">
+        <div className="mt-2 sm:mt-3">
           <ReadyLine
             counts={readyLineCounts(readinessCounts(r))}
             sentence={readinessSentence(readinessCounts(r))}
@@ -316,7 +328,7 @@ function ResultView({
         </div>
         {/* REQ-017 step 1: one button that starts the path; the checklist and the price stay as plain links. */}
         <div data-testid="checklist-teaser">
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-3 flex flex-col gap-3 sm:mt-4 sm:flex-row sm:items-center">
             <Link
               href={
                 signedIn

@@ -5,6 +5,7 @@
  * with the hint beside it, and a free-text area that warns (never blocks)
  * when the text looks like a participant's details.
  */
+import Link from "next/link";
 import { useId, useState, type ReactNode } from "react";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { Field } from "@/app/start/_components/fields";
@@ -118,7 +119,17 @@ export function RefField({
     <Field
       id={id}
       label={optional ? `${label} (optional)` : label}
-      help={`A code like ${hint}, never a name. Keep the list of codes in your own records.`}
+      help={
+        <>
+          A code like {hint}, never a name.{" "}
+          <Link
+            href="/registers#codes"
+            className="underline underline-offset-2"
+          >
+            How codes work
+          </Link>
+        </>
+      }
       errors={errors}
     >
       {(describedBy, invalid) => (

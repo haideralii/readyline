@@ -592,7 +592,13 @@
           "id": "procedure",
           "heading": "Complaints procedure",
           "mode": "tailored",
-          "brief": "Numbered steps with our own resolution time frames as a table (acknowledge, assess, resolve, tell the complainant), each step naming the role that acts and the record it writes to; one step that says how feedback differs from a complaint and where each is recorded; how a participant can complain to the Commission; a short \"Words we use\" callout with the exact sentences a worker says when a complaint is made. Say that if the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
+          "brief": "Numbered steps with our own resolution time frames as a table (acknowledge, assess, resolve, tell the complainant), each step naming the role that acts and the record it writes to; one step that says how feedback differs from a complaint and where each is recorded; how a participant can complain to the Commission, referring to the fixed section \"How to contact the Commission\" by its heading; a short \"Words we use\" callout with the exact sentences a worker says when a complaint is made. Say that if the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). To say how anyone contacts the Commission, refer to the fixed section \"How to contact the Commission\" by its heading; never write a phone number, an email address or a web address."
+        },
+        {
+          "id": "commission-contact",
+          "heading": "How to contact the Commission",
+          "mode": "fixed",
+          "brief": "Fixed table of the Commission's phone, TTY, relay service, email and website from the Commission's contact page, read 14 October 2026; a tailored section refers to this block by its heading and never writes a number or address."
         },
         {
           "id": "register",
@@ -633,7 +639,13 @@
           "id": "procedure",
           "heading": "Incident procedure",
           "mode": "tailored",
-          "brief": "Numbered steps sized to the business, each naming the role that acts, the time frame as a number and the record it writes to; at least one \"If X happens, do Y\" step for a medical emergency and for a restrictive practice used in an emergency; a short \"Words we use\" callout with the exact open-disclosure sentences. For who tells whom and by when, refer to the fixed escalation table by its number and title in the outline. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
+          "brief": "Numbered steps sized to the business, each naming the role that acts, the time frame as a number and the record it writes to; at least one \"If X happens, do Y\" step for a medical emergency and for a restrictive practice used in an emergency; a short \"Words we use\" callout with the exact open-disclosure sentences. For who tells whom and by when, refer to the fixed escalation table by its number and title in the outline. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline). To say how anyone contacts the Commission, refer to the fixed section \"How to contact the Commission\" by its heading; never write a phone number, an email address or a web address."
+        },
+        {
+          "id": "commission-contact",
+          "heading": "How to contact the Commission",
+          "mode": "fixed",
+          "brief": "Fixed table of the Commission's phone, TTY, relay service, email and website from the Commission's contact page, read 14 October 2026; a tailored section refers to this block by its heading and never writes a number or address."
         },
         {
           "id": "register",
@@ -793,6 +805,12 @@
           "heading": "Responding to an allegation",
           "mode": "tailored",
           "brief": "Steps that link to the incident procedure and the reportable incident timeframes."
+        },
+        {
+          "id": "restrictive-practice-position",
+          "heading": "Our position on restrictive practices",
+          "mode": "fixed",
+          "brief": "Fixed text for every pack: no restrictive practice outside an authorised behaviour support plan; the five regulated practices from the Restrictive Practices and Behaviour Support Rules in plain words with the locked door and withheld item examples; the four emergency-use steps; who reviews."
         }
       ],
       "basis": "code-of-conduct",
