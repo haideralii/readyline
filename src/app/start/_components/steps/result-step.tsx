@@ -218,7 +218,7 @@ function HaveTag({ have }: { have: string }) {
   const t = HAVE_TAG[have] ?? HAVE_TAG.unknown;
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${t.tone}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
     >
       <span aria-hidden="true">{t.icon}</span>
       {t.label}
