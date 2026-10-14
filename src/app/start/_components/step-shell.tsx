@@ -27,10 +27,14 @@ export function StepShell({
     (id, i) => i < index && ready && canOpenStep(id, answers),
   );
 
-  // AC-11: focus moves to the step heading on every step change.
+  // AC-11: focus moves to the step heading on every step change, and on a
+  // first load only once the draft has loaded and the form is live (batch
+  // 45b item 4): a heading focused while the form was still disabled told a
+  // keyboard user the step was ready when a Tab would have skipped every
+  // field and landed in the footer.
   useEffect(() => {
-    headingRef.current?.focus();
-  }, [step]);
+    if (ready) headingRef.current?.focus();
+  }, [step, ready]);
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
