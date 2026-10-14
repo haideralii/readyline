@@ -61,9 +61,9 @@ async function auditControls(
     expect(r.name, `${r.step} ${r.id}: accessible name`).not.toBe("");
     // A state or territory's human label is its abbreviation, which is also
     // its value; every other control's label must differ from the value.
-    // (The business step is in the server HTML since batch 45b item 4, so
-    // its controls are audited too; before that the audit ran before
-    // hydration and saw none of them.)
+    // (The business step is in the server HTML since backlog 2, so its
+    // controls are audited too; before that the audit ran before hydration
+    // and saw none of them.)
     if (!r.id.startsWith("states-"))
       expect(
         r.name,

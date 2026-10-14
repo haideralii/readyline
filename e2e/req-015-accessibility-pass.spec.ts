@@ -55,6 +55,11 @@ async function stepReady(page: Page, heading: string) {
   await expect(h1)
     .toBeFocused({ timeout: 5000 })
     .catch(() => undefined);
+  // The form is in the server HTML as a disabled fieldset until the draft
+  // has loaded, and on a client-side move between steps it is its own chunk
+  // (D-1012); a Tab before either skips its fields.
+  await expect(page.locator("main form").first()).toBeVisible();
+  await expect(page.locator('fieldset[aria-busy="true"]')).toHaveCount(0);
   await resetFocusTrail(page);
 }
 

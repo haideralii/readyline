@@ -2,12 +2,12 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import {
-  BusinessStep,
+import type {
+  BusinessStructureAnswer,
   State,
-  type BusinessStructureAnswer,
 } from "@/lib/questionnaire/schema";
-import { parseInput } from "@/lib/validation";
+import { STATE_CODES } from "@/lib/questionnaire/steps";
+import { parseStep } from "@/lib/questionnaire/validate-step";
 import {
   CheckboxGroup,
   ErrorSummary,
@@ -40,7 +40,7 @@ const STRUCTURES: {
   { value: "other", label: "Other" },
 ];
 
-const STATES = State.options.map((s) => ({ value: s, label: s }));
+const STATES = STATE_CODES.map((s) => ({ value: s, label: s }));
 
 const LABELS = {
   tradingName: "Trading name",
@@ -71,7 +71,7 @@ export function BusinessStepForm() {
     saved?.states ??
       (prefilled
         ? prefilled.states.filter((s): s is State =>
-            (State.options as readonly string[]).includes(s),
+            (STATE_CODES as readonly string[]).includes(s),
           )
         : []),
   );
@@ -81,7 +81,7 @@ export function BusinessStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseInput(BusinessStep, {
+    const parsed = await parseStep("business", {
       tradingName,
       structure,
       states,

@@ -2,13 +2,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import {
-  PracticesStep,
-  resolveRestrictivePractices,
-  type NotSureHelper,
-  type YesNoUnsure,
-} from "@/lib/questionnaire/schema";
-import { parseInput } from "@/lib/validation";
+import type { NotSureHelper, YesNoUnsure } from "@/lib/questionnaire/schema";
+import { resolveRestrictivePractices } from "@/lib/questionnaire/steps";
+import { parseStep } from "@/lib/questionnaire/validate-step";
 import {
   ErrorSummary,
   RadioGroup,
@@ -96,7 +92,7 @@ export function PracticesStepForm() {
         medicationForBehaviour: helper.medicationForBehaviour === "yes",
       };
     }
-    const parsed = parseInput(PracticesStep, values);
+    const parsed = await parseStep("practices", values);
     if (!parsed.ok) {
       setErrors(parsed.fieldErrors);
       return;

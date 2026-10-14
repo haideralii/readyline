@@ -10,9 +10,9 @@ import {
   type GroupOption,
 } from "@/lib/questionnaire/groups";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import { SIL_CODE, SupportsStep } from "@/lib/questionnaire/schema";
+import { SIL_CODE } from "@/lib/questionnaire/steps";
+import { parseStep } from "@/lib/questionnaire/validate-step";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
-import { parseInput } from "@/lib/validation";
 import {
   ChoiceRow,
   ErrorSummary,
@@ -176,7 +176,7 @@ export function SupportsStepForm() {
         };
       }
     }
-    const parsed = parseInput(SupportsStep, values);
+    const parsed = await parseStep("supports", values);
     if (!parsed.ok) {
       const fieldErrors = { ...parsed.fieldErrors };
       if (silChosen && !fewHours)

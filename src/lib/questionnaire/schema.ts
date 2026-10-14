@@ -7,58 +7,41 @@
 import { z } from "zod";
 import { strictObject, text } from "@/lib/validation";
 import { isValidAbn, normaliseAbn } from "./abn";
+import {
+  ANSWERS_VERSION,
+  BUSINESS_STRUCTURES,
+  SCREENING_ANSWERS,
+  SIL_CODE,
+  STATE_CODES,
+  STEP_IDS,
+  YES_NO_UNSURE,
+  type AnswerStepId,
+} from "./steps";
 
-export const STEP_IDS = [
-  "business",
-  "supports",
-  "practices",
-  "workforce",
-  "existing",
-  "result",
-] as const;
-export type StepId = (typeof STEP_IDS)[number];
-export const ANSWER_STEP_IDS = [
-  "business",
-  "supports",
-  "practices",
-  "workforce",
-  "existing",
-] as const;
-export type AnswerStepId = (typeof ANSWER_STEP_IDS)[number];
+// The ids, option lists and small rules live in steps.ts with no schema
+// library behind them (D-1012); they are re-exported here so every existing
+// import keeps working.
+export {
+  ANSWERS_VERSION,
+  ANSWER_STEP_IDS,
+  LARGE_PROVIDER_THRESHOLD,
+  SIL_CODE,
+  STEP_IDS,
+  resolveRestrictivePractices,
+  type AnswerStepId,
+  type StepId,
+} from "./steps";
 
-export const ANSWERS_VERSION = 1 as const;
-
-export const State = z.enum([
-  "NSW",
-  "VIC",
-  "QLD",
-  "SA",
-  "WA",
-  "TAS",
-  "ACT",
-  "NT",
-]);
+export const State = z.enum(STATE_CODES);
 export type State = z.infer<typeof State>;
 
-export const BusinessStructureAnswer = z.enum([
-  "sole-trader",
-  "partnership",
-  "company",
-  "incorporated-association",
-  "trust",
-  "other",
-]);
+export const BusinessStructureAnswer = z.enum(BUSINESS_STRUCTURES);
 export type BusinessStructureAnswer = z.infer<typeof BusinessStructureAnswer>;
 
-export const YesNoUnsure = z.enum(["yes", "no", "not-sure"]);
+export const YesNoUnsure = z.enum(YES_NO_UNSURE);
 export type YesNoUnsure = z.infer<typeof YesNoUnsure>;
 
-export const ScreeningAnswer = z.enum([
-  "yes",
-  "no",
-  "not-sure",
-  "not-applicable",
-]);
+export const ScreeningAnswer = z.enum(SCREENING_ANSWERS);
 
 export const GroupCode = z
   .string()
@@ -96,8 +79,6 @@ export const SilEligibilityAnswer = strictObject({
   participantManagesOwnWorkers: z.boolean({ error: "Choose yes or no" }),
 });
 
-export const SIL_CODE = "0138";
-
 export const SupportsStep = strictObject({
   groups: z
     .array(GroupCode, { error: "Choose at least one registration group" })
@@ -133,20 +114,6 @@ export const NotSureHelper = strictObject({
   medicationForBehaviour: z.boolean({ error: "Choose yes or no" }),
 });
 export type NotSureHelper = z.infer<typeof NotSureHelper>;
-
-export function resolveRestrictivePractices(
-  answer: YesNoUnsure,
-  helper?: NotSureHelper,
-): { uses: boolean; assumed: boolean } {
-  if (answer === "yes") return { uses: true, assumed: false };
-  if (answer === "no") return { uses: false, assumed: false };
-  if (!helper) return { uses: true, assumed: true };
-  const uses =
-    helper.locksOrBarriers ||
-    helper.holdsOrRestraint ||
-    helper.medicationForBehaviour;
-  return { uses, assumed: uses };
-}
 
 export const PracticesStep = strictObject({
   restrictivePractices: z.enum(YesNoUnsure.options, {
@@ -261,6 +228,3 @@ export const STEP_FIELDS: Record<AnswerStepId, readonly string[]> = {
     "workerInductionRecords",
   ],
 };
-
-/** Above this many workers the result shows a positioning note (PO review item 1). */
-export const LARGE_PROVIDER_THRESHOLD = 25;

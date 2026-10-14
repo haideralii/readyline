@@ -9,7 +9,7 @@ import {
   stepHref,
   stepIndex,
 } from "@/lib/questionnaire/navigation";
-import { STEP_IDS, type StepId } from "@/lib/questionnaire/schema";
+import { STEP_IDS, type StepId } from "@/lib/questionnaire/steps";
 import { useQuestionnaire } from "./questionnaire-provider";
 
 export function StepShell({

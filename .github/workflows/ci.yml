@@ -66,6 +66,46 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  # Batch 45a (D-1013): the Lighthouse budget runs in its own job and does
+  # not block a merge until it has gone green on the runner; the step prints
+  # Lighthouse's own error when it fails. Flip `continue-on-error` back to
+  # false by 21 October 2026 (one week), or sooner once a run is green.
+  performance-budget:
+    name: Performance budgets, mobile profile, public pages (REQ-010, D-1012; advisory until green, D-1013)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Install Playwright Chromium (the Chrome Lighthouse drives)
+        run: npx playwright install --with-deps chromium
+
+      - name: Lighthouse, four public pages, median of three
+        run: npm run perf:budget
+        env:
+          LIGHTHOUSE_BUDGET: "1"
+          LIGHTHOUSE_RUNS: "3"
+          LIGHTHOUSE_PAGES: "/,/pricing,/start,/start/business"
+
+      - name: Upload the Lighthouse budget report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-budget
+          path: out/lighthouse-budget.txt
+          if-no-files-found: ignore
+          retention-days: 14
+
   secrets:
     name: Secret scan (gitleaks, REQ-002 AC-2)
     runs-on: ubuntu-latest
@@ -126,6 +166,23 @@ jobs:
 
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
+
+      - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012; advisory until green, D-1013)
+        continue-on-error: true
+        run: npm run perf:budget
+        env:
+          LIGHTHOUSE_BUDGET: "1"
+          LIGHTHOUSE_RUNS: "3"
+          LIGHTHOUSE_PAGES: "/documents"
+
+      - name: Upload the signed-in Lighthouse budget report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-budget-signed-in
+          path: out/lighthouse-budget.txt
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Signed-in end-to-end specs against the local stack (three projects)
         run: npx playwright test e2e/signed-in

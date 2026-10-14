@@ -4,6 +4,7 @@ import "server-only";
  * Pages call these to decide whether to render, redirect or prefill.
  */
 import type { User } from "@supabase/supabase-js";
+import { cache } from "react";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -18,8 +19,13 @@ export type DeletedAccount = {
   deleted_at: string;
 };
 
-/** The signed-in user, or null (also null when Supabase is not configured, so public pages keep working). */
-export async function getSessionUser(): Promise<User | null> {
+/**
+ * The signed-in user, or null (also null when Supabase is not configured, so
+ * public pages keep working). Backlog 2 (D-1012): read once per request;
+ * the header, the next-step strip and the page each ask, and each ask was
+ * a round trip to the auth server.
+ */
+export const getSessionUser = cache(async (): Promise<User | null> => {
   try {
     const supabase = await createSupabaseServerClient();
     const { data } = await supabase.auth.getUser();
@@ -28,7 +34,7 @@ export async function getSessionUser(): Promise<User | null> {
     if (e instanceof SupabaseEnvError) return null;
     throw e;
   }
-}
+});
 
 /**
  * A soft-deleted account the user owns (FR-6: sign-in refused until purge).
@@ -65,12 +71,12 @@ export type Viewer = {
   deleted: DeletedAccount | null;
 };
 
-/** The signed-in user and their owned account, or null when signed out. */
-export async function getViewer(): Promise<Viewer | null> {
+/** The signed-in user and their owned account, or null when signed out; once per request (D-1012). */
+export const getViewer = cache(async (): Promise<Viewer | null> => {
   const user = await getSessionUser();
   if (!user) return null;
   const supabase = await createSupabaseServerClient();
   const account = await getOwnedAccount(supabase, user.id);
   const deleted = account ? null : await getDeletedAccount(user.id);
   return { user, account, deleted };
-}
+});

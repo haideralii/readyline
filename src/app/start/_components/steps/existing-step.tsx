@@ -2,8 +2,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import { ExistingStep, type YesNoUnsure } from "@/lib/questionnaire/schema";
-import { parseInput } from "@/lib/validation";
+import type {
+  QuestionnaireAnswers,
+  YesNoUnsure,
+} from "@/lib/questionnaire/schema";
+import { parseStep } from "@/lib/questionnaire/validate-step";
 import {
   ErrorSummary,
   RadioGroup,
@@ -13,7 +16,7 @@ import {
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
 
-type Key = keyof ReturnType<typeof ExistingStep.parse>;
+type Key = keyof QuestionnaireAnswers["existing"];
 
 const ITEMS: { key: Key; legend: string; help: string }[] = [
   {
@@ -62,7 +65,7 @@ export function ExistingStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseInput(ExistingStep, values);
+    const parsed = await parseStep("existing", values);
     if (!parsed.ok) {
       setErrors(parsed.fieldErrors);
       return;

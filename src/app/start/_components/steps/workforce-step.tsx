@@ -1,12 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  LARGE_PROVIDER_THRESHOLD,
-  WorkforceStep,
-} from "@/lib/questionnaire/schema";
 import { stepHref } from "@/lib/questionnaire/navigation";
-import { parseInput } from "@/lib/validation";
+import { LARGE_PROVIDER_THRESHOLD } from "@/lib/questionnaire/steps";
+import { parseStep } from "@/lib/questionnaire/validate-step";
 import {
   ErrorSummary,
   Field,
@@ -58,7 +55,7 @@ export function WorkforceStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = parseInput(WorkforceStep, {
+    const parsed = await parseStep("workforce", {
       workerCount: workerCount === "" ? undefined : Number(workerCount),
       keyPersonnelCount:
         keyPersonnelCount === "" ? undefined : Number(keyPersonnelCount),
