@@ -47,7 +47,7 @@ export default defineConfig({
       use: { ...devices["iPhone 17 Pro"] },
       // Backlog 1 (D-1508): the accessibility pass runs on all three projects.
       testMatch:
-        /(req-015-width|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|signed-in[\\/](checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers))\.spec\.ts$/,
     },
   ],
   webServer: {

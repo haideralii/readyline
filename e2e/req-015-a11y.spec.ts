@@ -267,7 +267,7 @@ test.describe("REQ-015 Section E", () => {
       .click();
     await expect(page.getByTestId("have-legend")).toBeVisible();
     const tags = page.getByTestId("result-section-documents").locator("span", {
-      hasText: /You have this|To prepare|You said/,
+      hasText: /You have this|drafts this|You said/,
     });
     expect(await tags.count()).toBeGreaterThan(0);
     await page.reload();

@@ -1,6 +1,7 @@
 import type { DocumentModel } from "@/lib/generator/document-model";
 import type { Block } from "@/lib/generator/section-schema";
 import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
+import { DataTable } from "./data-table";
 
 /**
  * The sample document preview (batch 24 item 2): every section of the
@@ -8,7 +9,7 @@ import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
  * provider's answers visibly marked, and the fixed legal text shown as what
  * it is. A real document from the recorded sole-trader set, not a mock-up.
  */
-function Blocks({ blocks }: { blocks: readonly Block[] }) {
+export function Blocks({ blocks }: { blocks: readonly Block[] }) {
   return (
     <>
       {blocks.map((b, i) => {
@@ -48,49 +49,10 @@ function Blocks({ blocks }: { blocks: readonly Block[] }) {
               </ol>
             );
           case "table":
-            return (
-              // Scrolls sideways on phones, so keyboard users must be able to reach it (axe scrollable-region-focusable).
-              <div
-                key={i}
-                className="mt-2 overflow-x-auto"
-                role="region"
-                aria-label={`Table: ${b.columns.join(", ")}`}
-                tabIndex={0}
-              >
-                <table
-                  className="w-full border-collapse text-sm"
-                  aria-label={`Table: ${b.columns.join(", ")}`}
-                >
-                  <thead>
-                    <tr>
-                      {b.columns.map((c) => (
-                        <th
-                          key={c}
-                          scope="col"
-                          className="border-b border-zinc-300 py-1 pr-3 text-left font-semibold dark:border-zinc-700"
-                        >
-                          {c}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {b.rows.map((r, ri) => (
-                      <tr key={ri}>
-                        {r.map((cell, ci) => (
-                          <td
-                            key={ci}
-                            className="border-b border-zinc-200 py-1 pr-3 align-top dark:border-zinc-800"
-                          >
-                            {cell}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            );
+            // REQ-013 batch 36: stacked rows on phones, a table that never
+            // splits a word on wider screens; its scrolling region is
+            // focusable (backlog 1, axe scrollable-region-focusable).
+            return <DataTable key={i} columns={b.columns} rows={b.rows} />;
         }
       })}
     </>

@@ -91,6 +91,59 @@ export async function expectNoSidewaysScroll(page: Page, label: string) {
  * own width, then 375 px, then 360 px with larger text. Desktop projects
  * check their own width only. The viewport is restored afterwards.
  */
+/**
+ * REQ-013 batch 36 item 1: no word in a table, a stacked table or a
+ * definition list may be broken across lines. A word broken by the layout
+ * paints as more than one client rectangle, so each word is wrapped in a
+ * Range and its rectangles counted.
+ */
+export async function expectNoBrokenWords(page: Page, label: string) {
+  const broken = await page.evaluate(() => {
+    const out: string[] = [];
+    const roots = document.querySelectorAll(
+      'table, dl, [data-testid="data-table"]',
+    );
+    const walkerFor = (root: Element) =>
+      document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (const root of roots) {
+      const walker = walkerFor(root);
+      let node: Node | null = walker.nextNode();
+      while (node) {
+        const text = node.textContent ?? "";
+        const re = /\S{3,}/g;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(text))) {
+          const range = document.createRange();
+          range.setStart(node, m.index);
+          range.setEnd(node, m.index + m[0].length);
+          const rects = Array.from(range.getClientRects()).filter(
+            (r) => r.width > 0 && r.height > 0,
+          );
+          const tops = new Set(rects.map((r) => Math.round(r.top)));
+          if (tops.size > 1) out.push(m[0]);
+        }
+        node = walker.nextNode();
+      }
+    }
+    return [...new Set(out)].slice(0, 10);
+  });
+  expect(broken, `${label}: words broken across lines`).toEqual([]);
+}
+
+/** Tables at the project's width, then 360 and 390 px on phones: no sideways scroll and no broken word (batch 36). */
+export async function checkTables(page: Page, label: string) {
+  const original = page.viewportSize();
+  const phone = (original?.width ?? 1280) < 640;
+  await expectNoBrokenWords(page, `${label} @${original?.width}`);
+  if (!phone) return;
+  for (const width of [360, 390]) {
+    await page.setViewportSize({ width, height: original?.height ?? 740 });
+    await expectNoSidewaysScroll(page, `${label} tables @${width}`);
+    await expectNoBrokenWords(page, `${label} @${width}`);
+  }
+  if (original) await page.setViewportSize(original);
+}
+
 export async function checkWidths(page: Page, label: string) {
   const original = page.viewportSize();
   const phone = (original?.width ?? 1280) < 640;
