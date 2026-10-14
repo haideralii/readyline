@@ -29,7 +29,7 @@ export async function NextStepStrip() {
         </p>
         <Link
           href={step.button.href}
-          className="btn-primary min-h-11 whitespace-nowrap"
+          className="btn-primary min-h-11"
           data-testid="next-step-button"
         >
           {step.button.label}
