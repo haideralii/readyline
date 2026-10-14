@@ -31,7 +31,7 @@ export function StatusTag({ status }: { status: ListRow["status"] }) {
   const t = TONE[status.tone];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${t.cls}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.cls}`}
       data-testid="status-tag"
       data-status={status.key}
     >
@@ -70,7 +70,8 @@ export function RegisterList({
           ].map((f) => (
             <label
               key={f.key}
-              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm whitespace-nowrap ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
+              // The radio is invisible, so the label shows its focus (WCAG 2.4.7; backlog 1, D-1508).
+              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
             >
               <input
                 type="radio"
@@ -93,7 +94,10 @@ export function RegisterList({
           {rows.length === 0 ? empty : "Nothing with that status."}
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul
+          className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800"
+          aria-labelledby="register-title"
+        >
           {shown.map((r) => (
             <li key={r.id}>
               <Link

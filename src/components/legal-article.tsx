@@ -97,7 +97,8 @@ export const markdownComponents: Components = {
   // REQ-013 batch 36: a markdown table becomes the shared DataTable (stacked
   // rows on phones, no split words on wider screens), read from the syntax
   // tree react-markdown hands over; cell text only, which is all the guides'
-  // tables carry.
+  // tables carry. The table carries its name from its header cells (backlog
+  // 1, D-1508) inside DataTable.
   table: ({ node }) => {
     const { columns, rows } = tableFromNode(node);
     return columns.length ? <DataTable columns={columns} rows={rows} /> : null;

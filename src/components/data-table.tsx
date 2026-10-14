@@ -68,8 +68,15 @@ export function DataTable({
           </li>
         ))}
       </ol>
-      {/* Wider screens: a table whose words never split. */}
-      <div className="hidden overflow-x-auto sm:block">
+      {/* Wider screens: a table whose words never split. The region can
+          scroll sideways, so keyboard users must be able to reach it (backlog
+          1, D-1508: axe scrollable-region-focusable). */}
+      <div
+        className="hidden overflow-x-auto sm:block"
+        role="region"
+        aria-label={name}
+        tabIndex={0}
+      >
         <table className="w-full border-collapse text-sm" aria-label={name}>
           <thead>
             <tr>

@@ -63,7 +63,10 @@ export function RegisterPage({
           </Link>
         </p>
       ) : null}
-      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+      {/* The register list and the events trail are labelled by this heading (backlog 1, D-1508). */}
+      <h1 id="register-title" className="text-3xl font-semibold tracking-tight">
+        {title}
+      </h1>
       {intro ? (
         <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
           {intro}

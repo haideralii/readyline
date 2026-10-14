@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { ProgressLine } from "@/components/progress-line";
 import {
   STEP_SHORT,
@@ -27,10 +27,24 @@ export function StepShell({
     (id, i) => i < index && ready && canOpenStep(id, answers),
   );
 
-  // AC-11: focus moves to the step heading on every step change.
-  useEffect(() => {
+  // AC-11: focus moves to the step heading on every step change, and on a
+  // first load only once the draft has loaded and the form is live (batch
+  // 45b item 4): a heading focused while the form was still disabled told a
+  // keyboard user the step was ready when a Tab would have skipped every
+  // field and landed in the footer. A layout effect, so the focus lands in
+  // the same task that enables the form (a passive effect left a window
+  // after paint in which text typed into a field went to the heading), and
+  // never from a text control someone has already reached.
+  useLayoutEffect(() => {
+    if (!ready) return;
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      ["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName)
+    )
+      return;
     headingRef.current?.focus();
-  }, [step]);
+  }, [step, ready]);
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">

@@ -49,7 +49,9 @@ export function Blocks({ blocks }: { blocks: readonly Block[] }) {
               </ol>
             );
           case "table":
-            // REQ-013 batch 36: stacked rows on phones, a table that never splits a word on wider screens.
+            // REQ-013 batch 36: stacked rows on phones, a table that never
+            // splits a word on wider screens; its scrolling region is
+            // focusable (backlog 1, axe scrollable-region-focusable).
             return <DataTable key={i} columns={b.columns} rows={b.rows} />;
         }
       })}

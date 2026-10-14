@@ -55,8 +55,13 @@ export function AdoptButton({
   return (
     <div className="mt-6">
       {/* REQ-018 FR-14: who was walked through these documents, and when; the document control register shows it. */}
+      {/* The date field focuses a segment inside its shadow tree, and on the
+          runner's Chromium the host then matches neither :focus nor
+          :focus-visible (#39, run 38633590513), so the ring is shown on this
+          wrapper with focus-within as well; the global input[type="date"]:focus
+          rule stays for the browsers that honour it. */}
       <div
-        className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+        className="focus-within:outline-ochre rounded-md border border-zinc-200 p-3 focus-within:outline-2 focus-within:outline-offset-2 dark:border-zinc-800"
         data-testid="circulation"
       >
         <label htmlFor="circulation-workers" className="block font-medium">
@@ -91,7 +96,7 @@ export function AdoptButton({
           type="date"
           value={on}
           onChange={(e) => setOn(e.target.value)}
-          className="mt-1 block min-h-11 rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+          className="mt-1 block min-h-11 rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
         />
       </div>
       <button

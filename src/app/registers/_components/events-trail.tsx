@@ -88,7 +88,10 @@ export function EventsTrail({
       <h2 id="trail-heading" className="text-lg font-semibold">
         What has happened since ({events.length})
       </h2>
-      <ol className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+      <ol
+        className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800"
+        aria-labelledby="trail-heading"
+      >
         {events.map((ev) => (
           <li key={ev.id} className="py-2">
             <span className="text-zinc-600 dark:text-zinc-400">
