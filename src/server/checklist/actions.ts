@@ -70,7 +70,7 @@ export async function saveChecklistItemAction(
     return { ok: false, message: "We could not save that just now." };
   }
   // REQ-009 FR-7: "Done" on a document sets the policy review's adopted date
-  // when it is still empty. With the admin client (D-1704): the policy
+  // when it is still empty. With the admin client (D-1706): the policy
   // reviews' update policy needs an active subscription, which a pack buyer
   // ticking Done need not have; the account id is the viewer's own.
   if (parsed.data.status === "have") {
