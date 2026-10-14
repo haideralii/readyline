@@ -169,10 +169,21 @@ button:active:not(:disabled),
 /* Long unbroken strings (addresses, references) wrap rather than widen the page (FR-16a). */
 p,
 li,
-dd,
-td,
 summary {
   overflow-wrap: anywhere;
+}
+/* REQ-013 batch 36: a definition value wraps at spaces too; only a single
+   over-long token (a reference, an address) breaks, never a short word. */
+dd {
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+/* REQ-013 batch 36: a table cell wraps at spaces; a word is never split
+   letter by letter. Narrow tables stack on phones (data-table.tsx). */
+td,
+th {
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 /* Buttons: one warm accent for the thing that matters on each screen. */
