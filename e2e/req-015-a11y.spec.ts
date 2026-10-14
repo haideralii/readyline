@@ -247,7 +247,8 @@ test.describe("REQ-015 Section E", () => {
     await expect(card.getByTestId("pathway-description")).toContainText(
       /An auditor visits you/,
     );
-    const button = card.getByRole("link", { name: "Open your checklist" });
+    // REQ-017 step 1: the one button is "Start getting ready"; the checklist and the price are plain links under it.
+    const button = card.getByRole("link", { name: "Start getting ready" });
     const viewport = page.viewportSize()!;
     const box = await button.boundingBox();
     expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);

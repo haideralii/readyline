@@ -16,6 +16,8 @@ export type Account = {
   business_structure: string;
   states: string[];
   abn: string | null;
+  /** The date the Commission registered the provider (REQ-009 FR-3; REQ-017 FR-1 reads it for the path). */
+  registration_date: string | null;
 };
 
 export async function getOwnedAccount(
@@ -40,7 +42,9 @@ export async function getOwnedAccount(
   if (!membership.data) return null;
   const account = await supabase
     .from("accounts")
-    .select("id, trading_name, business_structure, states, abn, deleted_at")
+    .select(
+      "id, trading_name, business_structure, states, abn, registration_date, deleted_at",
+    )
     .eq("id", membership.data.account_id as string)
     .maybeSingle();
   if (account.error) {
@@ -60,5 +64,6 @@ export async function getOwnedAccount(
     business_structure: a.business_structure,
     states: a.states,
     abn: a.abn,
+    registration_date: a.registration_date ?? null,
   };
 }

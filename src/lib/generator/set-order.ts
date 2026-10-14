@@ -40,6 +40,14 @@ export function orderDocuments<T extends { document_type_id: string }>(
   ].filter((g) => g.documents.length > 0);
 }
 
+/** A group title as a path segment (REQ-017 step 5): "Running the business" is "running-the-business". */
+export function groupSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 /** The flat audit order of type ids, for a lint over a whole set (S-7). */
 export function auditOrder(typeIds: readonly string[]): string[] {
   return orderDocuments(typeIds.map((id) => ({ document_type_id: id })))

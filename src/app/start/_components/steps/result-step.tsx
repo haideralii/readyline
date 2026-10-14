@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
@@ -146,18 +146,25 @@ function useRememberedOpen() {
   // ResultView mounts on the client only (after the result is fetched), so
   // reading storage in the initialiser never differs from a server render.
   const [open, setOpen] = useState<Set<string>>(readOpen);
+  // Batch 45b item 3: the write happens in the toggle event's own task. A
+  // details toggle is not a discrete event for React, so a render that ran
+  // the write from inside the state updater was scheduled for a later task;
+  // on a busy CI runner a reload issued straight after the click discarded
+  // it and the disclosure came back closed (run 435, Chromium projects).
+  // The latest set is mirrored in a ref so two toggles in one task (the
+  // mount-time toggle events of several open disclosures) never drop one.
+  const latest = useRef(open);
   const toggle = (id: string, isOpen: boolean) => {
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (isOpen) next.add(id);
-      else next.delete(id);
-      try {
-        localStorage.setItem(OPEN_KEY, JSON.stringify([...next]));
-      } catch {
-        // Storage can be blocked; the page still works.
-      }
-      return next;
-    });
+    const next = new Set(latest.current);
+    if (isOpen) next.add(id);
+    else next.delete(id);
+    latest.current = next;
+    try {
+      localStorage.setItem(OPEN_KEY, JSON.stringify([...next]));
+    } catch {
+      // Storage can be blocked; the page still works.
+    }
+    setOpen(next);
   };
   return { open, toggle };
 }
@@ -301,11 +308,23 @@ function ResultView({
             testId="result-ready-line"
           />
         </div>
+        {/* REQ-017 step 1: one button that starts the path; the checklist and the price stay as plain links. */}
         <div data-testid="checklist-teaser">
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
-              href={checklistHref}
+              href={
+                signedIn
+                  ? "/path/before-you-buy"
+                  : "/sign-in?next=%2Fpath%2Fbefore-you-buy"
+              }
               className="btn-primary"
+              data-testid="start-getting-ready"
+            >
+              Start getting ready
+            </Link>
+            <Link
+              href={checklistHref}
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
               data-testid={signedIn ? "checklist-link" : "checklist-sign-in"}
             >
               Open your checklist

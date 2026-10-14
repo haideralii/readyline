@@ -21,6 +21,8 @@ export default defineConfig({
       "tests/copy-lint.test.ts",
       // D-1507: no byte-order mark or double-encoded character in any text file.
       "tests/text-encoding.test.ts",
+      // REQ-017 FR-5: one primary button, one heading, three lines on every path screen.
+      "tests/path-screens.test.ts",
     ],
     exclude: ["e2e/**", "node_modules/**", ".next/**"],
   },

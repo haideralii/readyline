@@ -123,6 +123,8 @@ class MemoryBackend implements JobBackend {
   quotaHits = 0;
   revoked = false;
   contextError: string | null = null;
+  /** REQ-017 AC-2: facts given on an earlier pack. */
+  facts: Record<string, string> = {};
   constructor(private readonly store: MemoryStore) {}
   enqueue(): GenerationJobRow {
     const job: GenerationJobRow = {
@@ -170,6 +172,7 @@ class MemoryBackend implements JobBackend {
       ownerEmail: "owner@example.test",
       entitlementRevoked: this.revoked,
       assessmentMatches: true,
+      facts: this.facts,
     };
   }
   async listDocuments(versionSetId: string) {
@@ -426,7 +429,7 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
       "none",
     ]);
     expect(h.store.sets).toHaveLength(2);
-  });
+  }, 60_000);
 });
 
 /** Every section call costs a fixed time on a clock the test owns (batch 32 item 2). */
@@ -506,4 +509,41 @@ describe("budget loop (batch 32 item 2, D-1006)", () => {
     expect(out).toEqual({ reports: [{ claimed: false }], more: false });
     expect(h.client.calls).toBe(0);
   });
+});
+
+describe("account facts fill a later pack (REQ-017 FR-2, AC-2)", () => {
+  it("every blank the facts answer is filled before the document is rendered and stored", async () => {
+    const store = new MemoryStore();
+    const backend = new MemoryBackend(store);
+    backend.facts = {
+      name: "Jane Citizen",
+      role: "Owner",
+      date: "14 October 2026",
+      "phone-or-email": "0400 000 000",
+    };
+    backend.enqueue();
+    const report = await runGenerationTick({
+      backend,
+      store,
+      client: new ReplayClient(),
+      modelId: "claude-sonnet-5-5",
+      dataset,
+      email: new LogOnlyEmailProvider(),
+      siteUrl: "https://readyline.example",
+    });
+    expect(report).toMatchObject({ claimed: true, outcome: "ready" });
+    const governance = store.documents.find(
+      (d) => d.document_type_id === "governance-policy",
+    )!;
+    const text = JSON.stringify(governance.model);
+    expect(text).toContain("Jane Citizen, Owner");
+    expect(text).not.toMatch(/\[name\]|\[role\]|\[date\]/);
+    // The stored .docx carries the filled text too.
+    const docx = store.objects.get(governance.storage_path)!;
+    const xml = strFromU8(unzipSync(docx.bytes)["word/document.xml"]);
+    expect(xml).toContain("Jane Citizen");
+    expect(store.sets[0].provider_input_section_count).toBeLessThan(
+      governance.model.sections.length * store.documents.length,
+    );
+  }, 60_000);
 });

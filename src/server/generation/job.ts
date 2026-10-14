@@ -16,6 +16,7 @@ import {
   type ResolvedSection,
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
+import { applyFacts } from "@/lib/generator/facts-fill";
 import type { SectionFailure } from "@/lib/generator/generate-section";
 import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
@@ -88,6 +89,8 @@ export type JobContext = {
   entitlementRevoked: boolean;
   /** False when the current draft no longer hashes to the entitlement's assessment id (logged, not fatal). */
   assessmentMatches: boolean;
+  /** The account facts given on an earlier pack (REQ-017 FR-2, AC-2): every blank they answer is filled before rendering. */
+  facts: Record<string, string>;
 };
 
 export interface JobBackend {
@@ -326,10 +329,14 @@ export async function runGenerationTick(input: {
         await backend.update(job.id, { progress });
         lastSectionMs = now().getTime() - sectionStarted;
       }
-      const model: DocumentModel = {
-        ...skeleton,
-        sections: skeleton.sections.map((s) => progress.sections[s.id] ?? s),
-      };
+      // REQ-017 AC-2: facts the provider gave on an earlier pack fill this one's blanks too.
+      const model: DocumentModel = applyFacts(
+        {
+          ...skeleton,
+          sections: skeleton.sections.map((s) => progress.sections[s.id] ?? s),
+        },
+        ctx.facts,
+      );
       // REQ-016 FR-0b: a document with too many generic sections is redrafted
       // from scratch once (the next tick takes it again with a fresh set of
       // calls); after that it ships as it is, with the reason on the log.

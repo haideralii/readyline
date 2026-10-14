@@ -2320,6 +2320,49 @@ model; the zip keeps the draft files.
 
 
 
+
+**D-1701 One sentence and one button, from a state table (Dev, 2026-10-14,
+batch 34, REQ-017 FR-1).** `src/lib/path/next-step.ts` is a pure function
+from the account's state (questionnaire done, paid, drafting, ready set,
+blanks left, groups to adopt, checklist left, registration date) to the
+step: the first row that holds wins, so the strip never shows two things.
+`src/server/path/state.ts` gathers the state with the owner's session and
+stops at the first concern that decides it, so a signed-in page costs a few
+small reads. The strip is a server component in the root layout under the
+header; it renders nothing signed out or before the account exists. The
+registration date joined the owned-account read for this. A unit test walks
+every row of the table (AC-3).
+
+**D-1702 Blanks become account facts, asked once (REQ-017 FR-2, AC-2).** A
+blank names a fact ("[name]", "[phone or email]"); `facts-fill.ts` maps the
+closed list to a question a support worker can answer, with an example, and
+keys an unknown blank from its own text; signatures, register rows and
+whole-section placeholders are never facts. The form asks one question per
+screen on a phone (Back and Next only) and groups them by topic on a wider
+screen; each answer is saved to `account_facts` as it is given (FR-4), and
+the last screen re-renders every document (`rerender.ts`: a new version per
+changed document, a fresh summary and zip) and says "Done. Your N documents
+are complete." The job applies the facts to a new pack before rendering, so
+a second pack carries them (AC-2, `job.test.ts`). The "details to fill in"
+count on the set page falls to zero after the finish because the blanks are
+gone from the text, not because the provider ticked them.
+
+**D-1703 Adopt, audit day and the screen rule (REQ-017 FR-3, FR-5).** One
+screen per document group in audit order; "These are our policies" marks
+the group's checklist items Done, sets each policy review's adopted date,
+seeds the register, saves today as the approval-date fact when none was
+given, and re-renders so the control table carries it; the download then
+serves the documents without the draft marks (D-058). The audit-day page
+walks the checklist groups as the auditor's questions ("Show me: …") with a
+tick for each, the pack download and the summary, and prints. The checklist
+item titles stay as REQ-006 wrote them: rewriting thirty items as
+instructions is PO copy, listed in the Dev response. `tests/path-screens.
+test.ts` reads the path pages' source and fails a screen with more than one
+primary button, more than one h1, or more than three paragraphs above the
+control, measuring one rendered branch at a time.
+
+**D-1704 Adopting a pack writes the policy review rows with the admin client (Dev, 2026-10-15, batch 45b item 2, run 38575465593).** The signed-in guided-path journey was red at Adopt on every project: after "These are our policies" the group never read as adopted. Cause: `policy_reviews_insert_subscribed` and `policy_reviews_update_subscribed` (migration `20261013000000_registers.sql`) require `has_active_subscription`, written for the register page, which is locked to subscribers; but REQ-017's Adopt step and REQ-009 FR-7's checklist tick record adoption in the same table for a provider who has bought the pack and not subscribed, and under the owner's session the seed failed on RLS (logged, not thrown) and the dated update matched no row. Decision: `adoptGroupAction` and `saveChecklistItemAction` pass the admin client to `seedPolicyReviews` and `markAdopted` after the set and the item are proven to be the account's, the way the adopt re-render already uses it; the register's own pages and actions keep the owner's session and its policies, so a subscriber's register writes are unchanged and a non-subscriber still cannot write through the register. Not chosen: loosening the policies to members, because the register's write gate is the subscription's product boundary (REQ-009) and the two adoption writes are the only ones a pack buyer makes. Also from the same run: the adopt button is disabled until hydration (the account form's guard, 147ccad), and the spec waits to leave the group it is on rather than for the button to vanish, since on success the next group's page carries its own button.
+
 **D-1008 The integration suite aliases Next's `server-only` guard (Dev,
 2026-10-14, batch 38).** PRs #28 to #31 failed the Supabase job because
 `tests/integration/reminders-job.test.ts` imports the reminders job, the
@@ -2335,6 +2378,8 @@ skip, and no longer throw); CI's job proves the rows.
 
 
 
+
+
 **D-1009 The reminders job takes a test-only account filter (Dev,
 2026-10-14, batch 41).** With the guard aliased, PR #28's Supabase job ran
 the reminders test for real and `first.inserted` came back 9 against the
@@ -2346,7 +2391,6 @@ passes its own account on both runs and keeps the exact figures, reads the
 row count back from the table for that account, and checks the outbox for
 that owner did not grow on the second run. The subscription-ledger test
 already measured against a baseline and needed nothing.
-
 
 ## Open questions for Haider
 

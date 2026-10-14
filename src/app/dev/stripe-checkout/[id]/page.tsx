@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { decodeFakeSession } from "@/lib/payments/fake-session";
 import { formatAud } from "@/lib/payments/pricing";
 import { readStripeEnv, StripeEnvError } from "@/server/payments/stripe";
-import { fakeCheckoutAction } from "../actions";
 
 export const metadata: Metadata = { title: "Fake checkout (test only)" };
 
@@ -33,6 +32,9 @@ export default async function FakeCheckoutPage({
   // REQ-009 Session C: a subscription session shows the subscription buttons; `?portal=1` is the fake billing portal.
   const subscription = data.mode === "subscription";
   const portal = sp.portal === "1";
+  // Batch 45b item 2: a plain form post answered with a 303 (./act/route.ts),
+  // so the return is a full page load, as Stripe's own return is.
+  const act = `/dev/stripe-checkout/${encodeURIComponent(id)}/act`;
   const button =
     "inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300";
   const secondary =
@@ -75,7 +77,7 @@ export default async function FakeCheckoutPage({
       ) : subscription ? (
         <div className="mt-8 flex flex-col gap-3">
           {portal ? null : (
-            <form action={fakeCheckoutAction}>
+            <form method="post" action={act}>
               <input type="hidden" name="id" value={id} />
               <input type="hidden" name="action" value="subscribe" />
               <button
@@ -97,7 +99,7 @@ export default async function FakeCheckoutPage({
           <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
             Lifecycle events Stripe would send, for testing:
           </p>
-          <form action={fakeCheckoutAction}>
+          <form method="post" action={act}>
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="action" value="payment-failed" />
             <button
@@ -108,7 +110,7 @@ export default async function FakeCheckoutPage({
               Payment failed (fake, stays active)
             </button>
           </form>
-          <form action={fakeCheckoutAction}>
+          <form method="post" action={act}>
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="action" value="cancel-subscription" />
             <button
@@ -119,7 +121,7 @@ export default async function FakeCheckoutPage({
               Cancel the subscription (fake)
             </button>
           </form>
-          <form action={fakeCheckoutAction}>
+          <form method="post" action={act}>
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="action" value="renew" />
             <button
@@ -133,7 +135,7 @@ export default async function FakeCheckoutPage({
         </div>
       ) : (
         <div className="mt-8 flex flex-col gap-3">
-          <form action={fakeCheckoutAction}>
+          <form method="post" action={act}>
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="action" value="pay" />
             <button type="submit" className={button} data-testid="fake-pay">
@@ -147,7 +149,7 @@ export default async function FakeCheckoutPage({
           >
             Cancel and go back
           </a>
-          <form action={fakeCheckoutAction} className="mt-6">
+          <form method="post" action={act} className="mt-6">
             <input type="hidden" name="id" value={id} />
             <input type="hidden" name="action" value="refund" />
             <button
