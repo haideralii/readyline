@@ -1466,3 +1466,31 @@ The standing backlog is empty bar item 7, which stopped for the PO (the REQ-020 
 
 **STOP.** No numbered queue is open and the standing backlog has no item left that does not wait for the PO.
 
+
+
+
+## Batch 45a, do first (written by PO, 14 Oct 2026, during the public CI window): the Lighthouse budget job fails on every branch that carries backlog 2
+
+CI is finally running on all twenty-one branches. Everything passes except one step, and because the branches are stacked it fails on every branch from `req-010-performance-budget` onwards (#40 to #47 and the new performance-budget PR). Evidence: run 38526720048, job "Lint, typecheck, unit, build, e2e", step "Performance budgets, mobile profile, public pages": `npx --yes lighthouse@12.8.2 http://localhost:3100/ ... --chrome-flags=--headless=new --no-sandbox` exits 1 with `output: [null, null, null]`, so we cannot even see why. The same test passes on the laptop.
+
+1. On branch `req-010-performance-budget`: run the Lighthouse call with stdio piped and print its stderr on failure (drop `--quiet` in CI), pass the Chrome flags as one quoted argument (`--chrome-flags="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"`; today `--no-sandbox` is a separate argument that Lighthouse never passes to Chrome, and the runner's Chrome will not start without it), and set `CHROME_PATH` explicitly to the Playwright Chromium executable or to the runner's `google-chrome-stable`, whichever the log shows works. If it still fails, keep the budget job but make it fail with the real Lighthouse message, not a null.
+2. Until it is green, the budget step must not block the merge: put it in its own job with `continue-on-error: true` and a clear name, and record the decision as D-1013 with a date to flip it back to required (one week).
+3. Merge `origin/main` and then `req-010-performance-budget` into every later branch in stack order (accessibility is before it; the rest are after), push each, and write the status here with the run number that went green for the performance-budget PR.
+4. Do not touch anything else in this batch. The PO is merging #28 to #39 while you work.
+
+Status (dev): 
+
+
+## Batch 45b, do first with 45a (written by PO, 14 Oct 2026, 30 minutes later): the first real CI runs show four e2e failures and a NEXT.md conflict
+
+#28 is merged; #29 is green but now conflicts on `product/NEXT.md` (my two batch commits on main). #30 to #39 ran for real for the first time and fail in the Supabase job's signed-in e2e. These all pass on the laptop, so look for a CI difference (viewport, timing, the fake Stripe path, the first-run database), not for a timeout to raise.
+
+1. `e2e/signed-in/purchase-flow.spec.ts:194` on all three projects, from #30 onwards: strict mode violation, `getByTestId('set-list')` resolves to four `<ol>` elements since the grouped set view (batch 33). Put `data-testid="set-list"` on one wrapper and give the groups their own id, or assert on the wrapper. Fix it on `req-016-document-standard` so every later branch inherits it.
+2. `e2e/signed-in/guided-path.spec.ts` on android-small and desktop-chromium: line 86 (from #31) and line 137 (from #39), `getByRole('status').filter({ hasText: 'Saved.' })` never appears. Check whether the save on CI returns before the status renders, or whether the status text is now different (the batch 42 layman fixes renamed strings). Fix on `req-017-guided-path`.
+3. `e2e/req-015-a11y.spec.ts:275` on android-small and desktop-chromium from #31: "result page: the answer card fits the first screen" fails. Measure in CI and either fix the card or the measurement; do not loosen the budget without a line here saying what the number is.
+4. `e2e/req-015-accessibility-pass.spec.ts:102` on iphone (#39 only): the keyboard walk from the intro to the result reaches the footer and wraps to the skip link without finding its target. The target is after the footer in the tab order or is not focusable on WebKit; find which and fix the page, not the helper.
+5. Then merge `origin/main` into every open branch in stack order (#29 first), resolve `product/NEXT.md` with the prose resolver (both sides appended; nothing is dropped), push each, and put the branch heads here. The pushes re-run CI by themselves while the repository is public.
+6. Write one line per item above under this status: root cause in one sentence, the branch it was fixed on, the run number that went green.
+
+Status (dev):
+
