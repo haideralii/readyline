@@ -32,11 +32,17 @@ export function adminClient(): SupabaseClient {
   });
 }
 
-/** Creates a user and an owned account, and seeds the questionnaire draft. */
+/**
+ * Creates a user and an owned account, and seeds the questionnaire draft.
+ * With `withAccount: false` it creates and signs in the user only (no
+ * account, no draft, `accountId` empty), for the spec that creates the
+ * account through the setup form as a customer would (batch 45 item 28).
+ */
 export async function createTenant(input: {
   label: string;
   tradingName: string;
   answers: Record<string, unknown>;
+  withAccount?: boolean;
 }): Promise<TestTenant> {
   const { url, publishableKey } = env();
   const admin = adminClient();
@@ -55,6 +61,14 @@ export async function createTenant(input: {
   const signed = await client.auth.signInWithPassword({ email, password });
   if (signed.error || !signed.data.session)
     throw signed.error ?? new Error("sign-in failed");
+  if (input.withAccount === false)
+    return {
+      userId: created.data.user.id,
+      email,
+      accountId: "",
+      admin,
+      session: signed.data.session as unknown as Record<string, unknown>,
+    };
   const rpc = await client.rpc("create_account", {
     p_trading_name: input.tradingName,
     p_business_structure: "sole-trader",
@@ -121,10 +135,14 @@ export async function signInContext(
 
 /** Removes the user (cascading to the account and its rows) and the set's objects. */
 export async function deleteTenant(tenant: TestTenant): Promise<void> {
-  const sets = await tenant.admin
-    .from("version_sets")
-    .select("id")
-    .eq("account_id", tenant.accountId);
+  // A user created without an account (item 28) has no sets to clear, and the
+  // account the form created is removed with the user.
+  const sets = tenant.accountId
+    ? await tenant.admin
+        .from("version_sets")
+        .select("id")
+        .eq("account_id", tenant.accountId)
+    : { data: [] as { id: string }[] };
   for (const s of sets.data ?? []) {
     const prefix = `${tenant.accountId}/${s.id}`;
     const listed = await tenant.admin.storage
