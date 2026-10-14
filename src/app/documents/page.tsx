@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { contactEmail } from "@/lib/legal/config";
+import { DocumentsNotices } from "./notices";
 import { DOCUMENTS_COPY as C } from "@/lib/payments/documents-copy";
 import {
   deriveDocumentsState,
@@ -285,6 +286,9 @@ export default async function DocumentsPage({
       </p>
 
       <PurchaseSection state={state} thanks={thanks} email={email} />
+      {state.kind === "ready" || state.kind === "preparing" ? (
+        <DocumentsNotices />
+      ) : null}
 
       {enabled ? (
         <section aria-labelledby="generate-heading" className="mt-10">

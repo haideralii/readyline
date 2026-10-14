@@ -8,6 +8,7 @@
  * drives several ticks with a fake clock and an in-memory backend.
  */
 import { strToU8, zipSync } from "fflate";
+import { collectBlanks, type DocumentBlank } from "@/lib/generator/blanks";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import {
   buildSkeleton,
@@ -15,6 +16,7 @@ import {
   type ResolvedSection,
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
+import type { SectionFailure } from "@/lib/generator/generate-section";
 import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
@@ -29,6 +31,7 @@ import {
   documentStatus,
   generateTailoredSection,
   isTailoredSection,
+  MAX_GENERIC_SECTIONS,
   readmeText,
   SELF_ASSESSMENT_ID,
   type SectionLog,
@@ -60,6 +63,8 @@ export type JobProgress = {
   typeId?: string;
   sections?: Record<string, ResolvedSection>;
   logs?: SectionLog[];
+  /** How many times each document was redrafted from scratch for too many generic sections (REQ-016 FR-0b). */
+  redrafts?: Record<string, number>;
 };
 
 export type JobPatch = Partial<
@@ -103,6 +108,15 @@ export const MAX_ATTEMPTS = 3;
 /** How long a tick may generate before it hands the job back (fits a 60-second function). */
 export const DEFAULT_BUDGET_MS = 40_000;
 
+/** One fallen-back section for the tick line (REQ-016 FR-0b): the kind and rule names, never content. */
+export type SectionFailureReport = {
+  typeId: string;
+  sectionId: string;
+  kind: SectionFailure["kind"];
+  detail: string;
+  refusal: boolean;
+};
+
 export type TickReport =
   | { claimed: false }
   | {
@@ -112,7 +126,13 @@ export type TickReport =
       documentsDone: number;
       documentsTotal: number;
       sectionsGenerated: number;
+      /** Sections that fell back to generic text in this tick, and documents redrafted (FR-0b). */
+      failures?: SectionFailureReport[];
+      redrafted?: string[];
     };
+
+/** A document whose generic sections exceed MAX_GENERIC_SECTIONS is redrafted from scratch this many times before it ships as it is. */
+export const MAX_DOCUMENT_REDRAFTS = 1;
 
 function parseProgress(value: unknown): Required<JobProgress> {
   const p = (value ?? {}) as JobProgress;
@@ -120,6 +140,7 @@ function parseProgress(value: unknown): Required<JobProgress> {
     typeId: typeof p.typeId === "string" ? p.typeId : "",
     sections: p.sections && typeof p.sections === "object" ? p.sections : {},
     logs: Array.isArray(p.logs) ? p.logs : [],
+    redrafts: p.redrafts && typeof p.redrafts === "object" ? p.redrafts : {},
   };
 }
 
@@ -153,6 +174,8 @@ export async function runGenerationTick(input: {
   let lastSectionMs: number | null = null;
   let sectionsGenerated = 0;
   let documentsThisTick = 0;
+  const failures: SectionFailureReport[] = [];
+  const redrafted: string[] = [];
   // A tick always does at least one unit of work, so a chain of short ticks
   // cannot stall on a budget smaller than one section.
   const fits = (lastMs: number | null) =>
@@ -245,6 +268,8 @@ export async function runGenerationTick(input: {
         documentsDone: index,
         documentsTotal,
         sectionsGenerated,
+        failures,
+        redrafted,
       };
     };
 
@@ -258,7 +283,12 @@ export async function runGenerationTick(input: {
       if (!fits(lastDocumentMs)) return await handBack();
       const documentStarted = now().getTime();
       if (progress.typeId !== typeId)
-        progress = { typeId, sections: {}, logs: [] };
+        progress = {
+          typeId,
+          sections: {},
+          logs: [],
+          redrafts: progress.redrafts,
+        };
       const skeleton = buildSkeleton({
         type,
         facts,
@@ -284,6 +314,14 @@ export async function runGenerationTick(input: {
         });
         progress.sections[section.id] = out.section;
         progress.logs.push(out.log);
+        if (out.failure)
+          failures.push({
+            typeId,
+            sectionId: section.id,
+            kind: out.failure.kind,
+            detail: out.failure.detail,
+            refusal: out.failure.refusal,
+          });
         sectionsGenerated++;
         await backend.update(job.id, { progress });
         lastSectionMs = now().getTime() - sectionStarted;
@@ -292,6 +330,36 @@ export async function runGenerationTick(input: {
         ...skeleton,
         sections: skeleton.sections.map((s) => progress.sections[s.id] ?? s),
       };
+      // REQ-016 FR-0b: a document with too many generic sections is redrafted
+      // from scratch once (the next tick takes it again with a fresh set of
+      // calls); after that it ships as it is, with the reason on the log.
+      const generic = documentStatus(model).fallbackSections;
+      const redrafts = progress.redrafts?.[typeId] ?? 0;
+      if (generic > MAX_GENERIC_SECTIONS && redrafts < MAX_DOCUMENT_REDRAFTS) {
+        progress = {
+          typeId: "",
+          sections: {},
+          logs: [],
+          redrafts: { ...progress.redrafts, [typeId]: redrafts + 1 },
+        };
+        redrafted.push(typeId);
+        log.warn("payments.generation.document-redraft", {
+          jobId: job.id,
+          accountId: job.account_id,
+          documentTypeId: typeId,
+          genericSections: generic,
+          failures: failures.filter((f) => f.typeId === typeId),
+        });
+        return await handBack();
+      }
+      if (generic > MAX_GENERIC_SECTIONS)
+        log.error("payments.generation.document-degraded", {
+          jobId: job.id,
+          accountId: job.account_id,
+          documentTypeId: typeId,
+          genericSections: generic,
+          failures: failures.filter((f) => f.typeId === typeId),
+        });
       const docx = await renderDocx(model);
       const path = objectPath(job.account_id, setId, `${typeId}.docx`);
       await store.putObject(path, new Uint8Array(docx), DOCX_TYPE);
@@ -313,10 +381,15 @@ export async function runGenerationTick(input: {
         })),
       );
       index++;
-      progress = { typeId: "", sections: {}, logs: [] };
+      progress = {
+        typeId: "",
+        sections: {},
+        logs: [],
+        redrafts: progress.redrafts,
+      };
       await backend.update(job.id, {
         next_document_index: index,
-        progress: {},
+        progress: { redrafts: progress.redrafts },
       });
       // A resumed document measures only its remainder; the section rule still guards each call.
       lastDocumentMs = now().getTime() - documentStarted;
@@ -333,10 +406,17 @@ export async function runGenerationTick(input: {
       const { status, fallbackSections } = documentStatus(d.model);
       return { title: d.model.title, status, fallbackSections };
     });
+    // REQ-016 S-8, FR-0c: the blanks by document and section, and the sections that carry one.
+    const blanks: DocumentBlank[] = docs.flatMap((d) => collectBlanks(d.model));
+    const providerInputSections = docs.reduce(
+      (n, d) => n + documentStatus(d.model).providerInputSections,
+      0,
+    );
     const pdf = await renderSummaryPdf({
       facts,
       result,
       documents: summaries,
+      blanks,
       generatedAt,
       version: "1",
     });
@@ -369,6 +449,7 @@ export async function runGenerationTick(input: {
           n + d.model.sections.filter((s) => s.status === "generated").length,
         0,
       ),
+      providerInputSections,
       status: "ready",
     });
     if (job.entitlement_id)
@@ -402,6 +483,8 @@ export async function runGenerationTick(input: {
       documentsDone: docs.length,
       documentsTotal,
       sectionsGenerated,
+      failures,
+      redrafted,
     };
   } catch (e) {
     const attempts = job.attempts + 1;

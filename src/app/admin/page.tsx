@@ -29,6 +29,17 @@ export default async function AdminPage() {
   ]);
   await writeAdminAudit(ctx.user.id, "admin.viewed", "/admin");
 
+  // REQ-016 FR-0c: generator failures are an admin line, never a customer count.
+  const sets = await admin
+    .from("version_sets")
+    .select("fallback_section_count")
+    .eq("status", "ready")
+    .order("created_at", { ascending: false })
+    .limit(500);
+  const genericSections = (
+    (sets.data as { fallback_section_count: number }[] | null) ?? []
+  ).reduce((n, s) => n + (s.fallback_section_count ?? 0), 0);
+
   const rows: { label: string; value: number | null }[] = [
     { label: "Live accounts", value: live.count },
     {
@@ -36,6 +47,10 @@ export default async function AdminPage() {
       value: deleted.count,
     },
     { label: "Users", value: users.count },
+    {
+      label: "Generic sections across ready sets (generator failures)",
+      value: sets.error ? null : genericSections,
+    },
   ];
 
   return (

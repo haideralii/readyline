@@ -929,6 +929,8 @@ REQ-017 delivered on **branch `req-017-guided-path` d2aaaef** (from `req-016-doc
 - **Housekeeping.** This status commit also carries the two NDIS-watch edits that sat uncommitted in the working tree (NEXT.md items A10 and A12, and the 13 Oct research addendum), as the batch 35 note asked.
 - **Next:** batch 31 (the 38 registration-group pages) on `req-011-groups`, re-pointed to the top of the stack (`req-017-guided-path`) so it merges last as the PO's order says.
 
+- **Next:** batch 31 (the 38 registration-group pages) on `req-011-groups`, re-pointed to the top of the stack (`req-017-guided-path`) so it merges last as the PO's order says.
+
 ## Dev status (batch 31, written 14 Oct 2026, Dev; second unattended run, final STOP)
 
 The 38 registration-group pages on **branch `req-011-groups` 8ba2e2b** (from `req-017-guided-path`, so it merges last in the PO's order; every open branch now carries `main` 4331f7e, PR #27 included). No model calls (cost table: none). `npm run check` green (92 files, 669 tests + 3 skipped), `npm run build` green; guides e2e 21 passed on the three projects; footer and home specs 9 passed. Decision D-1105. REQ-011 has no requirement file; the evidence is this status and `product/evidence/req-011/` (screenshots with `EVIDENCE=1` in CI).
@@ -970,6 +972,8 @@ Branch `req-017-close-out` from `req-011-groups` after merging `main`.
 PRs #28 (Session C), #29 (kicker), #30 (REQ-016) and #31 (REQ-017) all fail the same CI job, "Supabase local stack, migrations and RLS tests": `tests/integration/reminders-job.test.ts` fails to load with "This module cannot be imported from a Client Component module. It should only be used from a Server Component." That is Next's `server-only` guard throwing under Vitest: the test (or something it imports, probably the reminders job or the email provider) pulls in a module marked `server-only`. This is the test the dev could not run locally. Fix on `req-009-session-c`: alias `server-only` to an empty module in the Vitest config for the integration project (or import the pure rules module and the job function through a path that does not carry the guard), prove the Supabase job green on PR #28, then merge the fix up through `req-010-generation-kicker`, `req-016-document-standard`, `req-017-guided-path` and `req-011-groups` and push all five. Status with the five SHAs. STOP. The PO then merges #28 to #31 in order and opens the groups PR.
 
 
+
+
 ## Dev status (batch 38, written 14 Oct 2026, Dev; third unattended run)
 
 CI fix for the Supabase job on **`req-009-session-c` 98f19ea** (fix commit ffb999b), merged up the stack: **`req-010-generation-kicker` dc303ae, `req-016-document-standard` ef6fc70, `req-017-guided-path` e918fc2, `req-011-groups` 4f2ab7b**; every branch also carries `main` 9abfdae. No model calls. Decision D-1008.
@@ -1002,6 +1006,8 @@ PO note for batch 39 (14 Oct 2026): REQ-018 gains FR-13, a document control regi
 The `server-only` fix worked: the Supabase job now loads all 12 files and runs the reminders test for real. It fails at `tests/integration/reminders-job.test.ts:140`: `expect(first.inserted).toBe(5)` received 9 (run 38418819924, job 115370344369). The kinds assertion just above it passed, so this account has exactly its 5 rows; the extra 4 come from other accounts seeded by the other integration files in the same stack, because `runRemindersJob` runs for every account and reports totals. Fix on `req-009-session-c`: scope the assertions to this account (count the rows with `.eq("account_id", accountId)` and assert 5; assert `first.inserted >= 5` and `first.emailed >= 5`, or better give `runRemindersJob` an optional `accountIds` filter used only by tests and keep the exact 5), make the second-run check count this account's rows again rather than the job's totals, and check the rest of the file for the same totals assumption. Merge up through `req-010-generation-kicker`, `req-016-document-standard`, `req-017-guided-path`, `req-011-groups` and any batch 36 or 37 branch you have started, push all, status with SHAs. STOP. The PO merges #28 to #31 in order once green.
 
 
+
+
 ## Dev status (batch 36, written 14 Oct 2026, Dev; third unattended run)
 
 Haider's phone findings fixed on **branch `req-013-phone-fixes` 4197d93** (from `req-011-groups`; every open branch now carries `main` 7056024). No model calls. `npm run check` green (92 files, 669 tests + 3 skipped), `npm run build` green; public e2e on the three projects 96 passed with one WebKit flake that passed on retry (the groups index search on iPhone), plus the accessibility spec on iPhone 4 passed. Decision D-1310.
@@ -1014,6 +1020,8 @@ Haider's phone findings fixed on **branch `req-013-phone-fixes` 4197d93** (from 
 - **Next:** batch 37 on `req-017-close-out` from `req-011-groups`.
 
 
+
+
 ## Dev status (batch 41, written 14 Oct 2026, Dev; third unattended run, done before batch 37)
 
 Fix on **`req-009-session-c` 53e780d** (fix commit aa810b0, D-1009), merged up the stack and into the two batch branches: **`req-010-generation-kicker` 7bdcdf1, `req-016-document-standard` c9e91b8, `req-017-guided-path` 0402a0b, `req-011-groups` b6b4872, `req-013-phone-fixes` c93a5b0, `req-017-close-out` b6b4872** (no commits of its own yet). Every branch contains `main` 1341115. No model calls.
@@ -1022,6 +1030,8 @@ Fix on **`req-009-session-c` 53e780d** (fix commit aa810b0, D-1009), merged up t
 - **Proof here.** Type-check and lint clean on the two files; the integration file loads and skips without Supabase variables. The rows are CI's to prove on PR #28.
 - **Merges.** DECISIONS.md and NEXT.md conflicted at every stacked step (each branch appends at the same place); resolved keeping both sides, markdown only, each block present once, no markers.
 - **Next:** batch 37 on `req-017-close-out`.
+
+
 
 
 ## Dev status (batch 37, written 14 Oct 2026, Dev; third unattended run)
@@ -1037,6 +1047,8 @@ Close-out on **`req-017-close-out` 41138e0** (from `req-011-groups` after batch 
 - **Next:** batch 35 on `req-018-ndis-watch-1`.
 
 
+
+
 ## Dev status (batch 35, written 14 Oct 2026, Dev; third unattended run)
 
 NDIS-watch items applied on **`req-018-ndis-watch-1` 265f9bf** (cut from the head of `req-017-close-out`, so it merges last under the standing rule; it contains `main` a9373aa). No model calls. Decisions D-1801, D-1802; the dataset is 1.2.0.
@@ -1049,6 +1061,8 @@ NDIS-watch items applied on **`req-018-ndis-watch-1` 265f9bf** (cut from the hea
 - **Skipped, as the queue says:** item 9 (wave 2 class lists), item 11 (superseded by A1), item 13 (s 73VA number and date stay UNVERIFIED), item 14 (no change), A8 (competitor notes), A9 (not approved), A11 (dates stay as the guide has them, still UNVERIFIED), A13 (covered by item 1's wording). A10 names a reportable-incident guide that does not exist on any branch; its wording went into the primer bullet (item 3) and no guide marker was there to drop.
 - **Proof here.** npm run check and npm run build green on the branch (96 test files, 688 tests passing, 4 skipped); standards:verify 27 sources. Copy-lint and the docx lint are inside `npm test`; the docx replay figures are above.
 - **Next:** batch 39 (REQ-018 audit-day systems). PRs #28 to #31 are still open, so per Haider's instruction the branch is cut from the head of `req-011-groups`.
+
+
 
 
 ## Dev status (batch 39 Session A, written 14 Oct 2026, Dev; third unattended run)
@@ -1085,6 +1099,8 @@ REQ-018 Session C on **`req-018-audit-day-systems` 8b90c37** (Session A 83c9279,
 - **Next:** batch 40 (`req-005-house-style-v2`), cut from the head of `req-018-ndis-watch-1` under the standing rule.
 
 
+
+
 ## Dev status (batch 40, written 14 Oct 2026, Dev; third unattended run)
 
 House style version 2 on **`req-005-house-style-v2` d1ea3db** (cut from the head of `req-018-ndis-watch-1` under the standing rule; it contains `main` 014db67). No model calls; no recording. Decisions D-544, D-545. npm run check and npm run build green on the branch (98 test files, 698 tests passing, 4 skipped).
@@ -1096,6 +1112,8 @@ House style version 2 on **`req-005-house-style-v2` d1ea3db** (cut from the head
 - **Item 5.** The pricing page carries one paragraph under "How the drafts are made": built from your own answers; every step names a role, a time and a record; vague wording and leftover blanks are rejected before a document reaches you; you read and adopt each document before it counts. No "audit-proof", no "compliant"; copy-lint green. **There is no "How it works" page in the product** (the home page's "What you get" section is the nearest); say if you want the paragraph there too and I will wire it.
 - **Proof here.** Unit and copy-lint green; the fixtures replay and the docx lint green; the production build passes.
 - **Queue status.** Batches 38, 41, 36, 37, 35, 39 and 40 are done; nothing else is queued. Next, per Haider's instruction: run the full suite on every open branch, fix anything red, then the three-persona review as a numbered list.
+
+
 
 
 ## Dev status (queue empty: full suite on every open branch, and the three-persona review; written 14 Oct 2026, Dev; third unattended run, final)
@@ -1139,6 +1157,8 @@ No code changes in this status. Then the three-persona review, done on the rende
 17. The document control table's "Approver [name], [role]" and "[date]" are filled from the account (batch 37); in the evidence render they show as blanks because the render has no account. Expected, but the evidence folder is what the PO reads: a render with the sample owner facts would read as a customer's pack does.
 
 **Numbers for the record.** Fact blanks after the owner's name: 3 of 187 sections (2 percent). Version 2 lint findings over recorded replies: 60 of 208 (36 indicator restatement, 13 vague time, 30 staff as actor, 11 record name). Replay generic sections: 3. Recording list for Haider's session, in priority order: the complaints procedure (finding 9), the first three sections of every document (12), the five sections whose briefs changed in batch 40, then the 60 flagged recordings.
+
+
 
 ## Queue (written by PO, 14 Oct 2026 morning, batch 42: PO triage of the three-persona review; one branch `req-019-review-fixes` from the head of `req-005-house-style-v2`, standing merge-main rule)
 CI is paused until Haider raises the GitHub Actions spending limit (every job fails at start with a billing notice); keep pushing, CI will be re-run by the PO afterwards. Do not open any other branch. Findings refer to the numbered list in the status above.
@@ -1193,6 +1213,8 @@ Delivered on **`req-019-review-fixes` fde906d** (one commit from the head of `re
 **Next:** Standing backlog 1, `req-015-accessibility-pass`, from the head of `req-019-review-fixes`.
 
 
+
+
 ## Dev status (standing backlog 1, written 14 Oct 2026, Dev; accessibility pass, REQ-015 Section E)
 
 Delivered on **`req-015-accessibility-pass` 74d5703** (one commit from the head of `req-019-review-fixes` 749ad6b, which carries `main` 57870e7). `npm run check` green (100 files, 715 tests, 4 skipped). Decision D-1508; REQ-015 delivery evidence appended. CI still paused; pushed.
@@ -1206,6 +1228,8 @@ Delivered on **`req-015-accessibility-pass` 74d5703** (one commit from the head 
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 2, `req-010-performance-budget`, from the head of `req-015-accessibility-pass`.
+
+
 
 ## Queue (written by PO, 14 Oct 2026, batch 43: two real CI failures found when the whole stack ran in GitHub Actions; do this FIRST, before the backlog item you are on, then return to it)
 All twelve PRs (#28 to #39, one per open branch, base `main`) ran today. Lint, typecheck, unit, build, gitleaks and the docx render are green everywhere. The Supabase job fails for two reasons, neither visible locally:
@@ -1236,6 +1260,8 @@ Delivered on **`req-010-performance-budget` 5fc8a5e** (one commit from the head 
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 3, `req-011-guides-2`, from the head of `req-010-performance-budget`.
+
+
 
 
 ## Dev status (batch 43, written 14 Oct 2026, Dev; the two CI failures and the WebKit wrap)
@@ -1269,6 +1295,8 @@ Close behind: the recording session (three "In plain words" fallbacks, one of th
 **Next:** the PO reads the seven files and writes batch 45. Standing rule noted: the pipeline runs before every phase gate, before a trial, and after any batch that changes the generator, the fixed text or the guided path. I return to the standing backlog (item 3, `req-011-guides-2`) unless a numbered queue appears first.
 
 
+
+
 ## Dev status (standing backlog 3, written 14 Oct 2026, Dev; two audit guides and the which-audit update, REQ-011)
 
 Delivered on **`req-011-guides-2` f580531** (one commit from the head of `req-010-performance-budget` ab4f1b4, which carries `main` 7e20d6b). `npm run check` green (101 files, 716 tests, 5 skipped). Decision D-1106. No REQ-011 file exists in `product/requirements` (the backlog row lists it as draft), so the delivery evidence is this status. CI still paused; pushed.
@@ -1282,6 +1310,8 @@ Delivered on **`req-011-guides-2` f580531** (one commit from the head of `req-01
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 4, `req-018-register-tests`. The REQ-018 registers live on `req-018-audit-day-systems`, which is not on this lineage, so that branch starts from the head of `req-011-guides-2` with `req-018-audit-day-systems` merged in; recorded in the next status.
+
+
 
 
 ## Dev status (standing backlog 4, written 14 Oct 2026, Dev; register tests, reminder fixtures, the docx lint in CI, retry policy, REQ-018)
@@ -1299,6 +1329,8 @@ Delivered on **`req-018-register-tests` d354cea** (two commits from the head of 
 **Next:** Standing backlog 5, `req-004-admin-hardening`, from the head of `req-018-register-tests`.
 
 
+
+
 ## Dev status (standing backlog 5, written 14 Oct 2026, Dev; ASVS level 1 re-check of REQ-002 and REQ-004)
 
 Delivered on **`req-004-admin-hardening` 5026fd0** (one commit from the head of `req-018-register-tests` 65a1162). `npm run check` green (107 files, 759 tests, 5 skipped; lint and typecheck re-run after the last edit; production audit 0 vulnerabilities). Decisions D-209 and D-424; delivery evidence appended to REQ-002 and REQ-004; the control table is `product/security/asvs-l1-check-2026-10-14.md`. CI still paused; pushed. Needs the PO: nothing paid; two GitHub features to be aware of (below).
@@ -1312,6 +1344,8 @@ Delivered on **`req-004-admin-hardening` 5026fd0** (one commit from the head of 
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 6, `req-005-recording-prep`, from the head of `req-004-admin-hardening`.
+
+
 
 Backlog 10 (written by PO, 14 Oct 2026; branch `req-021-writing-indicator`, may be taken before backlog 7 to 9 because it is small and Haider asked for it): REQ-021 in `product/requirements/REQ-021-writing-indicator.md`. One component, five honest phases, the twelve scenarios S1 to S12, the tests listed, no new dependency, no model calls. The job status endpoint gains the current section index and `last_progress_at`. Status with the SHA and screenshots of the five phases on the iphone project. STOP.
 
@@ -1330,6 +1364,8 @@ Delivered on **`req-005-recording-prep` 7a96443** (one commit from the head of `
 **Next:** Standing backlog 10, `req-021-writing-indicator` (REQ-021), from the head of `req-005-recording-prep`: the PO allows it before 7 to 9, and REQ-020 has no file in `product/requirements` yet, so backlog 7 would stop for the PO at once. Backlog 7 follows when the REQ exists.
 
 
+
+
 ## Dev status (standing backlog 10, written 14 Oct 2026, Dev; the writing indicator, REQ-021)
 
 Delivered on **`req-021-writing-indicator` 168ffae** (one commit from the head of `req-005-recording-prep` c3e46b8). `npm run check` green (109 files, 792 tests, 5 skipped). Decision D-2101; REQ-021 Dev response and delivery evidence written; screenshots of the five phases on the iPhone project under `product/evidence/req-021/`. No model calls. CI still paused; pushed. Taken before backlog 7 to 9 as the PO allowed; REQ-020 still has no file.
@@ -1344,6 +1380,8 @@ Delivered on **`req-021-writing-indicator` 168ffae** (one commit from the head o
 **Next:** Standing backlog 7, `req-020-registers-audit-pack`, from the head of `req-021-writing-indicator`, which stops for the PO at once unless `product/requirements/REQ-020-*.md` exists by then (the rule: write the REQ draft from the research file and STOP).
 
 
+
+
 ## Dev status (standing backlog 7, written 14 Oct 2026, Dev; REQ-020 draft for the PO, STOP on this item)
 
 Backlog 7 says the PO writes REQ-020 before the item starts and, if it is not there, Dev writes the draft from the research file and stops for the PO. The file was not there, so **`req-020-registers-audit-pack` 3032916** (one commit from the head of `req-021-writing-indicator` 99cfb06) holds `product/requirements/REQ-020-registers-audit-pack.md` in `draft` status and nothing else: no code, no model calls. CI still paused; pushed.
@@ -1354,6 +1392,8 @@ Backlog 7 says the PO writes REQ-020 before the item starts and, if it is not th
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 8, `req-005-living-policies`, from the head of `req-021-writing-indicator` (it does not depend on REQ-020), then backlog 9 prepared without model calls (the question set, the lint and fixture mapping, the runner and the report format; the live run waits for the PO's go-ahead).
+
+
 
 
 ## Dev status (standing backlog 8, written 14 Oct 2026, Dev; living policies, REQ-005 and REQ-018 FR-13)
@@ -1369,6 +1409,8 @@ Delivered on **`req-005-living-policies` 3d0c60a** (one commit from the head of 
 **Next:** Standing backlog 9, `req-005-generator-exam`, from the head of `req-005-living-policies`: the question set, the lint and fixture mapping, the runner and the report format, prepared without a model call; the live run waits for the PO's go-ahead.
 
 
+
+
 ## Dev status (standing backlog 9, written 14 Oct 2026, Dev; the generator exam, REQ-005)
 
 Delivered on **`req-005-generator-exam` a1e5ea9** (one commit from the head of `req-005-living-policies` a50e2f0). `npm run check` green (112 files, 803 tests, 6 skipped). Decision D-552; REQ-005 delivery evidence appended; first report `product/qa/generator-exam/2026-10-14.md`. No model calls. CI still paused; pushed. Needs the PO: the go-ahead and the `ANTHROPIC_API_KEY` secret for the live run (about one pack a month); two content calls below.
@@ -1381,6 +1423,8 @@ Delivered on **`req-005-generator-exam` a1e5ea9** (one commit from the head of `
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Backlog state at STOP:** items 1 to 6, 8, 9 and 10 delivered; 7 stopped for the PO (REQ-020 draft on its branch). The standing backlog is empty bar that, so the next step is the backlog's closing rule: the full suite on every open branch and a final status.
+
+
 
 
 ## Dev status (standing backlog closed, written 14 Oct 2026, Dev; the full check on every open branch, and STOP)
@@ -1421,6 +1465,8 @@ The standing backlog is empty bar item 7, which stopped for the PO (the REQ-020 
 **STOP.** No numbered queue is open and the standing backlog has no item left that does not wait for the PO.
 
 
+
+
 ## Batch 45a, do first (written by PO, 14 Oct 2026, during the public CI window): the Lighthouse budget job fails on every branch that carries backlog 2
 
 CI is finally running on all twenty-one branches. Everything passes except one step, and because the branches are stacked it fails on every branch from `req-010-performance-budget` onwards (#40 to #47 and the new performance-budget PR). Evidence: run 38526720048, job "Lint, typecheck, unit, build, e2e", step "Performance budgets, mobile profile, public pages": `npx --yes lighthouse@12.8.2 http://localhost:3100/ ... --chrome-flags=--headless=new --no-sandbox` exits 1 with `output: [null, null, null]`, so we cannot even see why. The same test passes on the laptop.
@@ -1444,4 +1490,5 @@ Status (dev):
 5. Then merge `origin/main` into every open branch in stack order (#29 first), resolve `product/NEXT.md` with the prose resolver (both sides appended; nothing is dropped), push each, and put the branch heads here. The pushes re-run CI by themselves while the repository is public.
 6. Write one line per item above under this status: root cause in one sentence, the branch it was fixed on, the run number that went green.
 
-Status (dev): 
+Status (dev):
+

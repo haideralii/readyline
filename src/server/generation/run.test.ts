@@ -262,6 +262,8 @@ describe("generateDocumentSet", () => {
           "cache_creation_input_tokens",
           "cache_read_input_tokens",
           "document_type_id",
+          "failure_detail",
+          "failure_kind",
           "input_tokens",
           "model",
           "output_tokens",

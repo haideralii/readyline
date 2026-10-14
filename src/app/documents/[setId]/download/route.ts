@@ -6,14 +6,17 @@
  */
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { renderDocx } from "@/lib/generator/render-docx";
 import { parseInput, strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { DOCX_TYPE } from "@/server/generation/run";
 import { isOwnedPath, signedDownloadUrl } from "@/server/generation/storage";
 import { isSetLocked } from "@/server/payments/queries";
+import { isDocumentAdopted as isAdopted } from "@/server/registers/queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -54,6 +57,20 @@ export async function GET(
     const typeId = query.data.file.replace(/(\.v\d+)?\.docx$/i, "");
     const doc = docs.find((d) => d.document_type_id === typeId);
     if (!doc) return new NextResponse("Not found", { status: 404 });
+    // REQ-016 D-058: once the provider has adopted the document (checklist
+    // Done sets the policy review's adopted date), it is served without the
+    // draft footer mark and the section marks, rendered from the stored model.
+    if (await isAdopted(supabase, viewer.account.id, typeId)) {
+      const bytes = await renderDocx(doc.model, { adopted: true });
+      return new NextResponse(new Uint8Array(bytes), {
+        status: 200,
+        headers: {
+          "Content-Type": DOCX_TYPE,
+          "Content-Disposition": `attachment; filename="${query.data.file}"`,
+          "Cache-Control": "no-store",
+        },
+      });
+    }
     path = doc.storage_path;
   }
   if (!isOwnedPath(path, viewer.account.id))

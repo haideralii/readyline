@@ -195,8 +195,11 @@ describe("recorded fixtures replay through the current gate", () => {
           const hits = lintReviewCycles(blocksToText(parsed.data), cycles).map(
             (h) => h.match,
           );
-          if (hits.length)
-            results[`${typeId}/${sectionId}/${file.slice(0, 8)}`] = hits;
+          // Keyed by section, not by fixture hash: a re-key (D-542) or a re-recording changes the hashes, not the finding.
+          if (hits.length) {
+            const key = `${typeId}/${sectionId}`;
+            results[key] = [...(results[key] ?? []), ...hits].sort();
+          }
         }
       }
     }
@@ -246,8 +249,11 @@ describe("recorded fixtures replay through the current gate", () => {
             blocksToText(parsed.data),
             outline,
           ).map((h) => h.match);
-          if (hits.length)
-            results[`${typeId}/${sectionId}/${file.slice(0, 8)}`] = hits;
+          // Keyed by section, not by fixture hash: a re-key (D-542) or a re-recording changes the hashes, not the finding.
+          if (hits.length) {
+            const key = `${typeId}/${sectionId}`;
+            results[key] = [...(results[key] ?? []), ...hits].sort();
+          }
         }
       }
     }
@@ -268,20 +274,20 @@ describe("recorded fixtures replay through the current gate", () => {
         "incident-management-policy-and-register/how-we-do-this",
       ],
       results: {
-        "behaviour-support-plan-implementation-procedure/steps-getting-the-plan/0079e9dd":
+        "behaviour-support-plan-implementation-procedure/steps-getting-the-plan":
           ["section 7 Reportable incidents for what we"],
-        "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review/07b684d6":
+        "behaviour-support-plan-implementation-procedure/steps-monitoring-reporting-and-review":
           [
             "section 6 Reporting to the Commission for",
             "section 7 Reportable incidents straight away",
           ],
-        "behaviour-support-plan-implementation-procedure/steps-putting-the-plan-into-practice/124db386":
+        "behaviour-support-plan-implementation-procedure/steps-putting-the-plan-into-practice":
           ["section 7 Reportable incidents", "section 8 Monitoring and review"],
-        "complaints-management-policy-and-register/responsibilities/01708a9f": [
+        "complaints-management-policy-and-register/responsibilities": [
           "section 3 What we do",
           "section 3 What we do",
         ],
-        "incident-management-policy-and-register/how-we-do-this/bcd8234b": [
+        "incident-management-policy-and-register/how-we-do-this": [
           "section 4 Records we keep",
         ],
       },
@@ -351,8 +357,6 @@ describe("recorded fixtures replay through the current gate", () => {
     }
     expect(rekeyed.sort()).toEqual(
       [
-        "ai-use-and-governance-policy/policy-statement",
-        "ai-use-and-governance-policy/purpose",
         "conflict-of-interest-policy/policy-statement",
         "conflict-of-interest-policy/purpose",
         "continuity-of-supports-plan/purpose",
@@ -367,7 +371,6 @@ describe("recorded fixtures replay through the current gate", () => {
         "records-management-policy/purpose",
         "safeguarding-policy/policy-statement",
         "safeguarding-policy/purpose",
-        "ai-and-digital-data-handling-procedure/purpose",
       ].sort(),
     );
   });

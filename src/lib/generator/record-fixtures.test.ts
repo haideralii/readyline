@@ -416,8 +416,9 @@ describe.skipIf(enabled)("record model fixtures (skipped)", () => {
     const soleTrader = list.filter(
       (r) => r.caseId === "verification-sole-trader",
     );
-    expect(soleTrader.length).toBe(90);
-    expect(new Set(soleTrader.map((r) => r.typeId)).size).toBe(18);
-    expect(list.filter((r) => r.batch === 16)).toHaveLength(76);
+    // REQ-016 S-6: the two AI documents left the set (seven sections, two types).
+    expect(soleTrader.length).toBe(83);
+    expect(new Set(soleTrader.map((r) => r.typeId)).size).toBe(16);
+    expect(list.filter((r) => r.batch === 16)).toHaveLength(69);
   });
 });

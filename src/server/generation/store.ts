@@ -19,6 +19,8 @@ export type VersionSetRow = {
   document_count: number;
   fallback_section_count: number;
   generated_count: number;
+  /** Sections carrying a blank for the provider (REQ-016 FR-0c); null on rows written before the column existed. */
+  provider_input_section_count?: number | null;
   storage_prefix: string;
   created_at: string;
   completed_at: string | null;
@@ -51,6 +53,10 @@ export type GenerationLogRow = {
   /** Prompt-cache writes and reads for the last call of the section (D-046). */
   cache_creation_input_tokens: number | null;
   cache_read_input_tokens: number | null;
+  /** Why a section fell back (REQ-016 FR-0b, D-540): the kind and rule names only, never content. */
+  failure_kind:
+    "model-error" | "gate" | "truncation" | "fixture-missing" | null;
+  failure_detail: string | null;
 };
 
 export interface GenerationStore {
@@ -66,6 +72,8 @@ export interface GenerationStore {
       documents: number;
       fallbackSections: number;
       generated: number;
+      /** Sections carrying a blank for the provider (REQ-016 FR-0c); what the set page counts. */
+      providerInputSections?: number;
       status: "ready" | "failed";
     },
   ): Promise<void>;
@@ -119,6 +127,7 @@ export class SupabaseGenerationStore implements GenerationStore {
       documents: number;
       fallbackSections: number;
       generated: number;
+      providerInputSections?: number;
       status: "ready" | "failed";
     },
   ): Promise<void> {
@@ -129,6 +138,7 @@ export class SupabaseGenerationStore implements GenerationStore {
         document_count: counts.documents,
         fallback_section_count: counts.fallbackSections,
         generated_count: counts.generated,
+        provider_input_section_count: counts.providerInputSections ?? 0,
         completed_at: new Date().toISOString(),
       })
       .eq("id", id);

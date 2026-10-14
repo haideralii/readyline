@@ -20,8 +20,13 @@ import {
 } from "./document-model";
 import { readabilityGateFor, reviewCyclesFor } from "./catalogue";
 
-/** .2 (batch 15, D-531): the user prompt carries the document outline (R-9). .3 (batch 16, D-046): document block first, section block last, for caching. */
-export const PROMPT_VERSION = "2026-10-12.3";
+/**
+ * .2 (batch 15, D-531): the user prompt carries the document outline (R-9).
+ * .3 (batch 16, D-046): document block first, section block last, for caching.
+ * 2026-10-13.1 (batch 33, D-542): the house style's blank rule (S-8) and its
+ * fixed-text paragraph (D-058); fixtures re-keyed, replies unchanged.
+ */
+export const PROMPT_VERSION = "2026-10-13.1";
 
 const FactsSchema = strictObject({
   tradingName: z.string().min(1).max(120),
@@ -167,7 +172,8 @@ function assemble(input: {
       purpose: type.purpose,
       basisReason: basisReasonFor(type, standards.length),
     },
-    readabilityGate: readabilityGateFor(type),
+    // REQ-016 S-4: a section may carry its own gate (the plain-language summary fails above Year 6).
+    readabilityGate: readabilityGateFor(type, section),
     section: {
       id: section.id,
       heading: section.heading,

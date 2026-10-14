@@ -7,6 +7,7 @@
  */
 import { strFromU8, unzipSync } from "fflate";
 import { describe, expect, it, vi } from "vitest";
+import { documentTypeById } from "@/lib/generator/catalogue";
 import { FakeClient, ReplayClient } from "@/lib/generator/model-client";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
@@ -77,6 +78,7 @@ class MemoryStore implements GenerationStore {
       documents: number;
       fallbackSections: number;
       generated: number;
+      providerInputSections?: number;
       status: "ready" | "failed";
     },
   ) {
@@ -86,6 +88,7 @@ class MemoryStore implements GenerationStore {
       document_count: counts.documents,
       fallback_section_count: counts.fallbackSections,
       generated_count: counts.generated,
+      provider_input_section_count: counts.providerInputSections ?? 0,
     });
   }
   async insertDocumentVersion(
@@ -373,9 +376,32 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
       siteUrl: "https://readyline.example",
     });
     expect(report).toMatchObject({ claimed: true, outcome: "ready" });
-    expect(store.sets[0].fallback_section_count).toBe(0);
-    expect(store.logs.every((l) => l.status === "generated")).toBe(true);
+    // REQ-016 S-4: the five participant-facing documents gained an unrecorded
+    // plain-language summary; it ships as marked generic text until the next
+    // recording session (D-542). Every recorded section still generates.
+    const notGenerated = store.logs.filter((l) => l.status !== "generated");
+    expect(new Set(notGenerated.map((l) => l.section_id))).toEqual(
+      new Set(["plain-language-summary"]),
+    );
+    const facing = store.documents.filter(
+      (d) => documentTypeById(d.document_type_id)?.participantFacing,
+    ).length;
+    expect(facing).toBeGreaterThan(0);
+    expect(notGenerated).toHaveLength(facing);
+    expect(store.sets[0].fallback_section_count).toBe(facing);
     expect(store.logs.length).toBeGreaterThan(50);
+    // FR-0c: no document ships undrafted, and the provider's blanks are counted apart from failures.
+    for (const d of store.documents)
+      expect(
+        d.model.sections.filter((s) => s.status === "placeholder"),
+        d.document_type_id,
+      ).toEqual([]);
+    expect(store.sets[0].provider_input_section_count).toBeGreaterThan(0);
+    expect(report.claimed && report.failures?.length).toBe(facing);
+    expect(
+      report.claimed &&
+        report.failures?.every((f) => f.kind === "fixture-missing"),
+    ).toBe(true);
   });
 
   it("runGenerationTicks takes the next runnable job within the budget and reports when more remains", async () => {

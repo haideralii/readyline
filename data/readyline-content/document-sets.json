@@ -20,9 +20,7 @@
     "service-agreement-template",
     "participant-rights-and-choice-policy",
     "safeguarding-policy",
-    "emergency-and-disaster-management-plan",
-    "ai-use-and-governance-policy",
-    "ai-and-digital-data-handling-procedure"
+    "emergency-and-disaster-management-plan"
   ],
   "byModule": {
     "verification": [],

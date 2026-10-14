@@ -61,7 +61,12 @@ export async function buildSampleDocument(): Promise<DocumentModel> {
       modelId: "claude-sonnet-5-5",
       allowedPhrases: allowed,
     });
-    if (out.section.status !== "generated")
+    // REQ-016 S-4: the plain-language summary is new and unrecorded; it ships
+    // as the marked generic text until the next recording session (D-542).
+    if (
+      out.section.status !== "generated" &&
+      section.id !== "plain-language-summary"
+    )
       throw new Error(`sample: section ${section.id} has no recorded fixture`);
     sections.push(out.section);
   }

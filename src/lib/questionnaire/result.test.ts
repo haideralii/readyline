@@ -73,14 +73,16 @@ describe("buildResult", () => {
       /^https:\/\/www\.ndiscommission\.gov\.au\//,
     );
     expect(r.documents.map((d) => d.id)).toEqual(
+      // REQ-016 S-6: the AI content lives in the privacy policy; no standalone AI document.
       expect.arrayContaining([
         "governance-policy",
-        "ai-use-and-governance-policy",
+        "privacy-and-information-management-policy",
       ]),
     );
     expect(
       r.documents.some((d) => d.id === "medication-management-procedure"),
     ).toBe(false);
+    expect(r.documents.some((d) => d.id.startsWith("ai-"))).toBe(false);
   });
 
   it("AC-2: [0120, 0107] is certification with the core module and a mid-term audit on governance", () => {

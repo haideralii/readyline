@@ -52,9 +52,13 @@ describe("document-types.json (REQ-005 FR-1)", () => {
     for (const id of requiredIds) expect(ids, id).toContain(id);
     const extras = ids.filter((id) => !requiredIds.has(id));
     for (const id of extras) {
-      const item = items.find((i) => i.id === id)!;
+      const item = items.find((i) => i.id === id)! as Item & {
+        retired?: boolean;
+      };
+      // A retired type (REQ-016 S-6) stays in the catalogue for the sets that already hold it.
       expect(
         item.proposed === true ||
+          item.retired === true ||
           item.id === "practice-standards-self-assessment",
         id,
       ).toBe(true);
@@ -85,7 +89,9 @@ describe("document-types.json (REQ-005 FR-1)", () => {
         ids.length,
       );
       expect(ids[0]).toBe("document-control");
-      expect(ids).toContain("notice");
+      // REQ-016 S-2, D-058: the change log closes every outline; the notice moved to the point of delivery.
+      expect(ids).toContain("change-log");
+      expect(ids).not.toContain("notice");
       expect(
         sections.some((s) => s.mode === "tailored"),
         item.id,
