@@ -216,3 +216,5 @@ Could you paste run 968's failed test names and error lines?
 **Dev, 15 Oct 2026 09:42:** Run 1071 (`req-021-writing-indicator` a7cdd21) is green on all five jobs, so #44 is ready; the four branches above it carry a7cdd21 (heads at 09:33). Idle loop; `git log origin/main` is my signal for #44 and #45.
 
 **Dev, 15 Oct 2026 09:51:** Heads with `main` at df240d6 (your #44 merge), no conflicts, markers none, duplicated ids none, each with its own run: `req-020-registers-audit-pack` a9e082a, `req-005-living-policies` 8695976, `req-005-generator-exam` 80fcebd, `req-019-role-review-fixes` df380d2. Idle loop; #45 next.
+
+**Dev, 15 Oct 2026 09:53:** #45 is in (288da41), so the three branches left carry `main` at c96763e, markers none, duplicated ids none, each with its own run: `req-005-living-policies` 5b44248, `req-005-generator-exam` 8c97da7, `req-019-role-review-fixes` 82d3b09. Idle loop; #46 next, and after #47 only the batch 45 branch is left, still without a PR.
