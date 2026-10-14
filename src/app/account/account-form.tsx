@@ -5,7 +5,7 @@
  * the client and again in the server action.
  */
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   browserStorage,
   createLocalDraftStore,
@@ -74,6 +74,16 @@ export function AccountForm({
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [prefilled, setPrefilled] = useState(false);
+  // Batch 45b item 2: until the client is live a click on the server-rendered
+  // button submits the form natively and the page reloads without "Saved.";
+  // on a production server that window is real (CI saw it). The button is
+  // disabled until hydration, and a click then waits for it, as the
+  // questionnaire steps do.
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   // Setup only: prefill from the local questionnaire draft (FR-2).
   useEffect(() => {
@@ -220,7 +230,11 @@ export function AccountForm({
           Saved.
         </p>
       ) : null}
-      <button type="submit" disabled={busy} className="btn-primary">
+      <button
+        type="submit"
+        disabled={busy || !hydrated}
+        className="btn-primary"
+      >
         {busy
           ? "Saving…"
           : mode === "setup"
