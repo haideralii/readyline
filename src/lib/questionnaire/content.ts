@@ -5,6 +5,7 @@
  * file fails the unit suite, never a page.
  */
 import { z } from "zod";
+import auditKindsJson from "../../../data/readyline-content/audit-kinds.json";
 import auditTypesJson from "../../../data/readyline-content/audit-types.json";
 import documentSetsJson from "../../../data/readyline-content/document-sets.json";
 import modulesJson from "../../../data/readyline-content/modules.json";
@@ -105,6 +106,27 @@ export const GroupCategoriesContent = z.object({
 
 export const modulesContent = ModulesContent.parse(modulesJson);
 export const auditTypesContent = AuditTypesContent.parse(auditTypesJson);
+
+/** REQ-018 FR-11, AC-4: the five kinds of audit, in plain words, for the audit-day page's glossary. */
+export const AuditKindsContent = z.object({
+  ...reviewed,
+  items: z
+    .array(
+      z.object({
+        id: z.enum([
+          "provisional",
+          "first-with-participants",
+          "mid-term",
+          "renewal",
+          "conditional",
+        ]),
+        name: z.string().min(5),
+        description: z.string().min(40),
+      }),
+    )
+    .length(5),
+});
+export const auditKindsContent = AuditKindsContent.parse(auditKindsJson);
 export const documentSetsContent = DocumentSetsContent.parse(documentSetsJson);
 export const groupDescriptionsContent = GroupDescriptionsContent.parse(
   groupDescriptionsJson,
