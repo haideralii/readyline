@@ -111,8 +111,12 @@ test.describe("questionnaire", () => {
       "Draft saved locally on this device",
     );
     // PO batch 5: legend and labels, and the claim-free "what happens next" block.
-    await expect(page.getByTestId("have-legend")).toContainText("To prepare");
+    // REQ-013 batch 36 item 3: the customer's words; no internal label.
+    await expect(page.getByTestId("have-legend")).toContainText("drafts this");
     await expect(page.getByText("Not asked yet")).toHaveCount(0);
+    await expect(page.getByText(/not asked about yet|To prepare/)).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId("what-next")).toContainText(
       "What happens next",
     );

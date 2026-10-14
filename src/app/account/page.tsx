@@ -93,8 +93,7 @@ export default async function AccountPage() {
           <ReadyLine
             counts={{
               done: registers.current,
-              toPrepare: registers.dueSoon,
-              remainder: registers.overdue,
+              todo: registers.dueSoon + registers.overdue,
             }}
             noun="register entries"
             testId="account-registers-line"

@@ -138,12 +138,13 @@ test.describe("REQ-014 visual identity", () => {
     await toResult(page);
     const line = page.getByTestId("result-ready-line");
     await expect(line).toBeVisible();
+    // REQ-013 batch 36 item 3: one sentence in the customer's words; two segments, the track in mist.
     await expect(page.getByTestId("result-ready-line-text")).toContainText(
-      /\d+ of \d+ documents and registers in place/,
+      /You already have \d+ of these\. Readyline drafts the \d+ documents for you; the \d+ registers you keep as you go\./,
     );
-    await expect(page.getByTestId("result-ready-line-to-prepare")).toHaveCSS(
-      "fill",
-      "rgb(180, 70, 31)",
+    await expect(page.getByTestId("result-ready-line-todo")).toBeAttached();
+    await expect(page.getByTestId("result-ready-line-to-prepare")).toHaveCount(
+      0,
     );
   });
 
