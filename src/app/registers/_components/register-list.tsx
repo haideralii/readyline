@@ -31,7 +31,7 @@ export function StatusTag({ status }: { status: ListRow["status"] }) {
   const t = TONE[status.tone];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap ${t.cls}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.cls}`}
       data-testid="status-tag"
       data-status={status.key}
     >
