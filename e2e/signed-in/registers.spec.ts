@@ -8,7 +8,7 @@ import {
   signInContext,
   type TestTenant,
 } from "../helpers/session";
-import { checkWidths } from "../helpers/width";
+import { checkTables, checkWidths } from "../helpers/width";
 
 /**
  * REQ-009 Session B (batch 28) on all three projects: a subscribed owner
@@ -145,6 +145,8 @@ test.describe("registers (REQ-009 Session B)", () => {
       "advocate ADV-1",
     );
     await checkWidths(page, "incident detail");
+    // REQ-013 batch 36 item 1: the detail list never splits a word on a phone.
+    await checkTables(page, "incident detail");
     await shot(page, "incident-detail", project);
     await axeClean(page, "incident detail");
 
