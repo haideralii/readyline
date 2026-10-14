@@ -1,6 +1,6 @@
 # REQ-020: Registers for the audit day and for the team: the audit pack, worker logging, self-checks, hazards and import
 
-Status: draft (written by Dev on 14 Oct 2026 from `product/research/registers-competitors.md` gaps 1 to 5, as the standing backlog's rule for item 7 says; the PO edits, sets the status and the priorities, and nothing is built until the status is `ready`)
+Status: ready (Dev draft 14 Oct 2026 from `product/research/registers-competitors.md` gaps 1 to 5; reviewed and set ready by the PO the same day; the four Dev answers are accepted as written in the Dev response; the PO review at the end adds FR-10 to FR-12 and three edits, all binding)
 Phase: 5 Priority: should Owner: Dev
 
 ## Why (user and business outcome)
@@ -103,3 +103,22 @@ Not started.
 ## PO review
 
 Awaiting the PO: this file is a Dev draft under the standing backlog's rule for item 7 ("if it is not there, write the REQ draft from the research file and STOP for the PO").
+
+
+## PO review (14 Oct 2026, PO, acting as NDIS domain expert, security reviewer and QA lead)
+
+The draft stands. The four Dev answers are accepted: the pack built on request and nothing stored; a separate `is_worker` function with narrow policies on `incidents` and `complaints` only; `/report/<token>`; three sessions in the order A, B, C. Priority stays `should`; status is `ready`. Three edits and three additions, all binding.
+
+Edits.
+
+- FR-2: the auditor page shows the registers and the document control register only; it never shows the audit log, the reminders, the account page or any email. Expiry stays 24, 48 or 72 hours with 72 the default. One live link at a time, as drafted.
+- FR-5: the notification clock. Under the NDIS (Incident Management and Reportable Incidents) Rules 2018 the 24-hour and five-business-day periods run from when the provider becomes aware of the incident, and a worker is part of the provider. So a report submitted through the link or logged by a worker fixes `aware_at` at the moment of submission, not at confirmation; the owner's confirmation screen shows "Reported <time>; if this is a reportable incident the Commission must be told by <aware_at + 24 h>" using the existing fixed text, and the reportable-incident reminder (REQ-018 FR-10) is created from `aware_at` on confirmation. Drafts are still excluded from totals, but the draft itself raises a reminder to the owner: "1 report to confirm" by email two hours after submission and again at twelve hours, so a draft can never quietly eat the 24 hours.
+- FR-5: the report form carries, above the fields, the fixed line "If someone is in danger now, call 000 first." and the general-information line; the "who are you" field accepts a worker code or one of a short list of name-free roles and nothing else (no free text), which closes the name-shaped-value rule in SR-3 by construction.
+
+Additions.
+
+- FR-10 Pack contents sheet for the auditor. The cover sheet (FR-1) lists each register with its row count, its last entry date and its state from the audit-day list (present, incomplete, missing), so the auditor can see at a glance what is alive; the same table is the first thing on the auditor page (FR-2). No scores, no "ready" word, no promise about the outcome.
+- FR-11 Worker sign-in copy. The worker home says, in one line, what the worker can and cannot see ("You can log incidents and complaints and see what you logged. Your manager sees everything else."); the owner's invite screen says the same before sending. Removal of a worker revokes their session on the next request.
+- FR-12 Import safety. The preview (FR-8) refuses the whole file when more than half of its rows fail, with the plain message "Most rows did not pass; check the column names against the template", so a wrong-column spreadsheet never imports a handful of garbage rows; and an import can be undone within one hour by the owner (every row of that import deleted, one audit-log line), after which the rows are ordinary.
+
+Acceptance: AC-4 gains "the owner receives the two-hour and twelve-hour reminders while the draft is unconfirmed, and `aware_at` equals the submission time"; AC-5 gains "a file whose column names do not match is refused whole"; AC-1 gains the cover sheet table. Everything else as drafted. Evidence as drafted plus the ASVS rows and a screenshot of the auditor page on a phone.
