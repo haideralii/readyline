@@ -19,14 +19,19 @@ import {
   standardsForType,
 } from "./document-model";
 import { readabilityGateFor, reviewCyclesFor } from "./catalogue";
+import { STATE_FACT_SECTIONS, stateFactsFor } from "./state-facts";
 
 /**
  * .2 (batch 15, D-531): the user prompt carries the document outline (R-9).
  * .3 (batch 16, D-046): document block first, section block last, for caching.
  * 2026-10-13.1 (batch 33, D-542): the house style's blank rule (S-8) and its
  * fixed-text paragraph (D-058); fixtures re-keyed, replies unchanged.
+ * 2026-10-14.1 (batch 35, D-1801, D-1802): the STATE FACTS block in the
+ * section prompt of the state-tailored sections, and per-document brief
+ * additions; fixtures re-keyed, the affected sections' replies predate the
+ * change and are listed for the next recording session.
  */
-export const PROMPT_VERSION = "2026-10-13.1";
+export const PROMPT_VERSION = "2026-10-14.1";
 
 const FactsSchema = strictObject({
   tradingName: z.string().min(1).max(120),
@@ -102,6 +107,20 @@ export const ContextPack = strictObject({
     policyMonths: z.number().int().positive(),
     registerMonths: z.number().int().positive(),
   }),
+  /**
+   * State and territory facts for the provider's states, from
+   * data/state-reference.json only (A1, D-1801); present for the
+   * state-tailored sections and rendered as the STATE FACTS block.
+   */
+  stateFacts: z
+    .array(
+      strictObject({
+        code: z.string().min(2).max(3),
+        name: z.string().min(1),
+        lines: z.array(z.string().min(1)).min(1),
+      }),
+    )
+    .optional(),
 });
 
 /** Fills the [review cycles] marker a brief may carry with the document's fixed cycles. */
@@ -133,6 +152,9 @@ export function briefFor(
     brief = `Two short sentences, each under 15 words: what this document is for, and which obligation it supports: ${reason}; nothing else. Never name or ask for a Practice Standard.`;
   if (noStandard && section.id === "policy-statement")
     brief = `The commitments, in the provider's voice, each resting on the obligation this document is kept for: ${reason}. If you use a table, its columns are "Our commitment" and "What we do"; never add a quality-indicator column and never ask the provider to name a standard or indicator.`;
+  // Batch 35 (D-1802): a document-specific sentence on a shared outline brief.
+  const addition = type.briefAdditions?.[section.id];
+  if (addition) brief = `${brief} ${addition}`;
   return briefWithCycles(brief, cycles);
 }
 
@@ -191,6 +213,10 @@ function assemble(input: {
     outline: outlineFor(type),
     ...(rulesSectionFor(type) ? { rulesSection: rulesSectionFor(type)! } : {}),
     reviewCycles: cycles,
+    // A1 (D-1801): the state-tailored sections see the reference facts for the provider's states and nothing else.
+    ...(STATE_FACT_SECTIONS.has(section.id)
+      ? { stateFacts: stateFactsFor(facts.states) }
+      : {}),
   };
   // Parsing our own object guarantees the strict shape even if a caller passes extras later.
   return ContextPack.parse(pack);

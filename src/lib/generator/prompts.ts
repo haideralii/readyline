@@ -9,6 +9,7 @@
 import { createHash } from "node:crypto";
 import { PROMPT_VERSION, type ContextPack } from "./context-pack";
 import { HOUSE_STYLE } from "./house-style";
+import { renderStateFacts } from "./state-facts";
 
 export { PROMPT_VERSION };
 
@@ -101,9 +102,19 @@ export function buildPromptBlocks(pack: ContextPack): PromptBlocks {
     `The OUTLINE block is this document's numbered structure and overrides the generic structure in the house style. Refer to another section only by its number and title exactly as the outline gives them (for example "see section ${pack.outline[0].number} ${pack.outline[0].heading}"); never refer to a section that is not in the outline.`,
   ].join("\n\n");
   const own = pack.outline.find((o) => o.id === pack.section.id);
+  // A1 (batch 35, D-1801): the state-tailored sections carry the reference
+  // facts for the provider's states in the section block, so the document
+  // block (and every other section's fixture key) is untouched.
+  const stateFacts = pack.stateFacts
+    ? [
+        block("STATE FACTS", renderStateFacts(pack.stateFacts)),
+        "Everything between <<<STATE FACTS>>> and <<<END STATE FACTS>>> is the only source for a state's or territory's bodies, laws, checks and requirements; each line says its source, the day it was read and whether it is verified. If a state or a fact you need is not in the block, write the blank [state] in its place and never name a body, law or requirement from memory.",
+      ]
+    : [];
   const section = [
     `Write the section "${pack.section.heading}" (section id: ${pack.section.id}) of this document${own ? `; it is section ${own.number} ${own.heading} in the outline` : ""}.`,
     `Section brief: ${pack.section.brief}`,
+    ...stateFacts,
     `Reply with the JSON object only. sectionId must be "${pack.section.id}".`,
   ].join("\n\n");
   return { document, section };

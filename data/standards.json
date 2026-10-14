@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "version": "1.1.0",
-  "generatedAt": "2026-10-12",
+  "version": "1.2.0",
+  "generatedAt": "2026-10-14",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
   "sources": [
     {
@@ -289,6 +289,17 @@
       "snapshotPath": "data/sources/aqa-expectations.txt",
       "publisher": "NDIS Quality and Safeguards Commission",
       "sha256": "928ea9dbe4912327c644fd07b5899a67c2d5cfe3561b02de9b2c0d74ceaae956"
+    },
+    {
+      "id": "sil-qi-guidelines",
+      "title": "NDIS (Quality Indicators for NDIS Practice Standards) Amendment (Supported Independent Living) Guidelines 2026 (F2026N00443, PDF)",
+      "url": "https://www.legislation.gov.au/F2026N00443/asmade/2026-06-24/text/original/pdf",
+      "versionLabel": "F2026N00443, made 23 June 2026, registered 24 June 2026; inserts Part 8A (Module 5A, ss 72A to 72E) into the 2018 Guidelines",
+      "effectiveFrom": "2026-07-01",
+      "fetchedAt": "2026-10-14",
+      "snapshotPath": "data/sources/sil-qi-guidelines.txt",
+      "publisher": "NDIS Quality and Safeguards Commission",
+      "sha256": "179f2084f43b0e22c734d9c7fee632cd53569d23816a33be862fdd98b61793db"
     }
   ],
   "modules": [
@@ -423,7 +434,8 @@
         "sil-module",
         "sil-ps",
         "mandatory-sil",
-        "legislation-rules-toc"
+        "legislation-rules-toc",
+        "sil-qi-guidelines"
       ],
       "divisions": [],
       "verification": {
@@ -3880,13 +3892,14 @@
       "moduleIds": ["sil"],
       "requiresCore": true,
       "mandatoryFrom": "2026-07-01",
-      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL who have not applied for registration by 1 October 2026 must stop providing SIL supports. Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
+      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports; a new SIL entrant cannot provide SIL while an application is pending (Commission explanatory document, June 2026, read 13 October 2026). Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
       "sourceIds": [
         "registration-groups",
         "mandatory-registration",
         "mandatory-sil",
         "sil-ps",
-        "legislation-rules-toc"
+        "legislation-rules-toc",
+        "sil-qi-guidelines"
       ],
       "verification": {
         "status": "verified",

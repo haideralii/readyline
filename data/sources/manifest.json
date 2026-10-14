@@ -1,5 +1,5 @@
 {
-  "note": "Text extracted on 2026-10-11 from the NDIS Quality and Safeguards Commission website (HTML main content with tags stripped; PDFs via pypdf). Kept so standards.json can be diffed against its source. Re-fetch and compare before each release.",
+  "note": "Text extracted on 2026-10-11 from the NDIS Quality and Safeguards Commission website (HTML main content with tags stripped; PDFs via pypdf). Kept so standards.json can be diffed against its source. Re-fetch and compare before each release. Addition 2026-10-14 (batch 35, NDIS watch item 7): the SIL quality indicators amending instrument F2026N00443, PDF via pypdf.",
   "items": [
     {
       "id": "practice-standards-hub",
@@ -240,6 +240,13 @@
       "snapshotPath": "data/sources/about-registration.txt",
       "fetchedAt": "2026-10-11",
       "sha256": "8cafdea92593d70238f538b881117919e0082031b0aa59f11f5061a6c9d53f64"
+    },
+    {
+      "id": "sil-qi-guidelines",
+      "url": "https://www.legislation.gov.au/F2026N00443/asmade/2026-06-24/text/original/pdf",
+      "snapshotPath": "data/sources/sil-qi-guidelines.txt",
+      "fetchedAt": "2026-10-14",
+      "sha256": "179f2084f43b0e22c734d9c7fee632cd53569d23816a33be862fdd98b61793db"
     }
   ]
 }

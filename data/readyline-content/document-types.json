@@ -418,6 +418,9 @@
   "items": [
     {
       "id": "governance-policy",
+      "briefAdditions": {
+        "policy-statement": "Include this commitment, worded as a \"What we do\" line: \"We tell the Commission about changes and events in its approved form as soon as we know they will happen.\" (Provider Registration Rules s 13A, in force 1 July 2026.)"
+      },
       "title": "Governance policy",
       "kind": "policy",
       "outline": "policy",
@@ -489,6 +492,9 @@
     },
     {
       "id": "conflict-of-interest-policy",
+      "briefAdditions": {
+        "policy-statement": "Include this commitment word for word: \"We do not offer or accept any payment, gift or benefit to attract or keep a participant, or in return for a referral.\" (The Commission's media release on the Securing the NDIS for Future Generations Act 2026 names kickbacks and inducements as a new offence; do not state a section number or a start date.)"
+      },
       "title": "Conflict of interest policy",
       "kind": "policy",
       "outline": "policy",
@@ -559,7 +565,7 @@
           "id": "retention-schedule",
           "heading": "Retention schedule",
           "mode": "tailored",
-          "brief": "Table of record type and retention period, adjusted to the supports and states; cites the source for each period or marks it for the provider to confirm."
+          "brief": "Table of record type and retention period, adjusted to the supports and states; cites the source for each period or marks it for the provider to confirm. For anything that depends on a state or territory, use only the STATE FACTS block; if a state or a fact is missing from it, write the blank [state] and never name a law, body or period from memory."
         }
       ],
       "basis": "commission-rules",
@@ -586,7 +592,7 @@
           "id": "procedure",
           "heading": "Complaints procedure",
           "mode": "tailored",
-          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
+          "brief": "Numbered steps with timeframes as a table; how a participant can complain to the Commission. Say that if the Commission requires us to take actions on a complaint, we do them, record them in the complaints register and tell the Commission when they are done. Never restate statutory timeframes, reportable-incident lists or the Commission's definitions; refer to the fixed section that holds them (by its number and title in the outline)."
         },
         {
           "id": "register",
@@ -680,7 +686,7 @@
           "id": "training-matrix",
           "heading": "Training we require",
           "mode": "tailored",
-          "brief": "Table of training by role, including anything the chosen modules require (high intensity skills, behaviour support, infection control)."
+          "brief": "Table of training by role, including anything the chosen modules require (high intensity skills, behaviour support, infection control). For any state-specific check or training requirement, use only the STATE FACTS block (for example Victoria's WWC Child Safety Training before a Working with Children Check application); if a state or a fact is missing from it, write the blank [state] and never name a requirement from memory."
         },
         {
           "id": "training-register",
@@ -1063,7 +1069,7 @@
           "id": "state-authorisation",
           "heading": "Authorisation in the states where we work",
           "mode": "tailored",
-          "brief": "One paragraph per state from the questionnaire, naming the authorisation body and marking anything not confirmed from a primary source."
+          "brief": "One paragraph per state from the questionnaire, naming the authorisation body and its law exactly as the STATE FACTS block gives them, with the block's status (verified or unverified) stated in the paragraph. Use only the STATE FACTS block; if a state or a fact is missing from it, write the blank [state] and never name a body or a law from memory."
         },
         {
           "id": "use-register",
@@ -1159,13 +1165,16 @@
           "id": "state-reporting",
           "heading": "Mandatory reporting where we work",
           "mode": "tailored",
-          "brief": "One paragraph per state from the questionnaire naming the reporting scheme, marked unverified where not confirmed from a primary source."
+          "brief": "One paragraph per state from the questionnaire naming the mandatory reporting position for disability support workers exactly as the STATE FACTS block gives it, with the block's status (verified or unverified) stated in the paragraph. Use only the STATE FACTS block; if a state or a fact is missing from it, write the blank [state] and never name a scheme, body or law from memory."
         }
       ],
       "basis": "practice-standard"
     },
     {
       "id": "conflict-of-interest-in-coordination-procedure",
+      "briefAdditions": {
+        "steps": "Include this rule word for word as its own step: \"We do not offer or accept any payment, gift or benefit to attract or keep a participant, or in return for a referral.\" (The Commission's media release on the Securing the NDIS for Future Generations Act 2026 names kickbacks and inducements as a new offence; do not state a section number or a start date.)"
+      },
       "title": "Conflict of interest in support coordination procedure",
       "kind": "procedure",
       "outline": "procedure",

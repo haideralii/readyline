@@ -57,6 +57,13 @@ export const DocumentTypeSpec = z
     /** Readability grade above which a tailored section fails (D-047); defaults to the catalogue default. */
     readabilityFailAbove: z.number().positive().optional(),
     extraSections: z.array(SectionSpec),
+    /**
+     * A sentence appended to a shared outline section's brief for this
+     * document only (batch 35, D-1802): the governance policy's s 13A
+     * commitment and the conflict-of-interest inducement rule live here, so
+     * the outline brief every policy shares stays unchanged. Keyed by section id.
+     */
+    briefAdditions: z.record(slug, z.string().min(1)).optional(),
     /** Outline sections this document does not use (for example a split steps section, D-041). */
     omitSections: z.array(slug).optional(),
     proposed: z.boolean().optional(),

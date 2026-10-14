@@ -2632,6 +2632,54 @@ resolution is to keep both, the check sentence first and the action link
 after it; DECISIONS.md conflicts as usual and the prose resolver handles
 it. Whichever PR the PO merges second carries that one-hunk resolution.
 
+**D-1801 State and territory facts come from `data/state-reference.json`
+and nowhere else (Dev, 2026-10-14, batch 35, NDIS watch items A1, A2, A5,
+A7).** One record per state and territory with three facts each (NDIS
+worker screening, the children's or vulnerable-people check, restrictive
+practice authorisation) and one national record (the Commission's renewal
+cycle), every fact with its source title, URL, the day it was read (13
+October 2026) and a status, verified from a state government, Commission or
+legislation page or unverified from a summary. `data/state-reference.test.ts`
+fails a missing state, field, source or date. The prompt's section block
+for the three state-tailored sections (restrictive practice
+`state-authorisation`, child safe `state-reporting`, records
+`retention-schedule`) and the induction `training-matrix` (for A7's Victorian
+WWC training rule) carries a `<<<STATE FACTS>>>` block for the provider's
+states only, and their briefs say to use the block alone and to write the
+"[state]" blank when a state or a fact is missing, never a body or a law
+from memory. The block sits in the section block so every other section's
+fixture key is untouched. Mandatory reporting and first aid (item A9) were
+not approved and are not in the file; the child-safe `state-reporting`
+section therefore gets no reporting facts and writes the blank, which is
+the honest state until the PO approves A9.
+
+**D-1802 Document-specific brief additions, and the live recordings
+re-keyed under the changed prompts (Dev, 2026-10-14, batch 35, NDIS watch
+items 2, 6, A6).** `briefAdditions` on a document type appends a sentence
+to a shared outline section's brief for that document alone: the governance
+policy statement asks for the s 13A commitment, the conflict-of-interest
+policy statement and the coordination procedure's steps for the inducement
+rule, without touching the brief every other policy shares. The complaints
+procedure's own brief gained item 6's sentence. `PROMPT_VERSION` is
+`2026-10-14.1`; every fixture was re-keyed as in D-542 (system prompt and
+version, replies unchanged). The nine live recordings whose user prompt
+changed (the sole trader's governance policy statement and its retry,
+complaints procedure and its retry in both model folders, conflict-of-
+interest policy statement, retention schedule and training matrix) were
+re-keyed under the new user prompt by the tool's `REKEY_USER` mode, which
+matches a fixture to its reference case by trading name, derives the
+previous brief from the previous catalogue (`REKEY_PREVIOUS_CATALOGUE`,
+`git show` of the old file) through the same `briefFor` rules, and moves
+only a recording whose old first-attempt prompt equals the new one with
+this batch undone, keeping a retry's rejection suffix; the two recordings
+of older briefs stay as history. Each moved fixture says so in
+`userRekeyNote`: the reply answers the earlier brief. The replay is
+unchanged (186 sections, 3 generic) and the committed sample document is
+byte-identical, so nothing the customer sees changed by this batch; the
+new sentences arrive when those sections are re-recorded at Haider's next
+recording session (five sections on the sole-trader set, listed in the
+batch 35 status).
+
 
 
 
