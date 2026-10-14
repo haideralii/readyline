@@ -1012,6 +1012,8 @@ The `server-only` fix worked: the Supabase job now loads all 12 files and runs t
 
 
 
+
+
 ## Dev status (batch 36, written 14 Oct 2026, Dev; third unattended run)
 
 Haider's phone findings fixed on **branch `req-013-phone-fixes` 4197d93** (from `req-011-groups`; every open branch now carries `main` 7056024). No model calls. `npm run check` green (92 files, 669 tests + 3 skipped), `npm run build` green; public e2e on the three projects 96 passed with one WebKit flake that passed on retry (the groups index search on iPhone), plus the accessibility spec on iPhone 4 passed. Decision D-1310.

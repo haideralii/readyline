@@ -5,7 +5,11 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
-import { readinessCounts } from "@/lib/questionnaire/readiness";
+import {
+  readinessCounts,
+  readinessSentence,
+  readyLineCounts,
+} from "@/lib/questionnaire/readiness";
 import {
   documentGroupId,
   documentGroupsContent,
@@ -26,9 +30,10 @@ import { useQuestionnaire } from "../questionnaire-provider";
 /** "You said" as a small tag with an icon, never a second line (FR-5). */
 const HAVE_TAG: Record<string, { label: string; icon: string; tone: string }> =
   {
+    // REQ-013 batch 36 item 3: the customer's words; "not asked about yet" is never shown.
     yes: { label: "You have this", icon: "✓", tone: "text-moss border-moss" },
     no: {
-      label: "You said: not yet",
+      label: "You said you don't have this yet",
       icon: "○",
       tone: "text-ochre border-ochre",
     },
@@ -38,7 +43,7 @@ const HAVE_TAG: Record<string, { label: string; icon: string; tone: string }> =
       tone: "text-slate border-slate",
     },
     unknown: {
-      label: "To prepare",
+      label: `${BRAND} drafts this`,
       icon: "○",
       tone: "text-slate border-slate",
     },
@@ -230,7 +235,7 @@ function haveCounts(items: readonly { have: string }[]) {
   }
   const parts: string[] = [];
   if (c.yes) parts.push(`${c.yes} you have`);
-  if (c.toPrepare) parts.push(`${c.toPrepare} to prepare`);
+  if (c.toPrepare) parts.push(`${c.toPrepare} ${BRAND} drafts`);
   if (c.notSure) parts.push(`${c.notSure} not sure`);
   return parts.join(", ");
 }
@@ -310,10 +315,11 @@ function ResultView({
           You will need <strong>{r.documents.length} documents</strong> and{" "}
           <strong>{r.registers.length} registers</strong>.
         </p>
+        {/* REQ-013 batch 36 item 3: two segments (have / still to do) and one sentence in the customer's words. */}
         <div className="mt-3">
           <ReadyLine
-            counts={readinessCounts(r)}
-            noun="documents and registers"
+            counts={readyLineCounts(readinessCounts(r))}
+            sentence={readinessSentence(readinessCounts(r))}
             testId="result-ready-line"
           />
         </div>
@@ -336,7 +342,7 @@ function ResultView({
               className="inline-flex min-h-11 items-center underline underline-offset-4"
               data-testid={signedIn ? "checklist-link" : "checklist-sign-in"}
             >
-              Open your checklist
+              Open your checklist ({checklistTotal} things)
             </Link>
             <Link
               href="/pricing"
@@ -346,10 +352,6 @@ function ResultView({
               See the price
             </Link>
           </div>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Your checklist has {checklistTotal} items
-            {signedIn ? "." : "; sign in to track them."}
-          </p>
         </div>
       </section>
 
@@ -391,11 +393,10 @@ function ResultView({
               className="text-sm leading-6"
               data-testid="reason"
             >
-              {x.unverified ? (
-                <span className="mr-2 rounded-full border border-amber-700 px-2 py-0.5 text-xs font-medium text-amber-800 dark:border-amber-400 dark:text-amber-300">
-                  Not confirmed by the Commission&apos;s text
-                </span>
-              ) : null}
+              {/* REQ-013 batch 36 item 2: a plain sentence and the link, never the internal confidence badge. */}
+              {x.unverified
+                ? "Check this against the Commission's page before you rely on it. "
+                : ""}
               {x.text}{" "}
               <a
                 href={x.source.url}
@@ -458,8 +459,8 @@ function ResultView({
           className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
           data-testid="have-legend"
         >
-          Tags come from your answers in the last step. &ldquo;To prepare&rdquo;
-          means the questionnaire did not ask about that item.
+          Tags come from your answers in the last step. &ldquo;{BRAND} drafts
+          this&rdquo; means it is in your pack.
         </p>
         {groups.map((g) => (
           <Disclosure
