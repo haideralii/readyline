@@ -2867,6 +2867,8 @@ rendering so document control is filled as a customer's account would
 fill it. Findings 16, 2, 8, 10 and 12 wait for the recording session and
 are listed in the recording order in `fixtures/generation/README.md`.
 
+
+
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
@@ -2985,6 +2987,9 @@ on the audit-day page as the plain-words glossary; there is no separate
 glossary page in the product, so the audit-day page is where the REQ's
 "glossary" lives. The pricing page gains FR-12's sentence beside the
 subscription.
+
+
+
 
 
 
