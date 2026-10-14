@@ -157,6 +157,9 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await checkWidths(page, "finish your pack");
     await pagePass(page, "finish your pack");
     await shot(page, "finish-pack", project);
+    // The owner's name, role and the approval date are account facts (D-541
+    // as amended, batch 37), so the form never asks for them; the keys stay
+    // here only so an older page would still be answered.
     const answersByKey: Record<string, string> = {
       name: "Jane Citizen",
       role: "Owner",
@@ -166,14 +169,18 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     };
     // Each click saves one fact on a phone, or every fact on a wider screen,
     // and on the last question re-renders the whole set; the page then
-    // refreshes to "Every blank is filled in" with no form. So after each
-    // click, wait for that click's end: the next question, the done line, or
-    // the refreshed page; never a fixed pause, and never a click on a busy
-    // button (batch 45b item 2: run 595 spent its whole budget there).
+    // refreshes to the summary with no form. So after each click, wait for
+    // that click's end: the next question, the done line, or the refreshed
+    // page; never a fixed pause, and never a click on a busy button (batch
+    // 45b item 2: run 595 spent its whole budget there). With the approval
+    // date left for adoption, the summary reads "Nothing else to answer
+    // here." rather than "Every blank is filled in." (run 794 waited 120 s
+    // for the second wording).
     const finishStart = Date.now();
     const summary = page.getByTestId("finish-summary");
+    const SUMMARY = /(Every blank is filled in|Nothing else to answer here)\./;
     const finished = async () =>
-      /Every blank is filled in/.test((await summary.textContent()) ?? "") ||
+      SUMMARY.test((await summary.textContent()) ?? "") ||
       (await page.getByTestId("finish-done").isVisible());
     const settle = () =>
       expect
@@ -242,9 +249,11 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         .not.toBe("busy");
     }
     await expect(summary).toContainText(
-      /Every blank is filled in\. Your \d+ documents are complete\./,
+      /(Every blank is filled in|Nothing else to answer here)\. Your \d+ documents are complete\./,
       { timeout: 60_000 },
     );
+    // The date is the one blank left, and the page says where it fills in.
+    await expect(page.getByTestId("finish-date")).toBeVisible();
     testInfo.annotations.push({
       type: "timing",
       description: `finish step ${Math.round((Date.now() - finishStart) / 1000)} s`,
