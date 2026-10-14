@@ -1342,3 +1342,15 @@ Delivered on **`req-021-writing-indicator` 168ffae** (one commit from the head o
 - **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
 
 **Next:** Standing backlog 7, `req-020-registers-audit-pack`, from the head of `req-021-writing-indicator`, which stops for the PO at once unless `product/requirements/REQ-020-*.md` exists by then (the rule: write the REQ draft from the research file and STOP).
+
+
+## Dev status (standing backlog 7, written 14 Oct 2026, Dev; REQ-020 draft for the PO, STOP on this item)
+
+Backlog 7 says the PO writes REQ-020 before the item starts and, if it is not there, Dev writes the draft from the research file and stops for the PO. The file was not there, so **`req-020-registers-audit-pack` 3032916** (one commit from the head of `req-021-writing-indicator` 99cfb06) holds `product/requirements/REQ-020-registers-audit-pack.md` in `draft` status and nothing else: no code, no model calls. CI still paused; pushed.
+
+- **What the draft covers.** Gaps 1 to 5 of `product/research/registers-competitors.md` as the three sessions the backlog names: A the one-click audit pack and the time-limited read-only auditor link (72 hours, revocable, audit-logged, codes only, no auditor named or paid, `CLAUDE.md` 4.4); B the worker role (log an incident or complaint, see only their own rows) and the no-login "report an incident" link that creates a draft the owner confirms; C the hazard and WHS register, CSV import with the export column names, and the quarterly self-check walk that writes findings into the improvement register. Gap 6 (living policies) is backlog 8; gap 7 (a team tier) is pricing and out of scope.
+- **What the PO decides.** Priority and status; the FR numbers and limits (link expiries 24, 48 or 72 hours; ten unconfirmed drafts; 500 rows per import); the four Dev questions, answered in the draft's Dev response with a recommendation each (pack built on request, a narrow `is_worker` policy set, `/report/<token>`, three sessions).
+- **Rule followed.** The draft touches `product/requirements` only, on its own branch rather than `main` (D-030); the PO moves or rewrites it as they see fit. Backlog 7 stays blocked until the status is `ready`.
+- **Merges.** `origin/main` merged into every open branch at the end of the batch; results in the next line.
+
+**Next:** Standing backlog 8, `req-005-living-policies`, from the head of `req-021-writing-indicator` (it does not depend on REQ-020), then backlog 9 prepared without model calls (the question set, the lint and fixture mapping, the runner and the report format; the live run waits for the PO's go-ahead).
