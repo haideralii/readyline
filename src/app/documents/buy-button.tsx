@@ -21,13 +21,13 @@ export function BuyButton({
   return (
     <form action={action} className="mt-4">
       <input type="hidden" name="cancelPath" value={cancelPath} />
-      {/* The house primary button (REQ-014), the same as the next-step strip's:
-          on "before you buy" this is the screen's one button (REQ-017, D-1703). */}
+      {/* The identity's primary button (REQ-014), like every other primary action on the path (backlog 1, D-1508). */}
       <button
         type="submit"
         disabled={pending}
+        aria-busy={pending || undefined}
         data-testid={testId}
-        className="btn-primary"
+        className="btn-primary disabled:opacity-60"
       >
         {pending ? "Taking you to the payment page…" : label}
       </button>
