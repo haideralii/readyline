@@ -119,3 +119,11 @@ Done 15 Oct 2026: `product/qa/req-reviews/2026-10-15-req-025-026.md` (independen
 - CI: the pull request's run once it is opened (public job, three projects).
 - Screenshots: `product/evidence/req-025/step-5-session-b-*`, `result-session-b-*`, `result-open-session-b-*` at 360 px and desktop, committed; the `before` set from Session A shows the old progress line and navigations.
 - Deferred: none. The `progress-line.tsx` component and its test are removed (nothing else used them).
+
+**Session C (Dev, 15 Oct 2026)** on `req-025-session-c` 4c06dcd (cut from `req-025-session-a`; carries batch 49's guide files; PR to `next` after Session A's and batch 49's; body: `product/evidence/req-025/pr-body-session-c.md`).
+
+- AC mapping: AC-7 → `tests/copy-lint.test.ts` (the 45-word cap over `/start/result`, `/pricing` and the four guides, list items and summaries exempt, the three lawyer's constants allow-listed by value) and `src/lib/copy-lint/rules.test.ts` (a 50-word tight block fails, 45 passes, 60 holds elsewhere); FR-11 → the pricing copy test over the new lead and list, the guides' lint over the split paragraphs; FR-12 → `e2e/home-v2.spec.ts` (the hero button and the card point at `/sample`, no sample on the home page, the sample page with its sections, tables and the Word download), `req-015-width` and `req-015-a11y` with `/sample` in their page lists, `e2e/req-025-c.spec.ts` (the home page's `scrollHeight` at 360 px under 5,000 px, recorded under `product/evidence/req-025/`).
+- `npm run check`: green (122 files, 872 tests, 6 skipped).
+- Local gate (dev server, desktop and Android): the home, home-v2, width, a11y, pricing, guides, result and height specs on desktop and Android 70 passed, and after the sample page's heading fix the a11y, home-v2 and width specs 42 passed.
+- Evidence: `product/evidence/req-025/home-height-before-*.json` (6,596 px at 360 px with the sample on the page) and `home-height-after-*.json` (6,596 px before, 4,880 px after (desktop 4,157 px to 3,268 px)); the lint output is the green unit run.
+- UNVERIFIED or deferred: none. "What you can count on" and "What it is not" were lists already (FR-11 left them).
