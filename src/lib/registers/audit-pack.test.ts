@@ -2,6 +2,7 @@
 /** REQ-020 FR-1, FR-10: the pack's columns, dates, states, names and cover sheet. */
 import { describe, expect, it } from "vitest";
 import {
+  PACK_HIDDEN_COLUMNS,
   auditPackFileName,
   auditorVisibleIncidents,
   lastEntryDate,
@@ -33,6 +34,41 @@ describe("the audit pack's rules", () => {
     ];
     expect(packColumns(rows)).toEqual(["title", "review_on"]);
     expect(packColumns([])).toEqual([]);
+  });
+
+  // Retro review of REQ-018 to 021, finding 35 (PO decision 35; D-2407 as
+  // amended): the worker checks file in the pack and the auditor's view (both
+  // read `CSV_COLUMNS.worker_clearances`) carry the check number, because the
+  // Worker Screening Rules s 18(3)(d) list it and it is not a name; the
+  // worker stays a code and no name column exists to leak.
+  it("carries the worker check number to the pack and the auditor, with the worker's code and never a name", () => {
+    const columns = CSV_COLUMNS.worker_clearances;
+    expect(columns).toContain("clearance_number");
+    expect(columns).toContain("worker_ref");
+    expect(PACK_HIDDEN_COLUMNS).not.toContain("clearance_number");
+    for (const c of columns) expect(c).not.toMatch(/name|email|phone|dob/);
+    const csv = toCsv(columns, [
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        account_id: "a",
+        worker_ref: "W-1",
+        role_label: "Support worker",
+        clearance_kind: "ndis-worker-screening",
+        clearance_number: "WWC1234567",
+        issued_on: "2026-01-01",
+        expires_on: "2031-01-01",
+        state: "NSW",
+        status: "current",
+        note: "",
+        created_at: "2026-01-01T03:00:00Z",
+        updated_at: "2026-01-01T03:00:00Z",
+      },
+    ]);
+    expect(csv).toContain("clearance_number");
+    expect(csv).toContain(
+      "W-1,Support worker,ndis-worker-screening,WWC1234567",
+    );
+    expect(csv).not.toContain("11111111-1111");
   });
 
   it("finds the latest date on any row, by the date columns a register carries", () => {

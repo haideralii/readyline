@@ -69,6 +69,11 @@ export const CSV_COLUMNS = {
     "worker_ref",
     "role_label",
     "clearance_kind",
+    // Retro review of REQ-018 to 021, finding 35 (PO decision 35; D-2407 as
+    // amended): the check number travels in the owner's export, the audit
+    // pack and the auditor's view, because the Worker Screening Rules
+    // s 18(3)(d) list it and it is not a name. Names never do; the worker is
+    // its code.
     "clearance_number",
     "issued_on",
     "expires_on",

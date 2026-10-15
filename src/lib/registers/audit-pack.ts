@@ -26,7 +26,13 @@ export function packStateWord(
   return "missing";
 }
 
-/** Columns never written to a pack file or shown to an auditor. */
+/**
+ * Columns never written to a pack file or shown to an auditor: the ids and
+ * the creator. The worker check number is not one of them (retro review of
+ * REQ-018 to 021, finding 35; D-2407 as amended): the Worker Screening Rules
+ * s 18(3)(d) list it and it is not a name, so the pack and the auditor's
+ * view carry it with the worker's code.
+ */
 export const PACK_HIDDEN_COLUMNS: readonly string[] = [
   "id",
   "account_id",
