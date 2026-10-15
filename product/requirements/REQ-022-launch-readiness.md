@@ -12,7 +12,7 @@ Everything a customer pays for is built and on production, and the product still
 In, as four sessions:
 
 - Session A, the launch switchboard: an admin page and an ops script that show the state of every launch condition, by name and never by value, and the guards that refuse a half-configured live mode.
-- Session B, transactional email: the provider behind `createEmailProvider()` (D-013 closes with D-2201), the sending domain, the magic link through the same provider, and the register reminders going out for real.
+- Session B, transactional email: the provider behind `createEmailProvider()` (D-013 closes with D-2201; decided 16 Oct 2026, DECISIONS.md: no Amazon SES and no paid provider until the launch pass needs one, so this session waits on that day's choice and the log-only provider stays meanwhile), the sending domain, the magic link through the same provider, and the register reminders going out for real.
 - Session C, the domain: the custom domain on Vercel, every URL that must change with it, the redirect from the vercel.app name, and the smoke test run against the real name.
 - Session D, the lawyer's bundle and the business identity: one export of everything a lawyer reads, the ABN and business-name switch exercised end to end, and the About page's name.
 
