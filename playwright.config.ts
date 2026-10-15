@@ -22,7 +22,11 @@ export default defineConfig({
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL,
-    trace: "on-first-retry",
+    // With retries at 0, "on-first-retry" never records anything; CI keeps
+    // the trace and a screenshot of every failed test in the uploaded report
+    // (run 38665790472 had no trace to read).
+    trace: isCI ? "retain-on-failure" : "on-first-retry",
+    screenshot: "only-on-failure",
   },
   projects: [
     {
