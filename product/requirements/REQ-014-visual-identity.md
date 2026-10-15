@@ -44,7 +44,7 @@ Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0
 - FR-4 A contrast test in CI that checks every token pair used for text against AA, in both themes.
 
 ## Acceptance criteria
-- AC-1 Every text/background pair in the UI meets AA in light and dark themes (automated check plus axe clean, Lighthouse accessibility 100 on all pages).
+- AC-1 Every text/background pair in the UI meets AA in light and dark themes (automated check; axe clean on every page in the e2e specs; Lighthouse accessibility 100 on the CI pages, `/`, `/pricing`, `/start` and `/start/business`, and on the six public pages in the REQ-015 evidence; no signed-in page is measured by Lighthouse; PO decision 15 Oct 2026, retro review finding 13).
 - AC-2 Fonts are self-hosted; CSP unchanged; no external origin added.
 - AC-3 The step line and result line render on both Playwright projects; reduced-motion disables the fill animation.
 - AC-4 Home page copy passes the claims checker; no superlatives.

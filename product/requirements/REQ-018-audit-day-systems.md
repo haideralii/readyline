@@ -12,7 +12,7 @@ FR-1 Corporate risk register. One row per risk. Fields: risk area (fixed list: e
 
 FR-2 Participant risk register. One row per participant: initials or code (no full names: REQ-009's no-participant-personal-data-by-schema rule, the `participant_ref` pattern and the NDIS-number CHECK in D-901's migration), risk, what we do, review date. Linked from the participant's support plan review reminder.
 
-FR-3 Conflict of interest register. Staff and participants. Fields: who, the conflict in plain words, how it is managed, declared on, review date. Our conflict-of-interest policy already says this register exists; the policy's "where the register is kept" blank auto-fills to "Readyline registers" when the provider is on the plan.
+FR-3 Conflict of interest register. Staff and participants. Fields: who, the conflict in plain words, how it is managed, declared on, review date. Our conflict-of-interest policy already names this register by its canonical record name, whether or not the provider subscribes. (The sentence that stood here, a "where the register is kept" blank auto-filling to "Readyline registers" on the plan, was never built and is struck; PO decision 15 Oct 2026, retro review finding 4.)
 
 FR-4 Delegations register. Each key role (owner or director, key management personnel, incident reporter, complaints contact, finance approver, worker screening checker) with the person, their backup, and what the backup may do when the person is away.
 
@@ -67,3 +67,7 @@ Register tests, reminder fixtures, the docx lint in CI and the Playwright retry 
 - **The docx lint over the full pack in CI.** The sole-trader set is the 16-document pack (fifteen documents and the self-assessment); `docx-lint.test.ts` already renders it from the skeletons and replays it through the recorded fixtures, and now pins the count. The main CI job runs that test by name after `npm test` with the report printed and uploaded, so it no longer depends on the LibreOffice job's trigger.
 - **Playwright flake triage.** Global retries are now zero in CI. Three signed-in specs keep one CI retry each, with the race written above the configure call: the purchase flow (webhook `after()` hook and the job route landing in either order), the guided path (the "wait" step written by the webhook while a cold runner compiles the job route) and the subscription (the payment-failed event applied after the page moved on). Every WebKit race found so far is handled inside the tests (settled goto, tap and fill retries, end-of-page wrap), so a red run on the other specs is a defect.
 - **Not run here.** The hosted Supabase project lacks the REQ-018 migrations, so the integration file cannot run on this machine; the unit suite, lint, format and typecheck are green, and CI's Supabase job is the gate for the integration cases when the PO re-runs it.
+
+## PO review notes
+
+- 15 Oct 2026: the strike of SR-2's per-tenant "full names on" clause is confirmed (retro review `product/qa/req-reviews/2026-10-15-retro-req-018-021.md`, finding 14). FR-3's auto-fill sentence is struck (finding 4).

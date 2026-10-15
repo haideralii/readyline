@@ -25,10 +25,10 @@ The PO walked the questionnaire on 12 Oct 2026 at phone size as a first-time, no
 
 ## Acceptance criteria
 - AC-1 Submitting each step empty shows only plain-English messages; a unit test proves every schema error maps to a message.
-- AC-2 Accessibility-tree test: every radio and checkbox in the questionnaire has its human label as its accessible name and belongs to a fieldset with a legend; manual screen-reader pass recorded in evidence.
+- AC-2 Accessibility-tree test: every radio and checkbox in the questionnaire has its human label as its accessible name and belongs to a fieldset with a legend. *(The manual screen-reader pass that stood here is owed under REQ-015 AC-5, in one place; PO decision 15 Oct 2026, retro review findings 1 and 24.)*
 - AC-3 Supports step shows the everyday groupings; searching "support worker", "cleaning" and "SIL" each return the expected classes; the hint selects 0107 and 0120.
 - AC-4 "Not sure" on restrictive practices opens the helper and resolves to yes or no; the result page shows the assumption only when the resolution is yes.
-- AC-5 Result page shows the summary and grouped documents; Lighthouse accessibility stays 100 and axe stays clean on both projects.
+- AC-5 Result page shows the summary and grouped documents; axe stays clean on every page in the e2e specs on both projects; Lighthouse accessibility stays 100 on the CI pages (`/`, `/pricing`, `/start`, `/start/business`, mobile form, `ci.yml`); the result page needs a draft and is not measured by Lighthouse (PO decision 15 Oct 2026, retro review finding 2).
 
 ## Evidence required on delivery
 Screenshots at 360x740 of every changed step; the accessibility-tree test output; a one-paragraph screen-reader walkthrough note.

@@ -1,5 +1,5 @@
 # REQ-009: Registers (incidents, complaints, worker clearances, policy reviews) and reminders
-Status: delivered (Sessions A, B and C, 13 Oct 2026, branches `req-009-registers`, `req-009-session-b`, `req-009-session-c`, merged; written by the PO 13 Oct 2026 from the Dev proposal below); PO acceptance and the AC-3 walk not yet recorded under "PO review" (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 36)   Phase: 5   Priority: must   Owner: Dev
+Status: delivered (Sessions A, B and C, 13 Oct 2026, branches `req-009-registers`, `req-009-session-b`, `req-009-session-c`, merged; written by the PO 13 Oct 2026 from the Dev proposal below); accepted by the PO on 15 Oct 2026 from the delivery evidence; AC-3 not yet walked on the hosted site (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 36)   Phase: 5   Priority: must   Owner: Dev
 Depends on: REQ-004 (accounts), REQ-006 (checklist), REQ-007 (entitlements; the subscription product is the second entitlement kind).
 
 ## Why (from the brief)
@@ -138,4 +138,6 @@ Restrictive-practice reporting to the Commission's portal, participant records o
 ### Session B verification (kept for the record)
 
 - `npm run check` green (79 files, 558 tests + 2 skipped); `npm run build` green; signed-in e2e against the hosted project on desktop, Android and the WebKit iPhone: registers 8 passed with one WebKit retry (the worker-checks list took over five seconds to render after the save on the hosted link; passed on the second attempt), checklist 6 passed. Two defects found and fixed on the way: server pages had called row-to-form mappers exported from client modules (Next refuses; moved to `labels.ts`), and the four-link header nav overflowed a 360 px screen at 130 % text, so whole links now wrap onto a second row instead of widening the page.
-(PO fills in.)
+
+## PO review
+Accepted by the PO on 15 Oct 2026 from the delivery evidence (Sessions A, B and C); AC-3 not yet walked on the hosted site (retro review `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 36).

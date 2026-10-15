@@ -39,7 +39,7 @@ A self-serve web app that:
 
 1. Runs a guided questionnaire (support types delivered, registration groups, number of workers, states/territories, whether SIL/personal care/behaviour support is involved, business structure, existing systems).
 2. Determines which Practice Standards modules and which audit pathway (verification vs certification) apply.
-3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary). *(v2)* The set always includes an **AI use and governance policy** and a **data-handling procedure for AI and digital tools** (de-identification before any AI use, approved tools, participant consent, human review), because the Commission's February 2026 position statement and sector guidance now expect providers to have these.
+3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary). *(v2, amended v2.8 on 15 Oct 2026 per REQ-016 S-6)* The set always includes **an AI and digital tools appendix to the privacy policy** (de-identification before any AI use, approved tools, participant consent, human review), not a separate document, because the Commission's February 2026 position statement and sector guidance now expect providers to have this.
 4. Shows a readiness checklist: which documents, registers, clearances and insurances are still missing.
 5. Sells a monthly "audit-ready" subscription: incident register, complaints register, worker screening expiry tracker, policy review reminders, mid-term audit countdown.
 

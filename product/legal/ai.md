@@ -1,6 +1,6 @@
 ---
 title: How Readyline uses AI
-updated: 2026-10-12
+updated: 2026-10-15
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -23,7 +23,7 @@ We use Claude, a model made by Anthropic. When we draft a document, we send the 
 
 ## How we check the drafts
 
-Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as "guaranteed" or "audit-proof", and refer to the fixed sections for legal timeframes rather than restating them. A section that fails these checks is redrafted once; if it still fails, you see a clear marker asking you to complete that section yourself.
+Software checks each tailored section before you see it. The section must be about your business facts only. It must use plain words at about a Year 8 reading level and the Commission's terms. It must avoid claims such as "guaranteed" or "audit-proof". For legal timeframes it must point to the fixed sections rather than restate them. A section that fails these checks is redrafted once; if it still fails, you see a clear marker asking you to complete that section yourself.
 
 ## Your own statement on AI and digital tools
 

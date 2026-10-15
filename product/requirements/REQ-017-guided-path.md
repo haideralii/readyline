@@ -6,7 +6,7 @@ Depends on: REQ-006 (checklist), REQ-007 (payments), REQ-015 (plain language), R
 Our customer is a support worker who does not like paperwork, is not technical and may not have done well at school. The site must work for that person. After the questionnaire they do not want options; they want to be taken by the hand, one step at a time, told exactly what to do next and shown when it is done. Every screen after the result answers one question: "What do I do now?" Anything that makes them read, decide or search is a cost we pay for in lost customers.
 
 ## What the path looks like
-1. **Result** (REQ-015 card): one button, "Start getting ready".
+1. **Result** (REQ-015 card): one primary button, "Start getting ready", and the link "Open your checklist (N things)" (PO decision 15 Oct 2026, retro review finding 59; REQ-025 PO decision 8 amended to match).
 2. **Before you buy**: one screen, three lines: what you get, the price, the refund promise; one button "Get my documents"; the sample document link for the cautious.
 3. **While we draft** (REQ-010 batch 32): "You can close this page; come back in about 20 minutes." with a progress line that counts documents, nothing else.
 4. **Finish your pack**: a guided form, one question per screen, that collects every blank the documents still need (name of the person responsible, phone or email, approval date, state), in plain words with an example under each field, with Back and Next only. On the last screen the documents are re-rendered with the answers filled in, so the provider never opens Word to fill a blank. Answers are saved to the account as facts for every future document.

@@ -1,5 +1,5 @@
 # REQ-015: Plain language, feedback on every action, and an accessibility pass
-Status: delivered (batch 27, D-1501 to D-1506; standing backlog 1, D-1508, the Section E pass as tests on three projects; on `main`; FR-18 and AC-5, the two screen-reader passes, and AC-2's throttled phone check still open; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-013-017.md`)   Phase: 6 (before the first trial provider)   Priority: must   Owner: Dev
+Status: delivered (batch 27, D-1501 to D-1506; standing backlog 1, D-1508, the Section E pass as tests on three projects; on `main`; FR-18 and AC-5, the two screen-reader passes, and AC-2's phone check still open; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-013-017.md`)   Phase: 6 (before the first trial provider)   Priority: must   Owner: Dev
 Depends on: REQ-013 (first-time UX), REQ-014 (identity), REQ-006 (checklist)
 
 ## Why
@@ -49,10 +49,10 @@ Haider walked the live site on his phone on 13 Oct 2026 as the customer would. T
 
 ## Acceptance criteria
 - AC-1 Phone walk by the PO: from the result page, the audit type, what happens, the counts and the one next button are visible without scrolling at 360 × 740 (the `android-small` project; 360 px everywhere per REQ-025's PO decision 9); every paragraph on the walked pages is 3 lines or fewer; no internal path or file name anywhere.
-- AC-2 Checklist: tapping a status shows the selection at once and "Saved" within 1 s on the hosted site over 3G throttling; the count line updates; a forced failure reverts and shows the retry.
+- AC-2 Checklist: tapping a status shows the selection at once and "Saved" within 1 s on the hosted site on a phone (the 3G throttling clause dropped by the PO on 15 Oct 2026, retro review finding 25; the phone walk stays); the count line updates; a forced failure reverts and shows the retry.
 - AC-3 Copy-lint test is in `npm test` and fails on a seeded banned word, a 70-word paragraph and a `data/` path.
-- AC-4 Keyboard and zoom checks in FR-17 recorded with screenshots under `product/evidence/req-015/`; axe clean and Lighthouse 100 on home, start, result, checklist, pricing, documents, account.
-- AC-5 The two screen-reader passes done and their findings closed or scheduled.
+- AC-4 Keyboard and zoom checks in FR-17 recorded with screenshots under `product/evidence/req-015/`; axe clean on every page in the e2e specs, including result, checklist, documents and account through `e2e/signed-in/accessibility-pass.spec.ts`; Lighthouse accessibility 100 on the six public pages measured (`/`, `/start`, `/pricing`, `/sign-in`, `/about`, `/refunds`; `product/evidence/req-015/lighthouse/summary.md`); result, checklist, documents and account are not measured by Lighthouse because they need a draft or a session (PO decision 15 Oct 2026, retro review finding 26).
+- AC-5 The two screen-reader passes (FR-18: NVDA by the PO, VoiceOver on iPhone by Haider) done and their findings closed or scheduled. *(Owed and recorded here, in one place; REQ-013 AC-2's duplicate clause is struck. Not yet done as at 15 Oct 2026; PO decision on retro review findings 1 and 24.)*
 
 ## Ideas parked for later (not in this REQ)
 Email me my result (needs D-013), a one-page printable result, a "what changed since last time" line when answers change, a guided tour on first checklist visit, a plain-language glossary page linked from every code, an optional phone call-back request, Urdu/Arabic/Vietnamese/Chinese versions of the questionnaire intro and the result card (the four largest language groups among small NDIS providers in Sydney and Melbourne; worth testing with the trial providers before building).

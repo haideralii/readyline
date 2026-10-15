@@ -19,6 +19,7 @@ Haider asked three things after reading his own pack on his phone: the document 
 - S-5 **Nothing that relies on colour alone.** Tailored sections are marked with text ("Drafted from your answers"), colour only as a second cue.
 - S-6 **AI documents.** Retire the two standalone AI documents. Their content becomes a section "AI and digital tools" in the privacy and information management policy (who may use which tools, no participant information in public tools, tell participants, the accountable person). The pack count drops by two; the result page, checklist and pricing copy follow automatically from the catalogue.
 - S-7 **The set view** lists documents as a numbered list in audit order (governance first, environment last), with the group headings from the result page, so the pack reads as one system.
+- Note (PO decision 15 Oct 2026, retro review findings 38 and 39): the sentence that the worker checks register is the companion to the list the Worker Screening Rules ask the provider to keep goes only where a list is shown or exported: the register page, the pack's clearance register table and the guide row. Not the registers index and not the pricing page.
 
 ## Defect found by Haider on 13 Oct 2026 (blocks the trial; do this first)
 (Moved here from after the PO review in the retro review of 15 Oct 2026; the text is the PO's, unchanged.)
@@ -31,11 +32,11 @@ In his own pack, the "AI and digital data handling procedure" has every section 
 ## Functional requirements
 - FR-1 A docx lint in CI's checks job (a second run of `docx-lint.test.ts` with `DOCX_REPORT=1` after `npm test`, `ci.yml`; the LibreOffice job only renders and converts) and in `npm test` over the recorded fixture sets: opens every generated .docx and asserts S-2, S-3, S-5 and S-7's order; fails the build on a miss. Report the font sizes and heading styles found.
 - FR-2 Catalogue change for S-6 with a migration note for existing sets (existing sets keep their documents; new sets get the merged policy).
-- FR-3 S-4 for the five participant-facing documents, with the plain-language summary drafted by the generator from the same facts and linted at Year 6.
+- FR-3 S-4 for the five participant-facing documents, with the plain-language summary drafted by the generator from the same facts and linted at Year 6. *(The five summaries ship as the marked generic text until Haider records them, D-542: open until the recording session; PO decision 15 Oct 2026, retro review finding 41.)*
 - FR-4 Numbered set view (S-7), on both viewports.
 
 ## Acceptance criteria
-- AC-1 The PO opens three generated documents (one governance, one participant-facing, one environment) in Word on a laptop and on an iPhone and finds every S-2 and S-3 item present.
+- AC-1 The PO opens three generated documents (one governance, one participant-facing, one environment) in Word on a laptop and on an iPhone and finds every S-2 and S-3 item present. *(Open until the recording session, recorded when the trial pack is opened; PO decision 15 Oct 2026, retro review finding 40.)*
 - AC-2 The lint fails on a seeded document with 11 pt body text and on one without a change log.
 - AC-3 A new pack for the sole-trader fixture has 16 documents (15 plus the self-assessment, D-543; the 22 first written here was not the catalogue's number), no standalone AI document, and the privacy policy carries the AI section.
 

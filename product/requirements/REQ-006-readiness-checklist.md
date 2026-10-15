@@ -1,5 +1,5 @@
 # REQ-006: Readiness checklist
-Status: delivered (Sessions A and B, 12 Oct 2026, branch `req-006-checklist`, merged); PO acceptance not yet recorded under "PO review" (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 1)
+Status: accepted by the PO on 15 Oct 2026 from the delivery evidence (Sessions A and B, 12 Oct 2026, branch `req-006-checklist`, merged; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 1)
 Phase: 4   Priority: must   Owner: Dev   Depends on: REQ-003 (result), REQ-005 (document set).
 
 ## Why
@@ -57,4 +57,4 @@ Screenshots of the checklist for the sole-trader and the certification case at b
 - **Owed and why.** The signed-in e2e, the RLS test and the screenshots need a Supabase stack. The dev machine has none (no Docker), and the hosted project refuses the admin client on every table until D-711's grants and this branch's migration apply (see REQ-007 Session C evidence), so they run in CI's Supabase job on this push (artifact `signed-in-screenshots`, both viewports). The screenshots will be committed to `product/evidence/req-006/` once a stack is reachable from the dev machine, or copied from the artifact by the PO. Lighthouse was not run (no stack to sign in with); axe is asserted in the spec.
 
 ## PO review
-(PO fills in.)
+Accepted by the PO on 15 Oct 2026 from the delivery evidence (Sessions A and B; retro review `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 1).

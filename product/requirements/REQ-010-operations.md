@@ -1,5 +1,5 @@
 # REQ-010: Operations: first deploy, backups, monitoring, runbook, export and deletion
-Status: part 1 delivered and accepted (13 Oct 2026, PR #20; AC-3 and AC-4 passed on the deployed site the same day); part 2 not yet written (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 53)   Priority: must   Owner: Dev
+Status: part 1 delivered and accepted (13 Oct 2026, PR #20; AC-3 and AC-4 passed on the deployed site the same day); part 2 not yet written; its backups, uptime check and error reporting move to REQ-022 Session D (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 53)   Priority: must   Owner: Dev
 Phase: 5   Depends on: REQ-004, REQ-005, REQ-007, REQ-008
 
 ## Why
@@ -9,6 +9,7 @@ Nothing can be trialled with a real provider until the app runs on a public addr
 - Haider does every account, secret and billing step himself on his personal accounts (CLAUDE.md section 4; never company resources). Dev and PO prepare exact instructions; they never hold a secret value.
 - Vercel Hobby for the trial (D-053). Sydney region (`syd1`) for functions.
 - No new external origin reaches the browser without a CSP change in the same PR.
+- The generation kicker's schedule (`.github/workflows/generate-kick.yml`, D-059): every thirty minutes until `GITHUB_DISPATCH_TOKEN` is set, then hourly, within the D-2207 runner budget (PO decision 15 Oct 2026, retro review finding 63).
 
 ## Part 1: first deploy (this batch)
 
@@ -35,7 +36,7 @@ Nothing can be trialled with a real provider until the app runs on a public addr
 1. Does `next build` on Vercel need `GENERATION_ENABLED` at build time, or only at request time?
 2. Any env variable read in a client component that is not `NEXT_PUBLIC_`? (Should be none; confirm.)
 
-## Part 2 (later): backups (Supabase daily plus a weekly export to Haider's own storage), uptime check, error reporting (Sentry DSN already in the example), the incident runbook, account export and deletion jobs (REQ-004 FR-6 and the privacy policy promise of 30 days) *(the purge job `/api/jobs/purge` and the account export exist since REQ-004 Session C; retro review 15 Oct 2026, finding 64)*.
+## Part 2 (later): backups (Supabase daily plus a weekly export to Haider's own storage), uptime check, error reporting (Sentry DSN already in the example), the incident runbook, account export and deletion jobs (REQ-004 FR-6 and the privacy policy promise of 30 days) *(the purge job `/api/jobs/purge` and the account export exist since REQ-004 Session C; retro review 15 Oct 2026, finding 64)*. *(PO decision 15 Oct 2026, retro review finding 53: backups, an uptime check and error reporting move to REQ-022 as a Session D that the PO writes; the two Sentry variables leave `.env.example` until code reads them, so "Sentry DSN already in the example" no longer holds.)*
 
 ## Dev response
 
