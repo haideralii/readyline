@@ -154,7 +154,8 @@ alter table public.incidents
   add constraint incidents_status_check check (status in ('draft', 'open', 'under-review', 'closed', 'rejected'));
 alter table public.incidents
   add column reported_via text not null default 'owner' check (reported_via in ('owner', 'worker', 'link')),
-  add column logged_by_ref text check (logged_by_ref is null or logged_by_ref ~ '^(W-?[0-9]{1,6}|[a-z][a-z -]{2,40})$'),
+  -- A worker code or one of the five name-free roles, never free text (retro review of REQ-020, finding 31; REPORTER_ROLES in src/lib/registers/worker.ts).
+  add column logged_by_ref text check (logged_by_ref is null or logged_by_ref ~ '^W-?[0-9]{1,6}$' or logged_by_ref in ('support worker', 'casual worker', 'team leader', 'volunteer', 'another person present')),
   add column rejected_reason text not null default '' check (char_length(rejected_reason) <= 500 and not public.looks_like_ndis_number(rejected_reason)),
   add column aware_at timestamptz not null default now(),
   add column aware_on date not null default current_date;
@@ -162,7 +163,26 @@ alter table public.incidents
 alter table public.incidents drop column notify_by;
 alter table public.incidents
   add column notify_by date generated always as (public.incident_notify_by(greatest(occurred_on, aware_on), category, reportable, severity)) stored;
-alter table public.incidents drop constraint incidents_reported_on_check;
+-- The original rule was written inline on `reported_on` in
+-- 20261013000000_registers.sql; because its expression also names
+-- occurred_on, Postgres named it incidents_check, not
+-- incidents_reported_on_check (run 38721710508, PR #62). Find it by its
+-- definition and drop it, whatever its name.
+do $$
+declare
+  v_name text;
+begin
+  select conname into v_name
+    from pg_constraint
+   where conrelid = 'public.incidents'::regclass
+     and contype = 'c'
+     and pg_get_constraintdef(oid) like '%reported_on >= occurred_on%';
+  if v_name is null then
+    raise exception 'incidents: the reported_on >= occurred_on CHECK was not found';
+  end if;
+  execute format('alter table public.incidents drop constraint %I', v_name);
+end
+$$;
 alter table public.incidents
   add constraint incidents_reported_on_check check (reported_on >= occurred_on or status = 'draft');
 

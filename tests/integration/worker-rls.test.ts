@@ -380,7 +380,48 @@ describe.skipIf(!enabled)(
           reported_on: awareOn,
         },
       ]);
-      // Nine drafts remain; the twelfth submission is accepted.
+      // The old inline CHECK (reported_on >= occurred_on, auto-named incidents_check) is gone and the
+      // new one lets a draft carry an earlier report date while an open row still may not (PR #62).
+      const earlyOpen = await admin.from("incidents").insert({
+        account_id: owner.accountId,
+        occurred_on: "2026-10-05",
+        reported_on: "2026-10-04",
+        category: "near-miss",
+        severity: "low",
+        summary: "Typed with the dates the wrong way round.",
+        status: "open",
+      });
+      expect(earlyOpen.error?.code).toBe("23514");
+      const earlyDraft = await admin
+        .from("incidents")
+        .insert({
+          account_id: owner.accountId,
+          occurred_on: "2026-10-05",
+          reported_on: "2026-10-04",
+          category: "near-miss",
+          severity: "low",
+          summary: "A draft may carry the reporter's dates as given.",
+          status: "draft",
+          reported_via: "link",
+          logged_by_ref: "casual worker",
+        })
+        .select("id")
+        .single();
+      expect(earlyDraft.error).toBeNull();
+      await admin.from("incidents").delete().eq("id", earlyDraft.data!.id);
+      // Finding 31: logged_by_ref is a worker code or one of the five roles, never a name.
+      const named = await admin.from("incidents").insert({
+        account_id: owner.accountId,
+        occurred_on: "2026-10-05",
+        reported_on: "2026-10-05",
+        category: "near-miss",
+        severity: "low",
+        summary: "Logged under a name.",
+        status: "draft",
+        reported_via: "link",
+        logged_by_ref: "jane smith",
+      });
+      expect(named.error?.code).toBe("23514"); // Nine drafts remain; the twelfth submission is accepted.
       const twelfth = await admin.rpc("submit_incident_report", {
         p_token_hash: hash,
         ...report(),
