@@ -1,6 +1,6 @@
 import "server-only";
 /**
- * The auditor link's server side (REQ-020 FR-2, SR-1, SR-2, D-2214): the
+ * The auditor link's server side (REQ-020 FR-2, SR-1, SR-2, D-2230): the
  * owner's current link, the signed-out resolution through the security
  * definer lookup by token hash, the open recorded (count, time, one audit
  * line with the link id and the viewer's hashed address), and the purge of
