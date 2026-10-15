@@ -22,28 +22,56 @@ const LEGAL = [
 const WATCHED = ["/", ...LEGAL.map((p) => p.path), "/sign-in"];
 const EVIDENCE_DIR = "product/evidence/req-008";
 
-/** Every route under src/app with its dynamic segments filled with harmless values. */
+/**
+ * Every route under src/app with its dynamic segments filled with real values,
+ * so the footer is asserted on the page itself and not on the 404 page (retro
+ * review of REQ-008, finding 33). A key is the route pattern so far when two
+ * routes share a segment name (`[slug]`), else the segment. The signed-in
+ * routes (`/path/adopt/[group]`, `/documents/[setId]`, the register `[id]`
+ * pages) redirect to sign-in on this signed-out run, and sign-in carries the
+ * footer; `/dev/stripe-checkout/[id]` is the fake Checkout, which answers
+ * 404 for an unknown session, also with the footer. A new dynamic segment
+ * without a value fails the walk rather than visiting a literal path.
+ */
 function appRoutes(): string[] {
   const root = join("src", "app");
+  const UUID = "11111111-1111-4111-8111-111111111111";
   const fill: Record<string, string> = {
-    "[setId]": "11111111-1111-4111-8111-111111111111",
+    // A published guide (content/guides/which-ndis-audit.md).
+    "/guides/[slug]": "which-ndis-audit",
+    // groupPageSlug of the first registration group in data/standards.json.
+    "/guides/registration-groups/[slug]": "accommodation-tenancy-assistance",
+    // groupSlug of the first document group (data/readyline-content/document-groups.json).
+    "/path/adopt/[group]": "running-the-business",
+    "[setId]": UUID,
     "[typeId]": "incident-management-policy-and-register",
     "[step]": "business",
+    "[id]": UUID,
   };
   const routes = new Set<string>();
-  const walk = (dir: string, segments: string[]) => {
+  const walk = (dir: string, pattern: string[], filled: string[]) => {
     for (const name of readdirSync(dir)) {
       const full = join(dir, name);
       if (statSync(full).isDirectory()) {
-        if (name.startsWith("(") && name.endsWith(")")) walk(full, segments);
-        else
-          walk(full, [...segments, fill[name] ?? name.replace(/^\[|\]$/g, "")]);
+        if (name.startsWith("(") && name.endsWith(")")) {
+          walk(full, pattern, filled);
+          continue;
+        }
+        const nextPattern = [...pattern, name];
+        const value = name.startsWith("[")
+          ? (fill[`/${nextPattern.join("/")}`] ?? fill[name])
+          : name;
+        if (!value)
+          throw new Error(
+            `legal-pages.spec: no fill value for /${nextPattern.join("/")}`,
+          );
+        walk(full, nextPattern, [...filled, value]);
       } else if (name === "page.tsx") {
-        routes.add(`/${segments.join("/")}`);
+        routes.add(`/${filled.join("/")}`);
       }
     }
   };
-  walk(root, []);
+  walk(root, [], []);
   return [...routes].sort();
 }
 
@@ -73,7 +101,15 @@ test.describe("legal and trust pages (REQ-008)", () => {
     page,
   }) => {
     const routes = appRoutes();
-    expect(routes).toEqual(expect.arrayContaining(["/", "/terms", "/about"]));
+    expect(routes).toEqual(
+      expect.arrayContaining([
+        "/",
+        "/terms",
+        "/about",
+        "/guides/which-ndis-audit",
+        "/guides/registration-groups/accommodation-tenancy-assistance",
+      ]),
+    );
     for (const route of routes) {
       await page.goto(route);
       const nav = page.getByTestId("footer-nav");

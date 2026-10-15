@@ -12,6 +12,7 @@ import {
   exportFileName,
 } from "@/server/accounts/export";
 import { getViewer } from "@/server/accounts/queries";
+import { isCrossSiteRequest } from "@/server/auth/cross-site";
 import { checkExportAllowed } from "@/server/auth/rate-limit";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -24,6 +25,12 @@ export async function GET(request: Request) {
     Object.fromEntries(new URL(request.url).searchParams.entries()),
   );
   if (!query.ok) return new NextResponse("Bad request", { status: 400 });
+  // Before the limiter and the audit row: a request another site started
+  // must not spend the owner's hour (retro review of REQ-009, finding 48).
+  if (isCrossSiteRequest(request.headers)) {
+    log.warn("account.export.cross-site", {});
+    return new NextResponse("Forbidden", { status: 403 });
+  }
   const viewer = await getViewer();
   if (!viewer) {
     return NextResponse.redirect(

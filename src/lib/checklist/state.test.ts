@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { deriveChecklist } from "./derive";
-import { DRAFTED_LABEL, mergeChecklist, statusLabel } from "./state";
+import {
+  DRAFTED_LABEL,
+  mergeChecklist,
+  screenLabel,
+  STATUS_WORDS,
+  statusLabel,
+} from "./state";
 
 const dataset = getStandardsDataset();
 const c = loadReferenceCases().find(
@@ -74,5 +80,17 @@ describe("mergeChecklist (REQ-006 FR-2, FR-3)", () => {
     expect(statusLabel("have", "people")).toBe("Have");
     expect(statusLabel("have", "documents")).toBe("Adopted");
     expect(DRAFTED_LABEL).toMatch(/review needed/);
+  });
+
+  it("the screen's short words and the print sheet's words come from one table (retro finding 9)", () => {
+    expect(screenLabel("need")).toBe("Need");
+    expect(screenLabel("in-progress")).toBe("Doing");
+    expect(screenLabel("have")).toBe("Done");
+    expect(screenLabel("drafted")).toBe("Drafted");
+    for (const status of ["need", "in-progress", "have"] as const) {
+      expect(screenLabel(status)).toBe(STATUS_WORDS[status].screen);
+      expect(statusLabel(status, "people")).toBe(STATUS_WORDS[status].print);
+    }
+    expect(STATUS_WORDS.have.printDocuments).toBe("Adopted");
   });
 });

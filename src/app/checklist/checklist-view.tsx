@@ -9,6 +9,7 @@ import {
 } from "@/lib/checklist/derive";
 import {
   DRAFTED_LABEL,
+  screenLabel,
   type ShownChecklist,
   type ShownItem,
   type ShownStatus,
@@ -31,21 +32,13 @@ type Feedback =
   | { kind: "failed"; itemId: string; message: string; retry: () => void };
 
 const NOTE_MAX = 500;
-const SHORT_LABEL: Record<ChecklistStatus, string> = {
-  need: "Need",
-  "in-progress": "Doing",
-  have: "Done",
-};
+// The words come from STATUS_WORDS in @/lib/checklist/state, shared with the print sheet (retro finding 9).
 const TAG: Record<ShownStatus, { icon: string; tone: string }> = {
   need: { icon: "○", tone: "border-ochre text-ochre" },
   "in-progress": { icon: "◐", tone: "border-slate text-slate" },
   have: { icon: "✓", tone: "border-moss text-moss" },
   drafted: { icon: "◐", tone: "border-slate text-slate" },
 };
-
-function tagLabel(status: ShownStatus): string {
-  return status === "drafted" ? "Drafted" : SHORT_LABEL[status];
-}
 
 function StatusTag({ status }: { status: ShownStatus }) {
   const t = TAG[status];
@@ -55,7 +48,7 @@ function StatusTag({ status }: { status: ShownStatus }) {
       data-testid="status-tag"
     >
       <span aria-hidden="true">{t.icon}</span>
-      {tagLabel(status)}
+      {screenLabel(status)}
     </span>
   );
 }
@@ -479,7 +472,7 @@ function ChecklistRow({
                       ✓
                     </span>
                   ) : null}
-                  {SHORT_LABEL[s]}
+                  {screenLabel(s)}
                 </label>
               );
             })}

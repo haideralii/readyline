@@ -80,14 +80,35 @@ export function mergeChecklist(input: {
   return { groups, items, ready, total: items.length };
 }
 
-/** Human labels for the status radio; documents call `have` "Adopted" (FR-2). */
+/**
+ * The words for the three stored statuses, one table for the screen and the
+ * print sheet so the two cannot drift (retro review of REQ-006, finding 9).
+ * The tag and the segmented control use the short words (REQ-015 FR-8); the
+ * print sheet the longer ones, with Adopted for a document (FR-2).
+ */
+export const STATUS_WORDS: Record<
+  ChecklistStatus,
+  { screen: string; print: string; printDocuments?: string }
+> = {
+  need: { screen: "Need", print: "Need" },
+  "in-progress": { screen: "Doing", print: "In progress" },
+  have: { screen: "Done", print: "Have", printDocuments: "Adopted" },
+};
+
+/** The short word the screen shows for a status (the tag and the control). */
+export function screenLabel(status: ShownStatus): string {
+  return status === "drafted" ? "Drafted" : STATUS_WORDS[status].screen;
+}
+
+/** The print sheet's label; documents call `have` "Adopted" (FR-2). */
 export function statusLabel(
   status: ChecklistStatus,
   group: ChecklistItem["group"],
 ): string {
-  if (status === "need") return "Need";
-  if (status === "in-progress") return "In progress";
-  return group === "documents" ? "Adopted" : "Have";
+  const words = STATUS_WORDS[status];
+  return group === "documents" && words.printDocuments
+    ? words.printDocuments
+    : words.print;
 }
 
 export const DRAFTED_LABEL = "Drafted (in your document set, review needed)";

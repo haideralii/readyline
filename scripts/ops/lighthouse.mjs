@@ -15,7 +15,18 @@ import { join } from "node:path";
 
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const outDir = process.argv[3] ?? "product/evidence/req-015/lighthouse";
-const pages = ["/", "/start", "/pricing", "/sign-in", "/about", "/refunds"];
+// The five legal and trust pages are all measured (REQ-008 AC-1; retro finding 24).
+const pages = [
+  "/",
+  "/start",
+  "/pricing",
+  "/sign-in",
+  "/about",
+  "/refunds",
+  "/terms",
+  "/privacy",
+  "/ai",
+];
 
 function playwrightChrome() {
   const root = join(homedir(), "AppData", "Local", "ms-playwright");

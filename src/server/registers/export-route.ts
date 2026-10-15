@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { log } from "@/lib/logging/logger";
 import { parseInput, type strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
+import { isCrossSiteRequest } from "@/server/auth/cross-site";
 import { checkRegisterExportAllowed } from "@/server/auth/rate-limit";
 import { buildRegisterExport, EXPORT_PATHS } from "@/server/registers/export";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -23,6 +24,12 @@ export function makeExportHandler(
       Object.fromEntries(new URL(request.url).searchParams.entries()),
     );
     if (!query.ok) return new NextResponse("Bad request", { status: 400 });
+    // Before the limiter and the audit row: a request another site started
+    // must not spend the member's hour (retro review of REQ-009, finding 48).
+    if (isCrossSiteRequest(request.headers)) {
+      log.warn("registers.export.cross-site", { register });
+      return new NextResponse("Forbidden", { status: 403 });
+    }
     const viewer = await getViewer();
     if (!viewer)
       return NextResponse.redirect(

@@ -11,6 +11,7 @@
  * CATCH_UP_DAYS rather than silently skipping them or flooding an account
  * that enters an old date.
  */
+import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { addBusinessDays, addDays, daysBetween } from "./status";
 import type {
   RegistrationKind,
@@ -268,6 +269,25 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   }
 
   return out;
+}
+
+/**
+ * The reference an email may carry for a policy review (SR-4): the catalogue
+ * id, or for a policy the provider named ("other") its title, unless the
+ * title looks like it names or describes a person, in which case the
+ * document id stands in (retro review of REQ-009, finding 49). The title is
+ * the provider's own name for the policy and the only thing that tells two
+ * "other" policies apart; the detector is the guard CLAUDE.md 4.5 asks for.
+ */
+export function policyReviewReference(row: {
+  document_type_id: string;
+  title: string | null;
+}): string {
+  if (row.document_type_id !== "other") return row.document_type_id;
+  const title = (row.title ?? "").trim();
+  if (!title || detectParticipantData(title).length > 0)
+    return row.document_type_id;
+  return title;
 }
 
 /** The sentence a reminder email and the "Due soon" list use: the register and the reference, never the content (SR-4). */

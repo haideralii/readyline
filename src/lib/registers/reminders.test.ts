@@ -4,6 +4,7 @@ import {
   CATCH_UP_DAYS,
   dueReminders,
   inWindow,
+  policyReviewReference,
   reminderLine,
   type ReminderInput,
 } from "./reminders";
@@ -330,6 +331,36 @@ describe("reminder rules (REQ-009 FR-3)", () => {
     expect(addMonths("2026-03-31", -1)).toBe("2026-02-28");
     expect(addMonths("2024-01-31", 1)).toBe("2024-02-29");
     expect(addMonths("2026-10-13", 18)).toBe("2028-04-13");
+  });
+
+  it("a policy review is referenced by its catalogue id; an 'other' policy by its title only when the title names nobody (SR-4, retro finding 49)", () => {
+    expect(
+      policyReviewReference({
+        document_type_id: "complaints-management-policy-and-register",
+        title: "Jane Citizen plan",
+      }),
+    ).toBe("complaints-management-policy-and-register");
+    expect(
+      policyReviewReference({
+        document_type_id: "other",
+        title: "Vehicle use",
+      }),
+    ).toBe("Vehicle use");
+    for (const title of [
+      "Jane Citizen plan",
+      "Plan for 431234567",
+      "Visits to 12 Smith Street",
+      "Medication for P-014",
+      "",
+      null,
+    ])
+      expect(
+        policyReviewReference({ document_type_id: "other", title }),
+        String(title),
+      ).toBe("other");
+    expect(reminderLine("policy-review", "Vehicle use", "2027-01-01")).toBe(
+      "Policy Vehicle use is due for review on 2027-01-01.",
+    );
   });
 
   it("the sentence names the register and the reference, nothing else (SR-4)", () => {

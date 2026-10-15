@@ -37,8 +37,8 @@ export class LogOnlyEmailProvider implements EmailProvider {
 
 /**
  * Picks the provider from the environment. A real provider arrives with D-013;
- * until then every environment logs only, and the variables EMAIL_FROM and
- * EMAIL_PROVIDER_API_KEY in .env.example stay unused.
+ * until then every environment logs only, and its variables (a sender address
+ * and an API key) are added to .env.example with the code that reads them.
  */
 export function createEmailProvider(): EmailProvider {
   return new LogOnlyEmailProvider();

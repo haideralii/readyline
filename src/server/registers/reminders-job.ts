@@ -11,6 +11,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { log } from "@/lib/logging/logger";
 import {
   dueReminders,
+  policyReviewReference,
   reminderLine,
   type ReminderDue,
 } from "@/lib/registers/reminders";
@@ -207,29 +208,40 @@ export async function computeAccountReminders(
   });
 }
 
-/** The reference shown for a reminder's subject: INC-0004, CMP-0002, W-003, the policy title, or the business. */
+/** The reference shown for a reminder's subject: INC-0004, CMP-0002, W-003, the policy's id or guarded title, or the business. */
 async function referenceFor(
   admin: SupabaseClient,
   r: { subject_table: string; subject_id: string },
   tradingName: string,
 ): Promise<string> {
   if (r.subject_table === "accounts") return tradingName;
+  if (r.subject_table === "policy_reviews") {
+    // The title is read only to name an "other" policy, and only when it names nobody (SR-4; retro finding 49).
+    const row = await admin
+      .from("policy_reviews")
+      .select("document_type_id, title")
+      .eq("id", r.subject_id)
+      .maybeSingle();
+    const data = row.data as {
+      document_type_id: string;
+      title: string | null;
+    } | null;
+    return data ? policyReviewReference(data) : r.subject_id.slice(0, 8);
+  }
   // REQ-018 Session C: the audit-day registers' references (a code, a label or an area), never content (SR-4).
   const column =
     r.subject_table === "worker_clearances" ||
     r.subject_table === "staff_matrix"
       ? "worker_ref"
-      : r.subject_table === "policy_reviews"
-        ? "document_type_id"
-        : r.subject_table === "insurance_items"
-          ? "label"
-          : r.subject_table === "participant_risks"
-            ? "participant_ref"
-            : r.subject_table === "corporate_risks"
-              ? "area"
-              : r.subject_table === "conflicts_of_interest"
-                ? "who_ref"
-                : "reference";
+      : r.subject_table === "insurance_items"
+        ? "label"
+        : r.subject_table === "participant_risks"
+          ? "participant_ref"
+          : r.subject_table === "corporate_risks"
+            ? "area"
+            : r.subject_table === "conflicts_of_interest"
+              ? "who_ref"
+              : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)
