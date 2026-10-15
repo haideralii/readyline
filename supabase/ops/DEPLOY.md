@@ -96,26 +96,27 @@ unexposed.
   including the query string, so an exact `/auth/callback` entry does not
   match `/auth/callback?next=…`. Step 5 below uses the trailing `*`.
 
-| Name                                   | Where the value comes from                                                                                                                           | Exposure    |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `NEXT_PUBLIC_SITE_URL`                 | `https://<domain>` with no trailing slash                                                                                                            | public      |
-| `NEXT_PUBLIC_BRAND_NAME`               | `Readyline` (optional; the code defaults to it)                                                                                                      | public      |
-| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase dashboard → Project Settings → API → Project URL                                                                                            | public      |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase dashboard → Project Settings → API Keys → publishable key                                                                                   | public      |
-| `SUPABASE_SECRET_KEY`                  | Supabase dashboard → Project Settings → API Keys → secret key                                                                                        | server-only |
-| `CRON_SECRET`                          | Generate one: `openssl rand -hex 32` (or any 64 random hex characters). Vercel Cron sends it; the routes check it.                                   | server-only |
-| `ANTHROPIC_API_KEY`                    | Anthropic console → API keys (set a monthly spend cap on the key)                                                                                    | server-only |
-| `ANTHROPIC_MODEL`                      | `claude-sonnet-5-5` (D-048); optional, the code defaults to it                                                                                       | server-only |
-| `GENERATION_LIVE`                      | `1` for the trial: real model calls for paid packs (D-708). Without it a purchase cannot be fulfilled.                                               | server-only |
-| `GENERATION_ENABLED`                   | `false` (keeps the free "Generate" button hidden; the paid path does not need it)                                                                    | server-only |
-| `CONTACT_EMAIL`                        | The address you answer from; shown in the footer and used for refund requests                                                                        | server-only |
-| `BUSINESS_ABN`                         | Optional, 11 digits; shown in the footer once set                                                                                                    | server-only |
-| `STRIPE_SECRET_KEY`                    | Stripe dashboard (test mode for the trial) → Developers → API keys → a restricted key with Checkout Sessions write, PaymentIntents read, Prices read | server-only |
-| `STRIPE_PRICE_PACK`                    | Stripe dashboard → Product catalogue → "Readyline document pack" → the AUD 399 Price id (`price_…`)                                                  | server-only |
-| `PACK_PRICE_AUD_CENTS`                 | `39900` (must equal the Price's amount; a live key refuses to start on a mismatch)                                                                   | server-only |
-| `GST_LINE`                             | The sentence beside the price, for example `No GST while Readyline is not registered for GST.`                                                       | server-only |
-| `SUBSCRIPTION_PRICE_AUD_CENTS`         | `3900` (display only, "coming soon")                                                                                                                 | server-only |
-| `STRIPE_WEBHOOK_SECRET`                | Step 7 below (needs the domain first). Add a placeholder now so the first build passes, then replace it.                                             | server-only |
+| Name                                   | Where the value comes from                                                                                                                                              | Exposure    |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `NEXT_PUBLIC_SITE_URL`                 | `https://<domain>` with no trailing slash                                                                                                                               | public      |
+| `NEXT_PUBLIC_BRAND_NAME`               | `Readyline` (optional; the code defaults to it)                                                                                                                         | public      |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Supabase dashboard → Project Settings → API → Project URL                                                                                                               | public      |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase dashboard → Project Settings → API Keys → publishable key                                                                                                      | public      |
+| `SUPABASE_SECRET_KEY`                  | Supabase dashboard → Project Settings → API Keys → secret key                                                                                                           | server-only |
+| `CRON_SECRET`                          | Generate one: `openssl rand -hex 32` (or any 64 random hex characters). Vercel Cron sends it; the routes check it.                                                      | server-only |
+| `HASH_PEPPER`                          | Generate one: `openssl rand -hex 32`. The HMAC key behind hashed viewer addresses and invitation emails; set once, never rotate (open invitations would stop matching). | server-only |
+| `ANTHROPIC_API_KEY`                    | Anthropic console → API keys (set a monthly spend cap on the key)                                                                                                       | server-only |
+| `ANTHROPIC_MODEL`                      | `claude-sonnet-5-5` (D-048); optional, the code defaults to it                                                                                                          | server-only |
+| `GENERATION_LIVE`                      | `1` for the trial: real model calls for paid packs (D-708). Without it a purchase cannot be fulfilled.                                                                  | server-only |
+| `GENERATION_ENABLED`                   | `false` (keeps the free "Generate" button hidden; the paid path does not need it)                                                                                       | server-only |
+| `CONTACT_EMAIL`                        | The address you answer from; shown in the footer and used for refund requests                                                                                           | server-only |
+| `BUSINESS_ABN`                         | Optional, 11 digits; shown in the footer once set                                                                                                                       | server-only |
+| `STRIPE_SECRET_KEY`                    | Stripe dashboard (test mode for the trial) → Developers → API keys → a restricted key with Checkout Sessions write, PaymentIntents read, Prices read                    | server-only |
+| `STRIPE_PRICE_PACK`                    | Stripe dashboard → Product catalogue → "Readyline document pack" → the AUD 399 Price id (`price_…`)                                                                     | server-only |
+| `PACK_PRICE_AUD_CENTS`                 | `39900` (must equal the Price's amount; a live key refuses to start on a mismatch)                                                                                      | server-only |
+| `GST_LINE`                             | The sentence beside the price, for example `No GST while Readyline is not registered for GST.`                                                                          | server-only |
+| `SUBSCRIPTION_PRICE_AUD_CENTS`         | `3900` (display only, "coming soon")                                                                                                                                    | server-only |
+| `STRIPE_WEBHOOK_SECRET`                | Step 7 below (needs the domain first). Add a placeholder now so the first build passes, then replace it.                                                                | server-only |
 
 Never set `STRIPE_FAKE`, `GENERATION_RECORD` or `EMAIL_*`/`SENTRY_*` in
 Vercel for this deploy.

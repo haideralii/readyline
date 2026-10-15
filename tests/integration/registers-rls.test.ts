@@ -254,6 +254,46 @@ describe.skipIf(!enabled)(
         .select("notify_by")
         .single();
       expect(notFlagged.data?.notify_by).toBeNull();
+      // Retro review finding 23 (PO decision 23): an owner's back-filled row
+      // carries the aware date the form sets (defaulting to the day it
+      // happened), so the clock runs from the event, not the typing day
+      // (D-902: early, never late); when the provider learned of it later,
+      // the clock runs from that day (migration 20261015050000 § 3).
+      const backFilled = await a.client
+        .from("incidents")
+        .insert(
+          incident(a.accountId, {
+            occurred_on: "2026-10-06",
+            aware_on: "2026-10-06",
+            reported_on: "2026-10-09",
+            category: "serious-injury",
+            severity: "high",
+            reportable: true,
+          }),
+        )
+        .select("notify_by, aware_on")
+        .single();
+      expect(backFilled.error).toBeNull();
+      expect(backFilled.data).toEqual({
+        notify_by: "2026-10-07",
+        aware_on: "2026-10-06",
+      });
+      const awareLater = await a.client
+        .from("incidents")
+        .insert(
+          incident(a.accountId, {
+            occurred_on: "2026-10-06",
+            aware_on: "2026-10-08",
+            reported_on: "2026-10-09",
+            category: "serious-injury",
+            severity: "high",
+            reportable: true,
+          }),
+        )
+        .select("notify_by")
+        .single();
+      expect(awareLater.error).toBeNull();
+      expect(awareLater.data?.notify_by).toBe("2026-10-09");
     });
 
     it("the NDIS-number CHECK fires on free text, and names in a reference field are refused", async () => {

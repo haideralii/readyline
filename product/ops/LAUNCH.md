@@ -43,6 +43,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 ## 7. Admin
 
 19. Supabase, Table editor, `users`: `platform_admin` = true on your own row (`DEPLOY.md`). Then `/admin/mfa`: enrol the authenticator. Row: **Authenticator enrolled for the platform admin**.
+19a. Vercel: `HASH_PEPPER` (`openssl rand -hex 32`), the key behind the hashed viewer addresses on audit lines and the hashed emails on worker invitations (retro finding 34). Set it once and keep it: a change orphans every open invitation. Until it is set the hashes are plain SHA-256 as before and the row stays red (D-2238). Row: **Hash pepper**.
 
 ## 8. Legal pages
 
