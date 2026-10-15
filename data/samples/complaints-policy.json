@@ -81,11 +81,7 @@
       "blocks": [
         {
           "type": "paragraph",
-          "text": "We keep an Easy Read version of the summary above with this document: one idea per line, with a picture for each idea, in large print."
-        },
-        {
-          "type": "callout",
-          "text": "[Easy Read version]"
+          "text": "You keep an Easy Read version of the summary above with this document: one idea per line, a picture for each idea, large print. Readyline does not draft it."
         }
       ]
     },

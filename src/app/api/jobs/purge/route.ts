@@ -11,6 +11,7 @@ import { log } from "@/lib/logging/logger";
 import { purgeGenerationArtifacts, runPurge } from "@/server/accounts/purge";
 import { createEmailProvider } from "@/server/email/provider";
 import { recordJobRun } from "@/server/jobs/record-run";
+import { purgeOldAuditorLinks } from "@/server/registers/auditor-links";
 import {
   isAuthorisedCronRequest,
   mayRunScheduledJobs,
@@ -48,6 +49,8 @@ export async function GET(request: Request) {
       dryRun,
     });
     const generation = await purgeGenerationArtifacts({ admin, dryRun });
+    // REQ-020 Data: auditor links go 30 days after they ended.
+    const auditorLinks = dryRun ? 0 : await purgeOldAuditorLinks(admin);
     log.info("jobs.purge.ran", {
       dryRun,
       purged: report.purged.length,
@@ -61,7 +64,7 @@ export async function GET(request: Request) {
         errors: report.errors.length,
       });
     return NextResponse.json(
-      { ...report, generation },
+      { ...report, generation, auditorLinks },
       {
         status: report.errors.length ? 207 : 200,
       },

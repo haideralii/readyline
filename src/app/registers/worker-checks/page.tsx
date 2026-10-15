@@ -38,6 +38,7 @@ export default async function WorkerChecksPage() {
       addHref="/registers/worker-checks/new"
       addLabel="Add a check"
       exportHref="/registers/worker-checks/export.csv"
+      importHref="/registers/worker-checks/import"
       back={{ href: "/registers", label: "Registers" }}
     >
       <RegisterList

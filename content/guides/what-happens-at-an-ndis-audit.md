@@ -5,14 +5,21 @@ description: "What an NDIS provider audit involves, in plain words: the five kin
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
+shortAnswer: "The Commission names five kinds of audit; your registration groups decide which you face. | The auditor reads your documents and registers, then talks to workers and some participants. | You check a draft report; the Commission then decides on registration."
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; sourced to the Commission's types-of-audits page; the sector-webinar lines are labelled as practice, not rules)
 ---
 
 # What happens at an NDIS audit: the five kinds, what the auditor reads, and what it costs
 
-**The short answer: an auditor checks that your systems work, not that your folder is neat.** You choose and pay an approved quality auditor from the Commission's list. The auditor reads your documents and samples your records. For a certification audit, they also visit you and talk to your workers and participants.
+**The short answer: an auditor checks that your systems work, not that your folder is neat.**
 
-The NDIS Quality and Safeguards Commission tells you which kind of audit you need. Everything below comes from the Commission's own page on audits unless it says otherwise. Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule.
+- You choose and pay an approved quality auditor from the Commission's list.
+- The auditor reads your documents and samples your records.
+- For a certification audit, they also visit you and talk to your workers and participants.
+
+The NDIS Quality and Safeguards Commission tells you which kind of audit you need. Everything below comes from the Commission's own page on audits unless it says otherwise.
+
+Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule.
 
 ## The five kinds of audit
 
@@ -59,13 +66,19 @@ Each Practice Standard and quality indicator gets a rating:
 
 A major non-conformity gives you 3 months to fix the issue, and your registration does not progress until it is fixed. A minor non-conformity gives you longer, and the registration process continues.
 
-The auditor writes the report after the visit and shares a draft with you to check for factual accuracy. The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit. The Commission then makes the registration decision.
+The auditor writes the report after the visit and shares a draft with you to check for factual accuracy.
+
+The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit. The Commission then makes the registration decision.
 
 ## How the money works
 
-There is no cost to register with the Commission. You pay the approved quality auditor. The Commission does not set prices for audits; the cost depends on the size and scale of your organisation and the number of participants you support. The Commission encourages you to get quotes from several auditors and compare them.
+There is no cost to register with the Commission. You pay the approved quality auditor.
 
-In practice (sector webinars, 2026, not a rule), a quote is a daily rate times a number of audit days. You can ask for the daily rate and how the days were worked out. Quotes for a sole support coordinator's renewal ranged from about AUD 5,000 to 7,000 in 2026.
+The Commission does not set prices for audits; the cost depends on the size and scale of your organisation and the number of participants you support. The Commission encourages you to get quotes from several auditors and compare them.
+
+In practice (sector webinars, 2026, not a rule), a quote is a daily rate times a number of audit days. You can ask for the daily rate and how the days were worked out.
+
+Quotes for a sole support coordinator's renewal ranged from about AUD 5,000 to 7,000 in 2026.
 
 Our [cost guide](/guides/ndis-registration-cost) has the ranges we have seen for each audit kind.
 

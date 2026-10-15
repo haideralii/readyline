@@ -5,20 +5,31 @@ description: "Which NDIS audit you face depends on the support types you registe
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
+shortAnswer: "Your registration groups decide: lower-risk groups get a verification audit; any higher-risk group makes it certification. | Verification is a desk audit of your documents; certification adds a site visit and interviews. | Certification brings a mid-term audit about 18 months in; verification does not."
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 13 Oct 2026, updated 14 Oct 2026 with the Commission's types-of-audits page: the five kinds, stages, report times and ratings; one UNVERIFIED line stays marked in the text)
 ---
 
 # Verification or certification: which NDIS audit do you need?
 
-**The short answer: your registration groups decide.** Every support type you register for (a "registration group" or "class", with a four-digit code) is listed by the NDIS Quality and Safeguards Commission as either lower-risk or higher-risk. Lower-risk groups get a verification audit. If any one of your groups is higher-risk, your whole registration gets a certification audit.
+**The short answer: your registration groups decide.**
+
+Every support type you register for (a "registration group" or "class", with a four-digit code) is listed by the NDIS Quality and Safeguards Commission as either lower-risk or higher-risk.
+
+- Lower-risk groups get a verification audit.
+- If any one of your groups is higher-risk, your whole registration gets a certification audit.
 
 You do not choose. An auditor does not choose either. The list below is the Commission's own, and the free questionnaire works it out for your exact mix of groups, with the source shown.
 
 ## The two audits in plain words
 
-**Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management. Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+**Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
 
-**Certification** is a full audit in two stages. Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add. Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
+Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+
+**Certification** is a full audit in two stages.
+
+- Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add.
+- Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
 
 The Commission names three more kinds: the mid-term audit for certified providers, a condition audit the Commission can require, and an out of cycle audit you arrange to change your registration. Our guide [What happens at an NDIS audit](/guides/what-happens-at-an-ndis-audit) walks through all five.
 
@@ -41,19 +52,25 @@ The questionnaire asks about each of these, so the result covers them.
 
 ## What the audit report says
 
-Each Practice Standard and quality indicator gets a rating from 3 (conforms with elements of best practice) down to 0 (major non-conformity). A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have. A minor non-conformity gives you longer, and the process continues.
+Each Practice Standard and quality indicator gets a rating from 3 (conforms with elements of best practice) down to 0 (major non-conformity).
+
+A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have. A minor non-conformity gives you longer, and the process continues.
 
 The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit. The Commission, not the auditor, makes the registration decision.
 
 ## The mid-term audit
 
-If your audit is certification, the Commission requires a mid-term audit about 18 months after registration. It covers the governance and operational management part of the core module, plus any standard that had a corrective action at your first audit. The Commission says to start preparing 12 months after your registration date. Verification registrations have no mid-term audit.
+If your audit is certification, the Commission requires a mid-term audit about 18 months after registration. It covers the governance and operational management part of the core module, plus any standard that had a corrective action at your first audit.
+
+The Commission says to start preparing 12 months after your registration date. Verification registrations have no mid-term audit.
 
 The mid-term audit does not apply to an individual or partnership certified only for early childhood supports, or to a provider registered only for specialist disability accommodation.
 
 ## When registration becomes compulsory
 
-Registration is becoming compulsory in waves. The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026. Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030.
+Registration is becoming compulsory in waves. The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026.
+
+Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030.
 
 UNVERIFIED: the 2027 and 2030 dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of. Check the Commission's registration pages before relying on them.
 

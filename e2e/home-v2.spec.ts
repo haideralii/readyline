@@ -41,10 +41,19 @@ test.describe("home page v2 (batch 24)", () => {
       "href",
       "/start",
     );
+    // REQ-025 FR-12: the sample has its own page; the hero button and the card point at it.
     await expect(page.getByTestId("home-cta-sample")).toHaveAttribute(
       "href",
-      "#sample",
+      "/sample",
     );
+    await expect(page.getByTestId("home-sample-card")).toContainText(
+      /\d+ of \d+ sections drafted from the answers/,
+    );
+    await expect(page.getByTestId("home-sample-read")).toHaveAttribute(
+      "href",
+      "/sample",
+    );
+    await expect(page.getByTestId("sample-document")).toHaveCount(0);
     await expect(page.getByTestId("home-price-line")).toContainText(
       /No subscription needed, no instalments, no interest/,
     );
@@ -57,8 +66,12 @@ test.describe("home page v2 (batch 24)", () => {
       /which audit you face, with the Commission's text behind it/,
     );
     // Batch 26 item 6: the badge shows off production (every e2e run); the
-    // smoke test asserts its absence on the deployed site.
-    await expect(page.getByTestId("dev-badge")).toHaveText("In development");
+    // smoke test asserts its absence on the deployed site. Batch 47 item 9:
+    // against a deployment (an https base) the badge is absent by design.
+    if (/^https:/.test(process.env.PLAYWRIGHT_BASE_URL ?? ""))
+      await expect(page.getByTestId("dev-badge")).toHaveCount(0);
+    else
+      await expect(page.getByTestId("dev-badge")).toHaveText("In development");
     await shot(page, "home-v2", testInfo.project.name);
   });
 
@@ -68,6 +81,7 @@ test.describe("home page v2 (batch 24)", () => {
   }, testInfo) => {
     await page.goto("/");
     await page.getByTestId("home-cta-sample").click();
+    await expect(page).toHaveURL(/\/sample$/);
     const sample = page.getByTestId("sample-document");
     await expect(sample).toBeVisible();
     await expect(sample).toContainText("Example Supports");

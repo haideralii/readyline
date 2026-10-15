@@ -3,13 +3,17 @@
  * twelve records from the evidence list in the auditor research, each
  * with the live state of the matching register (filled, nothing recorded,
  * overdue) and the tap that fixes it. Pure: counts in, lines out; the
- * audit-day page renders them and the test pins the twelve.
+ * audit-day page renders them and the test pins the count.
  */
 import type { AuditDayOverview } from "@/server/registers/audit-day-queries";
 import type { RegisterOverview } from "./overview";
 import type { DocumentControlRow } from "./document-control";
 import { documentControlSentence } from "./document-control";
-import { auditRecordTier, type AuditRecordTier } from "./names";
+import {
+  AUDIT_DAY_RECORDS,
+  auditRecordTier,
+  type AuditRecordTier,
+} from "./names";
 
 export type AskLine = {
   id: string;
@@ -27,7 +31,8 @@ export type AskLine = {
   paper: boolean;
 };
 
-export const ASK_COUNT = 12;
+/** The twelve records of REQ-018 plus the hazard register (REQ-020 FR-7): the one list in names.ts, which the pack's "items to prepare" also reads. */
+export const ASK_COUNT = AUDIT_DAY_RECORDS.length;
 
 function fromOverview(
   o: { total: number; attention: number; attentionLabel: string },
@@ -64,10 +69,9 @@ export function auditDayAskList(input: {
   const { registers: r, auditDay: a, documentControl: dc } = input;
   const dcOverdue = dc.filter((d) => d.state === "overdue").length;
   const dcMissing = dc.length === 0 || dc.some((d) => !d.adopted_on);
-  const lines: Omit<AskLine, "tier" | "paper">[] = [
+  const lines: Omit<AskLine, "ask" | "tier" | "paper">[] = [
     {
       id: "document-control",
-      ask: "Your document control register: every policy with its version, when it was adopted, by whom, and when it is next reviewed",
       state: dcOverdue ? "overdue" : dcMissing ? "missing" : "filled",
       word: documentControlSentence(dc),
       href: "/registers/document-control",
@@ -75,12 +79,10 @@ export function auditDayAskList(input: {
     },
     {
       id: "decisions",
-      ask: "Your record of decisions or meeting minutes",
       ...fromOverview(a.decisions, "/registers/decisions", "Add a decision"),
     },
     {
       id: "corporate-risks",
-      ask: "Your corporate risk register, every area filled, a review date on every row",
       ...fromOverview(
         a["corporate-risks"],
         "/registers/corporate-risks",
@@ -89,7 +91,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "participant-risks",
-      ask: "Your participant risk register, one line per participant",
       ...fromOverview(
         a["participant-risks"],
         "/registers/participant-risks",
@@ -98,7 +99,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "conflicts-of-interest",
-      ask: "Your conflict of interest register, with review dates",
       ...fromOverview(
         a["conflicts-of-interest"],
         "/registers/conflicts-of-interest",
@@ -107,17 +107,19 @@ export function auditDayAskList(input: {
     },
     {
       id: "delegations",
-      ask: "Your delegations register: who acts when you are away",
       ...fromOverview(a.delegations, "/registers/delegations", "Add a role"),
     },
     {
+      // REQ-020 FR-7: the hazard register, with its live state.
+      id: "hazards",
+      ...fromOverview(a.hazards, "/registers/hazards", "Add a hazard"),
+    },
+    {
       id: "insurances",
-      ask: "Your insurance certificates and, if you drive participants, your vehicle and driver records",
       ...fromOverview(a.insurances, "/registers/insurances", "Add an item"),
     },
     {
       id: "improvements",
-      ask: "Your continuous improvement register, fed by incidents, complaints and feedback",
       ...fromOverview(
         a.improvements,
         "/registers/improvements",
@@ -126,7 +128,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "staff-matrix",
-      ask: "Your staff matrix: each worker's screening, training, supervision and appraisal",
       ...fromOverview(
         a["staff-matrix"],
         "/registers/staff-matrix",
@@ -135,7 +136,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "onboarding",
-      ask: "A signed and dated onboarding checklist for each worker and each participant",
       ...fromOverview(
         a.onboarding,
         "/registers/onboarding",
@@ -144,7 +144,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "incidents",
-      ask: "Your incident register, with the reportable ones standing out",
       ...(r.incidents.total === 0
         ? {
             state: "missing" as const,
@@ -168,7 +167,6 @@ export function auditDayAskList(input: {
     },
     {
       id: "complaints",
-      ask: "Your complaints register, separate from feedback, with resolution times",
       ...(r.complaints.total === 0
         ? {
             state: "missing" as const,
@@ -184,7 +182,13 @@ export function auditDayAskList(input: {
           }),
     },
   ];
-  // The tier and the paper mark come from the one list in names.ts, so the
-  // page, the self-assessment and this list can never disagree.
-  return lines.map((l) => ({ ...l, ...auditRecordTier(l.id) }));
+  // The auditor's words, the tier and the paper mark come from the one list
+  // in names.ts, so the page, the self-assessment and this list can never
+  // disagree (PO, 15 Oct 2026).
+  const askOf = new Map(AUDIT_DAY_RECORDS.map((r) => [r.id, r.ask]));
+  return lines.map((l) => ({
+    ...l,
+    ask: askOf.get(l.id) ?? "",
+    ...auditRecordTier(l.id),
+  }));
 }

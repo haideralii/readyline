@@ -23,6 +23,28 @@ describe("guides (REQ-011)", () => {
     }
   });
 
+  it("batch 49 item 5: three short-answer lines, a jump list of the body's headings, and no paragraph over 45 words (REQ-025 D-2218)", () => {
+    for (const g of loadGuides()) {
+      expect(g.shortAnswer, g.slug).toHaveLength(3);
+      for (const line of g.shortAnswer)
+        expect(
+          line.split(/\s+/).length,
+          `${g.slug}: "${line}"`,
+        ).toBeLessThanOrEqual(24);
+      expect(g.headings.length, g.slug).toBeGreaterThanOrEqual(4);
+      for (const h of g.headings) expect(h.id, g.slug).toMatch(/^[a-z0-9-]+$/);
+      const paragraphs = g.markdown
+        .split(/\n{2,}/)
+        .map((p) => p.trim())
+        .filter((p) => p && !/^(#|-|\*|\d+\.|\||\{\{)/.test(p));
+      for (const p of paragraphs)
+        expect(
+          p.split(/\s+/).length,
+          `${g.slug}: "${p.slice(0, 50)}"`,
+        ).toBeLessThanOrEqual(45);
+    }
+  });
+
   it("lists the UNVERIFIED lines for the PO", () => {
     // Batch 35 (NDIS watch item A12): the application-fee lines now carry the ABLIS citation and no marker.
     const cost = loadGuide("ndis-registration-cost");

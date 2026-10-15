@@ -1,0 +1,31 @@
+{
+  "kind": "report-to-confirm",
+  "today": "2026-10-13",
+  "note": "REQ-020 FR-5: a report through the link still unconfirmed twelve hours after it came in nudges the owner, dated today; one that came in an hour ago does not (the submission email covered it).",
+  "input": {
+    "now": "2026-10-13T09:00:00Z",
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "reports": [
+      { "id": "d1", "aware_at": "2026-10-12T20:00:00Z" },
+      { "id": "d2", "aware_at": "2026-10-13T08:00:00Z" }
+    ],
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "report-to-confirm",
+      "subject_table": "incidents",
+      "subject_id": "d1",
+      "due_on": "2026-10-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

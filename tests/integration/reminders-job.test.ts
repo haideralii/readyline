@@ -104,6 +104,32 @@ describe.skipIf(!enabled)(
         }),
       ]);
       for (const s of seeds) if (s.error) throw s.error;
+      // REQ-020 FR-5 (AC-4): two unconfirmed reports. The first came in 13
+      // hours ago and would be overdue to the Commission if it counted: the
+      // job nudges the owner to confirm it and raises nothing else for it.
+      // The second came in an hour ago: nothing yet.
+      const hoursAgo = (h: number) =>
+        new Date(Date.now() - h * 3_600_000).toISOString();
+      for (const [awareAt, summary] of [
+        [hoursAgo(13), "Reported through the link, still waiting."],
+        [hoursAgo(1), "Reported through the link just now."],
+      ]) {
+        const draft = await admin.from("incidents").insert({
+          account_id: accountId,
+          occurred_on: addDays(TODAY, -2),
+          reported_on: addDays(TODAY, -2),
+          category: "serious-injury",
+          severity: "high",
+          summary,
+          reportable: true,
+          status: "draft",
+          reported_via: "link",
+          logged_by_ref: "support worker",
+          aware_at: awareAt,
+          aware_on: awareAt.slice(0, 10),
+        });
+        if (draft.error) throw draft.error;
+      }
       // REQ-018 Session C (AC-3): one row per new reminder kind with a fixed date that fires today.
       const drill = await admin
         .from("accounts")
@@ -138,6 +164,18 @@ describe.skipIf(!enabled)(
           conflict: "Related to a participant's plan manager.",
           managed_by: "Does not handle that plan.",
           declared_on: addDays(TODAY, -100),
+          review_on: addDays(TODAY, 14),
+        }),
+        // REQ-020 FR-7, AC-6: a hazard with a review date in 14 days raises one register-review reminder.
+        admin.from("hazards").insert({
+          account_id: accountId,
+          site_ref: "S-1",
+          hazard: "Loose rail on the back step.",
+          harm_to: "participant",
+          likelihood: "medium",
+          severity: "high",
+          controls: "Rail fixed; checked monthly.",
+          due_on: addDays(TODAY, 7),
           review_on: addDays(TODAY, 14),
         }),
       ]);
@@ -186,11 +224,18 @@ describe.skipIf(!enabled)(
           `support-plan-review@${TODAY}`,
           `register-review@${TODAY}`,
           `emergency-drill@${TODAY}`,
+          // REQ-020 AC-6: the hazard's review, 14 days out.
+          `register-review@${TODAY}`,
+          // REQ-020 FR-5 (AC-4): the 13-hour-old report, and nothing for the one-hour-old one.
+          `report-to-confirm@${TODAY}`,
         ].sort(),
       );
-      expect(rows.data?.length).toBe(11);
-      expect(first.inserted).toBe(11);
-      expect(first.emailed).toBe(11);
+      expect(
+        (rows.data ?? []).filter((r) => r.subject_table === "hazards"),
+      ).toHaveLength(1);
+      expect(rows.data?.length).toBe(13);
+      expect(first.inserted).toBe(13);
+      expect(first.emailed).toBe(13);
       expect((rows.data ?? []).every((r) => r.sent_at)).toBe(true);
       // SR-4: the message names registers and references, never the summary text.
       const sent = provider.sent.find((m) => m.to === email);
@@ -215,7 +260,7 @@ describe.skipIf(!enabled)(
         .from("reminders")
         .select("id", { count: "exact", head: true })
         .eq("account_id", accountId);
-      expect(again.count).toBe(11);
+      expect(again.count).toBe(13);
       expect(provider.sent.filter((m) => m.to === email).length).toBe(
         sentBefore,
       );
