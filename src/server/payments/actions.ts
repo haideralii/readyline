@@ -15,6 +15,7 @@ import {
   safeCancelPath,
 } from "@/lib/payments/checkout-params";
 import { FAKE_CHECKOUT_PATH } from "@/lib/payments/fake-session";
+import { paymentRefusal } from "@/lib/payments/refusal";
 import { hasActiveSubscription } from "@/server/registers/queries";
 import { getSubscription } from "@/server/payments/subscription-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -74,6 +75,9 @@ export async function createCheckoutAction(
   const built = buildResult(dataset, answers.data);
   if (!built.ok) return { ok: false, message: built.message };
 
+  // REQ-022 FR-3 (D-2209): a live key beside a wrong price or a test id sells nothing.
+  if (paymentRefusal().length)
+    return { ok: false, message: CHECKOUT_UNAVAILABLE };
   let env;
   try {
     env = readStripeEnv();
@@ -143,6 +147,8 @@ export async function createSubscriptionAction(
   if (!viewer.account) redirect("/account/setup");
   const account = viewer.account;
 
+  if (paymentRefusal().length)
+    return { ok: false, message: SUBSCRIPTION_UNAVAILABLE };
   let env;
   try {
     env = readStripeEnv();
@@ -221,6 +227,8 @@ export async function billingPortalAction(
   const supabase = await createSupabaseServerClient();
   const sub = await getSubscription(supabase, viewer.account.id);
   if (!sub?.stripe_customer_id)
+    return { ok: false, message: PORTAL_UNAVAILABLE };
+  if (paymentRefusal().length)
     return { ok: false, message: PORTAL_UNAVAILABLE };
   let env;
   try {

@@ -162,6 +162,8 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}" >> "$GITHUB_ENV"
           echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
+          # REQ-022 Session A (D-2210): the admin e2e raises its throwaway admin through SQL, as an operator would.
+          echo "SUPABASE_DB_URL=${DB_URL}" >> "$GITHUB_ENV"
 
       - name: Row-level security and tenancy tests
         run: npm run test:integration
