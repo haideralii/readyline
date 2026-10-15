@@ -1,4 +1,4 @@
--- REQ-020 Session A, FR-2, SR-1, SR-2 (D-2214): one read-only auditor link
+-- REQ-020 Session A, FR-2, SR-1, SR-2 (D-2230): one read-only auditor link
 -- per account at a time. The token itself is never stored: only its SHA-256
 -- hex, compared by the lookup function below. Members read the row (expiry,
 -- last opened, count); only the owner creates or revokes; nothing deletes a
