@@ -43,6 +43,7 @@ Session C, the writing rule on the rest of the public pages
 
 - FR-10 The copy lint gains the D-2218 paragraph rule for `/start/result`, `/pricing` and the four guides (max three lines at 360 px, measured as 220 characters), with an allow-list for the legal pages (a lawyer's text is not shortened by a lint).
 - FR-11 `/pricing` "What you get" and "What it is not", the home page's "What you can count on", and each guide's "short answer" are rewritten as lists where they are parallel facts; the house style page records the rule.
+- FR-12 The sample document leaves the home page (Haider: "sample document on the same page? it's too much"; the field review found 13,400 px at 360 px). `/sample` becomes its own page carrying today's full sample with the download button; the home page keeps the heading "See exactly what you get", the two intro sentences as two bullets, a card with the sample's name, its one-line description and the "7 of 16 sections drafted from the answers" line, and two links: "Read the sample" (to `/sample`) and "Download it as a Word file". The hero's "See a sample document" button points at `/sample`. The sample's recorded fixture and the `home` specs that assert the sample move with it; the home page's height at 360 px drops below 5,000 px and the budget job records it.
 
 ## Security and privacy
 
