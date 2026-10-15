@@ -108,11 +108,15 @@ $$;
 revoke all on function public.invitation_preview(text) from public, anon, authenticated;
 grant execute on function public.invitation_preview(text) to service_role;
 
--- Accepting runs as the signed-in user: the invitation's email hash must
--- equal the hash of the session's email; the owner of the account cannot
--- demote themselves by accepting their own invitation. Returns the account
--- id, or null when nothing matched (no reason is given, SR-1).
-create or replace function public.accept_invitation(p_token_hash text)
+-- Accepting: the server action passes the signed-in user's id and the
+-- peppered hash of their session email (HMAC-SHA-256 under HASH_PEPPER,
+-- retro review of REQ-018 to 021, finding 34; the database never holds the
+-- pepper, so it cannot compute the hash itself). The invitation's email
+-- hash must equal it; the owner of the account cannot demote themselves by
+-- accepting their own invitation. The function is the service key's alone,
+-- so a signed-in session cannot call it with a hash of its own choosing.
+-- Returns the account id, or null when nothing matched (no reason, SR-1).
+create or replace function public.accept_invitation(p_token_hash text, p_user_id uuid, p_email_hash text)
 returns uuid
 language plpgsql
 security definer
@@ -120,30 +124,28 @@ set search_path = public
 as $$
 declare
   v_inv public.invitations%rowtype;
-  v_email text;
 begin
-  v_email := lower(btrim(coalesce(auth.jwt() ->> 'email', '')));
-  if v_email = '' then return null; end if;
+  if p_user_id is null or p_email_hash is null or p_email_hash !~ '^[0-9a-f]{64}$' then return null; end if;
   select * into v_inv from public.invitations
     where token_hash = p_token_hash
       and accepted_at is null and revoked_at is null and expires_at > now()
     limit 1;
   if not found then return null; end if;
-  if v_inv.email_hash <> encode(sha256(convert_to(v_email, 'UTF8')), 'hex') then return null; end if;
-  if exists (select 1 from public.memberships where user_id = auth.uid() and account_id = v_inv.account_id and role <> 'worker') then
+  if v_inv.email_hash <> p_email_hash then return null; end if;
+  if exists (select 1 from public.memberships where user_id = p_user_id and account_id = v_inv.account_id and role <> 'worker') then
     return null;
   end if;
   insert into public.memberships (user_id, account_id, role, worker_ref)
-    values (auth.uid(), v_inv.account_id, 'worker', v_inv.worker_ref)
+    values (p_user_id, v_inv.account_id, 'worker', v_inv.worker_ref)
     on conflict (user_id, account_id) do update set worker_ref = excluded.worker_ref;
   update public.invitations set accepted_at = now() where id = v_inv.id;
   insert into public.audit_log (account_id, actor_user_id, action, target)
-    values (v_inv.account_id, auth.uid(), 'invitation.accepted', v_inv.id::text || ' ' || v_inv.worker_ref);
+    values (v_inv.account_id, p_user_id, 'invitation.accepted', v_inv.id::text || ' ' || v_inv.worker_ref);
   return v_inv.account_id;
 end;
 $$;
-revoke all on function public.accept_invitation(text) from public, anon;
-grant execute on function public.accept_invitation(text) to authenticated, service_role;
+revoke all on function public.accept_invitation(text, uuid, text) from public, anon, authenticated;
+grant execute on function public.accept_invitation(text, uuid, text) to service_role;
 
 -- 3. Incidents: draft reports, who logged them, when the provider became
 --    aware (the Rules' clock runs from awareness, and a worker is part of
@@ -154,7 +156,8 @@ alter table public.incidents
   add constraint incidents_status_check check (status in ('draft', 'open', 'under-review', 'closed', 'rejected'));
 alter table public.incidents
   add column reported_via text not null default 'owner' check (reported_via in ('owner', 'worker', 'link')),
-  add column logged_by_ref text check (logged_by_ref is null or logged_by_ref ~ '^(W-?[0-9]{1,6}|[a-z][a-z -]{2,40})$'),
+  -- A worker code or one of the five name-free roles, never free text (retro review of REQ-020, finding 31; REPORTER_ROLES in src/lib/registers/worker.ts).
+  add column logged_by_ref text check (logged_by_ref is null or logged_by_ref ~ '^W-?[0-9]{1,6}$' or logged_by_ref in ('support worker', 'casual worker', 'team leader', 'volunteer', 'another person present')),
   add column rejected_reason text not null default '' check (char_length(rejected_reason) <= 500 and not public.looks_like_ndis_number(rejected_reason)),
   add column aware_at timestamptz not null default now(),
   add column aware_on date not null default current_date;
@@ -162,7 +165,26 @@ alter table public.incidents
 alter table public.incidents drop column notify_by;
 alter table public.incidents
   add column notify_by date generated always as (public.incident_notify_by(greatest(occurred_on, aware_on), category, reportable, severity)) stored;
-alter table public.incidents drop constraint incidents_reported_on_check;
+-- The original rule was written inline on `reported_on` in
+-- 20261013000000_registers.sql; because its expression also names
+-- occurred_on, Postgres named it incidents_check, not
+-- incidents_reported_on_check (run 38721710508, PR #62). Find it by its
+-- definition and drop it, whatever its name.
+do $$
+declare
+  v_name text;
+begin
+  select conname into v_name
+    from pg_constraint
+   where conrelid = 'public.incidents'::regclass
+     and contype = 'c'
+     and pg_get_constraintdef(oid) like '%reported_on >= occurred_on%';
+  if v_name is null then
+    raise exception 'incidents: the reported_on >= occurred_on CHECK was not found';
+  end if;
+  execute format('alter table public.incidents drop constraint %I', v_name);
+end
+$$;
 alter table public.incidents
   add constraint incidents_reported_on_check check (reported_on >= occurred_on or status = 'draft');
 

@@ -11,8 +11,9 @@
  * Supabase variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { emailHash } from "@/lib/peppered-hash";
 import { hashAuditorToken } from "@/lib/registers/auditor-link";
 import { addDays } from "@/lib/registers/status";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
@@ -61,9 +62,9 @@ async function signUp(
   return { userId: created.data.user.id, email, client, accountId };
 }
 
-const emailHash = (email: string) =>
-  createHash("sha256").update(email.trim().toLowerCase(), "utf8").digest("hex");
-
+// The invitation's email hash is the app's peppered hash (retro finding 34);
+// the same function in the same process, so the stand-in pepper CI runs
+// with matches on both sides.
 const report = (over: Record<string, unknown> = {}) => ({
   p_occurred_on: "2026-10-01",
   p_category: "near-miss",
@@ -153,19 +154,34 @@ describe.skipIf(!enabled)(
       expect(preview.data).toEqual([
         { trading_name: "Tenant owner", worker_ref: "W-003" },
       ]);
-      // The wrong address: nothing, and no reason.
-      const wrong = await other.client.rpc("accept_invitation", {
+      // Accepting is the service key's alone (retro finding 34): the server
+      // action passes the session's user id and peppered email hash, so a
+      // signed-in session cannot call it with a hash of its own choosing.
+      const direct = await worker.client.rpc("accept_invitation", {
         p_token_hash: hashAuditorToken(inviteToken),
+        p_user_id: worker.userId,
+        p_email_hash: emailHash(worker.email),
+      });
+      expect(direct.error).not.toBeNull();
+      // The wrong address: nothing, and no reason.
+      const wrong = await admin.rpc("accept_invitation", {
+        p_token_hash: hashAuditorToken(inviteToken),
+        p_user_id: other.userId,
+        p_email_hash: emailHash(other.email),
       });
       expect(wrong.error).toBeNull();
       expect(wrong.data).toBeNull();
-      const accepted = await worker.client.rpc("accept_invitation", {
+      const accepted = await admin.rpc("accept_invitation", {
         p_token_hash: hashAuditorToken(inviteToken),
+        p_user_id: worker.userId,
+        p_email_hash: emailHash(worker.email),
       });
       expect(accepted.error).toBeNull();
       expect(accepted.data).toBe(owner.accountId);
-      const again = await worker.client.rpc("accept_invitation", {
+      const again = await admin.rpc("accept_invitation", {
         p_token_hash: hashAuditorToken(inviteToken),
+        p_user_id: worker.userId,
+        p_email_hash: emailHash(worker.email),
       });
       expect(again.data).toBeNull();
       const membership = await worker.client
@@ -380,7 +396,48 @@ describe.skipIf(!enabled)(
           reported_on: awareOn,
         },
       ]);
-      // Nine drafts remain; the twelfth submission is accepted.
+      // The old inline CHECK (reported_on >= occurred_on, auto-named incidents_check) is gone and the
+      // new one lets a draft carry an earlier report date while an open row still may not (PR #62).
+      const earlyOpen = await admin.from("incidents").insert({
+        account_id: owner.accountId,
+        occurred_on: "2026-10-05",
+        reported_on: "2026-10-04",
+        category: "near-miss",
+        severity: "low",
+        summary: "Typed with the dates the wrong way round.",
+        status: "open",
+      });
+      expect(earlyOpen.error?.code).toBe("23514");
+      const earlyDraft = await admin
+        .from("incidents")
+        .insert({
+          account_id: owner.accountId,
+          occurred_on: "2026-10-05",
+          reported_on: "2026-10-04",
+          category: "near-miss",
+          severity: "low",
+          summary: "A draft may carry the reporter's dates as given.",
+          status: "draft",
+          reported_via: "link",
+          logged_by_ref: "casual worker",
+        })
+        .select("id")
+        .single();
+      expect(earlyDraft.error).toBeNull();
+      await admin.from("incidents").delete().eq("id", earlyDraft.data!.id);
+      // Finding 31: logged_by_ref is a worker code or one of the five roles, never a name.
+      const named = await admin.from("incidents").insert({
+        account_id: owner.accountId,
+        occurred_on: "2026-10-05",
+        reported_on: "2026-10-05",
+        category: "near-miss",
+        severity: "low",
+        summary: "Logged under a name.",
+        status: "draft",
+        reported_via: "link",
+        logged_by_ref: "jane smith",
+      });
+      expect(named.error?.code).toBe("23514"); // Nine drafts remain; the twelfth submission is accepted.
       const twelfth = await admin.rpc("submit_incident_report", {
         p_token_hash: hash,
         ...report(),
