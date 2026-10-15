@@ -17,7 +17,9 @@ You can have a full refund within 14 days of buying the pack if you have not dow
 
 If you have downloaded the documents, we still refund you if they do not match the answers you gave in the questionnaire, or if they are missing something you were told they would include. When we are not sure, we decide in your favour.
 
-## The audit-ready subscription (when available)
+## The audit-ready subscription
+
+{{subscription-off}}
 
 You can cancel at any time. You keep access until the end of the period you have paid for. We do not charge for the next period after you cancel. We do not charge late fees or interest. If a payment fails, your access pauses; nothing is added to what you owe.
 

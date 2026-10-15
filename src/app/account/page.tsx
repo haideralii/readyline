@@ -18,6 +18,7 @@ import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
 import { loadFacts } from "@/server/path/facts";
 import { listPurchases } from "@/server/payments/queries";
+import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import { subscriptionAvailable } from "@/server/payments/stripe";
 import { getSubscription } from "@/server/payments/subscription-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -165,9 +166,9 @@ export default async function AccountPage() {
             ) : (
               <p
                 className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-                data-testid="subscription-coming"
+                data-testid="subscription-off"
               >
-                Subscriptions open soon.
+                {SUBSCRIPTION_OFF}
               </p>
             )}
           </>

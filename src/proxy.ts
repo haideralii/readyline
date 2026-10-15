@@ -58,7 +58,46 @@ export function supabaseOriginFromEnv(): string | null {
   }
 }
 
+/**
+ * Routes whose page redirects a signed-out visitor to sign-in but sits under
+ * a loading boundary, so the redirect would otherwise arrive inside a
+ * streamed 200 (batch 47 item 7). Without any Supabase session cookie the
+ * proxy answers the 307 itself, as /registers does; with a cookie the page
+ * still verifies the session, and the loading UI stays for the signed-in
+ * load.
+ */
+export const SESSION_ROUTES = ["/documents", "/checklist"] as const;
+
+export function needsSessionRedirect(
+  pathname: string,
+  cookieNames: readonly string[],
+): string | null {
+  const guarded = SESSION_ROUTES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+  if (!guarded) return null;
+  const hasSession = cookieNames.some(
+    (n) => n.startsWith("sb-") && n.includes("-auth-token"),
+  );
+  if (hasSession) return null;
+  // Batch 48 item 3: a download route is a handler with no loading boundary,
+  // so it answers for itself (a bad file name is 404 before any redirect, and
+  // its redirect comes back to the document's page, never to the file). A
+  // page comes back to itself after sign-in.
+  if (/^\/documents\/[^/]+\/download(?:\/.*)?$/.test(pathname)) return null;
+  return `/sign-in?next=${encodeURIComponent(pathname)}`;
+}
+
 export function proxy(request: NextRequest) {
+  const redirectTo = needsSessionRedirect(
+    request.nextUrl.pathname,
+    request.cookies.getAll().map((c) => c.name),
+  );
+  if (redirectTo)
+    return NextResponse.redirect(
+      new URL(redirectTo, request.nextUrl.origin),
+      307,
+    );
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = buildCsp(
     nonce,
