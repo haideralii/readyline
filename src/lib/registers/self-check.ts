@@ -11,16 +11,16 @@ import { AUDIT_DAY_RECORDS } from "./names";
 export const SELF_CHECK_MONTHS = 3;
 export const SELF_CHECK_FINDING_DAYS = 30;
 
-/** The question for each record id; the hazard register joins the twelve (FR-7). */
+/** The question for each record on the audit-day list, under 30 words each (D-2219); the PO's words, 15 Oct 2026. */
 export const SELF_CHECK_QUESTIONS: Record<string, string> = {
   "document-control":
-    "Is every policy in the document control register adopted, dated and inside its review date?",
+    "Is every policy in the document control register adopted, dated and not past its review date?",
   decisions:
     "Is every decision you made this quarter written down, with the date and who made it?",
   "corporate-risks":
     "Does every corporate risk have what you do about it and a review date that is not past?",
   "participant-risks":
-    "Does every participant you support have a risk row that is current?",
+    "Does every participant you support have a risk row that is up to date?",
   "conflicts-of-interest":
     "Have you asked about conflicts this quarter and recorded any, with a review date?",
   delegations:
@@ -30,7 +30,7 @@ export const SELF_CHECK_QUESTIONS: Record<string, string> = {
   insurances:
     "Is every insurance certificate current, and is each expiry date in the register?",
   improvements:
-    "Did every incident, complaint and piece of feedback this quarter lead to an improvement row?",
+    "Did every incident, complaint and piece of feedback this quarter get an improvement row?",
   "staff-matrix":
     "Does every worker have their screening, training, supervision and appraisal dates in the matrix?",
   onboarding:
@@ -44,11 +44,9 @@ export const SELF_CHECK_QUESTIONS: Record<string, string> = {
 export type SelfCheckAnswer = { answer: "yes" | "no"; note: string };
 export type SelfCheckAnswers = Record<string, SelfCheckAnswer>;
 
-/** The record ids the walk asks about, in the audit-day order, the hazard register after the delegations. */
+/** The record ids the walk asks about: the audit-day list, in its order. */
 export function selfCheckRecordIds(): string[] {
-  const ids = AUDIT_DAY_RECORDS.map((r) => r.id);
-  const at = ids.indexOf("delegations");
-  return [...ids.slice(0, at + 1), "hazards", ...ids.slice(at + 1)];
+  return AUDIT_DAY_RECORDS.map((r) => r.id);
 }
 
 export function addMonthsIso(iso: string, months: number): string {
@@ -122,8 +120,7 @@ export function findingsFrom(
   return selfCheckRecordIds()
     .filter((id) => answers[id]?.answer === "no")
     .map((id) => {
-      const record = AUDIT_DAY_RECORDS.find((r) => r.id === id);
-      const name = record?.name ?? "Hazard register";
+      const name = AUDIT_DAY_RECORDS.find((r) => r.id === id)?.name ?? id;
       const note = answers[id].note.trim();
       return {
         source_kind: "self-check",

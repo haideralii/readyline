@@ -47,7 +47,7 @@ export default async function CheckPage() {
     const ask = asks.find((a) => a.id === id);
     return {
       id,
-      name: names.get(id) ?? "Hazard register",
+      name: names.get(id) ?? id,
       word: ask?.word ?? "",
       state: ask?.state ?? "missing",
       href: ask?.href ?? "/registers",

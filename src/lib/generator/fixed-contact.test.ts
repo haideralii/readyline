@@ -140,7 +140,7 @@ describe("Our position on restrictive practices (D-548)", () => {
 });
 
 describe("Items to prepare before the audit (D-547)", () => {
-  it("is the audit-day list, twelve records in two tiers, each in the audit-day order, the paper records marked", () => {
+  it("is the audit-day list, thirteen records in two tiers, each in the audit-day order, the paper records marked", () => {
     const { sections } = skeleton(
       "verification-sole-trader",
       "practice-standards-self-assessment",

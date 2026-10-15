@@ -239,10 +239,11 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
         },
       ];
     case "gaps":
-      // Batch 42 item 3 (D-547): the twelve records an auditor asks for, in
-      // the order the audit-day page asks for them, from the one list.
-      // Batch 45 (REQ-018-gated item): the twelve in their two tiers, the
-      // two paper records marked, the same words as the audit-day page.
+      // Batch 42 item 3 (D-547): the records an auditor asks for, in the
+      // order the audit-day page asks for them, from the one list in
+      // names.ts. Batch 45 (REQ-018-gated item): in their two tiers, the two
+      // paper records marked, the same words as the audit-day page. REQ-020
+      // FR-7 (PO, 15 Oct 2026): the hazard register is the thirteenth line.
       return [
         {
           type: "paragraph",

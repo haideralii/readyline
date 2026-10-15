@@ -25,15 +25,16 @@ import {
 } from "./self-check";
 
 describe("the questions", () => {
-  it("one per record on the audit-day list, the hazard register after the delegations, every word plain", () => {
+  it("one per record on the audit-day list, in its order, every word plain", () => {
     const ids = selfCheckRecordIds();
     expect(ids).toHaveLength(ASK_COUNT);
-    expect(new Set(ids).size).toBe(ASK_COUNT);
+    expect(ids).toEqual(AUDIT_DAY_RECORDS.map((r) => r.id));
     expect(ids[ids.indexOf("delegations") + 1]).toBe("hazards");
-    for (const r of AUDIT_DAY_RECORDS) expect(ids).toContain(r.id);
     for (const id of ids) {
       const q = SELF_CHECK_QUESTIONS[id];
       expect(q, id).toMatch(/\?$/);
+      // D-2219: under 30 words each (PO, 15 Oct 2026).
+      expect(q.split(/\s+/).length, `${id}: ${q}`).toBeLessThan(30);
       expect(lintText(q, { block: true }), `${id}: ${q}`).toEqual([]);
       expect(findProhibitedClaims(q), id).toEqual([]);
     }
@@ -71,6 +72,13 @@ describe("the dates", () => {
       openFindings: 2,
       today: "2026-10-15",
     });
+    expect(SELF_CHECK_QUESTIONS["document-control"]).toBe(
+      "Is every policy in the document control register adopted, dated and not past its review date?",
+    );
+    expect(SELF_CHECK_QUESTIONS["participant-risks"]).toMatch(/up to date\?$/);
+    expect(SELF_CHECK_QUESTIONS.improvements).toMatch(
+      /get an improvement row\?$/,
+    );
     expect(sameDay.due).toBe(false);
     expect(sameDay.line).toBe(
       "Last checked 2026-10-15, 2 findings still open. Next due 2027-01-15.",
