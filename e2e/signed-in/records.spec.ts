@@ -57,8 +57,23 @@ async function axeClean(page: Page, label: string) {
   ).toEqual([]);
 }
 
+/** A date typed into a form: any calendar will do, the app stores it as typed. */
 const future = (days: number) =>
   new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
+/**
+ * A date the app derives itself: the self-check's walked-on day and the
+ * due dates that follow come from the product's calendar, Australia/Sydney
+ * (`todaySydney()` on the check page), so an expectation compared with them
+ * is computed the same way. The runner's UTC day is one behind Sydney from
+ * about 13:00Z, which is where run 38779174050 (18:51Z) failed (D-2242).
+ */
+const sydney = (days: number) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(Date.now() + days * 86_400_000));
 
 const HEADER =
   "occurred_on,reported_on,category,severity,participant_ref,worker_ref,summary,actions_taken,reportable,reportable_notified_on,commission_reference,status,closed_on";
@@ -289,7 +304,7 @@ test.describe("hazards, import and the self-check (REQ-020 Session C)", () => {
       .eq("account_id", tenant.accountId)
       .eq("source_kind", "self-check");
     expect(findings.data?.length).toBe(2);
-    expect(findings.data?.every((r) => r.due_on === future(30))).toBe(true);
+    expect(findings.data?.every((r) => r.due_on === sydney(30))).toBe(true);
     expect(
       findings.data?.every((r) =>
         r.learned.endsWith("Two are still on paper."),
@@ -307,7 +322,7 @@ test.describe("hazards, import and the self-check (REQ-020 Session C)", () => {
     await expect(page).toHaveURL(/\/path\/audit-day$/);
     await expect(block).toHaveAttribute("data-due", "false");
     await expect(block.getByTestId("audit-day-check-line")).toContainText(
-      `Last checked ${future(0)}, 2 findings still open.`,
+      `Last checked ${sydney(0)}, 2 findings still open.`,
     );
     // A second walk the same day is offered, not forced (AC-7).
     await expect(block.getByTestId("audit-day-check-start")).toHaveText(
