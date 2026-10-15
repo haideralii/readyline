@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
-import {
-  readinessSentence,
-  readyLineCounts,
-} from "@/lib/questionnaire/readiness";
+import { readyLineCounts } from "@/lib/questionnaire/readiness";
 import { SampleDocument } from "@/components/sample-document";
 import { Testimonials, TrustCounters } from "@/components/trust-blocks";
 import { JsonLd } from "@/components/json-ld";
@@ -11,7 +8,9 @@ import { BRAND } from "@/lib/brand";
 import { HOME_COPY as C, heroHeadline } from "@/lib/home-copy";
 import { businessAbn, businessName } from "@/lib/legal/config";
 import { siteUrl } from "@/lib/site";
+import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
+import { subscriptionAvailable } from "@/server/payments/stripe";
 
 /**
  * Home page v2 (REQ-013 FR-8; batch 24): the audit question and the price in
@@ -28,6 +27,7 @@ export default function Home() {
   const subscriptionPrice = pricing.subscriptionPriceCents
     ? formatAud(pricing.subscriptionPriceCents)
     : null;
+  const subscriptionOffered = subscriptionAvailable();
   const abn = businessAbn();
   // Batch 45 item 1: the registered name and ABN join the mission only once both are set.
   const name = businessName();
@@ -84,7 +84,8 @@ export default function Home() {
           {C.ctaNote}
         </p>
         {/* Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second. */}
-        {subscriptionPrice ? (
+        {/* Batch 47 item 1: the subscription is named only while it can be bought; otherwise the one off-state sentence. */}
+        {subscriptionOffered && subscriptionPrice ? (
           <p
             className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
             data-testid="home-subscription-line"
@@ -92,7 +93,15 @@ export default function Home() {
             <strong className="font-semibold">{C.keepsEyebrow}:</strong>{" "}
             {C.subscriptionLine(subscriptionPrice)}
           </p>
-        ) : null}
+        ) : (
+          <p
+            className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            data-testid="home-subscription-off"
+          >
+            <strong className="font-semibold">{C.keepsEyebrow}:</strong>{" "}
+            {SUBSCRIPTION_OFF}
+          </p>
+        )}
         {price ? (
           <p
             className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
@@ -167,7 +176,7 @@ export default function Home() {
           <div className="mt-4">
             <ReadyLine
               counts={readyLineCounts(C.example.line)}
-              sentence={readinessSentence(C.example.line)}
+              noun="documents and registers"
               testId="home-ready-line"
             />
           </div>

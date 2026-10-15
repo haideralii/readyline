@@ -7,6 +7,7 @@
  * the REQ mentions is not derived because no registration group in
  * `standards.json` ties first aid to a class.
  */
+import { glossaryMeaning } from "@/lib/questionnaire/content";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -68,6 +69,8 @@ export type ChecklistItem = {
   unverified: boolean;
   /** From the "already have" answers (FR-2). */
   initialStatus: ChecklistStatus;
+  /** REQ-025 D-2216: the one line a pre-ticked document or register carries in its detail. */
+  haveNote?: string;
   /** For People items: how many people the item covers. */
   count?: number;
   /** For Documents: the document type id, so a generated set can mark it drafted. */
@@ -199,6 +202,18 @@ function have(answer: "yes" | "no" | "not-sure" | "unknown"): ChecklistStatus {
   return answer === "yes" ? "have" : "need";
 }
 
+/**
+ * REQ-025 D-2216: "already have" means review, not skip. A step-5 "Yes"
+ * pre-ticks the item and adds this line to it; the pack drafts the full set
+ * regardless, for documents and registers alike.
+ */
+export const ALREADY_HAVE_LINE =
+  "You said you have this. Compare it with the draft and keep one: an auditor needs it tailored, understood and followed.";
+
+function haveNote(answer: "yes" | "no" | "not-sure" | "unknown") {
+  return answer === "yes" ? ALREADY_HAVE_LINE : undefined;
+}
+
 export function deriveChecklist(
   result: QuestionnaireResult,
   answers: QuestionnaireAnswers,
@@ -223,6 +238,7 @@ export function deriveChecklist(
       sourceRef: CONTENT_REF,
       unverified: false,
       initialStatus: have(d.have),
+      haveNote: haveNote(d.have),
       documentTypeId: d.id,
     });
   }
@@ -247,6 +263,7 @@ export function deriveChecklist(
       sourceRef: ref ?? CONTENT_REF,
       unverified: false,
       initialStatus: have(r.have),
+      haveNote: haveNote(r.have),
     });
   }
 
@@ -365,9 +382,10 @@ export function deriveChecklist(
     ask: certification
       ? "When is the site visit booked, and who will be there?"
       : "When is the desktop review booked, and what will you send?",
+    // REQ-025 FR-13: the audit kind's meaning comes from the glossary, the one source.
     why: certification
-      ? "A certification audit includes site visits, participant interviews and worker interviews."
-      : "A verification audit is a desktop review of your documents; nobody visits.",
+      ? `Certification audit: ${glossaryMeaning("certification-audit")}; the visit includes participant and worker interviews.`
+      : `Verification audit: ${glossaryMeaning("verification-audit")}.`,
     sourceRef: audits,
     unverified: false,
     initialStatus: "need",

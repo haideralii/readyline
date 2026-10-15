@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { STEP_TITLES, isStepId } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
 import { countEvent } from "@/server/metrics/counters";
+import { subscriptionAvailable } from "@/server/payments/stripe";
 import { StepPage } from "../_components/step-page";
 import { BusinessStepForm } from "../_components/steps/business-step";
 import { ExistingStepForm } from "../_components/steps/existing-step";
@@ -41,7 +42,8 @@ function stepContent(step: StepId) {
     case "existing":
       return <ExistingStepForm />;
     case "result":
-      return <ResultStep />;
+      // Batch 47 item 1: the one subscription story; the client step cannot read the Stripe env itself.
+      return <ResultStep subscriptionOffered={subscriptionAvailable()} />;
   }
 }
 

@@ -170,14 +170,14 @@ export default async function PricingPage() {
               )}
             </>
           ) : (
-            /* PO review (D-051): the price line and no buy button until the Price exists; batch 45 item 2: never "coming soon". */
-            <p className={body} data-testid="subscription-coming">
-              {pricing.subscriptionPriceCents
-                ? `${formatAud(pricing.subscriptionPriceCents)} a month, not available yet. `
-                : "Not available yet. "}
-              {C.subscriptionComing}
+            /* Batch 47 item 1 (after D-051 and batch 45 item 2): the one off-state sentence every page uses, no price, no "soon". */
+            <p className={body} data-testid="subscription-off">
+              {C.subscriptionOff}
             </p>
           )}
+          <p className={body} data-testid="pricing-no-credit">
+            {C.noCredit}
+          </p>
         </section>
 
         <section
