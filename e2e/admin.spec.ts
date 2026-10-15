@@ -24,6 +24,19 @@ test.describe("admin and job routes", () => {
     expect(wrong.status()).toBe(404);
   });
 
+  // REQ-020 SR-1: a token that is not live is a plain 404, never "expired".
+  test("an unknown auditor token is 404 on the page and the pack", async ({
+    page,
+    request,
+  }) => {
+    const token = "A".repeat(43);
+    expect((await page.goto(`/auditor/${token}`))?.status()).toBe(404);
+    expect(
+      (await request.get(`/auditor/${token}/audit-pack.zip`)).status(),
+    ).toBe(404);
+    expect((await request.get("/auditor/short")).status()).toBe(404);
+  });
+
   // Batch 47 item 7: the documents and checklist pages sit under a loading
   // boundary, so the proxy answers the signed-out 307 itself, as /registers does.
   test("documents and checklist answer 307 to sign-in without a session", async ({

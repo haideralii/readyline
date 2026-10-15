@@ -25,13 +25,18 @@ export const EXPORT_PATHS: Record<string, ExportRegister> = {
   "policy-reviews": "policy_reviews",
 };
 
-export async function buildRegisterExport(
+/**
+ * A register's export as files by name (one CSV, or the register and its
+ * event trail for incidents and complaints). The single export and the
+ * audit pack (REQ-020 FR-1) both build from this, so the pack carries
+ * exactly what the export does.
+ */
+export async function registerFiles(
   supabase: SupabaseClient,
   accountId: string,
   register: ExportRegister,
-  now: Date,
-): Promise<{ body: Uint8Array; contentType: string; fileName: string }> {
-  const stamp = now.toISOString().slice(0, 10);
+  stamp: string,
+): Promise<Record<string, Uint8Array>> {
   if (register === "incidents" || register === "complaints") {
     const rows =
       register === "incidents"
@@ -55,16 +60,11 @@ export async function buildRegisterExport(
         note: e.note,
       }),
     );
-    const files: Record<string, Uint8Array> = {
+    return {
       [`${register}-${stamp}.csv`]: strToU8(toCsv(CSV_COLUMNS[register], rows)),
       [`${register}-events-${stamp}.csv`]: strToU8(
         toCsv(CSV_COLUMNS[eventsTable], events),
       ),
-    };
-    return {
-      body: zipSync(files, { level: 6 }),
-      contentType: "application/zip",
-      fileName: `readyline-${register}-${stamp}.zip`,
     };
   }
   const rows =
@@ -74,7 +74,29 @@ export async function buildRegisterExport(
   const name =
     register === "worker_clearances" ? "worker-checks" : "policy-reviews";
   return {
-    body: strToU8(toCsv(CSV_COLUMNS[register], rows)),
+    [`${name}-${stamp}.csv`]: strToU8(toCsv(CSV_COLUMNS[register], rows)),
+  };
+}
+
+export async function buildRegisterExport(
+  supabase: SupabaseClient,
+  accountId: string,
+  register: ExportRegister,
+  now: Date,
+): Promise<{ body: Uint8Array; contentType: string; fileName: string }> {
+  const stamp = now.toISOString().slice(0, 10);
+  const files = await registerFiles(supabase, accountId, register, stamp);
+  if (register === "incidents" || register === "complaints") {
+    return {
+      body: zipSync(files, { level: 6 }),
+      contentType: "application/zip",
+      fileName: `readyline-${register}-${stamp}.zip`,
+    };
+  }
+  const name =
+    register === "worker_clearances" ? "worker-checks" : "policy-reviews";
+  return {
+    body: Object.values(files)[0],
     contentType: "text/csv; charset=utf-8",
     fileName: `readyline-${name}-${stamp}.csv`,
   };
