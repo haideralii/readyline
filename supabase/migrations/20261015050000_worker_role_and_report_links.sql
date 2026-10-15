@@ -108,11 +108,15 @@ $$;
 revoke all on function public.invitation_preview(text) from public, anon, authenticated;
 grant execute on function public.invitation_preview(text) to service_role;
 
--- Accepting runs as the signed-in user: the invitation's email hash must
--- equal the hash of the session's email; the owner of the account cannot
--- demote themselves by accepting their own invitation. Returns the account
--- id, or null when nothing matched (no reason is given, SR-1).
-create or replace function public.accept_invitation(p_token_hash text)
+-- Accepting: the server action passes the signed-in user's id and the
+-- peppered hash of their session email (HMAC-SHA-256 under HASH_PEPPER,
+-- retro review of REQ-018 to 021, finding 34; the database never holds the
+-- pepper, so it cannot compute the hash itself). The invitation's email
+-- hash must equal it; the owner of the account cannot demote themselves by
+-- accepting their own invitation. The function is the service key's alone,
+-- so a signed-in session cannot call it with a hash of its own choosing.
+-- Returns the account id, or null when nothing matched (no reason, SR-1).
+create or replace function public.accept_invitation(p_token_hash text, p_user_id uuid, p_email_hash text)
 returns uuid
 language plpgsql
 security definer
@@ -120,30 +124,28 @@ set search_path = public
 as $$
 declare
   v_inv public.invitations%rowtype;
-  v_email text;
 begin
-  v_email := lower(btrim(coalesce(auth.jwt() ->> 'email', '')));
-  if v_email = '' then return null; end if;
+  if p_user_id is null or p_email_hash is null or p_email_hash !~ '^[0-9a-f]{64}$' then return null; end if;
   select * into v_inv from public.invitations
     where token_hash = p_token_hash
       and accepted_at is null and revoked_at is null and expires_at > now()
     limit 1;
   if not found then return null; end if;
-  if v_inv.email_hash <> encode(sha256(convert_to(v_email, 'UTF8')), 'hex') then return null; end if;
-  if exists (select 1 from public.memberships where user_id = auth.uid() and account_id = v_inv.account_id and role <> 'worker') then
+  if v_inv.email_hash <> p_email_hash then return null; end if;
+  if exists (select 1 from public.memberships where user_id = p_user_id and account_id = v_inv.account_id and role <> 'worker') then
     return null;
   end if;
   insert into public.memberships (user_id, account_id, role, worker_ref)
-    values (auth.uid(), v_inv.account_id, 'worker', v_inv.worker_ref)
+    values (p_user_id, v_inv.account_id, 'worker', v_inv.worker_ref)
     on conflict (user_id, account_id) do update set worker_ref = excluded.worker_ref;
   update public.invitations set accepted_at = now() where id = v_inv.id;
   insert into public.audit_log (account_id, actor_user_id, action, target)
-    values (v_inv.account_id, auth.uid(), 'invitation.accepted', v_inv.id::text || ' ' || v_inv.worker_ref);
+    values (v_inv.account_id, p_user_id, 'invitation.accepted', v_inv.id::text || ' ' || v_inv.worker_ref);
   return v_inv.account_id;
 end;
 $$;
-revoke all on function public.accept_invitation(text) from public, anon;
-grant execute on function public.accept_invitation(text) to authenticated, service_role;
+revoke all on function public.accept_invitation(text, uuid, text) from public, anon, authenticated;
+grant execute on function public.accept_invitation(text, uuid, text) to service_role;
 
 -- 3. Incidents: draft reports, who logged them, when the provider became
 --    aware (the Rules' clock runs from awareness, and a worker is part of

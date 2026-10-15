@@ -35,6 +35,7 @@ import {
 
 const LABELS: Record<string, string> = {
   occurredOn: "Date it happened",
+  awareOn: "Date you became aware",
   reportedOn: "Date it was reported",
   category: "What happened",
   severity: "How serious",
@@ -69,6 +70,7 @@ export function IncidentFormView({
   const [v, setV] = useState<IncidentFormValues>(
     initial ?? {
       occurredOn: today(),
+      awareOn: today(),
       reportedOn: today(),
       category: "" as IncidentFormValues["category"],
       severity: "" as IncidentFormValues["severity"],
@@ -85,17 +87,34 @@ export function IncidentFormView({
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
+  // Finding 23: until the owner touches the aware date it follows the date it
+  // happened, so a back-filled incident runs its clock from the event, not
+  // from today. An edit starts from the saved date and never follows.
+  const [awareTouched, setAwareTouched] = useState(Boolean(initial));
   const set = <K extends keyof IncidentFormValues>(
     k: K,
     value: IncidentFormValues[K],
   ) => setV((s) => ({ ...s, [k]: value }));
+  const setOccurredOn = (x: string) =>
+    setV((s) => ({
+      ...s,
+      occurredOn: x,
+      ...(awareTouched ? {} : { awareOn: x }),
+    }));
+  const setAwareOn = (x: string) => {
+    setAwareTouched(true);
+    set("awareOn", x);
+  };
 
+  // The clock runs from the later of the two dates, as the database computes it.
+  const clockFrom =
+    v.awareOn && v.awareOn > v.occurredOn ? v.awareOn : v.occurredOn;
   const notifyBy =
     v.reportable &&
     v.category &&
     v.severity &&
-    /^\d{4}-\d{2}-\d{2}$/.test(v.occurredOn)
-      ? incidentNotifyBy(v.occurredOn, v.category, true, v.severity)
+    /^\d{4}-\d{2}-\d{2}$/.test(clockFrom)
+      ? incidentNotifyBy(clockFrom, v.category, true, v.severity)
       : null;
 
   async function onSubmit(e: React.FormEvent) {
@@ -130,7 +149,15 @@ export function IncidentFormView({
         label={LABELS.occurredOn}
         errors={errorsFor(errors, "occurredOn")}
         value={v.occurredOn}
-        onChange={(x) => set("occurredOn", x)}
+        onChange={setOccurredOn}
+      />
+      <DateField
+        id="awareOn"
+        label={LABELS.awareOn}
+        help="The day you or a worker first knew about it; usually the day it happened. The Commission's notification time runs from this day."
+        errors={errorsFor(errors, "awareOn")}
+        value={v.awareOn ?? ""}
+        onChange={setAwareOn}
       />
       <DateField
         id="reportedOn"

@@ -9,6 +9,7 @@ import {
 
 const incident = {
   occurredOn: "2026-10-09",
+  awareOn: "2026-10-09",
   reportedOn: "2026-10-09",
   category: "near-miss",
   severity: "low",
@@ -156,6 +157,72 @@ describe("register forms (REQ-009 FR-5, SR-1)", () => {
     ).toBe(true);
     expect(
       PolicyReviewForm.safeParse({ ...base, reviewCycleMonths: "40" }).success,
+    ).toBe(false);
+  });
+});
+
+describe("the aware date on an incident (retro review finding 23, PO decision 23)", () => {
+  const backFilled = {
+    ...incident,
+    occurredOn: "2026-10-06",
+    reportedOn: "2026-10-09",
+  };
+
+  it("defaults to the date it happened when empty or absent, so a back-filled row runs its clock from the event", () => {
+    const empty = IncidentForm.safeParse({ ...backFilled, awareOn: "" });
+    expect(empty.success).toBe(true);
+    if (empty.success) expect(empty.data.awareOn).toBe("2026-10-06");
+    const { awareOn: _omit, ...withoutField } = backFilled;
+    void _omit;
+    const absent = IncidentForm.safeParse(withoutField);
+    expect(absent.success).toBe(true);
+    if (absent.success) expect(absent.data.awareOn).toBe("2026-10-06");
+  });
+
+  it("keeps a given date between the date it happened and the date it was reported", () => {
+    const given = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-08",
+    });
+    expect(given.success).toBe(true);
+    if (given.success) expect(given.data.awareOn).toBe("2026-10-08");
+    const early = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-05",
+    });
+    expect(early.success).toBe(false);
+    if (!early.success)
+      expect(early.error.issues.map((i) => i.message)).toContain(
+        "Cannot be before the date it happened",
+      );
+    const late = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-10",
+    });
+    expect(late.success).toBe(false);
+    if (!late.success)
+      expect(late.error.issues.map((i) => i.message)).toContain(
+        "Cannot be after the date it was reported",
+      );
+  });
+
+  it("is never after today", () => {
+    const future = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2999-01-01",
+      reportedOn: "2999-01-02",
+    });
+    expect(future.success).toBe(false);
+    if (!future.success)
+      expect(future.error.issues.map((i) => i.message)).toContain(
+        "Cannot be after today",
+      );
+  });
+
+  it("refuses a date that is not a date", () => {
+    expect(
+      IncidentForm.safeParse({ ...backFilled, awareOn: "last Tuesday" })
+        .success,
     ).toBe(false);
   });
 });
