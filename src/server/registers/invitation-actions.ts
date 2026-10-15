@@ -9,6 +9,7 @@
  * verified session and nothing a browser sends can stand in for it. The
  * answer never says why it failed (SR-1).
  */
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { emailHash } from "@/lib/peppered-hash";
@@ -52,5 +53,9 @@ export async function acceptInvitationAction(
       message:
         "That invitation does not work for this sign-in. Check you signed in with the email it was sent to, or ask for a new one.",
     };
+  // The header lives in the root layout, which a client navigation keeps as
+  // it was; without this the new worker saw no "Your entries" link until a
+  // full load (run 38737845598, PR #62).
+  revalidatePath("/", "layout");
   redirect("/worker");
 }
