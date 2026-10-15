@@ -10,6 +10,7 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { log } from "@/lib/logging/logger";
 import { purgeGenerationArtifacts, runPurge } from "@/server/accounts/purge";
 import { createEmailProvider } from "@/server/email/provider";
+import { recordJobRun } from "@/server/jobs/record-run";
 import {
   isAuthorisedCronRequest,
   mayRunScheduledJobs,
@@ -52,6 +53,12 @@ export async function GET(request: Request) {
       purged: report.purged.length,
       errors: report.errors.length,
     });
+    // REQ-022 FR-1 (D-2208): the launch page reads the last run from audit_log.
+    if (!dryRun)
+      await recordJobRun(admin, "purge", {
+        purged: report.purged.length,
+        errors: report.errors.length,
+      });
     return NextResponse.json(
       { ...report, generation },
       {

@@ -8,7 +8,7 @@
  */
 import type { BrowserContext } from "@playwright/test";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 
 export type TestTenant = {
   userId: string;
@@ -131,6 +131,92 @@ export async function signInContext(
       sameSite: "Lax" as const,
     })),
   );
+}
+
+function base32Decode(s: string): Buffer {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = 0;
+  let value = 0;
+  const out: number[] = [];
+  for (const ch of s.replace(/=+$/, "").toUpperCase()) {
+    const idx = alphabet.indexOf(ch);
+    if (idx < 0) continue;
+    value = (value << 5) | idx;
+    bits += 5;
+    if (bits >= 8) {
+      out.push((value >>> (bits - 8)) & 0xff);
+      bits -= 8;
+    }
+  }
+  return Buffer.from(out);
+}
+
+/** RFC 6238, SHA-1, 30-second step, six digits: the code an authenticator app would show. */
+export function totpCode(secretBase32: string, now = Date.now()): string {
+  const counter = Math.floor(now / 1000 / 30);
+  const msg = Buffer.alloc(8);
+  msg.writeBigUInt64BE(BigInt(counter));
+  const h = createHmac("sha1", base32Decode(secretBase32)).update(msg).digest();
+  const off = h[h.length - 1] & 0x0f;
+  const code =
+    ((h[off] & 0x7f) << 24) |
+    (h[off + 1] << 16) |
+    (h[off + 2] << 8) |
+    h[off + 3];
+  return String(code % 1_000_000).padStart(6, "0");
+}
+
+/**
+ * A platform admin with a verified authenticator and an aal2 session
+ * (REQ-022 Session A, D-2210): the admin key grants `platform_admin` on
+ * the throwaway user, the user enrols TOTP through the auth API, and the
+ * test computes the code the way an authenticator app would. The session
+ * returned carries aal2, so `requireAdmin()` lets the browser in.
+ */
+export async function createAdminTenant(label: string): Promise<TestTenant> {
+  const t = await createTenant({
+    label: `admin-${label}`,
+    tradingName: "Admin",
+    answers: {},
+    withAccount: false,
+  });
+  const grant = await t.admin
+    .from("users")
+    .update({ platform_admin: true })
+    .eq("id", t.userId);
+  if (grant.error) throw grant.error;
+  const { url, publishableKey } = env();
+  const client = createClient(url, publishableKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const set = await client.auth.setSession({
+    access_token: t.session.access_token as string,
+    refresh_token: t.session.refresh_token as string,
+  });
+  if (set.error) throw set.error;
+  const enrol = await client.auth.mfa.enroll({
+    factorType: "totp",
+    friendlyName: "e2e",
+  });
+  if (enrol.error || !enrol.data)
+    throw enrol.error ?? new Error("enrol failed");
+  const challenge = await client.auth.mfa.challenge({
+    factorId: enrol.data.id,
+  });
+  if (challenge.error || !challenge.data)
+    throw challenge.error ?? new Error("challenge failed");
+  const verify = await client.auth.mfa.verify({
+    factorId: enrol.data.id,
+    challengeId: challenge.data.id,
+    code: totpCode(enrol.data.totp.secret),
+  });
+  if (verify.error) throw verify.error;
+  const s = await client.auth.getSession();
+  if (!s.data.session) throw new Error("no aal2 session after verify");
+  return {
+    ...t,
+    session: s.data.session as unknown as Record<string, unknown>,
+  };
 }
 
 /** Removes the user (cascading to the account and its rows) and the set's objects. */

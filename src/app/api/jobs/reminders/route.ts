@@ -10,6 +10,7 @@ import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
 import { createEmailProvider } from "@/server/email/provider";
+import { recordJobRun } from "@/server/jobs/record-run";
 import {
   isAuthorisedCronRequest,
   mayRunScheduledJobs,
@@ -77,6 +78,13 @@ export async function GET(request: Request) {
       },
     });
     log.info("jobs.reminders.ran", {
+      accounts: report.accounts,
+      inserted: report.inserted,
+      emailed: report.emailed,
+      errors: report.errors.length,
+    });
+    // REQ-022 FR-1 (D-2208): the launch page reads the last run from audit_log.
+    await recordJobRun(admin, "reminders", {
       accounts: report.accounts,
       inserted: report.inserted,
       emailed: report.emailed,

@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
+import { paymentRefusal } from "@/lib/payments/refusal";
 import { handleStripeWebhook } from "@/lib/payments/webhook";
 import { continueGeneration, keepAlive } from "@/server/generation/kick";
 import {
@@ -70,6 +71,12 @@ export async function POST(request: Request) {
         { status: 503 },
       );
     throw e;
+  }
+  // REQ-022 FR-3 (D-2209): while a live-mode guard stands, the endpoint does not exist.
+  const refused = paymentRefusal();
+  if (refused.length) {
+    log.warn("stripe.webhook.refused", { conditions: refused });
+    return new NextResponse("Not found", { status: 404 });
   }
   const payload = await request.text();
   // The only input we read ourselves is the signature header; its shape is
