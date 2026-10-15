@@ -56,9 +56,9 @@ test.describe("security headers", () => {
       const res = await page.request.get(path, { maxRedirects: 0 });
       const routeCsp = res.headers()["content-security-policy"];
       expect(routeCsp, path).toContain(
-        "form-action 'self' https://checkout.stripe.com",
+        "form-action 'self' https://checkout.stripe.com https://billing.stripe.com",
       );
-      expect(routeCsp.match(/stripe/g)?.length, path).toBe(1);
+      expect(routeCsp.match(/stripe/g)?.length, path).toBe(2);
     }
     for (const path of ["/account/deleted", "/documents/not-a-set"]) {
       const res = await page.request.get(path, { maxRedirects: 0 });

@@ -28,6 +28,8 @@ export const PURCHASE_ROUTES = [
   "/path/before-you-buy",
 ] as const;
 export const CHECKOUT_ORIGIN = "https://checkout.stripe.com";
+/** The Billing portal the "Manage your subscription" form on /account redirects to (retro review of REQ-007, finding 16). */
+export const BILLING_ORIGIN = "https://billing.stripe.com";
 
 export function isPurchaseRoute(pathname: string): boolean {
   return PURCHASE_ROUTES.some((p) => pathname === p);
@@ -51,7 +53,7 @@ export function buildCsp(
     `connect-src 'self'${supabaseOrigin ? ` ${supabaseOrigin}` : ""}${isDev ? " ws: wss:" : ""}`,
     "object-src 'none'",
     "base-uri 'self'",
-    `form-action 'self'${options.purchaseRoute ? ` ${CHECKOUT_ORIGIN}` : ""}`,
+    `form-action 'self'${options.purchaseRoute ? ` ${CHECKOUT_ORIGIN} ${BILLING_ORIGIN}` : ""}`,
     "frame-ancestors 'none'",
   ].join("; ");
 }

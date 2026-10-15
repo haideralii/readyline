@@ -43,8 +43,10 @@ describe("buildCsp connect-src (REQ-004 SR-2)", () => {
 describe("buildCsp form-action on purchase routes (REQ-007 SR-5, D-710)", () => {
   it("allows Stripe's hosted Checkout as a form destination only on purchase routes", () => {
     expect(buildCsp("abc", false, null)).toContain("form-action 'self';");
+    // The Billing portal joins Checkout (retro review of REQ-007, finding 16): the
+    // "Manage your subscription" form on /account redirects there.
     expect(buildCsp("abc", false, null, { purchaseRoute: true })).toContain(
-      "form-action 'self' https://checkout.stripe.com;",
+      "form-action 'self' https://checkout.stripe.com https://billing.stripe.com;",
     );
   });
 
@@ -53,7 +55,7 @@ describe("buildCsp form-action on purchase routes (REQ-007 SR-5, D-710)", () => 
     expect(csp).toContain("script-src 'self' 'nonce-abc' 'strict-dynamic';");
     expect(csp).toContain("connect-src 'self';");
     expect(csp).not.toContain("frame-src");
-    expect(csp.match(/stripe/g)?.length).toBe(1);
+    expect(csp.match(/stripe/g)?.length).toBe(2);
   });
 
   // Retro review of REQ-002 (15 Oct 2026, fix 15): every page that renders
