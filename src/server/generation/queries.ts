@@ -51,6 +51,19 @@ export async function listLatestDocuments(
   );
 }
 
+/** REQ-026: the version the pack shipped (1) of every document in a set; the sheet's lines come from it. */
+export async function listFirstDocuments(
+  supabase: SupabaseClient,
+  versionSetId: string,
+): Promise<DocumentVersionRow[]> {
+  const r = await supabase
+    .from("document_versions")
+    .select("*")
+    .eq("version_set_id", versionSetId)
+    .eq("version", 1);
+  return (r.data as DocumentVersionRow[] | null) ?? [];
+}
+
 export async function listDocumentVersions(
   supabase: SupabaseClient,
   versionSetId: string,

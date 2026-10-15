@@ -77,8 +77,48 @@ export default async function PricingPage() {
       <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
       <p className={body}>{C.intro}</p>
 
+      {/* Batch 49 item 3: on a phone the pack price sat below the fold behind the
+          subscription card (D-2001's order is right; the fold is the problem), so
+          both prices sit in a two-line strip above the cards, each a link to its
+          card. From 640 px the cards are side by side and the strip is not shown. */}
+      <nav
+        aria-label="Prices"
+        className="mt-6 rounded-md border border-zinc-300 p-3 text-sm sm:hidden dark:border-zinc-700"
+        data-testid="pricing-strip"
+      >
+        <ul className="space-y-1">
+          <li>
+            <a
+              href="#start"
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
+              data-testid="pricing-strip-pack"
+            >
+              {C.stripPack(
+                pricing.packPriceCents
+                  ? formatAud(pricing.packPriceCents)
+                  : null,
+              )}
+            </a>
+          </li>
+          {offered ? (
+            <li>
+              <a
+                href="#keeps"
+                className="inline-flex min-h-11 items-center underline underline-offset-4"
+                data-testid="pricing-strip-registers"
+              >
+                {C.stripRegisters(
+                  pricing.subscriptionPriceCents
+                    ? formatAud(pricing.subscriptionPriceCents)
+                    : null,
+                )}
+              </a>
+            </li>
+          ) : null}
+        </ul>
+      </nav>
       <div
-        className="mt-8 grid gap-4 sm:grid-cols-2"
+        className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2"
         data-testid="pricing-halves"
       >
         <section
@@ -93,19 +133,27 @@ export default async function PricingPage() {
           </h2>
           {offered ? (
             <>
-              {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee. */}
-              <p className={body} data-testid="subscription-offer">
-                {pricing.subscriptionPriceCents
-                  ? `${formatAud(pricing.subscriptionPriceCents)} a month for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee, no instalments, no interest.`
-                  : "A monthly subscription for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee."}
-              </p>
-              {/* REQ-018 FR-12: what the registers do that a spreadsheet does not. */}
-              <p className={body} data-testid="registers-linked">
-                {C.registersLinked}
-              </p>
-              <p className={body} data-testid="renewal-saves">
-                {C.renewalSaves}
-              </p>
+              {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee.
+                  Batch 49 item 2: a price line, a four-item list and the cancel line, nothing else
+                  on the first phone screen; the linking sentence is on the registers page. */}
+              <div data-testid="subscription-offer">
+                <p className={body}>
+                  {C.subscriptionPriceLine(
+                    pricing.subscriptionPriceCents
+                      ? formatAud(pricing.subscriptionPriceCents)
+                      : null,
+                  )}
+                </p>
+                <ul
+                  className="mt-2 list-disc pl-5 leading-7 text-zinc-700 dark:text-zinc-300"
+                  data-testid="subscription-includes"
+                >
+                  {C.subscriptionIncludes.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p className={body}>{C.subscriptionCancel}</p>
+              </div>
               {docs.signedIn ? (
                 <SubscribeButton
                   label={
@@ -122,14 +170,14 @@ export default async function PricingPage() {
               )}
             </>
           ) : (
-            /* PO review (D-051): the price line and no buy button until the Price exists; batch 45 item 2: never "coming soon". */
-            <p className={body} data-testid="subscription-coming">
-              {pricing.subscriptionPriceCents
-                ? `${formatAud(pricing.subscriptionPriceCents)} a month, not available yet. `
-                : "Not available yet. "}
-              {C.subscriptionComing}
+            /* Batch 47 item 1 (after D-051 and batch 45 item 2): the one off-state sentence every page uses, no price, no "soon". */
+            <p className={body} data-testid="subscription-off">
+              {C.subscriptionOff}
             </p>
           )}
+          <p className={body} data-testid="pricing-no-credit">
+            {C.noCredit}
+          </p>
         </section>
 
         <section
@@ -252,9 +300,14 @@ export default async function PricingPage() {
           {C.aiHeading}
         </h2>
         {/* REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies. */}
-        <p className={body} data-testid="pricing-ai-honest">
-          {C.aiHonest}
-        </p>
+        <div data-testid="pricing-ai-honest">
+          <p className={body}>{C.aiHonest}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+            {C.aiHonestPoints.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
         <p className={body} data-testid="pricing-ai-disclosure">
           {C.aiDisclosure}
         </p>

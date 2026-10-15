@@ -135,7 +135,8 @@ export function BusinessStepForm() {
       <RadioGroup
         name="structure"
         legend={LABELS.structure}
-        help="Your structure changes which parts of the audit apply, for example sole traders delivering only early childhood supports have a reduced scope."
+        // Batch 49 item 4: a first-screen sentence a new provider can parse; the early-childhood rule stays in the result's reasons.
+        help="Your structure changes a few audit questions; pick the one on your ABN record."
         options={STRUCTURES}
         value={structure}
         onChange={setStructure}

@@ -9,6 +9,7 @@
  * admin client the way the job does, after the set is proven to be theirs.
  */
 import { z } from "zod";
+import { openBlanks } from "./state";
 import { deriveChecklist } from "@/lib/checklist/derive";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
@@ -139,6 +140,15 @@ export async function adoptGroupAction(
     (g) => groupSlug(g.title) === parsed.data.group,
   );
   if (!group) return { ok: false, message: "That group was not found." };
+  // Batch 47 item 3 (D-2211): a document with a fact blank the Finish form can
+  // still fill is not adopted; the signed copy's own marks (signature, date
+  // reported) are not blanks here, so they never block adoption.
+  const open = openBlanks(docs);
+  if (open > 0)
+    return {
+      ok: false,
+      message: `Finish your pack first: ${open} ${open === 1 ? "blank is" : "blanks are"} still open.`,
+    };
 
   const today = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Australia/Sydney",

@@ -84,6 +84,11 @@ export const REQUIRED_LATER: ReadonlyArray<{
     from: "REQ-007 Session C (the paid job calls the model only when this is 1; D-708)",
     productionHome: "Vercel project environment variables (server only)",
   },
+  {
+    name: "HASH_PEPPER",
+    from: "REQ-020 Session B, retro finding 34 (the HMAC key behind hashed viewer addresses and invitation emails)",
+    productionHome: "Vercel project environment variables (server only)",
+  },
 ];
 
 /**
@@ -140,6 +145,21 @@ export function isProductionDeployment(
   source: Record<string, string | undefined> = process.env,
 ): boolean {
   return source.VERCEL_ENV?.trim() === "production";
+}
+
+/**
+ * `HASH_PEPPER`, the key behind every hashed viewer address and invitation
+ * email (retro review of REQ-018 to 021, finding 34; PO decision 34). Set:
+ * its value. Unset, in any environment: null, and the hashes fall back to
+ * the plain SHA-256 they had before the pepper existed (D-2238); nothing
+ * refuses to start, the launch switchboard's "Hash pepper" row stays red,
+ * and `hashPepper()` logs one warning.
+ */
+export function readHashPepper(
+  source: Record<string, string | undefined> = process.env,
+): string | null {
+  const value = source.HASH_PEPPER?.trim();
+  return value ? value : null;
 }
 
 const schema = z.object({

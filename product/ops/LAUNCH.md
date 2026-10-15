@@ -43,6 +43,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 ## 7. Admin
 
 19. Supabase, Table editor, `users`: `platform_admin` = true on your own row (`DEPLOY.md`). Then `/admin/mfa`: enrol the authenticator. Row: **Authenticator enrolled for the platform admin**.
+19a. Vercel: `HASH_PEPPER` (`openssl rand -hex 32`), the key behind the hashed viewer addresses on audit lines and the hashed emails on worker invitations (retro finding 34). Set it once and keep it: a change orphans every open invitation. Until it is set the hashes are plain SHA-256 as before and the row stays red (D-2238). Row: **Hash pepper**.
 
 ## 8. Legal pages
 
@@ -50,7 +51,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 
 ## 9. The last pass (everything above green)
 
-21. Run from a laptop: `node scripts/ops/launch-check.mjs --base https://<domain> --alias https://<name>.vercel.app`, with `STRIPE_SECRET_KEY` and `STRIPE_PRICE_PACK` in the shell environment for the price line. Commit its output under `product/evidence/req-022/` with the date.
+21. Run from a laptop: `node scripts/ops/launch-check.mjs --base https://<domain> --alias https://<name>.vercel.app`, with `STRIPE_SECRET_KEY` and `STRIPE_PRICE_PACK` in the shell environment for the price line. Then the public suite against the deployment, a second launch check (batch 47 item 9): `PLAYWRIGHT_BASE_URL=https://<domain> npm run test:e2e -- --project=desktop-chromium` (the specs know a deployment has no development badge and that same-origin means the domain). Commit both outputs under `product/evidence/req-022/` with the date.
 22. Stripe: the live restricted key (same permissions as the test one). Vercel: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_PACK`, `STRIPE_PRICE_REGISTERS` all from live mode in one go; redeploy. Row: **Stripe key mode**. If any payment row is red after the redeploy, the payment routes refuse to serve (404) and say why in the log; fix the row, redeploy.
 23. Vercel: `GENERATION_LIVE` = `1`; redeploy. Row: **Live model calls**.
 24. Open `/admin/launch`: every row green but **Supabase Site URL and redirects**, which you checked in step 14. Run `npm run smoke -- --base https://<domain>`. Buy one pack yourself with a real card, download it, and refund it the way `/refunds` promises (the runbook `supabase/ops/refund.md`). Then tell the PO.
