@@ -109,6 +109,18 @@ Written with the draft, 14 Oct 2026, so the PO can accept or change the approach
 - Accessibility: the page uses headings, one `DataTable` per register (the batch 36 component with its cards and focusable region) and the site's buttons; the signed-in accessibility pass does not cover the signed-out auditor page; a manual keyboard pass is owed with the PO's phone check.
 - UNVERIFIED or deferred: none; D-2214 records the hybrid of the accepted design (the lookup is the `security definer` function; the register reads use the admin client scoped to the account it returned).
 
+**Session B (Dev, 15 Oct 2026)** on `req-020-team` 526be30 (cut from `req-020-audit-pack`; PR to `next` after Session A's; body: `product/evidence/req-020/pr-body-session-b.md`).
+
+- AC mapping: AC-3 → `e2e/signed-in/team.spec.ts` (invite from the account page, accept signed in, log an incident with the same form, the worker's own entries only, every owner page redirecting home and the exports refusing, the owner's "Logged by W-003", removal ending access, the audit lines) and `tests/integration/worker-rls.test.ts` (accept once by the invited address only, a worker's own rows and nothing else across eight tables, no update path, removal); AC-4 → the same e2e (a signed-out report, "1 report to confirm" on the index and the register, the confirmation screen with the aware sentence, "Notify by" after confirming, the link off is a 404) and the integration suite (the draft with `aware_at` at submission, `notification_status = 'draft'`, the eleventh refused with P0003, confirming sets `notify_by` from the aware date, rejecting keeps the row, the CHECK on the reason, a revoked link answers P0002) plus `tests/integration/reminders-job.test.ts` (a 13-hour-old draft raises `report-to-confirm` and nothing else; a one-hour-old one nothing) and `src/lib/registers/reminders.test.ts`; the PO's "aware_at equals the submission time" clause is the integration assertion within five seconds of the call; AC-8 → axe and width checks in the e2e on the team panel, the worker home, the report form and the confirmation screen on the three projects; the copy lint in the unit run.
+- `npm run check`: green (123 files, 894 tests, 6 skipped); 25 new unit tests and the `report-to-confirm` reminder fixture.
+- CI: the pull request's run once it is opened (Supabase job: the two integration suites and the signed-in e2e; the migration `20261015050000_worker_role_and_report_links.sql` has its first real run there, never against the hosted project).
+- Local public gate (desktop Chromium, dev server): `home`, `not-found`, `req-015-a11y`, `subscription-story`, 7 passed.
+- Screenshots: saved by the spec under `product/evidence/req-020/` when `EVIDENCE=1` (team-invited, worker-home, report-form, confirm-report per project).
+- ASVS: seven rows under "REQ-020 Session B additions" in `product/security/asvs-l1-check-2026-10-14.md`.
+- Accessibility: plain forms with labels, one button per action, the radio-free team panel; the signed-out report page and the worker home are in the e2e's axe pass; a manual keyboard pass on the confirmation screen is owed with the PO's phone check.
+- Deviations (D-2231): the two-hour and twelve-hour nudges are one email at submission plus the nightly job's daily reminder from twelve hours after the report (no second schedule on the Hobby tier); a removed worker's session is not revoked server-side, the membership is re-read on every request so access ends on the next one. UNVERIFIED: none.
+
+
 ## PO review
 
 Awaiting the PO: this file is a Dev draft under the standing backlog's rule for item 7 ("if it is not there, write the REQ draft from the research file and STOP for the PO").
