@@ -11,15 +11,25 @@ status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 13
 
 # Verification or certification: which NDIS audit do you need?
 
-**The short answer: your registration groups decide.** Every support type you register for (a "registration group" or "class", with a four-digit code) is listed by the NDIS Quality and Safeguards Commission as either lower-risk or higher-risk. Lower-risk groups get a verification audit. If any one of your groups is higher-risk, your whole registration gets a certification audit.
+**The short answer: your registration groups decide.**
+
+Every support type you register for (a "registration group" or "class", with a four-digit code) is listed by the NDIS Quality and Safeguards Commission as either lower-risk or higher-risk.
+
+- Lower-risk groups get a verification audit.
+- If any one of your groups is higher-risk, your whole registration gets a certification audit.
 
 You do not choose. An auditor does not choose either. The list below is the Commission's own, and the free questionnaire works it out for your exact mix of groups, with the source shown.
 
 ## The two audits in plain words
 
-**Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management. Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+**Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
 
-**Certification** is a full audit in two stages. Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add. Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
+Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+
+**Certification** is a full audit in two stages.
+
+- Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add.
+- Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
 
 The Commission names three more kinds: the mid-term audit for certified providers, a condition audit the Commission can require, and an out of cycle audit you arrange to change your registration. Our guide [What happens at an NDIS audit](/guides/what-happens-at-an-ndis-audit) walks through all five.
 

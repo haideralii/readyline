@@ -41,10 +41,19 @@ test.describe("home page v2 (batch 24)", () => {
       "href",
       "/start",
     );
+    // REQ-025 FR-12: the sample has its own page; the hero button and the card point at it.
     await expect(page.getByTestId("home-cta-sample")).toHaveAttribute(
       "href",
-      "#sample",
+      "/sample",
     );
+    await expect(page.getByTestId("home-sample-card")).toContainText(
+      /\d+ of \d+ sections drafted from the answers/,
+    );
+    await expect(page.getByTestId("home-sample-read")).toHaveAttribute(
+      "href",
+      "/sample",
+    );
+    await expect(page.getByTestId("sample-document")).toHaveCount(0);
     await expect(page.getByTestId("home-price-line")).toContainText(
       /No subscription needed, no instalments, no interest/,
     );
@@ -72,6 +81,7 @@ test.describe("home page v2 (batch 24)", () => {
   }, testInfo) => {
     await page.goto("/");
     await page.getByTestId("home-cta-sample").click();
+    await expect(page).toHaveURL(/\/sample$/);
     const sample = page.getByTestId("sample-document");
     await expect(sample).toBeVisible();
     await expect(sample).toContainText("Example Supports");

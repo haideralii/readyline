@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
 import { readyLineCounts } from "@/lib/questionnaire/readiness";
-import { SampleDocument } from "@/components/sample-document";
+import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
 import { Testimonials, TrustCounters } from "@/components/trust-blocks";
 import { JsonLd } from "@/components/json-ld";
 import { BRAND } from "@/lib/brand";
@@ -32,6 +32,10 @@ export default function Home() {
   // Batch 45 item 1: the registered name and ABN join the mission only once both are set.
   const name = businessName();
   const registeredLine = name && abn ? C.missionRegistered(name, abn) : null;
+  // REQ-025 FR-12: the card's "N of M sections drafted from the answers" line, from the sample itself.
+  const sampleTailored = SAMPLE_DOCUMENT.sections.filter(
+    (s) => s.mode === "tailored",
+  ).length;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
       {/* REQ-011: Organization structured data; the ABN joins once BUSINESS_ABN is set. */}
@@ -69,13 +73,13 @@ export default function Home() {
           <Link href="/start" className="btn-primary" data-testid="home-cta">
             {C.cta}
           </Link>
-          <a
-            href="#sample"
+          <Link
+            href="/sample"
             className="btn-secondary"
             data-testid="home-cta-sample"
           >
             {C.ctaSecondary}
-          </a>
+          </Link>
         </div>
         <p
           className="mt-3 text-sm text-zinc-600 dark:text-zinc-400"
@@ -118,20 +122,52 @@ export default function Home() {
         <TrustCounters />
       </section>
 
+      {/* REQ-025 FR-12: the sample left this page (13,400 px at 360 px with it); a card and two links point at /sample. */}
       <section
         id="sample"
-        className="mt-12 max-w-3xl scroll-mt-6"
+        className="mt-12 max-w-2xl scroll-mt-6"
         aria-labelledby="sample-heading"
         data-testid="home-sample"
       >
         <h2 id="sample-heading" className="text-xl font-semibold">
           {C.sampleHeading}
         </h2>
-        <p className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300">
-          {C.sampleLead}
-        </p>
-        <div className="mt-4">
-          <SampleDocument />
+        <ul className="mt-2 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+          {C.sampleIntro.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <div
+          className="mt-4 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+          data-testid="home-sample-card"
+        >
+          <p className="text-lg font-semibold">{SAMPLE_DOCUMENT.title}</p>
+          <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+            {C.sampleCardDescription}
+          </p>
+          <p
+            className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
+            data-testid="home-sample-sections"
+          >
+            {sampleTailored} of {SAMPLE_DOCUMENT.sections.length} sections
+            drafted from the answers.
+          </p>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              href="/sample"
+              className="btn-secondary"
+              data-testid="home-sample-read"
+            >
+              {C.sampleRead}
+            </Link>
+            <a
+              href={SAMPLE_DOWNLOAD_PATH}
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
+              data-testid="home-sample-download"
+            >
+              {C.sampleDownload}
+            </a>
+          </div>
         </div>
       </section>
 

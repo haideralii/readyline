@@ -11,7 +11,11 @@ status: draft (Dev first draft, 13 Oct 2026; every figure carries its source and
 
 # NDIS registration cost in 2026-27: what a small provider really pays
 
-**The short answer: the audit is the big cost, and the audit type decides it.** A verification audit for lower-risk supports is quoted in the low thousands or under. A certification audit, with a site visit, is quoted in the thousands. Documents and help are on top, and that is where prices range from tens of dollars to many thousands.
+**The short answer: the audit is the big cost, and the audit type decides it.**
+
+- A verification audit for lower-risk supports is quoted in the low thousands or under.
+- A certification audit, with a site visit, is quoted in the thousands.
+- Documents and help are on top, and that is where prices range from tens of dollars to many thousands.
 
 Every figure below says where it comes from and when it was read. Prices change; check the source before you budget.
 

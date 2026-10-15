@@ -11,7 +11,11 @@ status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14
 
 # What happens at an NDIS audit: the five kinds, what the auditor reads, and what it costs
 
-**The short answer: an auditor checks that your systems work, not that your folder is neat.** You choose and pay an approved quality auditor from the Commission's list. The auditor reads your documents and samples your records. For a certification audit, they also visit you and talk to your workers and participants.
+**The short answer: an auditor checks that your systems work, not that your folder is neat.**
+
+- You choose and pay an approved quality auditor from the Commission's list.
+- The auditor reads your documents and samples your records.
+- For a certification audit, they also visit you and talk to your workers and participants.
 
 The NDIS Quality and Safeguards Commission tells you which kind of audit you need. Everything below comes from the Commission's own page on audits unless it says otherwise.
 

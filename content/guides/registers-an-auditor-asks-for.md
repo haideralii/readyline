@@ -11,7 +11,9 @@ status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14
 
 # The registers an auditor asks for, and what each one proves
 
-**The short answer: policies are one third of an audit; records are the rest.** The Commission says the auditor wants real examples, not just the policy: incident reports, complaints records, training logs, supervision notes. A perfect policy with an empty register is a finding. A good practice with nothing written down cannot be shown.
+**The short answer: policies are one third of an audit; records are the rest.**
+
+The Commission says the auditor wants real examples, not just the policy: incident reports, complaints records, training logs, supervision notes. A perfect policy with an empty register is a finding. A good practice with nothing written down cannot be shown.
 
 This guide lists the records auditors ask for, what each one proves, and where a one-to-ten-worker provider keeps it.
 
