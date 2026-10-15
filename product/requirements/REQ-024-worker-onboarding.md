@@ -1,6 +1,6 @@
 # REQ-024: Worker onboarding: the worker file an auditor samples, from invitation to first shift
 
-Status: draft, second version (PO, 15 Oct 2026 22:10; rewritten after the independent review of 15 Oct, `product/qa/req-reviews/2026-10-15-req-022-023-024.md`, findings 1 to 18; the Worker Screening Rules were read on 15 Oct 2026 from legislation.gov.au, compilation F2021C00788 of 31 July 2021, VERIFY that no later compilation exists; goes back to the reviewer before "ready" as D-2215 requires; every session waits for REQ-020 to be on `main`)
+Status: draft, second version (PO, 15 Oct 2026 22:10, D-2408 added 22:40 from Haider's instruction; rewritten after the independent review of 15 Oct, `product/qa/req-reviews/2026-10-15-req-022-023-024.md`, findings 1 to 18; the Worker Screening Rules were read on 15 Oct 2026 from legislation.gov.au, compilation F2021C00788 of 31 July 2021, VERIFY that no later compilation exists; goes back to the reviewer before "ready" as D-2215 requires; every session waits for REQ-020 to be on `main`)
 Phase: 6 Priority: should Owner: Dev
 
 ## Why (user and business outcome)
@@ -15,7 +15,7 @@ In, as three sessions, all after REQ-020 is on `main`:
 - Session B, the worker's own steps through the worker role: the worker completes what is theirs and the owner confirms; the acknowledgement rows; the invitation's first steps.
 - Session C, keeping it current: expiries on the existing reminders, the audit-day and checklist states, the supervision rows, the period filter and the pack (after REQ-023 Session B), ending a worker.
 
-Out: payroll, rostering, contracts, award interpretation, HR integrations; identity documents or certificates as files; a worker's performance notes; anything that names a participant; worker names, dates of birth and addresses (D-2406).
+Out: payroll, rostering, contracts, award interpretation, HR integrations; identity documents or certificates as files; a worker's performance notes; anything that names a participant; storing worker names, dates of birth and addresses (D-2406; D-2408 lets the owner supply them for one export without storage).
 
 ## Domain rules that apply (link to product/domain)
 
@@ -44,7 +44,8 @@ Session A, the onboarding sequence
 - FR-4 "Ready for first shift" is derived: every item marked "before first shift" (W-1 cleared or W-1a, W-2 where it applies, W-3, W-4, W-5, W-6 for the mandatory policies) is done, confirmed and not expired. When the clearance is pending, the owner may record "started under the s 14 exception" with the four W-1a conditions shown as four tick lines in plain words (application lodged on <date>; supervised by <worker code>; our risk management plan is in place and followed; our state allows it: <state wording or "check your state">), the start date, and later the end date; the record is what s 18(3)(c) asks for, except the supervisor's name, which is the supervisor's code (D-2406). The product never offers "start without a check".
 - FR-5 Expiries feed the existing reminders job as today (`CLEARANCE_OFFSETS` 90, 30, 7, 0 days already serve `worker_clearances`; the same offsets are extended to onboarding items with an expiry: the working with children check, first aid and CPR with defaults 3 years and 1 year as constants, supervision on the governance cadence). No item is reminded twice: a clearance's reminder comes from `worker_clearances` only.
 - FR-6 The worker file export: one sheet per worker in the audit pack's `workers/` folder (not a separate CSV path) with every item, its state, dates, check numbers and the trail, plus `workers/index.csv`; the auditor link shows codes and states only, no numbers (D-2407).
-- FR-6a The two Rules lists as exports from the same data: `risk-assessed-roles.csv` (s 17: the role title, the definition paragraph as a code, the description, the date assessed, the assessor's code; the owner keeps the assessor's name and title beside it, D-2406) and `screening-list.csv` (s 18: every current and past worker in a risk assessed role, by code, with the roles, the exception section and dates and supervisor code where one applied, the application number, the check number, the outcome and its expiry, and any suspension or revocation as a code and date). Each export's first line states which s 18 fields are not in the product (full name, date of birth, address, the supervisor's name) and that the owner's HR file holds them against the code. The screening list is reconstructable for any day in the last seven years from the trail (s 20).
+- FR-6a The two Rules lists as exports from the same data: `risk-assessed-roles.csv` (s 17: the role title, the definition paragraph as a code, the description, the date assessed, the assessor's code; the owner keeps the assessor's name and title beside it, D-2406) and `screening-list.csv` (s 18: every current and past worker in a risk assessed role, by code, with the roles, the exception section and dates and supervisor code where one applied, the application number, the check number, the outcome and its expiry, and any suspension or revocation as a code and date). The screening list is reconstructable for any day in the last seven years from the trail (s 20). The name, date of birth and address columns are filled per D-2408: either from the owner's one-time entry on the export screen, or as highlighted placeholders.
+- FR-6b The one-time fill (D-2408): the export screen for `screening-list.csv`, the worker file and any document that has a worker-name blank carries one unticked checkbox, "Fill in names, dates of birth and addresses now. Readyline uses them for this file only and does not keep them." Ticked, the screen shows one row per worker code with three fields (full name, date of birth, address) and the assessor's name and title for the roles list; the server builds the file in memory from the submitted values and streams it; nothing is written to any table, log, audit line, cache or error report (SR-7); the fields are cleared when the file is downloaded or the screen is left. Unticked, every such column or blank in the file reads `[Full name]`, `[Date of birth]`, `[Address]` with the REQ-016 highlight, and the file's first line says these are for the owner to complete, with the s 18 reference. The same two paths apply to any document the pack generates that has a person's name blank (REQ-016's blanks vocabulary).
 
 Session B, the worker's own steps
 
@@ -67,6 +68,7 @@ Session C, keeping it current
 - SR-4 Reminders name the worker by code and the item, never a number.
 - SR-5 The pack and the exports carry codes and check numbers (the auditor verifies by number in the database); the auditor link carries codes and states only (D-2407).
 - SR-6 The import refuses rows with a participant-shaped value in any field (REQ-020 FR-12 and the batch 45 CHECK), and the note field's helper says "no names".
+- SR-7 The one-time fill (FR-6b) is a POST whose body is used to render one response and discarded: no table, no `audit_log` payload (one line `exports.screening-list.filled` with the count of rows, no values), no server log of the body, no error report carrying the body (the error handler's redaction list gains the three field names), no query string, no cookie, no client-side storage, and a `Cache-Control: no-store` response; a unit test posts a marked value and asserts it appears in the file and nowhere else (database dump, log capture, audit rows). The privacy policy says the product processes these values for the export only and does not keep them.
 
 ## Data (entities, fields, retention)
 
@@ -90,6 +92,7 @@ Session C, keeping it current
 - AC-9 Given a worker with two supervision entries, when the worker file is exported, then both appear with kind, date and supervisor code, and `last_supervision_on` equals the later date.
 - AC-10 Given a worker ended on a date, when the worker file and the screening list are exported, then the worker is under past workers with the end date and the membership is revoked.
 - AC-11 Given the worker's first sign-in, when the home renders, then the collection notice screen shows first and the home shows after its one button.
+- AC-12 Given the screening list export with the FR-6b checkbox unticked, when the file is built, then its name, date of birth and address columns read `[Full name]`, `[Date of birth]`, `[Address]` with the highlight and the first line says so; given the checkbox ticked and three workers filled with a marked value, when the file is built, then the values are in the file, the response is `no-store`, the database and the captured logs contain no marked value, and the audit log has one count-only line.
 
 ## Test expectations (unit, integration, e2e, manual)
 
@@ -108,6 +111,7 @@ Per session: `npm run check`; the CI run; screenshots of the staff list and one 
 - D-2405 Order: A, then B, then C, all after REQ-020; C's period and pack items after REQ-023 Session B.
 - D-2406 The s 18 list needs names, dates of birth and addresses the product will not hold. The product exports everything else by code and says on the first line of the export which fields the owner's HR file must hold against the code; the product is the companion to the s 18 list, not the list. If a customer asks for the full list inside the product, that is a new REQ with the privacy policy, the contractor question and a data-minimisation review first.
 - D-2407 The auditor link shows codes and states, never numbers; numbers travel in the pack the owner hands over.
+- D-2408 (Haider, 15 Oct 2026) Personal details the product does not store can still be filled in: one optional, unticked checkbox on the export screen lets the owner supply names, dates of birth and addresses for that file only; the product uses them to build the file and keeps nothing (SR-7). Unticked, the file carries highlighted placeholders for the owner to complete. This is the pattern for every personal-detail blank in every generated document, not only the s 18 list; REQ-016's blanks vocabulary and highlight apply.
 
 ## Questions for Dev to answer before building
 
