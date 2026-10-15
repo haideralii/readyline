@@ -1,5 +1,6 @@
 // @vitest-environment node
 /** REQ-020 FR-2, SR-1: the auditor link's token, hash, expiry, liveness and banner. */
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
   AUDITOR_TOKEN_PATTERN,
@@ -40,6 +41,20 @@ describe("the auditor token", () => {
     expect(auditorLinkPath("abc")).toBe("/auditor/abc");
     expect(hashAddress("203.0.113.9")).toMatch(/^[0-9a-f]{16}$/);
     expect(hashAddress("203.0.113.9")).not.toContain("203");
+  });
+
+  it("the address hash is keyed: it changes with the pepper and is not the plain SHA-256 (retro finding 34)", () => {
+    const a = hashAddress("203.0.113.9", "pepper-a");
+    const b = hashAddress("203.0.113.9", "pepper-b");
+    expect(a).toMatch(/^[0-9a-f]{16}$/);
+    expect(a).not.toBe(b);
+    expect(hashAddress(" 203.0.113.9 ", "pepper-a")).toBe(a);
+    const plain = createHash("sha256")
+      .update("203.0.113.9", "utf8")
+      .digest("hex")
+      .slice(0, 16);
+    expect(a).not.toBe(plain);
+    expect(hashAddress("203.0.113.9")).not.toBe(plain);
   });
 });
 
