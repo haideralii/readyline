@@ -62,7 +62,7 @@ export function StepShell({
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="mt-4 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
+        className="focus-quiet mt-4 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
       >
         {STEP_TITLES[step]}
       </h1>

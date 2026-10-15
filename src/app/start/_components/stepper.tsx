@@ -10,12 +10,15 @@ import { STEP_IDS, type StepId } from "@/lib/questionnaire/steps";
 import type { QuestionnaireDraft } from "@/lib/questionnaire/schema";
 
 /**
- * One stepper on every questionnaire page (batch 48 item 2): six numbered
- * circles in a row with the label beneath, joined by a line that fills in
- * ochre up to the current step. A done step is a link back to it; the
+ * One stepper on every questionnaire page (REQ-025 FR-6 to FR-8; D-2217):
+ * line one, "Step 5 of 6: Already have", is the primary indicator and is
+ * always visible; beneath it a row of six numbered circles joined by a
+ * line that fills in ochre up to the current step, with the labels under
+ * the circles from 640 px up. A done step is a plain link back to it; the
  * current step carries aria-current="step"; a step not yet reached is
- * muted and not interactive. At 360 px the circles stay in one row without
- * labels and the line beneath says "Step 5 of 6: Already have". No
+ * muted and not interactive. On a phone the circles carry no labels and a
+ * "Show steps" disclosure beside line one lists the step names with the
+ * same links, so nothing nests an interaction inside the row. No
  * animation, CSS only, tap targets of 44 px, the REQ-015 focus ring.
  */
 export type StepState = "done" | "current" | "todo";
@@ -35,6 +38,9 @@ export function stepStates(
   );
 }
 
+const circle =
+  "flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2";
+
 export function Stepper({
   step,
   answers,
@@ -49,12 +55,59 @@ export function Stepper({
   const total = STEP_IDS.length;
   return (
     <nav aria-label="Questionnaire steps" data-testid="stepper">
-      <ol className="flex items-start">
+      {/* FR-6: line one is the indicator everyone reads; FR-8: the names on a phone sit behind one control beside it. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <p
+          className="text-slate text-sm font-medium"
+          data-testid="progress-line-label"
+        >
+          Step {index + 1} of {total}: {STEP_SHORT[step]}
+        </p>
+        <details className="relative sm:hidden" data-testid="stepper-steps">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
+            Show steps
+          </summary>
+          <ol
+            className="absolute right-0 z-10 mt-1 w-56 rounded-md border border-zinc-300 bg-white p-2 text-sm shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            data-testid="stepper-steps-list"
+          >
+            {STEP_IDS.map((id, i) => {
+              const state = states[i];
+              const text = `${i + 1}. ${STEP_SHORT[id]}`;
+              return (
+                <li key={id} data-state={state}>
+                  {state === "done" ? (
+                    <Link
+                      href={stepHref(id)}
+                      className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+                    >
+                      {text}
+                      <span className="sr-only">: done, change it</span>
+                    </Link>
+                  ) : state === "current" ? (
+                    <span
+                      aria-current="step"
+                      className="inline-flex min-h-11 items-center font-semibold"
+                    >
+                      {text}
+                      <span className="sr-only">: current</span>
+                    </span>
+                  ) : (
+                    <span className="text-slate inline-flex min-h-11 items-center">
+                      {text}
+                      <span className="sr-only">: not yet</span>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </details>
+      </div>
+      <ol className="mt-2 flex items-start">
         {STEP_IDS.map((id, i) => {
           const state = states[i];
           const n = i + 1;
-          const circle =
-            "flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2";
           return (
             <li
               key={id}
@@ -99,6 +152,7 @@ export function Stepper({
                   {n}
                 </span>
               )}
+              {/* FR-6: labels under the circles from 640 px up; FR-8: on a phone the names are in the disclosure above. */}
               <span
                 aria-hidden="true"
                 className={`mt-1 hidden text-xs sm:block ${state === "current" ? "font-semibold" : state === "todo" ? "text-slate" : ""}`}
@@ -109,12 +163,6 @@ export function Stepper({
           );
         })}
       </ol>
-      <p
-        className="text-slate mt-2 text-sm font-medium"
-        data-testid="progress-line-label"
-      >
-        Step {index + 1} of {total}: {STEP_SHORT[step]}
-      </p>
     </nav>
   );
 }

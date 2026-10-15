@@ -127,14 +127,15 @@ test.describe("REQ-014 visual identity", () => {
     const animated = await done.evaluate(
       (el) => getComputedStyle(el).animationDuration,
     );
-    expect(parseFloat(animated)).toBe(0);
+    // Chromium reports the global 0.01ms rule as 1e-05s; anything under a frame counts as off.
+    expect(parseFloat(animated)).toBeLessThan(0.01);
 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
     const reduced = await stepper
       .getByRole("link", { name: /Step 1, Business: done/ })
       .evaluate((el) => getComputedStyle(el).animationDuration);
-    expect(parseFloat(reduced)).toBe(0);
+    expect(parseFloat(reduced)).toBeLessThan(0.01);
     await page.emulateMedia({ reducedMotion: "no-preference" });
 
     await toResult(page);
