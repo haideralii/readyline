@@ -110,3 +110,12 @@ Done 15 Oct 2026: `product/qa/req-reviews/2026-10-15-req-025-026.md` (independen
 - CI: the pull request's run once it is opened (public job: the specs above on three projects).
 - Screenshots: `product/evidence/req-025/step-5-*`, `result-*`, `result-open-*` at 360 px and desktop, `before` and `after`, committed.
 - UNVERIFIED: the restrictive-practice meaning carries its VERIFY note against the NDIS Act 2013 s 9 in `glossary.json` and is not shown on the result page (not one of its six terms). Deferred: the per-term tap-to-open form of "first use" (REQ-027; D-2232).
+
+**Session B (Dev, 15 Oct 2026)** on `req-025-session-b` 5fa135a (from the parked `batch-48-questionnaire` on batch 47, with Session A merged in; PR to `next` after #59 and Session A's PR; body: `product/evidence/req-025/pr-body-session-b.md`).
+
+- AC mapping: AC-4 → `e2e/req-025-b.spec.ts` on desktop, Android and iPhone (one `nav`, six `li`, the current step `aria-current="step"`, five done links, four inert spans with no tab stop on step 2, axe on step 2 and the result); AC-5 → the same spec at the phone widths (no labels under the circles, line one visible, "Show steps" opens the six names with the one done link and the current item, no sideways scroll by the width helper, 44 px circles) and on desktop (labels shown, no disclosure); AC-6 → the same spec ("Start again" asks; Keep leaves everything; Yes clears and step 1 renders empty with step 2 not yet); FR-6 → the DOM-order check that line one precedes the row; FR-9 → tapping a done step, later steps stay done.
+- `npm run check`: green (122 files, 876 tests, 6 skipped).
+- Local gate (dev server): `req-025-b` on the three projects 6 passed; `req-014`, `req-013-p2`, `req-015-a11y`, `req-015-width`, `questionnaire-a11y`, `questionnaire-a11y-tree`, `req-025` and `questionnaire` on desktop and Android 76 passed.
+- CI: the pull request's run once it is opened (public job, three projects).
+- Screenshots: `product/evidence/req-025/step-5-session-b-*`, `result-session-b-*`, `result-open-session-b-*` at 360 px and desktop, committed; the `before` set from Session A shows the old progress line and navigations.
+- Deferred: none. The `progress-line.tsx` component and its test are removed (nothing else used them).
