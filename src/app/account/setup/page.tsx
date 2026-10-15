@@ -10,6 +10,8 @@ export default async function AccountSetupPage() {
   if (!viewer) redirect("/sign-in?next=%2Faccount%2Fsetup");
   if (viewer.deleted) redirect("/account/deleted");
   if (viewer.account) redirect("/account");
+  // REQ-020 FR-4, AC-3: every owner page sends a user with no account here; a worker goes on to their home.
+  if (viewer.worker) redirect("/worker");
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { isProductionDeployment } from "@/lib/env";
 import { Wordmark } from "@/components/wordmark";
-import { getSessionUser } from "@/server/accounts/queries";
+import { getSessionUser, getViewer } from "@/server/accounts/queries";
 
 /** Nav links: a 44 px target, a visible pressed state, never split across lines. */
 const navLink =
@@ -10,6 +10,10 @@ const navLink =
 
 export async function SiteHeader() {
   const user = await getSessionUser();
+  // REQ-020 FR-4: a worker's nav is their home alone; the owner's links would
+  // only bounce them back there. One cached read per request (D-1012).
+  const viewer = user ? await getViewer() : null;
+  const worker = Boolean(viewer && !viewer.account && viewer.worker);
   return (
     <header className="border-b border-zinc-200 dark:border-zinc-800">
       {/*
@@ -44,7 +48,11 @@ export async function SiteHeader() {
           className="ml-auto flex flex-wrap items-center justify-end gap-x-3 text-sm whitespace-nowrap sm:gap-x-4"
           data-testid="site-nav"
         >
-          {user ? (
+          {worker ? (
+            <Link href="/worker" className={navLink} data-testid="nav-worker">
+              Your entries
+            </Link>
+          ) : user ? (
             <>
               <Link href="/checklist" className={navLink}>
                 Checklist

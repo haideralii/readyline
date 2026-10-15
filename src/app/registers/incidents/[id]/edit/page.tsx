@@ -15,6 +15,10 @@ export default async function EditIncidentPage({
   if (!ctx.canWrite) redirect(`/registers/incidents/${id}`);
   const found = await getIncident(ctx.supabase, ctx.viewer.account.id, id);
   if (!found) notFound();
+  // REQ-020 FR-5: a draft is confirmed on its own screen; a rejected report is kept as it was.
+  if (found.row.status === "draft")
+    redirect(`/registers/incidents/${id}/confirm`);
+  if (found.row.status === "rejected") redirect(`/registers/incidents/${id}`);
   return (
     <RegisterPage
       title={`Edit ${found.row.reference}`}

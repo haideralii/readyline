@@ -26,7 +26,14 @@ import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
 import { BillingPortalButton, SubscribeButton } from "./subscribe-button";
 import { AuditorLinkPanel } from "./auditor-link";
+import { TeamPanel } from "./team";
 import { latestAuditorLink, liveLink } from "@/server/registers/auditor-links";
+import {
+  listInvitations,
+  listWorkers,
+  liveReportLink,
+  pendingInvitations,
+} from "@/server/registers/team-queries";
 
 export const metadata: Metadata = { title: "Your account" };
 
@@ -60,6 +67,12 @@ export default async function AccountPage() {
   const pricing = readPricing();
   const subscriptionOffered = subscriptionAvailable();
   const auditorLink = liveLink(await latestAuditorLink(supabase, a.id));
+  // REQ-020 FR-4, FR-5: the team and the report link, read by code only.
+  const [invitations, workers, reportLink] = await Promise.all([
+    listInvitations(supabase, a.id),
+    listWorkers(supabase, a.id),
+    liveReportLink(supabase, a.id),
+  ]);
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
@@ -151,6 +164,34 @@ export default async function AccountPage() {
                   lastOpenedAt: auditorLink.last_opened_at,
                   openedCount: auditorLink.opened_count,
                 }
+              : null
+          }
+        />
+      </section>
+
+      {/* REQ-020 FR-4, FR-5, FR-11: the workers who log for you and the report link. */}
+      <section
+        aria-labelledby="team-heading"
+        className="mt-8"
+        data-testid="account-team"
+      >
+        <h2 id="team-heading" className="text-xl font-semibold">
+          Your team
+        </h2>
+        <TeamPanel
+          invitations={pendingInvitations(invitations).map((i) => ({
+            id: i.id,
+            workerRef: i.worker_ref,
+            expiresAt: i.expires_at,
+          }))}
+          workers={workers.map((w) => ({
+            userId: w.user_id,
+            workerRef: w.worker_ref,
+            since: w.created_at,
+          }))}
+          reportLink={
+            reportLink
+              ? { id: reportLink.id, createdAt: reportLink.created_at }
               : null
           }
         />

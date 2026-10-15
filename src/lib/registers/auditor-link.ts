@@ -6,6 +6,7 @@
  * Nothing here names, lists or recommends an auditor (FR-3, CLAUDE.md 4.4).
  */
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { hashPepper, pepperedHash } from "@/lib/peppered-hash";
 
 export const AUDITOR_LINK_HOURS = [24, 48, 72] as const;
 export type AuditorLinkHours = (typeof AUDITOR_LINK_HOURS)[number];
@@ -73,10 +74,14 @@ export function auditorBanner(tradingName: string, expiresAt: Date): string {
   return `Read-only view shared by ${tradingName} for its audit; it expires on ${formatLinkTime(expiresAt)}.`;
 }
 
-/** A viewer's address for the audit log: hashed, never in clear (FR-2). */
-export function hashAddress(address: string): string {
-  return createHash("sha256")
-    .update(address.trim(), "utf8")
-    .digest("hex")
-    .slice(0, 16);
+/**
+ * A viewer's address for the audit log: hashed, never in clear (FR-2), and
+ * keyed under HASH_PEPPER so an IPv4 address cannot be recovered by
+ * enumerating the hash (retro finding 34).
+ */
+export function hashAddress(
+  address: string,
+  pepper: string | null = hashPepper(),
+): string {
+  return pepperedHash(address.trim(), pepper).slice(0, 16);
 }
