@@ -162,6 +162,19 @@ export function formQuestionsFor(
   return questionsFor(formBlanks(blanks));
 }
 
+/**
+ * Whether a key is one the Finish form asks for over these blanks (retro
+ * review of REQ-017, finding 67): the save action accepts a key only when
+ * the set's blanks ask for it or the account holds it, so an owner cannot
+ * write arbitrary rows that every path page then loads.
+ */
+export function isFormFactKey(
+  key: string,
+  blanks: readonly DocumentBlank[],
+): boolean {
+  return formQuestionsFor(blanks).some((q) => q.key === key);
+}
+
 export function factKeyFor(blank: string): string | null {
   const inner = blank
     .replace(/^\[|\]$/g, "")

@@ -49,6 +49,16 @@ describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
     ]);
   });
 
+  it("the source cue names the Commission's pages and the Rules on legislation.gov.au, and never claims every rule (retro review of REQ-013, finding 9)", () => {
+    const cue = HOME_COPY.trust.find(
+      (t) => t.title === "Sourced to the Commission",
+    )!;
+    expect(cue.text).toMatch(/Commission's published pages/);
+    expect(cue.text).toMatch(/legislation\.gov\.au/);
+    expect(cue.text).toMatch(/You review every document/);
+    expect(cue.text).not.toMatch(/^Every /);
+  });
+
   it("the example result is the real sole-trader reference case, not an invented number", () => {
     const c = loadReferenceCases().find(
       (x) => x.id === "verification-sole-trader",

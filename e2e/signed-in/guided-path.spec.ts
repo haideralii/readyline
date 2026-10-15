@@ -394,6 +394,14 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     // Step 7: the audit-day page, printable, with the pack download.
     await page.goto("/path/audit-day");
     await expect(page.getByTestId("audit-day-summary")).toContainText(/ready/);
+    // Retro review of REQ-017 (findings 64 and 65): the two sector-practice
+    // lines are qualified as such, never stated as a rule or a proportion.
+    await expect(page.getByTestId("audit-day-summary")).not.toContainText(
+      /phone you/,
+    );
+    await expect(page.getByTestId("audit-day-ask")).toContainText(
+      "Auditors in sector webinars say policies are only part of an audit.",
+    );
     await expect(page.getByTestId("audit-day-group").first()).toBeVisible();
     // Batch 45 items 3 and 4: the groups in the order the auditor asks, and
     // every quoted line is what the auditor says, never the provider's instruction.

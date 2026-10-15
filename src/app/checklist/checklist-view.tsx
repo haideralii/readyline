@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ParticipantDataWarning } from "@/app/start/_components/fields";
+import { detectParticipantData } from "@/lib/privacy/participant-data";
 import {
   CHECKLIST_STATUSES,
   progressLine,
@@ -362,6 +363,10 @@ function ChecklistRow({
   const noteId = `${b}-note`;
   const panelId = `${b}-panel`;
   const [noteOpen, setNoteOpen] = useState(note.length > 0);
+  // CLAUDE.md 4.5 (retro review of REQ-015, finding 23): the detector runs on
+  // the note as it is typed; it warns under the field and never blocks.
+  const warnings = noteOpen ? detectParticipantData(note) : [];
+  const warnId = `${b}-participant-warning`;
   // REQ-017 step 6: one tap to do it where the app can; a document item opens its document.
   const action =
     item.action ??
@@ -509,10 +514,27 @@ function ChecklistRow({
               maxLength={NOTE_MAX}
               rows={2}
               onChange={(e) => onNote(e.target.value)}
-              aria-describedby="checklist-note-warning"
+              aria-describedby={[
+                "checklist-note-warning",
+                warnings.length ? warnId : null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
               placeholder="Your reminder. No participant names or health details."
               className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950"
             />
+            {warnings.length ? (
+              <ul
+                id={warnId}
+                role="status"
+                className="mt-1 space-y-1 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+                data-testid={warnId}
+              >
+                {warnings.map((w) => (
+                  <li key={w.kind}>{w.message}</li>
+                ))}
+              </ul>
+            ) : null}
           </>
         ) : (
           <button

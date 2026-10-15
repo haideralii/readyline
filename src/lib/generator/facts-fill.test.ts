@@ -13,6 +13,7 @@ import {
   formFactKeyFor,
   formQuestionsFor,
   isAccountFactKey,
+  isFormFactKey,
   questionsFor,
   remainingBlanks,
 } from "./facts-fill";
@@ -44,6 +45,31 @@ describe("account facts stay off the Finish form (D-541 as amended, batch 37)", 
     expect(form).not.toContain("role");
     expect(form).not.toContain("date");
     expect(form).toEqual(all.filter((k) => !isAccountFactKey(k)));
+  });
+
+  it("the save action's key check: a key the set's blanks ask for passes, an account key is the account's, anything else is refused (retro review of REQ-017, finding 67)", () => {
+    const blank = (text: string) => ({
+      typeId: "governance-policy",
+      title: "Governance policy",
+      sectionNumber: "1",
+      sectionHeading: "Purpose",
+      blank: text,
+    });
+    const blanks = [
+      blank("[name]"),
+      blank("[phone or email]"),
+      blank("[insurer]"),
+    ];
+    expect(isFormFactKey("phone-or-email", blanks)).toBe(true);
+    // An unknown blank is asked by its own text and keyed from it.
+    expect(isFormFactKey("insurer", blanks)).toBe(true);
+    // The owner's name is an account fact, never a form key.
+    expect(isFormFactKey("name", blanks)).toBe(false);
+    expect(isAccountFactKey("name")).toBe(true);
+    expect(isFormFactKey("anything-else", blanks)).toBe(false);
+    expect(isAccountFactKey("anything-else")).toBe(false);
+    // A set with no blanks asks for nothing.
+    expect(isFormFactKey("phone-or-email", [])).toBe(false);
   });
 
   it("one rule counts the blanks the form can ask for: the strip and the set page count what the form asks (run 38599190033)", () => {

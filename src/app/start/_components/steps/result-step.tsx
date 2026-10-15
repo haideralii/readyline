@@ -640,7 +640,15 @@ function ResultView({
             .
           </>
         ) : (
-          "Email the contact address in the footer."
+          // Retro review of REQ-013 (finding 7): with CONTACT_EMAIL unset the
+          // footer has no Contact link either, so point at a page that exists.
+          <>
+            Contact details are on the{" "}
+            <Link href="/about" className="underline underline-offset-2">
+              About page
+            </Link>
+            .
+          </>
         )}{" "}
         We answer product and process questions, not legal ones.
       </p>

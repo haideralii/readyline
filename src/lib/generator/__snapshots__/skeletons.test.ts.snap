@@ -1262,6 +1262,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
           "paragraph",
           "paragraph",
           "paragraph",
+          "paragraph",
           "table",
         ],
         "heading": "Worker screening clearance register",
@@ -4510,6 +4511,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
           "paragraph",
           "paragraph",
           "paragraph",
+          "paragraph",
           "table",
         ],
         "heading": "Worker screening clearance register",
@@ -7596,6 +7598,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
+          "paragraph",
           "paragraph",
           "paragraph",
           "paragraph",

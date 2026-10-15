@@ -577,7 +577,7 @@
           "id": "retention-schedule",
           "heading": "Retention schedule",
           "mode": "fixed",
-          "brief": "Batch 45 item 18 (domain, provider, field and auditor reviews): a fixed table with sourced rows and read dates from the Incident Rules ss 12 and 25, the Complaints Rules s 10 and the Worker Screening Rules ss 20 and 21; where an instrument sets no period the row says so and gives our own choice. Was tailored until batch 45; the section keeps its number."
+          "brief": "Batch 45 item 18 (domain, provider, field and auditor reviews): a fixed table with sourced rows and read dates from the Incident Rules ss 12 and 25, the Complaints Rules s 10 and the Worker Screening Rules ss 17 and 18 (the two lists), s 20 (the form) and s 21 (the period); where an instrument sets no period the row says so and gives our own choice. Was tailored until batch 45; the section keeps its number."
         }
       ],
       "basis": "commission-rules",
@@ -875,7 +875,7 @@
         }
       ],
       "basis": "good-practice",
-      "basisReason": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI",
+      "basisReason": "the Commission's February 2026 position statement on AI in behaviour support plans and sector guidance (DSC, November 2025) expect providers to govern their use of AI",
       "retired": true,
       "retiredNote": "Retired for new sets on 13 October 2026 (REQ-016 S-6): its content is the 'AI and digital tools' section of the privacy and information management policy. Sets generated before then keep their copy."
     },
@@ -900,7 +900,7 @@
         }
       ],
       "basis": "good-practice",
-      "basisReason": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use",
+      "basisReason": "the Commission's February 2026 position statement on AI in behaviour support plans says no participant personal information goes into an AI system, and sector guidance (DSC, November 2025) asks for de-identification first",
       "retired": true,
       "retiredNote": "Retired for new sets on 13 October 2026 (REQ-016 S-6): its content is the 'AI and digital tools' section of the privacy and information management policy. Sets generated before then keep their copy."
     },

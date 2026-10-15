@@ -166,7 +166,10 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
         [
           "The list of risk-assessed roles and the list of screened workers",
           "7 years from the date the record is made, kept so an auditor can see who was in a risk-assessed role on any day in the last 7 years",
-          "Worker Screening Rules ss 20 and 21, read 15 October 2026",
+          // Retro review of REQ-016 (finding 38): the two lists are ss 17 and
+          // 18 of the Worker Screening Rules; s 20 is the form (any day in the
+          // last 7 years) and s 21 the period (contents page of F2018L00887).
+          "Worker Screening Rules ss 17 and 18 (the two lists), s 20 (the form) and s 21 (the period), read 15 October 2026",
         ],
         [
           "Service agreements and support plans",
@@ -368,6 +371,14 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     {
       type: "paragraph",
       text: "In Queensland, the ACT and Tasmania the NDIS clearance is issued with, or inside, the state's children's or vulnerable-people card; record the NDIS clearance number and expiry separately from the card.",
+    },
+    {
+      type: "paragraph",
+      // Retro review of REQ-016 (finding 39): this table holds role, kind,
+      // number and dates, so it is not the s 18 list, which carries each
+      // worker's full name, date of birth and address and never leaves the
+      // provider (REQ-024 D-2406).
+      text: "This register is the companion to our own list of workers in risk-assessed roles (Worker Screening Rules s 18), which holds each worker's full name, date of birth and address and stays in our own records.",
     },
     {
       type: "table",

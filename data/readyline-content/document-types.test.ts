@@ -114,6 +114,75 @@ describe("document-types.json (REQ-005 FR-1)", () => {
     expect(findProhibitedClaims(text)).toEqual([]);
   });
 
+  it("every current title follows a Practice Standards name or a Commission term, so an auditor recognises it at a glance (REQ-016 S-1)", () => {
+    // The Commission's own words in the dataset: standard, module and
+    // division names, outcomes, intents and quality indicators.
+    const commissionText = [
+      ...standards.standards.flatMap((s) => [
+        s.name,
+        s.outcome ?? "",
+        (s as { intent?: string }).intent ?? "",
+        ...(s.indicators ?? []),
+      ]),
+      ...standards.modules.flatMap((m) => [
+        m.name,
+        ...(m.divisions ?? []).map((d) => d.name),
+      ]),
+      ...standards.registrationGroups.map((g) => g.name),
+    ]
+      .join("\n")
+      .toLowerCase();
+    const names = [
+      ...standards.standards.map((s) => s.name),
+      ...standards.modules.map((m) =>
+        m.name.replace(/ \(SIL\)/, "").replace(/ module$/i, ""),
+      ),
+      ...standards.modules.flatMap((m) =>
+        (m.divisions ?? []).map((d) => d.name),
+      ),
+    ].map((n) => n.toLowerCase());
+    // Short Commission terms a title may rest on instead of a whole name.
+    // The first group is checked against the Commission text above; the
+    // second names its instrument.
+    const termsInText = [
+      "governance",
+      "records",
+      "induction",
+      "training",
+      "code of conduct",
+      "service agreement",
+      "choice and control",
+      "feedback",
+      "medication",
+      "transport",
+      "high intensity",
+      "clinical",
+      "restrictive practice",
+      "early childhood",
+      "child", // ec.the-child, "The child"
+      "complex",
+      "dwelling",
+      "tenancy",
+      "self-assessment",
+    ];
+    for (const term of termsInText)
+      expect(commissionText, `Commission term: ${term}`).toContain(term);
+    const termsFromInstruments = [
+      // NDIS (Practice Standards—Worker Screening) Rules 2018, F2018L00887 (data/SOURCES.md).
+      "worker screening",
+    ];
+    const terms = [...termsInText, ...termsFromInstruments];
+    const current = items.filter((i) => !(i as { retired?: boolean }).retired);
+    expect(current.length).toBeGreaterThan(30);
+    for (const item of current) {
+      const title = item.title.toLowerCase();
+      const matched =
+        names.some((n) => title.includes(n)) ||
+        terms.some((t) => new RegExp(`\\b${t}\\b`).test(title));
+      expect(matched, `${item.id}: "${item.title}"`).toBe(true);
+    }
+  });
+
   it("maps every reviewed evidence document id that is a policy, plan, form or register to at least one document", () => {
     const covered = new Set(items.flatMap((i) => i.evidenceAliases));
     const uncovered = [...evidenceIds].filter((e) => !covered.has(e));

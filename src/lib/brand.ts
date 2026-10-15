@@ -10,8 +10,11 @@ export const BRAND =
   process.env.NEXT_PUBLIC_BRAND_NAME?.trim() || BRAND_DEFAULT;
 
 /**
- * Plain-language statement required on the site footer and in every generated
- * document (CLAUDE.md sections 4.2 and 4.3).
+ * Plain-language statement shown at the point of delivery (CLAUDE.md
+ * sections 4.2 and 4.3, D-058): the site footer, the pricing and documents
+ * pages, the checklist, the audit-day page, the result card, the readiness
+ * summary's first page and the zip's cover note. Never inside a generated
+ * document, which is the provider's own.
  */
 export const GENERAL_INFORMATION_STATEMENT =
   `${BRAND} provides general information and document templates for your own review. ` +
@@ -22,7 +25,7 @@ export const INDEPENDENCE_STATEMENT =
   `${BRAND} is an independent service and is not affiliated with the National Disability ` +
   `Insurance Agency or the NDIS Quality and Safeguards Commission.`;
 
-/** Documents carry both sentences together; the site footer carries the statement and its own trust line (REQ-008, D-805). */
+/** The result card, the documents page, the readiness summary and the zip's cover note carry both sentences together; the site footer carries the statement and its own trust line (REQ-008, D-805). */
 export const GENERAL_INFORMATION_NOTICE = `${GENERAL_INFORMATION_STATEMENT} ${INDEPENDENCE_STATEMENT}`;
 
 /**

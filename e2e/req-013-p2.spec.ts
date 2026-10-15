@@ -215,6 +215,15 @@ test.describe("REQ-013 P2", () => {
     await expect(page.getByTestId("result-contact")).toContainText(
       /Questions about your result/,
     );
+    // Retro review of REQ-013 (finding 7): the contact line is a mailto link
+    // when CONTACT_EMAIL is set, otherwise a link to the About page; never a
+    // pointer at a footer link that is not there.
+    await expect(page.getByTestId("result-contact")).not.toContainText(
+      /in the footer/,
+    );
+    await expect(
+      page.getByTestId("result-contact").getByRole("link"),
+    ).toHaveCount(1);
     await expect(page.getByText("In short")).toHaveCount(0);
     await shot(page, "p2-result-summary", testInfo.project.name);
     await axeClean(page);

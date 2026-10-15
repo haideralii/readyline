@@ -10,6 +10,8 @@
  */
 import { z } from "zod";
 import { deriveChecklist } from "@/lib/checklist/derive";
+import { collectBlanks } from "@/lib/generator/blanks";
+import { isAccountFactKey, isFormFactKey } from "@/lib/generator/facts-fill";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
@@ -34,8 +36,16 @@ export type PathActionResult =
 const FactInput = strictObject({
   key: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
   value: z.string().trim().min(1).max(200),
+  /** The set whose blanks the Finish form is asking about (finding 67). */
+  setId: z.string().uuid(),
 });
 
+/**
+ * Retro review of REQ-017 (finding 67): a fact key is accepted only when
+ * the account holds it or the set's blanks ask for it (`formQuestionsFor`),
+ * so the table carries the closed list the Finish form knows and nothing
+ * an owner typed into a request by hand.
+ */
 export async function saveFactAction(
   input: unknown,
 ): Promise<PathActionResult> {
@@ -49,6 +59,15 @@ export async function saveFactAction(
   if (!viewer?.account || viewer.deleted)
     return { ok: false, message: "Sign in to save your answers." };
   const supabase = await createSupabaseServerClient();
+  if (!isAccountFactKey(parsed.data.key)) {
+    const set = await getVersionSet(supabase, parsed.data.setId);
+    if (!set || set.account_id !== viewer.account.id || set.status !== "ready")
+      return { ok: false, message: "That set was not found." };
+    const latest = await listLatestDocuments(supabase, set.id);
+    const blanks = latest.flatMap((d) => collectBlanks(d.model));
+    if (!isFormFactKey(parsed.data.key, blanks))
+      return { ok: false, message: "That field is not one we ask for." };
+  }
   const r = await saveFact(
     supabase,
     viewer.account.id,

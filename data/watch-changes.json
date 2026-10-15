@@ -96,7 +96,7 @@
       "sectionId": "retention-schedule",
       "oldSentence": null,
       "newSentence": "Complaint records | 7 years from the day the record is made | Complaints Rules s 10(3), read 15 October 2026",
-      "why": "Batch 45 item 18: the retention schedule is a fixed, sourced table; Complaints Rules s 10(3) (compilation F2026C00165) sets 7 years from the day the record is made; Incident Rules s 12(2) sets what is recorded, not how long; Worker Screening Rules ss 20 and 21 set 7 years for the worker lists.",
+      "why": "Batch 45 item 18: the retention schedule is a fixed, sourced table; Complaints Rules s 10(3) (compilation F2026C00165) sets 7 years from the day the record is made; Incident Rules s 12(2) sets what is recorded, not how long; Worker Screening Rules s 21 sets 7 years for the two worker lists (ss 17 and 18), in the form s 20 requires.",
       "source": "https://www.legislation.gov.au/F2018L00634/2026-01-28/2026-01-28/text/original/word",
       "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
     },

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { ParticipantDataWarning } from "@/app/start/_components/fields";
 import type { FactQuestion } from "@/lib/generator/facts-fill";
+import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { finishPackAction, saveFactAction } from "@/server/path/actions";
 
 /**
@@ -69,7 +70,7 @@ export function FinishForm({
       return false;
     }
     try {
-      const r = await saveFactAction({ key: q.key, value });
+      const r = await saveFactAction({ key: q.key, value, setId });
       if (!r.ok) {
         setMessage(r.message);
         return false;
@@ -138,34 +139,64 @@ export function FinishForm({
       </p>
     );
 
-  const field = (q: FactQuestion, autoFocus = false) => (
-    <div key={q.key} className="mt-5" data-testid={`fact-${q.key}`}>
-      <label htmlFor={`fact-${q.key}`} className="block text-lg font-medium">
-        {q.question}
-      </label>
-      <p
-        id={`fact-${q.key}-help`}
-        className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-      >
-        {q.example}
-      </p>
-      <input
-        id={`fact-${q.key}`}
-        name={q.key}
-        type="text"
-        inputMode={q.kind === "date" ? "text" : "text"}
-        autoComplete={
-          q.key === "name" ? "name" : q.key === "phone-or-email" ? "tel" : "off"
-        }
-        autoFocus={autoFocus}
-        maxLength={200}
-        value={answers[q.key] ?? ""}
-        aria-describedby={`fact-${q.key}-help`}
-        onChange={(e) => setAnswers((a) => ({ ...a, [q.key]: e.target.value }))}
-        className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
-      />
-    </div>
-  );
+  const field = (q: FactQuestion, autoFocus = false) => {
+    // CLAUDE.md 4.5 (retro review of REQ-015, finding 23): the detector runs
+    // on every free-text field that could receive participant details; it
+    // warns under the field and never blocks the answer.
+    const warnings = detectParticipantData(answers[q.key] ?? "");
+    const warnId = `fact-${q.key}-participant-warning`;
+    return (
+      <div key={q.key} className="mt-5" data-testid={`fact-${q.key}`}>
+        <label htmlFor={`fact-${q.key}`} className="block text-lg font-medium">
+          {q.question}
+        </label>
+        <p
+          id={`fact-${q.key}-help`}
+          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        >
+          {q.example}
+        </p>
+        <input
+          id={`fact-${q.key}`}
+          name={q.key}
+          type="text"
+          inputMode={q.kind === "date" ? "text" : "text"}
+          autoComplete={
+            q.key === "name"
+              ? "name"
+              : q.key === "phone-or-email"
+                ? "tel"
+                : "off"
+          }
+          autoFocus={autoFocus}
+          maxLength={200}
+          value={answers[q.key] ?? ""}
+          aria-describedby={[
+            `fact-${q.key}-help`,
+            warnings.length ? warnId : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          onChange={(e) =>
+            setAnswers((a) => ({ ...a, [q.key]: e.target.value }))
+          }
+          className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
+        />
+        {warnings.length ? (
+          <ul
+            id={warnId}
+            role="status"
+            className="mt-1 space-y-1 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+            data-testid={warnId}
+          >
+            {warnings.map((w) => (
+              <li key={w.kind}>{w.message}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    );
+  };
 
   if (wide) {
     const topics = [...new Set(questions.map((q) => q.topic))];

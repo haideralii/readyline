@@ -38,7 +38,8 @@ export const HOME_COPY = {
   trust: [
     {
       title: "Sourced to the Commission",
-      text: "Every module, standard and audit rule comes from the NDIS Quality and Safeguards Commission's published Practice Standards and registration pages, with a link to the source on your result.",
+      // Retro review of REQ-013 (finding 9): the dataset also rests on the Rules on legislation.gov.au, and the provider reviews every document; say that, not "every rule".
+      text: "The Practice Standards and the registration rules come from the NDIS Quality and Safeguards Commission's published pages and the Rules on legislation.gov.au, each with its date and a link on your result. You review every document before you use it.",
     },
     {
       title: "Hosted in Australia",

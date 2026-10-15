@@ -94,7 +94,8 @@ export default async function AuditDayPage() {
       </h1>
       <p className="mt-3 leading-7" data-testid="audit-day-summary">
         {ctx.result.pathway === "verification"
-          ? "The auditor reads your documents at their desk and may phone you with questions. "
+          ? // Retro review of REQ-017 (finding 64): the Commission describes a desktop review; the follow-up questions are sector practice, said as such.
+            "The auditor reads your documents at their desk, and auditors often come back to you with questions. "
           : "The auditor visits, reads your documents, and talks to you, your workers and some participants. "}
         You have {have} of {shown.total} things ready. Print this page and keep
         it with your pack.
@@ -197,10 +198,12 @@ export default async function AuditDayPage() {
           What the auditor will ask to see
         </h2>
         <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-          Policies are one third of an audit. The rest is records: a register
-          with every field filled and a review date on every row. A record
-          marked &quot;{KEPT_ON_PAPER}&quot; is a signed or issued document you
-          keep in your folder; the register holds its dates.
+          {/* Retro review of REQ-017 (finding 65): sector practice from the auditor webinars, not a Commission proportion. */}
+          Auditors in sector webinars say policies are only part of an audit.
+          The rest is records: a register with every field filled and a review
+          date on every row. A record marked &quot;{KEPT_ON_PAPER}&quot; is a
+          signed or issued document you keep in your folder; the register holds
+          its dates.
         </p>
         {/* Batch 45 (REQ-018-gated item): the twelve in their two tiers, the paper records marked. */}
         {(["named", "practice"] as const).map((tier) => (
