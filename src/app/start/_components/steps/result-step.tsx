@@ -1,4 +1,5 @@
 "use client";
+import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -55,7 +56,12 @@ type Fetch = {
   failed: boolean;
 };
 
-export function ResultStep() {
+export function ResultStep({
+  subscriptionOffered = true,
+}: {
+  /** Batch 47 item 1: the server page passes `subscriptionAvailable()`; off, the page says the one off-state sentence. */
+  subscriptionOffered?: boolean;
+}) {
   const { answers, clearDraft, mode, contactEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
@@ -122,6 +128,7 @@ export function ResultStep() {
 
   return (
     <ResultView
+      subscriptionOffered={subscriptionOffered}
       result={response.result}
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
@@ -271,7 +278,9 @@ function ResultView({
   signedIn,
   contactEmail,
   onStartAgain,
+  subscriptionOffered,
 }: {
+  subscriptionOffered: boolean;
   result: QuestionnaireResult;
   checklistTotal: number;
   signedIn: boolean;
@@ -387,17 +396,27 @@ function ResultView({
           >
             <div>
               <dt className="font-semibold">What keeps you audit-ready</dt>
-              <dd className="text-zinc-700 dark:text-zinc-300">
-                The registers and reminders, a monthly subscription with the
-                evidence already in place at renewal.{" "}
-                <Link
-                  href="/pricing#keeps"
-                  className="underline underline-offset-2"
+              {subscriptionOffered ? (
+                <dd className="text-zinc-700 dark:text-zinc-300">
+                  The registers and reminders, a monthly subscription with the
+                  evidence already in place at renewal.{" "}
+                  <Link
+                    href="/pricing#keeps"
+                    className="underline underline-offset-2"
+                  >
+                    The subscription
+                  </Link>
+                  .
+                </dd>
+              ) : (
+                <dd
+                  className="text-zinc-700 dark:text-zinc-300"
+                  data-testid="result-subscription-off"
                 >
-                  The subscription
-                </Link>
-                .
-              </dd>
+                  The registers and reminders, with the evidence already in
+                  place at renewal. {SUBSCRIPTION_OFF}
+                </dd>
+              )}
             </div>
             <div>
               <dt className="font-semibold">Where you start</dt>
@@ -606,8 +625,10 @@ function ResultView({
           What happens next
         </h2>
         <p className="mt-2 text-sm leading-6">
-          {BRAND} drafts these documents as a one-off pack; the registers follow
-          as a subscription.{" "}
+          {BRAND} drafts these documents as a one-off pack
+          {subscriptionOffered
+            ? "; the registers follow as a subscription."
+            : `. ${SUBSCRIPTION_OFF}`}{" "}
           <Link href="/documents" className="underline underline-offset-2">
             Go to your documents
           </Link>{" "}

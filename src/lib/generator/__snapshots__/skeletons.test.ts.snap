@@ -867,7 +867,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -1572,7 +1571,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -1694,7 +1692,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -2240,7 +2237,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -2682,7 +2678,6 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -4115,7 +4110,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -4820,7 +4814,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -4942,7 +4935,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -5488,7 +5480,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -6033,7 +6024,6 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -7204,7 +7194,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -7909,7 +7898,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",
@@ -8031,7 +8019,6 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
-          "callout",
         ],
         "heading": "Easy Read version",
         "id": "easy-read",

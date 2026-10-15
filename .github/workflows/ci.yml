@@ -75,6 +75,12 @@ jobs:
         env:
           CI: "true"
 
+      - name: The public pages with the subscription off (batch 47 item 1; no Stripe at all)
+        run: npx playwright test e2e/subscription-off.spec.ts --project=desktop-chromium
+        env:
+          CI: "true"
+          STRIPE_FAKE: "0"
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
