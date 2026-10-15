@@ -98,7 +98,16 @@ Written with the draft, 14 Oct 2026, so the PO can accept or change the approach
 
 ## Delivery evidence
 
-Not started.
+**Session A (Dev, 15 Oct 2026)** on `req-020-audit-pack` ca89788, PR to `next` (body: `product/evidence/req-020/pr-body-session-a.md`).
+
+- AC mapping: AC-1 → `e2e/signed-in/audit-pack.spec.ts` (the owner's download from the audit-day page, the file names in the zip, the sixth download in an hour refused, the `audit_pack.downloaded` lines) and `src/lib/registers/audit-pack.test.ts` (columns, dates, states, names, the cover sheet rendered and paginated); the summary PDF and the adopted documents join the zip when a ready set exists (the guided-path spec's account has one; this spec's account has none, so the pack holds the registers, the document control register and the cover sheet). AC-2 → the same e2e (a fresh signed-out context opens the link: banner, records table, codes only, no email, user id or account id in the HTML, `noindex`; the pack through the link; 404 after revocation; the four `auditor_link.*` lines) and `tests/integration/auditor-links-rls.test.ts` (RLS, the hash CHECK, the lookup function's answers and its grant). SR-1 → `src/lib/registers/auditor-link.test.ts` (token shape, hash, constant-time compare, liveness) and `e2e/admin.spec.ts` (an unknown token is a plain 404). SR-2 → the integration suite. SR-4 → the export limit shared by the pack and the link's pack (e2e), the audit lines (e2e). FR-3 → by construction and the copy: nothing names an auditor, nothing is sent.
+- `npm run check`: green (121 files, 866 tests, 6 skipped); 12 new unit tests.
+- CI: the pull request's run once it is opened (public job: the 404s; Supabase job: the integration suite and the signed-in e2e on three projects).
+- Local public gate against a production build (desktop and Android): `admin` and `legal-pages` specs, 16 passed, 2 skipped.
+- Screenshots: saved by the spec under `product/evidence/req-020/` when `EVIDENCE=1` (CI's Supabase job uploads them as `signed-in-screenshots`).
+- ASVS: rows added to `product/security/asvs-l1-check-2026-10-14.md`.
+- Accessibility: the page uses headings, one `DataTable` per register (the batch 36 component with its cards and focusable region) and the site's buttons; the signed-in accessibility pass does not cover the signed-out auditor page; a manual keyboard pass is owed with the PO's phone check.
+- UNVERIFIED or deferred: none; D-2214 records the hybrid of the accepted design (the lookup is the `security definer` function; the register reads use the admin client scoped to the account it returned).
 
 ## PO review
 
