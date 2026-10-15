@@ -37,14 +37,18 @@ export function StepShell({
     headingRef.current?.focus();
   }, [step, ready]);
 
+  // Phone top padding is 24 px and the "Start again" row carries no margin of
+  // its own (the link's 44 px height is the gap): the result card's one button
+  // has to end inside a 681 px iPhone screen (REQ-015 FR-4), and the stepper's
+  // second row had pushed it 13 px past it (run 38772962718).
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-12">
       {/* Batch 48 item 2: one stepper on every step; a done step is the way back to it. */}
       <Stepper step={step} answers={answers} ready={ready} />
       {step === "result" ? (
         // Batch 48 item 2: "Start again" clears the draft after a one-screen confirm (REQ-015 FR-15);
         // changing one answer is tapping that step above.
-        <div className="mt-2 text-sm">
+        <div className="text-sm">
           <ConfirmButton
             label="Start again"
             question="Clear your answers and start again? Your result goes with them."

@@ -90,10 +90,9 @@ export function Stepper({
                       <span className="sr-only">: done, change it</span>
                     </Link>
                   ) : state === "current" ? (
-                    <span
-                      aria-current="step"
-                      className="inline-flex min-h-11 items-center font-semibold"
-                    >
+                    // One current step per navigation: the circle below carries
+                    // aria-current; this item says "current" in words.
+                    <span className="inline-flex min-h-11 items-center font-semibold">
                       {text}
                       <span className="sr-only">: current</span>
                     </span>

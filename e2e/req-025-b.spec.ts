@@ -116,7 +116,10 @@ test.describe("REQ-025 Session B: one stepper", () => {
       await expect(
         list.getByRole("link", { name: /1\. Business/ }),
       ).toHaveAttribute("href", "/start/business");
-      await expect(list.locator("[aria-current='step']")).toContainText(
+      // One current step per navigation: the circle carries aria-current; the
+      // list marks its current item by state and the sr-only ": current".
+      await expect(list.locator("[aria-current='step']")).toHaveCount(0);
+      await expect(list.locator("[data-state='current']")).toContainText(
         "2. Supports",
       );
       await expect(list.locator("> li").nth(5)).toHaveAttribute(
