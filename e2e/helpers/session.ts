@@ -8,6 +8,7 @@
  */
 import type { BrowserContext } from "@playwright/test";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { execFileSync } from "node:child_process";
 import { createHmac, randomUUID } from "node:crypto";
 
 export type TestTenant = {
@@ -167,6 +168,40 @@ export function totpCode(secretBase32: string, now = Date.now()): string {
 }
 
 /**
+ * Raises or lowers `platform_admin` the way an operator would (REQ-004's
+ * trigger refuses the change from any API call that carries a JWT, the
+ * secret key included; run 38672915816): one SQL statement through `psql`
+ * against the CI stack's database, whose URL the Supabase job exports as
+ * SUPABASE_DB_URL. The user id is checked to be a UUID before it is placed
+ * in the statement. Never run against the hosted project.
+ */
+export function setPlatformAdmin(userId: string, on: boolean): void {
+  const dbUrl = process.env.SUPABASE_DB_URL?.trim();
+  if (!dbUrl)
+    throw new Error(
+      "SUPABASE_DB_URL is not set; the admin e2e raises its admin through SQL on the local stack",
+    );
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      userId,
+    )
+  )
+    throw new Error("not a user id");
+  execFileSync(
+    "psql",
+    [
+      dbUrl,
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-q",
+      "-c",
+      `update public.users set platform_admin = ${on ? "true" : "false"} where id = '${userId}'`,
+    ],
+    { stdio: ["ignore", "ignore", "pipe"] },
+  );
+}
+
+/**
  * A platform admin with a verified authenticator and an aal2 session
  * (REQ-022 Session A, D-2210): the admin key grants `platform_admin` on
  * the throwaway user, the user enrols TOTP through the auth API, and the
@@ -180,11 +215,7 @@ export async function createAdminTenant(label: string): Promise<TestTenant> {
     answers: {},
     withAccount: false,
   });
-  const grant = await t.admin
-    .from("users")
-    .update({ platform_admin: true })
-    .eq("id", t.userId);
-  if (grant.error) throw grant.error;
+  setPlatformAdmin(t.userId, true);
   const { url, publishableKey } = env();
   const client = createClient(url, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false },
