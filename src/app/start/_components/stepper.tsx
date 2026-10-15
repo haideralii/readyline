@@ -56,19 +56,24 @@ export function Stepper({
   return (
     <nav aria-label="Questionnaire steps" data-testid="stepper">
       {/* FR-6: line one is the indicator everyone reads; FR-8: the names on a phone sit behind one control beside it. */}
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+      {/* The row is the list's containing block: the open list spans the row's
+          width, so it never hangs off the screen when the control wraps onto
+          its own line at a large text size (the iphone project at 130 %, run
+          38766171500; anchored to the control's right edge it sat 173 px off
+          the left edge). */}
+      <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <p
           className="text-slate text-sm font-medium"
           data-testid="progress-line-label"
         >
           Step {index + 1} of {total}: {STEP_SHORT[step]}
         </p>
-        <details className="relative sm:hidden" data-testid="stepper-steps">
+        <details className="sm:hidden" data-testid="stepper-steps">
           <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
             Show steps
           </summary>
           <ol
-            className="absolute right-0 z-10 mt-1 w-56 rounded-md border border-zinc-300 bg-white p-2 text-sm shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="absolute inset-x-0 z-10 mt-1 rounded-md border border-zinc-300 bg-white p-2 text-sm shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
             data-testid="stepper-steps-list"
           >
             {STEP_IDS.map((id, i) => {
@@ -85,10 +90,9 @@ export function Stepper({
                       <span className="sr-only">: done, change it</span>
                     </Link>
                   ) : state === "current" ? (
-                    <span
-                      aria-current="step"
-                      className="inline-flex min-h-11 items-center font-semibold"
-                    >
+                    // One current step per navigation: the circle below carries
+                    // aria-current; this item says "current" in words.
+                    <span className="inline-flex min-h-11 items-center font-semibold">
                       {text}
                       <span className="sr-only">: current</span>
                     </span>

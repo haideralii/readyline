@@ -8,6 +8,7 @@
  * the variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
@@ -312,6 +313,38 @@ describe.skipIf(!enabled)(
         .select("id")
         .single();
       expect(imp.error).toBeNull();
+      // D-2241: the grant itself, read from the catalogue, so a stack whose
+      // default privileges reach the table fails here, at the grant, rather
+      // than at an update that happened to succeed (run 38779174050).
+      // `column_privileges` expands a table-level grant to every column, so
+      // one column means one column.
+      const dbUrl = process.env.SUPABASE_DB_URL?.trim();
+      if (dbUrl) {
+        const sql = (text: string) =>
+          execFileSync(
+            "psql",
+            [dbUrl, "-v", "ON_ERROR_STOP=1", "-At", "-c", text],
+            { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+          )
+            .split("\n")
+            .filter(Boolean);
+        expect(
+          sql(
+            "select column_name from information_schema.column_privileges where grantee = 'authenticated' and table_schema = 'public' and table_name = 'imports' and privilege_type = 'UPDATE' order by 1",
+          ),
+          "authenticated may update one column of imports",
+        ).toEqual(["undone_at"]);
+        expect(
+          sql(
+            "select privilege_type from information_schema.role_table_grants where grantee = 'authenticated' and table_schema = 'public' and table_name = 'imports' order by 1",
+          ),
+          "authenticated holds no table-level update on imports",
+        ).toEqual(["INSERT", "SELECT"]);
+      } else {
+        // CI's Supabase job exports the URL before this suite; a missing one
+        // there would skip the grant check silently, so it fails instead.
+        expect(process.env.CI, "SUPABASE_DB_URL is not set").toBeFalsy();
+      }
       const counts = await a.client
         .from("imports")
         .update({ rows_imported: 0 })
