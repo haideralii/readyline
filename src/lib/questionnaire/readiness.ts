@@ -34,5 +34,9 @@ export function readinessSentence(c: ReadinessCounts): string {
     c.registers === 1
       ? "the 1 register you keep as you go"
       : `the ${c.registers} registers you keep as you go`;
-  return `You already have ${c.have} of these. ${BRAND} drafts the ${c.documents} documents for you; ${registers}.`;
+  if (c.have === 0)
+    return `You already have ${c.have} of these. ${BRAND} drafts the ${c.documents} documents for you; ${registers}.`;
+  // Batch 48 item 1 (D-2214): "already have" pre-ticks the checklist; the pack still drafts every document.
+  const todo = readyLineCounts(c).todo;
+  return `You told us you already have ${c.have} of these; the pack still drafts all ${c.documents} so they match each other, and your checklist shows the ${todo} still to prepare.`;
 }
