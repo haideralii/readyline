@@ -37,14 +37,18 @@ export async function GET(
     Object.fromEntries(url.searchParams.entries()),
   );
   if (!query.ok) return new NextResponse("Not found", { status: 404 });
+  const { setId } = await ctx.params;
   const viewer = await getViewer();
+  // Batch 48 item 3: a signed-out download comes back to the document's page after sign-in, never to the file.
   if (!viewer)
     return NextResponse.redirect(
-      new URL("/sign-in?next=%2Fdocuments", url.origin),
+      new URL(
+        `/sign-in?next=${encodeURIComponent(`/documents/${setId}`)}`,
+        url.origin,
+      ),
     );
   if (!viewer.account) return new NextResponse("Not found", { status: 404 });
 
-  const { setId } = await ctx.params;
   const supabase = await createSupabaseServerClient();
   const set = await getVersionSet(supabase, setId);
   if (!set || set.account_id !== viewer.account.id)

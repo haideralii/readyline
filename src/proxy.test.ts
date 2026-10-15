@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { buildCsp, isPurchaseRoute, supabaseOriginFromEnv } from "./proxy";
+import {
+  buildCsp,
+  isPurchaseRoute,
+  supabaseOriginFromEnv,
+  needsSessionRedirect,
+} from "./proxy";
 
 const ORIGINAL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -72,5 +77,45 @@ describe("supabaseOriginFromEnv", () => {
     expect(supabaseOriginFromEnv()).toBeNull();
     process.env.NEXT_PUBLIC_SUPABASE_URL = "not a url";
     expect(supabaseOriginFromEnv()).toBeNull();
+  });
+});
+
+describe("needsSessionRedirect (batch 47 item 7)", () => {
+  it("sends a visitor without a Supabase session cookie to sign-in for the documents and checklist routes only", () => {
+    expect(needsSessionRedirect("/documents", [])).toBe(
+      "/sign-in?next=%2Fdocuments",
+    );
+    expect(needsSessionRedirect("/documents/abc/finish", ["other"])).toBe(
+      "/sign-in?next=%2Fdocuments%2Fabc%2Ffinish",
+    );
+    expect(needsSessionRedirect("/checklist", [])).toBe(
+      "/sign-in?next=%2Fchecklist",
+    );
+    expect(needsSessionRedirect("/documentsx", [])).toBeNull();
+    expect(needsSessionRedirect("/pricing", [])).toBeNull();
+    expect(needsSessionRedirect("/", [])).toBeNull();
+  });
+
+  it("lets a request with a session cookie through, chunked or not, and leaves the page to verify it", () => {
+    expect(
+      needsSessionRedirect("/documents", ["sb-abc-auth-token"]),
+    ).toBeNull();
+    expect(
+      needsSessionRedirect("/checklist", [
+        "sb-abc-auth-token.0",
+        "sb-abc-auth-token.1",
+      ]),
+    ).toBeNull();
+    expect(needsSessionRedirect("/documents", ["sb-abc-code-verifier"])).toBe(
+      "/sign-in?next=%2Fdocuments",
+    );
+  });
+
+  it("leaves a download route to its own handler, which refuses a bad file name before any redirect (batch 48 item 3)", () => {
+    expect(needsSessionRedirect("/documents/abc/download", [])).toBeNull();
+    expect(needsSessionRedirect("/documents/abc/download/more", [])).toBeNull();
+    expect(needsSessionRedirect("/documents/abc", [])).toBe(
+      "/sign-in?next=%2Fdocuments%2Fabc",
+    );
   });
 });

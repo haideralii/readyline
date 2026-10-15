@@ -325,6 +325,44 @@ describe("reminder rules (REQ-009 FR-3)", () => {
     expect(kinds(r)).toEqual([`clearance-expiry@${addDays(TODAY, -5)}`]);
   });
 
+  describe("a report waiting for the owner (REQ-020 FR-5; PO review 14 Oct)", () => {
+    const at = (hoursAgo: number) =>
+      new Date(
+        Date.parse(`${TODAY}T20:00:00Z`) - hoursAgo * 3_600_000,
+      ).toISOString();
+    it("nudges once a day from twelve hours after the report, dated today", () => {
+      const r = dueReminders(
+        base({
+          now: `${TODAY}T20:00:00Z`,
+          reports: [
+            { id: "d1", aware_at: at(12) },
+            { id: "d2", aware_at: at(30) },
+          ],
+        }),
+      );
+      expect(kinds(r)).toEqual([
+        `report-to-confirm@${TODAY}`,
+        `report-to-confirm@${TODAY}`,
+      ]);
+      expect(r.map((x) => x.subject_id)).toEqual(["d1", "d2"]);
+      expect(r[0]).toMatchObject({ subject_table: "incidents", due_on: TODAY });
+    });
+    it("says nothing in the first twelve hours (the submission email covers them)", () => {
+      const r = dueReminders(
+        base({
+          now: `${TODAY}T20:00:00Z`,
+          reports: [{ id: "d1", aware_at: at(11.9) }],
+        }),
+      );
+      expect(r).toEqual([]);
+    });
+    it("the line names the reference and the 24 hours, nothing else (SR-4)", () => {
+      expect(reminderLine("report-to-confirm", "INC-0007", TODAY)).toBe(
+        "Report INC-0007 is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report.",
+      );
+    });
+  });
+
   it("addMonths clamps to the month's end", () => {
     expect(addMonths("2026-01-31", 1)).toBe("2026-02-28");
     expect(addMonths("2026-03-31", -1)).toBe("2026-02-28");

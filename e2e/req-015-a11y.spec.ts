@@ -283,8 +283,10 @@ test.describe("REQ-015 Section E", () => {
       "open",
       "",
     );
-    // FR-6: one "Change my answers" link; the per-step links are folded; clearing asks first.
-    await expect(page.getByTestId("change-answers")).toBeVisible();
+    // FR-6 as batch 48 item 2 reshaped it: the stepper's done steps are the way back; "Start again" asks first.
+    await expect(
+      page.getByRole("navigation", { name: "Questionnaire steps" }),
+    ).toBeVisible();
     await expect(page.getByText("Back to:")).toHaveCount(0);
     await page.getByTestId("clear-draft").click();
     await expect(page.getByTestId("clear-draft-confirm")).toContainText(

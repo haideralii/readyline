@@ -11,6 +11,15 @@ import {
   GENERAL_INFORMATION_STATEMENT,
 } from "@/lib/brand";
 
+/**
+ * Batch 47 item 1: the one sentence for the subscription's off state, used
+ * by every page that names the registers subscription (home, result,
+ * pricing, refunds, account) while STRIPE_PRICE_REGISTERS is unset. In the
+ * voice of batch 45 item 2: an environment fact, never "coming" or "soon".
+ */
+export const SUBSCRIPTION_OFF =
+  "The registers subscription is not switched on in this environment.";
+
 export const PRICING_COPY = {
   title: "Your document pack",
   intro: `One fixed price for the policies, procedures, registers and self-assessment your answers call for, as editable Word files. ${BRAND} drafts them; you review and adopt them.`,
@@ -32,7 +41,7 @@ export const PRICING_COPY = {
   aiHeading: "How the drafts are made",
   /** REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies (CLAUDE.md 4.3: no audit-proof, no compliant). */
   aiHonest:
-    "Consultants warn that AI-written policies are vague, generic and unfinished. Ours are built from your own answers. Every step names a role, a time and a record. Vague wording and leftover blanks are rejected before a document reaches you. You read and adopt each document before it counts.",
+    "Consultants warn that AI-written policies are vague, generic and unfinished. Ours are built from your own answers. Every step names a role, a time and a record. Vague wording is rejected before a document reaches you; the facts we cannot know are marked for you to complete, never left blank. You read and adopt each document before it counts.",
   aiDisclosure: AI_DISCLOSURE,
   /** Batch 45 item 10: the provider's own AI statement is an appendix to the pack's privacy policy, not a separate document (REQ-016 S-6). */
   aiAppendixLead:
@@ -42,16 +51,33 @@ export const PRICING_COPY = {
   /** Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second; no bundling, no discount. */
   keepsEyebrow: "What keeps you audit-ready",
   startEyebrow: "Where you start",
-  renewalSaves:
-    "At the mid-term audit and at renewal the registers are already the evidence, so there is nothing to rebuild from paper.",
+  /** Batch 49 item 2: the subscription card as a price line, a four-item list and the cancel line; the linking sentence lives on the registers page. */
+  subscriptionPriceLine: (price: string | null) =>
+    price
+      ? `${price} a month for the registers, with email reminders.`
+      : "A monthly subscription for the registers, with email reminders.",
+  subscriptionIncludes: [
+    "Incident register",
+    "Complaints register",
+    "Worker checks, with expiry reminders",
+    "Policy review reminders",
+  ],
+  subscriptionCancel:
+    "Cancel at any time; no notice period, no fee, no instalments, no interest.",
+  /** Batch 49 item 3: the two prices above both cards on a phone, each a link to its card. */
+  stripPack: (price: string | null) =>
+    price ? `Document pack: ${price}, once` : "Document pack: one price, once",
+  stripRegisters: (price: string | null) =>
+    price
+      ? `Registers: ${price} a month, cancel any time`
+      : "Registers: monthly, cancel any time",
   separateLine:
     "The two are separate: the pack is paid once and the subscription is monthly; neither includes the other, and there is no discount for taking both.",
   subscriptionHeading: "Audit-ready subscription",
-  subscriptionComing:
-    "Coming after the document pack: the incident and complaints registers, the worker screening expiry tracker, policy review reminders and the mid-term audit countdown, as a monthly subscription you can cancel at any time. No instalments, no interest, no late fees.",
-  /** REQ-018 FR-12: what the registers do that a spreadsheet does not. */
-  registersLinked:
-    "The registers are linked: an incident becomes an improvement row, a worker check becomes a staff matrix row, and the reminders go out by email, which a spreadsheet does not do.",
+  /** Batch 47 item 1: the one sentence every page uses while STRIPE_PRICE_REGISTERS is unset; never "coming" or "soon". */
+  subscriptionOff: SUBSCRIPTION_OFF,
+  /** CLAUDE.md 5: said under the subscription in both states, since it holds whether or not it can be bought today. */
+  noCredit: "No instalments, no interest, no late fees.",
   buy: "Buy the document pack",
   signInToBuy: "Sign in to buy",
   signInNote:
@@ -67,6 +93,8 @@ export function pricingStrings(): string[] {
   const out: string[] = [];
   for (const value of Object.values(PRICING_COPY)) {
     if (typeof value === "string") out.push(value);
+    else if (typeof value === "function")
+      out.push(value("AUD 399"), value(null));
     else out.push(...value);
   }
   return out;

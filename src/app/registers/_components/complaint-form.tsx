@@ -45,9 +45,12 @@ function today() {
 export function ComplaintFormView({
   id,
   initial,
+  afterSave,
 }: {
   id?: string;
   initial?: ComplaintFormValues;
+  /** REQ-020 FR-4: where a worker lands after saving (the owner lands on the row). */
+  afterSave?: string;
 }) {
   const router = useRouter();
   const [v, setV] = useState<ComplaintFormValues>(
@@ -87,7 +90,7 @@ export function ComplaintFormView({
         setErrors({ ...(r.fieldErrors ?? {}), form: [r.message] });
         return;
       }
-      router.push(`/registers/complaints/${r.id}?saved=1`);
+      router.push(afterSave ?? `/registers/complaints/${r.id}?saved=1`);
     } finally {
       setPending(false);
     }
