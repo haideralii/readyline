@@ -75,4 +75,11 @@ Done 15 Oct 2026: `product/qa/req-reviews/2026-10-15-req-025-026.md` (independen
 
 ## Delivery evidence
 
-Not started.
+**Delivered (Dev, 15 Oct 2026)** on `req-026-start-here` dfec69d (cut from `next` with `req-025-session-a` merged in for the glossary; PR to `next` after Session A's; body: `product/evidence/req-026/pr-body.md`).
+
+- AC mapping: AC-1 → `src/lib/generator/start-here.test.ts` (every document in `set-order.ts`'s order, numbered; the "Fill in" lines equal `formBlanks` over the shipped version, counted the same way; the privacy policy's three; the signature and account-fact blanks in neither bucket; the content file) and `src/server/generation/job.test.ts` (`00-start-here.docx` first in the zip, the README line); AC-2 → the unit test (two of the privacy policy's three blanks filled through `applyFacts` leave one open line and the counts move; a finished pack reads all done) and `e2e/signed-in/guided-path.spec.ts` on desktop and Android (the sheet before Finish with open lines and the privacy policy's three, after Finish with every line done, after adopt with every Adopt line done, the Word download); AC-3 → waits for REQ-025 Session C (decision 34); AC-4 → the unit test over every line of every reference case (20 words, claim-free, lint-clean, every glossary term's meaning present).
+- `npm run check`: green (122 files, 876 tests, 6 skipped); 5 new unit tests.
+- Local gate: the public `documents`, `home` and `not-found` specs on desktop 5 passed (the new route redirects signed out like the rest of `/documents`); the signed-in e2e runs in the PR's Supabase job.
+- Evidence: `product/evidence/req-026/00-start-here.docx` and `start-here-sole-trader.txt` (the sole-trader reference case's sheet), committed.
+- Accessibility: the page is headings and lists with a visible box or tick and a screen-reader "Done:" / "To do:" prefix on every line; the guided-path e2e runs the width check and the keyboard pass on it.
+- UNVERIFIED or deferred: FR-6 (REQ-025 Session C); "Check my systems" in section 5 until REQ-020 Session C; the minutes and reasons are a Dev draft (status draft) for the PO's words (D-2234).
