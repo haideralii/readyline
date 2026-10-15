@@ -7,6 +7,7 @@
  * regenerate it or turn it off. Every step writes its audit line; tokens
  * are stored hashed and never logged.
  */
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import {
@@ -106,6 +107,10 @@ export async function inviteWorkerAction(
     action: "invitation.created",
     target: `${ins.data.id as string} ${parsed.data.workerRef}`,
   });
+  // The account page is a server component: revalidate it so the team panel
+  // shows the change at once (run 38741556381, PR #62; the same class of
+  // fault as #61's link panel).
+  revalidatePath("/account");
   return { ok: true, url };
 }
 
@@ -135,6 +140,7 @@ export async function revokeInvitationAction(
     action: "invitation.revoked",
     target: parsed.data.id,
   });
+  revalidatePath("/account");
   return { ok: true, message: "Invitation revoked." };
 }
 
@@ -163,6 +169,7 @@ export async function removeWorkerAction(
     action: "worker.removed",
     target: parsed.data.userId,
   });
+  revalidatePath("/account");
   return {
     ok: true,
     message: "Worker removed. What they logged stays in the register.",
@@ -211,6 +218,7 @@ export async function createReportLinkAction(
     action: current ? "report_link.regenerated" : "report_link.created",
     target: ins.data.id as string,
   });
+  revalidatePath("/account");
   return { ok: true, url: `${siteUrl()}${reportPath(token)}` };
 }
 
@@ -236,5 +244,6 @@ export async function revokeReportLinkAction(
     action: "report_link.revoked",
     target: parsed.data.id,
   });
+  revalidatePath("/account");
   return { ok: true, message: "The report link is off." };
 }
