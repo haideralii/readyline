@@ -14,4 +14,10 @@ The customer is a support worker on a phone, often tired, who needs the answer a
 - **One primary action per screen**, named by what it does: "See which audit I need", "Open your checklist".
 - **Feedback in words.** A tap shows its result in words within a moment: "Saved", "Not saved, try again", "Loading". Colour and icons support the words, never replace them.
 
+## The incident form's three dates (Dev, 15 Oct 2026; retro review of REQ-018 to 021, finding 23)
+
+- **Date it happened.** The event.
+- **Date you became aware.** Help: "The day you or a worker first knew about it; usually the day it happened. The Commission's notification time runs from this day." It follows the date it happened until the owner changes it, so a back-filled incident never runs its clock from the typing day. Errors: "Cannot be before the date it happened", "Cannot be after the date it was reported", "Cannot be after today".
+- **Date it was reported.** When it reached the register.
+
 The lint in `tests/copy-lint.test.ts` enforces the hard limits (60-word paragraph, 35-word sentence, banned words, internal paths) over every page, copy module and content file the customer sees, and the 45-word paragraph on the result page, the pricing page and the guides. The phone width every rule and test uses is 360 px.

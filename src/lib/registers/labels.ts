@@ -104,6 +104,7 @@ export const CLEARANCE_LABELS: Record<
 export function fromIncidentRow(row: IncidentRow): IncidentFormValues {
   return {
     occurredOn: row.occurred_on,
+    awareOn: row.aware_on,
     reportedOn: row.reported_on,
     category: row.category,
     severity: row.severity,

@@ -290,6 +290,42 @@ describe.skipIf(!enabled)(
       expect(forged.error).not.toBeNull();
     });
 
+    it("retro findings 32 and 33: an NDIS number inside the self-check answers is refused, and the import row's update grant covers undone_at alone", async () => {
+      const ndis = await a.client.from("self_checks").insert({
+        account_id: a.accountId,
+        walked_on: day(0),
+        walked_by_ref: "owner",
+        findings: 0,
+        answers: {
+          incidents: { answer: "no", note: "Participant 430123456 fell." },
+        },
+      });
+      expect(ndis.error?.code).toBe("23514");
+      const imp = await a.client
+        .from("imports")
+        .insert({
+          account_id: a.accountId,
+          register: "complaints",
+          rows_total: 1,
+          rows_imported: 1,
+        })
+        .select("id")
+        .single();
+      expect(imp.error).toBeNull();
+      const counts = await a.client
+        .from("imports")
+        .update({ rows_imported: 0 })
+        .eq("id", imp.data!.id)
+        .select("id");
+      expect(counts.error?.code).toBe("42501");
+      const mark = await a.client
+        .from("imports")
+        .update({ undone_at: new Date().toISOString() })
+        .eq("id", imp.data!.id)
+        .select("id");
+      expect(mark.error).toBeNull();
+      expect(mark.data?.length).toBe(1);
+    });
     it("FR-9: a self-check row is inserted with the answers, never updated (42501), read by its tenant alone; a finding is an improvement row with the self-check source", async () => {
       const walk = await a.client
         .from("self_checks")
