@@ -190,6 +190,12 @@ export const Rules = z.object({
     sourceId: slug,
   }),
   registrationPeriodYears: z.number().int().positive(),
+  /**
+   * The Commission's page says providers are "generally registered for three
+   * years" (retro review of REQ-001, 15 Oct 2026, fix 5): the number above is
+   * the usual period, and this note keeps the Commission's qualifier beside it.
+   */
+  registrationPeriodNote: z.string().min(1),
   registrationPeriodSourceId: slug,
   midTermAudit: MidTermAuditRule,
   /**

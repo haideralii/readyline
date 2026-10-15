@@ -4,7 +4,8 @@
  *
  * Inputs:
  *   data/sources/*.txt          verbatim text snapshots of Commission pages and PDFs
- *   data/standards.meta.json    hand-maintained: sources, modules, groups, rules, evidence
+ *   data/standards.meta.json    hand-maintained: sources, modules, groups, rules, evidence,
+ *                               derivation-level UNVERIFIED items (derivationUnverified)
  *
  * The outcome and indicator text is parsed from the snapshots, never retyped,
  * so the dataset can be diffed against what the Commission published.
@@ -338,6 +339,14 @@ function renderSourcesMd(data, meta) {
   ]
     .filter(([, , v]) => v.status === "unverified")
     .map(([kind, id, v]) => `- ${kind} \`${id}\`: ${v.note}`);
+  // Derivation-level items (REQ-001 AC-7; retro review 15 Oct 2026, fix 1):
+  // rules that deriveApplicability tags `unverified`, registered in
+  // DECISIONS.md by decision number, come from meta.derivationUnverified.
+  for (const d of meta.derivationUnverified ?? []) {
+    unverified.push(
+      `- derivation rule \`${d.rule}\` (${d.decision}): ${d.note}`,
+    );
+  }
   const changelog = meta.changelog
     .map((c) => `- **${c.version}** (${c.date}): ${c.note}`)
     .join("\n");

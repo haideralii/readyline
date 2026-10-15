@@ -26,8 +26,17 @@ const TOKEN_PATTERNS: RegExp[] = [
 const SENSITIVE_KEY =
   /(password|passwd|secret|token|api[-_]?key|authorization|cookie|session|credential|private[-_]?key|signature)/i;
 
+/**
+ * Exact names, plus the questionnaire's `servicesNote`, the account's
+ * `tradingName`, the owner's `name` and the path's `how` answer, plus any key
+ * that ends in note, notes, description, comment(s), message or narrative
+ * (`incidentNotes`, `errorMessage`), so a logged `supports` or `business`
+ * object cannot carry free text (retro review of REQ-002, 15 Oct 2026,
+ * fix 16). Keys that merely contain "text" or "name" (`context`, `hostname`,
+ * `fileName`) are left alone on purpose.
+ */
 const FREE_TEXT_KEY =
-  /^(note|notes|description|details?|comments?|message|body|text|free_?text|narrative|summary|reason|answer|answers|content|html|markdown|prompt|completion)$/i;
+  /^(note|notes|description|details?|comments?|message|body|text|free_?text|narrative|summary|reason|answer|answers|content|html|markdown|prompt|completion|servicesNote|tradingName|name|how)$|(?:notes?|description|comments?|message|narrative)$/i;
 
 export const REDACTED = "[redacted]";
 export const OMITTED = "[free-text omitted]";

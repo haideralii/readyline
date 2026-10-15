@@ -11,13 +11,17 @@ before public disclosure. No bug bounty is offered at this stage.
 
 ## Where data lives
 
-- Application compute: Vercel, Sydney region, once deployed.
-- Database, authentication and file storage: Supabase project in the
-  Sydney region (`ap-southeast-2`), once provisioned (Phase 2).
-- Data never leaves Australia except that questionnaire answers about the
-  provider's business are sent to the Anthropic API to draft documents
-  (Phase 3). Register text and anything that could describe a participant is
-  never sent to any model.
+- Application compute: Vercel. The app is deployed there; the functions
+  region is a Vercel project setting, not pinned in this repository (D-008
+  asks for Sydney, `syd1`, and whether the plan allows it is still
+  unverified).
+- Database, authentication and file storage: the Supabase project in the
+  Sydney region (`ap-southeast-2`). Migrations reach it only through
+  `.github/workflows/migrate.yml`.
+- Stored data stays in Australia. The one outbound path is drafting:
+  questionnaire answers about the provider's business are sent to the
+  Anthropic API to draft documents. Register text and anything that could
+  describe a participant is never sent to any model.
 - The product holds provider business data only. It is designed so that NDIS
   participants' personal, health or disability information is never collected;
   every free-text field warns against entering it.

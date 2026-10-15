@@ -83,6 +83,27 @@ describe("redact", () => {
     });
   });
 
+  // Retro review of REQ-002 (15 Oct 2026, fix 16): the questionnaire's and
+  // the account's own free-text keys, nested inside the objects a log line
+  // would carry them in, and the suffix rule for keys like incidentNotes.
+  it("omits servicesNote, tradingName and note-like suffixes inside nested objects", () => {
+    expect(
+      redact({
+        supports: { servicesNote: "x", groups: ["0120"] },
+        business: { tradingName: "Jane Doe Care", structure: "sole-trader" },
+        owner: { name: "Jane Doe", role: "Director" },
+        incident: { incidentNotes: "fell at 3pm", errorMessage: "boom" },
+        context: { hostname: "app", fileName: "a.docx", accountId: "a1" },
+      }),
+    ).toEqual({
+      supports: { servicesNote: OMITTED, groups: ["0120"] },
+      business: { tradingName: OMITTED, structure: "sole-trader" },
+      owner: { name: OMITTED, role: "Director" },
+      incident: { incidentNotes: OMITTED, errorMessage: OMITTED },
+      context: { hostname: "app", fileName: "a.docx", accountId: "a1" },
+    });
+  });
+
   it("masks emails and tokens inside nested values and arrays", () => {
     expect(
       redact({

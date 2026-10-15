@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "version": "1.2.0",
-  "generatedAt": "2026-10-14",
+  "version": "1.2.1",
+  "generatedAt": "2026-10-15",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
   "sources": [
     {
@@ -3892,7 +3892,7 @@
       "moduleIds": ["sil"],
       "requiresCore": true,
       "mandatoryFrom": "2026-07-01",
-      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports; a new SIL entrant cannot provide SIL while an application is pending (Commission explanatory document, June 2026, read 13 October 2026). Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
+      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports. Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
       "sourceIds": [
         "registration-groups",
         "mandatory-registration",
@@ -3923,6 +3923,7 @@
       "sourceId": "registration-requirements"
     },
     "registrationPeriodYears": 3,
+    "registrationPeriodNote": "The Commission's page says providers are \"generally registered for three years\" (about-registration). Three years is the usual period, not a fixed one.",
     "registrationPeriodSourceId": "about-registration",
     "midTermAudit": {
       "monthsAfterRegistration": 18,

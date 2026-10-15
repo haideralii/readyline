@@ -11,13 +11,22 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Routes with a Buy form (REQ-007 SR-5). With JavaScript off the form posts
- * and the server answers with a redirect to Stripe's hosted Checkout, which
- * `form-action` governs; nowhere else may a form leave our origin. No Stripe
- * script, frame or connection exists on any page, so nothing is added to
- * script-src, frame-src or connect-src (D-710).
+ * Every page that renders a Buy or Subscribe form (REQ-007 SR-5): `/pricing`
+ * and `/documents` (BuyButton), `/account` (SubscribeButton) and
+ * `/path/before-you-buy` (BuyButton; retro review of REQ-002, 15 Oct 2026,
+ * fix 15). With JavaScript off the form posts and the server answers with a
+ * redirect to Stripe's hosted Checkout, which `form-action` governs; nowhere
+ * else may a form leave our origin. No Stripe script, frame or connection
+ * exists on any page, so nothing is added to script-src, frame-src or
+ * connect-src (D-710). Add a page here when it gains either button;
+ * `src/proxy.test.ts` pins the list.
  */
-export const PURCHASE_ROUTES = ["/pricing", "/documents"] as const;
+export const PURCHASE_ROUTES = [
+  "/pricing",
+  "/documents",
+  "/account",
+  "/path/before-you-buy",
+] as const;
 export const CHECKOUT_ORIGIN = "https://checkout.stripe.com";
 
 export function isPurchaseRoute(pathname: string): boolean {

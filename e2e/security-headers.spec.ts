@@ -41,14 +41,31 @@ test.describe("security headers", () => {
     expect(directives["form-action"]).toEqual(["'self'"]);
     expect(directives["frame-ancestors"]).toEqual(["'none'"]);
 
-    // REQ-007 SR-5: Stripe's hosted Checkout is a form destination on the
-    // purchase routes only, and appears nowhere else in the policy.
-    const pricing = await page.request.get("/pricing");
-    const pricingCsp = pricing.headers()["content-security-policy"];
-    expect(pricingCsp).toContain(
-      "form-action 'self' https://checkout.stripe.com",
-    );
-    expect(pricingCsp.match(/stripe/g)?.length).toBe(1);
+    // REQ-007 SR-5 and the retro review of REQ-002 (15 Oct 2026, fix 15):
+    // Stripe's hosted Checkout is a form destination on every page that
+    // carries a Buy or Subscribe form (the list mirrors PURCHASE_ROUTES in
+    // src/proxy.ts) and appears nowhere else in the policy. The signed-in
+    // pages answer a visitor with a redirect; the proxy sets the header on
+    // that response too, so no session is needed to check it.
+    for (const path of [
+      "/pricing",
+      "/documents",
+      "/account",
+      "/path/before-you-buy",
+    ]) {
+      const res = await page.request.get(path, { maxRedirects: 0 });
+      const routeCsp = res.headers()["content-security-policy"];
+      expect(routeCsp, path).toContain(
+        "form-action 'self' https://checkout.stripe.com",
+      );
+      expect(routeCsp.match(/stripe/g)?.length, path).toBe(1);
+    }
+    for (const path of ["/account/deleted", "/documents/not-a-set"]) {
+      const res = await page.request.get(path, { maxRedirects: 0 });
+      expect(res.headers()["content-security-policy"], path).not.toContain(
+        "stripe",
+      );
+    }
     expect(csp).not.toContain("stripe");
 
     expect(headers["strict-transport-security"]).toBe(

@@ -166,6 +166,34 @@ describe("standards.json: registration groups (AC-1, AC-2, AC-5)", () => {
     expect(
       data.sources.some((s) => s.id === data.rules.silDefinition.sourceId),
     ).toBe(true);
+    // Retro review of REQ-001 (15 Oct 2026, fix 6): a note may cite only the
+    // snapshots in data/sources, never a document read elsewhere. The 0138
+    // note once cited a "Commission explanatory document, June 2026, read
+    // 13 October 2026" that was no source; the sentence was dropped.
+    for (const g of data.registrationGroups) {
+      if (!g.notes) continue;
+      expect(g.notes, g.code).not.toMatch(/explanatory document/i);
+      expect(g.notes, g.code).not.toMatch(/\bread \d{1,2} \w+ \d{4}\b/);
+    }
+  });
+});
+
+describe("standards.json: registration period (retro review of REQ-001, fix 5)", () => {
+  it("keeps the Commission's qualifier beside registrationPeriodYears", () => {
+    expect(data.rules.registrationPeriodYears).toBe(3);
+    expect(data.rules.registrationPeriodNote).toMatch(
+      /generally registered for three years/,
+    );
+    expect(data.rules.registrationPeriodNote).toContain(
+      data.rules.registrationPeriodSourceId,
+    );
+    // The snapshot the rule rests on says "generally", not a fixed term.
+    const source = data.sources.find(
+      (s) => s.id === data.rules.registrationPeriodSourceId,
+    )!;
+    expect(read(source.snapshotPath)).toMatch(
+      /generally registered for three years/,
+    );
   });
 });
 

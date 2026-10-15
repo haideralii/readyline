@@ -36,5 +36,11 @@ test.describe("admin and job routes", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Your account was deleted" }),
     ).toBeVisible();
+    // Retro review of REQ-004 (15 Oct 2026, fix 31a): no email leaves the
+    // app while the provider is log-only (D-013), so the page must not say
+    // one was sent or ask the customer to reply to it.
+    const body = await page.locator("body").innerText();
+    expect(body).not.toMatch(/has been sent|confirmation email|reply to/i);
+    expect(body).toMatch(/If this was a mistake/);
   });
 });

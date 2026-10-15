@@ -204,6 +204,37 @@ describe.skipIf(!enabled)(
         .select("id")
         .eq("id", a.accountId);
       expect(untouched.data?.length).toBe(1);
+
+      // Retro review of REQ-004 (15 Oct 2026, fix 40): a limiter row whose
+      // window ended more than a day ago goes with the purge; a live one
+      // stays, and a dry run only counts.
+      const staleKey = `test:stale:${randomUUID()}`;
+      const liveKey = `test:live:${randomUUID()}`;
+      const seeded = await admin.from("auth_rate_limits").insert([
+        {
+          key: staleKey,
+          window_start: new Date(Date.now() - 3 * 86_400_000).toISOString(),
+          count: 1,
+        },
+        { key: liveKey, window_start: new Date().toISOString(), count: 1 },
+      ]);
+      expect(seeded.error).toBeNull();
+      const counted = await runPurge({
+        admin,
+        email,
+        now: new Date(),
+        dryRun: true,
+      });
+      expect(counted.rateLimitRowsRemoved).toBeGreaterThanOrEqual(1);
+      const swept = await runPurge({ admin, email, now: new Date() });
+      expect(swept.errors).toEqual([]);
+      expect(swept.rateLimitRowsRemoved).toBeGreaterThanOrEqual(1);
+      const keys = await admin
+        .from("auth_rate_limits")
+        .select("key")
+        .in("key", [staleKey, liveKey]);
+      expect(keys.data?.map((r) => r.key)).toEqual([liveKey]);
+      await admin.from("auth_rate_limits").delete().eq("key", liveKey);
     });
   },
 );

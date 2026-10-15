@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { buildCsp, isPurchaseRoute, supabaseOriginFromEnv } from "./proxy";
+import {
+  PURCHASE_ROUTES,
+  buildCsp,
+  isPurchaseRoute,
+  supabaseOriginFromEnv,
+} from "./proxy";
 
 const ORIGINAL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
@@ -51,10 +56,23 @@ describe("buildCsp form-action on purchase routes (REQ-007 SR-5, D-710)", () => 
     expect(csp.match(/stripe/g)?.length).toBe(1);
   });
 
-  it("names the pricing and documents pages exactly, not their subpaths", () => {
-    expect(isPurchaseRoute("/pricing")).toBe(true);
-    expect(isPurchaseRoute("/documents")).toBe(true);
+  // Retro review of REQ-002 (15 Oct 2026, fix 15): every page that renders
+  // BuyButton or SubscribeButton, not only the pricing and documents pages.
+  it("names every page with a Buy or Subscribe form exactly, not their subpaths", () => {
+    expect([...PURCHASE_ROUTES]).toEqual([
+      "/pricing",
+      "/documents",
+      "/account",
+      "/path/before-you-buy",
+    ]);
+    for (const path of PURCHASE_ROUTES) {
+      expect(isPurchaseRoute(path), path).toBe(true);
+    }
     expect(isPurchaseRoute("/documents/abc")).toBe(false);
+    expect(isPurchaseRoute("/account/deleted")).toBe(false);
+    expect(isPurchaseRoute("/account/setup")).toBe(false);
+    expect(isPurchaseRoute("/path")).toBe(false);
+    expect(isPurchaseRoute("/path/before-you-buy/")).toBe(false);
     expect(isPurchaseRoute("/")).toBe(false);
     expect(isPurchaseRoute("/start/result")).toBe(false);
   });

@@ -16,12 +16,53 @@ import { accountPurgedEmail } from "@/server/email/templates";
 
 export const RETENTION_DAYS = 30;
 
+/**
+ * Our limiter's rows (`auth_rate_limits`, one per hashed email, IP, user or
+ * account key) never expire on their own (retro review of REQ-004, 15 Oct
+ * 2026, fix 40). The longest window in `src/server/auth/rate-limit.ts` is an
+ * hour; a row whose window ended more than a day ago is dead weight and the
+ * purge removes it. Keep the first constant in step with that file.
+ */
+export const RATE_LIMIT_MAX_WINDOW_SECONDS = 3600;
+export const RATE_LIMIT_ROW_GRACE_DAYS = 1;
+
 export type PurgeReport = {
   dryRun: boolean;
   cutoff: string;
   purged: { accountId: string; usersRemoved: number; objectsRemoved: number }[];
   errors: { accountId: string; message: string }[];
+  /** Expired `auth_rate_limits` rows removed (counted only on a dry run). */
+  rateLimitRowsRemoved: number;
 };
+
+/** Removes limiter rows whose window ended more than a day ago; returns how many. */
+export async function purgeExpiredRateLimits(input: {
+  admin: SupabaseClient;
+  now?: Date;
+  dryRun?: boolean;
+}): Promise<number> {
+  const now = input.now ?? new Date();
+  const cutoff = new Date(
+    now.getTime() -
+      RATE_LIMIT_ROW_GRACE_DAYS * 86_400_000 -
+      RATE_LIMIT_MAX_WINDOW_SECONDS * 1000,
+  ).toISOString();
+  if (input.dryRun) {
+    const expired = await input.admin
+      .from("auth_rate_limits")
+      .select("key")
+      .lt("window_start", cutoff);
+    if (expired.error) throw expired.error;
+    return expired.data?.length ?? 0;
+  }
+  const removed = await input.admin
+    .from("auth_rate_limits")
+    .delete()
+    .lt("window_start", cutoff)
+    .select("key");
+  if (removed.error) throw removed.error;
+  return removed.data?.length ?? 0;
+}
 
 export async function runPurge(input: {
   admin: SupabaseClient;
@@ -39,7 +80,22 @@ export async function runPurge(input: {
     cutoff: cutoff.toISOString(),
     purged: [],
     errors: [],
+    rateLimitRowsRemoved: 0,
   };
+
+  // Expired limiter rows go first and on their own: a failure here is
+  // logged and reported, never a reason to skip an account that is due.
+  try {
+    report.rateLimitRowsRemoved = await purgeExpiredRateLimits({
+      admin: input.admin,
+      now,
+      dryRun,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    report.errors.push({ accountId: "auth_rate_limits", message });
+    log.error("account.purge.rate-limits.failed", { error: e });
+  }
 
   const due = await input.admin
     .from("accounts")

@@ -1,7 +1,7 @@
 {
   "$comment": "Hand-maintained inputs for scripts/standards/build.mjs. Outcome and indicator text is NOT here; it is parsed from data/sources. Evidence items are Readyline guidance (draft until the PO reviews them), not Commission text.",
-  "version": "1.2.0",
-  "generatedAt": "2026-10-14",
+  "version": "1.2.1",
+  "generatedAt": "2026-10-15",
   "checkedAt": "2026-10-11",
   "evidenceDisclaimer": "Evidence items are Readyline guidance on what auditors typically ask to see. They are not part of the NDIS Practice Standards and do not replace the auditor's own scope of audit.",
   "evidenceReview": {
@@ -24,6 +24,11 @@
       "version": "1.2.0",
       "date": "2026-10-14",
       "note": "NDIS watch 13 October 2026 (batch 35, items 7 and 8): the SIL quality indicators are also in the amending instrument F2026N00443 (Part 8A, Module 5A, ss 72A to 72E, commenced 1 July 2026), added as a source for the SIL module and class 0138; the 0138 note puts the 1 October 2026 application deadline in the past tense. No change to Commission text, standards or evidence items."
+    },
+    {
+      "version": "1.2.1",
+      "date": "2026-10-15",
+      "note": "Retrospective review of REQ-001 (15 October 2026, code fixes 1, 5 and 6): SOURCES.md now lists the two derivation-level UNVERIFIED items (D-119, D-122) from derivationUnverified; rules.registrationPeriodNote records that the Commission says providers are generally registered for three years; the class 0138 note drops a sentence that cited a Commission explanatory document which is not a snapshot in data/sources. No change to Commission text, standards or evidence items."
     }
   ],
   "sources": [
@@ -1838,7 +1843,7 @@
       "moduleIds": ["sil"],
       "requiresCore": true,
       "mandatoryFrom": "2026-07-01",
-      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports; a new SIL entrant cannot provide SIL while an application is pending (Commission explanatory document, June 2026, read 13 October 2026). Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
+      "notes": "Mandatory registration from 1 July 2026. Registered SIL providers need a certification audit, the core module and the SIL supplementary module. Providers already delivering SIL had to apply for registration by 1 October 2026 or stop providing SIL supports. Whether supports are SIL depends on the Commission's definition and exclusions (rules.silDefinition).",
       "sourceIds": [
         "registration-groups",
         "mandatory-registration",
@@ -1847,6 +1852,18 @@
         "legislation-rules-toc",
         "sil-qi-guidelines"
       ]
+    }
+  ],
+  "derivationUnverified": [
+    {
+      "decision": "D-119",
+      "rule": "restrictive-practices",
+      "note": "Whether using regulated restrictive practices changes a verification audit into a certification audit is not stated in the material we hold. deriveApplicability keeps the verification pathway and tags the reason unverified (src/lib/standards/derive.ts)."
+    },
+    {
+      "decision": "D-122",
+      "rule": "modified-certification",
+      "note": "Whether an individual or partnership with early childhood (0118) plus one or more verification classes keeps the modified-certification scope. The Commission's mapping document lists early childhood \"and any other verification registration\" under modified certification; deriveApplicability follows that reading and tags the reason unverified for that combination."
     }
   ],
   "rules": {
@@ -1865,6 +1882,7 @@
       "sourceId": "registration-requirements"
     },
     "registrationPeriodYears": 3,
+    "registrationPeriodNote": "The Commission's page says providers are \"generally registered for three years\" (about-registration). Three years is the usual period, not a fixed one.",
     "registrationPeriodSourceId": "about-registration",
     "midTermAudit": {
       "monthsAfterRegistration": 18,

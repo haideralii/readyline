@@ -5,6 +5,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import { StandardsDataset } from "@/lib/standards/schema";
 
 const root = process.cwd();
@@ -13,6 +14,19 @@ const read = (p: string) =>
 const data = StandardsDataset.parse(JSON.parse(read("data/standards.json")));
 const sourcesMd = read("data/SOURCES.md");
 const decisionsMd = read("DECISIONS.md");
+const deriveTs = read("src/lib/standards/derive.ts");
+/** The hand-maintained inputs; only `derivationUnverified` is read here. */
+const meta = z
+  .object({
+    derivationUnverified: z.array(
+      z.object({
+        decision: z.string().regex(/^D-\d+$/),
+        rule: z.string().min(1),
+        note: z.string().min(1),
+      }),
+    ),
+  })
+  .parse(JSON.parse(read("data/standards.meta.json")));
 
 describe("SOURCES.md agrees with standards.json", () => {
   it("states the dataset version and totals", () => {
@@ -38,6 +52,8 @@ describe("SOURCES.md agrees with standards.json", () => {
 
   it("has an UNVERIFIED section that matches the dataset (AC-7)", () => {
     expect(sourcesMd).toMatch(/## UNVERIFIED items/);
+    const section = sourcesMd.split("## UNVERIFIED items")[1]?.split("## ")[0];
+    expect(section).toBeTruthy();
     const unverified = [
       ...data.modules
         .filter((m) => m.verification.status === "unverified")
@@ -49,10 +65,29 @@ describe("SOURCES.md agrees with standards.json", () => {
         .filter((g) => g.verification.status === "unverified")
         .map((g) => g.code),
     ];
-    if (unverified.length === 0) {
+    // Retro review of REQ-001 (15 Oct 2026, fix 1): the derivation-level
+    // items that deriveApplicability tags `unverified` are listed too, by the
+    // decision number DECISIONS.md registers them under, from
+    // meta.derivationUnverified.
+    const derivation = meta.derivationUnverified;
+    expect(derivation.map((d) => d.decision).sort()).toEqual([
+      "D-119",
+      "D-122",
+    ]);
+    if (unverified.length === 0 && derivation.length === 0) {
       expect(sourcesMd).toMatch(/## UNVERIFIED items\n\n- none/);
     } else {
-      for (const id of unverified) expect(sourcesMd).toContain(`\`${id}\``);
+      expect(section).not.toMatch(/^- none$/m);
+      for (const id of unverified) expect(section).toContain(`\`${id}\``);
+      for (const d of derivation) {
+        expect(section).toContain(`\`${d.rule}\` (${d.decision})`);
+        // The rule is one derive.ts really emits with `unverified: true`.
+        expect(deriveTs).toContain(`rule: "${d.rule}"`);
+        // And DECISIONS.md keeps it in the register.
+        expect(decisionsMd.split("## UNVERIFIED register")[1]).toContain(
+          `- ${d.decision}:`,
+        );
+      }
     }
   });
 
