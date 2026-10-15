@@ -1,5 +1,5 @@
 {
-  "note": "The five kinds of audit a provider meets, in plain words, for the audit-day page's glossary (REQ-018 FR-11, AC-4; D-1907). Written by the product owner's research of 14 October 2026 (section B of product/research/webinars/2026-10-14-what-auditors-look-for.md) and checked against the Commission's registration pages for the cycle; NOT NDIS Quality and Safeguards Commission text. The verification and certification pathways themselves are in audit-types.json.",
+  "note": "The five kinds of audit a provider meets, in plain words, for the audit-day page's glossary (REQ-018 FR-11, AC-4; D-1907). Written by the product owner's research of 14 October 2026 (section B of product/research/webinars/2026-10-14-what-auditors-look-for.md) and checked against the Commission's registration pages for the cycle; NOT NDIS Quality and Safeguards Commission text. The verification and certification pathways themselves are in audit-types.json. A {{glossary:<id>}} token is replaced by that term's sentence from glossary.json at load (REQ-025 FR-13), so the mid-term meaning has one source.",
   "author": "readyline",
   "status": "draft",
   "items": [
@@ -16,7 +16,7 @@
     {
       "id": "mid-term",
       "name": "Mid-term audit",
-      "description": "For certification only, about 18 months into your three-year registration. It covers governance and operational management and anything that had a corrective action last time."
+      "description": "{{glossary:mid-term-audit}} For certification only, about 18 months in; it covers governance and operational management and anything that had a corrective action last time."
     },
     {
       "id": "renewal",

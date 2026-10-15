@@ -415,6 +415,15 @@ function ChecklistRow({
             </a>
           )}
         </p>
+        {item.haveNote ? (
+          // REQ-025 FR-4, D-2216: "already have" means review, not skip.
+          <p
+            className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            data-testid={`checklist-have-note-${b}`}
+          >
+            {item.haveNote}
+          </p>
+        ) : null}
         {item.unverified ? (
           <p
             className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"

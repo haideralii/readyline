@@ -6,6 +6,7 @@
  * No superlatives; testimonials only from data/readyline-content/trust.json.
  */
 import { BRAND } from "@/lib/brand";
+import { glossarySentence } from "@/lib/questionnaire/content";
 
 /** The hero headline with the configured price (batch 24 item 1); the price clause is dropped when no price is set. */
 export function heroHeadline(price: string | null): string {
@@ -58,15 +59,20 @@ export const HOME_COPY = {
     "A sole trader in New South Wales delivering household tasks (class 0120):",
   example: {
     audit: "Your audit: verification.",
-    summary:
-      "You will need 15 documents and 5 registers. An auditor reviews your documents at their desk; nobody visits.",
+    summary: `You will need 15 documents and 5 registers. ${glossarySentence("verification-audit")}`,
     facts: [
       { label: "Practice Standards module", value: "Verification module" },
       { label: "Audit", value: "Desk review of your documents" },
       { label: "Mid-term audit", value: "Does not apply" },
     ],
     /** The ready line for this example: what the reference case said it has (REQ-014 FR-2); pinned by a test. */
-    line: { have: 0, documents: 15, registers: 5 },
+    line: {
+      have: 0,
+      documentsHave: 0,
+      registersHave: 0,
+      documents: 15,
+      registers: 5,
+    },
     note: "Add personal care and the result changes to a certification audit with the core module, a site visit and a mid-term audit. The questionnaire shows the reason and the source for each change.",
   },
   missionHeading: "Why one price, and who is behind it",
