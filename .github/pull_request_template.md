@@ -2,6 +2,8 @@
 
 REQ-nnn: <title> (link to `product/requirements/REQ-nnn-*.md`)
 
+Base branch: `next` (D-2205). A pull request targets `main` only for a production fix that cannot wait, and the PO says so under the item.
+
 ## What changed
 
 -
