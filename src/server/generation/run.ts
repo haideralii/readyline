@@ -33,6 +33,8 @@ import { canonicalJson } from "@/lib/generator/prompts";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
+import { renderStartHere, startHereFromRows } from "./start-here";
 import { objectPath } from "./storage";
 import type {
   DocumentVersionRow,
@@ -193,7 +195,8 @@ export function readmeText(tradingName: string, generatedAt: string): string {
     "",
     "What is in this zip: one Word document (.docx) for each policy, procedure, plan or template in your set, the readiness summary (PDF), and this note.",
     "",
-    'How to use them: open each document in Word or LibreOffice. Fill in every bracketed blank, such as [name] or [date]; the readiness summary lists them by document and section. A section marked "Generic text: add your details" is complete but general; make it yours. When you have reviewed and adopted a document, mark it Done on your checklist.',
+    // REQ-026 FR-7: the sheet is the list of what to do; the summary keeps its blanks list.
+    `How to use them: open ${START_HERE_FILE} first. It lists, document by document, what to fill in, what to review and what to read once, in the order to adopt them. Fill in every bracketed blank, such as [name] or [date]; the readiness summary lists them by document and section too. A section marked "Generic text: add your details" is complete but general; make it yours. When you have reviewed and adopted a document, mark it Done on your checklist.`,
     "",
     "About these documents:",
     GENERAL_INFORMATION_NOTICE,
@@ -269,6 +272,7 @@ export async function generateDocumentSet(input: {
   };
   const logRows: GenerationLogRow[] = [];
   const zipEntries: Record<string, Uint8Array> = {};
+  const shipped: DocumentVersionRow[] = [];
   try {
     for (const typeId of typeIds) {
       const type = documentTypeById(typeId);
@@ -308,7 +312,7 @@ export async function generateDocumentSet(input: {
         (s) => s.status === "generated",
       ).length;
       summary.fallbackSections += fallbackSections;
-      await store.insertDocumentVersion({
+      const row = await store.insertDocumentVersion({
         version_set_id: set.id,
         account_id: input.accountId,
         document_type_id: typeId,
@@ -317,6 +321,7 @@ export async function generateDocumentSet(input: {
         storage_path: path,
         model: filled.model,
       });
+      shipped.push(row);
       summary.documents.push({
         typeId,
         title: type.title,
@@ -345,9 +350,24 @@ export async function generateDocumentSet(input: {
     zipEntries["README.txt"] = strToU8(
       readmeText(facts.tradingName, generatedAt),
     );
+    // REQ-026 FR-1: the Start here sheet first in the zip.
+    const startHere = startHereFromRows({
+      set: { derived_result: result, created_at: generatedAt },
+      first: shipped,
+      latest: shipped,
+      adopted: new Set(),
+      subscribed: false,
+      summaryVersion: version,
+    });
+    const ordered: Record<string, Uint8Array> = startHere
+      ? {
+          [START_HERE_FILE]: new Uint8Array(await renderStartHere(startHere)),
+          ...zipEntries,
+        }
+      : zipEntries;
     await store.putObject(
       objectPath(input.accountId, set.id, "set.zip"),
-      zipSync(zipEntries, { level: 6 }),
+      zipSync(ordered, { level: 6 }),
       "application/zip",
     );
     await store.insertLog(logRows);

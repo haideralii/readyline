@@ -5,6 +5,7 @@ import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
 import { collectBlanks } from "@/lib/generator/blanks";
 import { formBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { getViewer } from "@/server/accounts/queries";
 import {
   getVersionSet,
@@ -106,6 +107,22 @@ export default async function DocumentSetPage({
         )}
       </p>
 
+      {/* REQ-026 FR-1: the sheet first on the set's page, before the files. */}
+      <p
+        className="border-ochre mt-5 rounded-md border p-3 leading-7"
+        data-testid="start-here"
+      >
+        <Link
+          href={`/documents/${set.id}/start-here`}
+          className="font-medium underline underline-offset-4"
+          data-testid="start-here-link"
+        >
+          Start here: what to do with your documents
+        </Link>
+        . One list of what to fill in, what to review and what to read once, in
+        the order to adopt them. It is in your zip as{" "}
+        <span className="font-mono text-sm">{START_HERE_FILE}</span>.
+      </p>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <a
           href={`/documents/${set.id}/download?file=set.zip`}
