@@ -8,7 +8,8 @@
  */
 import type { BrowserContext } from "@playwright/test";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { randomUUID } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { createHmac, randomUUID } from "node:crypto";
 
 export type TestTenant = {
   userId: string;
@@ -131,6 +132,122 @@ export async function signInContext(
       sameSite: "Lax" as const,
     })),
   );
+}
+
+function base32Decode(s: string): Buffer {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = 0;
+  let value = 0;
+  const out: number[] = [];
+  for (const ch of s.replace(/=+$/, "").toUpperCase()) {
+    const idx = alphabet.indexOf(ch);
+    if (idx < 0) continue;
+    value = (value << 5) | idx;
+    bits += 5;
+    if (bits >= 8) {
+      out.push((value >>> (bits - 8)) & 0xff);
+      bits -= 8;
+    }
+  }
+  return Buffer.from(out);
+}
+
+/** RFC 6238, SHA-1, 30-second step, six digits: the code an authenticator app would show. */
+export function totpCode(secretBase32: string, now = Date.now()): string {
+  const counter = Math.floor(now / 1000 / 30);
+  const msg = Buffer.alloc(8);
+  msg.writeBigUInt64BE(BigInt(counter));
+  const h = createHmac("sha1", base32Decode(secretBase32)).update(msg).digest();
+  const off = h[h.length - 1] & 0x0f;
+  const code =
+    ((h[off] & 0x7f) << 24) |
+    (h[off + 1] << 16) |
+    (h[off + 2] << 8) |
+    h[off + 3];
+  return String(code % 1_000_000).padStart(6, "0");
+}
+
+/**
+ * Raises or lowers `platform_admin` the way an operator would (REQ-004's
+ * trigger refuses the change from any API call that carries a JWT, the
+ * secret key included; run 38672915816): one SQL statement through `psql`
+ * against the CI stack's database, whose URL the Supabase job exports as
+ * SUPABASE_DB_URL. The user id is checked to be a UUID before it is placed
+ * in the statement. Never run against the hosted project.
+ */
+export function setPlatformAdmin(userId: string, on: boolean): void {
+  const dbUrl = process.env.SUPABASE_DB_URL?.trim();
+  if (!dbUrl)
+    throw new Error(
+      "SUPABASE_DB_URL is not set; the admin e2e raises its admin through SQL on the local stack",
+    );
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      userId,
+    )
+  )
+    throw new Error("not a user id");
+  execFileSync(
+    "psql",
+    [
+      dbUrl,
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-q",
+      "-c",
+      `update public.users set platform_admin = ${on ? "true" : "false"} where id = '${userId}'`,
+    ],
+    { stdio: ["ignore", "ignore", "pipe"] },
+  );
+}
+
+/**
+ * A platform admin with a verified authenticator and an aal2 session
+ * (REQ-022 Session A, D-2210): the admin key grants `platform_admin` on
+ * the throwaway user, the user enrols TOTP through the auth API, and the
+ * test computes the code the way an authenticator app would. The session
+ * returned carries aal2, so `requireAdmin()` lets the browser in.
+ */
+export async function createAdminTenant(label: string): Promise<TestTenant> {
+  const t = await createTenant({
+    label: `admin-${label}`,
+    tradingName: "Admin",
+    answers: {},
+    withAccount: false,
+  });
+  setPlatformAdmin(t.userId, true);
+  const { url, publishableKey } = env();
+  const client = createClient(url, publishableKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const set = await client.auth.setSession({
+    access_token: t.session.access_token as string,
+    refresh_token: t.session.refresh_token as string,
+  });
+  if (set.error) throw set.error;
+  const enrol = await client.auth.mfa.enroll({
+    factorType: "totp",
+    friendlyName: "e2e",
+  });
+  if (enrol.error || !enrol.data)
+    throw enrol.error ?? new Error("enrol failed");
+  const challenge = await client.auth.mfa.challenge({
+    factorId: enrol.data.id,
+  });
+  if (challenge.error || !challenge.data)
+    throw challenge.error ?? new Error("challenge failed");
+  const verify = await client.auth.mfa.verify({
+    factorId: enrol.data.id,
+    challengeId: challenge.data.id,
+    code: totpCode(enrol.data.totp.secret),
+  });
+  if (verify.error) throw verify.error;
+  const s = await client.auth.getSession();
+  if (!s.data.session) throw new Error("no aal2 session after verify");
+  return {
+    ...t,
+    session: s.data.session as unknown as Record<string, unknown>,
+  };
 }
 
 /** Removes the user (cascading to the account and its rows) and the set's objects. */

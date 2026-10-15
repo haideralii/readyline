@@ -51,13 +51,16 @@ prints the names; previews and local builds only need
 
 1. Settings → General → **Node.js Version**: 22.x.
 2. Settings → Functions → **Function Region**: Sydney (`syd1`).
-3. Settings → Git: production branch `main`. Previews for pull requests can
-   stay on; they never run the scheduled jobs or generation (REQ-010 FR-6).
-   **A preview build needs two variables ticked for the Preview
-   environment: `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME`** (see
-   section 3). Until they are, every pull-request preview fails at the
-   `check-env` step with "missing NEXT_PUBLIC_SITE_URL"; that is expected on
-   Hobby and does not affect production.
+3. Settings → Git: production branch `main`. **Ignored Build Step** (batch
+   46, D-2206): paste `bash scripts/ops/vercel-ignore-build.sh`. With it,
+   Vercel builds only a commit on `main` that changes something other than
+   `product/` and markdown; a status or chat commit deploys nothing and
+   pull requests get no preview (CI's Playwright run against a production
+   build covers what previews did). The script's own tests are in
+   `scripts/ops/vercel-ignore-build.test.ts`. If previews are ever turned
+   back on, a preview build needs two variables ticked for the Preview
+   environment, `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME` (see
+   section 3); without them every preview fails at `check-env`.
 4. Settings → Domains: add your domain when you have it; until then the
    `*.vercel.app` address is the production domain. Whatever it is, that
    is `<domain>` below.
@@ -268,6 +271,19 @@ buy the pack with Stripe's test card `4242 4242 4242 4242` (any future
 date, any CVC), watch `/documents` move from "Preparing" to ready, download
 the zip. Then refund that payment in the Stripe dashboard and confirm the
 downloads close (`supabase/ops/refund.md`).
+
+## Limits (the free tiers; batch 46, D-2207)
+
+Every service here is on a free tier, and the limits shape how work ships.
+Anything that would push against one of them is said in `product/CHAT.md`
+before it is done, by the PO or by Dev.
+
+| Service        | Limit                                                 | What we do about it                                                                                                                                                                                   |
+| -------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vercel Hobby   | 100 deployments a day; 100 GB bandwidth a month       | Work merges to `next`; the PO merges `next` into `main` once a day, twice at most (D-2205). The Ignored Build Step (section 2) skips docs-only commits and previews (D-2206).                         |
+| GitHub Actions | 2,000 minutes a month while the repository is private | A full CI run is about 45 job minutes. No re-run of a red job without reading its trace or annotations first; `cancel-in-progress` stays on; docs-only pushes to `main` run nothing (`paths-ignore`). |
+| Supabase Free  | Two projects; a project pauses after 7 idle days      | The daily crons (section 8) keep the project warm. Migrations reach it once a day with the `next` merge, through `migrate.yml`.                                                                       |
+| Stripe         | Test mode only until launch                           | Live keys arrive with REQ-022's launch pass, never before every row on `/admin/launch` is green (D-2202).                                                                                             |
 
 ## If something fails
 

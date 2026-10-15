@@ -7,7 +7,7 @@ import { test, expect } from "@playwright/test";
  */
 test.describe("admin and job routes", () => {
   test("admin pages are 404 for anonymous visitors", async ({ page }) => {
-    for (const path of ["/admin", "/admin/mfa"]) {
+    for (const path of ["/admin", "/admin/mfa", "/admin/launch"]) {
       const response = await page.goto(path);
       expect(response?.status(), path).toBe(404);
     }
