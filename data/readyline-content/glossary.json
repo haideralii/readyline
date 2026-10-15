@@ -1,0 +1,73 @@
+{
+  "note": "The audit words a provider meets, each with one plain meaning (REQ-025 FR-13; D-2219). The one source: audit-kinds.json, the checklist's audit items, the home example and the result page read their meanings from here, so the site never carries two texts for one term. Written by the product owner on 15 October 2026 (REQ-025, with the review's decisions 16 and 17); NOT NDIS Quality and Safeguards Commission text. The restrictive-practice meaning is marked VERIFY against the NDIS Act 2013 s 9 and must be checked before it ships.",
+  "author": "readyline",
+  "status": "draft",
+  "items": [
+    {
+      "id": "verification-audit",
+      "term": "verification audit",
+      "meaning": "an auditor checks your documents at a desk; nobody visits"
+    },
+    {
+      "id": "certification-audit",
+      "term": "certification audit",
+      "meaning": "an auditor reads your documents and visits you"
+    },
+    {
+      "id": "practice-standards",
+      "term": "Practice Standards",
+      "meaning": "the rules every registered provider is audited against"
+    },
+    {
+      "id": "module",
+      "term": "module",
+      "meaning": "a group of those rules that applies to the supports you deliver"
+    },
+    {
+      "id": "quality-indicator",
+      "term": "quality indicator",
+      "meaning": "one thing an auditor looks for under a rule"
+    },
+    {
+      "id": "registration-group",
+      "term": "registration group",
+      "meaning": "the Commission's name for a type of support"
+    },
+    {
+      "id": "mid-term-audit",
+      "term": "mid-term audit",
+      "meaning": "a check about halfway through your three years"
+    },
+    {
+      "id": "restrictive-practice",
+      "term": "restrictive practice",
+      "meaning": "a practice that restricts a person's rights or movement; the law controls it",
+      "verify": "NDIS Act 2013 s 9: check the meaning against the definition before it ships (review finding 17)"
+    },
+    {
+      "id": "key-personnel",
+      "term": "key personnel",
+      "meaning": "the people who run the business"
+    },
+    {
+      "id": "self-assessment",
+      "term": "self-assessment",
+      "meaning": "the form where you say how you meet each rule"
+    },
+    {
+      "id": "worker-screening-check",
+      "term": "NDIS Worker Screening Check",
+      "meaning": "the national police-and-history check a worker in a risk-assessed role must hold"
+    },
+    {
+      "id": "reportable-incident",
+      "term": "reportable incident",
+      "meaning": "a serious incident the Commission must be told about"
+    },
+    {
+      "id": "adopt",
+      "term": "adopt",
+      "meaning": "sign and date a document so it is yours"
+    }
+  ]
+}

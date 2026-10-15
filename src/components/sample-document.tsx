@@ -62,10 +62,15 @@ export function Blocks({ blocks }: { blocks: readonly Block[] }) {
 /** Document control, Purpose and Scope are open; the rest is one tap away. */
 const SHOWN_FIRST = 3;
 
+type HeadingTag = "h2" | "h3" | "h4" | "h5";
+
 function Section({
   section: s,
+  heading: H,
 }: {
   section: DocumentModel["sections"][number];
+  /** One level under the document's title (REQ-025 FR-12: the sample page's order is h1, h2, h3). */
+  heading: HeadingTag;
 }) {
   return (
     <li
@@ -77,10 +82,10 @@ function Section({
       data-testid={`sample-section-${s.id}`}
       data-mode={s.mode}
     >
-      <h4 className="text-lg">
+      <H className="text-lg">
         {s.number ? `${s.number} ` : ""}
         {s.heading}
-      </h4>
+      </H>
       <p className="text-slate mt-1 text-xs font-medium tracking-wide uppercase">
         {s.mode === "tailored"
           ? "Drafted from the answers"
@@ -91,9 +96,16 @@ function Section({
   );
 }
 
-export function SampleDocument() {
+export function SampleDocument({
+  level = 3,
+}: {
+  /** The title's heading level: 2 on the sample's own page, 3 under a page section (REQ-025 FR-12). */
+  level?: 2 | 3;
+} = {}) {
   const doc = SAMPLE_DOCUMENT;
   const tailored = doc.sections.filter((s) => s.mode === "tailored").length;
+  const Title: HeadingTag = level === 2 ? "h2" : "h3";
+  const sectionHeading: HeadingTag = level === 2 ? "h3" : "h4";
   return (
     <div
       className="bg-paper rounded-md border border-zinc-300 p-4 sm:p-6 dark:border-zinc-700"
@@ -105,7 +117,7 @@ export function SampleDocument() {
         ; {tailored} of {doc.sections.length} sections drafted from the answers,
         the rest fixed text.
       </p>
-      <h3 className="mt-2 text-2xl">{doc.title}</h3>
+      <Title className="mt-2 text-2xl">{doc.title}</Title>
       <p className="mt-3">
         <a
           href={SAMPLE_DOWNLOAD_PATH}
@@ -117,7 +129,7 @@ export function SampleDocument() {
       </p>
       <ol className="mt-6 space-y-5">
         {doc.sections.slice(0, SHOWN_FIRST).map((s) => (
-          <Section key={s.id} section={s} />
+          <Section key={s.id} section={s} heading={sectionHeading} />
         ))}
       </ol>
       {/* The rest folds away so the page stays short on a phone; a native
@@ -131,7 +143,7 @@ export function SampleDocument() {
         </summary>
         <ol className="mt-5 space-y-5" start={SHOWN_FIRST + 1}>
           {doc.sections.slice(SHOWN_FIRST).map((s) => (
-            <Section key={s.id} section={s} />
+            <Section key={s.id} section={s} heading={sectionHeading} />
           ))}
         </ol>
       </details>

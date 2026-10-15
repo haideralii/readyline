@@ -73,12 +73,14 @@ async function toResult(page: Page) {
 test.describe("REQ-014 visual identity", () => {
   test("fonts come from our origin, the wordmark and tokens render, and nothing external is loaded (AC-1, AC-2)", async ({
     page,
+    baseURL,
   }) => {
+    // Batch 47 item 9: same-origin is the test's base (a deployment or localhost), not a literal.
+    const origin = new URL(baseURL!).origin;
     const external: string[] = [];
     page.on("request", (r) => {
       const u = new URL(r.url());
-      if (u.origin !== new URL(page.url() || "http://localhost").origin)
-        external.push(r.url());
+      if (u.origin !== origin) external.push(r.url());
     });
     await page.goto("/");
     await expect(page.getByTestId("wordmark")).toBeVisible();
@@ -88,9 +90,7 @@ test.describe("REQ-014 visual identity", () => {
       () => getComputedStyle(document.body).backgroundColor,
     );
     expect(bodyBg).toBe("rgb(247, 243, 236)");
-    expect(external.filter((u) => !u.startsWith("http://localhost"))).toEqual(
-      [],
-    );
+    expect(external).toEqual([]);
     const csp = (await page.request.get("/")).headers()[
       "content-security-policy"
     ];
@@ -112,26 +112,29 @@ test.describe("REQ-014 visual identity", () => {
     page,
   }) => {
     await toSupports(page);
-    const fill = page.getByTestId("progress-line-fill");
-    await expect(fill).toBeVisible();
-    await expect(page.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuetext",
+    // Batch 48 item 2: the stepper replaced the progress line. A done step is
+    // the ochre circle and a link; the line beneath names the step; nothing
+    // animates, with or without reduced motion.
+    const stepper = page.getByRole("navigation", {
+      name: "Questionnaire steps",
+    });
+    await expect(stepper).toBeVisible();
+    await expect(page.getByTestId("progress-line-label")).toHaveText(
       "Step 2 of 6: Supports",
     );
-    await expect(fill).toHaveCSS("fill", "rgb(180, 70, 31)");
-    // R-2: step 2 of 6 fills about a third of the line.
-    await expect(fill).toHaveAttribute("width", "33");
-    const animated = await fill.evaluate(
+    const done = stepper.getByRole("link", { name: /Step 1, Business: done/ });
+    await expect(done).toHaveCSS("background-color", "rgb(180, 70, 31)");
+    const animated = await done.evaluate(
       (el) => getComputedStyle(el).animationDuration,
     );
-    expect(animated).toBe("0.7s");
+    // Chromium reports the global 0.01ms rule as 1e-05s; anything under a frame counts as off.
+    expect(parseFloat(animated)).toBeLessThan(0.01);
 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
-    const reduced = await page
-      .getByTestId("progress-line-fill")
+    const reduced = await stepper
+      .getByRole("link", { name: /Step 1, Business: done/ })
       .evaluate((el) => getComputedStyle(el).animationDuration);
-    // Chromium reports the global 0.01ms rule as "1e-05s"; anything under a frame counts as off.
     expect(parseFloat(reduced)).toBeLessThan(0.01);
     await page.emulateMedia({ reducedMotion: "no-preference" });
 
@@ -139,8 +142,9 @@ test.describe("REQ-014 visual identity", () => {
     const line = page.getByTestId("result-ready-line");
     await expect(line).toBeVisible();
     // REQ-013 batch 36 item 3: one sentence in the customer's words; two segments, the track in mist.
+    // REQ-025 FR-3: the sentence under the line is the pack line, over derived counts.
     await expect(page.getByTestId("result-ready-line-text")).toContainText(
-      /You already have \d+ of these\. Readyline drafts the \d+ documents for you; the \d+ registers you keep as you go\./,
+      /The pack drafts all \d+ so they match; your checklist shows which to compare with what you have\./,
     );
     await expect(page.getByTestId("result-ready-line-todo")).toBeAttached();
     await expect(page.getByTestId("result-ready-line-to-prepare")).toHaveCount(

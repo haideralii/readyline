@@ -51,6 +51,8 @@ async function accountsWithRegisters(
     "participant_risks",
     "corporate_risks",
     "conflicts_of_interest",
+    // REQ-020 FR-7.
+    "hazards",
   ]) {
     const r = await admin.from(table).select("account_id").limit(10_000);
     for (const row of (r.data as { account_id: string }[] | null) ?? [])
@@ -82,7 +84,7 @@ export async function computeAccountReminders(
   today: string,
 ): Promise<ReminderDue[]> {
   // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
-  const [insurance, staff, participants, corporate, conflicts] =
+  const [insurance, staff, participants, corporate, conflicts, hazards] =
     await Promise.all([
       admin
         .from("insurance_items")
@@ -102,6 +104,11 @@ export async function computeAccountReminders(
         .eq("account_id", account.id),
       admin
         .from("conflicts_of_interest")
+        .select("id, review_on")
+        .eq("account_id", account.id),
+      // REQ-020 FR-7: the hazard register's review dates.
+      admin
+        .from("hazards")
         .select("id, review_on")
         .eq("account_id", account.id),
     ]);
@@ -134,6 +141,11 @@ export async function computeAccountReminders(
         table: "participant_risks" as const,
         review_on: r.review_on,
       })),
+      ...rows<{ id: string; review_on: string }>(hazards).map((r) => ({
+        id: r.id,
+        table: "hazards" as const,
+        review_on: r.review_on,
+      })),
     ],
     lastEmergencyDrillOn: account.last_emergency_drill_on,
   };
@@ -141,7 +153,7 @@ export async function computeAccountReminders(
     admin
       .from("incidents")
       .select(
-        "id, status, reportable, notify_by, reportable_notified_on, reported_on",
+        "id, status, reportable, notify_by, reportable_notified_on, reported_on, aware_at",
       )
       .eq("account_id", account.id),
     admin
@@ -168,28 +180,40 @@ export async function computeAccountReminders(
     [])
     if (!lastEvent.has(e.incident_id))
       lastEvent.set(e.incident_id, e.at.slice(0, 10));
+  // REQ-020 FR-5: a draft report raises only the nudge to confirm it; it joins
+  // the incident rules once confirmed. A rejected report raises nothing.
+  const incidentRows =
+    (inc.data as
+      | {
+          id: string;
+          status: "draft" | "open" | "under-review" | "closed" | "rejected";
+          reportable: boolean;
+          notify_by: string | null;
+          reportable_notified_on: string | null;
+          reported_on: string;
+          aware_at: string;
+        }[]
+      | null) ?? [];
   return dueReminders({
     today,
+    now: new Date().toISOString(),
     account: {
       id: account.id,
       registration_date: account.registration_date,
       registration_kind: account.registration_kind,
     },
-    incidents: (
-      (inc.data as
-        | {
-            id: string;
-            status: "open" | "under-review" | "closed";
-            reportable: boolean;
-            notify_by: string | null;
-            reportable_notified_on: string | null;
-            reported_on: string;
-          }[]
-        | null) ?? []
-    ).map((i) => ({
-      ...i,
-      last_activity_on: lastEvent.get(i.id) ?? i.reported_on,
-    })),
+    reports: incidentRows
+      .filter((i) => i.status === "draft")
+      .map((i) => ({ id: i.id, aware_at: i.aware_at })),
+    incidents: incidentRows
+      .filter(
+        (i): i is typeof i & { status: "open" | "under-review" | "closed" } =>
+          i.status !== "draft" && i.status !== "rejected",
+      )
+      .map((i) => ({
+        ...i,
+        last_activity_on: lastEvent.get(i.id) ?? i.reported_on,
+      })),
     complaints:
       (comp.data as
         | {
@@ -233,15 +257,19 @@ async function referenceFor(
     r.subject_table === "worker_clearances" ||
     r.subject_table === "staff_matrix"
       ? "worker_ref"
-      : r.subject_table === "insurance_items"
-        ? "label"
-        : r.subject_table === "participant_risks"
-          ? "participant_ref"
-          : r.subject_table === "corporate_risks"
-            ? "area"
-            : r.subject_table === "conflicts_of_interest"
-              ? "who_ref"
-              : "reference";
+      : r.subject_table === "policy_reviews"
+        ? "document_type_id"
+        : r.subject_table === "insurance_items"
+          ? "label"
+          : r.subject_table === "participant_risks"
+            ? "participant_ref"
+            : r.subject_table === "corporate_risks"
+              ? "area"
+              : r.subject_table === "conflicts_of_interest"
+                ? "who_ref"
+                : r.subject_table === "hazards"
+                  ? "site_ref"
+                  : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)

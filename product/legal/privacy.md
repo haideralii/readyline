@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-12
+updated: 2026-10-15
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -9,7 +9,7 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 ## Who we are
 
-Readyline is run by a sole trader in Sydney, Australia. [Legal name and ABN to be added when registered.] Contact details are in the footer.
+Readyline is run by a sole trader in Sydney, Australia. {{business-line}} Contact details are in the footer.
 
 ## What we collect
 
@@ -38,7 +38,7 @@ We do not sell your information. We do not share it with anyone except the servi
 
 - Supabase stores your account and data on servers in Sydney, Australia.
 - Vercel runs the website. Its servers are in Sydney where we can choose; some requests may be handled elsewhere briefly.
-- Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models.
+- Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models. Anthropic processes our requests in the United States.
 - Stripe takes payments and keeps card details. Stripe may process data outside Australia under its own privacy policy.
 - An email provider sends service emails.
 

@@ -12,6 +12,8 @@ import modulesJson from "../../../data/readyline-content/modules.json";
 import groupDescriptionsJson from "../../../data/registration-group-descriptions.json";
 import groupCategoriesJson from "../../../data/readyline-content/group-categories.json";
 import documentGroupsJson from "../../../data/readyline-content/document-groups.json";
+import glossaryJson from "../../../data/readyline-content/glossary.json";
+import startHereJson from "../../../data/readyline-content/start-here.json";
 
 const reviewed = {
   note: z.string().min(1),
@@ -107,6 +109,72 @@ export const GroupCategoriesContent = z.object({
 export const modulesContent = ModulesContent.parse(modulesJson);
 export const auditTypesContent = AuditTypesContent.parse(auditTypesJson);
 
+/**
+ * REQ-025 FR-13, D-2219: the audit words with one plain meaning each, the
+ * one source the pages read (decision 12 of the review). A meaning is a
+ * clause without a full stop; `glossarySentence` capitalises it and adds one.
+ */
+export const GlossaryContent = z.object({
+  ...reviewed,
+  items: z
+    .array(
+      z.object({
+        id: slug,
+        term: z.string().min(3),
+        meaning: z.string().min(10).max(160),
+        verify: z.string().min(10).optional(),
+      }),
+    )
+    .min(1),
+});
+export const glossaryContent = GlossaryContent.parse(glossaryJson);
+export type GlossaryId = (typeof glossaryContent.items)[number]["id"];
+
+export function glossaryTerm(id: string): { term: string; meaning: string } {
+  const t = glossaryContent.items.find((x) => x.id === id);
+  if (!t) throw new Error(`glossary: no term "${id}"`);
+  return { term: t.term, meaning: t.meaning };
+}
+
+export function glossaryMeaning(id: string): string {
+  return glossaryTerm(id).meaning;
+}
+
+/** The meaning as a sentence: "A check about halfway through your three years." */
+export function glossarySentence(id: string): string {
+  const m = glossaryMeaning(id);
+  return `${m[0].toUpperCase()}${m.slice(1)}.`;
+}
+
+/** `{{glossary:<id>}}` in a content file becomes that term's sentence, so a JSON file reads from the glossary too. */
+export function resolveGlossaryTokens(text: string): string {
+  return text.replace(/\{\{glossary:([a-z0-9-]+)\}\}/g, (_, id: string) =>
+    glossarySentence(id),
+  );
+}
+
+/** REQ-026 FR-2: the Start here sheet's own words; the estimates are the PO's to edit. */
+export const StartHereContent = z.object({
+  ...reviewed,
+  estimateLine: z.string().min(20),
+  defaultMinutes: z.number().int().positive(),
+  estimatesMinutes: z.record(slug, z.number().int().positive()),
+  defaultFirstWhy: z.string().min(5),
+  /** Six words or fewer each (FR-2.2); checked by the content test. */
+  firstWhy: z.record(slug, z.string().min(5)),
+  registerPurpose: z.record(slug, z.string().min(10)),
+  registerDocuments: z.record(slug, z.array(slug)),
+  next: z
+    .array(
+      z.object({
+        text: z.string().min(5),
+        href: z.string().regex(/^\/[a-z-]+(\/[a-z-]+)*$/),
+      }),
+    )
+    .min(1),
+});
+export const startHereContent = StartHereContent.parse(startHereJson);
+
 /** REQ-018 FR-11, AC-4: the five kinds of audit, in plain words, for the audit-day page's glossary. */
 export const AuditKindsContent = z.object({
   ...reviewed,
@@ -126,7 +194,16 @@ export const AuditKindsContent = z.object({
     )
     .length(5),
 });
-export const auditKindsContent = AuditKindsContent.parse(auditKindsJson);
+export const auditKindsContent = (() => {
+  const parsed = AuditKindsContent.parse(auditKindsJson);
+  return {
+    ...parsed,
+    items: parsed.items.map((k) => ({
+      ...k,
+      description: resolveGlossaryTokens(k.description),
+    })),
+  };
+})();
 export const documentSetsContent = DocumentSetsContent.parse(documentSetsJson);
 export const groupDescriptionsContent = GroupDescriptionsContent.parse(
   groupDescriptionsJson,

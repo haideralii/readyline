@@ -74,10 +74,15 @@ test.describe("REQ-013 P2", () => {
     await expect(page.getByTestId("progress-line-label")).toHaveText(
       "Step 1 of 6: Business",
     );
-    await expect(page.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuenow",
-      "1",
+    // Batch 48 item 2: one stepper; the current step is marked, nothing ahead is a link.
+    const stepper = page.getByRole("navigation", {
+      name: "Questionnaire steps",
+    });
+    await expect(stepper.locator("[aria-current='step']")).toHaveAttribute(
+      "aria-label",
+      /Step 1, Business/,
     );
+    await expect(stepper.getByRole("link")).toHaveCount(0);
     await page.getByLabel("Trading name").fill("Sunrise Supports");
     await page.getByRole("radio", { name: "Sole trader" }).check();
     await page.getByRole("checkbox", { name: "NSW" }).check();
@@ -85,15 +90,16 @@ test.describe("REQ-013 P2", () => {
     await expect(page.getByTestId("progress-line-label")).toHaveText(
       "Step 2 of 6: Supports",
     );
-    const completed = page.getByRole("navigation", { name: "Completed steps" });
-    await expect(completed).toContainText("Back to:");
     await expect(
-      completed.getByRole("link", { name: "Business" }),
+      stepper.getByRole("link", { name: /Step 1, Business: done/ }),
     ).toHaveAttribute("href", "/start/business");
-    // No wrapped list of six step names any more.
-    await expect(
-      page.getByRole("navigation", { name: "Questionnaire steps" }),
-    ).toHaveCount(0);
+    await expect(stepper.getByTestId("stepper-practices")).toHaveAttribute(
+      "data-state",
+      "todo",
+    );
+    // Batch 48 item 2: the six steps are the one stepper, in one row, nothing wrapped beneath it.
+    await expect(stepper).toHaveCount(1);
+    await expect(stepper.getByRole("listitem")).toHaveCount(6);
     await shot(page, "p2-step-indicator", testInfo.project.name);
   });
 
@@ -206,11 +212,9 @@ test.describe("REQ-013 P2", () => {
         name: /^Your audit: verification/,
       }),
     ).toHaveCount(1);
-    await expect(page.getByTestId("summary")).toContainText(
-      /You will need \d+ documents/,
-    );
+    await expect(page.getByTestId("summary")).toContainText(/Documents: \d+/);
     await expect(
-      page.getByTestId("summary").getByTestId("pathway-description"),
+      page.getByTestId("summary").getByTestId("audit-kind"),
     ).toBeVisible();
     await expect(page.getByTestId("result-contact")).toContainText(
       /Questions about your result/,

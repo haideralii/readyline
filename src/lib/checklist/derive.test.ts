@@ -3,7 +3,9 @@ import { findProhibitedClaims } from "@/lib/claims";
 import { lintText } from "@/lib/copy-lint/rules";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
+import { glossaryMeaning } from "@/lib/questionnaire/content";
 import {
+  ALREADY_HAVE_LINE,
   CHECKLIST_GROUP_IDS,
   deriveChecklist,
   progressLine,
@@ -193,6 +195,41 @@ describe("deriveChecklist (REQ-006 AC-1)", () => {
         "documents:incident-management-policy-and-register",
       ),
     ).toBe("have");
+  });
+
+  it("a pre-ticked document or register carries the D-2216 line; nothing else does (REQ-025 FR-4, AC-3)", () => {
+    const note = (c: Checklist, id: string) =>
+      c.items.find((i) => i.id === id)?.haveNote;
+    expect(note(personalCare.checklist, "registers:incidents")).toBe(
+      ALREADY_HAVE_LINE,
+    );
+    expect(
+      note(
+        personalCare.checklist,
+        "documents:incident-management-policy-and-register",
+      ),
+    ).toBe(ALREADY_HAVE_LINE);
+    expect(
+      note(personalCare.checklist, "registers:complaints"),
+    ).toBeUndefined();
+    expect(note(soleTrader.checklist, "registers:incidents")).toBeUndefined();
+    for (const item of Object.values(byId).flatMap((c) => c.checklist.items))
+      if (item.haveNote !== undefined) {
+        expect(item.initialStatus, item.id).toBe("have");
+        expect(["documents", "registers"], item.id).toContain(item.group);
+      }
+    expect(lintText(ALREADY_HAVE_LINE)).toEqual([]);
+  });
+
+  it("the audit items' meanings come from the glossary (REQ-025 FR-13)", () => {
+    const book = (c: Checklist) =>
+      c.items.find((i) => i.id === "audit:book-audit")!.why;
+    expect(book(soleTrader.checklist)).toBe(
+      `Verification audit: ${glossaryMeaning("verification-audit")}.`,
+    );
+    expect(book(personalCare.checklist)).toContain(
+      glossaryMeaning("certification-audit"),
+    );
   });
 
   it("audit items follow the pathway (FR-6): verification is desktop only; certification adds interviews and the mid-term date", () => {

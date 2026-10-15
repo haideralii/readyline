@@ -114,10 +114,57 @@ describe("the two tiers and the paper marks (batch 45, REQ-018-gated item)", () 
       "incidents",
       "complaints",
     ]);
-    expect(lines.filter((l) => l.tier === "practice")).toHaveLength(6);
+    // REQ-020 FR-7: the hazard register joins the practice tier after the delegations.
+    expect(lines.filter((l) => l.tier === "practice").map((l) => l.id)).toEqual(
+      [
+        "decisions",
+        "participant-risks",
+        "conflicts-of-interest",
+        "delegations",
+        "hazards",
+        "improvements",
+        "onboarding",
+      ],
+    );
     expect(lines.filter((l) => l.paper).map((l) => l.id)).toEqual([
       "insurances",
       "onboarding",
     ]);
+  });
+});
+
+describe("the hazard register on the list (REQ-020 FR-7, AC-6)", () => {
+  it("is missing on an empty account with a tap to add, filled with its count, overdue when a review is past", () => {
+    const missing = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: empty,
+      documentControl: [],
+    }).find((l) => l.id === "hazards")!;
+    expect(missing).toMatchObject({
+      state: "missing",
+      href: "/registers/hazards",
+      tier: "practice",
+    });
+    const filled = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: {
+        ...empty,
+        hazards: { total: 2, attention: 0, attentionLabel: "All current" },
+      },
+      documentControl: [],
+    }).find((l) => l.id === "hazards")!;
+    expect(filled).toMatchObject({
+      state: "filled",
+      word: "2 entries; all current.",
+    });
+    const overdue = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: {
+        ...empty,
+        hazards: { total: 2, attention: 1, attentionLabel: "1 overdue" },
+      },
+      documentControl: [],
+    }).find((l) => l.id === "hazards")!;
+    expect(overdue).toMatchObject({ state: "overdue", action: "Fix it" });
   });
 });

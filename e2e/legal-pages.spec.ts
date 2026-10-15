@@ -101,6 +101,9 @@ test.describe("legal and trust pages (REQ-008)", () => {
     page,
   }) => {
     const routes = appRoutes();
+    // Batch 47 item 9: one visit per route; the budget grows with the route list
+    // rather than sharing one 30 s cap across all of them (run 38661716805).
+    test.setTimeout(Math.max(60_000, routes.length * 10_000));
     expect(routes).toEqual(
       expect.arrayContaining([
         "/",

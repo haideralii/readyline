@@ -12,7 +12,10 @@ test.describe("documents", () => {
     await page.goto("/documents");
     await expect(page).toHaveURL(/\/sign-in\?next=%2Fdocuments$/);
     await page.goto("/documents/11111111-1111-4111-8111-111111111111");
-    await expect(page).toHaveURL(/\/sign-in\?next=%2Fdocuments$/);
+    // Batch 47 item 7 and batch 48 item 3: a page comes back to itself after sign-in.
+    await expect(page).toHaveURL(
+      /\/sign-in\?next=%2Fdocuments%2F11111111-1111-4111-8111-111111111111$/,
+    );
   });
 
   test("the download route redirects signed-out visitors and rejects bad file names", async ({
@@ -25,7 +28,10 @@ test.describe("documents", () => {
       },
     );
     expect(ok.status()).toBe(307);
-    expect(ok.headers()["location"]).toMatch(/\/sign-in\?next=%2Fdocuments$/);
+    // Batch 48 item 3: a download route comes back to its document's page, never to the file.
+    expect(ok.headers()["location"]).toMatch(
+      /\/sign-in\?next=%2Fdocuments%2F11111111-1111-4111-8111-111111111111$/,
+    );
     const bad = await request.get(
       "/documents/11111111-1111-4111-8111-111111111111/download?file=../x.zip",
       {
