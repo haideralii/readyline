@@ -359,6 +359,8 @@ National Disability Insurance Agency and is used here descriptively only" is
 unchanged. Role skills under `.claude/skills` still say `{{BRAND}}` in prose
 and are left as documentation.
 
+**D-027 confirmed by PO.** Brand default Readyline in code; env override retained.
+
 **D-028 Merge rule when CI is unreadable (PO, 2026-10-11).** Dev may satisfy
 the "CI green" condition by running the identical checks locally (check,
 build, e2e, audit, gitleaks) and recording the output in Delivery evidence;
@@ -2146,6 +2148,23 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
+**D-907 Register pages (Dev, 2026-10-13, batch 28, branch
+`req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
+`req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
+One list component for the four registers (rows with a text-and-icon
+status tag, a filter by status, 44 px targets), one page shell that
+resolves the signed-in owner and the subscription state, and forms built
+from shared inputs (select, date, reference code, free text with the
+participant-data detector). Lists read the Session A status views so the
+tag and the filter use the database's own arithmetic. Events for status
+changes, reportable flags, notification, acknowledgement and resolution
+are written by the server action, never typed. The gate is the database's
+(42501 becomes the lapse sentence); the UI hides Add and Edit and
+redirects the add and edit routes when the subscription is not active.
+The REQ-015 branch was merged in because the pages are built on its
+patterns (ConfirmButton, the width check, the iPhone project), so the
+Session B pull request lands after REQ-015's.
+
 **D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
 batch 30, branch `req-009-session-c` from `req-011-content` with
 `req-009-session-b` merged in; REQ-009 FR-3, SR-4, AC-4).**
@@ -2388,6 +2407,32 @@ least one runner minute, so `*/5` is about 8,600 minutes a month against
 the 2,000 free for a private repository; the schedule runs only from
 `main`, so nothing is spent until the PO merges and chooses (public
 repository, `*/30`, or the overage).
+
+**D-540 Why every section of Haider's AI procedure shipped undrafted, and
+what the log can and cannot say (Dev, 2026-10-14, batch 33 item 1, REQ-016
+FR-0d).** Two defects sat on one path. (1) The catalogue `brief` (the
+model's instruction) was also the customer placeholder: `placeholderBlocks`
+and the fallback both printed `[Provider to complete: <heading>. <brief>]`,
+so the procedure's "Never restate statutory timeframes … the outline"
+instruction reached the document verbatim. (2) The fallback fired for every
+tailored section of that one document. The fixture replay of the recorded
+sole-trader case cannot reproduce it: all seven AI sections generate (two
+on the retry: readability 12 on "when this applies", a stated review cycle
+on "steps"). The generation log held only `status`, `attempts` and token
+counts, so a model error and a gate rejection were indistinguishable after
+the fact; the most likely causes, in order, are a burst of API errors on
+consecutive calls (one document's sections run back to back, and both
+attempts of each would fail inside the same minute) and, for a case whose
+STANDARDS block is "none", the R-12 gate rejecting a reply that asks for a
+standard twice. The PO can settle it with the rows for that set:
+`select section_id, status, attempts, input_tokens from generation_log where
+document_type_id = 'ai-and-digital-data-handling-procedure'`; null tokens
+on a fallback row mean the call threw. From this batch the log carries
+`failure_kind` and `failure_detail` (rule names, never content), and the
+tick line carries the same, so the next one is readable. The placeholder
+and the brief are now different strings (`placeholders.ts`), a lint fails
+any instruction phrasing inside a bracketed placeholder, and the fallback
+is a complete generic section marked "Generic text: add your details."
 
 **D-541 Blanks, not instructions (REQ-016 S-8), and what the count on the set
 page means (FR-0c).** A missing fact is a bracketed blank of at most four
@@ -3278,8 +3323,6 @@ runner does not take the dev page, noted in the evidence.
 
 **D-2232 The glossary is read, never copied, and "on first use" on the result page is the audit-kind line plus one disclosure (Dev, 2026-10-15, REQ-025 Session A, FR-13, decision 12 of the review).** `data/readyline-content/glossary.json` holds the thirteen terms as clauses without a full stop; `glossaryMeaning`, `glossaryTerm` and `glossarySentence` in `content.ts` hand them out, and a `{{glossary:<id>}}` token in a content file (today `audit-kinds.json`'s mid-term kind) is replaced by the term's sentence at load, so a JSON file reads from the glossary too. The checklist's "book the audit" item, the home example's summary and the result page's audit-kind line build their text from the glossary, and a unit test fails if any of those four files carries a meaning verbatim. On the result page the term a reader meets first (the audit kind) has its meaning as the line under the heading; the other words the page uses (Practice Standards, module, quality indicator, registration group, mid-term audit, adopt) sit in one "What these words mean" disclosure at the top of "Why this result", on the page and never a link away; the per-term tap-to-open form is REQ-027's call. The summary card's four lines come from `summaryLines` over `readinessCounts`, which now counts documents and registers apart so each clause can drop at zero (FR-3, AC-2); the checklist's third line keeps the `checklist-count-line` test id so the public checklist spec still proves the numbers add up.
 
-**D-2235 The 45-word paragraph cap is a file set and a tag set in the copy lint, with the lawyer's text allow-listed by value (Dev, 2026-10-15, REQ-025 Session C, FR-10; review decisions 10 and 11).** `lintText` takes a `maxWords` option; the file-walking test applies `TIGHT_PARAGRAPH_MAX_WORDS` (45) to `p`, `dd` and `blockquote` blocks in `result-step.tsx` and `pricing/page.tsx`, to the strings of `payments/copy.ts` that are not items of an array, and to the non-list paragraphs of the four guides; list items, summaries, headings and every other page keep the 60-word cap. A block whose text equals `AI_DISCLOSURE`, `GENERAL_INFORMATION_NOTICE` or `GENERAL_INFORMATION_STATEMENT` keeps the 60-word cap wherever it renders, which is the allow-list by constant; the legal pages' markdown is not walked by the lint at all. The rule is recorded in `product/domain/ui-copy.md`, whose phone width is now 360 px like every test. The home page's height is measured by `e2e/req-025-c.spec.ts` as `scrollHeight` at 360 px and written under `product/evidence/req-025/` with `EVIDENCE=1` (before 6,596 px with the sample on the page); the budget job is untouched.
-
 **D-2234 The Start here sheet is rendered fresh on every download and built from the shipped version's blanks (Dev, 2026-10-15, REQ-026 FR-1, FR-4, FR-5, FR-7).** The lines on the sheet are the blanks of the version the pack shipped (`document_versions` where `version = 1`), split by one rule: a blank the Finish form asks for (`formBlanks`) is a "Fill in" line that ticks when the blank no longer appears in the latest version; a blank the app never sees (the signature and date lines, a register's row template) is a "Fill in Word" line with the printed box; the owner's name, role and the approval date are account facts and appear on neither list, which section 1 says in one line. The zip carries `00-start-here.docx` first, built at generation (nothing done yet) and again at every re-render; the download route renders it from the models on every request, so a set generated before this change has the sheet too and a line filled since the zip reads done. The sheet is a `DocumentModel` through the shared renderer, five numbered fixed sections, no document type, no adoption, no document control row. The per-document minutes, the "Do these first" reasons, the register purposes and the next steps live in `data/readyline-content/start-here.json` as a Dev draft for the PO to edit (FR-2.1 says the estimates are PO text); "Check my systems" is left out of the next steps until REQ-020 Session C builds it. The README's "How to use them" paragraph points at the sheet; the readiness summary keeps its blanks list.
 
 **D-2214 The auditor link resolves through one security definer function and the reads that follow are scoped by code (Dev, 2026-10-15, REQ-020 Session A, FR-2, SR-1, SR-2).** As accepted in the Dev response: `auditor_link_lookup(p_token_hash)` is `security definer`, executable by the service key only (anon and authenticated are refused with 42501), and answers the live link's id, account and trading name, or no row for an unknown, revoked or expired hash, so a caller never learns why. The signed-out page and its pack route resolve the token (a 256-bit random value, base64url, stored only as SHA-256 hex, compared in constant time) through that function with the admin client and then read the registers, the document control register and the set's stored files with the same admin client scoped to the account it returned; hidden columns (`id`, `account_id`, `created_by`, version ids) never leave the server, participant references are the codes they already are, and the HTML carries no account id, email or user id (the e2e asserts it). The pack is built on request and nothing is stored. Every open and every pack download writes one audit line with the link id and the viewer's hashed address; creating, revoking and replacing write theirs. One live link at a time: creating a new one revokes the live one first. The purge job deletes rows 30 days after they ended.
@@ -3290,4 +3333,6 @@ runner does not take the dev page, noted in the evidence.
 **D-2212 The proxy answers the signed-out 307 for routes under a loading boundary (Dev, 2026-10-15, batch 47 item 7).** `/documents` and `/checklist` keep their loading UI for the signed-in load, so a page-level `redirect()` would stream inside a 200. `src/proxy.ts` `needsSessionRedirect` sends a request with no Supabase session cookie (`sb-*-auth-token`, chunked or not) to `/sign-in?next=<path>` with 307 before the page runs; a request with a cookie still has its session verified by the page. The route list is the constant `SESSION_ROUTES`; unit tested, and the public e2e asserts the 307 and its location.
 
 **D-2213 The legal pages carry runtime tokens for the two facts only the server knows (Dev, 2026-10-15, batch 47 items 1 and 2).** `product/legal/*.md` stays the PO's prose; `{{business-line}}` becomes the registered name and ABN sentence once both are set (the home page's own sentence) and nothing before, `{{subscription-off}}` becomes the one off-state sentence while STRIPE_PRICE_REGISTERS is unset and nothing after, and `{{#subscription}}…{{/subscription}}` keeps its text only while the subscription can be bought. `src/lib/legal/tokens.ts` is pure and tested; `src/server/legal/render.ts` supplies the values and the five legal routes render through it. A test over the pages as written refuses any bracketed "to be added" placeholder, any "when available", and any token the renderer does not know.
+
+**D-2235 The 45-word paragraph cap is a file set and a tag set in the copy lint, with the lawyer's text allow-listed by value (Dev, 2026-10-15, REQ-025 Session C, FR-10; review decisions 10 and 11).** `lintText` takes a `maxWords` option; the file-walking test applies `TIGHT_PARAGRAPH_MAX_WORDS` (45) to `p`, `dd` and `blockquote` blocks in `result-step.tsx` and `pricing/page.tsx`, to the strings of `payments/copy.ts` that are not items of an array, and to the non-list paragraphs of the four guides; list items, summaries, headings and every other page keep the 60-word cap. A block whose text equals `AI_DISCLOSURE`, `GENERAL_INFORMATION_NOTICE` or `GENERAL_INFORMATION_STATEMENT` keeps the 60-word cap wherever it renders, which is the allow-list by constant; the legal pages' markdown is not walked by the lint at all. The rule is recorded in `product/domain/ui-copy.md`, whose phone width is now 360 px like every test. The home page's height is measured by `e2e/req-025-c.spec.ts` as `scrollHeight` at 360 px and written under `product/evidence/req-025/` with `EVIDENCE=1` (before 6,596 px with the sample on the page); the budget job is untouched.
 
