@@ -44,6 +44,17 @@ describe("boundaries use the validation layer", () => {
     expect(missing.map((f) => relative(root, f))).toEqual([]);
   });
 
+  // Next.js refuses a "use server" module whose exports include anything but
+  // async functions, at module load, so every action in the file answers a
+  // bare 500 (run 38750817767, PR #62). Types are erased and do not count.
+  it("every server action file exports async functions only", () => {
+    const offenders = serverActionFiles.filter((f) =>
+      /^export (const|let|var|class|enum|default|\*|\{|function\b|async (?!function))/m.test(
+        readFileSync(f, "utf8"),
+      ),
+    );
+    expect(offenders.map((f) => relative(root, f))).toEqual([]);
+  });
   it("no boundary file uses z.object directly (use strictObject)", () => {
     const offenders = [...routeHandlers, ...serverActionFiles].filter((f) =>
       /\bz\.object\(/.test(readFileSync(f, "utf8")),
