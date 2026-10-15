@@ -1,5 +1,5 @@
 # REQ-017: The guided path: one step at a time, from the result to audit day
-Status: ready (PO, 13 Oct 2026, from Haider's product principle)   Phase: 6   Priority: must   Owner: Dev
+Status: delivered (batch 34, D-1701 to D-1703; batch 37, D-1704 and D-1705; batch 45b, D-1706; REQ-018 FR-14 added the circulation record to the Adopt screen; on `main`; AC-1, Haider's phone walk, still open; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-013-017.md`)   Phase: 6   Priority: must   Owner: Dev
 Depends on: REQ-006 (checklist), REQ-007 (payments), REQ-015 (plain language), REQ-016 (document standard, fill-in blanks)
 
 ## The principle (Haider, 13 Oct 2026; add to CLAUDE.md section 1 as a product rule)
@@ -16,10 +16,10 @@ Our customer is a support worker who does not like paperwork, is not technical a
 
 ## Functional requirements
 - FR-1 A persistent "Your next step" strip at the top of every signed-in page: one sentence and one button, computed from the account's state (questionnaire done, paid, pack generating, blanks left, documents not adopted, checklist items left, registration date not entered). It never shows two things.
-- FR-2 The Finish your pack form (step 4): fields come from the blanks the generator recorded (REQ-016 S-8); one per screen on phones, grouped by topic on desktop; examples under each field; the participant-data warning once; re-render on finish; a confirmation that reads "Done. Your 22 documents are complete."
+- FR-2 The Finish your pack form (step 4): fields come from the blanks the generator recorded (REQ-016 S-8); one per screen on phones, grouped by topic on desktop; examples under each field; the participant-data warning once; re-render on finish; a confirmation that reads "Done. Your N documents are complete." (N is the set's count, 16 for the sole-trader case). Since batch 37 (D-1704) the owner's name and role come from the account page and the approval date from adoption, so the form asks only the remaining facts.
 - FR-3 The Adopt screens (step 5) and the audit-day page (step 7) as described, both printable, both passing copy-lint and the width check.
 - FR-4 Every step is resumable: closing the phone and coming back a week later lands on the same step with the same words.
-- FR-5 No screen on the path has more than one primary button, one heading, and three lines of text above the control.
+- FR-5 No screen on the path has more than one primary button, one heading, and three paragraphs of text above the control (small print excluded; `tests/path-screens.test.ts` counts paragraphs, not lines; the layout's next-step strip is not counted).
 
 ## Acceptance criteria
 - AC-1 Haider's test: a person who has never seen the site completes result to audit-day checklist on a phone without asking a question, and can say at every screen what to do next.
@@ -44,7 +44,7 @@ Our customer is a support worker who does not like paperwork, is not technical a
 
 - `npm run check` and `npm run build` green (outputs in the NEXT.md status). Unit: the state table (`next-step.test.ts`, AC-3), the fact mapping and filling (`facts-fill.test.ts`), the job filling a later pack from saved facts (`job.test.ts`, AC-2), the screen rule over every path page (`tests/path-screens.test.ts`, FR-5), copy-lint over the new screens.
 - Migration `20261014000000_account_facts.sql` (owner-scoped facts; `migrate.yml` applies it on merge).
-- `e2e/signed-in/guided-path.spec.ts` on the three projects (desktop, small Android, iPhone): a fresh account from the result to the audit-day page with the strip checked at every stage, screenshots under `product/evidence/req-017/` (`before-you-buy`, `while-we-draft`, `finish-pack`, `finish-done`, `adopt-group`, `checklist`, `audit-day`) with `EVIDENCE=1`. It runs in CI's Supabase job; the hosted project lacks this stack's migrations, so it cannot run on the Dev machine yet.
+- `e2e/signed-in/guided-path.spec.ts` on the three projects (desktop, small Android, iPhone): a fresh account from the result to the audit-day page with the strip checked at every stage, screenshots under `product/evidence/req-017/` (`before-you-buy`, `while-we-draft`, `finish-pack`, `finish-done`, `adopt-group`, `checklist`, `audit-day`) with `EVIDENCE=1` (retro note, 15 Oct 2026: the folder is not on `main`; the spec writes it only under the flag and CI's job does not commit it). It runs in CI's Supabase job; the hosted project lacks this stack's migrations, so it cannot run on the Dev machine yet.
 - AC-1 is Haider's walk on his phone once the branch is deployed.
 
 ## PO review
