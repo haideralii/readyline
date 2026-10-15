@@ -191,6 +191,8 @@ export type IncidentRow = {
   actions_taken: string;
   reportable: boolean;
   reportable_notified_on: string | null;
+  /** The reference the Commission gives back when told; "" until then (batch 45, REQ-018-gated item). */
+  commission_reference: string;
   /** Generated: 24 hours or 5 business days after `occurred_on` by category when reportable; else null. */
   notify_by: string | null;
   status: IncidentStatus;
@@ -213,6 +215,7 @@ export type IncidentInsert = Omit<
   | "actions_taken"
   | "reportable"
   | "reportable_notified_on"
+  | "commission_reference"
   | "status"
   | "closed_on"
   | "participant_ref"
@@ -225,6 +228,7 @@ export type IncidentInsert = Omit<
       | "actions_taken"
       | "reportable"
       | "reportable_notified_on"
+      | "commission_reference"
       | "status"
       | "closed_on"
       | "participant_ref"

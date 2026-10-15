@@ -68,6 +68,19 @@ export const IncidentForm = strictObject({
   actionsTaken: safeText(TEXT_CAPS.actionsTaken),
   reportable: z.boolean(),
   reportableNotifiedOn: optionalDate("date you told the Commission"),
+  // REQ-018-gated item (batch 45): the reference the Commission gives back
+  // when told; letters, digits, spaces, slash and dash, never a participant
+  // number (the column's CHECK refuses that shape too).
+  commissionReference: z
+    .string()
+    .trim()
+    .max(40, "Use 40 characters or fewer")
+    .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only")
+    .refine(
+      (s) => !NDIS_NUMBER_SHAPE.test(s),
+      "This looks like an NDIS participant number. Use the Commission's reference instead.",
+    )
+    .default(""),
   status: z.enum(INCIDENT_STATUSES),
   closedOn: optionalDate("date it was closed"),
 }).superRefine((v, ctx) => {
@@ -81,6 +94,12 @@ export const IncidentForm = strictObject({
     ctx.addIssue({
       code: "custom",
       path: ["reportableNotifiedOn"],
+      message: "Tick reportable first",
+    });
+  if (v.commissionReference && !v.reportable)
+    ctx.addIssue({
+      code: "custom",
+      path: ["commissionReference"],
       message: "Tick reportable first",
     });
   if (v.status === "closed" && !v.closedOn)

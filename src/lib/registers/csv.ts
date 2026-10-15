@@ -39,6 +39,7 @@ export const CSV_COLUMNS = {
     "reportable",
     "notify_by",
     "reportable_notified_on",
+    "commission_reference",
     "status",
     "closed_on",
     "created_at",

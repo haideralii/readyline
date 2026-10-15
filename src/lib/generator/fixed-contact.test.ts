@@ -13,6 +13,7 @@ import {
   canonicalRecordName,
   isCanonicalRecordName,
   itemsToPrepareBeforeAudit,
+  itemsToPrepareByTier,
 } from "@/lib/registers/names";
 import { documentTypeById } from "./catalogue";
 import { buildSkeleton, type ResolvedSection } from "./document-model";
@@ -139,16 +140,31 @@ describe("Our position on restrictive practices (D-548)", () => {
 });
 
 describe("Items to prepare before the audit (D-547)", () => {
-  it("is the audit-day list, twelve records in the audit-day order", () => {
+  it("is the audit-day list, twelve records in two tiers, each in the audit-day order, the paper records marked", () => {
     const { sections } = skeleton(
       "verification-sole-trader",
       "practice-standards-self-assessment",
     );
     const s = section(sections, "gaps");
-    const bullets = s.blocks.find((b) => b.type === "bullets");
-    expect(bullets && bullets.type === "bullets" && bullets.items).toEqual(
-      itemsToPrepareBeforeAudit(),
+    const lists = s.blocks.filter((b) => b.type === "bullets");
+    expect(lists).toHaveLength(2);
+    const tiers = itemsToPrepareByTier();
+    expect(lists[0].type === "bullets" && lists[0].items).toEqual(tiers.named);
+    expect(lists[1].type === "bullets" && lists[1].items).toEqual(
+      tiers.practice,
     );
+    expect(new Set([...tiers.named, ...tiers.practice])).toEqual(
+      new Set(itemsToPrepareBeforeAudit()),
+    );
+    const leads = s.blocks
+      .filter((b) => b.type === "paragraph")
+      .map((b) => (b.type === "paragraph" ? b.text : ""));
+    expect(leads.some((t) => t.startsWith("Records the standards name:"))).toBe(
+      true,
+    );
+    expect(
+      leads.some((t) => t.startsWith("Records auditors often ask for:")),
+    ).toBe(true);
   });
 
   it("the records section names registers by their canonical names", () => {

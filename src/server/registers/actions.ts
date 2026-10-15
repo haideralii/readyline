@@ -107,13 +107,16 @@ export async function saveIncidentAction(
     actions_taken: v.actionsTaken,
     reportable: v.reportable,
     reportable_notified_on: v.reportableNotifiedOn,
+    commission_reference: v.commissionReference,
     status: v.status,
     closed_on: v.closedOn,
   };
   if (parsed.data.id) {
     const before = await ctx.supabase
       .from("incidents")
-      .select("id, status, reportable, reportable_notified_on")
+      .select(
+        "id, status, reportable, reportable_notified_on, commission_reference",
+      )
       .eq("id", parsed.data.id)
       .eq("account_id", ctx.account.id)
       .maybeSingle();
@@ -142,6 +145,15 @@ export async function saveIncidentAction(
       events.push({
         kind: "notified",
         note: `Commission notified on ${v.reportableNotifiedOn}`,
+      });
+    // The Commission's reference, once it arrives, is part of the notification trail.
+    if (
+      v.commissionReference &&
+      before.data.commission_reference !== v.commissionReference
+    )
+      events.push({
+        kind: "notified",
+        note: `Commission reference ${v.commissionReference}`,
       });
     for (const e of events)
       await ctx.supabase.from("incident_events").insert({

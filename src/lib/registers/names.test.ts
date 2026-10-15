@@ -14,6 +14,10 @@ import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
   AUDIT_DAY_RECORDS,
+  AUDIT_RECORD_TIER_TITLES,
+  KEPT_ON_PAPER,
+  auditRecordTier,
+  itemsToPrepareByTier,
   CLEARANCE_COLUMNS,
   COMPLAINT_COLUMNS,
   INCIDENT_COLUMNS,
@@ -81,15 +85,74 @@ describe("the twelve records an auditor asks for", () => {
     }
   });
 
-  it("the self-assessment list mirrors them in the same order, with the insurances line pointing at the register", () => {
+  it("the self-assessment list mirrors them in the same order, with the insurances line pointing at the register and the paper records marked", () => {
     const items = itemsToPrepareBeforeAudit();
     expect(items).toHaveLength(12);
     AUDIT_DAY_RECORDS.forEach((r, i) => {
       if (r.id === "insurances") {
         expect(items[i]).toMatch(/^Your insurances and vehicles register:/);
         expect(items[i]).toMatch(/expiry date/);
-      } else expect(items[i]).toBe(r.ask);
+        expect(items[i]).toMatch(/\(kept on paper\)$/);
+      } else if (r.paper) expect(items[i]).toBe(`${r.ask} (${KEPT_ON_PAPER})`);
+      else expect(items[i]).toBe(r.ask);
     });
+  });
+});
+
+describe("the twelve records in two tiers (batch 45, REQ-018-gated item)", () => {
+  it("six are named by the standards or the Rules and six are asked for in practice; two are kept on paper", () => {
+    const named = AUDIT_DAY_RECORDS.filter((r) => r.tier === "named").map(
+      (r) => r.id,
+    );
+    const practice = AUDIT_DAY_RECORDS.filter((r) => r.tier === "practice").map(
+      (r) => r.id,
+    );
+    expect(named).toEqual([
+      "document-control",
+      "corporate-risks",
+      "insurances",
+      "staff-matrix",
+      "incidents",
+      "complaints",
+    ]);
+    expect(practice).toEqual([
+      "decisions",
+      "participant-risks",
+      "conflicts-of-interest",
+      "delegations",
+      "improvements",
+      "onboarding",
+    ]);
+    expect(AUDIT_DAY_RECORDS.filter((r) => r.paper).map((r) => r.id)).toEqual([
+      "insurances",
+      "onboarding",
+    ]);
+    expect(AUDIT_RECORD_TIER_TITLES.named).toBe("Records the standards name");
+    expect(AUDIT_RECORD_TIER_TITLES.practice).toBe(
+      "Records auditors often ask for",
+    );
+  });
+
+  it("the tiered list holds the same twelve lines as the flat one, each tier in the audit-day order, and the lookup answers by id", () => {
+    const tiers = itemsToPrepareByTier();
+    expect(tiers.named).toHaveLength(6);
+    expect(tiers.practice).toHaveLength(6);
+    expect(new Set([...tiers.named, ...tiers.practice])).toEqual(
+      new Set(itemsToPrepareBeforeAudit()),
+    );
+    const flat = itemsToPrepareBeforeAudit();
+    expect(tiers.named.map((l) => flat.indexOf(l))).toEqual(
+      [...tiers.named.map((l) => flat.indexOf(l))].sort((a, b) => a - b),
+    );
+    expect(auditRecordTier("insurances")).toEqual({
+      tier: "named",
+      paper: true,
+    });
+    expect(auditRecordTier("decisions")).toEqual({
+      tier: "practice",
+      paper: false,
+    });
+    expect(auditRecordTier("nope")).toEqual({ tier: "practice", paper: false });
   });
 });
 

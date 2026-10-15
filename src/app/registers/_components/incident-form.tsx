@@ -3,10 +3,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   ErrorSummary,
+  Field,
+  TextInput,
   errorsFor,
   type FieldErrors,
 } from "@/app/start/_components/fields";
 import { IncidentForm, type IncidentFormValues } from "@/lib/registers/forms";
+import { INCIDENT_COLUMNS } from "@/lib/registers/names";
 import {
   CATEGORY_LABELS,
   INCIDENT_STATUS_LABELS,
@@ -41,6 +44,7 @@ const LABELS: Record<string, string> = {
   actionsTaken: "What you did about it",
   reportable: "Reportable to the Commission",
   reportableNotifiedOn: "Date you told the Commission",
+  commissionReference: INCIDENT_COLUMNS.commission_reference,
   status: "Status",
   closedOn: "Date closed",
   form: "Incident",
@@ -71,6 +75,7 @@ export function IncidentFormView({
       actionsTaken: "",
       reportable: false,
       reportableNotifiedOn: "",
+      commissionReference: "",
       status: "open",
       closedOn: "",
     },
@@ -205,14 +210,35 @@ export function IncidentFormView({
         </p>
       ) : null}
       {v.reportable ? (
-        <DateField
-          id="reportableNotifiedOn"
-          label={LABELS.reportableNotifiedOn}
-          errors={errorsFor(errors, "reportableNotifiedOn")}
-          value={v.reportableNotifiedOn ?? ""}
-          onChange={(x) => set("reportableNotifiedOn", x)}
-          optional
-        />
+        <>
+          <DateField
+            id="reportableNotifiedOn"
+            label={LABELS.reportableNotifiedOn}
+            errors={errorsFor(errors, "reportableNotifiedOn")}
+            value={v.reportableNotifiedOn ?? ""}
+            onChange={(x) => set("reportableNotifiedOn", x)}
+            optional
+          />
+          {/* Batch 45 (REQ-018-gated item): the reference the Commission gives back, on the row an auditor samples. */}
+          <Field
+            id="commissionReference"
+            label={`${LABELS.commissionReference} (optional)`}
+            help="The reference the Commission gave you when you told them. Letters and digits; never a participant's number."
+            errors={errorsFor(errors, "commissionReference")}
+          >
+            {(describedBy, invalid) => (
+              <TextInput
+                id="commissionReference"
+                name="commissionReference"
+                value={v.commissionReference ?? ""}
+                onChange={(x) => set("commissionReference", x)}
+                describedBy={describedBy}
+                invalid={invalid}
+                maxLength={40}
+              />
+            )}
+          </Field>
+        </>
       ) : null}
       <SelectField
         id="status"

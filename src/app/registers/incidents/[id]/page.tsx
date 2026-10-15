@@ -43,6 +43,14 @@ export default async function IncidentPage({
           ] as [string, string],
         ]
       : []),
+    ...(r.commission_reference
+      ? [
+          [INCIDENT_COLUMNS.commission_reference, r.commission_reference] as [
+            string,
+            string,
+          ],
+        ]
+      : []),
     ...(r.closed_on ? [["Closed on", r.closed_on] as [string, string]] : []),
   ];
   return (

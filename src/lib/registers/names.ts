@@ -208,97 +208,159 @@ export function registerDisplayName(id: string): string {
 }
 
 /**
+ * Which records the standards and the Rules name, and which auditors ask
+ * for in practice (batch 45, the REQ-018-gated item; the guide
+ * `registers-an-auditor-asks-for` carries the sources): the Incident and
+ * Complaints Rules require the two registers, the Practice Standards expect
+ * the policy review record (document control), the risk register, the
+ * insurances and the worker screening and training records (staff matrix);
+ * the other six are what auditors ask to see.
+ */
+export type AuditRecordTier = "named" | "practice";
+
+export const AUDIT_RECORD_TIER_TITLES: Record<AuditRecordTier, string> = {
+  named: "Records the standards name",
+  practice: "Records auditors often ask for",
+};
+
+/** The suffix a record kept on paper carries in the lists. */
+export const KEPT_ON_PAPER = "kept on paper";
+
+/**
  * The twelve records an auditor asks to see (REQ-018 FR-11; the auditor
  * research section B), in the order the audit-day page and the
- * self-assessment's "Items to prepare before the audit" both use.
+ * self-assessment's "Items to prepare before the audit" both use. `tier`
+ * splits them in two; `paper` marks the two whose artefact is a signed or
+ * issued document the provider keeps on paper, with the register holding
+ * the dates.
  */
 export const AUDIT_DAY_RECORDS: readonly {
   id: string;
   name: string;
   ask: string;
   href: string;
+  tier: AuditRecordTier;
+  paper?: true;
 }[] = [
   {
     id: "document-control",
     name: "Document control register",
     ask: "Your document control register: every policy with its version, when it was adopted, by whom, and when it is next reviewed",
     href: "/registers/document-control",
+    tier: "named",
   },
   {
     id: "decisions",
     name: "Record of decisions",
     ask: "Your record of decisions or meeting minutes",
     href: "/registers/decisions",
+    tier: "practice",
   },
   {
     id: "corporate-risks",
     name: "Corporate risk register",
     ask: "Your corporate risk register, every area filled, a review date on every row",
     href: "/registers/corporate-risks",
+    tier: "named",
   },
   {
     id: "participant-risks",
     name: "Participant risk register",
     ask: "Your participant risk register, one line per participant",
     href: "/registers/participant-risks",
+    tier: "practice",
   },
   {
     id: "conflicts-of-interest",
     name: "Conflict of interest register",
     ask: "Your conflict of interest register, with review dates",
     href: "/registers/conflicts-of-interest",
+    tier: "practice",
   },
   {
     id: "delegations",
     name: "Delegations register",
     ask: "Your delegations register: who acts when you are away",
     href: "/registers/delegations",
+    tier: "practice",
   },
   {
     id: "insurances",
     name: "Insurances and vehicles register",
     ask: "Your insurance certificates and, if you drive participants, your vehicle and driver records",
     href: "/registers/insurances",
+    tier: "named",
+    paper: true,
   },
   {
     id: "improvements",
     name: "Improvement register",
     ask: "Your improvement register, fed by incidents, complaints and feedback",
     href: "/registers/improvements",
+    tier: "practice",
   },
   {
     id: "staff-matrix",
     name: "Staff matrix",
     ask: "Your staff matrix: each worker's screening, training, supervision and appraisal",
     href: "/registers/staff-matrix",
+    tier: "named",
   },
   {
     id: "onboarding",
     name: "Onboarding checklist",
     ask: "A signed and dated onboarding checklist for each worker and each participant",
     href: "/registers/onboarding",
+    tier: "practice",
+    paper: true,
   },
   {
     id: "incidents",
     name: "Incident register",
     ask: "Your incident register, with the reportable ones standing out",
     href: "/registers/incidents",
+    tier: "named",
   },
   {
     id: "complaints",
     name: "Complaints register",
     ask: "Your complaints register, separate from feedback, with resolution times",
     href: "/registers/complaints",
+    tier: "named",
   },
 ];
 
-/** The self-assessment's fixed list (batch 42 item 3): the twelve records in the same order and words, the insurances line pointing at the register. */
-export function itemsToPrepareBeforeAudit(): string[] {
-  return AUDIT_DAY_RECORDS.map((r) =>
+/** The line one record takes in the self-assessment's list: the ask, the insurances line pointing at the register, the paper mark where it applies. */
+function prepareLine(r: (typeof AUDIT_DAY_RECORDS)[number]): string {
+  const ask =
     r.id === "insurances"
       ? "Your insurances and vehicles register: public liability, professional indemnity, workers compensation and any vehicle, with each expiry date"
-      : r.ask,
-  );
+      : r.ask;
+  return r.paper ? `${ask} (${KEPT_ON_PAPER})` : ask;
+}
+
+/** The self-assessment's fixed list (batch 42 item 3): the twelve records in the same order and words, the insurances line pointing at the register. */
+export function itemsToPrepareBeforeAudit(): string[] {
+  return AUDIT_DAY_RECORDS.map(prepareLine);
+}
+
+/** The same list in its two tiers (batch 45, REQ-018-gated item), each in the audit-day order. */
+export function itemsToPrepareByTier(): Record<AuditRecordTier, string[]> {
+  return {
+    named: AUDIT_DAY_RECORDS.filter((r) => r.tier === "named").map(prepareLine),
+    practice: AUDIT_DAY_RECORDS.filter((r) => r.tier === "practice").map(
+      prepareLine,
+    ),
+  };
+}
+
+/** The tier and paper mark of a record by id, for the audit-day page's lines. */
+export function auditRecordTier(id: string): {
+  tier: AuditRecordTier;
+  paper: boolean;
+} {
+  const r = AUDIT_DAY_RECORDS.find((x) => x.id === id);
+  return { tier: r?.tier ?? "practice", paper: Boolean(r?.paper) };
 }
 
 /**
@@ -316,6 +378,8 @@ export const INCIDENT_COLUMNS = {
   severity: "How serious",
   reportable: "Reportable",
   reportable_notified_on: "Commission told on",
+  // REQ-018-gated item (batch 45): the reference the Commission gives back.
+  commission_reference: "Commission reference",
   status: "Status",
 } as const;
 
@@ -327,6 +391,7 @@ export const INCIDENT_EXAMPLE_ROW: readonly string[] = [
   "[Low, medium or high]",
   "[Yes or no]",
   "[Date, or not needed]",
+  "[Reference, or not needed]",
   "[Open, under review or closed]",
 ];
 

@@ -9,6 +9,7 @@ import type { AuditDayOverview } from "@/server/registers/audit-day-queries";
 import type { RegisterOverview } from "./overview";
 import type { DocumentControlRow } from "./document-control";
 import { documentControlSentence } from "./document-control";
+import { auditRecordTier, type AuditRecordTier } from "./names";
 
 export type AskLine = {
   id: string;
@@ -20,6 +21,10 @@ export type AskLine = {
   /** Where one tap takes them to fix or fill it. */
   href: string;
   action: string;
+  /** Named by the standards and the Rules, or asked for in practice (batch 45, REQ-018-gated item). */
+  tier: AuditRecordTier;
+  /** A signed or issued document kept on paper; the register holds its dates. */
+  paper: boolean;
 };
 
 export const ASK_COUNT = 12;
@@ -59,7 +64,7 @@ export function auditDayAskList(input: {
   const { registers: r, auditDay: a, documentControl: dc } = input;
   const dcOverdue = dc.filter((d) => d.state === "overdue").length;
   const dcMissing = dc.length === 0 || dc.some((d) => !d.adopted_on);
-  return [
+  const lines: Omit<AskLine, "tier" | "paper">[] = [
     {
       id: "document-control",
       ask: "Your document control register: every policy with its version, when it was adopted, by whom, and when it is next reviewed",
@@ -179,4 +184,7 @@ export function auditDayAskList(input: {
           }),
     },
   ];
+  // The tier and the paper mark come from the one list in names.ts, so the
+  // page, the self-assessment and this list can never disagree.
+  return lines.map((l) => ({ ...l, ...auditRecordTier(l.id) }));
 }

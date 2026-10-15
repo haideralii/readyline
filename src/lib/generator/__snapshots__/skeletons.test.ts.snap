@@ -3219,6 +3219,9 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+          "paragraph",
+          "bullets",
+          "paragraph",
           "bullets",
         ],
         "heading": "Items to prepare before the audit",
@@ -6310,6 +6313,9 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
+          "paragraph",
+          "bullets",
+          "paragraph",
           "bullets",
         ],
         "heading": "Items to prepare before the audit",
@@ -8466,6 +8472,9 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
+          "paragraph",
+          "paragraph",
+          "bullets",
           "paragraph",
           "bullets",
         ],
