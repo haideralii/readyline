@@ -102,4 +102,11 @@ Done 15 Oct 2026: `product/qa/req-reviews/2026-10-15-req-025-026.md` (independen
 
 ## Delivery evidence
 
-Not started.
+**Session A (Dev, 15 Oct 2026)** on `req-025-session-a` ebe524c (cut from `next` 5866b4a; PR to `next`; body: `product/evidence/req-025/pr-body-session-a.md`).
+
+- AC mapping: AC-1 → `e2e/req-025.spec.ts` (the two lines verbatim on step 5, three projects) and the copy lint in the unit run; AC-2 → `e2e/req-025.spec.ts` (the list's numbers read back from the page and compared with the disclosures' counts, the tags and the checklist link; no literal) and `src/lib/questionnaire/readiness.test.ts` (0, 1, 2 for documents and registers); AC-3 → `src/lib/checklist/derive.test.ts` (the D-2216 line on pre-ticked documents and registers of the reference cases, on nothing else) and `checklist-view.tsx` renders it under the why line (the signed-in checklist e2e is untouched); FR-4a → `e2e/req-025.spec.ts` and the updated `questionnaire` and `req-015-a11y` specs (only the three labels, the old words absent); FR-5 → `e2e/req-025.spec.ts` (one link per reason, by title, "new tab" once in the intro); FR-13 → `data/readyline-content/glossary.test.ts` (thirteen terms, 20 words, claim-free, the loader, the token, no reader keeps a copy), `derive.test.ts`, `home-copy.test.ts` and the e2e's glossary disclosure; AC-4's axe and width checks on step 5 and the open result in the e2e.
+- `npm run check`: green (122 files, 871 tests, 6 skipped); 17 new unit tests.
+- Local public gate (dev server, desktop and Android): `req-025`, `questionnaire`, `req-013-p2`, `req-014`, `req-015-a11y`, `checklist`, `home`, `home-v2`, `questionnaire-a11y`, `questionnaire-a11y-tree`: 69 passed, 2 skipped, one timeout in the a11y page sweep on the first compile that passed alone on the re-run (4 passed).
+- CI: the pull request's run once it is opened (public job: the specs above on three projects).
+- Screenshots: `product/evidence/req-025/step-5-*`, `result-*`, `result-open-*` at 360 px and desktop, `before` and `after`, committed.
+- UNVERIFIED: the restrictive-practice meaning carries its VERIFY note against the NDIS Act 2013 s 9 in `glossary.json` and is not shown on the result page (not one of its six terms). Deferred: the per-term tap-to-open form of "first use" (REQ-027; D-2232).
