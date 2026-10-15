@@ -16,8 +16,12 @@ import { renderDocx } from "@/lib/generator/render-docx";
 import { auditOrder } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
 import { documentControlForSet } from "@/server/registers/document-control-queries";
-import { listLatestDocuments } from "./queries";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
+import { listAdoptedTypeIds } from "@/server/path/state";
+import { hasActiveSubscription } from "@/server/registers/queries";
+import { listFirstDocuments, listLatestDocuments } from "./queries";
 import { DOCX_TYPE, documentStatus, readmeText } from "./run";
+import { renderStartHere, startHereFromRows } from "./start-here";
 import { objectPath } from "./storage";
 import { SupabaseGenerationStore, type VersionSetRow } from "./store";
 
@@ -107,9 +111,30 @@ export async function rerenderSetWithFacts(input: {
     entries["README.txt"] = strToU8(
       readmeText(first.facts.tradingName, generatedAt),
     );
+    // REQ-026 FR-5: the sheet regenerates with the pack, first in the zip; filled lines read done.
+    const [shipped, adopted, subscribed] = await Promise.all([
+      listFirstDocuments(admin, set.id),
+      listAdoptedTypeIds(admin, set.account_id),
+      hasActiveSubscription(admin, set.account_id),
+    ]);
+    const latestRows = await listLatestDocuments(admin, set.id);
+    const startHere = startHereFromRows({
+      set,
+      first: shipped,
+      latest: latestRows,
+      adopted,
+      subscribed,
+      summaryVersion: "1",
+    });
+    const ordered: Record<string, Uint8Array> = startHere
+      ? {
+          [START_HERE_FILE]: new Uint8Array(await renderStartHere(startHere)),
+          ...entries,
+        }
+      : entries;
     await store.putObject(
       objectPath(set.account_id, set.id, "set.zip"),
-      zipSync(entries, { level: 6 }),
+      zipSync(ordered, { level: 6 }),
       "application/zip",
     );
     await admin

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getIncident } from "@/server/registers/queries";
 import { CATEGORY_LABELS } from "@/lib/registers/labels";
 import { INCIDENT_COLUMNS } from "@/lib/registers/names";
@@ -23,6 +23,8 @@ export default async function IncidentPage({
   const found = await getIncident(ctx.supabase, ctx.viewer.account.id, id);
   if (!found) notFound();
   const r = found.row;
+  // REQ-020 FR-5, FR-6: a report waiting for the owner has one screen, the confirmation.
+  if (r.status === "draft") redirect(`/registers/incidents/${id}/confirm`);
   const rows: [string, string][] = [
     // Batch 45 item 17: the same words as the paper register in the pack (names.ts).
     [INCIDENT_COLUMNS.category, CATEGORY_LABELS[r.category]],
@@ -31,6 +33,20 @@ export default async function IncidentPage({
     [INCIDENT_COLUMNS.reported_on, r.reported_on],
     ["Participant", r.participant_ref ?? "Not recorded"],
     ["Worker", r.worker_ref ?? "Not recorded"],
+    // REQ-020 FR-4, FR-5: who logged it, when it was not the owner.
+    ...(r.reported_via === "worker"
+      ? [["Logged by", r.logged_by_ref ?? "A worker"] as [string, string]]
+      : r.reported_via === "link"
+        ? [
+            [
+              "Reported through your link by",
+              r.logged_by_ref ?? "Not recorded",
+            ] as [string, string],
+          ]
+        : []),
+    ...(r.status === "rejected"
+      ? [["Rejected because", r.rejected_reason] as [string, string]]
+      : []),
     [INCIDENT_COLUMNS.reportable, r.reportable ? "Yes" : "No"],
     ...(r.notify_by
       ? [["Notify the Commission by", r.notify_by] as [string, string]]
@@ -109,7 +125,7 @@ export default async function IncidentPage({
           .
         </p>
       ) : null}
-      {ctx.canWrite ? (
+      {ctx.canWrite && r.status !== "rejected" ? (
         // REQ-020 FR-7: a hazard behind the incident goes to the hazard register in one tap.
         <p
           className="mt-3 rounded-md border border-zinc-300 p-3 text-sm leading-6 dark:border-zinc-700"
@@ -126,7 +142,7 @@ export default async function IncidentPage({
           .
         </p>
       ) : null}
-      {ctx.canWrite ? (
+      {ctx.canWrite && r.status !== "rejected" ? (
         <p className="mt-5">
           <Link
             href={`/registers/incidents/${r.id}/edit`}

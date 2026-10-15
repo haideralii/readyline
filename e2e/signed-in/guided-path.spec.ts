@@ -154,6 +154,41 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     ).toBeVisible();
     await page.goto("/documents");
 
+    // REQ-026 AC-2: the Start here sheet sits first on the set's page; before
+    // Finish its "Fill in" lines are open and the count says so.
+    await page.getByTestId("open-set").click();
+    await expect(page.getByTestId("start-here")).toBeVisible();
+    await page.getByTestId("start-here-link").click();
+    await expect(page).toHaveURL(/\/documents\/[0-9a-f-]{36}\/start-here$/);
+    await expect(page.getByTestId("start-here-counts")).toContainText(
+      /^You have \d+ things? to fill in across \d+ documents?\.$/,
+    );
+    const fillLines = page.getByTestId("sheet-fill");
+    expect(await fillLines.count()).toBeGreaterThan(0);
+    await expect(fillLines.first()).toHaveAttribute("data-done", "false");
+    await expect(
+      page
+        .getByTestId("sheet-document-privacy-and-information-management-policy")
+        .getByTestId("sheet-fill"),
+    ).toHaveCount(3);
+    expect(
+      await page.getByTestId("sheet-documents").locator("> li").count(),
+    ).toBeGreaterThanOrEqual(10);
+    await expect(
+      page.getByTestId("sheet-first").locator("li").first(),
+    ).toBeVisible();
+    await checkWidths(page, "start here");
+    await pagePass(page, "start here");
+    await shot(page, "start-here-before", project);
+    const sheetDownload = await page.request.get(
+      (await page.getByTestId("start-here-download").getAttribute("href"))!,
+    );
+    expect(sheetDownload.status()).toBe(200);
+    expect(sheetDownload.headers()["content-disposition"]).toContain(
+      "00-start-here.docx",
+    );
+    await page.goto("/documents");
+
     // Step 4: finish your pack, one question at a time on a phone, grouped on desktop.
     await expectStep(page, "finish");
     await page.getByTestId("next-step-button").click();
@@ -316,6 +351,22 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       page.getByText("Jane Citizen").filter({ visible: true }).first(),
     ).toBeVisible();
 
+    // REQ-026 AC-2: after Finish every "Fill in" line reads done and the count
+    // says so; the adopt lines wait for step 5.
+    await page.goto("/documents");
+    await page.getByTestId("open-set").click();
+    await page.getByTestId("start-here-link").click();
+    await expect(page.getByTestId("start-here-counts")).toContainText(
+      /^All \d+ things to fill in are done\.$/,
+    );
+    for (const line of await page.getByTestId("sheet-fill").all())
+      await expect(line).toHaveAttribute("data-done", "true");
+    await expect(page.getByTestId("sheet-adopt").first()).toHaveAttribute(
+      "data-done",
+      "false",
+    );
+    await shot(page, "start-here-finished", project);
+
     // Step 5: adopt, one group per screen.
     await page.goto("/documents");
     await expectStep(page, "adopt");
@@ -390,6 +441,10 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page.getByTestId("set-summary")).toContainText(
       "No blanks to fill in",
     );
+    // REQ-026 FR-4: adoption ticks every document's Adopt line on the sheet.
+    await page.getByTestId("start-here-link").click();
+    for (const line of await page.getByTestId("sheet-adopt").all())
+      await expect(line).toHaveAttribute("data-done", "true");
 
     // Step 7: the audit-day page, printable, with the pack download.
     await page.goto("/path/audit-day");

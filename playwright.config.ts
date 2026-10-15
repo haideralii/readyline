@@ -52,7 +52,7 @@ export default defineConfig({
       // Backlog 1 (D-1508): the accessibility pass runs on all three projects;
       // batch 45 item 28: so does the setup form a new customer submits.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team))\.spec\.ts$/,
     },
   ],
   webServer: {
@@ -73,7 +73,9 @@ export default defineConfig({
       SUBSCRIPTION_PRICE_AUD_CENTS:
         process.env.SUBSCRIPTION_PRICE_AUD_CENTS ?? "3900",
       // REQ-007 AC-1 (D-709): Checkout is the fake page; the webhook secret is the local one.
-      STRIPE_FAKE: "1",
+      // Batch 47 item 1: STRIPE_FAKE=0 in the environment starts the server with no
+      // Stripe at all, the state production shows until the Prices exist.
+      STRIPE_FAKE: process.env.STRIPE_FAKE ?? "1",
       STRIPE_WEBHOOK_SECRET: "",
       // The job route and the webhook's hand-on need the cron secret the spec also sends.
       CRON_SECRET: e2eCronSecret(),

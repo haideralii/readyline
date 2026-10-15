@@ -7,6 +7,7 @@ import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { auditKindsContent } from "@/lib/questionnaire/content";
 import { auditDayAskList } from "@/lib/registers/audit-day-ask";
+import { reportsToConfirmLine } from "@/lib/registers/worker";
 import { AUDIT_RECORD_TIER_TITLES, KEPT_ON_PAPER } from "@/lib/registers/names";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { getViewer } from "@/server/accounts/queries";
@@ -23,6 +24,7 @@ import {
   openSelfCheckFindings,
 } from "@/server/registers/self-check-queries";
 import { selfCheckOffer } from "@/lib/registers/self-check";
+import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { DrillForm } from "./drill-form";
 
@@ -62,19 +64,27 @@ export default async function AuditDayPage() {
   });
   if (!ctx.result || !ctx.answers) redirect("/start");
   const dataset = getStandardsDataset();
-  const [stored, drafted, registers, auditDay, documentControl, drill] =
-    await Promise.all([
-      listChecklistItems(supabase, viewer.account.id),
-      listDraftedDocumentTypeIds(supabase, viewer.account.id),
-      registerOverview(supabase, viewer.account.id),
-      auditDayOverview(supabase, viewer.account.id),
-      documentControlForAccount(supabase, viewer.account.id),
-      supabase
-        .from("accounts")
-        .select("last_emergency_drill_on")
-        .eq("id", viewer.account.id)
-        .maybeSingle(),
-    ]);
+  const [
+    stored,
+    drafted,
+    registers,
+    auditDay,
+    documentControl,
+    toConfirm,
+    drill,
+  ] = await Promise.all([
+    listChecklistItems(supabase, viewer.account.id),
+    listDraftedDocumentTypeIds(supabase, viewer.account.id),
+    registerOverview(supabase, viewer.account.id),
+    auditDayOverview(supabase, viewer.account.id),
+    documentControlForAccount(supabase, viewer.account.id),
+    countReportsToConfirm(supabase, viewer.account.id),
+    supabase
+      .from("accounts")
+      .select("last_emergency_drill_on")
+      .eq("id", viewer.account.id)
+      .maybeSingle(),
+  ]);
   // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
   const asks = auditDayAskList({
     registers,
@@ -120,6 +130,22 @@ export default async function AuditDayPage() {
         You have {have} of {shown.total} things ready. Print this page and keep
         it with your pack.
       </p>
+      {reportsToConfirmLine(toConfirm) ? (
+        // REQ-020 FR-5: the owner sees a waiting report here too, one tap from confirming it.
+        <p
+          className="border-signal mt-3 rounded-md border p-3 leading-7 print:hidden"
+          data-testid="audit-day-reports"
+        >
+          <Link
+            href="/registers/incidents"
+            className="font-medium underline underline-offset-4"
+          >
+            {reportsToConfirmLine(toConfirm)}
+          </Link>
+          . Confirm it before the audit; it is not in your register until you
+          do.
+        </p>
+      ) : null}
       <p className="mt-4 print:hidden">
         {setId ? (
           <a
@@ -145,6 +171,17 @@ export default async function AuditDayPage() {
           </a>
         </p>
       ) : null}
+      {/* REQ-020 FR-1: everything the auditor asks for, in one zip, built when you click. */}
+      <p className="mt-3 text-sm print:hidden">
+        <a
+          href="/registers/audit-pack.zip"
+          className="underline underline-offset-2"
+          data-testid="audit-pack-download"
+        >
+          Download my audit pack (every register, the document control register,
+          the summary and the adopted documents)
+        </a>
+      </p>
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
       {[...shown.groups]

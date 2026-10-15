@@ -152,7 +152,7 @@ export async function computeAccountReminders(
     admin
       .from("incidents")
       .select(
-        "id, status, reportable, notify_by, reportable_notified_on, reported_on",
+        "id, status, reportable, notify_by, reportable_notified_on, reported_on, aware_at",
       )
       .eq("account_id", account.id),
     admin
@@ -179,28 +179,40 @@ export async function computeAccountReminders(
     [])
     if (!lastEvent.has(e.incident_id))
       lastEvent.set(e.incident_id, e.at.slice(0, 10));
+  // REQ-020 FR-5: a draft report raises only the nudge to confirm it; it joins
+  // the incident rules once confirmed. A rejected report raises nothing.
+  const incidentRows =
+    (inc.data as
+      | {
+          id: string;
+          status: "draft" | "open" | "under-review" | "closed" | "rejected";
+          reportable: boolean;
+          notify_by: string | null;
+          reportable_notified_on: string | null;
+          reported_on: string;
+          aware_at: string;
+        }[]
+      | null) ?? [];
   return dueReminders({
     today,
+    now: new Date().toISOString(),
     account: {
       id: account.id,
       registration_date: account.registration_date,
       registration_kind: account.registration_kind,
     },
-    incidents: (
-      (inc.data as
-        | {
-            id: string;
-            status: "open" | "under-review" | "closed";
-            reportable: boolean;
-            notify_by: string | null;
-            reportable_notified_on: string | null;
-            reported_on: string;
-          }[]
-        | null) ?? []
-    ).map((i) => ({
-      ...i,
-      last_activity_on: lastEvent.get(i.id) ?? i.reported_on,
-    })),
+    reports: incidentRows
+      .filter((i) => i.status === "draft")
+      .map((i) => ({ id: i.id, aware_at: i.aware_at })),
+    incidents: incidentRows
+      .filter(
+        (i): i is typeof i & { status: "open" | "under-review" | "closed" } =>
+          i.status !== "draft" && i.status !== "rejected",
+      )
+      .map((i) => ({
+        ...i,
+        last_activity_on: lastEvent.get(i.id) ?? i.reported_on,
+      })),
     complaints:
       (comp.data as
         | {

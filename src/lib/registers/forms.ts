@@ -15,8 +15,8 @@ import {
   COMPLAINT_STATUSES,
   INCIDENT_CATEGORIES,
   INCIDENT_SEVERITIES,
-  INCIDENT_STATUSES,
   NDIS_NUMBER_SHAPE,
+  OWNER_INCIDENT_STATUSES,
   REF_PATTERNS,
   TEXT_CAPS,
 } from "./types";
@@ -81,7 +81,7 @@ export const IncidentForm = strictObject({
       "This looks like an NDIS participant number. Use the Commission's reference instead.",
     )
     .default(""),
-  status: z.enum(INCIDENT_STATUSES),
+  status: z.enum(OWNER_INCIDENT_STATUSES),
   closedOn: optionalDate("date it was closed"),
 }).superRefine((v, ctx) => {
   if (v.reportedOn < v.occurredOn)

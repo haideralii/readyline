@@ -5,10 +5,16 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { documentControlSentence } from "@/lib/registers/document-control";
+import {
+  REGISTERS_LINKED_LINE,
+  RENEWAL_SAVES_LINE,
+} from "@/lib/registers/messages";
 import { MID_TERM_DUE_MONTHS, addMonths } from "@/lib/registers/reminders";
+import { reportsToConfirmLine } from "@/lib/registers/worker";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
 export const metadata: Metadata = { title: "Registers" };
@@ -60,10 +66,11 @@ const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const [o, a, dc, reg] = await Promise.all([
+  const [o, a, dc, toConfirm, reg] = await Promise.all([
     registerOverview(ctx.supabase, ctx.viewer.account.id),
     auditDayOverview(ctx.supabase, ctx.viewer.account.id),
     documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
+    countReportsToConfirm(ctx.supabase, ctx.viewer.account.id),
     ctx.supabase
       .from("accounts")
       .select("registration_date, registration_kind")
@@ -178,10 +185,44 @@ export default async function RegistersPage() {
   return (
     <RegisterPage
       title="Registers"
-      intro="What an auditor samples at the mid-term audit (certification providers) and at renewal. Keep them as things happen; nothing here is sent to anyone."
+      intro={
+        <>
+          What an auditor samples at the mid-term audit (certification
+          providers) and at renewal. Keep them as things happen; nothing here is
+          sent to anyone.{" "}
+          <span data-testid="registers-linked">{REGISTERS_LINKED_LINE}</span>{" "}
+          {RENEWAL_SAVES_LINE}
+        </>
+      }
       canWrite={ctx.canWrite}
     >
       <div data-testid="registers-index">
+        {reportsToConfirmLine(toConfirm) ? (
+          // REQ-020 FR-5: a report through the link or by a worker waits here until the owner confirms it.
+          <p
+            className="border-signal mt-4 rounded-md border p-3 leading-7"
+            data-testid="reports-to-confirm"
+          >
+            <Link
+              href="/registers/incidents"
+              className="font-medium underline underline-offset-4"
+            >
+              {reportsToConfirmLine(toConfirm)}
+            </Link>
+            . The 24 hours for a reportable incident run from the report, not
+            from when you read it.
+          </p>
+        ) : null}
+        {/* REQ-020 FR-1: one zip of every register, the document control register, the summary and the adopted documents. */}
+        <p className="mt-2 text-sm">
+          <a
+            href="/registers/audit-pack.zip"
+            className="underline underline-offset-2"
+            data-testid="audit-pack-download"
+          >
+            Download my audit pack
+          </a>
+        </p>
         {midTermDue ? (
           <p
             className="mt-2 text-sm text-zinc-700 dark:text-zinc-300"

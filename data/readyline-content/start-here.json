@@ -1,0 +1,97 @@
+{
+  "note": "The Start here sheet's own words (REQ-026 FR-2; D-2220): how long each document takes, why the first documents come first, what each register is for and which pack document carries its template, and the next steps. Dev draft of 15 October 2026 for the product owner to edit (FR-2.1 says the estimates are PO text); NOT NDIS Quality and Safeguards Commission text. Minutes are reading-and-filling time for one person who knows their business.",
+  "author": "readyline",
+  "status": "draft",
+  "draftedBy": "dev",
+  "draftedAt": "2026-10-15",
+  "estimateLine": "most documents take 15 to 30 minutes to fill in and read; the self-assessment about an hour.",
+  "defaultMinutes": 20,
+  "estimatesMinutes": {
+    "governance-policy": 30,
+    "risk-management-policy-and-register": 30,
+    "continuity-of-supports-plan": 25,
+    "conflict-of-interest-policy": 20,
+    "privacy-and-information-management-policy": 30,
+    "records-management-policy": 20,
+    "complaints-management-policy-and-register": 25,
+    "incident-management-policy-and-register": 30,
+    "worker-screening-and-recruitment-procedure": 25,
+    "induction-and-training-procedure-and-register": 25,
+    "code-of-conduct-acknowledgement": 10,
+    "service-agreement-template": 20,
+    "participant-rights-and-choice-policy": 20,
+    "safeguarding-policy": 25,
+    "emergency-and-disaster-management-plan": 25,
+    "quality-management-and-continuous-improvement": 25,
+    "feedback-and-participant-engagement-procedure": 15,
+    "support-planning-and-transitions-procedure": 20,
+    "medication-management-procedure": 25,
+    "mealtime-management-procedure": 20,
+    "waste-and-infection-control-procedure": 20,
+    "transport-safety-procedure": 15,
+    "high-intensity-skills-descriptors-and-training-register": 30,
+    "clinical-oversight-procedure": 25,
+    "restrictive-practice-authorisation-and-reporting-procedure": 30,
+    "behaviour-support-plan-implementation-procedure": 30,
+    "family-centred-practice-procedure": 20,
+    "child-safe-practices-policy": 25,
+    "conflict-of-interest-in-coordination-procedure": 20,
+    "complex-support-escalation-procedure": 20,
+    "dwelling-enrolment-and-maintenance-procedure": 20,
+    "tenancy-rights-and-dispute-procedure": 20,
+    "supported-decision-making-procedure": 20,
+    "sil-safeguarding-and-roster-oversight-procedure": 25,
+    "practice-governance-framework": 30,
+    "tenancy-housing-and-support-agreements-procedure": 20,
+    "practice-standards-self-assessment": 60,
+    "participant-money-and-property-procedure": 15
+  },
+  "defaultFirstWhy": "Auditors read it first.",
+  "firstWhy": {
+    "governance-policy": "Who decides what; read first.",
+    "risk-management-policy-and-register": "Every other document points here.",
+    "continuity-of-supports-plan": "What happens if you cannot.",
+    "conflict-of-interest-policy": "Auditors ask on day one.",
+    "privacy-and-information-management-policy": "Participant information, the law behind it.",
+    "records-management-policy": "Where every record lives.",
+    "complaints-management-policy-and-register": "A Rules requirement with a register.",
+    "incident-management-policy-and-register": "A Rules requirement with a register.",
+    "quality-management-and-continuous-improvement": "How you fix what goes wrong.",
+    "emergency-and-disaster-management-plan": "Required since the 2021 changes.",
+    "practice-governance-framework": "How practice is overseen."
+  },
+  "registerPurpose": {
+    "incidents": "What happened, what you did, whether the Commission was told.",
+    "complaints": "Every complaint, how it was handled and resolved.",
+    "worker-clearances": "Each worker's screening check and when it expires.",
+    "policy-reviews": "When each document was adopted and is next reviewed.",
+    "training": "Who was inducted and trained, and when.",
+    "restrictive-practices": "Each restrictive practice, its authorisation and its reporting."
+  },
+  "registerDocuments": {
+    "incidents": [
+      "incident-management-policy-and-register",
+      "risk-management-policy-and-register"
+    ],
+    "complaints": [
+      "complaints-management-policy-and-register",
+      "risk-management-policy-and-register"
+    ],
+    "worker-clearances": ["worker-screening-and-recruitment-procedure"],
+    "policy-reviews": ["governance-policy", "records-management-policy"],
+    "training": [
+      "induction-and-training-procedure-and-register",
+      "high-intensity-skills-descriptors-and-training-register"
+    ],
+    "restrictive-practices": [
+      "restrictive-practice-authorisation-and-reporting-procedure"
+    ]
+  },
+  "next": [
+    { "text": "Tick off your readiness checklist", "href": "/checklist" },
+    {
+      "text": "See what the auditor asks for on the day",
+      "href": "/path/audit-day"
+    }
+  ]
+}

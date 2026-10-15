@@ -12,6 +12,7 @@ const PUBLIC_PAGES = [
   "/",
   "/start",
   "/pricing",
+  "/sample",
   "/sign-in",
   "/about",
   "/privacy",
