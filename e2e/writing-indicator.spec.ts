@@ -286,4 +286,44 @@ test.describe("the writing indicator (REQ-021)", () => {
       await line.evaluate((el) => getComputedStyle(el).animationName),
     ).toBe("none");
   });
+
+  // D-2006 (batch 45, backlog 10): Lighthouse cannot measure the idle cost of
+  // one state, so the Writing phase's animation is measured with the
+  // devtools protocol on the Android project: main-thread task time over
+  // ten seconds, under half a second.
+  test("D-2006: the Writing animation costs the main thread under 0.5 s in 10 s (android-small)", async ({
+    page,
+    browserName,
+  }, testInfo) => {
+    test.skip(
+      browserName !== "chromium" || testInfo.project.name !== "android-small",
+      "the devtools protocol is Chromium's; the budget is the phone's",
+    );
+    // The steady scenario stays in Writing with fresh progress, so the pen
+    // moves for as long as the measurement runs.
+    await page.goto(`/dev/writing-indicator?scenario=steady&t0=${Date.now()}`);
+    await expect(indicator(page)).toHaveAttribute("data-phase", "writing");
+    await expect(indicator(page)).toHaveAttribute("data-moving", "true");
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Performance.enable");
+    const task = async () => {
+      const { metrics } = (await cdp.send("Performance.getMetrics")) as {
+        metrics: { name: string; value: number }[];
+      };
+      return metrics.find((m) => m.name === "TaskDuration")?.value ?? 0;
+    };
+    const before = await task();
+    await page.waitForTimeout(10_000);
+    const after = await task();
+    await expect(indicator(page)).toHaveAttribute("data-phase", "writing");
+    const seconds = after - before;
+    testInfo.annotations.push({
+      type: "cpu",
+      description: `Writing phase: ${seconds.toFixed(3)} s of main-thread tasks in 10 s`,
+    });
+    expect(
+      seconds,
+      "main-thread task time over 10 s of the Writing phase",
+    ).toBeLessThan(0.5);
+  });
 });

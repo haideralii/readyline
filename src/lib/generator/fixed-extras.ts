@@ -6,6 +6,14 @@
  * timeframes are not restated here: the Rules set them and the Commission's
  * current guidance is kept with the procedure (CLAUDE.md 4.6).
  */
+import {
+  CLEARANCE_COLUMNS,
+  COMPLAINT_COLUMNS,
+  COMPLAINT_EXAMPLE_ROW,
+  INCIDENT_COLUMNS,
+  INCIDENT_EXAMPLE_ROW,
+} from "@/lib/registers/names";
+import { reviewCyclesFor } from "./catalogue";
 import type { Block } from "./section-schema";
 import type { FixedContext } from "./fixed-text";
 
@@ -123,53 +131,90 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       text: "Consent can be withdrawn at any time by telling any worker; we record the withdrawal the same day.",
     },
   ],
+  // Batch 45 item 18: a fixed, sourced table (the section was tailored until
+  // batch 45 and its one sourced row never rendered; generator exam Q04).
+  // Read 15 October 2026 from the authorised Word copies on
+  // legislation.gov.au: Incident Rules F2018L00633 (as made) s 12(2) and
+  // s 25(1) to (3); Complaints Rules compilation F2026C00165 s 10(2) and (3);
+  // Worker Screening Rules compilation F2021C00788 ss 17, 18, 20 and 21.
+  // Where an instrument sets no period the row says so; seven years is our
+  // choice, the longest period any of the three sets.
   "retention-schedule": () => [
     {
       type: "paragraph",
-      text: "We keep each record for at least the period below, or longer where a law, a funding agreement or a complaint requires it, then destroy it securely.",
+      text: "We keep each record for at least the period below, or longer where a law, a funding agreement or a complaint requires it, then destroy it securely. Each row names the rule that sets the period; where no rule sets one, the period is our choice.",
     },
     {
       type: "table",
-      columns: ["Record", "Kept for", "Where"],
+      columns: ["Record", "Kept for", "Set by"],
       rows: [
-        ["Service agreements and support plans", "[period]", "[Location]"],
-        // NDIS watch 13 Oct 2026 item 4 (batch 35): Incident Rules F2018L00633 s 25(2), read 13 October 2026, https://www.legislation.gov.au/F2018L00633/latest/text.
         [
           "Reportable incident records",
-          "7 years from the date we notified the Commission (Incident Rules s 25)",
-          "[Location]",
+          "7 years from the date we notified the Commission",
+          "Incident Rules s 25(2), read 15 October 2026",
         ],
-        ["Other incident and complaint records", "[period]", "[Location]"],
         [
-          "Worker files, screening and training records",
-          "[period]",
-          "[Location]",
+          "Other incident records (the register entry the Rules require)",
+          "No period set in the Rules; we keep it 7 years, our choice",
+          "Incident Rules s 12(2) sets what we record, not how long, read 15 October 2026",
         ],
-        ["Financial records", "[period]", "[Location]"],
+        [
+          "Complaint records",
+          "7 years from the day the record is made",
+          "Complaints Rules s 10(3), read 15 October 2026",
+        ],
+        [
+          "The list of risk-assessed roles and the list of screened workers",
+          "7 years from the date the record is made, kept so an auditor can see who was in a risk-assessed role on any day in the last 7 years",
+          "Worker Screening Rules ss 20 and 21, read 15 October 2026",
+        ],
+        [
+          "Service agreements and support plans",
+          "No period set in the Rules; we keep it 7 years, our choice",
+          "The Practice Standards name the records, not a period",
+        ],
+        [
+          "Policies, procedures and the document control register",
+          "No period set in the Rules; we keep it 7 years, our choice",
+          "The Practice Standards name the records, not a period",
+        ],
+        [
+          "Worker files, training and induction records",
+          "No period set in the Rules; we keep it 7 years, our choice",
+          "The Practice Standards name the records, not a period",
+        ],
+        [
+          "Financial records",
+          "No period set in the Rules; we keep it 7 years, our choice",
+          "Tax and corporate law set their own periods, which we also meet",
+        ],
       ],
     },
   ],
-  register: (ctx) => [
+  // Batch 45 item 17 (field, auditor major NC, Commission): the paper
+  // registers carry the app's columns, from one list in
+  // src/lib/registers/names.ts, with one example row each; a unit test
+  // holds the two tables to that list.
+  "incident-register": (ctx) => [
     {
       type: "paragraph",
-      text: `${ctx.facts.tradingName} keeps this register up to date. ${NO_PARTICIPANT_DETAILS}`,
+      text: `${ctx.facts.tradingName} keeps this register up to date, on paper or in the app, with the same columns. ${NO_PARTICIPANT_DETAILS}`,
     },
     {
       type: "table",
-      columns: [
-        "Reference",
-        "Date received",
-        "Summary and actions",
-        "Outcome and improvement",
-      ],
-      rows: [
-        [
-          "[C-001]",
-          "[Date]",
-          "[summary and actions]",
-          "[Outcome; what we changed]",
-        ],
-      ],
+      columns: [...Object.values(INCIDENT_COLUMNS)],
+      rows: [[...INCIDENT_EXAMPLE_ROW]],
+    },
+  ],
+  "complaints-register": (ctx) => [
+    {
+      type: "paragraph",
+      text: `${ctx.facts.tradingName} keeps this register up to date, on paper or in the app, with the same columns. ${NO_PARTICIPANT_DETAILS}`,
+    },
+    {
+      type: "table",
+      columns: [...Object.values(COMPLAINT_COLUMNS)],
+      rows: [[...COMPLAINT_EXAMPLE_ROW]],
     },
   ],
   // Batch 42 item 1 (D-546): the Commission's contact details as fixed text,
@@ -207,7 +252,13 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
   "restrictive-practice-position": (ctx) => [
     {
       type: "paragraph",
-      text: `${ctx.facts.tradingName} does not use a restrictive practice unless it is in a behaviour support plan and authorised under the rules of the state or territory we work in.`,
+      // Batch 45 item 26 (Commission review): a provider that said it uses none
+      // says so in one sentence and points to the steps; one that uses them
+      // under a plan keeps the authorised-plan sentence.
+      text:
+        ctx.facts.usesRestrictivePractices === "no"
+          ? "We do not use restrictive practices. If one is used in an emergency, we treat it as an unauthorised restrictive practice and this is what we do: the steps below."
+          : `${ctx.facts.tradingName} does not use a restrictive practice unless it is in a behaviour support plan and authorised under the rules of the state or territory we work in. If one is used outside a plan or in an emergency, we treat it as an unauthorised restrictive practice and this is what we do: the steps below.`,
     },
     {
       type: "paragraph",
@@ -222,7 +273,8 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
       items: [
         "If a worker uses a restrictive practice in an emergency to keep someone safe, the worker keeps the person safe first and stops the practice as soon as the danger has passed.",
         "The worker tells the owner the same day and records what happened in the incident register before the end of the shift.",
-        "The owner reports the use to the Commission as an unauthorised restrictive practice: within 5 business days, or within 24 hours if the person was harmed (the escalation table in our incident management policy holds the rule).",
+        // Batch 45 item 19: Incident Rules ss 20 and 21, read 15 October 2026 (product/research/ndis-watch/2026-10-15.md).
+        "The owner reports the use to the Commission as an unauthorised restrictive practice: within 5 business days; within 24 hours if the use of a restrictive practice also caused serious injury or is itself abuse or neglect (Incident Rules ss 20 and 21; the escalation table in our incident management policy holds the rule).",
         "The owner reviews what led to it within 5 business days and records what we change in the improvement register.",
       ],
     },
@@ -250,14 +302,15 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
           "Straight away, and before the end of the shift in the incident register",
         ],
         ["The key person on duty", "The owner", "The same day"],
+        // Batch 45 item 19: the two windows as the Rules set them (ss 20 and 21, read 15 October 2026).
         [
           "The owner",
-          "The Commission, for death, serious injury, abuse or neglect, unlawful sexual or physical contact, sexual misconduct, or an unauthorised restrictive practice that caused harm",
+          "The Commission, for death, serious injury, abuse or neglect, unlawful sexual or physical contact, sexual misconduct, including when the use of a restrictive practice also caused serious injury or is itself abuse or neglect",
           "Within 24 hours of becoming aware (Incident Rules s 20), with the full report within 5 business days",
         ],
         [
           "The owner",
-          "The Commission, for an unauthorised restrictive practice that caused no harm",
+          "The Commission, for an unauthorised restrictive practice that is not also one of the kinds above",
           "Within 5 business days, in writing (Incident Rules s 21)",
         ],
         [
@@ -302,7 +355,15 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     // and the Queensland, ACT and Tasmanian screening pages, all read 13 October 2026.
     {
       type: "paragraph",
-      text: `${ctx.facts.tradingName} links every screened worker to our record in the NDIS Worker Screening Database and unlinks workers who leave. We check this register each month and start each renewal at least 90 days before the clearance expires. If a clearance expires, the worker stops risk-assessed work that day until a new clearance is issued.`,
+      // Batch 45 item 21: the cadence comes from the review cycles data, so
+      // "each month" and "every 3 months" can never both appear.
+      text: `${ctx.facts.tradingName} links every screened worker to our record in the NDIS Worker Screening Database and unlinks workers who leave. We check this register every ${reviewCyclesFor(ctx.type).registerMonths} months and start each renewal at least 90 days before the clearance expires. If a clearance expires, the worker stops risk-assessed work that day until a new clearance is issued.`,
+    },
+    {
+      type: "paragraph",
+      // Batch 45 item 24: Worker Screening Rules s 14(1)(a)(ii) and s 15(2)(a)
+      // and (e), read 15 October 2026 (product/research/ndis-watch/2026-10-15.md).
+      text: "A worker whose clearance is pending does not work unsupervised; a worker who is excluded or barred does not work with participants at all (Worker Screening Rules ss 13 to 15).",
     },
     {
       type: "paragraph",
@@ -310,20 +371,89 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     },
     {
       type: "table",
+      // Batch 45 item 22: the app's columns (src/lib/registers/names.ts);
+      // the Rules s 18(3)(d) require the check number on the provider's list.
       columns: [
-        "Worker role",
-        "Clearance type and number",
-        "Expiry",
-        "Next check",
+        CLEARANCE_COLUMNS.role_label,
+        CLEARANCE_COLUMNS.clearance_kind,
+        CLEARANCE_COLUMNS.clearance_number,
+        CLEARANCE_COLUMNS.issued_on,
+        CLEARANCE_COLUMNS.expires_on,
+        CLEARANCE_COLUMNS.next_check,
       ],
       rows: [
         [
           "[Role]",
-          "[NDIS worker screening clearance] [Number]",
+          "[NDIS worker screening clearance]",
+          "[Number]",
+          "[Date]",
           "[Date]",
           "[Date]",
         ],
       ],
+    },
+  ],
+  // Batch 45 item 15 (provider review): the recruitment and referee steps are
+  // written for workers; the owner with no workers is told, in one sentence,
+  // whom they apply to, rather than reading them as if they had a team.
+  // Batch 45 item 23 (Commission review): the changes and events the
+  // Provider Registration and Practice Standards Rules ss 13 and 13A
+  // (compilation F2026C00527, read 15 October 2026) require us to notify,
+  // each in the Commission's approved form, and one cooperation sentence.
+  // The Commission's site could not be read on 15 October 2026, so the
+  // forms are named only as "the Commission's approved form".
+  "telling-the-commission": (ctx) => [
+    {
+      type: "paragraph",
+      text: `${ctx.facts.tradingName} tells the NDIS Quality and Safeguards Commission, in its approved form, about the changes and events below. It is a condition of our registration (Provider Registration and Practice Standards Rules 2018, sections 13 and 13A, read 15 October 2026).`,
+    },
+    {
+      type: "table",
+      columns: ["What", "By when"],
+      rows: [
+        [
+          "A change to our contact details (Rules s 13)",
+          "As soon as practicable after we know it will happen, or after it happens, whichever is earlier",
+        ],
+        [
+          "A change in our scale: the area or the locations we work from, or a significant rise or fall in the number of participants or workers (Rules s 13)",
+          "As soon as practicable after we know it will happen, or after it happens, whichever is earlier",
+        ],
+        [
+          "An event that significantly affects our ability to meet a condition of registration, or a change that adversely affects a participant's access to our supports (Rules s 13A)",
+          "When we become aware it will occur, or when it occurs, whichever is earlier",
+        ],
+        [
+          "An adverse change in our financial capacity, or a significant change in our organisation or governance, including a change of ownership (Rules s 13A)",
+          "For a change of ownership: when we become aware it will occur, or when a necessary step toward it occurs, whichever is earlier; otherwise as the row above",
+        ],
+        [
+          "An event about the suitability of the business or of our key personnel of the kind the Commission would weigh for an applicant (Rules s 13A)",
+          "When we become aware it will occur, or when it occurs, whichever is earlier",
+        ],
+      ],
+    },
+    {
+      type: "paragraph",
+      text: "We cooperate with the Commission: we answer its requests for information, allow its inspections, carry out any action it requires, and keep the record of what we told it and when in the decisions register.",
+    },
+  ],
+  // Batch 45 item 25 (domain review): the privacy obligation named with its
+  // two sources, so the policy is right whether or not the Privacy Act binds
+  // the business.
+  "privacy-law": () => [
+    {
+      type: "paragraph",
+      text: "The NDIS Code of Conduct requires us to respect participants' privacy, and we follow the Australian Privacy Principles whether or not the Privacy Act 1988 binds us.",
+    },
+  ],
+  "first-recruit": (ctx) => [
+    {
+      type: "paragraph",
+      text:
+        ctx.facts.workerCountBand === "sole"
+          ? "Until we employ anyone, these steps apply to the first person we recruit."
+          : "These steps apply to every worker and key person we recruit, and to the referees we contact about them.",
     },
   ],
   "training-register": () => [
@@ -558,8 +688,6 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
 export const EXTRA_ALIASES: Record<string, string> = {
   "clearance-register": "clearance-register",
   "training-register": "training-register",
-  "complaints-register": "register",
-  "incident-register": "register",
   "complaints-procedure": "procedure",
   "incident-procedure": "procedure",
 };

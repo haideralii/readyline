@@ -334,8 +334,10 @@ describe.skipIf(enabled)("record model fixtures (skipped)", () => {
       (r) => r.caseId === "verification-sole-trader",
     );
     // REQ-016 S-6: the two AI documents left the set (seven sections, two types).
-    expect(soleTrader.length).toBe(83);
+    // 82 since batch 45 item 18 made the records policy's retention schedule fixed.
+    expect(soleTrader.length).toBe(82);
     expect(new Set(soleTrader.map((r) => r.typeId)).size).toBe(16);
-    expect(list.filter((r) => r.batch === 16)).toHaveLength(69);
+    // 68 for the same reason: the retention schedule was one of batch 16's recordings.
+    expect(list.filter((r) => r.batch === 16)).toHaveLength(68);
   });
 });

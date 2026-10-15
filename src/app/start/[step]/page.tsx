@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { STEP_TITLES, isStepId } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
+import { countEvent } from "@/server/metrics/counters";
 import { StepPage } from "../_components/step-page";
 import { BusinessStepForm } from "../_components/steps/business-step";
 import { ExistingStepForm } from "../_components/steps/existing-step";
@@ -49,5 +50,7 @@ export default async function QuestionnaireStepPage({
 }: PageProps<"/start/[step]">) {
   const { step } = await params;
   if (!isStepId(step)) notFound();
+  // Batch 45 item 12 (D-2002): results shown, counted per day, nothing per user.
+  if (step === "result") countEvent("result-shown");
   return <StepPage step={step}>{stepContent(step)}</StepPage>;
 }

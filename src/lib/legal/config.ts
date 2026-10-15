@@ -15,6 +15,14 @@ export function contactEmail(
   return value && EMAIL.test(value) ? value : null;
 }
 
+/** The registered business name, or null when `BUSINESS_NAME` is unset or blank (batch 45 item 1). */
+export function businessName(
+  env: Record<string, string | undefined> = process.env,
+): string | null {
+  const value = env.BUSINESS_NAME?.trim();
+  return value ? value : null;
+}
+
 /** The ABN formatted "NN NNN NNN NNN", or null when `BUSINESS_ABN` is unset or not 11 digits. */
 export function businessAbn(
   env: Record<string, string | undefined> = process.env,

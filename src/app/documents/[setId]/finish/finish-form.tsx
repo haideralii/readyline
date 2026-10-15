@@ -55,25 +55,47 @@ export function FinishForm({
   const [message, setMessage] = useState<string | null>(null);
   const [done, setDone] = useState<number | null>(null);
 
+  // A call that never comes back (the connection dropped, the server did
+  // not answer) must not leave the button busy for good: the customer gets
+  // the message and the button back, and can press it again (REQ-017: one
+  // step at a time, never a dead end).
+  const UNREACHABLE =
+    "Could not reach the server. Check your connection and try again.";
+
   async function saveOne(q: FactQuestion): Promise<boolean> {
     const value = (answers[q.key] ?? "").trim();
     if (!value) {
       setMessage("Type an answer first. A few words are enough.");
       return false;
     }
-    const r = await saveFactAction({ key: q.key, value });
-    if (!r.ok) {
-      setMessage(r.message);
+    try {
+      const r = await saveFactAction({ key: q.key, value });
+      if (!r.ok) {
+        setMessage(r.message);
+        return false;
+      }
+      return true;
+    } catch {
+      setMessage(UNREACHABLE);
       return false;
     }
-    return true;
   }
 
   async function finish() {
     setBusy(true);
     setMessage(null);
-    const r = await finishPackAction({ setId });
-    setBusy(false);
+    let r: Awaited<ReturnType<typeof finishPackAction>> | null = null;
+    try {
+      r = await finishPackAction({ setId });
+    } catch {
+      r = null;
+    } finally {
+      setBusy(false);
+    }
+    if (!r) {
+      setMessage(UNREACHABLE);
+      return;
+    }
     if (!r.ok) {
       setMessage(r.message);
       return;

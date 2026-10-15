@@ -5,7 +5,7 @@ description: "What an NDIS provider audit involves, in plain words: the five kin
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
-status: draft (Dev first draft, 14 Oct 2026; sourced to the Commission's types-of-audits page; the sector-webinar lines are labelled as practice, not rules; the PO reviews before publishing)
+status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; sourced to the Commission's types-of-audits page; the sector-webinar lines are labelled as practice, not rules)
 ---
 
 # What happens at an NDIS audit: the five kinds, what the auditor reads, and what it costs

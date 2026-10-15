@@ -1,18 +1,18 @@
 {
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "promptVersion": "2026-10-14.2",
   "model": "claude-sonnet-5-5",
   "mode": "replay",
   "caseId": "verification-sole-trader",
   "questions": 60,
-  "passed": 52,
-  "failed": 6,
+  "passed": 53,
+  "failed": 5,
   "notApplicable": 2,
   "mustPassFailed": [],
   "byGroup": {
     "time-frames": {
-      "passed": 8,
-      "failed": 1,
+      "passed": 9,
+      "failed": 0,
       "notApplicable": 1
     },
     "definitions": {
@@ -61,7 +61,7 @@
     },
     {
       "id": "Q04",
-      "outcome": "fail"
+      "outcome": "pass"
     },
     {
       "id": "Q05",

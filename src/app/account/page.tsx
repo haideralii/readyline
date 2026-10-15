@@ -9,21 +9,17 @@ import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
 import { registersLine } from "@/lib/registers/overview";
-import { reminderLine } from "@/lib/registers/reminders";
+import { dueSoonForAccount } from "@/server/registers/due-soon";
 import {
   hasActiveSubscription,
   registerOverview,
-  reminderReference,
 } from "@/server/registers/queries";
 import { getViewer } from "@/server/accounts/queries";
 import { signOut, signOutEverywhere } from "@/server/auth/actions";
 import { loadFacts } from "@/server/path/facts";
 import { listPurchases } from "@/server/payments/queries";
 import { subscriptionAvailable } from "@/server/payments/stripe";
-import {
-  getSubscription,
-  listUpcomingReminders,
-} from "@/server/payments/subscription-queries";
+import { getSubscription } from "@/server/payments/subscription-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
@@ -47,30 +43,19 @@ export default async function AccountPage() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  const [purchases, overview, subscription, subscribed, reminders, facts] =
+  const [purchases, overview, subscription, subscribed, dueSoon, facts] =
     await Promise.all([
       listPurchases(supabase, a.id),
       registerOverview(supabase, a.id),
       getSubscription(supabase, a.id),
       hasActiveSubscription(supabase, a.id),
-      listUpcomingReminders(supabase, a.id, today),
+      // Batch 45 item 5: every notify-by and review date inside 30 days from the live rows, the incident first.
+      dueSoonForAccount(supabase, a, today),
       loadFacts(supabase, a.id),
     ]);
   const registers = registersLine(overview);
   const pricing = readPricing();
   const subscriptionOffered = subscriptionAvailable();
-  const dueSoon = await Promise.all(
-    reminders.map(async (r) => ({
-      id: r.id,
-      line: reminderLine(
-        r.kind,
-        await reminderReference(supabase, r, a.trading_name),
-        r.due_on,
-      ),
-      sent: Boolean(r.sent_at),
-      sendOn: r.send_on,
-    })),
-  );
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>

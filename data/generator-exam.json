@@ -69,16 +69,17 @@
       "check": {
         "kind": "contains",
         "values": [
-          "7 years from the date we notified the Commission (Incident Rules s 25)"
+          "7 years from the date we notified the Commission",
+          "Incident Rules s 25(2)"
         ]
       },
-      "mapsTo": "fixed text: retention-schedule (watch item 4)",
+      "mapsTo": "fixed text: retention-schedule (watch item 4; batch 45 item 18 made the table fixed and sourced)",
       "source": {
         "title": "Incident Rules 2018, s 25",
         "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
       },
-      "mustPass": false,
-      "note": "Gap found by the exam on 14 Oct 2026: the records policy's retention schedule is a tailored section, so the fixed row the watch added (D-1801 batch 35, item 4) is never rendered, and the recorded reply predates the rule. PO: either make the brief require the seven-year row (recording group 3) or render the fixed table under the tailored text. Must pass once fixed.",
+      "mustPass": true,
+      "note": "Gap found by the exam on 14 Oct 2026: the retention schedule was a tailored section, so the fixed row never rendered. Batch 45 item 18 (15 Oct 2026) made the section fixed, with a sourced table; must pass from then on.",
       "watchChangeId": "wc-2026-10-14-04"
     },
     {

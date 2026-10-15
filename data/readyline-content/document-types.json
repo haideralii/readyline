@@ -437,6 +437,12 @@
           "heading": "Our structure and delegations",
           "mode": "tailored",
           "brief": "Describes the legal structure from the questionnaire (sole trader through to company), key personnel and who holds each delegation."
+        },
+        {
+          "id": "telling-the-commission",
+          "heading": "Telling the Commission about changes",
+          "mode": "fixed",
+          "brief": "Batch 45 item 23 (Commission review): the changes and events the Provider Registration and Practice Standards Rules ss 13 and 13A require us to notify, each in the Commission's approved form, with a read date, and one cooperation sentence. Unnumbered so the recorded prompts keep their outline (D-542)."
         }
       ],
       "basis": "code-of-conduct",
@@ -541,6 +547,12 @@
           "insertAfter": "review"
         },
         {
+          "id": "privacy-law",
+          "heading": "The law we follow",
+          "mode": "fixed",
+          "brief": "Batch 45 item 25 (domain review): the NDIS Code of Conduct's privacy obligation and the Australian Privacy Principles, followed whether or not the Privacy Act 1988 binds us. Unnumbered so the recorded prompts keep their outline (D-542)."
+        },
+        {
           "id": "consent-form",
           "heading": "Consent form",
           "mode": "fixed",
@@ -564,8 +576,8 @@
         {
           "id": "retention-schedule",
           "heading": "Retention schedule",
-          "mode": "tailored",
-          "brief": "Table of record type and retention period, adjusted to the supports and states; cites the source for each period or marks it for the provider to confirm. For anything that depends on a state or territory, use only the STATE FACTS block; if a state or a fact is missing from it, write the blank [state] and never name a law, body or period from memory."
+          "mode": "fixed",
+          "brief": "Batch 45 item 18 (domain, provider, field and auditor reviews): a fixed table with sourced rows and read dates from the Incident Rules ss 12 and 25, the Complaints Rules s 10 and the Worker Screening Rules ss 20 and 21; where an instrument sets no period the row says so and gives our own choice. Was tailored until batch 45; the section keeps its number."
         }
       ],
       "basis": "commission-rules",
@@ -683,6 +695,12 @@
           "heading": "Worker screening clearance register",
           "mode": "fixed",
           "brief": "Columns: role, clearance type, number, expiry, next check."
+        },
+        {
+          "id": "first-recruit",
+          "heading": "Who these steps apply to",
+          "mode": "fixed",
+          "brief": "Batch 45 item 15 (provider review): the recruitment and referee steps are written for workers; for the owner with no workers, one sentence says they apply to the first person recruited."
         }
       ],
       "basis": "practice-standard"

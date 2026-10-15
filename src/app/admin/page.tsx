@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { unverifiedChecklistItems } from "@/lib/checklist/confidence";
 import { requireAdmin, writeAdminAudit } from "@/server/admin/access";
 import { RETENTION_DAYS } from "@/server/accounts/purge";
+import { COUNTER_EVENTS, COUNTER_LABELS } from "@/lib/metrics/counters";
+import { countersLast30Days } from "@/server/metrics/counters";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 
 export const metadata: Metadata = {
@@ -29,6 +31,8 @@ export default async function AdminPage() {
       .limit(25),
   ]);
   await writeAdminAudit(ctx.user.id, "admin.viewed", "/admin");
+  // Batch 45 item 12 (D-2002): the five first-party counters, last 30 days.
+  const counters = await countersLast30Days(admin);
 
   // REQ-016 FR-0c: generator failures are an admin line, never a customer count.
   const sets = await admin
@@ -76,6 +80,38 @@ export default async function AdminPage() {
                 {r.label}
               </dt>
               <dd className="mt-1 text-2xl font-semibold">{r.value ?? "–"}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <section
+        aria-labelledby="counters-heading"
+        className="mt-10"
+        data-testid="admin-counters"
+      >
+        <h2 id="counters-heading" className="text-xl font-semibold">
+          Last 30 days
+        </h2>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+          First-party counts by day: no cookies, no third party, nothing per
+          person.
+        </p>
+        <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {COUNTER_EVENTS.map((e) => (
+            <div
+              key={e}
+              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+            >
+              <dt className="text-sm text-zinc-600 dark:text-zinc-400">
+                {COUNTER_LABELS[e]}
+              </dt>
+              <dd
+                className="mt-1 text-2xl font-semibold"
+                data-testid={`counter-${e}`}
+              >
+                {counters ? counters[e] : "–"}
+              </dd>
             </div>
           ))}
         </dl>
@@ -150,7 +186,7 @@ export default async function AdminPage() {
 
       <p className="mt-10 text-sm text-zinc-600 dark:text-zinc-400">
         The purge job runs daily from Vercel Cron; to run it by hand call the
-        purge route with the cron secret and
+        purge route with the cron secret and{" "}
         <code className="mx-1">?dryRun=1</code> first.
       </p>
     </div>

@@ -31,10 +31,16 @@ describe("checklist items as instructions (REQ-017 step 6, batch 37)", () => {
 
   it("every title is an instruction in the customer's voice and passes the copy lint", () => {
     for (const item of items) {
-      // An instruction starts with a verb in the imperative: ask, get, read, start, type, book, choose, tell, put.
+      // An instruction starts with a verb in the imperative: ask, get, read, start, type, book, choose, tell, put, keep.
       expect(item.title, item.id).toMatch(
-        /^(Ask|Get|Read|Start|Type|Book|Choose|Tell|Put)\b/,
+        /^(Ask|Get|Read|Start|Type|Book|Choose|Tell|Put|Keep)\b/,
       );
+      // Batch 45 item 4: what the auditor says, never the provider's instruction.
+      expect(item.ask, item.id).toMatch(/^(Show me|What|Which|When|Who|How)\b/);
+      expect(item.ask, item.id).not.toMatch(
+        /Read your|Start your|adopt it|Ask your|Get |Book your|Choose an|Tell your|Put your/,
+      );
+      expect(lintText(item.ask, { block: true }), item.id).toEqual([]);
       expect(lintText(item.title, { block: true }), item.id).toEqual([]);
       expect(lintText(item.why, { block: true }), item.id).toEqual([]);
       if (item.action) {
@@ -124,6 +130,9 @@ describe("deriveChecklist (REQ-006 AC-1)", () => {
         c.answers.business.structure === "company"
       )
         expected.push("business:insurance-workers-compensation");
+      // Batch 45 item 11: the service agreement standard is in the core module; a verification-only provider's item cites the HR standard and says so.
+      if (!c.result.modules.some((m) => m.id === "core"))
+        expected.push("audit:service-agreements");
       expect(unverified, c.id).toEqual(expected.sort());
     }
   });
@@ -190,6 +199,7 @@ describe("deriveChecklist (REQ-006 AC-1)", () => {
     expect(ids(soleTrader.checklist, "audit")).toEqual([
       "audit:choose-auditor",
       "audit:book-audit",
+      "audit:service-agreements",
     ]);
     expect(
       soleTrader.checklist.items.find((i) => i.id === "audit:book-audit")!
@@ -198,6 +208,7 @@ describe("deriveChecklist (REQ-006 AC-1)", () => {
     expect(ids(personalCare.checklist, "audit")).toEqual([
       "audit:choose-auditor",
       "audit:book-audit",
+      "audit:service-agreements",
       "audit:participant-interview-consent",
       "audit:worker-interview-availability",
       "audit:mid-term-audit-date",

@@ -20,12 +20,13 @@ import { subscriptionAvailable } from "@/server/payments/stripe";
 export const metadata: Metadata = { title: "Pricing" };
 
 /**
- * The pricing page (REQ-007 FR-1): one fixed price, what the pack is and is
- * not, the refund promise from refunds.md, the AI disclosure, the subscription
- * shown as coming, and the links the law and the house rules require. Works
- * signed out; a signed-in owner with a complete questionnaire sees their own
- * document set instead of the core set. Session C replaces the sign-in link
- * with the Buy action.
+ * The pricing page (REQ-007 FR-1): the two offers as halves of equal weight
+ * (batch 45 item 9, D-2001), the subscription first as what keeps a provider
+ * audit-ready, the pack second as where they start, no bundling and no
+ * discount; then what the pack is and is not, the refund promise from
+ * refunds.md, the AI disclosure, and the links the law and the house rules
+ * require. Works signed out; a signed-in owner with a complete questionnaire
+ * sees their own document set instead of the core set.
  */
 async function documentsForVisitor(): Promise<{
   titles: string[];
@@ -62,6 +63,9 @@ async function documentsForVisitor(): Promise<{
 const h2 = "mt-10 text-xl font-semibold";
 const body = "mt-3 leading-7 text-zinc-700 dark:text-zinc-300";
 const link = "underline underline-offset-2";
+const half =
+  "scroll-mt-6 rounded-md border border-zinc-300 p-5 dark:border-zinc-700";
+const eyebrow = "text-sm font-medium text-zinc-600 dark:text-zinc-400";
 
 export default async function PricingPage() {
   const pricing = readPricing();
@@ -73,69 +77,134 @@ export default async function PricingPage() {
       <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
       <p className={body}>{C.intro}</p>
 
-      <section
-        aria-labelledby="price-heading"
-        className="mt-8 rounded-md border border-zinc-300 p-5 dark:border-zinc-700"
+      <div
+        className="mt-8 grid gap-4 sm:grid-cols-2"
+        data-testid="pricing-halves"
       >
-        <h2 id="price-heading" className="text-xl font-semibold">
-          {C.priceHeading}
-        </h2>
-        {pricing.packPriceCents ? (
-          <p className="mt-2">
-            <span className="text-3xl font-semibold" data-testid="pack-price">
-              {formatAud(pricing.packPriceCents)}
-            </span>
-            <span className="ml-2 text-zinc-600 dark:text-zinc-400">
-              one-off, for the document pack
-            </span>
-          </p>
-        ) : (
-          <p className={body} data-testid="pack-price-unset">
-            {C.priceUnset}
-          </p>
-        )}
-        {pricing.gstLine ? (
-          <p
-            className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-            data-testid="gst-line"
-          >
-            {pricing.gstLine}
-          </p>
-        ) : null}
-        {docs.signedIn ? (
-          <BuyButton label={C.buy} cancelPath="/pricing" />
-        ) : (
-          <>
-            <p className="mt-4">
-              <Link
-                href="/sign-in?next=%2Fpricing"
-                className="inline-flex min-h-12 items-center justify-center rounded-md bg-zinc-900 px-5 text-base font-medium text-white hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-                data-testid="sign-in-to-buy"
-              >
-                {C.signInToBuy}
-              </Link>
+        <section
+          id="keeps"
+          aria-labelledby="sub-heading"
+          className={half}
+          data-testid="pricing-subscription"
+        >
+          <p className={eyebrow}>{C.keepsEyebrow}</p>
+          <h2 id="sub-heading" className="mt-1 text-xl font-semibold">
+            {C.subscriptionHeading}
+          </h2>
+          {offered ? (
+            <>
+              {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee. */}
+              <p className={body} data-testid="subscription-offer">
+                {pricing.subscriptionPriceCents
+                  ? `${formatAud(pricing.subscriptionPriceCents)} a month for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee, no instalments, no interest.`
+                  : "A monthly subscription for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee."}
+              </p>
+              {/* REQ-018 FR-12: what the registers do that a spreadsheet does not. */}
+              <p className={body} data-testid="registers-linked">
+                {C.registersLinked}
+              </p>
+              <p className={body} data-testid="renewal-saves">
+                {C.renewalSaves}
+              </p>
+              {docs.signedIn ? (
+                <SubscribeButton
+                  label={
+                    pricing.subscriptionPriceCents
+                      ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
+                      : "Subscribe to the registers"
+                  }
+                  cancelPath="/pricing"
+                />
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                  Sign in to subscribe; the registers belong to your account.
+                </p>
+              )}
+            </>
+          ) : (
+            /* PO review (D-051): the price line and no buy button until the Price exists; batch 45 item 2: never "coming soon". */
+            <p className={body} data-testid="subscription-coming">
+              {pricing.subscriptionPriceCents
+                ? `${formatAud(pricing.subscriptionPriceCents)} a month, not available yet. `
+                : "Not available yet. "}
+              {C.subscriptionComing}
             </p>
-            <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              {C.signInNote}
+          )}
+        </section>
+
+        <section
+          id="start"
+          aria-labelledby="price-heading"
+          className={half}
+          data-testid="pricing-pack"
+        >
+          <p className={eyebrow}>{C.startEyebrow}</p>
+          <h2 id="price-heading" className="mt-1 text-xl font-semibold">
+            {C.priceHeading}
+          </h2>
+          {pricing.packPriceCents ? (
+            <p className="mt-2">
+              <span className="text-3xl font-semibold" data-testid="pack-price">
+                {formatAud(pricing.packPriceCents)}
+              </span>{" "}
+              <span className="text-zinc-600 dark:text-zinc-400">
+                one-off, for the document pack
+              </span>
             </p>
-          </>
-        )}
-        <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          {C.termsLead}{" "}
-          <Link href="/terms" className={link}>
-            {C.terms}
-          </Link>
-          ,{" "}
-          <Link href="/privacy" className={link}>
-            {C.privacy}
-          </Link>{" "}
-          and{" "}
-          <Link href="/refunds" className={link}>
-            {C.refundsPage}
-          </Link>
-          .
-        </p>
-      </section>
+          ) : (
+            <p className={body} data-testid="pack-price-unset">
+              {C.priceUnset}
+            </p>
+          )}
+          {pricing.gstLine ? (
+            <p
+              className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+              data-testid="gst-line"
+            >
+              {pricing.gstLine}
+            </p>
+          ) : null}
+          {docs.signedIn ? (
+            <BuyButton label={C.buy} cancelPath="/pricing" />
+          ) : (
+            <>
+              <p className="mt-4">
+                <Link
+                  href="/sign-in?next=%2Fpricing"
+                  className="btn-primary"
+                  data-testid="sign-in-to-buy"
+                >
+                  {C.signInToBuy}
+                </Link>
+              </p>
+              <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                {C.signInNote}
+              </p>
+            </>
+          )}
+          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            {C.termsLead}{" "}
+            <Link href="/terms" className={link}>
+              {C.terms}
+            </Link>
+            ,{" "}
+            <Link href="/privacy" className={link}>
+              {C.privacy}
+            </Link>{" "}
+            and{" "}
+            <Link href="/refunds" className={link}>
+              {C.refundsPage}
+            </Link>
+            .
+          </p>
+        </section>
+      </div>
+      <p
+        className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        data-testid="pricing-separate"
+      >
+        {C.separateLine}
+      </p>
 
       <section aria-labelledby="get-heading">
         <h2 id="get-heading" className={h2}>
@@ -189,53 +258,16 @@ export default async function PricingPage() {
         <p className={body} data-testid="pricing-ai-disclosure">
           {C.aiDisclosure}
         </p>
+        <p className={body} data-testid="pricing-ai-appendix">
+          {C.aiAppendixLead}{" "}
+          <Link href="/ai" className={link}>
+            {C.aiAppendixLink}
+          </Link>
+          .
+        </p>
         <p className={body} data-testid="pricing-notice">
           {C.notLegalAdvice}
         </p>
-      </section>
-
-      <section aria-labelledby="sub-heading">
-        <h2 id="sub-heading" className={h2}>
-          {C.subscriptionHeading}
-        </h2>
-        {offered ? (
-          <>
-            {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee. */}
-            <p className={body} data-testid="subscription-offer">
-              {pricing.subscriptionPriceCents
-                ? `${formatAud(pricing.subscriptionPriceCents)} a month for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee, no instalments, no interest.`
-                : "A monthly subscription for the incident, complaints, worker check and policy review registers, with email reminders. Cancel at any time; no notice period, no fee."}
-            </p>
-            {/* REQ-018 FR-12: what the registers do that a spreadsheet does not. */}
-            <p className={body} data-testid="registers-linked">
-              The registers are linked: an incident becomes an improvement row,
-              a worker check becomes a staff matrix row, and the reminders go
-              out by email, which a spreadsheet does not do.
-            </p>
-            {docs.signedIn ? (
-              <SubscribeButton
-                label={
-                  pricing.subscriptionPriceCents
-                    ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
-                    : "Subscribe to the registers"
-                }
-                cancelPath="/pricing"
-              />
-            ) : (
-              <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                Sign in to subscribe; the registers belong to your account.
-              </p>
-            )}
-          </>
-        ) : (
-          /* PO review (D-051): "AUD 39 a month, coming soon", no buy button until the Price exists. */
-          <p className={body} data-testid="subscription-coming">
-            {pricing.subscriptionPriceCents
-              ? `${C.subscriptionHeading}: ${formatAud(pricing.subscriptionPriceCents)} a month, coming soon. `
-              : `${C.subscriptionHeading}: coming soon. `}
-            {C.subscriptionComing}
-          </p>
-        )}
       </section>
 
       <p className="mt-10 text-sm text-zinc-600 dark:text-zinc-400">

@@ -89,6 +89,18 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "bullets",
         ],
         "heading": "Records and evidence to retain",
@@ -612,6 +624,16 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -760,13 +782,14 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -1238,12 +1261,23 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "blocks": [
           "paragraph",
           "paragraph",
+          "paragraph",
           "table",
         ],
         "heading": "Worker screening clearance register",
         "id": "clearance-register",
         "mode": "fixed",
         "number": "6",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+        ],
+        "heading": "Who these steps apply to",
+        "id": "first-recruit",
+        "mode": "fixed",
+        "number": "",
         "status": "fixed",
       },
       {
@@ -3185,6 +3219,9 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
       {
         "blocks": [
           "paragraph",
+          "paragraph",
+          "bullets",
+          "paragraph",
           "bullets",
         ],
         "heading": "Items to prepare before the audit",
@@ -3296,6 +3333,18 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "mode": "tailored",
         "number": "7",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -3823,6 +3872,16 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -3971,13 +4030,14 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -4449,12 +4509,23 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "blocks": [
           "paragraph",
           "paragraph",
+          "paragraph",
           "table",
         ],
         "heading": "Worker screening clearance register",
         "id": "clearance-register",
         "mode": "fixed",
         "number": "6",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+        ],
+        "heading": "Who these steps apply to",
+        "id": "first-recruit",
+        "mode": "fixed",
+        "number": "",
         "status": "fixed",
       },
       {
@@ -6242,6 +6313,9 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
       {
         "blocks": [
           "paragraph",
+          "paragraph",
+          "bullets",
+          "paragraph",
           "bullets",
         ],
         "heading": "Items to prepare before the audit",
@@ -6353,6 +6427,18 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "mode": "tailored",
         "number": "7",
         "status": "placeholder",
+      },
+      {
+        "blocks": [
+          "paragraph",
+          "table",
+          "paragraph",
+        ],
+        "heading": "Telling the Commission about changes",
+        "id": "telling-the-commission",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -6877,6 +6963,16 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       {
         "blocks": [
           "paragraph",
+        ],
+        "heading": "The law we follow",
+        "id": "privacy-law",
+        "mode": "fixed",
+        "number": "",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
           "table",
           "paragraph",
         ],
@@ -7024,13 +7120,14 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
-          "callout",
+          "paragraph",
+          "table",
         ],
         "heading": "Retention schedule",
         "id": "retention-schedule",
-        "mode": "tailored",
+        "mode": "fixed",
         "number": "7",
-        "status": "placeholder",
+        "status": "fixed",
       },
       {
         "blocks": [
@@ -7501,12 +7598,23 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "paragraph",
+          "paragraph",
           "table",
         ],
         "heading": "Worker screening clearance register",
         "id": "clearance-register",
         "mode": "fixed",
         "number": "6",
+        "status": "fixed",
+      },
+      {
+        "blocks": [
+          "paragraph",
+        ],
+        "heading": "Who these steps apply to",
+        "id": "first-recruit",
+        "mode": "fixed",
+        "number": "",
         "status": "fixed",
       },
       {
@@ -8364,6 +8472,9 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
       },
       {
         "blocks": [
+          "paragraph",
+          "paragraph",
+          "bullets",
           "paragraph",
           "bullets",
         ],

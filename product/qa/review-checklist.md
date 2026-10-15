@@ -16,6 +16,7 @@
 
 ## Quality
 - Tests actually assert behaviour (not just "renders"). Snapshot tests are reviewed, not auto-accepted.
+- Every form the change adds or touches that a customer submits has an e2e that submits it through the real handler on all three projects (definition of done, item 11); name the spec.
 - Error states and empty states exist and are humane.
 - Performance on the budget-Android project: interactive quickly, no layout shift.
 

@@ -442,24 +442,12 @@
       "blocks": [
         {
           "type": "paragraph",
-          "text": "Example Supports keeps this register up to date. We record a reference code for each person, never a name, date of birth, NDIS number, address or health detail."
+          "text": "Example Supports keeps this register up to date. We use reference codes, never a participant's name or health details."
         },
         {
           "type": "table",
-          "columns": [
-            "Reference",
-            "Date received",
-            "Summary and actions",
-            "Outcome and improvement"
-          ],
-          "rows": [
-            [
-              "[C-001]",
-              "[Date]",
-              "[summary and actions]",
-              "[Outcome; what we changed]"
-            ]
-          ]
+          "columns": ["Reference", "Date", "Summary", "Action and outcome"],
+          "rows": [["[Code]", "[Date]", "[Summary]", "[Action and outcome]"]]
         }
       ]
     },

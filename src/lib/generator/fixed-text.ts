@@ -17,8 +17,9 @@ import type { Block } from "./section-schema";
 import { fixedExtra } from "./fixed-extras";
 import { placeholderFor } from "./placeholders";
 import {
+  AUDIT_RECORD_TIER_TITLES,
   canonicalRecordName,
-  itemsToPrepareBeforeAudit,
+  itemsToPrepareByTier,
 } from "@/lib/registers/names";
 
 export type FixedContext = {
@@ -240,12 +241,23 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
     case "gaps":
       // Batch 42 item 3 (D-547): the twelve records an auditor asks for, in
       // the order the audit-day page asks for them, from the one list.
+      // Batch 45 (REQ-018-gated item): the twelve in their two tiers, the
+      // two paper records marked, the same words as the audit-day page.
       return [
         {
           type: "paragraph",
-          text: "The records listed below are what an auditor asks to see, in the order they ask. We mark each one as ready or still to prepare before we book the audit.",
+          text: 'The records listed below are what an auditor asks to see, in the order they ask. We mark each one as ready or still to prepare before we book the audit. A record marked "kept on paper" is a signed or issued document we keep in our folder; the register holds its dates.',
         },
-        { type: "bullets", items: itemsToPrepareBeforeAudit() },
+        {
+          type: "paragraph",
+          text: `${AUDIT_RECORD_TIER_TITLES.named}: the Rules require the incident and complaints registers, and the Practice Standards expect the rest of these.`,
+        },
+        { type: "bullets", items: itemsToPrepareByTier().named },
+        {
+          type: "paragraph",
+          text: `${AUDIT_RECORD_TIER_TITLES.practice}: not named by a standard, asked for at most audits.`,
+        },
+        { type: "bullets", items: itemsToPrepareByTier().practice },
       ];
     case "standards-table": {
       // The Commission's outcome stays verbatim (CLAUDE.md 4.6); tables hold at most 20 rows (D-501).

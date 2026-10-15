@@ -87,6 +87,78 @@
       "why": "Sector practice from the auditors' webinar: the auditor asks for the participant's medical emergency list and the agreed action; the step names the role that acts and the record it writes to.",
       "source": "product/research/webinars/2026-10-14-what-auditors-look-for.md",
       "watchReport": "batch 35, D-1802 (brief addition)"
+    },
+    {
+      "id": "wc-2026-10-15-01",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["records-management-policy"],
+      "sectionId": "retention-schedule",
+      "oldSentence": null,
+      "newSentence": "Complaint records | 7 years from the day the record is made | Complaints Rules s 10(3), read 15 October 2026",
+      "why": "Batch 45 item 18: the retention schedule is a fixed, sourced table; Complaints Rules s 10(3) (compilation F2026C00165) sets 7 years from the day the record is made; Incident Rules s 12(2) sets what is recorded, not how long; Worker Screening Rules ss 20 and 21 set 7 years for the worker lists.",
+      "source": "https://www.legislation.gov.au/F2018L00634/2026-01-28/2026-01-28/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
+    },
+    {
+      "id": "wc-2026-10-15-06",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["incident-management-policy-and-register"],
+      "sectionId": "escalation-pathway",
+      "oldSentence": "The Commission, for an unauthorised restrictive practice that caused no harm",
+      "newSentence": "The Commission, for an unauthorised restrictive practice that is not also one of the kinds above",
+      "why": "Batch 45 item 19: the escalation table's two Commission rows say what the Incident Rules ss 20 and 21 say; the 24-hour row now names the case where the use of a restrictive practice also caused serious injury or is itself abuse or neglect.",
+      "source": "https://www.legislation.gov.au/F2018L00633/asmade/2018-05-18/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
+    },
+    {
+      "id": "wc-2026-10-15-02",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["safeguarding-policy"],
+      "sectionId": "restrictive-practice-position",
+      "oldSentence": "The owner reports the use to the Commission as an unauthorised restrictive practice: within 5 business days, or within 24 hours if the person was harmed (the escalation table in our incident management policy holds the rule).",
+      "newSentence": "The owner reports the use to the Commission as an unauthorised restrictive practice: within 5 business days; within 24 hours if the use of a restrictive practice also caused serious injury or is itself abuse or neglect (Incident Rules ss 20 and 21; the escalation table in our incident management policy holds the rule).",
+      "why": "Batch 45 item 19: the 24-hour window is s 20's, which applies when the event is also death, serious injury, abuse or neglect, unlawful contact or sexual misconduct; an unauthorised restrictive practice on its own is s 21's 5 business days.",
+      "source": "https://www.legislation.gov.au/F2018L00633/asmade/2018-05-18/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
+    },
+    {
+      "id": "wc-2026-10-15-03",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["worker-screening-and-recruitment-procedure"],
+      "sectionId": "clearance-register",
+      "oldSentence": null,
+      "newSentence": "A worker whose clearance is pending does not work unsupervised; a worker who is excluded or barred does not work with participants at all.",
+      "why": "Batch 45 item 24: Worker Screening Rules s 14(1)(a)(ii) (supervised by a person with a clearance while the application is pending) and s 15(2)(a) and (e) (an exclusion or an interim bar means the person is not in the process of obtaining a clearance, so s 13 applies: no risk-assessed role).",
+      "source": "https://www.legislation.gov.au/F2018L00887/2021-07-31/2021-07-31/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
+    },
+    {
+      "id": "wc-2026-10-15-04",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["worker-screening-and-recruitment-procedure"],
+      "sectionId": "clearance-register",
+      "oldSentence": "Clearance type and number",
+      "newSentence": "Check number",
+      "why": "Batch 45 item 22: the register's columns match the app (kind, check number, issued, expiry, next check); Worker Screening Rules s 18(3)(d) require the provider's list to hold the application number and the check number, so the app gains the optional field.",
+      "source": "https://www.legislation.gov.au/F2018L00887/2021-07-31/2021-07-31/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
+    },
+    {
+      "id": "wc-2026-10-15-05",
+      "appliedOn": "2026-10-15",
+      "where": "fixed-text",
+      "documentTypeIds": ["governance-policy"],
+      "sectionId": "telling-the-commission",
+      "oldSentence": null,
+      "newSentence": "We tell the Commission, in its approved form, about a change to our contact details, our area, our locations or a significant change in participant or worker numbers (Rules s 13), and about an event that affects our ability to meet a condition of registration, access to our supports, our financial capacity, our organisation or governance, including a change of ownership, or the suitability of the business or its key personnel (Rules s 13A).",
+      "why": "Batch 45 item 23: the Provider Registration and Practice Standards Rules ss 13 and 13A (compilation F2026C00527) list the changes and events and set 'as soon as practicable' and 'the earlier of' timing; the section also carries one cooperation sentence.",
+      "source": "https://www.legislation.gov.au/F2018L00631/2026-07-01/2026-07-01/text/original/word",
+      "watchReport": "product/research/ndis-watch/2026-10-15.md (batch 45 Session B)"
     }
   ]
 }

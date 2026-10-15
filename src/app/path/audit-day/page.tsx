@@ -7,6 +7,7 @@ import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { auditKindsContent } from "@/lib/questionnaire/content";
 import { auditDayAskList } from "@/lib/registers/audit-day-ask";
+import { AUDIT_RECORD_TIER_TITLES, KEPT_ON_PAPER } from "@/lib/registers/names";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { getViewer } from "@/server/accounts/queries";
 import {
@@ -124,38 +125,43 @@ export default async function AuditDayPage() {
         </p>
       ) : null}
 
-      {shown.groups.map((g) => (
-        <section
-          key={g.id}
-          aria-labelledby={`ask-${g.id}`}
-          className="mt-10"
-          data-testid="audit-day-group"
-        >
-          <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
-            {ASK[g.id] ?? g.title}
-          </h2>
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
-            {g.items.map((i) => {
-              const t = tick(i);
-              return (
-                <li key={i.id} className="flex gap-3 py-3 leading-7">
-                  <span aria-hidden="true" className="w-5 shrink-0">
-                    {t.mark}
-                  </span>
-                  <span>
-                    <span className="font-medium">
-                      &quot;Show me: {i.title}.&quot;
-                    </span>{" "}
-                    <span className="text-zinc-700 dark:text-zinc-300">
-                      {t.word}
+      {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
+      {[...shown.groups]
+        .sort(
+          (a, b) =>
+            Object.keys(ASK).indexOf(a.id) - Object.keys(ASK).indexOf(b.id),
+        )
+        .map((g) => (
+          <section
+            key={g.id}
+            aria-labelledby={`ask-${g.id}`}
+            className="mt-10"
+            data-testid="audit-day-group"
+          >
+            <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
+              {ASK[g.id] ?? g.title}
+            </h2>
+            <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+              {g.items.map((i) => {
+                const t = tick(i);
+                return (
+                  <li key={i.id} className="flex gap-3 py-3 leading-7">
+                    <span aria-hidden="true" className="w-5 shrink-0">
+                      {t.mark}
                     </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+                    <span>
+                      {/* Batch 45 item 4: what the auditor says, never the provider's instruction. */}
+                      <span className="font-medium">&quot;{i.ask}&quot;</span>{" "}
+                      <span className="text-zinc-700 dark:text-zinc-300">
+                        {t.word}
+                      </span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
 
       {groups.length ? (
         <section
@@ -192,37 +198,58 @@ export default async function AuditDayPage() {
         </h2>
         <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
           Policies are one third of an audit. The rest is records: a register
-          with every field filled and a review date on every row.
+          with every field filled and a review date on every row. A record
+          marked &quot;{KEPT_ON_PAPER}&quot; is a signed or issued document you
+          keep in your folder; the register holds its dates.
         </p>
-        <ol className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
-          {asks.map((a) => (
-            <li
-              key={a.id}
-              className="flex gap-3 py-3 leading-7"
-              data-testid={`ask-${a.id}`}
-              data-state={a.state}
-            >
-              <span aria-hidden="true" className="w-5 shrink-0">
-                {a.state === "filled" ? "✓" : a.state === "overdue" ? "!" : "○"}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="font-medium">
-                  &quot;Show me: {a.ask}.&quot;
-                </span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">
-                  {a.word}
-                </span>{" "}
-                <Link
-                  href={a.href}
-                  className="underline underline-offset-2 print:hidden"
-                  data-testid={`ask-link-${a.id}`}
-                >
-                  {a.action}
-                </Link>
-              </span>
-            </li>
-          ))}
-        </ol>
+        {/* Batch 45 (REQ-018-gated item): the twelve in their two tiers, the paper records marked. */}
+        {(["named", "practice"] as const).map((tier) => (
+          <div key={tier} data-testid={`ask-tier-${tier}`}>
+            <h3 className="mt-5 text-base font-semibold">
+              {AUDIT_RECORD_TIER_TITLES[tier]}
+            </h3>
+            <ol className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
+              {asks
+                .filter((a) => a.tier === tier)
+                .map((a) => (
+                  <li
+                    key={a.id}
+                    className="flex gap-3 py-3 leading-7"
+                    data-testid={`ask-${a.id}`}
+                    data-state={a.state}
+                  >
+                    <span aria-hidden="true" className="w-5 shrink-0">
+                      {a.state === "filled"
+                        ? "✓"
+                        : a.state === "overdue"
+                          ? "!"
+                          : "○"}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="font-medium">
+                        &quot;Show me: {a.ask}.&quot;
+                      </span>{" "}
+                      {a.paper ? (
+                        <span className="text-zinc-700 dark:text-zinc-300">
+                          ({KEPT_ON_PAPER})
+                        </span>
+                      ) : null}{" "}
+                      <span className="text-zinc-700 dark:text-zinc-300">
+                        {a.word}
+                      </span>{" "}
+                      <Link
+                        href={a.href}
+                        className="underline underline-offset-2 print:hidden"
+                        data-testid={`ask-link-${a.id}`}
+                      >
+                        {a.action}
+                      </Link>
+                    </span>
+                  </li>
+                ))}
+            </ol>
+          </div>
+        ))}
       </section>
 
       {/* REQ-018 FR-10: the emergency drill date the reminder counts from. */}

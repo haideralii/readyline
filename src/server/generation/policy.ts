@@ -21,8 +21,9 @@ export function isGenerationEnabled(
 export const QUOTA_MESSAGE =
   "You have used today's document generations for this account. The limit resets at midnight Sydney time; your existing documents stay available.";
 
+// Batch 45 item 2: never "coming soon" on the production site; the flag is an environment fact.
 export const DISABLED_MESSAGE =
-  "Document generation is coming soon. Your questionnaire result and readiness list are ready now.";
+  "Document generation is not switched on in this environment. Your questionnaire result and readiness list are ready now.";
 
 export function decideGeneration(input: {
   enabled: boolean;

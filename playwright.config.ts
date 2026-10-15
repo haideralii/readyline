@@ -22,7 +22,11 @@ export default defineConfig({
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL,
-    trace: "on-first-retry",
+    // With retries at 0, "on-first-retry" never records anything; CI keeps
+    // the trace and a screenshot of every failed test in the uploaded report
+    // (run 38665790472 had no trace to read).
+    trace: isCI ? "retain-on-failure" : "on-first-retry",
+    screenshot: "only-on-failure",
   },
   projects: [
     {
@@ -45,9 +49,10 @@ export default defineConfig({
       // home page, the result, the checklist and the purchase path.
       name: "iphone",
       use: { ...devices["iPhone 17 Pro"] },
-      // Backlog 1 (D-1508): the accessibility pass runs on all three projects.
+      // Backlog 1 (D-1508): the accessibility pass runs on all three projects;
+      // batch 45 item 28: so does the setup form a new customer submits.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|signed-in[\\/](checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off))\.spec\.ts$/,
     },
   ],
   webServer: {

@@ -159,3 +159,38 @@ describe("register forms (REQ-009 FR-5, SR-1)", () => {
     ).toBe(false);
   });
 });
+
+describe("the Commission reference on an incident (batch 45, REQ-018-gated item)", () => {
+  it("is optional, needs reportable, takes letters and digits only, and never a participant number", () => {
+    expect(
+      IncidentForm.safeParse({
+        ...incident,
+        commissionReference: "REF-2026/14",
+      }).success,
+    ).toBe(false);
+    const ok = IncidentForm.safeParse({
+      ...incident,
+      reportable: true,
+      commissionReference: " REF-2026/14 ",
+    });
+    expect(ok.success).toBe(true);
+    if (ok.success) expect(ok.data.commissionReference).toBe("REF-2026/14");
+    expect(
+      IncidentForm.safeParse({
+        ...incident,
+        reportable: true,
+        commissionReference: "ref #14",
+      }).success,
+    ).toBe(false);
+    expect(
+      IncidentForm.safeParse({
+        ...incident,
+        reportable: true,
+        commissionReference: "430123456",
+      }).success,
+    ).toBe(false);
+    const none = IncidentForm.safeParse(incident);
+    expect(none.success).toBe(true);
+    if (none.success) expect(none.data.commissionReference).toBe("");
+  });
+});

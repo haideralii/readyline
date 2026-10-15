@@ -103,7 +103,7 @@ test.describe("registers (REQ-009 Session B)", () => {
       page.getByRole("heading", { level: 1, name: "Add an incident" }),
     ).toBeVisible();
     await page.getByLabel("Date it happened").fill("2026-10-09");
-    await page.getByLabel("Date it was reported to you").fill("2026-10-09");
+    await page.getByLabel("Date it was reported").fill("2026-10-09");
     await page
       .getByLabel("What happened", { exact: true })
       .selectOption("restrictive-practice-unauthorised");
@@ -134,6 +134,20 @@ test.describe("registers (REQ-009 Session B)", () => {
       "Notify by 2026-10-16",
     );
     await expect(page.getByTestId("events-trail")).toContainText("Recorded");
+
+    // Batch 45 item 5: the account page says the same words as the registers
+    // index, pluralised, and "Due soon" leads with the incident's notify-by date.
+    const incidentUrl = page.url();
+    await page.goto("/account");
+    await expect(page.getByTestId("account-registers")).toContainText(
+      "1 entry, all current.",
+    );
+    await expect(
+      page.getByTestId("due-soon").getByRole("listitem").first(),
+    ).toContainText(
+      "Notify the Commission about incident INC-0001 by 2026-10-16.",
+    );
+    await page.goto(incidentUrl);
 
     // A note joins the trail.
     await page.getByTestId("add-note").click();
@@ -207,6 +221,8 @@ test.describe("registers (REQ-009 Session B)", () => {
     await page
       .getByLabel("Kind of check")
       .selectOption("ndis-worker-screening");
+    // Batch 45 item 22: the optional check number, once, so the column is exercised.
+    await page.getByLabel(/Check number/).fill("WWC1234567");
     await page.getByLabel("Date issued").fill("2026-02-01");
     await expect(page.getByLabel(/Expiry date/)).toHaveValue("2031-02-01");
     await page.getByTestId("register-submit").click();
@@ -233,10 +249,20 @@ test.describe("registers (REQ-009 Session B)", () => {
     expect(csv.status()).toBe(200);
     const text = await csv.text();
     expect(text.charCodeAt(0)).toBe(0xfeff);
-    expect(text).toContain("worker_ref,role_label");
-    expect(text).toContain(
-      "W-1,support worker,ndis-worker-screening,2026-02-01,2031-02-01",
-    );
+    // Read the row by the export's own header, so a column added or moved
+    // (batch 45 item 22 added clearance_number) cannot break this line again.
+    const [header, ...rows] = text.slice(1).trim().split(/\r?\n/);
+    const columns = header.split(",");
+    expect(columns.slice(0, 2)).toEqual(["worker_ref", "role_label"]);
+    expect(columns).toContain("clearance_number");
+    const w1 = rows.map((r) => r.split(",")).find((r) => r[0] === "W-1");
+    expect(w1).toBeDefined();
+    const cell = (name: string) => w1![columns.indexOf(name)];
+    expect(cell("role_label")).toBe("support worker");
+    expect(cell("clearance_kind")).toBe("ndis-worker-screening");
+    expect(cell("clearance_number")).toBe("WWC1234567");
+    expect(cell("issued_on")).toBe("2026-02-01");
+    expect(cell("expires_on")).toBe("2031-02-01");
     const bad = await page.request.get(
       "/registers/worker-checks/export.csv?x=1",
     );

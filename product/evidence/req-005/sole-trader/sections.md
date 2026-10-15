@@ -1,9 +1,9 @@
 # REQ-005 review pack: sole-trader reference case
 
 Case: verification-sole-trader (Sunrise Supports, sole trader, New South Wales; classes 0120; verification).
-Rendered 2026-10-12 from recorded fixtures only (replay client, no model call); model id in the fixtures: claude-sonnet-5-5; 18 documents.
+Rendered 2026-10-14 from recorded fixtures only (replay client, no model call); model id in the fixtures: claude-sonnet-5-5; 16 documents.
 Sections marked MODEL TEXT replay a recorded fixture that passed the schema, lint and readability gates; sections marked fallback show the marker the provider would see, with the reason the pipeline gave (no fixture recorded, readability fail after the retry, or a reply cut at the output cap).
-Tailored sections: 90 with model text, 0 with a fallback marker.
+Tailored sections: 79 with model text, 3 with a fallback marker.
 
 ## Governance policy (governance-policy.docx)
 
@@ -84,10 +84,11 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > A sole trader cannot review their own decisions in the usual way. To cover this, the owner records significant decisions in writing and checks them at each scheduled review of this policy. If a decision involves a conflict of interest, the owner writes down the conflict and the reason for the decision.
   > [Provider to complete: name of the owner and the date this structure was last confirmed.]
 
+- Telling the Commission about changes: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Risk management policy and register (risk-management-policy-and-register.docx)
 
@@ -171,7 +172,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 9 Records and evidence to retain: fixed text.
 - 10 Related documents and registers: fixed text.
 - 11 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Continuity of supports plan (continuity-of-supports-plan.docx)
 
@@ -264,7 +265,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 7 Records and evidence to retain: fixed text.
 - 8 Related documents and registers: fixed text.
 - 9 Review and testing: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Conflict of interest policy (conflict-of-interest-policy.docx)
 
@@ -330,7 +331,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Privacy and information management policy (privacy-and-information-management-policy.docx)
 
@@ -398,11 +399,13 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > Because we work alone, no one else sees participant information unless the participant has agreed to it. That makes it our duty to keep it safe at every step.
   > [Provider to complete: name of any person who covers for the owner when the owner is unavailable, if there is one.]
 
+- The law we follow: fixed text.
 - 7 Consent form: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Appendix: AI and digital tools: fixed text.
+- Change log: fixed text.
 
 ## Records management policy (records-management-policy.docx)
 
@@ -470,31 +473,17 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > Any worker we engage in future | Reads this policy before they start. Records only what is needed. Keeps records secure. Tells the owner at once if a record is lost or seen by the wrong person. | Before starting work, then every day they work
   > The records we must keep, and how long we keep them, are set out in section 7 Retention schedule and section 8 Records and evidence to retain. We do not repeat them here.
 
-- 7 Retention schedule: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Registration groups (audit type derived) (step 2); Risk-assessed roles (step 4); Regulated restrictive practices (step 3). Readability grade 7.4.
-
-  > This table shows how long Sunrise Supports keeps each type of record. We provide 0120 Household tasks in New South Wales as a sole trader, so we list only the records that apply to our work.
-  > Where a period comes from a law, a Commission rule or the NDIS Practice Standards, the source is named. Where we have not confirmed the period, the table says so. We do not destroy a record early or keep it past its period without a reason.
-  > Record type | How long we keep it | Source or status
-  > Service agreements and participant plan details | [Provider to complete: retention period] | [Provider to confirm against the NDIS Practice Standards, NDIS Rules and NSW requirements]
-  > Records of supports delivered and shift notes | [Provider to complete: retention period] | [Provider to confirm against the NDIS Rules and NSW requirements]
-  > Complaints and their outcomes | [Provider to complete: retention period] | [Provider to confirm against the NDIS Complaints Management and Resolution Rules]
-  > Incident records and notifications to the Commission | [Provider to complete: retention period] | [Provider to confirm against the NDIS Incident Management and Reportable Incidents Rules]
-  > Worker screening checks, identity and qualification checks | [Provider to complete: retention period] | [Provider to confirm against the NDIS Worker Screening Rules]
-  > Worker training and induction records | [Provider to complete: retention period] | [Provider to confirm against the NDIS Practice Standards]
-  > Invoices, claims and financial records | [Provider to complete: retention period] | [Provider to confirm against Australian tax law and the NDIS Pricing Arrangements]
-  > Policy review register and document control records | Until the policy is replaced, then [provider to complete: retention period] | [Provider to confirm]
-  > We keep records for the longer of the periods above or any period set by law, and the longest period applies where two rules differ. We do not use restrictive practices, so we hold no restrictive practice records.
-  > [Provider to complete: confirm each retention period with your accountant or a legal adviser, then replace the placeholders in the table.]
-  > When a record reaches the end of its period, we check that no complaint, investigation or legal matter needs it. If none does, we destroy it as set out in section 5 How we put this into practice.
-
+- 7 Retention schedule: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Complaints management policy, procedure and register (complaints-management-policy-and-register.docx)
 
 - Document control: fixed text.
+-  In plain words: fallback marker: No recorded fixture for this request (prompt 2026-10-14.2, model claude-sonnet-5-5). Expected fixtures\generation\complaints-management-policy-and-register\plain-language-summary\465df60e80f8633195c029bcb4aff9e95f2dfa71299e9ed08a4d9853d20ed28e.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- Easy Read version: fixed text.
 - 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.3.
 
   > This document explains how Sunrise Supports welcomes, resolves, records and learns from complaints and feedback. It supports the Complaints management standard.
@@ -579,11 +568,12 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > We tell every participant how to contact the Commission when we first meet them, and again whenever we give them the outcome of a complaint.
   > [Provider to complete: the best phone number and email address for people to contact Sunrise Supports with a complaint]
 
+- How to contact the Commission: fixed text.
 - 8 Complaints register: fixed text.
 - 9 Records and evidence to retain: fixed text.
 - 10 Related documents and registers: fixed text.
 - 11 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Incident management policy, procedure and register (incident-management-policy-and-register.docx)
 
@@ -650,6 +640,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > [Provider to complete: name of a trusted person who can step in if the owner is unwell or unavailable and a serious incident needs to be handled]
 
 - 7 Reportable incidents: fixed text.
+- Who tells whom, and by when: fixed text.
 - 8 Incident procedure: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 6.
 
   > Sunrise Supports is run by one person, so the owner carries out every step below. When an incident happens, we follow these steps in order.
@@ -672,11 +663,12 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > Review the register | Owner | Every 3 months
   > [Provider to complete: name and phone number of a trusted person who can help if the owner is unwell or unable to act after an incident.]
 
+- How to contact the Commission: fixed text.
 - 9 Incident register: fixed text.
 - 10 Records and evidence to retain: fixed text.
 - 11 Related documents and registers: fixed text.
 - 12 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Worker screening and recruitment procedure (worker-screening-and-recruitment-procedure.docx)
 
@@ -746,10 +738,11 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > [Provider to complete: confirm that the owner's NDIS worker screening clearance is current, and enter the clearance number and expiry date in the worker screening clearance register.]
 
 - 6 Worker screening clearance register: fixed text.
+- Who these steps apply to: fixed text.
 - 7 Records and evidence to retain: fixed text.
 - 8 Related documents and registers: fixed text.
 - 9 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Induction and training procedure and register (induction-and-training-procedure-and-register.docx)
 
@@ -824,7 +817,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 7 Records and evidence to retain: fixed text.
 - 8 Related documents and registers: fixed text.
 - 9 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## NDIS Code of Conduct acknowledgement (code-of-conduct-acknowledgement.docx)
 
@@ -857,11 +850,13 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 4 Acknowledgement: fixed text.
 - 5 Records to keep: fixed text.
 - 6 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Service agreement template (service-agreement-template.docx)
 
 - Document control: fixed text.
+-  In plain words: fallback marker: No recorded fixture for this request (prompt 2026-10-14.2, model claude-sonnet-5-5). Expected fixtures\generation\service-agreement-template\plain-language-summary\56e589ceeb5766b85a2cf6017d93dfea7c0653ac703e7ddf42ba1de7e004bfbb.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- Easy Read version: fixed text.
 - 1 How to use this template: fixed text.
 - 2 Parties: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); ABN (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2). Readability grade 4.9.
 
@@ -932,11 +927,13 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 5 Signatures: fixed text.
 - 6 Records to keep: fixed text.
 - 7 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Participant rights, choice and control policy (participant-rights-and-choice-policy.docx)
 
 - Document control: fixed text.
+-  In plain words: fallback marker: No recorded fixture for this request (prompt 2026-10-14.2, model claude-sonnet-5-5). Expected fixtures\generation\participant-rights-and-choice-policy\plain-language-summary\fc4c5ba8b8d71c63cb03477031db40fe12c5a4202848e88bb5a44eda35f77d87.json. Re-record locally with GENERATION_RECORD=1 and a real key; CI never calls the model.
+- Easy Read version: fixed text.
 - 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 8.3.
 
   > This policy sets out how Sunrise Supports respects each participant's choices, values and dignity. It supports our duties under the NDIS Code of Conduct.
@@ -1019,7 +1016,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Safeguarding policy (safeguarding-policy.docx)
 
@@ -1100,10 +1097,11 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > Because we are a sole trader, an allegation may be about us. In that case we still record it in the incident register, we still report it as the incident management procedure requires, and we do not delay or change any record. We tell the participant they can also contact the NDIS Quality and Safeguards Commission directly.
   > We do not treat anyone badly for raising a concern in good faith. We do not stop or reduce a participant's supports because they or someone close to them made an allegation.
 
+- Our position on restrictive practices: fixed text.
 - 8 Records and evidence to retain: fixed text.
 - 9 Related documents and registers: fixed text.
 - 10 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Emergency and disaster management plan (emergency-and-disaster-management-plan.docx)
 
@@ -1184,153 +1182,7 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
 - 6 Records and evidence to retain: fixed text.
 - 7 Related documents and registers: fixed text.
 - 8 Review and testing: fixed text.
-- About this document: fixed text.
-
-## AI use and governance policy (ai-use-and-governance-policy.docx)
-
-- Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 9.5.
-
-  > This policy sets out how Sunrise Supports uses digital and AI tools, and the safeguards we apply.
-  > It supports the Commission's 2026 position that every provider must govern its use of AI.
-
-- 2 Scope: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 7.7.
-
-  > This policy covers Sunrise Supports, a sole trader business. It applies to every digital and AI tool we use in our work, and to everyone who does that work for us.
-  > Area | What it covers
-  > Supports | Household tasks (support type 0120), delivered to participants.
-  > Location | New South Wales.
-  > People | Our one key personnel, who is also our only worker, and anyone we later engage to work with us.
-  > Tools | Any software, app, online service or AI tool used for scheduling, records, messages, document writing or any other part of our supports.
-  > Information | Business records, worker records and any information about participants.
-  > Some of our roles involve a higher level of risk. This policy applies to those roles in the same way as to all others.
-  > If our team grows, or we start delivering other types of support or work in another state, we will review this scope and update it. See section 11 Review.
-  > This policy does not cover tools used only in a personal capacity that never touch our business or our participants. If a personal tool is ever used for our work, this policy applies to that use.
-
-- 3 Definitions: fixed text.
-- 4 Policy statement: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4). Readability grade 8.2.
-
-  > Sunrise Supports is a sole trader business in New South Wales. We provide household tasks support. The Commission's 2026 position on AI use by providers expects every provider to govern its use of AI. This policy is how we do that.
-  > We use digital and AI tools only when they help us do our work safely and well. We stay responsible for every decision and every document, whatever tool we used to prepare it.
-  > Our commitment | What we do
-  > We decide, not the tool | We read and check anything an AI tool produces before we use it. We make every decision about a participant's support ourselves.
-  > We use only approved tools | We use only the tools listed in section 7 Approved tools and uses. We add a new tool only after we have checked how it handles information.
-  > We protect participant information | We do not put participant names, contact details, health information or support details into an AI tool unless section 7 Approved tools and uses allows it for that tool.
-  > We are open with participants | We tell participants when we use AI in a way that affects them. We ask for their consent first where it involves their information. See section 8 Participant information and AI.
-  > We keep records | We keep a record of the tools we use, what we use them for and the checks we make. See section 9 Records and evidence to retain.
-  > We review our use | We review this policy and our list of tools every 12 months. We also review them sooner if a tool, a risk or the Commission's position changes.
-  > If we make a mistake with a tool, or a tool puts participant information at risk, we stop using it, fix the problem and record what happened. We tell the participant if their information was affected.
-
-- 5 How we put this into practice: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Registration groups (step 2); States and territories (step 1). Readability grade 8.2.
-
-  > Sunrise Supports is run by one person, so we do not have workers to train or supervise. The steps below are what we do ourselves before and while we use any digital or AI tool in our household tasks support.
-  > Before we use a new tool, we check what it does, who runs it and what happens to the information we type into it. We only use it if it appears in section 7 Approved tools and uses.
-  > We decide the purpose first. We only use a tool for the uses listed in section 7 Approved tools and uses, such as drafting a schedule or tidying a message.
-  > We do not enter participant personal information into any AI tool unless the participant has agreed and section 8 Participant information and AI allows it.
-  > We read and check everything an AI tool produces before we use or send it. We fix anything that is wrong, unclear or does not fit the participant.
-  > We make every decision about a participant ourselves. An AI tool never makes a decision about a participant's supports, safety or services.
-  > We tell a participant when we use an AI tool in a way that affects them. If they say no, we do not use it for their supports, and their services stay the same.
-  > We keep a short note of each tool we approve, why we approved it and when. We add this to the records listed in section 9 Records and evidence to retain.
-  > If an AI tool gives a wrong result, or we think information was shared by mistake, we stop using the tool for that task, write down what happened and what we changed, and follow the steps in the related documents in section 10 Related documents and registers.
-  > We review this policy every 12 months. We review the policy review register every 3 months and update the list of approved tools if anything has changed.
-  > [Provider to complete: the name of any tool you already use for scheduling, invoicing or messages, so it can be listed in section 7 Approved tools and uses.]
-
-- 6 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4). Readability grade 7.7.
-
-  > Sunrise Supports is a sole trader business. We have one key person, and the owner holds every role in this policy. There is no one else to hand a task to, so we write each duty down and say when it happens.
-  > Role | Does what | When
-  > Owner and key person | Decides which digital and AI tools we use, and keeps the list in section 7 Approved tools and uses up to date. | Before we start using any new tool, and whenever a tool or its use changes
-  > Owner and key person | Checks any AI-assisted output before we use it, send it or file it, and corrects it if it is wrong. | Every time, before use
-  > Owner and key person | Follows the rules in section 8 Participant information and AI, including asking for participant consent where it applies. | Before any participant information is put into a tool
-  > Owner and key person | Keeps the records listed in section 9 Records and evidence to retain. | As each record is created
-  > Owner and key person | Reviews this policy, and records the review in the Policy review register. | Every 12 months
-  > Owner and key person | Reviews the Policy review register to check that entries are complete and next review dates are correct. | Every 3 months
-  > If we later engage a worker, we will give that worker a copy of this policy before they start. We will then add the worker to this table with their own duties, including a duty to use only the tools listed in section 7 Approved tools and uses.
-  > Our role includes risk-assessed duties, so we are careful about which tasks any tool is used for. We do not use an AI tool to make a decision that affects a participant without our own review first.
-
-- 7 Approved tools and uses: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Registration groups (step 2). Readability grade 6.9.
-
-  > Sunrise Supports is run by one person, who is also the only worker. This section lists the kinds of digital and AI tools we allow, what we use them for, what we never use them for, and who approves each one.
-  > Tool category | Allowed use | Not allowed | Who approves
-  > AI writing and drafting assistants | Drafting and tidying our own policies, checklists and general business letters, with no participant details in the request | Entering any participant name, address, plan detail or support note. Sending AI text to a participant without checking it first | Owner, before first use
-  > Scheduling and calendar tools | Booking household task visits and sending reminders using the details the participant has agreed we can hold | Letting software change, cancel or confirm a visit without us checking it | Owner, before first use
-  > Invoicing and accounting software | Preparing invoices and keeping payment records for the supports we deliver | Using AI features that read or summarise participant records | Owner, before first use
-  > Email, phone and messaging apps | Talking with participants and their nominees in the way they have asked us to | Using AI features that read, sort or reply to participant messages for us | Owner, before first use
-  > Cloud storage and backup | Keeping our records and documents in storage that needs a password and a second sign-in step | Storing records in personal accounts or on shared devices | Owner, before first use
-  > Before we start using any new tool, we check what information it collects, where it keeps that information, and whether it uses what we enter to train AI. If we cannot find the answers, we do not use the tool.
-  > We review this list at least once a year and any time we add or stop using a tool. We record each change in the Policy review register.
-  > [Provider to complete: list the specific apps and software Sunrise Supports uses now, so each one can be placed in a category above.]
-
-- 8 Participant information and AI: fixed text.
-- 9 Records and evidence to retain: fixed text.
-- 10 Related documents and registers: fixed text.
-- 11 Review: fixed text.
-- About this document: fixed text.
-
-## AI and digital data handling procedure (ai-and-digital-data-handling-procedure.docx)
-
-- Document control: fixed text.
-- 1 Purpose: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1). Readability grade 12.7.
-
-  > This procedure shows how Sunrise Supports removes personal details before using any AI or digital tool. It supports the Commission's 2026 position that participant information is de-identified before any AI use.
-
-- 2 When this procedure applies: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); States and territories (step 1); Registration groups (step 2); Number of workers (step 4); Regulated restrictive practices (step 3). Readability grade 8.9.
-
-  > This procedure applies whenever we use an AI or digital tool to work with information about our business or our participants. I run Sunrise Supports as a sole trader in New South Wales, so these rules apply to me.
-  > We deliver household tasks (support type 0120). Our records are usually simple. They still hold personal details, so we follow these steps each time.
-  > Writing or editing a service agreement, schedule or note about a participant.
-  > Asking an AI tool to draft a message, email or report that uses real details from a participant's file.
-  > Typing or pasting participant information into an app, cloud service or online form.
-  > Using a digital tool to plan visits, track tasks or store records.
-  > Recording or transcribing a call, visit or meeting with a digital tool.
-  > Writing up an incident for the incident register with help from a digital tool.
-  > Examples from our work include a cleaning schedule with a participant's address, a note about a home access arrangement, or a message about a missed visit.
-  > This procedure does not apply when we use a tool with no participant or personal information in it. An example is asking for a general cleaning checklist. We still check the result before we use it.
-  > [Provider to complete: list the AI and digital tools you use now, so this section names them.]
-
-- 3 Steps: MODEL TEXT (recorded fixture, passed on the retry). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); States and territories (step 1); Registration groups (step 2). Readability grade 7.3.
-
-  > As a sole trader, I do every step below myself. Sunrise Supports has no other workers, so there is no one to hand a step to. Follow the steps in order each time we use an AI or digital tool with any information from our work.
-  > Decide whether the tool is needed. If the task can be done well without it, do it without the tool.
-  > Pick the tool. Use only a tool we have chosen to use for Sunrise Supports. Do not use a free or personal account for work information.
-  > Ask the participant for consent before their information is used in a tool, even after it is de-identified. Explain in plain words what the tool does and what we will put into it.
-  > Record the consent, or the refusal, in the participant's file on the day we ask. If the participant says no, do not use the tool for their information.
-  > Work through the checklist in section 5 De-identification checklist. Remove or replace every detail that could identify a participant, their family, a worker or another person.
-  > Read the cleaned text once more before it goes into the tool. If any identifying detail is still there, remove it and check again.
-  > Put only the cleaned text into the tool. Do not upload files, photos, voice recordings or screenshots that show identifying details.
-  > Read everything the tool gives back. Check each fact against our own records and the participant's agreed plan. Correct anything that is wrong, unclear or does not suit the participant.
-  > Do not send, file or act on any output until we have reviewed and approved it. Where we use the output in a document, we remain responsible for what it says.
-  > Record each use of a tool: the date, the tool, the purpose, that consent was recorded and that the output was reviewed. Keep this record as set out in section 6 Records and evidence to retain.
-  > If we put identifying information into a tool by mistake, or use an output without reviewing it, follow the mistake steps in the table below.
-  > Step | Who | When
-  > Check the tool is one we have chosen to use | Sunrise Supports owner | Before each new use
-  > Ask for and record consent | Sunrise Supports owner | Before any information goes into the tool, and the same day for the record
-  > De-identify and re-check the text | Sunrise Supports owner | Immediately before using the tool
-  > Review and approve the output | Sunrise Supports owner | Before the output is sent, filed or acted on
-  > Record the use of the tool | Sunrise Supports owner | The same day
-  > Report a mistake | Sunrise Supports owner | The same day we find it
-  > When we find a mistake, stop using the tool for that task straight away and write down what happened: what information went in, which tool, and when. Log it in the Incident register on the same day. Where the mistake may count as a reportable incident, a privacy breach or a matter the Commission must hear about, follow the rules in the fixed section of this document that holds them, and do not restate or judge those rules here.
-  > After a mistake, tell the affected participant what happened and what we have done about it. Then change how we work so it does not happen again, and note that change in the Incident register entry.
-  > [Provider to complete: name the AI or digital tools Sunrise Supports has chosen to use, if any.]
-
-- 4 Responsibilities: MODEL TEXT (recorded fixture). Used answers: Trading name (step 1); Business structure (step 1); Number of workers (step 4); Number of key personnel (step 4); Risk-assessed roles (step 4); Registration groups (step 2). Readability grade 8.2.
-
-  > Sunrise Supports is run by a sole trader. The owner holds every role in this procedure. If we ever take on another worker, we will give that person a role in the table below and tell them what it means for them.
-  > Role | Does what | When
-  > Owner (sole trader) | Follows the steps in section 3 Steps. Removes identifying details using section 5 De-identification checklist before any AI or digital tool is used. | Every time we use an AI or digital tool with information about our work
-  > Owner (sole trader) | Records the participant's consent to the use of an AI or digital tool, and keeps the consent record. | Before the tool is used with any information about that participant
-  > Owner (sole trader) | Reads every AI output and checks it for errors, made-up facts and any detail that could identify a participant. | Before we use, send or store the output
-  > Owner (sole trader) | Records any mistake in the incident register. Reports it as set out in the Commission's requirements in our other documents. | As soon as we find the mistake
-  > Owner (sole trader) | Keeps the records listed in section 6 Records and evidence to retain. | After each use of a tool
-  > Owner (sole trader) | Reviews this procedure every 12 months and the incident register every 3 months. | On the review dates set in section 8 Review
-  > If we engage a worker whose role involves access to participant information, we will add that worker to this table. We will train them on this procedure before they use any AI or digital tool.
-  > The rules for reportable incidents and their timeframes are not repeated here. We follow the documents listed in section 7 Related documents and registers.
-
-- 5 De-identification checklist: fixed text.
-- 6 Records and evidence to retain: fixed text.
-- 7 Related documents and registers: fixed text.
-- 8 Review: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 
 ## Practice Standards self-assessment (practice-standards-self-assessment.docx)
 
@@ -1362,5 +1214,5 @@ Tailored sections: 90 with model text, 0 with a fallback marker.
   > [Provider to complete: list your professional indemnity, public liability and accident insurance policies, with insurer and expiry dates.]
 
 - 5 Items to prepare before the audit: fixed text.
-- About this document: fixed text.
+- Change log: fixed text.
 

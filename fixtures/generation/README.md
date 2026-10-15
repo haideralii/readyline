@@ -59,6 +59,25 @@ document on a truncation (D-043).
 5. **Recorded replies the version 2 lints flag** (finding 10, `LINT_V2_REPORT=1`)
    `GENERATION_RECORD=1 GENERATION_RECORD_GROUP=5 npm run generation:record`
 
+6. **Batch 45 item 27: two brief changes that wait for this session, not a fixture now**
+   `GENERATION_RECORD=1 GENERATION_RECORD_SECTIONS="practice-standards-self-assessment/summary,supports-step" npm run generation:record`
+   The self-assessment's reason for the behaviour support modules reads
+   "Our registration group does not carry the behaviour support modules, and
+   we do not use restrictive practices"; the supports-step brief says
+   "describe only supports inside the registration groups chosen". Apply both
+   to `data/readyline-content/document-types.json` in the same commit as the
+   recording: a changed brief changes the request hash, so the live briefs
+   stay as recorded until then (D-542).
+7. **Batch 45, the reviews' stale fixtures (PO recording list)**
+   The three "plain-language-summary" fixtures (home sample, complaints
+   policy, service agreement template, participant rights policy); the
+   incident procedure (open-disclosure words, the medical emergency list
+   step, "as soon as possible" replaced by a number, escalation roles taken
+   from the responsibilities table); the safeguarding policy steps 3 and 4;
+   the complaints policy contact section (refer to the fixed block by
+   heading, no second list); the worker screening procedure names ("Worker
+   checks"). Each brief change goes into the catalogue with its recording.
+
 One section by name, in or out of a group:
 `GENERATION_RECORD=1 GENERATION_RECORD_SECTIONS="complaints-management-policy-and-register/procedure" npm run generation:record`
 

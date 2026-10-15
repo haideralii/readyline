@@ -98,3 +98,26 @@ describe("audit-day ask list (REQ-018 FR-11)", () => {
     });
   });
 });
+
+describe("the two tiers and the paper marks (batch 45, REQ-018-gated item)", () => {
+  it("every line carries its tier from the one list, six and six, and only the two paper records are marked", () => {
+    const lines = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: empty,
+      documentControl: [],
+    });
+    expect(lines.filter((l) => l.tier === "named").map((l) => l.id)).toEqual([
+      "document-control",
+      "corporate-risks",
+      "insurances",
+      "staff-matrix",
+      "incidents",
+      "complaints",
+    ]);
+    expect(lines.filter((l) => l.tier === "practice")).toHaveLength(6);
+    expect(lines.filter((l) => l.paper).map((l) => l.id)).toEqual([
+      "insurances",
+      "onboarding",
+    ]);
+  });
+});

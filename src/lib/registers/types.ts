@@ -191,6 +191,8 @@ export type IncidentRow = {
   actions_taken: string;
   reportable: boolean;
   reportable_notified_on: string | null;
+  /** The reference the Commission gives back when told; "" until then (batch 45, REQ-018-gated item). */
+  commission_reference: string;
   /** Generated: 24 hours or 5 business days after `occurred_on` by category when reportable; else null. */
   notify_by: string | null;
   status: IncidentStatus;
@@ -213,6 +215,7 @@ export type IncidentInsert = Omit<
   | "actions_taken"
   | "reportable"
   | "reportable_notified_on"
+  | "commission_reference"
   | "status"
   | "closed_on"
   | "participant_ref"
@@ -225,6 +228,7 @@ export type IncidentInsert = Omit<
       | "actions_taken"
       | "reportable"
       | "reportable_notified_on"
+      | "commission_reference"
       | "status"
       | "closed_on"
       | "participant_ref"
@@ -286,6 +290,8 @@ export type WorkerClearanceRow = {
   worker_ref: string;
   role_label: string;
   clearance_kind: ClearanceKind;
+  /** Batch 45 item 22: the check (or application) number, optional; Worker Screening Rules s 18(3)(d). */
+  clearance_number: string;
   issued_on: string;
   /** Null means no expiry (the orientation module). */
   expires_on: string | null;
@@ -299,7 +305,12 @@ export type WorkerClearanceInsert = Pick<
   WorkerClearanceRow,
   "account_id" | "worker_ref" | "role_label" | "clearance_kind" | "issued_on"
 > &
-  Partial<Pick<WorkerClearanceRow, "expires_on" | "state" | "note">>;
+  Partial<
+    Pick<
+      WorkerClearanceRow,
+      "expires_on" | "state" | "note" | "clearance_number"
+    >
+  >;
 
 export type PolicyReviewRow = {
   id: string;

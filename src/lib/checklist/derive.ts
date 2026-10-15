@@ -58,6 +58,8 @@ export type ChecklistItem = {
   group: ChecklistGroupId;
   /** An instruction in the customer's voice: what to do, where to type it. */
   title: string;
+  /** What the auditor says on the day (batch 45 item 4), never the provider's instruction. */
+  ask: string;
   action?: ChecklistAction;
   /** One line, plain words. */
   why: string;
@@ -213,6 +215,7 @@ export function deriveChecklist(
       id: `documents:${d.id}`,
       group: "documents",
       title: `Read your ${d.title} and adopt it`,
+      ask: `Show me your ${d.title}, adopted and dated.`,
       why:
         from.length === 0
           ? "Every provider's set includes this; auditors ask to see it."
@@ -234,6 +237,7 @@ export function deriveChecklist(
       title:
         REGISTER_INSTRUCTIONS[r.id] ??
         `Start your ${r.title.toLowerCase()} and keep it up to date`,
+      ask: `Show me your ${r.title.toLowerCase()}, with the entries up to date.`,
       action: route
         ? { label: `Open the ${r.title.toLowerCase()}`, href: route }
         : undefined,
@@ -259,6 +263,9 @@ export function deriveChecklist(
     title: w.hasRiskAssessedRoles
       ? `Ask your ${keyPeople} and every worker in a risk-assessed role for their NDIS Worker Screening clearance, and type each expiry date here`
       : `Ask your ${keyPeople} for their NDIS Worker Screening clearance, and type each expiry date here`,
+    ask: w.hasRiskAssessedRoles
+      ? "Show me a current NDIS Worker Screening clearance for each key person and each worker in a risk-assessed role."
+      : "Show me a current NDIS Worker Screening clearance for each key person.",
     action: { label: "Add a clearance", href: "/registers/worker-checks/new" },
     why: "Auditors sample worker files for a current clearance and check the clearance register's expiry dates.",
     sourceRef: standardRef(dataset, hr.id),
@@ -271,6 +278,7 @@ export function deriveChecklist(
     id: "people:worker-orientation-module",
     group: "people",
     title: `Ask all ${w.workerCount} worker${w.workerCount === 1 ? "" : "s"} to complete the NDIS Worker Orientation Module and keep each certificate`,
+    ask: "Show me each worker's NDIS Worker Orientation Module certificate.",
     why: "The Practice Standards require every worker to complete the Commission's orientation module as part of induction; keep the certificates.",
     sourceRef: standardRef(dataset, hr.id, hr.orientationIndicator),
     unverified: false,
@@ -283,6 +291,7 @@ export function deriveChecklist(
     id: "business:abn",
     group: "business",
     title: "Get an ABN for the business and type it on your account page",
+    ask: "What is your ABN, and is it in the business name you registered under?",
     action: { label: "Open your account page", href: "/account" },
     why: "The registration rules say an applicant must have an ABN; the application form asks for it first.",
     sourceRef: sourceRef(dataset, "legislation-rules-toc"),
@@ -290,25 +299,29 @@ export function deriveChecklist(
     initialStatus: answers.business.abn?.trim() ? "have" : "need",
   });
   const risk = riskStandard(moduleIds);
-  const insurances: [string, string][] = [
+  const insurances: [string, string, string][] = [
     [
       "public-liability",
       "Get public liability insurance and keep the certificate of currency",
+      "public liability",
     ],
     [
       "professional-indemnity",
       "Get professional indemnity insurance and keep the certificate of currency",
+      "professional indemnity",
     ],
     [
       "personal-accident",
       "Get personal accident insurance and keep the certificate of currency",
+      "personal accident",
     ],
   ];
-  for (const [slug, title] of insurances) {
+  for (const [slug, title, kind] of insurances) {
     items.push({
       id: `business:insurance-${slug}`,
       group: "business",
       title,
+      ask: `Show me your current ${kind} insurance certificate.`,
       why: "The risk management standard says appropriate insurance is in place, naming professional indemnity, public liability and accident insurance; auditors ask for current certificates.",
       sourceRef: standardRef(dataset, risk.id, risk.insuranceIndicator),
       unverified: false,
@@ -321,6 +334,7 @@ export function deriveChecklist(
       group: "business",
       title:
         "Get workers compensation insurance for your workers and keep the certificate",
+      ask: "Show me your current workers compensation certificate.",
       why: "A state or territory requirement for employers, not a Commission requirement; auditors commonly ask for it alongside the other certificates.",
       sourceRef: CONTENT_REF,
       unverified: true,
@@ -336,6 +350,7 @@ export function deriveChecklist(
     group: "audit",
     title:
       "Choose an approved quality auditor from the Commission's list and ask for a quote",
+    ask: "Which approved quality auditor are you using, and what did they quote?",
     why: "Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list. Readyline takes no fee or commission from any auditor.",
     sourceRef: audits,
     unverified: false,
@@ -347,11 +362,31 @@ export function deriveChecklist(
     title: certification
       ? "Book your certification audit with the auditor; it includes a site visit"
       : "Book your verification audit with the auditor; it is a desktop review of your documents",
+    ask: certification
+      ? "When is the site visit booked, and who will be there?"
+      : "When is the desktop review booked, and what will you send?",
     why: certification
       ? "A certification audit includes site visits, participant interviews and worker interviews."
       : "A verification audit is a desktop review of your documents; nobody visits.",
     sourceRef: audits,
     unverified: false,
+    initialStatus: "need",
+  });
+  // Batch 45 item 11 (auditor review): a signed service agreement is the first thing sampled from a participant file.
+  items.push({
+    id: "audit:service-agreements",
+    group: "audit",
+    title:
+      "Keep a signed service agreement for each participant where you can find it on the day",
+    ask: "Show me a signed service agreement for each participant.",
+    why: "The service agreement standard expects an agreement with each participant; auditors sample participant files for a signed copy.",
+    sourceRef: standardRef(
+      dataset,
+      moduleIds.includes("core")
+        ? "core.provision.service-agreements-with-participants"
+        : "verification.human-resource-management",
+    ),
+    unverified: !moduleIds.includes("core"),
     initialStatus: "need",
   });
   if (certification) {
@@ -360,6 +395,7 @@ export function deriveChecklist(
       group: "audit",
       title:
         "Ask participants whether they agree to be interviewed by the auditor, and note only that they agreed",
+      ask: "Show me that participants agreed to be interviewed, without their health details.",
       why: "The auditor interviews participants during a certification audit; arrange consent in advance and record only that it was given, never health details.",
       sourceRef: audits,
       unverified: false,
@@ -370,6 +406,7 @@ export function deriveChecklist(
       group: "audit",
       title:
         "Tell your workers the audit days and make sure some are free for an interview",
+      ask: "Which workers are free for an interview on the audit days?",
       why: "The auditor interviews workers during a certification audit.",
       sourceRef: audits,
       unverified: false,
@@ -380,6 +417,7 @@ export function deriveChecklist(
         id: "audit:mid-term-audit-date",
         group: "audit",
         title: `Put your mid-term audit in the calendar: about ${result.midTermAudit.monthsAfterRegistration} months after registration`,
+        ask: "When is your mid-term audit due, and what will you have ready for it?",
         why: `Certified providers have a mid-term audit against the governance standards; start preparing from month ${result.midTermAudit.prepareFromMonth}.`,
         sourceRef: {
           kind: "rule",

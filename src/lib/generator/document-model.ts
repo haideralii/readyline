@@ -75,6 +75,11 @@ const UNNUMBERED = new Set([
   // restrictive practice position, both fixed and added after the recordings.
   "commission-contact",
   "restrictive-practice-position",
+  // Batch 45 item 15: who the worker screening steps apply to, fixed and added after the recordings.
+  "first-recruit",
+  // Batch 45 items 23 and 25: telling the Commission about changes, and the privacy law we follow; both fixed and added after the recordings.
+  "telling-the-commission",
+  "privacy-law",
 ]);
 
 /** Section numbers as the rendered document shows them (front and back matter unnumbered). */

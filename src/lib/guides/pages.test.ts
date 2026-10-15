@@ -42,7 +42,8 @@ describe("guides (REQ-011)", () => {
       "registers-an-auditor-asks-for",
     ]) {
       const g = loadGuide(slug);
-      expect(g.draft).toBe(true);
+      // D-2003 (batch 45): published on the PO's decision, 15 Oct 2026.
+      expect(g.draft).toBe(false);
       expect(
         g.sources.filter((s) => s.url?.includes("ndiscommission.gov.au"))
           .length,

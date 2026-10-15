@@ -189,6 +189,14 @@ jobs:
         env:
           CI: "true"
           EVIDENCE: "1"
+          # Batch 45 item 2 (PO, 15 Oct 2026): the Buy box is hidden while generation is off,
+          # so the purchase flow needs it on; the set replays recorded fixtures, no live model.
+          GENERATION_ENABLED: "true"
+
+      - name: The documents page with generation off (batch 45 item 2; the variable unset)
+        run: npx playwright test e2e/signed-in/generation-off.spec.ts
+        env:
+          CI: "true"
 
       - name: Upload the signed-in screenshots (REQ evidence)
         if: always()

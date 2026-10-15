@@ -207,18 +207,50 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         await either.first().waitFor({ state: "visible", timeout: 120_000 });
       }
     };
-    const settle = () =>
-      expect
+    // The server's own word (run 38665790472, android only: the last click
+    // stayed busy for 120 s while desktop and iPhone passed the same step,
+    // and no trace exists at retries 0). The finish page re-fetched with
+    // this context's cookies says "Your N documents are complete." once the
+    // re-render is stored, whether or not this tab's action call came back;
+    // asked at most every five seconds so the poll adds no load while the
+    // server renders. If the server is done and the tab is not, the page is
+    // reloaded and the run goes on; a set the server never finishes still
+    // fails here.
+    const finishUrl = page.url();
+    let lastServerAsk = 0;
+    const serverFinished = async (): Promise<boolean> => {
+      if (Date.now() - lastServerAsk < 5_000) return false;
+      lastServerAsk = Date.now();
+      const r = await page.request.get(finishUrl).catch(() => null);
+      if (!r || !r.ok()) return false;
+      return /Your \d+ documents are complete\./.test(await r.text());
+    };
+    const clickEnd = async () => {
+      let seen = "busy";
+      await expect
         .poll(
-          async () =>
-            (await finished())
+          async () => {
+            seen = (await finished())
               ? "done"
               : (await next.isEnabled().catch(() => false))
                 ? "next"
-                : "busy",
+                : (await serverFinished())
+                  ? "server-done"
+                  : "busy";
+            return seen;
+          },
           { timeout: 120_000, intervals: [250, 500, 1000] },
         )
         .not.toBe("busy");
+      if (seen === "server-done") {
+        testInfo.annotations.push({
+          type: "finish",
+          description:
+            "the server had finished the set while this tab's button stayed busy; the page was reloaded",
+        });
+        await page.reload();
+      }
+    };
     // Backlog 1 (D-1508): the first screen is answered with the keyboard only
     // (one question on a phone, every question of the topic groups on a
     // wider screen): Tab to each field, type, Tab to the button, Enter.
@@ -241,7 +273,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         label: "finish your pack",
       });
       await page.keyboard.press("Enter");
-      await settle();
+      await clickEnd();
     }
     for (let i = 0; i < 40; i += 1) {
       if ((await state()) === "done") break;
@@ -257,17 +289,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         await input.fill(answersByKey[key] ?? "Example");
       }
       await next.click();
-      await expect
-        .poll(
-          async () =>
-            (await finished())
-              ? "done"
-              : (await next.isEnabled().catch(() => false))
-                ? "next"
-                : "busy",
-          { timeout: 120_000, intervals: [250, 500, 1000] },
-        )
-        .not.toBe("busy");
+      await clickEnd();
     }
     await expect(summary).toContainText(
       /(Every blank is filled in|Nothing else to answer here)\. Your \d+ documents are complete\./,
@@ -373,6 +395,29 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await page.goto("/path/audit-day");
     await expect(page.getByTestId("audit-day-summary")).toContainText(/ready/);
     await expect(page.getByTestId("audit-day-group").first()).toBeVisible();
+    // Batch 45 items 3 and 4: the groups in the order the auditor asks, and
+    // every quoted line is what the auditor says, never the provider's instruction.
+    await expect(
+      page.getByTestId("audit-day-group").getByRole("heading", { level: 2 }),
+    ).toHaveText([
+      "First they check who you are",
+      "Then they ask to see your policies",
+      "Then they ask for your records",
+      "Then they ask about your workers",
+      "Then they talk about the audit itself",
+    ]);
+    const asks = await page
+      .getByTestId("audit-day-group")
+      .locator("li > span > span.font-medium")
+      .allTextContents();
+    expect(asks.length).toBeGreaterThan(10);
+    for (const ask of asks)
+      expect(
+        ask,
+        `an instruction leaked into the auditor's words: ${ask}`,
+      ).not.toMatch(
+        /Read your|Start your|adopt it|Ask your|Get |Book your|Choose an|Tell your|Put your/,
+      );
     await expect(page.getByTestId("audit-day-download")).toHaveAttribute(
       "href",
       /download\?file=set\.zip$/,

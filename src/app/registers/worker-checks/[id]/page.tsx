@@ -33,6 +33,7 @@ export default async function WorkerCheckPage({
           {(
             [
               ["Role", row.role_label],
+              ["Check number", row.clearance_number || "Not recorded"],
               ["Issued", row.issued_on],
               ["Expires", row.expires_on ?? "No expiry"],
               ["State", row.state ?? "Not set"],

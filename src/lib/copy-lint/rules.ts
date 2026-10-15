@@ -20,6 +20,8 @@ export const BANNED_WORDS: readonly RegExp[] = [
   /\bin order to\b/i,
   /\bpursuant\b/i,
   /\bN\/A\b/,
+  // Batch 45 item 2: a promise with no date; an environment fact is said as one.
+  /\bcoming soon\b/i,
   // REQ-013 batch 36 item 2: the evidence-confidence flag is internal; the customer reads a plain "check this" sentence.
   /\bnot confirmed by the Commission/i,
   /\bnot asked about yet\b/i,

@@ -5,12 +5,23 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { documentControlSentence } from "@/lib/registers/document-control";
+import { MID_TERM_DUE_MONTHS, addMonths } from "@/lib/registers/reminders";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
 export const metadata: Metadata = { title: "Registers" };
+
+/** "15 April 2028", the way the reminder emails say a date. */
+function formatLongDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${iso}T00:00:00Z`));
+}
 
 type Row = {
   href: string;
@@ -47,11 +58,27 @@ const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const [o, a, dc] = await Promise.all([
+  const [o, a, dc, reg] = await Promise.all([
     registerOverview(ctx.supabase, ctx.viewer.account.id),
     auditDayOverview(ctx.supabase, ctx.viewer.account.id),
     documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
+    ctx.supabase
+      .from("accounts")
+      .select("registration_date, registration_kind")
+      .eq("id", ctx.viewer.account.id)
+      .maybeSingle(),
   ]);
+  // Batch 45 item 8: a certification provider with a registration date is told
+  // when the mid-term audit falls, from REQ-009's column (18 months in).
+  const registration = reg.data as {
+    registration_date: string | null;
+    registration_kind: "certification" | "verification" | null;
+  } | null;
+  const midTermDue =
+    registration?.registration_date &&
+    registration.registration_kind === "certification"
+      ? addMonths(registration.registration_date, MID_TERM_DUE_MONTHS)
+      : null;
   const auditDayRow = (slug: AuditDaySlug): Row => ({
     href: `/registers/${slug}`,
     title: AUDIT_DAY_META[slug].title,
@@ -149,10 +176,18 @@ export default async function RegistersPage() {
   return (
     <RegisterPage
       title="Registers"
-      intro="What an auditor samples at the mid-term audit and at renewal. Keep them as things happen; nothing here is sent to anyone."
+      intro="What an auditor samples at the mid-term audit (certification providers) and at renewal. Keep them as things happen; nothing here is sent to anyone."
       canWrite={ctx.canWrite}
     >
       <div data-testid="registers-index">
+        {midTermDue ? (
+          <p
+            className="mt-2 text-sm text-zinc-700 dark:text-zinc-300"
+            data-testid="mid-term-due"
+          >
+            Your mid-term audit is due around {formatLongDate(midTermDue)}.
+          </p>
+        ) : null}
         {groups.map((g) => (
           <section
             key={g.id}

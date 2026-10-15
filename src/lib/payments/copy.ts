@@ -34,7 +34,18 @@ export const PRICING_COPY = {
   aiHonest:
     "Consultants warn that AI-written policies are vague, generic and unfinished. Ours are built from your own answers. Every step names a role, a time and a record. Vague wording and leftover blanks are rejected before a document reaches you. You read and adopt each document before it counts.",
   aiDisclosure: AI_DISCLOSURE,
+  /** Batch 45 item 10: the provider's own AI statement is an appendix to the pack's privacy policy, not a separate document (REQ-016 S-6). */
+  aiAppendixLead:
+    "Your own statement on AI and digital tools is an appendix to the privacy policy in your pack, so an auditor finds it with your privacy commitments.",
+  aiAppendixLink: "How Readyline uses AI",
   notLegalAdvice: GENERAL_INFORMATION_STATEMENT,
+  /** Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second; no bundling, no discount. */
+  keepsEyebrow: "What keeps you audit-ready",
+  startEyebrow: "Where you start",
+  renewalSaves:
+    "At the mid-term audit and at renewal the registers are already the evidence, so there is nothing to rebuild from paper.",
+  separateLine:
+    "The two are separate: the pack is paid once and the subscription is monthly; neither includes the other, and there is no discount for taking both.",
   subscriptionHeading: "Audit-ready subscription",
   subscriptionComing:
     "Coming after the document pack: the incident and complaints registers, the worker screening expiry tracker, policy review reminders and the mid-term audit countdown, as a monthly subscription you can cancel at any time. No instalments, no interest, no late fees.",

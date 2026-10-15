@@ -9,7 +9,7 @@ import { Testimonials, TrustCounters } from "@/components/trust-blocks";
 import { JsonLd } from "@/components/json-ld";
 import { BRAND } from "@/lib/brand";
 import { HOME_COPY as C, heroHeadline } from "@/lib/home-copy";
-import { businessAbn } from "@/lib/legal/config";
+import { businessAbn, businessName } from "@/lib/legal/config";
 import { siteUrl } from "@/lib/site";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
 
@@ -25,7 +25,13 @@ export default function Home() {
   const price = pricing.packPriceCents
     ? formatAud(pricing.packPriceCents)
     : null;
+  const subscriptionPrice = pricing.subscriptionPriceCents
+    ? formatAud(pricing.subscriptionPriceCents)
+    : null;
   const abn = businessAbn();
+  // Batch 45 item 1: the registered name and ABN join the mission only once both are set.
+  const name = businessName();
+  const registeredLine = name && abn ? C.missionRegistered(name, abn) : null;
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
       {/* REQ-011: Organization structured data; the ABN joins once BUSINESS_ABN is set. */}
@@ -77,11 +83,22 @@ export default function Home() {
         >
           {C.ctaNote}
         </p>
-        {price ? (
+        {/* Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second. */}
+        {subscriptionPrice ? (
           <p
             className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            data-testid="home-subscription-line"
+          >
+            <strong className="font-semibold">{C.keepsEyebrow}:</strong>{" "}
+            {C.subscriptionLine(subscriptionPrice)}
+          </p>
+        ) : null}
+        {price ? (
+          <p
+            className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
             data-testid="home-price-line"
           >
+            <strong className="font-semibold">{C.startLine}</strong>{" "}
             {C.priceLine(price)} {C.refundLine}{" "}
             <Link href="/refunds" className="underline underline-offset-2">
               Refunds
@@ -178,7 +195,12 @@ export default function Home() {
         <h2 id="mission-heading" className="text-xl font-semibold">
           {C.missionHeading}
         </h2>
-        {C.mission.map((p) => (
+        {[
+          [C.missionOpen, registeredLine, C.missionWhy]
+            .filter(Boolean)
+            .join(" "),
+          ...C.mission,
+        ].map((p) => (
           <p
             key={p.slice(0, 24)}
             className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"

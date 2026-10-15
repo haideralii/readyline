@@ -373,13 +373,61 @@ function ResultView({
               Open your checklist ({checklistTotal} things)
             </Link>
             <Link
-              href="/pricing"
+              href="/pricing#start"
               className="inline-flex min-h-11 items-center underline underline-offset-4"
               data-testid="result-buy-link"
             >
               See the price
             </Link>
           </div>
+          {/* Batch 45 item 9 (D-2001): the two offers as halves of equal weight, the subscription first. */}
+          <dl
+            className="mt-3 grid gap-2 text-sm sm:grid-cols-2"
+            data-testid="result-two-halves"
+          >
+            <div>
+              <dt className="font-semibold">What keeps you audit-ready</dt>
+              <dd className="text-zinc-700 dark:text-zinc-300">
+                The registers and reminders, a monthly subscription with the
+                evidence already in place at renewal.{" "}
+                <Link
+                  href="/pricing#keeps"
+                  className="underline underline-offset-2"
+                >
+                  The subscription
+                </Link>
+                .
+              </dd>
+            </div>
+            <div>
+              <dt className="font-semibold">Where you start</dt>
+              <dd className="text-zinc-700 dark:text-zinc-300">
+                The document pack, one price paid once; nothing is bundled and
+                nothing is discounted.{" "}
+                <Link
+                  href="/pricing#start"
+                  className="underline underline-offset-2"
+                >
+                  The pack
+                </Link>
+                .
+              </dd>
+            </div>
+          </dl>
+          {/* Batch 45 item 6: the counts add up on the page, the line a provider screenshots for a partner. */}
+          <p
+            className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+            data-testid="checklist-count-line"
+          >
+            Your checklist has {checklistTotal} items: the{" "}
+            {r.documents.length + r.registers.length} above plus{" "}
+            {Math.max(
+              checklistTotal - r.documents.length - r.registers.length,
+              0,
+            )}{" "}
+            about your workers, insurance and the audit
+            {signedIn ? "." : "; sign in to track them."}
+          </p>
         </div>
       </section>
 

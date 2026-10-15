@@ -5,7 +5,7 @@ description: "Which NDIS audit you face depends on the support types you registe
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
-status: draft (Dev first draft, 13 Oct 2026; updated 14 Oct 2026 with the Commission's types-of-audits page: the five kinds, stages, report times and ratings; the PO reviews the wording and the UNVERIFIED line)
+status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 13 Oct 2026, updated 14 Oct 2026 with the Commission's types-of-audits page: the five kinds, stages, report times and ratings; one UNVERIFIED line stays marked in the text)
 ---
 
 # Verification or certification: which NDIS audit do you need?

@@ -5,6 +5,8 @@
  * change, is in scope, does not carry the new sentence and has not been
  * checked; the old sentence makes the finding certain.
  */
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { documentTypeById, sectionsFor } from "@/lib/generator/catalogue";
 import {
@@ -131,5 +133,57 @@ describe("changesForDocument", () => {
         [anywhere],
       ),
     ).toEqual([]);
+  });
+});
+
+// D-2004 (batch 45): the watch's apply step refuses without a ledger entry.
+// Every watch note that says what it applied names ledger ids, and every id
+// it names exists; every ledger entry points at a watch note that exists.
+describe("the watch notes and the ledger agree (D-2004)", () => {
+  const notesDir = join(process.cwd(), "product", "research", "ndis-watch");
+  const notes = readdirSync(notesDir).filter((f) => f.endsWith(".md"));
+
+  it("every ledger id a watch note cites is in the ledger", () => {
+    const ids = new Set(changes.map((c) => c.id));
+    for (const f of notes) {
+      const text = readFileSync(join(notesDir, f), "utf8");
+      for (const m of text.matchAll(/wc-\d{4}-\d{2}-\d{2}-\d{2}/g))
+        expect(ids.has(m[0]), `${f} cites ${m[0]}`).toBe(true);
+      // A range "wc-2026-10-15-01 to wc-2026-10-15-05" names every id between.
+      for (const m of text.matchAll(
+        /(wc-\d{4}-\d{2}-\d{2}-)(\d{2}) to wc-\d{4}-\d{2}-\d{2}-(\d{2})/g,
+      )) {
+        for (let n = Number(m[2]); n <= Number(m[3]); n += 1)
+          expect(
+            ids.has(`${m[1]}${String(n).padStart(2, "0")}`),
+            `${f} range names ${m[1]}${String(n).padStart(2, "0")}`,
+          ).toBe(true);
+      }
+    }
+  });
+
+  it("every ledger entry from 15 October 2026 points at a watch note that exists, and any file an older entry names exists too", () => {
+    for (const c of changes) {
+      const file = c.watchReport.match(/product\/[\w./-]+\.md/)?.[0];
+      if (c.appliedOn >= "2026-10-15")
+        expect(file, `${c.id}: watchReport names a file`).toBeTruthy();
+      if (file)
+        expect(existsSync(join(process.cwd(), file)), `${c.id}: ${file}`).toBe(
+          true,
+        );
+    }
+  });
+
+  it("a watch note written on or after 15 October 2026 that applied a rule has an Applied section naming the ledger", () => {
+    for (const f of notes) {
+      const day = f.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? "";
+      if (day < "2026-10-15") continue;
+      const text = readFileSync(join(notesDir, f), "utf8");
+      if (/## Applied/.test(text)) {
+        expect(text, `${f}: the Applied section names ledger ids`).toMatch(
+          /wc-\d{4}-\d{2}-\d{2}-\d{2}/,
+        );
+      }
+    }
   });
 });

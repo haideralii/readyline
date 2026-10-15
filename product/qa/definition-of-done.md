@@ -12,3 +12,4 @@ A REQ is done only when the PO accepts it. Dev's delivery must show all of the f
 8. Any assumption or unverified fact is in `DECISIONS.md` (and the `UNVERIFIED` register) with how to resolve it.
 9. The REQ file's **Delivery evidence** section is filled in; the PR description links the REQ.
 10. No new runtime dependency without a one-line justification in the REQ; no dependency with known high-severity advisories.
+11. Every form a customer submits has one end-to-end test that submits it through the real handler, on all three Playwright projects, as the customer would: a fresh user where the form creates something, the real button, the real result on the next screen. A seeded shortcut (an admin insert, an RPC, a cookie written by the test) never stands in for the form. (Batch 45 item 28: the account form's save failed on the client for every customer from batch 37 up, and no test submitted it.)
