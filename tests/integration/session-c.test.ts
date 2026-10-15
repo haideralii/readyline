@@ -6,6 +6,7 @@
  * ordinary users (AC-7 data side). Skips itself without the Supabase variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { unzipSync } from "fflate";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildAccountExport, buildExportZip } from "@/server/accounts/export";
@@ -116,6 +117,35 @@ describe.skipIf(!enabled)(
     });
 
     it("export contains every row for the account and nothing from any other account (AC-4)", async () => {
+      // Retro review of REQ-004 (15 Oct 2026, finding 32): the zip covers
+      // every owner-readable table. A fact the owner wrote and a register row
+      // for each tenant (written by the service role, so no subscription is
+      // needed) prove the new tables are in and scoped.
+      const fact = await a.client.from("account_facts").insert({
+        account_id: a.accountId,
+        key: "complaints-contact",
+        value: "the owner",
+      });
+      expect(fact.error).toBeNull();
+      const reviews = await admin
+        .from("policy_reviews")
+        .insert([
+          {
+            account_id: a.accountId,
+            document_type_id: "other",
+            title: "Review A",
+          },
+          {
+            account_id: b.accountId,
+            document_type_id: "other",
+            title: "Review B",
+          },
+        ])
+        .select("id, account_id");
+      expect(reviews.error).toBeNull();
+      const reviewA = reviews.data!.find((r) => r.account_id === a.accountId)!;
+      const reviewB = reviews.data!.find((r) => r.account_id === b.accountId)!;
+
       const data = await buildAccountExport(a.client, a.accountId);
       expect(data).not.toBeNull();
       expect(data!.account.id).toBe(a.accountId);
@@ -124,13 +154,26 @@ describe.skipIf(!enabled)(
       expect(data!.auditLog.length).toBeGreaterThanOrEqual(2); // account.created + test.own
       for (const row of data!.auditLog)
         expect(row.actor_user_id).toBe(a.userId);
+      expect(data!.tables.account_facts.map((r) => r.key)).toEqual([
+        "complaints-contact",
+      ]);
+      expect(data!.tables.policy_reviews.map((r) => r.id)).toEqual([
+        reviewA.id,
+      ]);
       const json = JSON.stringify(data);
       expect(json).not.toContain(b.accountId);
       expect(json).not.toContain(b.userId);
+      expect(json).not.toContain(reviewB.id);
+      expect(json).not.toContain("token_hash");
 
       const zip = buildExportZip(data!);
       expect(zip.length).toBeGreaterThan(100);
       expect(Buffer.from(zip.slice(0, 2)).toString("binary")).toBe("PK");
+      const files = Object.keys(unzipSync(zip));
+      expect(files).toContain("account.json");
+      expect(files).toContain("account_facts.json");
+      expect(files).toContain("policy_reviews.json");
+      expect(files).toContain("README.txt");
 
       const cross = await buildAccountExport(b.client, a.accountId);
       expect(cross).toBeNull();
@@ -235,6 +278,75 @@ describe.skipIf(!enabled)(
         .in("key", [staleKey, liveKey]);
       expect(keys.data?.map((r) => r.key)).toEqual([liveKey]);
       await admin.from("auth_rate_limits").delete().eq("key", liveKey);
+
+      // Retro review of REQ-004 (15 Oct 2026, finding 34): audit rows older
+      // than two years go; a job-run row of the same age stays because the
+      // launch page reads it; a recent row stays; a dry run only counts.
+      const oldAt = new Date(Date.now() - 731 * 86_400_000).toISOString();
+      const marker = `test.old.${randomUUID()}`;
+      const jobMarker = `jobs.purge.ran`;
+      const seededAudit = await admin
+        .from("audit_log")
+        .insert([
+          {
+            account_id: a.accountId,
+            actor_user_id: a.userId,
+            action: marker,
+            target: "old",
+            at: oldAt,
+          },
+          {
+            account_id: null,
+            actor_user_id: null,
+            action: jobMarker,
+            target: `test=${marker}`,
+            at: oldAt,
+          },
+          {
+            account_id: a.accountId,
+            actor_user_id: a.userId,
+            action: marker,
+            target: "recent",
+          },
+        ])
+        .select("id");
+      expect(seededAudit.error).toBeNull();
+      const countedAudit = await runPurge({
+        admin,
+        email,
+        now: new Date(),
+        dryRun: true,
+      });
+      expect(countedAudit.auditLogRowsRemoved).toBeGreaterThanOrEqual(1);
+      const stillOld = await admin
+        .from("audit_log")
+        .select("target")
+        .eq("action", marker);
+      expect(stillOld.data?.map((r) => r.target).sort()).toEqual([
+        "old",
+        "recent",
+      ]);
+      const sweptAudit = await runPurge({ admin, email, now: new Date() });
+      expect(sweptAudit.errors).toEqual([]);
+      expect(sweptAudit.auditLogRowsRemoved).toBeGreaterThanOrEqual(1);
+      const afterSweep = await admin
+        .from("audit_log")
+        .select("target")
+        .eq("action", marker);
+      expect(afterSweep.data?.map((r) => r.target)).toEqual(["recent"]);
+      const jobRowKept = await admin
+        .from("audit_log")
+        .select("id")
+        .eq("action", jobMarker)
+        .eq("target", `test=${marker}`);
+      expect(jobRowKept.data?.length).toBe(1);
+      await admin
+        .from("audit_log")
+        .delete()
+        .in(
+          "id",
+          seededAudit.data!.map((r) => r.id),
+        );
     });
   },
 );

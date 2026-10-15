@@ -26,6 +26,16 @@ export const RETENTION_DAYS = 30;
 export const RATE_LIMIT_MAX_WINDOW_SECONDS = 3600;
 export const RATE_LIMIT_ROW_GRACE_DAYS = 1;
 
+/**
+ * REQ-004 Data: the audit log is kept two years. Retro review of REQ-004
+ * (15 Oct 2026, finding 34, PO decision): rows older than that go with the
+ * purge, except the one row per scheduled-job run (`jobs.<name>.ran`, see
+ * `src/server/jobs/record-run.ts`), which the launch page reads to show the
+ * job ran; those stay. Keep the prefix in step with `jobRunAction`.
+ */
+export const AUDIT_LOG_RETENTION_DAYS = 730;
+export const JOB_RUN_ACTION_PREFIX = "jobs.";
+
 export type PurgeReport = {
   dryRun: boolean;
   cutoff: string;
@@ -33,7 +43,38 @@ export type PurgeReport = {
   errors: { accountId: string; message: string }[];
   /** Expired `auth_rate_limits` rows removed (counted only on a dry run). */
   rateLimitRowsRemoved: number;
+  /** `audit_log` rows older than two years removed, job-run rows excepted (counted only on a dry run). */
+  auditLogRowsRemoved: number;
 };
+
+/** Removes audit rows older than the retention, keeping the job-run rows; returns how many. */
+export async function purgeOldAuditLog(input: {
+  admin: SupabaseClient;
+  now?: Date;
+  dryRun?: boolean;
+}): Promise<number> {
+  const now = input.now ?? new Date();
+  const cutoff = new Date(
+    now.getTime() - AUDIT_LOG_RETENTION_DAYS * 86_400_000,
+  ).toISOString();
+  if (input.dryRun) {
+    const old = await input.admin
+      .from("audit_log")
+      .select("id")
+      .lt("at", cutoff)
+      .not("action", "like", `${JOB_RUN_ACTION_PREFIX}%`);
+    if (old.error) throw old.error;
+    return old.data?.length ?? 0;
+  }
+  const removed = await input.admin
+    .from("audit_log")
+    .delete()
+    .lt("at", cutoff)
+    .not("action", "like", `${JOB_RUN_ACTION_PREFIX}%`)
+    .select("id");
+  if (removed.error) throw removed.error;
+  return removed.data?.length ?? 0;
+}
 
 /** Removes limiter rows whose window ended more than a day ago; returns how many. */
 export async function purgeExpiredRateLimits(input: {
@@ -81,6 +122,7 @@ export async function runPurge(input: {
     purged: [],
     errors: [],
     rateLimitRowsRemoved: 0,
+    auditLogRowsRemoved: 0,
   };
 
   // Expired limiter rows go first and on their own: a failure here is
@@ -95,6 +137,19 @@ export async function runPurge(input: {
     const message = e instanceof Error ? e.message : String(e);
     report.errors.push({ accountId: "auth_rate_limits", message });
     log.error("account.purge.rate-limits.failed", { error: e });
+  }
+
+  // Audit rows past two years, the same way (finding 34).
+  try {
+    report.auditLogRowsRemoved = await purgeOldAuditLog({
+      admin: input.admin,
+      now,
+      dryRun,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    report.errors.push({ accountId: "audit_log", message });
+    log.error("account.purge.audit-log.failed", { error: e });
   }
 
   const due = await input.admin

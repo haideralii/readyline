@@ -56,6 +56,7 @@ export async function GET(request: Request) {
       purged: report.purged.length,
       errors: report.errors.length,
       rateLimitRowsRemoved: report.rateLimitRowsRemoved,
+      auditLogRowsRemoved: report.auditLogRowsRemoved,
     });
     // REQ-022 FR-1 (D-2208): the launch page reads the last run from audit_log.
     if (!dryRun)
