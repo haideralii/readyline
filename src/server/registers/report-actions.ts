@@ -32,6 +32,8 @@ export type ReportSubmitResult =
       ok: false;
       message: string;
       fieldErrors?: Record<string, string[]>;
+      /** Set when the action threw instead of answering (run 38743907016); the job log carries the cause. */
+      code?: "report.unexpected";
     };
 
 /** FR-5: ten an hour per address, fifty a day per account. */
@@ -46,7 +48,36 @@ const SubmitInput = strictObject({
   values: ReportForm,
 });
 
+/**
+ * The guard around the submission: a throw anywhere inside (a limiter or
+ * client error that is thrown rather than returned) used to reach the page
+ * as a bare 500 with a digest and no message (run 38743907016, PR #62). It
+ * now answers the reporter in plain words and logs the cause, so the job
+ * log says what happened.
+ */
 export async function submitReportAction(input: {
+  token: string;
+  values: ReportFormValues;
+}): Promise<ReportSubmitResult> {
+  try {
+    return await submitReport(input);
+  } catch (e) {
+    const err = e as { name?: string; code?: string; message?: string };
+    log.error("report.submit-threw", {
+      kind: err?.name ?? typeof e,
+      code: err?.code ?? "",
+      thrown: String(err?.message ?? e).slice(0, 300),
+    });
+    return {
+      ok: false,
+      code: "report.unexpected",
+      message:
+        "Something went wrong on our side. Please tell the owner directly, or try again in a minute.",
+    };
+  }
+}
+
+async function submitReport(input: {
   token: string;
   values: ReportFormValues;
 }): Promise<ReportSubmitResult> {
