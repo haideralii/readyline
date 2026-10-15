@@ -7,6 +7,7 @@
  * are reference codes, free text is capped and refuses an NDIS-number shape.
  */
 import { z } from "zod";
+import { sydneyDay } from "@/lib/metrics/counters";
 import { strictObject, text } from "@/lib/validation";
 import {
   AU_STATES,
@@ -55,6 +56,15 @@ const optionalRef = (pattern: RegExp, hint: string) =>
 
 export const IncidentForm = strictObject({
   occurredOn: dateField("date it happened"),
+  // Retro review of REQ-018 to 021, finding 23 (PO decision 23): the day the
+  // provider became aware, which the Incident Rules count from (ss 20(2),
+  // 21(2)(b)). Empty means the date it happened, so a back-filled row never
+  // runs its clock from the typing day (D-902: early, never late). Bounds:
+  // not before the date it happened, not after the date it was reported,
+  // not after today (Sydney).
+  awareOn: z
+    .union([z.literal(""), dateField("date you became aware")])
+    .default(""),
   reportedOn: dateField("date it was reported"),
   category: z.enum(INCIDENT_CATEGORIES, { error: "Choose what happened" }),
   severity: z.enum(INCIDENT_SEVERITIES, { error: "Choose how serious it was" }),
@@ -83,60 +93,61 @@ export const IncidentForm = strictObject({
     .default(""),
   status: z.enum(OWNER_INCIDENT_STATUSES),
   closedOn: optionalDate("date it was closed"),
-}).superRefine((v, ctx) => {
-  if (v.reportedOn < v.occurredOn)
-    ctx.addIssue({
-      code: "custom",
-      path: ["reportedOn"],
-      message: "The report date cannot be before the date it happened",
-    });
-  if (v.reportableNotifiedOn && !v.reportable)
-    ctx.addIssue({
-      code: "custom",
-      path: ["reportableNotifiedOn"],
-      message: "Tick reportable first",
-    });
-  if (v.commissionReference && !v.reportable)
-    ctx.addIssue({
-      code: "custom",
-      path: ["commissionReference"],
-      message: "Tick reportable first",
-    });
-  if (v.status === "closed" && !v.closedOn)
-    ctx.addIssue({
-      code: "custom",
-      path: ["closedOn"],
-      message: "Enter the date it was closed",
-    });
-  if (v.status !== "closed" && v.closedOn)
-    ctx.addIssue({
-      code: "custom",
-      path: ["closedOn"],
-      message: "Set the status to closed, or clear this date",
-    });
-});
+})
+  .superRefine((v, ctx) => {
+    if (v.reportedOn < v.occurredOn)
+      ctx.addIssue({
+        code: "custom",
+        path: ["reportedOn"],
+        message: "The report date cannot be before the date it happened",
+      });
+    const aware = v.awareOn || v.occurredOn;
+    if (aware < v.occurredOn)
+      ctx.addIssue({
+        code: "custom",
+        path: ["awareOn"],
+        message: "Cannot be before the date it happened",
+      });
+    else if (aware > v.reportedOn)
+      ctx.addIssue({
+        code: "custom",
+        path: ["awareOn"],
+        message: "Cannot be after the date it was reported",
+      });
+    else if (aware > sydneyDay())
+      ctx.addIssue({
+        code: "custom",
+        path: ["awareOn"],
+        message: "Cannot be after today",
+      });
+    if (v.reportableNotifiedOn && !v.reportable)
+      ctx.addIssue({
+        code: "custom",
+        path: ["reportableNotifiedOn"],
+        message: "Tick reportable first",
+      });
+    if (v.commissionReference && !v.reportable)
+      ctx.addIssue({
+        code: "custom",
+        path: ["commissionReference"],
+        message: "Tick reportable first",
+      });
+    if (v.status === "closed" && !v.closedOn)
+      ctx.addIssue({
+        code: "custom",
+        path: ["closedOn"],
+        message: "Enter the date it was closed",
+      });
+    if (v.status !== "closed" && v.closedOn)
+      ctx.addIssue({
+        code: "custom",
+        path: ["closedOn"],
+        message: "Set the status to closed, or clear this date",
+      });
+  })
+  // The empty aware date resolves to the date it happened (finding 23).
+  .transform((v) => ({ ...v, awareOn: v.awareOn || v.occurredOn }));
 export type IncidentFormValues = z.input<typeof IncidentForm>;
-
-/**
- * The day the notification clock starts: the later of the day it happened
- * and the day the provider became aware (the database's
- * `greatest(occurred_on, aware_on)`, REQ-020 Session B, D-2231).
- */
-export function incidentClockStart(occurredOn: string, awareOn: string) {
-  return awareOn > occurredOn ? awareOn : occurredOn;
-}
-
-/**
- * Retro review of REQ-020, finding 23 (interim until the form has an "aware
- * on" field, PO decision 23): an owner typing their own incident is aware of
- * it no later than the day they say it happened, so `aware_on` is the
- * occurred date and `notify_by` keeps D-902's "early, never late" date even
- * when the row is back-filled days later. A worker's row and a report
- * through the link keep the day they were logged (the database default).
- */
-export function ownerAwareOn(values: { occurredOn: string }): string {
-  return values.occurredOn;
-}
 
 export const ComplaintForm = strictObject({
   receivedOn: dateField("date it was received"),

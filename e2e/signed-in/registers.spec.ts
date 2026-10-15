@@ -103,6 +103,12 @@ test.describe("registers (REQ-009 Session B)", () => {
       page.getByRole("heading", { level: 1, name: "Add an incident" }),
     ).toBeVisible();
     await page.getByLabel("Date it happened").fill("2026-10-09");
+    // Retro finding 23: the aware date follows the date it happened until it
+    // is touched, so the clock never runs from the typing day.
+    await expect(page.getByLabel("Date you became aware")).toHaveValue(
+      "2026-10-09",
+    );
+    await page.getByLabel("Date you became aware").fill("2026-10-09");
     await page.getByLabel("Date it was reported").fill("2026-10-09");
     await page
       .getByLabel("What happened", { exact: true })

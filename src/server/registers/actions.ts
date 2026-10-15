@@ -14,7 +14,6 @@ import {
   IncidentForm,
   PolicyReviewForm,
   WorkerCheckForm,
-  ownerAwareOn,
 } from "@/lib/registers/forms";
 import { plainDatabaseMessage } from "@/lib/registers/messages";
 import { parseInput, strictObject, text } from "@/lib/validation";
@@ -106,6 +105,11 @@ export async function saveIncidentAction(
   const row = {
     account_id: ctx.account.id,
     occurred_on: v.occurredOn,
+    // Finding 23 (PO decision 23): the day the provider became aware, bounded
+    // by the schema, defaulting to the date it happened; `notify_by` is
+    // generated from the later of the two. A report through the link keeps
+    // the aware date the confirm screen set (report-actions.ts).
+    aware_on: v.awareOn,
     reported_on: v.reportedOn,
     category: v.category,
     severity: v.severity,
@@ -195,17 +199,11 @@ export async function saveIncidentAction(
       reference: up.data.reference as string,
     };
   }
-  // Retro review of REQ-020, finding 23: a new row the owner types is aware
-  // on the day it happened, so `notify_by` (greatest of the two dates) keeps
-  // D-902's early date; a worker's row keeps the column default, and an
-  // edit never touches `aware_on` (a link report's clock runs from its own
-  // aware date, D-2231).
-  const insertRow: typeof row & { aware_on?: string } = ctx.worker
-    ? row
-    : { ...row, aware_on: ownerAwareOn(v) };
+  // The aware date comes from the form (Session B, D-2237: it defaults to the
+  // day it happened), so a back-filled row's clock never starts on the typing day.
   const ins = await ctx.supabase
     .from("incidents")
-    .insert(insertRow)
+    .insert(row)
     .select("id, reference")
     .single();
   if (ins.error) {

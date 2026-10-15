@@ -100,7 +100,9 @@ create policy imports_insert_subscribed on public.imports
 -- Undo is the owner's and is only ever the undone_at mark; nothing else on the row changes.
 create policy imports_update_owner on public.imports
   for update to authenticated using (public.is_owner(account_id)) with check (public.is_owner(account_id));
-grant select, insert, update on public.imports to authenticated;
+-- Retro review of REQ-020 (15 Oct 2026, finding 33): the update grant covers the one column the undo sets.
+grant select, insert on public.imports to authenticated;
+grant update (undone_at) on public.imports to authenticated;
 revoke delete on public.imports from anon, authenticated;
 grant all privileges on public.imports to service_role;
 revoke all on public.imports from anon;
@@ -116,8 +118,9 @@ create table public.self_checks (
   -- The role or code of who walked it, never a name.
   walked_by_ref text not null check (walked_by_ref ~ '^(owner|(W|KP)-?[0-9]{1,6})$'),
   findings integer not null check (findings between 0 and 50),
-  -- Record id -> { answer: 'yes' | 'no', note } ; notes are capped and checked by the action, never free of the NDIS-number rule.
-  answers jsonb not null default '{}'::jsonb,
+  -- Record id -> { answer: 'yes' | 'no', note }; notes are capped by the action, and the
+  -- NDIS-number rule holds at the table too (retro review of REQ-020, 15 Oct 2026, finding 32).
+  answers jsonb not null default '{}'::jsonb check (not public.looks_like_ndis_number(answers::text)),
   created_by uuid default auth.uid(),
   created_at timestamptz not null default now()
 );

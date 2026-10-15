@@ -4,13 +4,12 @@ import {
   IncidentForm,
   PolicyReviewForm,
   WorkerCheckForm,
-  incidentClockStart,
-  ownerAwareOn,
   suggestedExpiry,
 } from "./forms";
 
 const incident = {
   occurredOn: "2026-10-09",
+  awareOn: "2026-10-09",
   reportedOn: "2026-10-09",
   category: "near-miss",
   severity: "low",
@@ -162,6 +161,72 @@ describe("register forms (REQ-009 FR-5, SR-1)", () => {
   });
 });
 
+describe("the aware date on an incident (retro review finding 23, PO decision 23)", () => {
+  const backFilled = {
+    ...incident,
+    occurredOn: "2026-10-06",
+    reportedOn: "2026-10-09",
+  };
+
+  it("defaults to the date it happened when empty or absent, so a back-filled row runs its clock from the event", () => {
+    const empty = IncidentForm.safeParse({ ...backFilled, awareOn: "" });
+    expect(empty.success).toBe(true);
+    if (empty.success) expect(empty.data.awareOn).toBe("2026-10-06");
+    const { awareOn: _omit, ...withoutField } = backFilled;
+    void _omit;
+    const absent = IncidentForm.safeParse(withoutField);
+    expect(absent.success).toBe(true);
+    if (absent.success) expect(absent.data.awareOn).toBe("2026-10-06");
+  });
+
+  it("keeps a given date between the date it happened and the date it was reported", () => {
+    const given = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-08",
+    });
+    expect(given.success).toBe(true);
+    if (given.success) expect(given.data.awareOn).toBe("2026-10-08");
+    const early = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-05",
+    });
+    expect(early.success).toBe(false);
+    if (!early.success)
+      expect(early.error.issues.map((i) => i.message)).toContain(
+        "Cannot be before the date it happened",
+      );
+    const late = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2026-10-10",
+    });
+    expect(late.success).toBe(false);
+    if (!late.success)
+      expect(late.error.issues.map((i) => i.message)).toContain(
+        "Cannot be after the date it was reported",
+      );
+  });
+
+  it("is never after today", () => {
+    const future = IncidentForm.safeParse({
+      ...backFilled,
+      awareOn: "2999-01-01",
+      reportedOn: "2999-01-02",
+    });
+    expect(future.success).toBe(false);
+    if (!future.success)
+      expect(future.error.issues.map((i) => i.message)).toContain(
+        "Cannot be after today",
+      );
+  });
+
+  it("refuses a date that is not a date", () => {
+    expect(
+      IncidentForm.safeParse({ ...backFilled, awareOn: "last Tuesday" })
+        .success,
+    ).toBe(false);
+  });
+});
+
 describe("the Commission reference on an incident (batch 45, REQ-018-gated item)", () => {
   it("is optional, needs reportable, takes letters and digits only, and never a participant number", () => {
     expect(
@@ -194,25 +259,5 @@ describe("the Commission reference on an incident (batch 45, REQ-018-gated item)
     const none = IncidentForm.safeParse(incident);
     expect(none.success).toBe(true);
     if (none.success) expect(none.data.commissionReference).toBe("");
-  });
-
-  // Retro review of REQ-020, finding 23: an owner's back-filled row keeps
-  // D-902's early date. A serious injury on 6 October typed on 9 October
-  // starts the clock on 6 October, not on the typing day.
-  it("an owner's own incident is aware on the day it happened, so the clock never starts later than D-902's date", () => {
-    const typed = {
-      ...incident,
-      occurredOn: "2026-10-06",
-      reportedOn: "2026-10-09",
-    };
-    const awareOn = ownerAwareOn(typed);
-    expect(awareOn).toBe("2026-10-06");
-    expect(incidentClockStart(typed.occurredOn, awareOn)).toBe("2026-10-06");
-    // The column default (the typing day) would have moved it three days late.
-    expect(incidentClockStart(typed.occurredOn, "2026-10-09")).toBe(
-      "2026-10-09",
-    );
-    // A report through the link is aware when it is submitted, after the event.
-    expect(incidentClockStart("2026-10-06", "2026-10-07")).toBe("2026-10-07");
   });
 });
