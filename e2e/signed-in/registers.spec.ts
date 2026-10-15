@@ -221,6 +221,8 @@ test.describe("registers (REQ-009 Session B)", () => {
     await page
       .getByLabel("Kind of check")
       .selectOption("ndis-worker-screening");
+    // Batch 45 item 22: the optional check number, once, so the column is exercised.
+    await page.getByLabel(/Check number/).fill("WWC1234567");
     await page.getByLabel("Date issued").fill("2026-02-01");
     await expect(page.getByLabel(/Expiry date/)).toHaveValue("2031-02-01");
     await page.getByTestId("register-submit").click();
@@ -247,10 +249,20 @@ test.describe("registers (REQ-009 Session B)", () => {
     expect(csv.status()).toBe(200);
     const text = await csv.text();
     expect(text.charCodeAt(0)).toBe(0xfeff);
-    expect(text).toContain("worker_ref,role_label");
-    expect(text).toContain(
-      "W-1,support worker,ndis-worker-screening,2026-02-01,2031-02-01",
-    );
+    // Read the row by the export's own header, so a column added or moved
+    // (batch 45 item 22 added clearance_number) cannot break this line again.
+    const [header, ...rows] = text.slice(1).trim().split(/\r?\n/);
+    const columns = header.split(",");
+    expect(columns.slice(0, 2)).toEqual(["worker_ref", "role_label"]);
+    expect(columns).toContain("clearance_number");
+    const w1 = rows.map((r) => r.split(",")).find((r) => r[0] === "W-1");
+    expect(w1).toBeDefined();
+    const cell = (name: string) => w1![columns.indexOf(name)];
+    expect(cell("role_label")).toBe("support worker");
+    expect(cell("clearance_kind")).toBe("ndis-worker-screening");
+    expect(cell("clearance_number")).toBe("WWC1234567");
+    expect(cell("issued_on")).toBe("2026-02-01");
+    expect(cell("expires_on")).toBe("2031-02-01");
     const bad = await page.request.get(
       "/registers/worker-checks/export.csv?x=1",
     );
