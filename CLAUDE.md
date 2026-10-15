@@ -11,6 +11,7 @@ You are the lead engineer and product partner on this project. Read this whole b
 - Business will initially trade as a sole trader (ABN registered once there is something to sell), later a Pty Ltd if revenue justifies it.
 - The business must be shariah-compliant in how it earns money (see section 6). Customers can be anyone.
 - *(v2.7, REQ-017, Haider's product principle, 13 Oct 2026)* **Product rule: one step at a time.** Our customer is a support worker who does not like paperwork, is not technical and may not have done well at school. The site must work for that person. After the questionnaire they do not want options; they want to be taken by the hand, one step at a time, told exactly what to do next and shown when it is done. Every screen after the result answers one question: "What do I do now?" Anything that makes them read, decide or search is a cost we pay for in lost customers.
+- *(v2.8, 16 Oct 2026, Haider's standing rule since 14 Oct, recorded here on REQ-027 review finding 35)* **Nothing of this product uses the founder's employer's resources.** No company time, devices, accounts, plans or colleagues: every account is personal, every tool is free-tier or paid by Haider, and anyone who helps (a hallway tester, a reader of a draft) is someone from Haider's own life outside work, never a colleague and never on company time.
 
 ## 2. The problem being solved
 
