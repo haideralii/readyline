@@ -105,6 +105,11 @@ export async function saveIncidentAction(
   const row = {
     account_id: ctx.account.id,
     occurred_on: v.occurredOn,
+    // Finding 23 (PO decision 23): the day the provider became aware, bounded
+    // by the schema, defaulting to the date it happened; `notify_by` is
+    // generated from the later of the two. A report through the link keeps
+    // the aware date the confirm screen set (report-actions.ts).
+    aware_on: v.awareOn,
     reported_on: v.reportedOn,
     category: v.category,
     severity: v.severity,
