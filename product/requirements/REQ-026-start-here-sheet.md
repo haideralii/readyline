@@ -59,7 +59,11 @@ Phase: 6 Priority: must Owner: Dev
 
 ## Dev response
 
-Awaiting Dev.
+Written 15 Oct 2026 (Dev), answers only; no session started: the independent review comes first (D-2215).
+
+1. **Markers and section kinds as data.** Yes, the data path exists and is the one the app already uses. Every stored document version carries its model (`document_versions.model`, jsonb): sections with `number`, `heading`, `mode` (`fixed` or `tailored`) and `status`, and their blocks. The "[Provider to complete: ...]" markers are found in that model by `collectBlanks(model)` in `src/lib/generator/blanks.ts`, which the Finish form, `openBlanks` and the readiness summary already read; the adoption order is `auditOrder` in `src/lib/generator/set-order.ts`; adoption state is `listAdoptedTypeIds`. So the sheet builder reads the set's models and nothing from the docx files, and FR-4's "done when the marker no longer appears" is a comparison of two models' blanks, which is what Finish already does.
+2. **The docx path.** `renderDocx` renders a `DocumentModel` whose blocks are paragraph, bullets, steps (a numbered list), table and callout, so the sheet is a synthetic model (one section per heading in FR-2, the per-document blocks as `steps` lists, the counts as paragraphs) rendered through the existing path with no new template; the printed box per line is a "☐ " prefix on each step, no new block type. One change outside the builder: the zip assembly in `src/server/generation/run.ts` and `rerender.ts` adds the sheet first (fflate keeps insertion order), and the download route's file-name pattern needs to accept `00 Start here.docx` (it allows letters, digits, dots and dashes today, not a space), or the file is named `00-start-here.docx` and the title inside says "Start here".
+3. **Estimate.** One session of 5 to 6 hours: the builder with its tests over the fixture pack (order, markers, counts, N = 0), the docx through the model, `/documents/start-here` with the live done state from the Finish comparison and adoption, the zip order and the file name, the footer with the generation date and set id, the copy lint over the sheet's lines, the e2e on desktop and Android through the guided path. FR-6 (the sheet on `/sample`) depends on REQ-025 FR-12's `/sample` page; until that exists the sample sheet can sit under the sample on the home page, or wait for REQ-025 Session C, your call.
 
 ## Review
 
