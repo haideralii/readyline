@@ -530,14 +530,16 @@ export const STAFF_MATRIX_FIELDS: FieldSpec[] = [
     name: "last_supervision_on",
     label: "Last supervision",
     kind: "date",
-    help: "At least monthly. We remind you when a month has passed.",
+    // Readyline's suggestion, not a rule: the Practice Standards ask for
+    // timely supervision and set no interval (retro review of REQ-018, finding 10).
+    help: "We suggest monthly; we remind you when a month has passed.",
     optional: true,
   },
   {
     name: "last_appraisal_on",
     label: "Last appraisal",
     kind: "date",
-    help: "At least yearly.",
+    help: "We suggest yearly.",
     optional: true,
   },
   {

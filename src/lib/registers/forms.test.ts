@@ -4,6 +4,8 @@ import {
   IncidentForm,
   PolicyReviewForm,
   WorkerCheckForm,
+  incidentClockStart,
+  ownerAwareOn,
   suggestedExpiry,
 } from "./forms";
 
@@ -192,5 +194,25 @@ describe("the Commission reference on an incident (batch 45, REQ-018-gated item)
     const none = IncidentForm.safeParse(incident);
     expect(none.success).toBe(true);
     if (none.success) expect(none.data.commissionReference).toBe("");
+  });
+
+  // Retro review of REQ-020, finding 23: an owner's back-filled row keeps
+  // D-902's early date. A serious injury on 6 October typed on 9 October
+  // starts the clock on 6 October, not on the typing day.
+  it("an owner's own incident is aware on the day it happened, so the clock never starts later than D-902's date", () => {
+    const typed = {
+      ...incident,
+      occurredOn: "2026-10-06",
+      reportedOn: "2026-10-09",
+    };
+    const awareOn = ownerAwareOn(typed);
+    expect(awareOn).toBe("2026-10-06");
+    expect(incidentClockStart(typed.occurredOn, awareOn)).toBe("2026-10-06");
+    // The column default (the typing day) would have moved it three days late.
+    expect(incidentClockStart(typed.occurredOn, "2026-10-09")).toBe(
+      "2026-10-09",
+    );
+    // A report through the link is aware when it is submitted, after the event.
+    expect(incidentClockStart("2026-10-06", "2026-10-07")).toBe("2026-10-07");
   });
 });

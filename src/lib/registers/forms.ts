@@ -117,6 +117,27 @@ export const IncidentForm = strictObject({
 });
 export type IncidentFormValues = z.input<typeof IncidentForm>;
 
+/**
+ * The day the notification clock starts: the later of the day it happened
+ * and the day the provider became aware (the database's
+ * `greatest(occurred_on, aware_on)`, REQ-020 Session B, D-2231).
+ */
+export function incidentClockStart(occurredOn: string, awareOn: string) {
+  return awareOn > occurredOn ? awareOn : occurredOn;
+}
+
+/**
+ * Retro review of REQ-020, finding 23 (interim until the form has an "aware
+ * on" field, PO decision 23): an owner typing their own incident is aware of
+ * it no later than the day they say it happened, so `aware_on` is the
+ * occurred date and `notify_by` keeps D-902's "early, never late" date even
+ * when the row is back-filled days later. A worker's row and a report
+ * through the link keep the day they were logged (the database default).
+ */
+export function ownerAwareOn(values: { occurredOn: string }): string {
+  return values.occurredOn;
+}
+
 export const ComplaintForm = strictObject({
   receivedOn: dateField("date it was received"),
   channel: z.enum(COMPLAINT_CHANNELS, { error: "Choose how it arrived" }),

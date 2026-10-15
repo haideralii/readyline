@@ -3,12 +3,15 @@
 import { describe, expect, it } from "vitest";
 import {
   auditPackFileName,
+  auditorVisibleIncidents,
   lastEntryDate,
   packColumns,
   packIntro,
   packLine,
   packStateWord,
+  trailRows,
 } from "./audit-pack";
+import { CSV_COLUMNS, toCsv } from "./csv";
 import { renderCoverSheet } from "./audit-pack-pdf";
 
 describe("the audit pack's rules", () => {
@@ -83,5 +86,90 @@ describe("the audit pack's rules", () => {
     });
     expect(Buffer.from(pdf.slice(0, 5)).toString("latin1")).toBe("%PDF-");
     expect(pdf.length).toBeGreaterThan(1500);
+  });
+
+  // Retro review of REQ-020, finding 30: what an auditor sees is the
+  // register, and a draft or rejected report is not in it (FR-5, D-2231).
+  it("keeps a draft and a rejected report out of the auditor's incidents", () => {
+    const rows = [
+      { reference: "INC-0001", status: "open" },
+      { reference: "INC-0002", status: "draft" },
+      { reference: "INC-0003", status: "rejected" },
+      { reference: "INC-0004", status: "closed" },
+      { reference: "INC-0005", status: "under-review" },
+    ];
+    expect(auditorVisibleIncidents(rows).map((r) => r.reference)).toEqual([
+      "INC-0001",
+      "INC-0004",
+      "INC-0005",
+    ]);
+    expect(auditorVisibleIncidents([])).toEqual([]);
+  });
+
+  // Retro finding 25: the audit-day registers' shared trail is one file in
+  // the pack, each line naming its register and the row as its list does;
+  // the row id never leaves the server.
+  it("writes the shared trail with the register's title and the row's label, never the row id", () => {
+    const events = [
+      {
+        register: "corporate_risks",
+        row_id: "11111111-1111-4111-8111-111111111111",
+        at: "2026-10-14T03:00:00Z",
+        kind: "created",
+        note: "",
+      },
+      {
+        register: "corporate_risks",
+        row_id: "11111111-1111-4111-8111-111111111111",
+        at: "2026-10-15T03:00:00Z",
+        kind: "reviewed",
+        note: "Checked the generator.",
+      },
+      {
+        register: "staff_matrix",
+        row_id: "22222222-2222-4222-8222-222222222222",
+        at: "2026-10-15T04:00:00Z",
+        kind: "note",
+        note: "Row since deleted.",
+      },
+    ];
+    const labels = new Map([
+      [
+        "corporate_risks",
+        new Map([["11111111-1111-4111-8111-111111111111", "Power failure"]]),
+      ],
+      ["staff_matrix", new Map<string, string>()],
+    ]);
+    const titles = new Map([
+      ["corporate_risks", "Corporate risks"],
+      ["staff_matrix", "Staff matrix"],
+    ]);
+    const rows = trailRows(events, labels, titles);
+    expect(rows).toEqual([
+      {
+        register: "Corporate risks",
+        row: "Power failure",
+        at: "2026-10-14T03:00:00Z",
+        kind: "created",
+        note: "",
+      },
+      {
+        register: "Corporate risks",
+        row: "Power failure",
+        at: "2026-10-15T03:00:00Z",
+        kind: "reviewed",
+        note: "Checked the generator.",
+      },
+      {
+        register: "Staff matrix",
+        row: "",
+        at: "2026-10-15T04:00:00Z",
+        kind: "note",
+        note: "Row since deleted.",
+      },
+    ]);
+    const csv = toCsv(CSV_COLUMNS.register_events, rows);
+    expect(csv).toContain("register,row,at,kind,note");
+    expect(csv).not.toContain("11111111-1111");
   });
 });

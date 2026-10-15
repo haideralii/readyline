@@ -19,8 +19,10 @@ import {
 import { auditDayAskList } from "@/lib/registers/audit-day-ask";
 import {
   auditPackFileName,
+  auditorVisibleIncidents,
   packColumns,
   packLine,
+  trailRows,
   type PackLine,
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
@@ -29,7 +31,11 @@ import { log } from "@/lib/logging/logger";
 import { listAdoptedTypeIds } from "@/server/path/state";
 import { listLatestDocuments } from "@/server/generation/queries";
 import { downloadObject, objectPath } from "@/server/generation/storage";
-import { auditDayOverview, listAuditDayRows } from "./audit-day-queries";
+import {
+  auditDayOverview,
+  listAccountRegisterEvents,
+  listAuditDayRows,
+} from "./audit-day-queries";
 import { documentControlForAccount } from "./document-control-queries";
 import { registerFiles } from "./export";
 import {
@@ -92,7 +98,11 @@ export async function collectAuditView(
       id: "incidents",
       title: "Incident register",
       columns: CSV_COLUMNS.incidents,
-      rows: incidents as unknown as Record<string, unknown>[],
+      // Retro finding 30: a draft or rejected report is not in the register.
+      rows: auditorVisibleIncidents(incidents) as unknown as Record<
+        string,
+        unknown
+      >[],
     },
     {
       id: "complaints",
@@ -181,13 +191,52 @@ export async function buildAuditPack(input: {
   ] as const)
     Object.assign(
       files,
-      await registerFiles(supabase, accountId, register, stamp),
+      // Retro finding 30: the pack's incident file holds the register only
+      // (no draft or rejected report), as the auditor's view does.
+      await registerFiles(supabase, accountId, register, stamp, {
+        registerOnly: true,
+      }),
     );
   for (const t of view.tables)
     if ((AUDIT_DAY_SLUGS as readonly string[]).includes(t.id))
       files[`${t.id}-${stamp}.csv`] = strToU8(toCsv(t.columns, t.rows));
   files[`document-control-${stamp}.csv`] = strToU8(
     toCsv(DOCUMENT_CONTROL_COLUMNS, view.documentControl),
+  );
+  // FR-1 "including the events trails" (retro finding 25): the audit-day
+  // registers share one trail, so it is one file, each line naming its
+  // register and its row as the register's own list names it (the row's id
+  // never leaves the server).
+  const events = await listAccountRegisterEvents(supabase, accountId);
+  const titles = new Map<string, string>();
+  const labels = new Map<string, Map<string, string>>();
+  for (const slug of AUDIT_DAY_SLUGS) {
+    const meta = AUDIT_DAY_META[slug];
+    titles.set(meta.table, meta.title);
+    const byId = new Map<string, string>();
+    for (const r of view.tables.find((t) => t.id === slug)?.rows ?? [])
+      byId.set(String(r.id), meta.titleOf(r as never));
+    labels.set(meta.table, byId);
+  }
+  // Session C's imports write to the same trail for the REQ-009 registers.
+  for (const [table, id, title, label] of [
+    ["incidents", "incidents", "Incident register", "reference"],
+    ["complaints", "complaints", "Complaints register", "reference"],
+    [
+      "worker_clearances",
+      "worker-checks",
+      "Worker checks register",
+      "worker_ref",
+    ],
+  ] as const) {
+    titles.set(table, title);
+    const byId = new Map<string, string>();
+    for (const r of view.tables.find((t) => t.id === id)?.rows ?? [])
+      byId.set(String(r.id), String(r[label] ?? ""));
+    labels.set(table, byId);
+  }
+  files[`register-events-${stamp}.csv`] = strToU8(
+    toCsv(CSV_COLUMNS.register_events, trailRows(events, labels, titles)),
   );
 
   if (view.setId) {

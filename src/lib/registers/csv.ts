@@ -63,6 +63,8 @@ export const CSV_COLUMNS = {
     "updated_at",
   ],
   complaint_events: ["reference", "at", "kind", "note"],
+  /** The audit-day registers' shared trail in the pack (REQ-020 FR-1; retro finding 25): the register, the row as its list names it, then the line. */
+  register_events: ["register", "row", "at", "kind", "note"],
   worker_clearances: [
     "worker_ref",
     "role_label",

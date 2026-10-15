@@ -14,6 +14,7 @@ import {
   IncidentForm,
   PolicyReviewForm,
   WorkerCheckForm,
+  ownerAwareOn,
 } from "@/lib/registers/forms";
 import { plainDatabaseMessage } from "@/lib/registers/messages";
 import { parseInput, strictObject, text } from "@/lib/validation";
@@ -194,9 +195,17 @@ export async function saveIncidentAction(
       reference: up.data.reference as string,
     };
   }
+  // Retro review of REQ-020, finding 23: a new row the owner types is aware
+  // on the day it happened, so `notify_by` (greatest of the two dates) keeps
+  // D-902's early date; a worker's row keeps the column default, and an
+  // edit never touches `aware_on` (a link report's clock runs from its own
+  // aware date, D-2231).
+  const insertRow: typeof row & { aware_on?: string } = ctx.worker
+    ? row
+    : { ...row, aware_on: ownerAwareOn(v) };
   const ins = await ctx.supabase
     .from("incidents")
-    .insert(row)
+    .insert(insertRow)
     .select("id, reference")
     .single();
   if (ins.error) {

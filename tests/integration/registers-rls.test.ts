@@ -213,6 +213,27 @@ describe.skipIf(!enabled)(
         .single();
       expect(serious.error).toBeNull();
       expect(serious.data?.notify_by).toBe("2026-10-10");
+      // Retro review of REQ-020, finding 23: an owner's back-filled row
+      // (occurred three days before it was logged) keeps D-902's early date
+      // when `aware_on` is the occurred date, as the owner's form sets it;
+      // the column default (today) would move `notify_by` to tomorrow.
+      const backFilled = await a.client
+        .from("incidents")
+        .insert(
+          incident(a.accountId, {
+            occurred_on: "2026-10-06",
+            reported_on: "2026-10-09",
+            aware_on: "2026-10-06",
+            category: "serious-injury",
+            severity: "high",
+            reportable: true,
+          }),
+        )
+        .select("notify_by, aware_on")
+        .single();
+      expect(backFilled.error).toBeNull();
+      expect(backFilled.data?.aware_on).toBe("2026-10-06");
+      expect(backFilled.data?.notify_by).toBe("2026-10-07");
       const rp = await a.client
         .from("incidents")
         .insert(

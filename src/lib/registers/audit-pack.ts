@@ -100,3 +100,60 @@ export function auditPackFileName(tradingName: string, stamp: string): string {
 export function packIntro(tradingName: string, date: string): string {
   return `Audit pack for ${tradingName}, prepared on ${date}. Every register as a file, the document control register, the readiness summary and the adopted documents.`;
 }
+
+/**
+ * Retro review of REQ-020, finding 30: a report through the link is a draft
+ * until the owner confirms it and a rejected one never joins the register
+ * (FR-5, D-2231), so neither reaches the auditor's view or the pack. The
+ * overview and the register totals apply the same rule.
+ */
+export const INCIDENT_STATUSES_NOT_IN_REGISTER: readonly string[] = [
+  "draft",
+  "rejected",
+];
+
+export function auditorVisibleIncidents<T extends { status: string }>(
+  rows: readonly T[],
+): T[] {
+  return rows.filter(
+    (r) => !INCIDENT_STATUSES_NOT_IN_REGISTER.includes(r.status),
+  );
+}
+
+export type TrailEvent = {
+  register: string;
+  row_id: string;
+  at: string;
+  kind: string;
+  note: string;
+};
+
+export type TrailRow = {
+  register: string;
+  row: string;
+  at: string;
+  kind: string;
+  note: string;
+};
+
+/**
+ * The shared trail as the pack's `register-events` file (FR-1 "including
+ * the events trails"; retro finding 25): one line per event with the
+ * register's name and the row as its own list names it, because the row's
+ * id never leaves the server (`PACK_HIDDEN_COLUMNS`). `labels` maps a
+ * register's stored name to each row id's label; an event whose row is gone
+ * keeps an empty row label rather than being dropped.
+ */
+export function trailRows(
+  events: readonly TrailEvent[],
+  labels: ReadonlyMap<string, ReadonlyMap<string, string>>,
+  titles: ReadonlyMap<string, string>,
+): TrailRow[] {
+  return events.map((e) => ({
+    register: titles.get(e.register) ?? e.register,
+    row: labels.get(e.register)?.get(e.row_id) ?? "",
+    at: e.at,
+    kind: e.kind,
+    note: e.note,
+  }));
+}

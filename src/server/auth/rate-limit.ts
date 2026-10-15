@@ -7,6 +7,7 @@ import "server-only";
  * database statement, so two concurrent requests cannot both slip through.
  */
 import { createHash } from "node:crypto";
+import { hashAddress } from "@/lib/registers/auditor-link";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 
 export const MAGIC_LINK_LIMITS = {
@@ -85,4 +86,24 @@ export async function checkCheckoutAllowed(
   accountId: string,
 ): Promise<boolean> {
   return hitRateLimit(`checkout:${accountId}`, CHECKOUT_LIMIT);
+}
+
+/**
+ * REQ-020 SR-2 (retro review, finding 21): the auditor page and its pack
+ * route are signed-out GETs that write a row on every open, so one viewer
+ * address gets sixty opens of one link per rolling hour. The key carries
+ * the link id and the address's hash (the same hash the audit line holds),
+ * never the address itself.
+ */
+export const AUDITOR_OPEN_LIMIT = { limit: 60, windowSeconds: 3600 } as const;
+
+export function auditorOpenKey(linkId: string, address: string | null) {
+  return `auditor-open:${linkId}:${address ? hashAddress(address) : "unknown"}`;
+}
+
+export async function checkAuditorOpenAllowed(
+  linkId: string,
+  address: string | null,
+): Promise<boolean> {
+  return hitRateLimit(auditorOpenKey(linkId, address), AUDITOR_OPEN_LIMIT);
 }

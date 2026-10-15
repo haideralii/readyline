@@ -95,14 +95,19 @@ export async function expectNoSidewaysScroll(page: Page, label: string) {
  * REQ-013 batch 36 item 1: no word in a table, a stacked table or a
  * definition list may be broken across lines. A word broken by the layout
  * paints as more than one client rectangle, so each word is wrapped in a
- * Range and its rectangles counted.
+ * Range and its rectangles counted. `roots` widens the check to another
+ * container (a register list, REQ-018 AC-1); the default is the tables.
  */
-export async function expectNoBrokenWords(page: Page, label: string) {
-  const broken = await page.evaluate(() => {
+export const BROKEN_WORD_ROOTS = 'table, dl, [data-testid="data-table"]';
+
+export async function expectNoBrokenWords(
+  page: Page,
+  label: string,
+  roots: string = BROKEN_WORD_ROOTS,
+) {
+  const broken = await page.evaluate((selector) => {
     const out: string[] = [];
-    const roots = document.querySelectorAll(
-      'table, dl, [data-testid="data-table"]',
-    );
+    const roots = document.querySelectorAll(selector);
     const walkerFor = (root: Element) =>
       document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     for (const root of roots) {
@@ -126,7 +131,7 @@ export async function expectNoBrokenWords(page: Page, label: string) {
       }
     }
     return [...new Set(out)].slice(0, 10);
-  });
+  }, roots);
   expect(broken, `${label}: words broken across lines`).toEqual([]);
 }
 
