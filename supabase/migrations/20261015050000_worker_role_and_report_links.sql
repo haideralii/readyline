@@ -1,4 +1,4 @@
--- REQ-020 Session B (FR-4, FR-5, FR-6, FR-11, SR-1, SR-2, SR-3, SR-5; D-2215):
+-- REQ-020 Session B (FR-4, FR-5, FR-6, FR-11, SR-1, SR-2, SR-3, SR-5; D-2231):
 -- the worker role, invitations, the report link and draft incidents.
 --
 -- 1. The worker role. `memberships.role` gains 'worker' and the worker's

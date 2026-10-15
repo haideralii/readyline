@@ -19,7 +19,7 @@ import { incidentNotifyBy } from "@/lib/registers/status";
 import {
   INCIDENT_CATEGORIES,
   INCIDENT_SEVERITIES,
-  INCIDENT_STATUSES,
+  OWNER_INCIDENT_STATUSES,
   TEXT_CAPS,
 } from "@/lib/registers/types";
 import { parseInput } from "@/lib/validation";
@@ -251,7 +251,7 @@ export function IncidentFormView({
         onChange={(x) =>
           set("status", (x || "open") as IncidentFormValues["status"])
         }
-        options={INCIDENT_STATUSES.map((s) => ({
+        options={OWNER_INCIDENT_STATUSES.map((s) => ({
           value: s,
           label: INCIDENT_STATUS_LABELS[s],
         }))}

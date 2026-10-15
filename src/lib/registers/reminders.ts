@@ -140,7 +140,10 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   const nowMs = Date.parse(input.now ?? `${today}T23:59:59Z`);
   for (const r of input.reports ?? []) {
     const aware = Date.parse(r.aware_at);
-    if (Number.isFinite(aware) && aware + REPORT_NUDGE_HOURS * 3_600_000 <= nowMs)
+    if (
+      Number.isFinite(aware) &&
+      aware + REPORT_NUDGE_HOURS * 3_600_000 <= nowMs
+    )
       push("report-to-confirm", "incidents", r.id, today, today);
   }
 
@@ -319,5 +322,7 @@ export function reminderLine(
       return `Your emergency drill is due by ${dueOn}. Run it and record the date on the audit-day page.`;
     case "register-review":
       return `Register row ${reference} is due for review on ${dueOn}. Open it and tap Reviewed today.`;
+    case "report-to-confirm":
+      return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report.`;
   }
 }

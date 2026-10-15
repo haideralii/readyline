@@ -34,7 +34,12 @@ export type ReportSubmitResult =
       fieldErrors?: Record<string, string[]>;
     };
 
+/** FR-5: ten an hour per address, fifty a day per account. */
 export const REPORT_LIMIT = { limit: 10, windowSeconds: 3600 } as const;
+export const REPORT_ACCOUNT_LIMIT = {
+  limit: 50,
+  windowSeconds: 86_400,
+} as const;
 
 const SubmitInput = strictObject({
   token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
@@ -50,12 +55,45 @@ export async function submitReportAction(input: {
     const fieldErrors: Record<string, string[]> = {};
     for (const [k, v] of Object.entries(parsed.fieldErrors))
       fieldErrors[k.replace(/^values\./, "")] = v;
-    return { ok: false, message: "Check the fields marked below.", fieldErrors };
+    return {
+      ok: false,
+      message: "Check the fields marked below.",
+      fieldErrors,
+    };
   }
   const address = clientIp(await headers()) ?? "unknown";
   if (!(await hitRateLimit(`report:${address}`, REPORT_LIMIT)))
-    return { ok: false, message: "Too many reports from this connection in the last hour. Please try again later." };
+    return {
+      ok: false,
+      message:
+        "Too many reports from this connection in the last hour. Please try again later.",
+    };
   const admin = createSupabaseAdminClient();
+  // FR-5, SR-4: the per-account limit (50 a day) needs the account, so the
+  // link resolves first; an unknown or revoked link gets the one plain answer.
+  const DEAD = {
+    ok: false as const,
+    message:
+      "That report link does not work. Ask the owner for the current one.",
+  };
+  const lookup = await admin.rpc("report_link_lookup", {
+    p_token_hash: hashAuditorToken(parsed.data.token),
+  });
+  const link = (
+    lookup.data as { account_id: string; trading_name: string }[] | null
+  )?.[0];
+  if (lookup.error || !link) return DEAD;
+  if (
+    !(await hitRateLimit(
+      `report-account:${link.account_id}`,
+      REPORT_ACCOUNT_LIMIT,
+    ))
+  )
+    return {
+      ok: false,
+      message:
+        "This business has received many reports today. Please tell the owner directly.",
+    };
   const v = parsed.data.values;
   const r = await admin.rpc("submit_incident_report", {
     p_token_hash: hashAuditorToken(parsed.data.token),
@@ -70,24 +108,30 @@ export async function submitReportAction(input: {
   });
   if (r.error) {
     if (r.error.code === "P0003")
-      return { ok: false, message: "The owner has several reports waiting already. Please tell them directly." };
+      return {
+        ok: false,
+        message:
+          "The owner has several reports waiting already. Please tell them directly.",
+      };
     log.warn("report.submit-failed", { code: r.error.code });
-    return { ok: false, message: "That report link does not work. Ask the owner for the current one." };
+    return DEAD;
   }
-  const row = (r.data as { incident_id: string; reference: string }[] | null)?.[0];
-  if (!row) return { ok: false, message: "That report link does not work. Ask the owner for the current one." };
+  const row = (
+    r.data as { incident_id: string; reference: string }[] | null
+  )?.[0];
+  if (!row) return DEAD;
 
   // The owner is told at once (PO edit to FR-5); the daily job nudges again while it waits.
   try {
-    const link = await admin
-      .from("incidents")
-      .select("account_id")
-      .eq("id", row.incident_id)
-      .single();
-    const accountId = link.data?.account_id as string;
-    const [owner, account, count] = await Promise.all([
-      admin.from("memberships").select("user_id").eq("account_id", accountId).eq("role", "owner").limit(1).maybeSingle(),
-      admin.from("accounts").select("trading_name").eq("id", accountId).single(),
+    const accountId = link.account_id;
+    const [owner, count] = await Promise.all([
+      admin
+        .from("memberships")
+        .select("user_id")
+        .eq("account_id", accountId)
+        .eq("role", "owner")
+        .limit(1)
+        .maybeSingle(),
       countReportsToConfirm(admin, accountId),
     ]);
     const userId = (owner.data as { user_id: string } | null)?.user_id;
@@ -96,7 +140,7 @@ export async function submitReportAction(input: {
       const to = u.data.user?.email;
       if (to)
         await createEmailProvider().send(
-          reportToConfirmEmail({ to, tradingName: (account.data?.trading_name as string) ?? "", count }),
+          reportToConfirmEmail({ to, tradingName: link.trading_name, count }),
         );
     }
     await admin.from("audit_log").insert({
@@ -129,11 +173,15 @@ const ConfirmInput = strictObject({
 });
 
 /** FR-5, FR-6: one screen, one button; the draft becomes an ordinary open row. */
-export async function confirmReportAction(input: unknown): Promise<ConfirmResult> {
+export async function confirmReportAction(
+  input: unknown,
+): Promise<ConfirmResult> {
   const parsed = parseInput(ConfirmInput, input);
-  if (!parsed.ok) return { ok: false, message: "Check the notification fields." };
+  if (!parsed.ok)
+    return { ok: false, message: "Check the notification fields." };
   const viewer = await getViewer();
-  if (!viewer?.account || viewer.deleted) return { ok: false, message: "Sign in to confirm a report." };
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to confirm a report." };
   const supabase = await createSupabaseServerClient();
   const d = parsed.data;
   const draft = await supabase
@@ -143,9 +191,18 @@ export async function confirmReportAction(input: unknown): Promise<ConfirmResult
     .eq("account_id", viewer.account.id)
     .eq("status", "draft")
     .maybeSingle();
-  const row = draft.data as { id: string; aware_on: string; occurred_on: string } | null;
-  if (!row) return { ok: false, message: "That report was not found or is already confirmed." };
-  const reportedOn = row.aware_on >= row.occurred_on ? row.aware_on : row.occurred_on;
+  const row = draft.data as {
+    id: string;
+    aware_on: string;
+    occurred_on: string;
+  } | null;
+  if (!row)
+    return {
+      ok: false,
+      message: "That report was not found or is already confirmed.",
+    };
+  const reportedOn =
+    row.aware_on >= row.occurred_on ? row.aware_on : row.occurred_on;
   const up = await supabase
     .from("incidents")
     .update({
@@ -159,14 +216,22 @@ export async function confirmReportAction(input: unknown): Promise<ConfirmResult
     .eq("account_id", viewer.account.id)
     .select("id");
   if (up.error || !up.data?.length) {
-    log.warn("report.confirm-failed", { accountId: viewer.account.id, code: up.error?.code });
-    return { ok: false, message: "Could not confirm the report. Check the dates and try again." };
+    log.warn("report.confirm-failed", {
+      accountId: viewer.account.id,
+      code: up.error?.code,
+    });
+    return {
+      ok: false,
+      message: "Could not confirm the report. Check the dates and try again.",
+    };
   }
   await supabase.from("incident_events").insert({
     incident_id: row.id,
     account_id: viewer.account.id,
     kind: "confirmed",
-    note: d.reportable ? "Confirmed by the owner; marked reportable" : "Confirmed by the owner",
+    note: d.reportable
+      ? "Confirmed by the owner; marked reportable"
+      : "Confirmed by the owner",
   });
   await supabase.from("audit_log").insert({
     account_id: viewer.account.id,
@@ -186,11 +251,14 @@ const RejectInput = strictObject({
 });
 
 /** The rejected report is kept, append-only, with the reason; it counts nowhere. */
-export async function rejectReportAction(input: unknown): Promise<ConfirmResult> {
+export async function rejectReportAction(
+  input: unknown,
+): Promise<ConfirmResult> {
   const parsed = parseInput(RejectInput, input);
   if (!parsed.ok) return { ok: false, message: "Say why, in a sentence." };
   const viewer = await getViewer();
-  if (!viewer?.account || viewer.deleted) return { ok: false, message: "Sign in to reject a report." };
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to reject a report." };
   const supabase = await createSupabaseServerClient();
   const up = await supabase
     .from("incidents")
@@ -199,7 +267,11 @@ export async function rejectReportAction(input: unknown): Promise<ConfirmResult>
     .eq("account_id", viewer.account.id)
     .eq("status", "draft")
     .select("id");
-  if (up.error || !up.data?.length) return { ok: false, message: "That report was not found or is already confirmed." };
+  if (up.error || !up.data?.length)
+    return {
+      ok: false,
+      message: "That report was not found or is already confirmed.",
+    };
   await supabase.from("incident_events").insert({
     incident_id: parsed.data.id,
     account_id: viewer.account.id,

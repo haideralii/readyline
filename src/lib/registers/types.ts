@@ -50,7 +50,11 @@ export const INCIDENT_STATUSES = [
   "rejected",
 ] as const;
 /** The statuses the owner's form may set (a draft is confirmed on its own screen). */
-export const OWNER_INCIDENT_STATUSES = ["open", "under-review", "closed"] as const;
+export const OWNER_INCIDENT_STATUSES = [
+  "open",
+  "under-review",
+  "closed",
+] as const;
 export type IncidentStatus = (typeof INCIDENT_STATUSES)[number];
 
 export const INCIDENT_EVENT_KINDS = [

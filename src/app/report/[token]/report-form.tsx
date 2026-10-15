@@ -1,19 +1,30 @@
 "use client";
 import { useState } from "react";
 import {
-  DateField,
   ErrorSummary,
   Field,
   ParticipantDataWarning,
-  RefField,
-  SelectField,
   TextArea,
   errorsFor,
   type FieldErrors,
 } from "@/app/start/_components/fields";
+import {
+  DateField,
+  RefField,
+  SelectField,
+} from "@/app/registers/_components/inputs";
 import { CATEGORY_LABELS, SEVERITY_LABELS } from "@/lib/registers/labels";
-import { INCIDENT_CATEGORIES, INCIDENT_SEVERITIES, TEXT_CAPS } from "@/lib/registers/types";
-import { REPORTER_ROLES, REPORT_THANKS, ReportForm as Schema, type ReportFormValues } from "@/lib/registers/worker";
+import {
+  INCIDENT_CATEGORIES,
+  INCIDENT_SEVERITIES,
+  TEXT_CAPS,
+} from "@/lib/registers/types";
+import {
+  REPORTER_ROLES,
+  REPORT_THANKS,
+  ReportForm as Schema,
+  type ReportFormValues,
+} from "@/lib/registers/worker";
 import { parseInput } from "@/lib/validation";
 import { submitReportAction } from "@/server/registers/report-actions";
 
@@ -30,10 +41,18 @@ const LABELS: Record<string, string> = {
 };
 
 function today(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney" }).format(new Date());
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+  }).format(new Date());
 }
 
-export function ReportForm({ token, workerCodes }: { token: string; workerCodes: string[] }) {
+export function ReportForm({
+  token,
+  workerCodes,
+}: {
+  token: string;
+  workerCodes: string[];
+}) {
   const [v, setV] = useState<ReportFormValues>({
     occurredOn: today(),
     category: "" as ReportFormValues["category"],
@@ -47,14 +66,19 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState<string | null>(null);
-  const set = <K extends keyof ReportFormValues>(k: K, value: ReportFormValues[K]) =>
-    setV((s) => ({ ...s, [k]: value }));
+  const set = <K extends keyof ReportFormValues>(
+    k: K,
+    value: ReportFormValues[K],
+  ) => setV((s) => ({ ...s, [k]: value }));
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = parseInput(Schema, v);
     if (!parsed.ok) {
-      setErrors({ ...parsed.fieldErrors, ...(parsed.formErrors.length ? { form: parsed.formErrors } : {}) });
+      setErrors({
+        ...parsed.fieldErrors,
+        ...(parsed.formErrors.length ? { form: parsed.formErrors } : {}),
+      });
       return;
     }
     setErrors({});
@@ -67,7 +91,11 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
       }
       setDone(r.reference);
     } catch {
-      setErrors({ form: ["Could not reach the server. Check your connection and try again."] });
+      setErrors({
+        form: [
+          "Could not reach the server. Check your connection and try again.",
+        ],
+      });
     } finally {
       setPending(false);
     }
@@ -75,13 +103,22 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
 
   if (done)
     return (
-      <p role="status" className="mt-6 text-lg leading-8" data-testid="report-done">
+      <p
+        role="status"
+        className="mt-6 text-lg leading-8"
+        data-testid="report-done"
+      >
         {REPORT_THANKS} Your report is {done}.
       </p>
     );
 
   return (
-    <form onSubmit={onSubmit} noValidate className="mt-6" data-testid="report-form">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="mt-6"
+      data-testid="report-form"
+    >
       <ErrorSummary errors={errors} labels={LABELS} />
       <ParticipantDataWarning />
       <SelectField
@@ -108,7 +145,10 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
         errors={errorsFor(errors, "category")}
         value={v.category}
         onChange={(x) => set("category", x as ReportFormValues["category"])}
-        options={INCIDENT_CATEGORIES.map((c) => ({ value: c, label: CATEGORY_LABELS[c] }))}
+        options={INCIDENT_CATEGORIES.map((c) => ({
+          value: c,
+          label: CATEGORY_LABELS[c],
+        }))}
       />
       <SelectField
         id="severity"
@@ -116,7 +156,10 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
         errors={errorsFor(errors, "severity")}
         value={v.severity}
         onChange={(x) => set("severity", x as ReportFormValues["severity"])}
-        options={INCIDENT_SEVERITIES.map((s) => ({ value: s, label: SEVERITY_LABELS[s] }))}
+        options={INCIDENT_SEVERITIES.map((s) => ({
+          value: s,
+          label: SEVERITY_LABELS[s],
+        }))}
       />
       <RefField
         id="participantRef"
@@ -136,7 +179,11 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
         onChange={(x) => set("workerRef", x)}
         optional
       />
-      <Field id="summary" label={LABELS.summary} errors={errorsFor(errors, "summary")}>
+      <Field
+        id="summary"
+        label={LABELS.summary}
+        errors={errorsFor(errors, "summary")}
+      >
         {(describedBy, invalid) => (
           <TextArea
             id="summary"
@@ -150,7 +197,11 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
           />
         )}
       </Field>
-      <Field id="actionsTaken" label={`${LABELS.actionsTaken} (optional)`} errors={errorsFor(errors, "actionsTaken")}>
+      <Field
+        id="actionsTaken"
+        label={`${LABELS.actionsTaken} (optional)`}
+        errors={errorsFor(errors, "actionsTaken")}
+      >
         {(describedBy, invalid) => (
           <TextArea
             id="actionsTaken"
@@ -164,7 +215,13 @@ export function ReportForm({ token, workerCodes }: { token: string; workerCodes:
           />
         )}
       </Field>
-      <button type="submit" disabled={pending} aria-busy={pending || undefined} className="btn-primary mt-6" data-testid="report-submit">
+      <button
+        type="submit"
+        disabled={pending}
+        aria-busy={pending || undefined}
+        className="btn-primary mt-6"
+        data-testid="report-submit"
+      >
         {pending ? "Sending…" : "Send the report"}
       </button>
     </form>

@@ -10,7 +10,10 @@ import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 import { getOwnedAccount, type Account } from "./owned-account";
-import { getWorkerMembership, type WorkerMembership } from "./worker-membership";
+import {
+  getWorkerMembership,
+  type WorkerMembership,
+} from "./worker-membership";
 
 export { getOwnedAccount, type Account };
 

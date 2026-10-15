@@ -19,11 +19,16 @@ export default async function WorkerNewComplaintPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm">
-        <Link href="/worker" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">
+        <Link
+          href="/worker"
+          className="inline-flex min-h-11 items-center underline-offset-4 hover:underline"
+        >
           Your entries
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">Log a complaint</h1>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+        Log a complaint
+      </h1>
       <ComplaintFormView afterSave="/worker?saved=1" />
     </div>
   );

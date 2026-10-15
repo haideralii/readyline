@@ -37,27 +37,47 @@ export default async function WorkerHome() {
       </h1>
       <p className="mt-3 leading-7" data-testid="worker-home-line">
         {WORKER_HOME_LINE}
-        {viewer.worker.worker_ref ? ` Your code is ${viewer.worker.worker_ref}.` : ""}
+        {viewer.worker.worker_ref
+          ? ` Your code is ${viewer.worker.worker_ref}.`
+          : ""}
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/worker/incidents/new" className="btn-primary" data-testid="worker-log-incident">
+        <Link
+          href="/worker/incidents/new"
+          className="btn-primary"
+          data-testid="worker-log-incident"
+        >
           Log an incident
         </Link>
-        <Link href="/worker/complaints/new" className="btn-secondary" data-testid="worker-log-complaint">
+        <Link
+          href="/worker/complaints/new"
+          className="btn-secondary"
+          data-testid="worker-log-complaint"
+        >
           Log a complaint
         </Link>
       </div>
 
-      <section aria-labelledby="mine-heading" className="mt-10" data-testid="worker-entries">
+      <section
+        aria-labelledby="mine-heading"
+        className="mt-10"
+        data-testid="worker-entries"
+      >
         <h2 id="mine-heading" className="text-xl font-semibold">
           What you logged
         </h2>
         {incidents.length === 0 && complaints.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Nothing yet.</p>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            Nothing yet.
+          </p>
         ) : (
           <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
             {incidents.map((r) => (
-              <li key={r.id} className="py-3 leading-7" data-testid="worker-entry">
+              <li
+                key={r.id}
+                className="py-3 leading-7"
+                data-testid="worker-entry"
+              >
                 <span className="font-medium">
                   {r.reference}: {CATEGORY_LABELS[r.category]}
                 </span>{" "}
@@ -70,7 +90,11 @@ export default async function WorkerHome() {
               </li>
             ))}
             {complaints.map((r) => (
-              <li key={r.id} className="py-3 leading-7" data-testid="worker-entry">
+              <li
+                key={r.id}
+                className="py-3 leading-7"
+                data-testid="worker-entry"
+              >
                 <span className="font-medium">
                   {r.reference}: complaint by {CHANNEL_LABELS[r.channel]}
                 </span>{" "}
@@ -85,7 +109,11 @@ export default async function WorkerHome() {
       </section>
 
       <form action={signOut} className="mt-10">
-        <button type="submit" className="btn-secondary" data-testid="worker-sign-out">
+        <button
+          type="submit"
+          className="btn-secondary"
+          data-testid="worker-sign-out"
+        >
           Sign out
         </button>
       </form>

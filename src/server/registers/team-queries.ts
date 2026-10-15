@@ -16,9 +16,17 @@ export type InvitationRow = {
   created_at: string;
 };
 
-export type WorkerRow = { user_id: string; worker_ref: string | null; created_at: string };
+export type WorkerRow = {
+  user_id: string;
+  worker_ref: string | null;
+  created_at: string;
+};
 
-export type ReportLinkRow = { id: string; created_at: string; revoked_at: string | null };
+export type ReportLinkRow = {
+  id: string;
+  created_at: string;
+  revoked_at: string | null;
+};
 
 export async function listInvitations(
   supabase: SupabaseClient,
@@ -33,9 +41,15 @@ export async function listInvitations(
   return (r.data as InvitationRow[] | null) ?? [];
 }
 
-export function pendingInvitations(rows: InvitationRow[], now = new Date()): InvitationRow[] {
+export function pendingInvitations(
+  rows: InvitationRow[],
+  now = new Date(),
+): InvitationRow[] {
   return rows.filter(
-    (i) => !i.accepted_at && !i.revoked_at && Date.parse(i.expires_at) > now.getTime(),
+    (i) =>
+      !i.accepted_at &&
+      !i.revoked_at &&
+      Date.parse(i.expires_at) > now.getTime(),
   );
 }
 

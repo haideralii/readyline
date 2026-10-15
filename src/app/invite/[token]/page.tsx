@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AUDITOR_TOKEN_PATTERN, hashAuditorToken } from "@/lib/registers/auditor-link";
+import {
+  AUDITOR_TOKEN_PATTERN,
+  hashAuditorToken,
+} from "@/lib/registers/auditor-link";
 import { INVITE_LINE } from "@/lib/registers/worker";
 import { getViewer } from "@/server/accounts/queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
@@ -19,14 +22,20 @@ export const dynamic = "force-dynamic";
  * you and sends you to sign in with the invited address; signed in, one
  * button accepts. A used, revoked, expired or unknown token is a plain 404.
  */
-export default async function InvitePage({ params }: PageProps<"/invite/[token]">) {
+export default async function InvitePage({
+  params,
+}: PageProps<"/invite/[token]">) {
   const { token } = await params;
   if (!AUDITOR_TOKEN_PATTERN.test(token)) notFound();
   let preview: { trading_name: string; worker_ref: string } | null = null;
   try {
     const admin = createSupabaseAdminClient();
-    const r = await admin.rpc("invitation_preview", { p_token_hash: hashAuditorToken(token) });
-    preview = (r.data as { trading_name: string; worker_ref: string }[] | null)?.[0] ?? null;
+    const r = await admin.rpc("invitation_preview", {
+      p_token_hash: hashAuditorToken(token),
+    });
+    preview =
+      (r.data as { trading_name: string; worker_ref: string }[] | null)?.[0] ??
+      null;
   } catch (e) {
     if (e instanceof SupabaseEnvError) notFound();
     throw e;

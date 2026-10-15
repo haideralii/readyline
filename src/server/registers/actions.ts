@@ -117,12 +117,16 @@ export async function saveIncidentAction(
     commission_reference: v.commissionReference,
     status: v.status,
     closed_on: v.closedOn,
-    // REQ-020 FR-4: a worker's row says who logged it; the owner's says the owner.
+    // REQ-020 FR-4: a worker's row says who logged it and opens as open (the
+    // owner closes it; the insert policy holds the same line); the owner's
+    // row says the owner.
     ...(ctx.worker
       ? {
           reported_via: "worker" as const,
           logged_by_ref: ctx.worker.worker_ref,
           created_by: ctx.viewer.user.id,
+          status: "open" as const,
+          closed_on: null,
         }
       : {}),
   };

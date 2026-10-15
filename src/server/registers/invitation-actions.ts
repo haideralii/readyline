@@ -21,9 +21,13 @@ export async function acceptInvitationAction(
   formData: FormData,
 ): Promise<AcceptResult> {
   const parsed = parseInput(Input, { token: formData.get("token") });
-  if (!parsed.ok) return { ok: false, message: "That invitation does not work." };
+  if (!parsed.ok)
+    return { ok: false, message: "That invitation does not work." };
   const viewer = await getViewer();
-  if (!viewer) redirect(`/sign-in?next=${encodeURIComponent(`/invite/${parsed.data.token}`)}`);
+  if (!viewer)
+    redirect(
+      `/sign-in?next=${encodeURIComponent(`/invite/${parsed.data.token}`)}`,
+    );
   const supabase = await createSupabaseServerClient();
   const r = await supabase.rpc("accept_invitation", {
     p_token_hash: hashAuditorToken(parsed.data.token),
