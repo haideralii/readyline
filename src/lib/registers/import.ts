@@ -188,6 +188,8 @@ function toFormValues(
         commissionReference: s("commission_reference"),
         status: s("status") || "open",
         closedOn: s("closed_on"),
+        // Session B's aware date: the form defaults it to the occurred date (retro finding 23).
+        awareOn: "",
       };
     case "complaints":
       return {
@@ -244,6 +246,7 @@ function toRow(
         commission_reference: v.commissionReference,
         status: v.status,
         closed_on: v.closedOn,
+        aware_on: v.awareOn,
       };
     case "complaints":
       return {

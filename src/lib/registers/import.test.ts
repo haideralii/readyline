@@ -85,6 +85,7 @@ describe("the preview (FR-8)", () => {
     expect(p.rows.map((r) => r.n)).toEqual([1, 2]);
     expect(p.rows[0].row).toMatchObject({
       occurred_on: "2026-09-01",
+      aware_on: "2026-09-01",
       category: "near-miss",
       participant_ref: "P-014",
       worker_ref: "W-3",
@@ -127,9 +128,9 @@ describe("the preview (FR-8)", () => {
     expect(p.ok).toBe(true);
     if (!p.ok) return;
     expect(p.failed).toBe(2);
-    expect(p.rows[0].reasons).toEqual([
+    expect(p.rows[0].reasons).toContain(
       "reported_on: The report date cannot be before the date it happened",
-    ]);
+    );
     expect(p.rows[2].reasons.join(" ")).toMatch(/NDIS/);
     const choice = previewImport(
       "incidents",

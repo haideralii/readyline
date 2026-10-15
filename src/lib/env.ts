@@ -84,6 +84,11 @@ export const REQUIRED_LATER: ReadonlyArray<{
     from: "REQ-007 Session C (the paid job calls the model only when this is 1; D-708)",
     productionHome: "Vercel project environment variables (server only)",
   },
+  {
+    name: "HASH_PEPPER",
+    from: "REQ-020 Session B, retro finding 34 (the HMAC key behind hashed viewer addresses and invitation emails)",
+    productionHome: "Vercel project environment variables (server only)",
+  },
 ];
 
 /**
@@ -127,6 +132,7 @@ export const PRODUCTION_REQUIRED: ReadonlyArray<{
       "STRIPE_WEBHOOK_SECRET",
       "STRIPE_PRICE_PACK",
       "PACK_PRICE_AUD_CENTS",
+      "HASH_PEPPER",
     ].includes(v.name),
   ),
   {
@@ -140,6 +146,32 @@ export function isProductionDeployment(
   source: Record<string, string | undefined> = process.env,
 ): boolean {
   return source.VERCEL_ENV?.trim() === "production";
+}
+
+/**
+ * The stand-in HMAC key for development, test and CI (retro review of
+ * REQ-018 to 021, finding 34; PO decision 34). Never a production value: the
+ * production deployment refuses to run without `HASH_PEPPER`.
+ */
+export const DEVELOPMENT_HASH_PEPPER =
+  "readyline-development-pepper-not-for-production";
+
+/**
+ * `HASH_PEPPER`, the key behind every hashed viewer address and invitation
+ * email. Set: its value. Unset on the production deployment: refused, the
+ * way the boot check refuses every production variable. Unset anywhere
+ * else: the fixed development value, flagged so the caller can warn once.
+ */
+export function readHashPepper(
+  source: Record<string, string | undefined> = process.env,
+): { pepper: string; fallback: boolean } {
+  const value = source.HASH_PEPPER?.trim();
+  if (value) return { pepper: value, fallback: false };
+  if (isProductionDeployment(source))
+    throw new EnvError([
+      "HASH_PEPPER is missing. Set it in .env.local locally; in production it lives in: Vercel project environment variables (server only).",
+    ]);
+  return { pepper: DEVELOPMENT_HASH_PEPPER, fallback: true };
 }
 
 const schema = z.object({
