@@ -73,12 +73,14 @@ async function toResult(page: Page) {
 test.describe("REQ-014 visual identity", () => {
   test("fonts come from our origin, the wordmark and tokens render, and nothing external is loaded (AC-1, AC-2)", async ({
     page,
+    baseURL,
   }) => {
+    // Batch 47 item 9: same-origin is the test's base (a deployment or localhost), not a literal.
+    const origin = new URL(baseURL!).origin;
     const external: string[] = [];
     page.on("request", (r) => {
       const u = new URL(r.url());
-      if (u.origin !== new URL(page.url() || "http://localhost").origin)
-        external.push(r.url());
+      if (u.origin !== origin) external.push(r.url());
     });
     await page.goto("/");
     await expect(page.getByTestId("wordmark")).toBeVisible();
@@ -88,9 +90,7 @@ test.describe("REQ-014 visual identity", () => {
       () => getComputedStyle(document.body).backgroundColor,
     );
     expect(bodyBg).toBe("rgb(247, 243, 236)");
-    expect(external.filter((u) => !u.startsWith("http://localhost"))).toEqual(
-      [],
-    );
+    expect(external).toEqual([]);
     const csp = (await page.request.get("/")).headers()[
       "content-security-policy"
     ];

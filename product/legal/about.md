@@ -1,6 +1,6 @@
 ---
 title: About Readyline
-updated: 2026-10-12
+updated: 2026-10-15
 owner: po
 status: draft (plain-language draft by the product owner)
 ---
@@ -15,7 +15,7 @@ Readyline sits in between. You answer plain questions about what you do. Readyli
 
 ## Who runs it
 
-Readyline is built and run by one person in Sydney, a software quality engineer who tests systems for a living. [Name and ABN to be added when registered.] It is not a law firm and not a consultancy.
+Readyline is built and run by one person in Sydney, a software quality engineer who tests systems for a living. {{business-line}} It is not a law firm and not a consultancy.
 
 ## Independence
 
@@ -27,7 +27,7 @@ One fixed price for the document pack, and an optional monthly subscription for 
 
 ## Where your data lives
 
-In Australia, in Sydney. We never collect information about NDIS participants. See the Privacy policy.
+Your account and your documents live in Sydney. The model that drafts the documents and the payment provider process requests overseas; see the Privacy policy. We never collect information about NDIS participants.
 
 ## Contact
 
