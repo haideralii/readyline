@@ -1,7 +1,8 @@
 /**
  * Kicks the paid generation job route until it reports nothing more to do
  * (batch 32 item 1, D-1006). The GitHub Actions kicker
- * (.github/workflows/generate-kick.yml) runs this every thirty minutes and
+ * (.github/workflows/generate-kick.yml) runs this on a schedule (every
+ * thirty minutes until GITHUB_DISPATCH_TOKEN is set, then hourly) and
  * whenever the app dispatches it (D-059); it needs no dependencies, only
  * Node 22's fetch.
  *

@@ -1,7 +1,8 @@
 /**
  * Runs queued paid generation jobs (REQ-007 FR-5, D-706, D-707, D-1006).
  * Vercel Cron calls it daily as a backstop; the GitHub Actions kicker calls
- * it every thirty minutes (generate-kick.yml, D-059) and on dispatch until
+ * it on a schedule (generate-kick.yml, D-059: every thirty minutes until
+ * GITHUB_DISPATCH_TOKEN is set, then hourly) and on dispatch until
  * it answers `more: false`; the webhook's hook
  * and this route itself call it to carry a long set through a chain; a
  * person can call it with the bearer. Anything unauthorised gets 404 so the

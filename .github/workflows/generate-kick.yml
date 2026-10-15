@@ -6,18 +6,21 @@ name: Kick paid generation
 # self-kick reliably, D-057). The app sends a `repository_dispatch` event
 # (type `generate`) when work exists: on a paid checkout and on a nudge from
 # the documents page that finds a stalled job (src/server/generation/
-# dispatch.ts, needs GITHUB_DISPATCH_TOKEN in Vercel). The schedule every
-# thirty minutes is the safety net when the token is missing or the
-# dispatch failed. Either way the job calls the route with the bearer until
+# dispatch.ts, needs GITHUB_DISPATCH_TOKEN in Vercel). The schedule is the
+# safety net when the token is missing or the dispatch failed: every thirty
+# minutes until GITHUB_DISPATCH_TOKEN is set in Vercel, then hourly (retro
+# 006-010 finding 63, PO decision 15 Oct 2026; the cron below changes to
+# `0 * * * *` when Haider sets the token). Either way the job calls the
+# route with the bearer until
 # it answers `"more": false` or twenty minutes have passed. The route
 # refuses without the bearer (404) and claims jobs behind a skip-locked
 # lease, so a kick that overlaps a live chain is a no-op
 # (scripts/ops/kick-generation.test.ts).
 #
 # Minutes: a scheduled run with nothing to do makes one call and ends, so
-# the schedule costs about 1,440 runner minutes a month against GitHub's
-# 2,000 free for a private repository; a dispatched run costs only while a
-# pack is generating.
+# the half-hourly schedule costs about 1,440 runner minutes a month against
+# GitHub's 2,000 free for a private repository (about 720 once hourly); a
+# dispatched run costs only while a pack is generating.
 #
 # Needs: repository variable PROD_URL (https://<domain>, no trailing slash)
 # and repository secret CRON_SECRET (the same value as the Vercel variable;

@@ -1,7 +1,8 @@
 /**
  * Asking GitHub Actions to carry the paid generation chain (D-059, batch 37
- * item 1). The kicker workflow runs every thirty minutes as a safety net;
- * when work exists now (a pack was just paid for, or the documents page
+ * item 1). The kicker workflow runs on a schedule as a safety net (every
+ * thirty minutes until the token below is set, then hourly); when work
+ * exists now (a pack was just paid for, or the documents page
  * found a stalled job) the app sends a `repository_dispatch` event and the
  * workflow starts within a minute and loops until the route answers
  * `more: false` or twenty minutes have passed.

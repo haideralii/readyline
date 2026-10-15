@@ -209,7 +209,9 @@ export function IncidentFormView({
           role="status"
           data-testid="notify-by"
         >
-          Notify the Commission by <strong>{notifyBy}</strong>.
+          Notify the Commission by <strong>{notifyBy}</strong>. We give the
+          earlier date to be safe; the Rules give 24 hours when the event is
+          also serious injury, abuse or neglect.
         </p>
       ) : null}
       {v.reportable ? (
