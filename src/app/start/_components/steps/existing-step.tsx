@@ -78,10 +78,21 @@ export function ExistingStepForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <p className="mb-6 text-base leading-7 text-zinc-700 dark:text-zinc-300">
-        This does not change which standards apply. It shapes your readiness
-        checklist so you can see what is missing.
-      </p>
+      {/* REQ-025 FR-1, D-2216: what these answers do and do not change, in two lines. */}
+      <div
+        className="mb-6 space-y-2 text-base leading-7 text-zinc-700 dark:text-zinc-300"
+        data-testid="existing-intro"
+      >
+        <p>
+          Your answers here pre-tick your readiness checklist, so you can see
+          what is missing today.
+        </p>
+        <p>
+          They do not change which standards apply or what your pack contains:
+          the pack drafts the full set so every document matches. Not sure
+          counts as no.
+        </p>
+      </div>
       <ErrorSummary errors={errors} labels={LABELS} />
       {ITEMS.map((item) => (
         <RadioGroup

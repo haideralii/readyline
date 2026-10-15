@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
-import {
-  readinessSentence,
-  readyLineCounts,
-} from "@/lib/questionnaire/readiness";
+import { readyLineCounts } from "@/lib/questionnaire/readiness";
 import { SampleDocument } from "@/components/sample-document";
 import { Testimonials, TrustCounters } from "@/components/trust-blocks";
 import { JsonLd } from "@/components/json-ld";
@@ -167,7 +164,7 @@ export default function Home() {
           <div className="mt-4">
             <ReadyLine
               counts={readyLineCounts(C.example.line)}
-              sentence={readinessSentence(C.example.line)}
+              noun="documents and registers"
               testId="home-ready-line"
             />
           </div>

@@ -112,18 +112,27 @@ test.describe("questionnaire", () => {
     );
     // PO batch 5: legend and labels, and the claim-free "what happens next" block.
     // REQ-013 batch 36 item 3: the customer's words; no internal label.
-    await expect(page.getByTestId("have-legend")).toContainText("drafts this");
-    await expect(page.getByText("Not asked yet")).toHaveCount(0);
-    await expect(page.getByText(/not asked about yet|To prepare/)).toHaveCount(
-      0,
+    // REQ-025 FR-4a: the pack's part is the line above the list; the tags say the provider's status only.
+    await expect(page.getByTestId("have-legend")).toContainText(
+      "Your pack includes a draft of every document below",
     );
+    await expect(page.getByText("Not asked yet")).toHaveCount(0);
+    await expect(
+      page.getByText(/not asked about yet|drafts this|You said:/),
+    ).toHaveCount(0);
+    expect(
+      await page
+        .getByTestId("have-tag")
+        .filter({ hasText: "To prepare" })
+        .count(),
+    ).toBeGreaterThan(0);
     await expect(page.getByTestId("what-next")).toContainText(
       "What happens next",
     );
     // REQ-013 AC-5: the summary line and the grouped document list.
     // REQ-013 FR-12: the audit word is the block's heading; the sentence follows it.
     await expect(page.getByTestId("summary")).toContainText(
-      /Your audit: verification[\s\S]*You will need \d+ documents and \d+ registers/,
+      /Your audit: verification[\s\S]*Documents: \d+[\s\S]*Registers: \d+/,
     );
     await expect(
       page.getByTestId("doc-group-running-the-business"),

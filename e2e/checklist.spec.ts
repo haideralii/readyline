@@ -55,12 +55,13 @@ test.describe("readiness checklist, signed out (REQ-006 FR-5)", () => {
         /Open your checklist \((\d+) things\)/,
       )?.[1],
     );
+    // REQ-025 FR-3: the checklist line is the summary list's third item.
     const line = page.getByTestId("checklist-count-line");
     await expect(line).toContainText(
-      /Your checklist has \d+ items: the \d+ above plus \d+ about your workers, insurance and the audit/,
+      /Checklist: \d+ items \(\d+ above plus \d+ about your workers, insurance and the audit\)/,
     );
     const m = ((await line.textContent()) ?? "").match(
-      /has (\d+) items: the (\d+) above plus (\d+)/,
+      /Checklist: (\d+) items \((\d+) above plus (\d+)/,
     )!;
     expect(Number(m[1])).toBe(things);
     expect(Number(m[2]) + Number(m[3])).toBe(Number(m[1]));
