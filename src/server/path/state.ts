@@ -4,9 +4,12 @@ import "server-only";
  * read per concern, folded into the pure `PathState` the strip and every
  * path page decide from. Reads run with the owner's session (RLS). Each
  * concern is skipped once an earlier one decides the step, so a signed-in
- * page costs at most a few small queries.
+ * page costs at most a few small queries. Retro 013-017 finding 70: the
+ * strip in the root layout and the path page each ask in the same request,
+ * so the context is loaded once per account per request (`requestMemo`).
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cache } from "react";
 import { deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist } from "@/lib/checklist/state";
 import { collectBlanks } from "@/lib/generator/blanks";
@@ -114,7 +117,31 @@ export function groupsLeftToAdopt(
   ).length;
 }
 
-export async function loadPathContext(
+/**
+ * One load per account per request (retro 013-017 finding 70, the D-1012
+ * pattern). React's `cache()` memoises by argument identity, and every
+ * caller passes a fresh `{ ...viewer, account }` literal and its own
+ * Supabase client, so the memo is a request-scoped map keyed by account id
+ * instead: `cache(() => new Map())` hands back the same map for the whole
+ * render. Outside a request (a unit test, a job) there is no cache scope and
+ * the map is new each time, so nothing is shared across requests or users.
+ */
+const requestMemo = cache(() => new Map<string, Promise<PathContext>>());
+
+export function loadPathContext(
+  supabase: SupabaseClient,
+  viewer: Viewer & { account: NonNullable<Viewer["account"]> },
+): Promise<PathContext> {
+  const memo = requestMemo();
+  const key = viewer.account.id;
+  const hit = memo.get(key);
+  if (hit) return hit;
+  const loading = loadPathContextUncached(supabase, viewer);
+  memo.set(key, loading);
+  return loading;
+}
+
+async function loadPathContextUncached(
   supabase: SupabaseClient,
   viewer: Viewer & { account: NonNullable<Viewer["account"]> },
 ): Promise<PathContext> {
