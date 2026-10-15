@@ -8,36 +8,49 @@
  * peppered; they are 256-bit random values and stay plain SHA-256
  * (`hashAuditorToken`).
  *
- * Without the variable, development, test and CI use one fixed stand-in
- * value and log one warning; the production deployment refuses to run.
+ * Without the variable (D-2238): every environment falls back to the plain
+ * SHA-256 these values had before the pepper existed, one warning is logged
+ * at the first hash, and the launch switchboard's "Hash pepper" row stays
+ * red until Haider sets it. No deployment refuses to start over it. Once
+ * set, new hashes are HMAC; open invitations hashed the old way expire
+ * within their seven days, and addresses on audit lines are records, not
+ * lookups.
  */
-import { createHmac } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { readHashPepper } from "./env";
 import { log } from "./logging/logger";
 
 let warned = false;
 
-/** The pepper in force, warning once when the development stand-in is used. */
+/** The pepper in force, or null when HASH_PEPPER is unset (warned once). */
 export function hashPepper(
   source: Record<string, string | undefined> = process.env,
-): string {
-  const { pepper, fallback } = readHashPepper(source);
-  if (fallback && !warned) {
+): string | null {
+  const pepper = readHashPepper(source);
+  if (pepper === null && !warned) {
     warned = true;
-    log.warn("hash-pepper.fallback", {
+    log.warn("hash-pepper.unset", {
       name: "HASH_PEPPER",
-      note: "not set; using the fixed development value",
+      note: "not set; address and email hashes are plain SHA-256 until it is (D-2238)",
     });
   }
   return pepper;
 }
 
-/** HMAC-SHA-256 of `value` under the pepper, as 64 hex characters. */
-export function pepperedHash(value: string, pepper = hashPepper()): string {
+/** HMAC-SHA-256 of `value` under the pepper, or plain SHA-256 while there is none, as 64 hex characters. */
+export function pepperedHash(
+  value: string,
+  pepper: string | null = hashPepper(),
+): string {
+  if (pepper === null)
+    return createHash("sha256").update(value, "utf8").digest("hex");
   return createHmac("sha256", pepper).update(value, "utf8").digest("hex");
 }
 
 /** An email, trimmed and lower-cased, hashed under the pepper (invitations, limiter keys, log lines). */
-export function emailHash(email: string, pepper = hashPepper()): string {
+export function emailHash(
+  email: string,
+  pepper: string | null = hashPepper(),
+): string {
   return pepperedHash(email.trim().toLowerCase(), pepper);
 }

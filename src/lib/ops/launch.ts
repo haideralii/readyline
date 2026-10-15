@@ -535,7 +535,7 @@ const RULES: Rule[] = [
         ? { state: "set", sentence: "HASH_PEPPER is set." }
         : {
             state: "unset",
-            sentence: `Set HASH_PEPPER in ${VERCEL} (openssl rand -hex 32), once, before any worker is invited; production refuses to start without it (retro finding 34).`,
+            sentence: `Set HASH_PEPPER in ${VERCEL} (openssl rand -hex 32), once and never changed; until then address and email hashes are plain SHA-256, as before (retro finding 34, D-2238).`,
           },
   },
   {
