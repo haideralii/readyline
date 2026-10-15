@@ -15,7 +15,12 @@ import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { hashAuditorToken } from "@/lib/registers/auditor-link";
 import { NDIS_NUMBER_SHAPE } from "@/lib/registers/types";
-import { ReportForm, type ReportFormValues } from "@/lib/registers/worker";
+import {
+  REPORT_ACCOUNT_LIMIT,
+  REPORT_LIMIT,
+  ReportForm,
+  type ReportFormValues,
+} from "@/lib/registers/worker";
 import { parseInput, strictObject, text } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import { clientIp } from "@/server/auth/paths";
@@ -35,13 +40,6 @@ export type ReportSubmitResult =
       /** Set when the action threw instead of answering (run 38743907016); the job log carries the cause. */
       code?: "report.unexpected";
     };
-
-/** FR-5: ten an hour per address, fifty a day per account. */
-export const REPORT_LIMIT = { limit: 10, windowSeconds: 3600 } as const;
-export const REPORT_ACCOUNT_LIMIT = {
-  limit: 50,
-  windowSeconds: 86_400,
-} as const;
 
 const SubmitInput = strictObject({
   token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
