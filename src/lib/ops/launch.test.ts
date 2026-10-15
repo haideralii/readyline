@@ -82,6 +82,7 @@ const everythingSet = (): LaunchFacts =>
       ANTHROPIC_MODEL: "MARKER-model",
       NEXT_PUBLIC_SITE_URL: "https://readyline.example",
       CRON_SECRET: "MARKER-cron",
+      HASH_PEPPER: "MARKER-pepper",
     },
   );
 
@@ -245,6 +246,15 @@ describe("launchRows (REQ-022 FR-1)", () => {
     expect(byId(f)["email-test-send"].state).toBe("unset");
     expect(byId(f)["admin-totp"].state).toBe("unset");
     expect(byId(facts())["email-domain"].state).toBe("unverified");
+  });
+
+  it("the hash pepper row is unset until HASH_PEPPER exists (retro finding 34)", () => {
+    const unset = byId(facts())["hash-pepper"];
+    expect(unset.state).toBe("unset");
+    expect(unset.sentence).toMatch(/HASH_PEPPER/);
+    expect(byId(facts({}, { HASH_PEPPER: "x" }))["hash-pepper"].state).toBe(
+      "set",
+    );
   });
 });
 

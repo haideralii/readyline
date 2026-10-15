@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   EnvError,
   PRODUCTION_REQUIRED,
+  REQUIRED_LATER,
   REQUIRED,
   assertEnv,
   isProductionDeployment,
+  readHashPepper,
   validateEnv,
 } from "./env";
 
@@ -75,6 +77,17 @@ describe("validateEnv for the production deployment (REQ-010 FR-2, AC-2)", () =>
     expect(isProductionDeployment({ VERCEL_ENV: "preview" })).toBe(false);
     expect(isProductionDeployment({ NODE_ENV: "production" })).toBe(false);
     expect(isProductionDeployment({})).toBe(false);
+  });
+
+  it("reads HASH_PEPPER when set and answers null otherwise; no deployment refuses to start over it (retro finding 34, D-2238)", () => {
+    expect(PRODUCTION_REQUIRED.map((v) => v.name)).not.toContain("HASH_PEPPER");
+    expect(REQUIRED_LATER.map((v) => v.name)).toContain("HASH_PEPPER");
+    expect(readHashPepper({ HASH_PEPPER: " k " })).toBe("k");
+    expect(readHashPepper({})).toBeNull();
+    expect(
+      readHashPepper({ HASH_PEPPER: "  ", VERCEL_ENV: "preview" }),
+    ).toBeNull();
+    expect(readHashPepper({ VERCEL_ENV: "production" })).toBeNull();
   });
 });
 

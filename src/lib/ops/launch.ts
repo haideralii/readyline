@@ -527,6 +527,18 @@ const RULES: Rule[] = [
     judge: (f) => jobRow("reminders", f.jobs.reminders, f),
   },
   {
+    id: "hash-pepper",
+    group: "admin",
+    name: "Hash pepper",
+    judge: (f) =>
+      present(f.env, "HASH_PEPPER")
+        ? { state: "set", sentence: "HASH_PEPPER is set." }
+        : {
+            state: "unset",
+            sentence: `Set HASH_PEPPER in ${VERCEL} (openssl rand -hex 32), once and never changed; until then address and email hashes are plain SHA-256, as before (retro finding 34, D-2238).`,
+          },
+  },
+  {
     id: "admin-totp",
     group: "admin",
     name: "Authenticator enrolled for the platform admin",
