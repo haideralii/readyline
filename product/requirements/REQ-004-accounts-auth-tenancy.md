@@ -1,5 +1,5 @@
 # REQ-004: Accounts, authentication and tenancy
-Status: ready (Dev response first; build after Haider creates the Supabase project)
+Status: accepted (Session C 11 Oct 2026, PR #7; FR-9 and FR-10 12 Oct 2026, PR #14; backlog-5 ASVS re-check 14 Oct 2026; status line corrected by the retro review 15 Oct 2026)
 Phase: 2   Priority: must   Owner: Dev
 
 ## Why
@@ -18,7 +18,7 @@ Out: payments, registers, documents, multi-member invitations (model it, do not 
 - FR-3 Tables: `users`, `accounts`, `memberships (user_id, account_id, role: owner|member)`, `questionnaire_drafts (account_id, answers jsonb, version, updated_at)`, `audit_log (account_id, actor_user_id, action, target, at)`; later REQs add theirs. Every account-scoped table has `account_id` and RLS policies that allow access only through an active membership.
 - FR-4 All data access goes through server code with the user's session; the service-role key is used only in server-only modules for admin and purge jobs and is never imported by client code (lint rule or test).
 - FR-5 Account settings page: trading name, structure, states, ABN; change requires re-validation with the REQ-003 schemas.
-- FR-6 Export: owner can download a JSON zip of everything stored for the account within the request (sync for now). Deletion: owner can delete the account; it is soft-deleted immediately (sign-in blocked, data hidden) and purged by a scheduled job after 30 days, including storage objects; an email confirms both events.
+- FR-6 Export: owner can download a JSON zip of everything stored for the account within the request (sync for now). Deletion: owner can delete the account; it is soft-deleted immediately (sign-in blocked, data hidden) and purged by a scheduled job after 30 days, including storage objects; an email confirms both events. *(Retro review 15 Oct 2026: both emails go through `createEmailProvider()`, which is the log-only implementation until D-013 chooses a provider; nothing is delivered today, and `/account/deleted` must not say otherwise, see the review's finding 35.)*
 - FR-7 Admin: a `platform_admin` flag on Haider's user only, settable only via SQL; admin routes require MFA (Supabase TOTP) and are allow-listed server-side; admin actions are written to `audit_log`.
 - FR-8 Sessions: Supabase SSR cookies (HttpOnly, Secure, SameSite=Lax); sign out everywhere on password-less reset (re-issuing a magic link) is not needed, but "sign out of all devices" is.
 

@@ -1,5 +1,5 @@
 # REQ-002: Security and privacy baseline (applies from now on)
-Status: in progress
+Status: accepted (11 Oct 2026, PR #5; backlog-5 ASVS re-check 14 Oct 2026; status line corrected by the retro review 15 Oct 2026)
 Phase: 1   Priority: must   Owner: Dev
 
 ## Why
@@ -171,7 +171,7 @@ Then rebase onto `main` (after PR #1 merges), resolve the expected conflicts in 
 
 OWASP ASVS level 1 re-check of this REQ's controls; the table with evidence per control is `product/security/asvs-l1-check-2026-10-14.md`.
 
-- **FR-1, AC-1 (dependency audit).** `npm audit --omit=dev --audit-level=high` on 14 October 2026: 0 vulnerabilities; the CI step is unchanged. Added `.github/dependabot.yml`: weekly npm updates in two groups (production, development) and monthly GitHub Actions updates, the "Dependabot or Renovate weekly" line of the threat model. A GitHub feature, not a paid service; its pull requests queue while Actions is paused.
+- **FR-1, AC-1 (dependency audit).** `npm audit --omit=dev --audit-level=high` on 14 October 2026: 0 vulnerabilities; the CI step is unchanged. Added `.github/dependabot.yml`: weekly npm updates in two groups (production, development) and monthly GitHub Actions updates, the "Dependabot or Renovate weekly" line of the threat model. A GitHub feature, not a paid service; its pull requests queue while Actions is paused. *(Retro review 15 Oct 2026: the file was removed in 5be604d under D-2005, "Dependabot off until launch"; GitHub's security alerts stay on and the audit step is unchanged.)*
 - **FR-1, AC-2 (secret scan on every branch).** The gitleaks job moved to `.github/workflows/secrets.yml`, which runs on every push to every branch, on pull requests and by hand, with the same action, config and the D-205 comment setting. Before this it lived in `ci.yml`, whose push trigger is `main` only, so a feature branch without a pull request was never scanned. The `.env` file check stays in the main job.
 - **FR-2, AC-3 (headers verified by a test).** `e2e/security-headers.spec.ts` gains a second test: the five static headers, `frame-ancestors 'none'`, `object-src 'none'` and no `X-Powered-By` on `/pricing`, `/start`, `/sign-in`, a guide, a 404 path and `/api/health`, not only on `/`. Both tests pass on desktop Chromium against the dev server (6 passed with the new abuse spec).
 - **FR-3 (every boundary validated), extended.** `src/lib/validation/handlers.test.ts` now also requires every route handler and server action file to be gated (session, secret or signature, or rate limiter); see REQ-004's evidence for the inventory.

@@ -1,5 +1,5 @@
 # REQ-005: Document generator and `.docx` rendering
-Status: ready (Dev response first)
+Status: accepted (12 Oct 2026, PR #9, batch-17 review; standing-backlog deliveries 6, 8 and 9 on 14 Oct 2026; status line corrected by the retro review 15 Oct 2026)
 Phase: 3   Priority: must   Owner: Dev
 
 ## Why
@@ -14,13 +14,13 @@ In: document type catalogue; per-document templates as structured sections; AI d
 ## Functional requirements
 - FR-1 Document catalogue `data/readyline-content/document-types.json`: for every id in `document-sets.json`, a title, purpose sentence, the standards and indicators it evidences (ids from `standards.json`), the fixed section outline, which sections are tailored by AI and which are fixed text, the review cycle (default 12 months), and the registers it references. PO reviews this file.
 - FR-2 Generation pipeline per document: (1) assemble a context pack from the questionnaire answers and the account's business details only (never `servicesNote`, never register contents); (2) for each tailored section, call the model with a versioned prompt that supplies the section's purpose, the relevant standard and indicators verbatim, the business facts, and the house style; (3) validate the output against the section's JSON schema (headings, paragraphs, bullet lists, responsibility tables; no free HTML); (4) run `assertNoProhibitedClaims` and a terminology lint (participant/worker/provider; no "client", "patient", "guaranteed", "compliant with" as a claim); (5) render the full document from fixed text plus validated sections. A failed section retries once with the validation error in the prompt, then falls back to the fixed template text for that section with a visible "review and complete" marker.
-- FR-3 Every document carries: the provider's trading name and ABN (if given), version, generation date, review-due date, a document control table, the general-information notice and AI disclosure (CLAUDE.md 4.2, 4.3), and a footer "Prepared with Readyline".
+- FR-3 Every document carries: the provider's trading name and ABN (if given), version, generation date, review-due date, a document control table, the general-information notice and AI disclosure (CLAUDE.md 4.2, 4.3), and a footer "Prepared with Readyline". *(Retro review 15 Oct 2026: REQ-016 D-058 and CLAUDE.md 4.2 v2.6 moved the notice and the AI disclosure to the point of delivery (`src/app/documents/notices.tsx`, the readiness summary's first page, the zip's cover note); no outline carries a notice section, and the footer reads "Draft prepared with Readyline" until the provider adopts the document (`render-docx.ts` `DRAFT_FOOTER_SUFFIX`).)*
 - FR-4 Self-assessment document: one row per applicable standard (from `deriveApplicability`) with outcome, indicators, "how we meet this" (tailored), evidence to retain (from the reviewed evidence items), and a status column the provider fills in.
 - FR-5 Reviewer view (in-app): per document, each tailored section shows which answers it used and offers "regenerate this section"; a diff against the previous version is shown on regeneration.
 - FR-6 Versioning: each generation creates a new immutable version set stored per account; the latest is downloadable as a zip of `.docx` files plus the PDF summary; previous versions remain downloadable for 12 months.
 - FR-7 Tailoring guarantee: two different questionnaire inputs never produce byte-identical tailored sections; documents include the provider's name, structure, states and support types in defined sections (test).
 - FR-8 Output quality: Australian spelling; Year 8 reading level target for policies (measure with a readability score in tests, warn above the target); headings numbered; tables for responsibilities and timeframes.
-- FR-9 Feature flag `GENERATION_ENABLED` and a per-account quota (default 5 full generations per day) to cap AI spend; admin can raise it.
+- FR-9 Feature flag `GENERATION_ENABLED` and a per-account quota (default 5 full generations per day) to cap AI spend; admin can raise it. *(Retro review 15 Oct 2026: the raise is by SQL on `accounts.generation_daily_limit` (migration `20261012000000_documents.sql`); no admin screen reads or sets it.)*
 
 ## Security and privacy requirements
 - SR-1 Model called only from server code; `ANTHROPIC_API_KEY` server-only with a monthly spend cap set in the console; model id pinned in `ANTHROPIC_MODEL` and recorded in `generation_log`.
@@ -31,7 +31,7 @@ In: document type catalogue; per-document templates as structured sections; AI d
 - SR-6 Rate limits on generation endpoints; quota enforcement server-side.
 
 ## Data
-`document_types` (from data file), `document_versions` (account_id, version_set_id, document_type_id, status, storage_path, created_at), `generation_log`, `version_sets` (account_id, answers_snapshot_hash, derived_result_snapshot, created_at). Retention: versions 12 months after superseded; logs 90 days for content, 2 years for counts.
+`document_types` (from data file), `document_versions` (account_id, version_set_id, document_type_id, status, storage_path, created_at), `generation_log`, `version_sets` (account_id, answers_snapshot_hash, derived_result_snapshot, created_at). Retention: versions 12 months after superseded; logs 90 days for content, 2 years for counts. *(Retro review 15 Oct 2026: `document_types` is the data file `data/readyline-content/document-types.json` read by `catalogue.ts`, not a table; `generation_log` holds ids, prompt version, model, request hash, status, attempts and token counts only, no content, and is kept 730 days by `purgeGenerationArtifacts`; superseded sets 365 days.)*
 
 ## Acceptance criteria
 - AC-1 Given the reference questionnaire for [0120] (verification), when a full generation runs, then the set contains exactly the "always" document types plus none of the certification-only ones, each rendering to a valid `.docx` that opens in Word and LibreOffice (CI opens with LibreOffice headless and converts to PDF without error).
@@ -201,7 +201,7 @@ Decisions applied: `participant-money-and-property-procedure` and the new `suppo
 **Item 4, Session B recordings.** Waiting for key: `.env.local` has neither `ANTHROPIC_API_KEY` nor `ANTHROPIC_MODEL` (checked by name).
 ### Batch 10 items 2 and 3 (2026-10-12): first recordings and the review pack
 
-**Recordings (D-039, one call per case).** `npm run generation:record` now records exactly one section per reference case (the recorder loads the two Anthropic variables from `.env.local` itself, prints the estimated input tokens before the first call, and writes `fixtures/generation/recordings-2026-10-12.json` with counts only). Model `claude-sonnet-5-5`; prices from D-037 (`` in, `` out per million tokens).
+**Recordings (D-039, one call per case).** `npm run generation:record` now records exactly one section per reference case (the recorder loads the two Anthropic variables from `.env.local` itself, prints the estimated input tokens before the first call, and writes `fixtures/generation/recordings-2026-10-12.json` with counts only). Model `claude-sonnet-5-5`; prices from D-037 ($2 in, $10 out per million tokens; the figures were lost from this line and restored by the retro review 15 Oct 2026).
 
 | Case | Document / section | Estimated in | Actual in | Out | Dollars | Validation |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -209,7 +209,7 @@ Decisions applied: `participant-money-and-property-procedure` and the new `suppo
 | certification-personal-care | governance policy / purpose | 2,021 | 2,672 | 159 | 0.007 | passed first time; readability grade 11.8 (above the fail threshold; see note) |
 | behaviour-support-company | behaviour support plan implementation / steps | 4,498 | 5,635 then 5,678 | 2,000 then 2,000 | 0.031 each | failed twice: the reply was cut at the 2,000-token output cap mid-JSON, so it never parsed; stopped per the queue, not re-recorded |
 
-Spend for the batch: about `.09` across four completed calls, plus one earlier attempt on the sole-trader case that vitest's default 5-second test timeout cut off mid-flight (its reply was lost; if the API billed it, roughly `.02` more). Two earlier attempts made no call at all (the SDK refused to run under vitest's browser-like environment; fixed with the Node environment directive). The estimate undercounted the real input by about 25 to 40 per cent because the house-style system prompt and the Commission text tokenise denser than four characters per token.
+Spend for the batch: about $0.09 across four completed calls, plus one earlier attempt on the sole-trader case that vitest's default 5-second test timeout cut off mid-flight (its reply was lost; if the API billed it, roughly $0.02 more). Two earlier attempts made no call at all (the SDK refused to run under vitest's browser-like environment; fixed with the Node environment directive). The estimate undercounted the real input by about 25 to 40 per cent because the house-style system prompt and the Commission text tokenise denser than four characters per token.
 
 Notes for the PO: (1) the `steps` section for the behaviour-support case needs a higher output cap (the model wrote a long numbered procedure; 2,000 tokens is too low for that section type). Dev will raise `maxTokens` to 4,000 for `steps` and `how-we-do-this` sections before any further recording, which the PO approves separately under D-039. (2) The governance purpose paragraph for the company case scored grade 11.8; it validated because readability is reported, not gated, in the pipeline today. The quality gate (fail above 11) is Session D work; this is the first measured signal that the house-style prompt should push harder on sentence length for "purpose" sections.
 
@@ -218,7 +218,7 @@ Notes for the PO: (1) the `steps` section for the behaviour-support case needs a
 
 **R-5 and R-6 (894daba).** `validateReply` treats a readability `fail` as a validation problem carrying the house-style instruction; the retry prompt includes it; a second fail falls back. `ModelReply` carries `stopReason` (mapped from the API; inferred for the four earlier fixtures from usage equal to the cap); a `max_tokens` reply is recorded as "reply truncated at N output tokens (cap M); not retried", surfaced in `SectionOutcome.truncatedAtTokens` and in the recordings report. D-040 caps live in `maxTokensFor`. The fixture key excludes the cap (D-524); the existing fixtures were re-keyed in place. Unit tests: readability fail retries with the instruction then falls back; truncation is reported with its count and makes exactly one call; caps per section type; cap outside the key. `fixtures-replay.test.ts` replays every fixture through the current gate: the sole-trader policy statement passes at grade 8.5, the governance purpose fixture now reports "readability grade 11.8 is above 11" and falls back, and the first behaviour-support recordings are reported as truncations. No model calls for this item.
 
-**Recordings (items 2 and 3), one run of `npm run generation:record`, 7 calls, about `.15`:**
+**Recordings (items 2 and 3), one run of `npm run generation:record`, 7 calls, about $0.15:**
 
 | Case / document / section | Cap | In | Out | Dollars | Outcome |
 | --- | --- | --- | --- | --- | --- |
@@ -229,7 +229,7 @@ Notes for the PO: (1) the `steps` section for the behaviour-support case needs a
 | sole trader / incident policy / responsibilities | 1,500 | 2,320 | 831 | 0.013 | passed first time; grade 6.3 |
 | sole trader / incident policy / incident procedure | 1,500 | 2,305 | 1,500 | 0.020 | truncated at 1,500 output tokens; stopped |
 
-Spend to date about `.26` (`.11` before this batch). Estimates before the calls ran about 25 to 40 per cent under the real input counts, as in batch 10.
+Spend to date about $0.26 ($0.11 before this batch). Estimates before the calls ran about 25 to 40 per cent under the real input counts, as in batch 10.
 
 **Review pack re-rendered.** `product/evidence/req-005/sole-trader/incident-management-policy-and-register.docx` now carries real text in scope, policy statement, how we put this into practice and responsibilities, and `sections.md` names the pipeline's reason for each fallback (purpose: readability fail after the retry; incident procedure: cut at the cap). The complaints procedure and the self-assessment are unchanged from batch 10 (no recordings approved for them).
 
