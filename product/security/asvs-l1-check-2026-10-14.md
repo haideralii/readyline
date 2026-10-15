@@ -30,3 +30,14 @@ Scope: the controls in `threat-model.md` that ASVS 4.0 level 1 asks of every web
 - No external automated scan (OWASP ZAP baseline) has run yet; the threat model schedules it for phase 6 with the restore drill and the runbook walkthrough.
 - Dependabot pull requests will not run CI while Actions is paused; they queue until the PO re-enables it.
 - The CSRF test proves the framework refuses a cross-origin action; it does not try every action, because the origin check sits in front of all of them. The boundary guard test is the per-file proof.
+
+## REQ-020 Session A additions (Dev, 15 Oct 2026): the audit pack and the auditor link
+
+| ASVS area | Control | State | Evidence (file, test) |
+| --- | --- | --- | --- |
+| V3 Session / V2.2 | A share link is a 256-bit random token (base64url), stored only as SHA-256 hex, compared in constant time, bound to one account, with a stated expiry (24, 48 or 72 hours) and revocation; one live link at a time | Met | `src/lib/registers/auditor-link.ts` (`auditor-link.test.ts`); migration `20261015040000_auditor_links.sql`; `tests/integration/auditor-links-rls.test.ts` |
+| V4 Access control | The signed-out path resolves the token through a `security definer` function the service key alone may execute; unknown, revoked and expired hashes answer no row and the page a plain 404; another account's token shows nothing | Met | `auditor_link_lookup`; `tests/integration/auditor-links-rls.test.ts`; `e2e/signed-in/audit-pack.spec.ts`; `e2e/admin.spec.ts` |
+| V4 | Only the owner creates or revokes a link (RLS insert and update policies on `is_owner`); members read the row; nobody deletes through the API | Met | migration policies and grants; `tests/integration/auditor-links-rls.test.ts` |
+| V7 Logging | Every create, replace, revoke, open and pack download writes one audit line with the link id and the viewer's hashed address, never the token or the address in clear | Met | `src/server/registers/auditor-links.ts`, `auditor-link-actions.ts`; the e2e asserts the four actions |
+| V8 Data protection | The auditor page and the pack carry participant codes only, hide ids and the creator, and the HTML has no account id, email or user id; `noindex` on the page and the pack | Met | `src/lib/registers/audit-pack.ts` (`PACK_HIDDEN_COLUMNS`, tested); `e2e/signed-in/audit-pack.spec.ts` |
+| V11 Business logic | The pack and the link's pack share the account's export limit (five an hour); the sixth download is a 429 with a plain message | Met | `src/app/registers/audit-pack.zip/route.ts`; `e2e/signed-in/audit-pack.spec.ts` |

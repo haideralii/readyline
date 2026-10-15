@@ -124,6 +124,17 @@ export default async function AuditDayPage() {
           </a>
         </p>
       ) : null}
+      {/* REQ-020 FR-1: everything the auditor asks for, in one zip, built when you click. */}
+      <p className="mt-3 text-sm print:hidden">
+        <a
+          href="/registers/audit-pack.zip"
+          className="underline underline-offset-2"
+          data-testid="audit-pack-download"
+        >
+          Download my audit pack (every register, the document control register,
+          the summary and the adopted documents)
+        </a>
+      </p>
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
       {[...shown.groups]

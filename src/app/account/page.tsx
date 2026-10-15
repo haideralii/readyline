@@ -24,6 +24,8 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
 import { BillingPortalButton, SubscribeButton } from "./subscribe-button";
+import { AuditorLinkPanel } from "./auditor-link";
+import { latestAuditorLink, liveLink } from "@/server/registers/auditor-links";
 
 export const metadata: Metadata = { title: "Your account" };
 
@@ -56,6 +58,7 @@ export default async function AccountPage() {
   const registers = registersLine(overview);
   const pricing = readPricing();
   const subscriptionOffered = subscriptionAvailable();
+  const auditorLink = liveLink(await latestAuditorLink(supabase, a.id));
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
@@ -120,6 +123,36 @@ export default async function AccountPage() {
             ))}
           </ul>
         )}
+      </section>
+
+      {/* REQ-020 FR-2, FR-3: one read-only auditor link at a time; the owner sends it, Readyline never does. */}
+      <section
+        aria-labelledby="auditor-heading"
+        className="mt-8"
+        data-testid="account-auditor-link"
+      >
+        <h2 id="auditor-heading" className="text-xl font-semibold">
+          Share a read-only view with your auditor
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          A link that opens your registers, your document control register and
+          your audit pack, read-only, with participants shown as codes only. It
+          expires when you say and you can revoke it at any time. You copy it
+          and send it yourself; we send nothing and we do not list or recommend
+          auditors.
+        </p>
+        <AuditorLinkPanel
+          current={
+            auditorLink
+              ? {
+                  id: auditorLink.id,
+                  expiresAt: auditorLink.expires_at,
+                  lastOpenedAt: auditorLink.last_opened_at,
+                  openedCount: auditorLink.opened_count,
+                }
+              : null
+          }
+        />
       </section>
 
       {/* REQ-009 Session C: the registers subscription, its state and the billing portal. */}

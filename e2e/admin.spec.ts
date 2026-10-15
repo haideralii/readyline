@@ -24,6 +24,19 @@ test.describe("admin and job routes", () => {
     expect(wrong.status()).toBe(404);
   });
 
+  // REQ-020 SR-1: a token that is not live is a plain 404, never "expired".
+  test("an unknown auditor token is 404 on the page and the pack", async ({
+    page,
+    request,
+  }) => {
+    const token = "A".repeat(43);
+    expect((await page.goto(`/auditor/${token}`))?.status()).toBe(404);
+    expect(
+      (await request.get(`/auditor/${token}/audit-pack.zip`)).status(),
+    ).toBe(404);
+    expect((await request.get("/auditor/short")).status()).toBe(404);
+  });
+
   test("export redirects signed-out visitors to sign-in", async ({ page }) => {
     await page.goto("/account/export");
     await expect(page).toHaveURL(/\/sign-in\?next=%2Faccount$/);

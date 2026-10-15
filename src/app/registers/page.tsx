@@ -180,6 +180,16 @@ export default async function RegistersPage() {
       canWrite={ctx.canWrite}
     >
       <div data-testid="registers-index">
+        {/* REQ-020 FR-1: one zip of every register, the document control register, the summary and the adopted documents. */}
+        <p className="mt-2 text-sm">
+          <a
+            href="/registers/audit-pack.zip"
+            className="underline underline-offset-2"
+            data-testid="audit-pack-download"
+          >
+            Download my audit pack
+          </a>
+        </p>
         {midTermDue ? (
           <p
             className="mt-2 text-sm text-zinc-700 dark:text-zinc-300"
