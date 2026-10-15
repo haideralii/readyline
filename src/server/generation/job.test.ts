@@ -276,14 +276,19 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
     const zip = unzipSync(
       h.store.objects.get(`${ACCOUNT}/${set.id}/set.zip`)!.bytes,
     );
+    // REQ-026 FR-1: the Start here sheet is the first entry; the rest as before.
+    expect(Object.keys(zip)[0]).toBe("00-start-here.docx");
     expect(Object.keys(zip).sort()).toEqual(
       [
+        "00-start-here.docx",
         ...expectedTypeIds.map((id) => `${id}.docx`),
         "readiness-summary.pdf",
         "README.txt",
       ].sort(),
     );
+    expect(zip["00-start-here.docx"].length).toBeGreaterThan(5_000);
     expect(strFromU8(zip["README.txt"])).toContain("Sunrise Supports");
+    expect(strFromU8(zip["README.txt"])).toContain("00-start-here.docx");
     expect(h.backend.entitlementVersionSets.get("ent-1")).toBe(set.id);
     expect(h.backend.audits).toEqual([set.id]);
     expect(h.backend.quotaHits).toBe(1);

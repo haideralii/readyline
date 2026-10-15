@@ -116,6 +116,15 @@ strong {
   outline-offset: 2px;
 }
 
+/* Batch 49 item 1: a heading the page focuses for keyboard and screen-reader
+   users on every step change (REQ-003 AC-11) kept drawing the ring on mouse
+   loads too; the global rule above is unlayered, so a utility class cannot
+   beat it. This one class, on that heading alone, turns the ring off; the
+   heading still takes focus and is still announced. */
+.focus-quiet:focus-visible {
+  outline: none;
+}
+
 /* A date or time input focuses a segment inside its own shadow tree, so the
    host matches :focus but not :focus-visible in Chromium and WebKit alike, and
    a keyboard user saw no ring (#39, run 38623216096). The ring is shown on

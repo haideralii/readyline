@@ -66,8 +66,12 @@ test.describe("home page v2 (batch 24)", () => {
       /which audit you face, with the Commission's text behind it/,
     );
     // Batch 26 item 6: the badge shows off production (every e2e run); the
-    // smoke test asserts its absence on the deployed site.
-    await expect(page.getByTestId("dev-badge")).toHaveText("In development");
+    // smoke test asserts its absence on the deployed site. Batch 47 item 9:
+    // against a deployment (an https base) the badge is absent by design.
+    if (/^https:/.test(process.env.PLAYWRIGHT_BASE_URL ?? ""))
+      await expect(page.getByTestId("dev-badge")).toHaveCount(0);
+    else
+      await expect(page.getByTestId("dev-badge")).toHaveText("In development");
     await shot(page, "home-v2", testInfo.project.name);
   });
 

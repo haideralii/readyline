@@ -33,6 +33,8 @@ export const BANNED_WORDS: readonly RegExp[] = [
   // REQ-013 batch 36 item 2: the evidence-confidence flag is internal; the customer reads a plain "check this" sentence.
   /\bnot confirmed by the Commission/i,
   /\bnot asked about yet\b/i,
+  // Batch 47 item 2: a bracketed "to be added" placeholder is never shown on a public page.
+  /\[[^\]]*\bto be added\b/i,
 ];
 
 /** An internal path or file name has no place in customer-facing text (FR-2). */

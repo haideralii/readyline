@@ -22,6 +22,7 @@ import type {
   PolicyReviewRow,
   WorkerClearanceRow,
 } from "./types";
+import { OWNER_INCIDENT_STATUSES } from "./types";
 
 /** Plain labels for the Commission's categories (PO answer 1). */
 export const CATEGORY_LABELS: Record<
@@ -51,10 +52,17 @@ export const SEVERITY_LABELS: Record<
   high: "High (serious harm)",
 };
 
+/** Every status the view can show; the owner's form offers the three in `OWNER_INCIDENT_STATUSES` (REQ-020 Session B). */
 export const INCIDENT_STATUS_LABELS: Record<
   (typeof INCIDENT_STATUSES)[number],
   string
-> = { open: "Open", "under-review": "Under review", closed: "Closed" };
+> = {
+  draft: "To confirm",
+  open: "Open",
+  "under-review": "Under review",
+  closed: "Closed",
+  rejected: "Rejected",
+};
 
 export const CHANNEL_LABELS: Record<
   (typeof COMPLAINT_CHANNELS)[number],
@@ -105,7 +113,10 @@ export function fromIncidentRow(row: IncidentRow): IncidentFormValues {
     actionsTaken: row.actions_taken,
     reportable: row.reportable,
     reportableNotifiedOn: row.reportable_notified_on ?? "",
-    status: row.status,
+    // A draft or rejected row never reaches the form (its pages redirect); the type still needs a home.
+    status: (OWNER_INCIDENT_STATUSES as readonly string[]).includes(row.status)
+      ? (row.status as (typeof OWNER_INCIDENT_STATUSES)[number])
+      : "open",
     closedOn: row.closed_on ?? "",
   };
 }

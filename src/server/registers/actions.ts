@@ -32,12 +32,19 @@ export type RegisterActionResult =
 
 const UUID = z.string().uuid();
 
+/**
+ * The owner's account, or (REQ-020 FR-4) the account a worker logs for;
+ * the row-level policies decide what each may write.
+ */
 async function viewerOrFail() {
   const viewer = await getViewer();
-  if (!viewer?.account || viewer.deleted) return null;
+  if (!viewer || viewer.deleted) return null;
+  const account = viewer.account ?? viewer.worker;
+  if (!account) return null;
   return {
     viewer,
-    account: viewer.account,
+    account: { id: account.id, trading_name: account.trading_name },
+    worker: viewer.account ? null : viewer.worker,
     supabase: await createSupabaseServerClient(),
   };
 }
@@ -110,6 +117,18 @@ export async function saveIncidentAction(
     commission_reference: v.commissionReference,
     status: v.status,
     closed_on: v.closedOn,
+    // REQ-020 FR-4: a worker's row says who logged it and opens as open (the
+    // owner closes it; the insert policy holds the same line); the owner's
+    // row says the owner.
+    ...(ctx.worker
+      ? {
+          reported_via: "worker" as const,
+          logged_by_ref: ctx.worker.worker_ref,
+          created_by: ctx.viewer.user.id,
+          status: "open" as const,
+          closed_on: null,
+        }
+      : {}),
   };
   if (parsed.data.id) {
     const before = await ctx.supabase
@@ -280,6 +299,8 @@ export async function saveComplaintAction(
     acknowledged_on: v.acknowledgedOn,
     resolved_on: v.resolvedOn,
     status: v.status,
+    // REQ-020 FR-4: a worker's complaint row carries their user id for the own-rows policy.
+    ...(ctx.worker ? { created_by: ctx.viewer.user.id } : {}),
   };
   if (parsed.data.id) {
     const before = await ctx.supabase

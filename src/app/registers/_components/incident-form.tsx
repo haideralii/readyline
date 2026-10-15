@@ -19,7 +19,7 @@ import { incidentNotifyBy } from "@/lib/registers/status";
 import {
   INCIDENT_CATEGORIES,
   INCIDENT_SEVERITIES,
-  INCIDENT_STATUSES,
+  OWNER_INCIDENT_STATUSES,
   TEXT_CAPS,
 } from "@/lib/registers/types";
 import { parseInput } from "@/lib/validation";
@@ -58,9 +58,12 @@ function today() {
 export function IncidentFormView({
   id,
   initial,
+  afterSave,
 }: {
   id?: string;
   initial?: IncidentFormValues;
+  /** REQ-020 FR-4: where a worker lands after saving (the owner lands on the row). */
+  afterSave?: string;
 }) {
   const router = useRouter();
   const [v, setV] = useState<IncidentFormValues>(
@@ -113,7 +116,7 @@ export function IncidentFormView({
         setErrors({ ...(r.fieldErrors ?? {}), form: [r.message] });
         return;
       }
-      router.push(`/registers/incidents/${r.id}?saved=1`);
+      router.push(afterSave ?? `/registers/incidents/${r.id}?saved=1`);
     } finally {
       setPending(false);
     }
@@ -248,7 +251,7 @@ export function IncidentFormView({
         onChange={(x) =>
           set("status", (x || "open") as IncidentFormValues["status"])
         }
-        options={INCIDENT_STATUSES.map((s) => ({
+        options={OWNER_INCIDENT_STATUSES.map((s) => ({
           value: s,
           label: INCIDENT_STATUS_LABELS[s],
         }))}

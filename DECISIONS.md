@@ -359,8 +359,6 @@ National Disability Insurance Agency and is used here descriptively only" is
 unchanged. Role skills under `.claude/skills` still say `{{BRAND}}` in prose
 and are left as documentation.
 
-**D-027 confirmed by PO.** Brand default Readyline in code; env override retained.
-
 **D-028 Merge rule when CI is unreadable (PO, 2026-10-11).** Dev may satisfy
 the "CI green" condition by running the identical checks locally (check,
 build, e2e, audit, gitleaks) and recording the output in Delivery evidence;
@@ -2148,23 +2146,6 @@ registration dates (SIL and platforms from July 2026, personal care from
 July 2027, all by December 2030) come from the research document and are
 marked UNVERIFIED for the PO, as is the change-of-registration process.
 
-**D-907 Register pages (Dev, 2026-10-13, batch 28, branch
-`req-009-session-b` from `req-009-registers` with `main` 4062fe7 and
-`req-015-plain-language` merged in; REQ-009 FR-5, FR-7, SR-1 to SR-3).**
-One list component for the four registers (rows with a text-and-icon
-status tag, a filter by status, 44 px targets), one page shell that
-resolves the signed-in owner and the subscription state, and forms built
-from shared inputs (select, date, reference code, free text with the
-participant-data detector). Lists read the Session A status views so the
-tag and the filter use the database's own arithmetic. Events for status
-changes, reportable flags, notification, acknowledgement and resolution
-are written by the server action, never typed. The gate is the database's
-(42501 becomes the lapse sentence); the UI hides Add and Edit and
-redirects the add and edit routes when the subscription is not active.
-The REQ-015 branch was merged in because the pages are built on its
-patterns (ConfirmButton, the width check, the iPhone project), so the
-Session B pull request lands after REQ-015's.
-
 **D-910 Reminders are pure rules plus one nightly job (Dev, 2026-10-13,
 batch 30, branch `req-009-session-c` from `req-011-content` with
 `req-009-session-b` merged in; REQ-009 FR-3, SR-4, AC-4).**
@@ -2407,32 +2388,6 @@ least one runner minute, so `*/5` is about 8,600 minutes a month against
 the 2,000 free for a private repository; the schedule runs only from
 `main`, so nothing is spent until the PO merges and chooses (public
 repository, `*/30`, or the overage).
-
-**D-540 Why every section of Haider's AI procedure shipped undrafted, and
-what the log can and cannot say (Dev, 2026-10-14, batch 33 item 1, REQ-016
-FR-0d).** Two defects sat on one path. (1) The catalogue `brief` (the
-model's instruction) was also the customer placeholder: `placeholderBlocks`
-and the fallback both printed `[Provider to complete: <heading>. <brief>]`,
-so the procedure's "Never restate statutory timeframes … the outline"
-instruction reached the document verbatim. (2) The fallback fired for every
-tailored section of that one document. The fixture replay of the recorded
-sole-trader case cannot reproduce it: all seven AI sections generate (two
-on the retry: readability 12 on "when this applies", a stated review cycle
-on "steps"). The generation log held only `status`, `attempts` and token
-counts, so a model error and a gate rejection were indistinguishable after
-the fact; the most likely causes, in order, are a burst of API errors on
-consecutive calls (one document's sections run back to back, and both
-attempts of each would fail inside the same minute) and, for a case whose
-STANDARDS block is "none", the R-12 gate rejecting a reply that asks for a
-standard twice. The PO can settle it with the rows for that set:
-`select section_id, status, attempts, input_tokens from generation_log where
-document_type_id = 'ai-and-digital-data-handling-procedure'`; null tokens
-on a fallback row mean the call threw. From this batch the log carries
-`failure_kind` and `failure_detail` (rule names, never content), and the
-tick line carries the same, so the next one is readable. The placeholder
-and the brief are now different strings (`placeholders.ts`), a lint fails
-any instruction phrasing inside a bracketed placeholder, and the fallback
-is a complete generic section marked "Generic text: add your details."
 
 **D-541 Blanks, not instructions (REQ-016 S-8), and what the count on the set
 page means (FR-0c).** A missing fact is a bracketed blank of at most four
@@ -2985,10 +2940,6 @@ the brief and the fixed table). First run: 52 passed, 6 reported, 2 not
 applicable to the sole-trader pack. The NDIS watch adds a question and
 names the watch change id when a rule changes.
 
-
-
-
-
 **D-1901 The audit-day registers follow the REQ-009 shape, one migration
 (Dev, 2026-10-14, batch 39 Session A, REQ-018 FR-1 to FR-9, SR-1 to
 SR-3).** Nine tables in `20261014100000_audit_day_registers.sql`:
@@ -3269,8 +3220,6 @@ branches); CI's Supabase job is the gate.
 
 **D-2006 The writing indicator's idle cost is measured with Playwright, not Lighthouse (PO, 2026-10-14, batch 45).** Lighthouse cannot measure idle CPU for one state; the check is Playwright CDP `Performance.getMetrics`, the TaskDuration delta over 10 seconds of the Writing phase under 0.5 seconds on the android-small project (backlog 10). Dev note: the spec lands with Session B.
 
-
-
 **D-2007 The twelve audit-day records sit in two tiers, and the tier is a property of the one list (Dev, 2026-10-15, batch 45, the REQ-018-gated items).** `AUDIT_DAY_RECORDS` in `src/lib/registers/names.ts` carries `tier` and `paper`, so the audit-day page, the self-assessment's "Items to prepare before the audit" and the ask list cannot drift from each other. "Records the standards name" holds the six a standard or the Rules name or plainly require: document control (Governance and Operational Management, quality management), the corporate risk register (risk management), the insurances and vehicles register (the insurance indicator), the staff matrix (human resource management), the incident register (Incident Management and Reportable Incidents Rules) and the complaints register (Complaints Management and Resolution Rules). "Records auditors often ask for" holds the six no standard names but every certification audit in the role reviews asked for: the record of decisions, participant risk assessments, the conflicts-of-interest register, the delegations schedule, the improvement register and the onboarding checklist. The two "kept on paper" records are the signed or issued documents (the insurance certificates; the signed onboarding checklist) whose register holds only the dates; the words follow each line in the app and in the generated self-assessment. The Commission reference on a reportable incident (`incidents.commission_reference`, migration `20261015020000`) is optional, 40 characters of letters, digits, spaces, slash and dash, refused when it has an NDIS-number shape, shown only once `reportable` is ticked, and a change to it is written as a `notified` event on the incident so the trail from report to notification stays on the row; it is never sent to the model, email or logs.
 
 **D-2101 The writing indicator reads the job row, never a timer; the row
@@ -3319,15 +3268,26 @@ the indicator for the existing specs and the screen-reader role. Not
 measured: the Lighthouse CPU-idle figure while animating; the budget
 runner does not take the dev page, noted in the evidence.
 
-
 **D-2208 Every scheduled job writes one audit row per run (Dev, 2026-10-15, REQ-022 Session A).** The purge, generate and reminders routes insert `audit_log` rows `jobs.<name>.ran` (no account, no actor; the target carries the run's counts as `name=value` pairs, never content) through `src/server/jobs/record-run.ts`, so the launch page's "ran within its schedule" rows are a database read of the latest row per job, not a search through platform logs. A purge dry run records nothing.
 
 **D-2209 A failed live-mode guard refuses the payment routes, not the process (Dev, 2026-10-15, REQ-022 FR-3).** REQ-007 AC-6 had the server exit at start when a live key met a display price that differed from the Price. The boot check now judges every guard in `src/lib/payments/live-guards.ts` (STRIPE_FAKE beside a live key, a missing webhook secret, a missing or test-mode or non-AUD Price, a display price unset or differing, for the pack and, when configured, the registers Price) and stores the conditions in `src/lib/payments/refusal.ts`; the checkout, subscription and billing-portal actions answer their "not available" message and the webhook route 404s while any condition stands, and one log line names the conditions at boot. The rest of the site serves. The generate job route refuses (404, one log line) when GENERATION_LIVE is 1 without an ANTHROPIC_API_KEY. A test key is never refused; its price mismatch is logged as before.
 
 **D-2210 The admin e2e enrols its own authenticator (Dev, 2026-10-15, REQ-022 Session A).** `e2e/helpers/session.ts` `createAdminTenant` grants `platform_admin` with the admin key on a throwaway user, enrols a TOTP factor through the auth API, computes the six-digit code the way an authenticator app does (RFC 6238, SHA-1, thirty-second step, in the test process) and verifies it, so the browser gets an aal2 session and `requireAdmin()` lets it in. No shared admin fixture, no secret in the repository; the local stack's `config.toml` already has TOTP enrolment and verification on.
 
+**D-2233 The step heading's ring is turned off by one unlayered CSS class, not a utility (Dev, 2026-10-15, batch 49 item 1).** The site's focus ring is an unlayered `:focus-visible` rule in `globals.css`, and Tailwind's utilities sit in a cascade layer, so `focus-visible:outline-none` on the heading could never beat it (unlayered styles win over layered ones whatever their specificity); the heading already carried `outline-none` and still drew the ring on every mouse load. One class, `.focus-quiet:focus-visible { outline: none }`, beside the global rule and applied to that heading alone, is the fix; the heading keeps `tabIndex=-1` and the programmatic focus, so keyboard and screen-reader users still land on it, and `e2e/batch-49.spec.ts` asserts the heading has no outline while the next Tab stop still has its ring.
+
 **D-2232 The glossary is read, never copied, and "on first use" on the result page is the audit-kind line plus one disclosure (Dev, 2026-10-15, REQ-025 Session A, FR-13, decision 12 of the review).** `data/readyline-content/glossary.json` holds the thirteen terms as clauses without a full stop; `glossaryMeaning`, `glossaryTerm` and `glossarySentence` in `content.ts` hand them out, and a `{{glossary:<id>}}` token in a content file (today `audit-kinds.json`'s mid-term kind) is replaced by the term's sentence at load, so a JSON file reads from the glossary too. The checklist's "book the audit" item, the home example's summary and the result page's audit-kind line build their text from the glossary, and a unit test fails if any of those four files carries a meaning verbatim. On the result page the term a reader meets first (the audit kind) has its meaning as the line under the heading; the other words the page uses (Practice Standards, module, quality indicator, registration group, mid-term audit, adopt) sit in one "What these words mean" disclosure at the top of "Why this result", on the page and never a link away; the per-term tap-to-open form is REQ-027's call. The summary card's four lines come from `summaryLines` over `readinessCounts`, which now counts documents and registers apart so each clause can drop at zero (FR-3, AC-2); the checklist's third line keeps the `checklist-count-line` test id so the public checklist spec still proves the numbers add up.
 
-
 **D-2235 The 45-word paragraph cap is a file set and a tag set in the copy lint, with the lawyer's text allow-listed by value (Dev, 2026-10-15, REQ-025 Session C, FR-10; review decisions 10 and 11).** `lintText` takes a `maxWords` option; the file-walking test applies `TIGHT_PARAGRAPH_MAX_WORDS` (45) to `p`, `dd` and `blockquote` blocks in `result-step.tsx` and `pricing/page.tsx`, to the strings of `payments/copy.ts` that are not items of an array, and to the non-list paragraphs of the four guides; list items, summaries, headings and every other page keep the 60-word cap. A block whose text equals `AI_DISCLOSURE`, `GENERAL_INFORMATION_NOTICE` or `GENERAL_INFORMATION_STATEMENT` keeps the 60-word cap wherever it renders, which is the allow-list by constant; the legal pages' markdown is not walked by the lint at all. The rule is recorded in `product/domain/ui-copy.md`, whose phone width is now 360 px like every test. The home page's height is measured by `e2e/req-025-c.spec.ts` as `scrollHeight` at 360 px and written under `product/evidence/req-025/` with `EVIDENCE=1` (before 6,596 px with the sample on the page); the budget job is untouched.
+
+**D-2234 The Start here sheet is rendered fresh on every download and built from the shipped version's blanks (Dev, 2026-10-15, REQ-026 FR-1, FR-4, FR-5, FR-7).** The lines on the sheet are the blanks of the version the pack shipped (`document_versions` where `version = 1`), split by one rule: a blank the Finish form asks for (`formBlanks`) is a "Fill in" line that ticks when the blank no longer appears in the latest version; a blank the app never sees (the signature and date lines, a register's row template) is a "Fill in Word" line with the printed box; the owner's name, role and the approval date are account facts and appear on neither list, which section 1 says in one line. The zip carries `00-start-here.docx` first, built at generation (nothing done yet) and again at every re-render; the download route renders it from the models on every request, so a set generated before this change has the sheet too and a line filled since the zip reads done. The sheet is a `DocumentModel` through the shared renderer, five numbered fixed sections, no document type, no adoption, no document control row. The per-document minutes, the "Do these first" reasons, the register purposes and the next steps live in `data/readyline-content/start-here.json` as a Dev draft for the PO to edit (FR-2.1 says the estimates are PO text); "Check my systems" is left out of the next steps until REQ-020 Session C builds it. The README's "How to use them" paragraph points at the sheet; the readiness summary keeps its blanks list.
+
+**D-2214 The auditor link resolves through one security definer function and the reads that follow are scoped by code (Dev, 2026-10-15, REQ-020 Session A, FR-2, SR-1, SR-2).** As accepted in the Dev response: `auditor_link_lookup(p_token_hash)` is `security definer`, executable by the service key only (anon and authenticated are refused with 42501), and answers the live link's id, account and trading name, or no row for an unknown, revoked or expired hash, so a caller never learns why. The signed-out page and its pack route resolve the token (a 256-bit random value, base64url, stored only as SHA-256 hex, compared in constant time) through that function with the admin client and then read the registers, the document control register and the set's stored files with the same admin client scoped to the account it returned; hidden columns (`id`, `account_id`, `created_by`, version ids) never leave the server, participant references are the codes they already are, and the HTML carries no account id, email or user id (the e2e asserts it). The pack is built on request and nothing is stored. Every open and every pack download writes one audit line with the link id and the viewer's hashed address; creating, revoking and replacing write theirs. One live link at a time: creating a new one revokes the live one first. The purge job deletes rows 30 days after they ended.
+**D-2231 The worker is a narrow second gate, not a member; a report is a draft the owner confirms; the Commission's clock runs from the report (Dev, 2026-10-15, REQ-020 Session B, FR-4, FR-5, FR-6, FR-11; PO review 14 Oct).** `is_member` now means owner or member, so every existing policy keeps its meaning and a worker reads nothing through them; `is_worker` gates only the worker's own incident and complaint rows (`created_by = auth.uid()`), their events, and their own membership row. A worker's incident opens as `open` (the insert policy and the action both hold it); the owner closes it. An invitation stores the address as a SHA-256 hash and the token hashed; `accept_invitation` runs as the signed-in user, matches the session's email hash, once, within 7 days. Removing a worker deletes the membership; their rows stay with `logged_by_ref`, and because every request re-reads the membership (one cached read, D-1012) their access ends on the next request, which is what FR-11 asks; no server-side session revocation. The report link resolves through one `security definer` function the service key alone may execute; `submit_incident_report` writes a `draft` row with `aware_at = now()` and refuses the eleventh unconfirmed draft (P0003); drafts and rejected rows are excluded from the overview, the register totals and the incident reminder rules, and the status view names them (`draft`, `rejected`). The owner confirms on one screen (`/registers/incidents/[id]/confirm`): `reported_on` becomes the later of the occurred and aware dates, and `notify_by` is generated from that same date, so the 24 hours run from the report. The PO's two-hour and twelve-hour nudges are met as one email at submission (the action) plus a daily `report-to-confirm` reminder from twelve hours after the report (the nightly job; the unique key keeps it to one a day); a two-hour nudge would need a second schedule the Hobby tier does not have, recorded as a deviation for the PO. The per-account limit on the report form is 50 submissions a day (`report-account:<id>`), checked after the link resolves and before the write, beside the per-address 10 an hour.
+
+**D-2211 Adoption waits for the Finish form's blanks, never for the signed copy's marks (Dev, 2026-10-15, batch 47 item 3).** The adopt action did not refuse while a marker remained. It now refuses a group while `openBlanks()` (the fact blanks the Finish form can fill, the one rule from batch 45) is above zero, with "Finish your pack first: N blanks are still open."; the signature, "date reported" and participant-reference marks a provider fills by hand in the signed copy are not blanks under that rule, so they never block adoption, and the "[Easy Read version]" placeholder is gone from the fixed text (the sentence now says the provider keeps the Easy Read version and Readyline does not draft it). Refusing on every "[...]" marker would have blocked every pack on its signature line.
+
+**D-2212 The proxy answers the signed-out 307 for routes under a loading boundary (Dev, 2026-10-15, batch 47 item 7).** `/documents` and `/checklist` keep their loading UI for the signed-in load, so a page-level `redirect()` would stream inside a 200. `src/proxy.ts` `needsSessionRedirect` sends a request with no Supabase session cookie (`sb-*-auth-token`, chunked or not) to `/sign-in?next=<path>` with 307 before the page runs; a request with a cookie still has its session verified by the page. The route list is the constant `SESSION_ROUTES`; unit tested, and the public e2e asserts the 307 and its location.
+
+**D-2213 The legal pages carry runtime tokens for the two facts only the server knows (Dev, 2026-10-15, batch 47 items 1 and 2).** `product/legal/*.md` stays the PO's prose; `{{business-line}}` becomes the registered name and ABN sentence once both are set (the home page's own sentence) and nothing before, `{{subscription-off}}` becomes the one off-state sentence while STRIPE_PRICE_REGISTERS is unset and nothing after, and `{{#subscription}}…{{/subscription}}` keeps its text only while the subscription can be bought. `src/lib/legal/tokens.ts` is pure and tested; `src/server/legal/render.ts` supplies the values and the five legal routes render through it. A test over the pages as written refuses any bracketed "to be added" placeholder, any "when available", and any token the renderer does not know.
 

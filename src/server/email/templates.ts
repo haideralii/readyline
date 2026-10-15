@@ -62,6 +62,52 @@ export function documentsReadyEmail(input: {
  * run, each line naming the register and the reference only, never the
  * summary text or anything about a participant.
  */
+/** REQ-020 FR-4, SR-5: the invitation names the business and the role and carries no register content. */
+export function workerInvitationEmail(input: {
+  to: string;
+  tradingName: string;
+  workerRef: string;
+  url: string;
+  expiresOn: string;
+}): EmailMessage {
+  return {
+    to: input.to,
+    subject: `${input.tradingName} has invited you to log incidents and complaints in ${BRAND}`,
+    text: [
+      `${input.tradingName} has invited you, as worker ${input.workerRef}, to log incidents and complaints in ${BRAND}.`,
+      "",
+      "You can log incidents and complaints and see what you logged. Your manager sees everything else.",
+      "",
+      `Open this link and sign in with this email address: ${input.url}`,
+      `The invitation works until ${input.expiresOn}.`,
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
+/** REQ-020 FR-5 (PO edit): the owner is told at once that a report waits, and nudged again while it does. */
+export function reportToConfirmEmail(input: {
+  to: string;
+  tradingName: string;
+  count: number;
+}): EmailMessage {
+  const line = `${input.count} ${input.count === 1 ? "report is" : "reports are"} waiting for you to confirm`;
+  return {
+    to: input.to,
+    subject: `${BRAND}: ${line}`,
+    text: [
+      `${line} for ${input.tradingName}.`,
+      "",
+      "If a report is a reportable incident, the Commission must be told within 24 hours of the report, so please confirm it today.",
+      "",
+      "Sign in, open Registers, then Incidents, and confirm or reject each report.",
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
 export function remindersEmail(input: {
   to: string;
   tradingName: string;

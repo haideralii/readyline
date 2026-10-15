@@ -13,6 +13,7 @@ import groupDescriptionsJson from "../../../data/registration-group-descriptions
 import groupCategoriesJson from "../../../data/readyline-content/group-categories.json";
 import documentGroupsJson from "../../../data/readyline-content/document-groups.json";
 import glossaryJson from "../../../data/readyline-content/glossary.json";
+import startHereJson from "../../../data/readyline-content/start-here.json";
 
 const reviewed = {
   note: z.string().min(1),
@@ -151,6 +152,28 @@ export function resolveGlossaryTokens(text: string): string {
     glossarySentence(id),
   );
 }
+
+/** REQ-026 FR-2: the Start here sheet's own words; the estimates are the PO's to edit. */
+export const StartHereContent = z.object({
+  ...reviewed,
+  estimateLine: z.string().min(20),
+  defaultMinutes: z.number().int().positive(),
+  estimatesMinutes: z.record(slug, z.number().int().positive()),
+  defaultFirstWhy: z.string().min(5),
+  /** Six words or fewer each (FR-2.2); checked by the content test. */
+  firstWhy: z.record(slug, z.string().min(5)),
+  registerPurpose: z.record(slug, z.string().min(10)),
+  registerDocuments: z.record(slug, z.array(slug)),
+  next: z
+    .array(
+      z.object({
+        text: z.string().min(5),
+        href: z.string().regex(/^\/[a-z-]+(\/[a-z-]+)*$/),
+      }),
+    )
+    .min(1),
+});
+export const startHereContent = StartHereContent.parse(startHereJson);
 
 /** REQ-018 FR-11, AC-4: the five kinds of audit, in plain words, for the audit-day page's glossary. */
 export const AuditKindsContent = z.object({

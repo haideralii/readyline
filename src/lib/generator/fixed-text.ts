@@ -309,13 +309,14 @@ export function fixedBlocks(spec: SectionSpec, ctx: FixedContext): Block[] {
         },
       ];
     case "easy-read":
-      // REQ-016 S-4: a marked place; Easy Read is good practice, not a rule.
+      // REQ-016 S-4: Easy Read is good practice, not a rule. Batch 47 item 3:
+      // the provider keeps it, nobody drafts it here, and no bracketed
+      // placeholder promises an artefact the provider cannot evidence.
       return [
         {
           type: "paragraph",
-          text: "We keep an Easy Read version of the summary above with this document: one idea per line, with a picture for each idea, in large print.",
+          text: `You keep an Easy Read version of the summary above with this document: one idea per line, a picture for each idea, large print. ${BRAND} does not draft it.`,
         },
-        { type: "callout", text: "[Easy Read version]" },
       ];
     default:
       return fixedExtra(spec.id, ctx) ?? extraFixedBlocks(spec, ctx);
