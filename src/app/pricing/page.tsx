@@ -252,9 +252,14 @@ export default async function PricingPage() {
           {C.aiHeading}
         </h2>
         {/* REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies. */}
-        <p className={body} data-testid="pricing-ai-honest">
-          {C.aiHonest}
-        </p>
+        <div data-testid="pricing-ai-honest">
+          <p className={body}>{C.aiHonest}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+            {C.aiHonestPoints.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
         <p className={body} data-testid="pricing-ai-disclosure">
           {C.aiDisclosure}
         </p>

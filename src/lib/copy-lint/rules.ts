@@ -12,6 +12,14 @@
  */
 export const PARAGRAPH_MAX_WORDS = 60;
 export const SENTENCE_MAX_WORDS = 35;
+/**
+ * REQ-025 D-2218, FR-10 (review decisions 10 and 11): on the result page,
+ * the pricing page and the guides a paragraph is at most three lines at
+ * 360 px, measured as 45 words (ui-copy's number); list items and
+ * disclosure summaries are exempt; the lawyer's text is allow-listed by
+ * constant, never by path.
+ */
+export const TIGHT_PARAGRAPH_MAX_WORDS = 45;
 
 /** Words we never use with a customer (FR-1). */
 export const BANNED_WORDS: readonly RegExp[] = [
@@ -68,17 +76,18 @@ export function splitSentences(text: string): string[] {
  */
 export function lintText(
   text: string,
-  options: { block?: boolean } = {},
+  options: { block?: boolean; maxWords?: number } = {},
 ): CopyViolation[] {
   const out: CopyViolation[] = [];
   const clean = text.replace(/\s+/g, " ").trim();
   if (!clean) return out;
   if (options.block) {
+    const max = options.maxWords ?? PARAGRAPH_MAX_WORDS;
     const words = countWords(clean);
-    if (words > PARAGRAPH_MAX_WORDS)
+    if (words > max)
       out.push({
         rule: "paragraph-length",
-        detail: `${words} words (max ${PARAGRAPH_MAX_WORDS}): "${clean.slice(0, 60)}…"`,
+        detail: `${words} words (max ${max}): "${clean.slice(0, 60)}…"`,
       });
   }
   for (const s of splitSentences(clean)) {

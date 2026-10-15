@@ -9,9 +9,50 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
-import { lintText, type CopyViolation } from "@/lib/copy-lint/rules";
+import {
+  AI_DISCLOSURE,
+  GENERAL_INFORMATION_NOTICE,
+  GENERAL_INFORMATION_STATEMENT,
+} from "@/lib/brand";
+import {
+  TIGHT_PARAGRAPH_MAX_WORDS,
+  lintText,
+  type CopyViolation,
+} from "@/lib/copy-lint/rules";
 
 const ROOT = process.cwd();
+
+/**
+ * REQ-025 FR-10, D-2218: the result page, the pricing page and the guides
+ * hold a paragraph to 45 words. The lawyer's text is allow-listed by
+ * constant (review decision 10): a block whose text is one of these
+ * constants keeps the 60-word cap wherever it renders.
+ */
+const TIGHT_FILES = new Set([
+  "src/app/start/_components/steps/result-step.tsx",
+  "src/app/pricing/page.tsx",
+  "src/lib/payments/copy.ts",
+]);
+/** Paragraph-like tags the tight cap applies to; list items, summaries and the rest keep the 60-word cap (decision 11). */
+const TIGHT_TAGS = new Set(["p", "dd", "blockquote"]);
+const ALLOWED_CONSTANTS = new Set(
+  [
+    AI_DISCLOSURE,
+    GENERAL_INFORMATION_NOTICE,
+    GENERAL_INFORMATION_STATEMENT,
+  ].map((s) => s.replace(/\s+/g, " ").trim()),
+);
+
+function maxWordsFor(
+  rel: string,
+  tag: string,
+  text: string,
+): number | undefined {
+  const tight = TIGHT_FILES.has(rel.replace(/\\/g, "/"));
+  if (!tight || !TIGHT_TAGS.has(tag)) return undefined;
+  if (ALLOWED_CONSTANTS.has(text.replace(/\s+/g, " ").trim())) return undefined;
+  return TIGHT_PARAGRAPH_MAX_WORDS;
+}
 
 /** Paragraph-like elements whose whole text is capped. */
 const BLOCK_TAGS = new Set([
@@ -208,7 +249,10 @@ function lintTsx(file: string, findings: Finding[]) {
         });
       if (BLOCK_TAGS.has(tag)) {
         const text = inlineText(node.children, sf);
-        for (const v of lintText(text, { block: true }))
+        for (const v of lintText(text, {
+          block: true,
+          maxWords: maxWordsFor(rel, tag, text),
+        }))
           findings.push({
             file: rel,
             where: `<${tag}> line ${line}`,
@@ -270,7 +314,13 @@ function lintCopyModule(file: string, findings: Finding[]) {
       ].join("");
     if (text !== null && text.trim().split(/\s+/).length >= 3) {
       const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
-      for (const v of lintText(text, { block: true }))
+      // A copy module's strings are paragraphs or list items alike; the tight
+      // cap applies to strings outside an array (a list's items are exempt).
+      const inList = ts.isArrayLiteralExpression(node.parent);
+      for (const v of lintText(text, {
+        block: true,
+        maxWords: inList ? undefined : maxWordsFor(rel, "p", text),
+      }))
         findings.push({
           file: rel,
           where: `string line ${line}`,
@@ -376,8 +426,12 @@ function lintMarkdown(file: string, findings: Finding[]) {
     if (kept.length === 0) continue;
     const isList = kept.every((l) => /^\s*(?:[-*+]|\d+\.)\s+/.test(l));
     const items = isList ? kept.map(plain) : [kept.map(plain).join(" ")];
+    // REQ-025 FR-10: a guide's paragraph is held to 45 words; its list items are not.
     for (const item of items)
-      for (const v of lintText(item, { block: true }))
+      for (const v of lintText(item, {
+        block: true,
+        maxWords: isList ? undefined : TIGHT_PARAGRAPH_MAX_WORDS,
+      }))
         findings.push({ file: rel, where: `paragraph ${n}`, violation: v });
   }
 }

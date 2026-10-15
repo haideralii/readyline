@@ -33,8 +33,18 @@ export const HOME_COPY = {
   refundLine:
     "Full refund within 14 days if you have not downloaded the documents; after a download, a refund if they do not match your answers.",
   sampleHeading: "See exactly what you get",
-  sampleLead:
-    "This is a real document from a recorded run, not a template: the complaints policy for a fictional sole trader. The sections marked in colour were drafted from that provider's answers; the rest is fixed text every provider gets. Your pack has every document your audit calls for, each one like this.",
+  /** REQ-025 FR-12: the two intro sentences as two bullets; the sample itself lives on /sample. */
+  sampleIntro: [
+    "A real document from a recorded run, not a template: the complaints policy for a fictional sole trader.",
+    "Your pack has every document your audit calls for, each one like this.",
+  ],
+  sampleCardDescription:
+    "The sections marked in colour were drafted from that provider's answers; the rest is fixed text every provider gets.",
+  sampleRead: "Read the sample",
+  sampleDownload: "Download it as a Word file",
+  /** The /sample page's own lead (REQ-025 FR-12). */
+  samplePageLead:
+    "This is a real document from a recorded run, not a template. The sections marked in colour were drafted from a fictional sole trader's answers; the rest is fixed text every provider gets.",
   trustHeading: "What you can count on",
   trust: [
     {
