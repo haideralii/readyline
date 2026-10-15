@@ -11,6 +11,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { parseFrontMatter } from "@/lib/legal/pages";
+import { slugify } from "@/lib/text/slug";
 
 export const GUIDES_DIR = join(process.cwd(), "content", "guides");
 
@@ -24,6 +25,8 @@ const FrontMatter = z.object({
   reviewed: z.string().regex(DATE),
   owner: z.literal("po"),
   status: z.string().trim().optional(),
+  /** Batch 49 item 5: three lines, separated by " | ", shown in the "Short answer" box at the top. */
+  shortAnswer: z.string().trim().min(30),
 });
 
 export type GuideFaq = { question: string; answer: string };
@@ -38,6 +41,10 @@ export type Guide = {
   draft: boolean;
   /** The body without the title heading, FAQ and Sources sections. */
   markdown: string;
+  /** Batch 49 item 5: the three lines of the "Short answer" box. */
+  shortAnswer: string[];
+  /** The body's section headings with the ids the renderer gives them, for the "Jump to" list. */
+  headings: { id: string; text: string }[];
   faq: GuideFaq[];
   sources: { label: string; url: string | null }[];
   /** UNVERIFIED lines for the PO, as written. */
@@ -104,6 +111,7 @@ export function loadGuide(slug: string, dir: string = GUIDES_DIR): Guide {
     .replace(/^\s*\n/, "")
     .replace(/^#\s[^\n]*\n+/, "");
   const status = front.data.status ?? null;
+  const markdown = withoutSections(body, ["FAQ", "Sources"]);
   return {
     slug,
     title: front.data.title,
@@ -112,7 +120,15 @@ export function loadGuide(slug: string, dir: string = GUIDES_DIR): Guide {
     reviewed: front.data.reviewed,
     status,
     draft: /^draft\b/i.test(status ?? ""),
-    markdown: withoutSections(body, ["FAQ", "Sources"]),
+    markdown,
+    shortAnswer: front.data.shortAnswer
+      .split(" | ")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    headings: [...markdown.matchAll(/^## (.+?)\s*$/gm)].map((m) => ({
+      id: slugify(m[1]),
+      text: m[1],
+    })),
     faq: parseFaq(section(body, "FAQ")),
     sources: parseSources(section(body, "Sources")),
     unverified: body

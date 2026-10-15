@@ -42,16 +42,31 @@ export const PRICING_COPY = {
   /** Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second; no bundling, no discount. */
   keepsEyebrow: "What keeps you audit-ready",
   startEyebrow: "Where you start",
-  renewalSaves:
-    "At the mid-term audit and at renewal the registers are already the evidence, so there is nothing to rebuild from paper.",
+  /** Batch 49 item 2: the subscription card as a price line, a four-item list and the cancel line; the linking sentence lives on the registers page. */
+  subscriptionPriceLine: (price: string | null) =>
+    price
+      ? `${price} a month for the registers, with email reminders.`
+      : "A monthly subscription for the registers, with email reminders.",
+  subscriptionIncludes: [
+    "Incident register",
+    "Complaints register",
+    "Worker checks, with expiry reminders",
+    "Policy review reminders",
+  ],
+  subscriptionCancel:
+    "Cancel at any time; no notice period, no fee, no instalments, no interest.",
+  /** Batch 49 item 3: the two prices above both cards on a phone, each a link to its card. */
+  stripPack: (price: string | null) =>
+    price ? `Document pack: ${price}, once` : "Document pack: one price, once",
+  stripRegisters: (price: string | null) =>
+    price
+      ? `Registers: ${price} a month, cancel any time`
+      : "Registers: monthly, cancel any time",
   separateLine:
     "The two are separate: the pack is paid once and the subscription is monthly; neither includes the other, and there is no discount for taking both.",
   subscriptionHeading: "Audit-ready subscription",
   subscriptionComing:
     "Coming after the document pack: the incident and complaints registers, the worker screening expiry tracker, policy review reminders and the mid-term audit countdown, as a monthly subscription you can cancel at any time. No instalments, no interest, no late fees.",
-  /** REQ-018 FR-12: what the registers do that a spreadsheet does not. */
-  registersLinked:
-    "The registers are linked: an incident becomes an improvement row, a worker check becomes a staff matrix row, and the reminders go out by email, which a spreadsheet does not do.",
   buy: "Buy the document pack",
   signInToBuy: "Sign in to buy",
   signInNote:
@@ -67,6 +82,8 @@ export function pricingStrings(): string[] {
   const out: string[] = [];
   for (const value of Object.values(PRICING_COPY)) {
     if (typeof value === "string") out.push(value);
+    else if (typeof value === "function")
+      out.push(value("AUD 399"), value(null));
     else out.push(...value);
   }
   return out;

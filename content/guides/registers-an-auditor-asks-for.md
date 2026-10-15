@@ -5,6 +5,7 @@ description: "The twelve records NDIS auditors ask to see, what each one proves 
 updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
+shortAnswer: "Auditors ask for twelve records; two are required by the Rules, the rest by the Practice Standards or by practice. | Each register proves what happened, what you did and what changed. | Keep them as things happen, with codes instead of names."
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's)
 ---
 
@@ -12,7 +13,9 @@ status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14
 
 **The short answer: policies are one third of an audit; records are the rest.** The Commission says the auditor wants real examples, not just the policy: incident reports, complaints records, training logs, supervision notes. A perfect policy with an empty register is a finding. A good practice with nothing written down cannot be shown.
 
-This guide lists the records auditors ask for, what each one proves, and where a one-to-ten-worker provider keeps it. The list of twelve comes from auditors' and consultants' own accounts (sector webinars, 2026), so it is practice, not a rule. What the Rules and the Practice Standards require is marked.
+This guide lists the records auditors ask for, what each one proves, and where a one-to-ten-worker provider keeps it.
+
+The list of twelve comes from auditors' and consultants' own accounts (sector webinars, 2026), so it is practice, not a rule. What the Rules and the Practice Standards require is marked.
 
 ## Two records the Rules require you to keep
 
@@ -51,7 +54,9 @@ These are not named in the Rules, but auditors ask for them because they show th
 
 The Commission's description of an audit day says the auditor traces one thing end to end: an incident from the first report to the review to the notification. So the auditor does not count rows. They pick one and follow it.
 
-That is why a register row needs a date, a code for the person, what happened, what you did, and what changed. Readyline's registers ask for those and nothing that would identify a participant: a code, never a name, a date of birth or a health detail.
+That is why a register row needs a date, a code for the person, what happened, what you did, and what changed.
+
+Readyline's registers ask for those and nothing that would identify a participant: a code, never a name, a date of birth or a health detail.
 
 ## Keep them as things happen
 
