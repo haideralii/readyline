@@ -17,6 +17,7 @@ const PAGES = [
   "/",
   "/start",
   "/pricing",
+  "/sample",
   "/sign-in",
   "/about",
   "/privacy",
@@ -244,8 +245,9 @@ test.describe("REQ-015 Section E", () => {
     // FR-4: audit, sentence, counts, line and the one button are inside the first screen on a phone.
     const card = page.getByTestId("summary");
     await expect(card).toContainText(/Your audit: certification/);
-    await expect(card.getByTestId("pathway-description")).toContainText(
-      /An auditor visits you/,
+    // REQ-025 FR-13: the audit kind's meaning under the heading comes from the glossary.
+    await expect(card.getByTestId("audit-kind")).toContainText(
+      /An auditor reads your documents and visits you/,
     );
     // REQ-017 step 1: the one button is "Start getting ready"; the checklist and the price are plain links under it.
     const button = card.getByRole("link", { name: "Start getting ready" });
@@ -266,9 +268,11 @@ test.describe("REQ-015 Section E", () => {
       .locator("> summary")
       .click();
     await expect(page.getByTestId("have-legend")).toBeVisible();
-    const tags = page.getByTestId("result-section-documents").locator("span", {
-      hasText: /You have this|drafts this|You said/,
-    });
+    // REQ-025 FR-4a: one vocabulary, the provider's status only.
+    const tags = page
+      .getByTestId("result-section-documents")
+      .getByTestId("have-tag")
+      .filter({ hasText: /^.(You have this|To prepare|Not asked)$/ });
     expect(await tags.count()).toBeGreaterThan(0);
     await page.reload();
     await expect(page.getByTestId("result")).toBeVisible();
@@ -280,8 +284,10 @@ test.describe("REQ-015 Section E", () => {
       "open",
       "",
     );
-    // FR-6: one "Change my answers" link; the per-step links are folded; clearing asks first.
-    await expect(page.getByTestId("change-answers")).toBeVisible();
+    // FR-6 as batch 48 item 2 reshaped it: the stepper's done steps are the way back; "Start again" asks first.
+    await expect(
+      page.getByRole("navigation", { name: "Questionnaire steps" }),
+    ).toBeVisible();
     await expect(page.getByText("Back to:")).toHaveCount(0);
     await page.getByTestId("clear-draft").click();
     await expect(page.getByTestId("clear-draft-confirm")).toContainText(

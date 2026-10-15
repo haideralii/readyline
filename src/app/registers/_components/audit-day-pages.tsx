@@ -82,6 +82,12 @@ export async function AuditDayListPage({
       canWrite={ctx.canWrite}
       addHref={`/registers/${slug}/new`}
       addLabel={meta.addLabel}
+      // REQ-020 FR-8: the corporate risk register takes a spreadsheet.
+      importHref={
+        slug === "corporate-risks"
+          ? "/registers/corporate-risks/import"
+          : undefined
+      }
       back={{ href: "/registers", label: "Registers" }}
     >
       {saved ? (
@@ -91,6 +97,20 @@ export async function AuditDayListPage({
           data-testid="register-saved"
         >
           ✓ Saved.
+        </p>
+      ) : null}
+      {slug === "corporate-risks" ? (
+        // REQ-020 FR-7: the emergency and WHS risks point at the hazard register.
+        <p className="mt-3 text-sm leading-6" data-testid="hazards-link-line">
+          A risk in the emergency area or a work health and safety risk often
+          starts as a hazard:{" "}
+          <Link
+            href="/registers/hazards"
+            className="underline underline-offset-2"
+          >
+            open the hazard register
+          </Link>
+          .
         </p>
       ) : null}
       <RegisterList

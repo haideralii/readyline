@@ -1,19 +1,19 @@
 "use client";
 import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
-import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
 import {
   readinessCounts,
-  readinessSentence,
   readyLineCounts,
+  summaryLines,
 } from "@/lib/questionnaire/readiness";
 import {
   documentGroupId,
   documentGroupsContent,
+  glossarySentence,
+  glossaryTerm,
 } from "@/lib/questionnaire/content";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
@@ -28,27 +28,35 @@ import { useQuestionnaire } from "../questionnaire-provider";
  * The earlier REQ-013 and REQ-014 test ids are kept.
  */
 
-/** "You said" as a small tag with an icon, never a second line (FR-5). */
-const HAVE_TAG: Record<string, { label: string; icon: string; tone: string }> =
-  {
-    // REQ-013 batch 36 item 3: the customer's words; "not asked about yet" is never shown.
-    yes: { label: "You have this", icon: "✓", tone: "text-moss border-moss" },
-    no: {
-      label: "You said you don't have this yet",
-      icon: "○",
-      tone: "text-ochre border-ochre",
-    },
-    "not-sure": {
-      label: "You said: not sure",
-      icon: "?",
-      tone: "text-slate border-slate",
-    },
-    unknown: {
-      label: `${BRAND} drafts this`,
-      icon: "○",
-      tone: "text-slate border-slate",
-    },
-  };
+/**
+ * One badge vocabulary for the result lists and the checklist (REQ-025
+ * FR-4a): the provider's status only; the pack's part is one line above
+ * each list, never per row. "Not sure" reads "To prepare" with the detail.
+ */
+const HAVE_TAG: Record<
+  string,
+  { label: string; icon: string; tone: string; detail?: string }
+> = {
+  yes: { label: "You have this", icon: "✓", tone: "text-moss border-moss" },
+  no: { label: "To prepare", icon: "○", tone: "text-ochre border-ochre" },
+  "not-sure": {
+    label: "To prepare",
+    icon: "○",
+    tone: "text-ochre border-ochre",
+    detail: "you said not sure",
+  },
+  unknown: { label: "Not asked", icon: "○", tone: "text-slate border-slate" },
+};
+
+/** The glossary terms a reader meets on this page, with their meanings on first use (REQ-025 FR-13). */
+const PAGE_TERMS = [
+  "practice-standards",
+  "module",
+  "quality-indicator",
+  "registration-group",
+  "mid-term-audit",
+  "adopt",
+] as const;
 
 type Fetch = {
   key: string;
@@ -62,7 +70,7 @@ export function ResultStep({
   /** Batch 47 item 1: the server page passes `subscriptionAvailable()`; off, the page says the one off-state sentence. */
   subscriptionOffered?: boolean;
 }) {
-  const { answers, clearDraft, mode, contactEmail } = useQuestionnaire();
+  const { answers, mode, contactEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -133,7 +141,6 @@ export function ResultStep({
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
       contactEmail={contactEmail}
-      onStartAgain={() => void clearDraft()}
     />
   );
 }
@@ -249,26 +256,35 @@ function Disclosure({
 function HaveTag({ have }: { have: string }) {
   const t = HAVE_TAG[have] ?? HAVE_TAG.unknown;
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
-    >
-      <span aria-hidden="true">{t.icon}</span>
-      {t.label}
+    <span className="inline-flex items-center gap-2">
+      <span
+        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
+        data-testid="have-tag"
+      >
+        <span aria-hidden="true">{t.icon}</span>
+        {t.label}
+      </span>
+      {t.detail ? (
+        <span className="text-xs text-zinc-600 dark:text-zinc-400">
+          ({t.detail})
+        </span>
+      ) : null}
     </span>
   );
 }
 
+/** "2 you have, 3 to prepare": the FR-4a words in a group's summary. */
 function haveCounts(items: readonly { have: string }[]) {
-  const c = { yes: 0, toPrepare: 0, notSure: 0 };
+  const c = { yes: 0, toPrepare: 0, notAsked: 0 };
   for (const i of items) {
     if (i.have === "yes") c.yes += 1;
-    else if (i.have === "not-sure") c.notSure += 1;
+    else if (i.have === "unknown") c.notAsked += 1;
     else c.toPrepare += 1;
   }
   const parts: string[] = [];
   if (c.yes) parts.push(`${c.yes} you have`);
-  if (c.toPrepare) parts.push(`${c.toPrepare} ${BRAND} drafts`);
-  if (c.notSure) parts.push(`${c.notSure} not sure`);
+  if (c.toPrepare) parts.push(`${c.toPrepare} to prepare`);
+  if (c.notAsked) parts.push(`${c.notAsked} not asked`);
   return parts.join(", ");
 }
 
@@ -277,7 +293,6 @@ function ResultView({
   checklistTotal,
   signedIn,
   contactEmail,
-  onStartAgain,
   subscriptionOffered,
 }: {
   subscriptionOffered: boolean;
@@ -285,10 +300,8 @@ function ResultView({
   checklistTotal: number;
   signedIn: boolean;
   contactEmail: string | null;
-  onStartAgain: () => void;
 }) {
   const r = result;
-  const router = useRouter();
   const { open, toggle, remember } = useRememberedOpen();
   const pathwayWord =
     r.pathway === "verification" ? "verification" : "certification";
@@ -299,6 +312,9 @@ function ResultView({
     }))
     .filter((g) => g.items.length > 0);
   const checklistHref = signedIn ? "/checklist" : "/sign-in?next=%2Fchecklist";
+  // REQ-025 FR-3: the summary as a list over derived counts, never a literal.
+  const counts = readinessCounts(r);
+  const lines = summaryLines(counts, checklistTotal);
 
   return (
     <div className="space-y-6" data-testid="result">
@@ -312,14 +328,12 @@ function ResultView({
           Your audit: {pathwayWord}
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
-        {/* Batch 42 item 6 (D-549): what the word means, in one line under the heading. */}
+        {/* Batch 42 item 6 (D-549), REQ-025 FR-13: what the word means, from the glossary, in one line under the heading. */}
         <p
           className="mt-1 text-sm text-zinc-700 dark:text-zinc-300"
           data-testid="audit-kind"
         >
-          {r.pathway === "verification"
-            ? "That is a desk check of your documents."
-            : "That is a visit, with interviews."}
+          {glossarySentence(`${pathwayWord}-audit`)}
         </p>
         <ul
           className="mt-2 flex flex-wrap gap-1.5"
@@ -337,26 +351,26 @@ function ResultView({
             </li>
           ))}
         </ul>
-        {/* Batch 42 item 5 added the audit-kind line; the phone spacing below is
-            16 px tighter than the wider layout so the one button still ends
-            inside the first screen on a 681 px iPhone (REQ-015 FR-4). */}
-        <p
-          className="mt-2 text-base leading-7 sm:mt-3"
-          data-testid="pathway-description"
+        {/* REQ-025 FR-3: the summary as a list, not a sentence; every number derived
+            from the result. The phone spacing is 16 px tighter than the wider
+            layout so the one button still ends inside the first screen on a
+            681 px iPhone (REQ-015 FR-4). */}
+        <ul
+          className="mt-2 space-y-1 text-base leading-7 sm:mt-3"
+          data-testid="summary-list"
         >
-          {r.pathway === "verification"
-            ? "An auditor reads your documents at their desk. Nobody visits."
-            : "An auditor visits you, talks to your workers and some participants, and reads your documents."}
-        </p>
-        <p className="mt-1 text-base leading-7 sm:mt-2">
-          You will need <strong>{r.documents.length} documents</strong> and{" "}
-          <strong>{r.registers.length} registers</strong>.
-        </p>
-        {/* REQ-013 batch 36 item 3: two segments (have / still to do) and one sentence in the customer's words. */}
+          <li data-testid="summary-documents">{lines.documents}</li>
+          <li data-testid="summary-registers">{lines.registers}</li>
+          <li data-testid="checklist-count-line">
+            {lines.checklist}
+            {signedIn ? "" : "; sign in to track them"}
+          </li>
+        </ul>
+        {/* REQ-013 batch 36 item 3: two segments (have / still to do); the sentence is the pack line (REQ-025 FR-3). */}
         <div className="mt-2 sm:mt-3">
           <ReadyLine
-            counts={readyLineCounts(readinessCounts(r))}
-            sentence={readinessSentence(readinessCounts(r))}
+            counts={readyLineCounts(counts)}
+            sentence={lines.pack}
             testId="result-ready-line"
           />
         </div>
@@ -433,20 +447,6 @@ function ResultView({
               </dd>
             </div>
           </dl>
-          {/* Batch 45 item 6: the counts add up on the page, the line a provider screenshots for a partner. */}
-          <p
-            className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-            data-testid="checklist-count-line"
-          >
-            Your checklist has {checklistTotal} items: the{" "}
-            {r.documents.length + r.registers.length} above plus{" "}
-            {Math.max(
-              checklistTotal - r.documents.length - r.registers.length,
-              0,
-            )}{" "}
-            about your workers, insurance and the audit
-            {signedIn ? "." : "; sign in to track them."}
-          </p>
         </div>
       </section>
 
@@ -482,7 +482,14 @@ function ResultView({
             standards below still apply to you.
           </p>
         ) : null}
-        <ul className="mt-3 space-y-3">
+        {/* REQ-025 FR-5: one list item per reason, the source as the link text; "opens in a new tab" said once. */}
+        <p
+          className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+          data-testid="reasons-intro"
+        >
+          Each reason links to its source; the sources open in a new tab.
+        </p>
+        <ul className="mt-2 space-y-2">
           {r.reasons.map((x, i) => (
             <li
               key={`${x.rule}-${i}`}
@@ -500,11 +507,28 @@ function ResultView({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Source: {x.source.title} (opens in a new tab)
+                {x.source.title}
               </a>
             </li>
           ))}
         </ul>
+        {/* REQ-025 FR-13: the audit words on this page, each with its plain meaning, on the page itself. */}
+        <details className="mt-4" data-testid="glossary-terms">
+          <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
+            What these words mean ({PAGE_TERMS.length})
+          </summary>
+          <dl className="mt-1 space-y-1 text-sm leading-6">
+            {PAGE_TERMS.map((id) => {
+              const t = glossaryTerm(id);
+              return (
+                <div key={id} data-testid={`glossary-${id}`}>
+                  <dt className="inline font-medium">{t.term}: </dt>
+                  <dd className="inline">{t.meaning}.</dd>
+                </div>
+              );
+            })}
+          </dl>
+        </details>
         <h3 className="mt-5 text-base font-semibold">
           Practice Standards modules that apply ({r.modules.length})
         </h3>
@@ -552,12 +576,13 @@ function ResultView({
         onRemember={remember}
         summary={`Documents you will need (${r.documents.length})`}
       >
+        {/* REQ-025 FR-4a: the pack's part is one line above the list, never per row. */}
         <p
           className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
           data-testid="have-legend"
         >
-          Tags come from your answers in the last step. &ldquo;{BRAND} drafts
-          this&rdquo; means it is in your pack.
+          Your pack includes a draft of every document below. The tags are what
+          you told us in the last step.
         </p>
         {groups.map((g) => (
           <Disclosure
@@ -599,9 +624,13 @@ function ResultView({
         onRemember={remember}
         summary={`Registers to keep (${r.registers.length})`}
       >
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          Kept after registration; an auditor samples them at the mid-term audit
-          and at renewal.
+        <p
+          className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          data-testid="registers-legend"
+        >
+          Your pack includes a template for every register below; the
+          subscription keeps them for you. An auditor samples them at the
+          mid-term audit and at renewal.
         </p>
         <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
           {r.registers.map((x) => (
@@ -665,19 +694,6 @@ function ResultView({
         )}{" "}
         We answer product and process questions, not legal ones.
       </p>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <ConfirmButton
-          label="Clear the draft on this device"
-          question="Clear your answers on this device? Your result goes with them."
-          confirmLabel="Yes, clear them"
-          onConfirm={() => {
-            onStartAgain();
-            router.push("/start");
-          }}
-          testId="clear-draft"
-        />
-      </div>
     </div>
   );
 }

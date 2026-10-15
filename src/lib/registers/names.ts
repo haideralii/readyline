@@ -140,6 +140,13 @@ export const RECORD_NAMES: readonly RecordName[] = [
     href: "/registers/onboarding",
   },
   {
+    // REQ-020 FR-7.
+    id: "hazards",
+    name: "Hazard register",
+    aliases: ["hazard and WHS register", "WHS register", "hazards register"],
+    href: "/registers/hazards",
+  },
+  {
     id: "training",
     name: "Training register",
     aliases: ["training records", "training log"],
@@ -227,12 +234,13 @@ export const AUDIT_RECORD_TIER_TITLES: Record<AuditRecordTier, string> = {
 export const KEPT_ON_PAPER = "kept on paper";
 
 /**
- * The twelve records an auditor asks to see (REQ-018 FR-11; the auditor
- * research section B), in the order the audit-day page and the
- * self-assessment's "Items to prepare before the audit" both use. `tier`
- * splits them in two; `paper` marks the two whose artefact is a signed or
- * issued document the provider keeps on paper, with the register holding
- * the dates.
+ * The records an auditor asks to see (REQ-018 FR-11; the auditor research
+ * section B; REQ-020 FR-7 adds the hazard register, PO 15 Oct 2026), in
+ * the order the audit-day page, the self-check and the self-assessment's
+ * "Items to prepare before the audit" all use: one list, so the words
+ * cannot drift. `tier` splits them in two; `paper` marks the two whose
+ * artefact is a signed or issued document the provider keeps on paper,
+ * with the register holding the dates.
  */
 export const AUDIT_DAY_RECORDS: readonly {
   id: string;
@@ -282,6 +290,14 @@ export const AUDIT_DAY_RECORDS: readonly {
     name: "Delegations register",
     ask: "Your delegations register: who acts when you are away",
     href: "/registers/delegations",
+    tier: "practice",
+  },
+  {
+    // REQ-020 FR-7 (PO, 15 Oct 2026): the thirteenth record, after the delegations.
+    id: "hazards",
+    name: "Hazard register",
+    ask: "Your hazard register: what could hurt someone, what you did, and when you check it again",
+    href: "/registers/hazards",
     tier: "practice",
   },
   {
@@ -339,7 +355,7 @@ function prepareLine(r: (typeof AUDIT_DAY_RECORDS)[number]): string {
   return r.paper ? `${ask} (${KEPT_ON_PAPER})` : ask;
 }
 
-/** The self-assessment's fixed list (batch 42 item 3): the twelve records in the same order and words, the insurances line pointing at the register. */
+/** The self-assessment's fixed list (batch 42 item 3): the records in the same order and words as the audit-day page, the insurances line pointing at the register. */
 export function itemsToPrepareBeforeAudit(): string[] {
   return AUDIT_DAY_RECORDS.map(prepareLine);
 }

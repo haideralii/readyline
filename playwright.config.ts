@@ -52,7 +52,7 @@ export default defineConfig({
       // Backlog 1 (D-1508): the accessibility pass runs on all three projects;
       // batch 45 item 28: so does the setup form a new customer submits.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|audit-pack|team))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team))\.spec\.ts$/,
     },
   ],
   webServer: {

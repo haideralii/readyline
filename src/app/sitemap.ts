@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       "/",
       "/start",
       "/pricing",
+      "/sample",
       "/guides",
       "/guides/registration-groups",
       ...LEGAL_NAV.map((l) => l.href),

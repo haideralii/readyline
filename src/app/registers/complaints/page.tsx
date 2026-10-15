@@ -38,6 +38,7 @@ export default async function ComplaintsPage() {
       addHref="/registers/complaints/new"
       addLabel="Add a complaint"
       exportHref="/registers/complaints/export.zip"
+      importHref="/registers/complaints/import"
       back={{ href: "/registers", label: "Registers" }}
     >
       <RegisterList

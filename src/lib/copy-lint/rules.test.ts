@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { countWords, lintText, splitSentences } from "./rules";
+import {
+  TIGHT_PARAGRAPH_MAX_WORDS,
+  countWords,
+  lintText,
+  splitSentences,
+} from "./rules";
 
 describe("copy lint rules (REQ-015 FR-2, AC-3)", () => {
   it("fails a seeded banned word", () => {
@@ -26,6 +31,22 @@ describe("copy lint rules (REQ-015 FR-2, AC-3)", () => {
     expect(lintText(sixty, { block: true })).toEqual([]);
     // Inline strings are not capped as paragraphs.
     expect(lintText(seventy)).toEqual([]);
+  });
+
+  it("REQ-025 FR-10: a tight block fails at 50 words and passes at 45", () => {
+    const five = "Five short words sit here.";
+    const fifty = Array.from({ length: 10 }, () => five).join(" ");
+    expect(
+      lintText(fifty, { block: true, maxWords: TIGHT_PARAGRAPH_MAX_WORDS }).map(
+        (x) => x.rule,
+      ),
+    ).toEqual(["paragraph-length"]);
+    const fortyFive = Array.from({ length: 9 }, () => five).join(" ");
+    expect(
+      lintText(fortyFive, { block: true, maxWords: TIGHT_PARAGRAPH_MAX_WORDS }),
+    ).toEqual([]);
+    // Without the option the 60-word cap holds, so the other pages are unchanged.
+    expect(lintText(fifty, { block: true })).toEqual([]);
   });
 
   it("fails a sentence over 35 words", () => {

@@ -75,6 +75,7 @@ export default async function IncidentsPage() {
       addHref="/registers/incidents/new"
       addLabel="Add an incident"
       exportHref="/registers/incidents/export.zip"
+      importHref="/registers/incidents/import"
       back={{ href: "/registers", label: "Registers" }}
     >
       {toConfirm ? (

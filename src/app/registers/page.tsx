@@ -5,6 +5,10 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { documentControlSentence } from "@/lib/registers/document-control";
+import {
+  REGISTERS_LINKED_LINE,
+  RENEWAL_SAVES_LINE,
+} from "@/lib/registers/messages";
 import { MID_TERM_DUE_MONTHS, addMonths } from "@/lib/registers/reminders";
 import { reportsToConfirmLine } from "@/lib/registers/worker";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
@@ -42,6 +46,8 @@ const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
 /** The REQ-018 registers you keep current: a date changes, the row changes. */
 const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
   "corporate-risks",
+  // REQ-020 FR-7.
+  "hazards",
   "participant-risks",
   "conflicts-of-interest",
   "delegations",
@@ -179,7 +185,15 @@ export default async function RegistersPage() {
   return (
     <RegisterPage
       title="Registers"
-      intro="What an auditor samples at the mid-term audit (certification providers) and at renewal. Keep them as things happen; nothing here is sent to anyone."
+      intro={
+        <>
+          What an auditor samples at the mid-term audit (certification
+          providers) and at renewal. Keep them as things happen; nothing here is
+          sent to anyone.{" "}
+          <span data-testid="registers-linked">{REGISTERS_LINKED_LINE}</span>{" "}
+          {RENEWAL_SAVES_LINE}
+        </>
+      }
       canWrite={ctx.canWrite}
     >
       <div data-testid="registers-index">
