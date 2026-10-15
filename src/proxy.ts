@@ -79,7 +79,13 @@ export function needsSessionRedirect(
   const hasSession = cookieNames.some(
     (n) => n.startsWith("sb-") && n.includes("-auth-token"),
   );
-  return hasSession ? null : `/sign-in?next=${encodeURIComponent(pathname)}`;
+  if (hasSession) return null;
+  // Batch 48 item 3: a download route is a handler with no loading boundary,
+  // so it answers for itself (a bad file name is 404 before any redirect, and
+  // its redirect comes back to the document's page, never to the file). A
+  // page comes back to itself after sign-in.
+  if (/^\/documents\/[^/]+\/download(?:\/.*)?$/.test(pathname)) return null;
+  return `/sign-in?next=${encodeURIComponent(pathname)}`;
 }
 
 export function proxy(request: NextRequest) {
@@ -87,12 +93,11 @@ export function proxy(request: NextRequest) {
     request.nextUrl.pathname,
     request.cookies.getAll().map((c) => c.name),
   );
-  if (redirectTo) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/sign-in";
-    url.search = `?next=${encodeURIComponent(request.nextUrl.pathname)}`;
-    return NextResponse.redirect(url, 307);
-  }
+  if (redirectTo)
+    return NextResponse.redirect(
+      new URL(redirectTo, request.nextUrl.origin),
+      307,
+    );
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = buildCsp(
     nonce,

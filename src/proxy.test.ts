@@ -110,4 +110,12 @@ describe("needsSessionRedirect (batch 47 item 7)", () => {
       "/sign-in?next=%2Fdocuments",
     );
   });
+
+  it("leaves a download route to its own handler, which refuses a bad file name before any redirect (batch 48 item 3)", () => {
+    expect(needsSessionRedirect("/documents/abc/download", [])).toBeNull();
+    expect(needsSessionRedirect("/documents/abc/download/more", [])).toBeNull();
+    expect(needsSessionRedirect("/documents/abc", [])).toBe(
+      "/sign-in?next=%2Fdocuments%2Fabc",
+    );
+  });
 });
