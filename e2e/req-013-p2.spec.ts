@@ -212,11 +212,9 @@ test.describe("REQ-013 P2", () => {
         name: /^Your audit: verification/,
       }),
     ).toHaveCount(1);
-    await expect(page.getByTestId("summary")).toContainText(
-      /You will need \d+ documents/,
-    );
+    await expect(page.getByTestId("summary")).toContainText(/Documents: \d+/);
     await expect(
-      page.getByTestId("summary").getByTestId("pathway-description"),
+      page.getByTestId("summary").getByTestId("audit-kind"),
     ).toBeVisible();
     await expect(page.getByTestId("result-contact")).toContainText(
       /Questions about your result/,

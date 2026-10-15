@@ -141,8 +141,9 @@ test.describe("REQ-014 visual identity", () => {
     const line = page.getByTestId("result-ready-line");
     await expect(line).toBeVisible();
     // REQ-013 batch 36 item 3: one sentence in the customer's words; two segments, the track in mist.
+    // REQ-025 FR-3: the sentence under the line is the pack line, over derived counts.
     await expect(page.getByTestId("result-ready-line-text")).toContainText(
-      /(You already have \d+ of these\. Readyline drafts the \d+ documents for you; the \d+ registers you keep as you go\.|You told us you already have \d+ of these; the pack still drafts all \d+ so they match each other, and your checklist shows the \d+ still to prepare\.)/,
+      /The pack drafts all \d+ so they match; your checklist shows which to compare with what you have\./,
     );
     await expect(page.getByTestId("result-ready-line-todo")).toBeAttached();
     await expect(page.getByTestId("result-ready-line-to-prepare")).toHaveCount(
