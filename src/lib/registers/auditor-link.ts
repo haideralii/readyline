@@ -79,6 +79,9 @@ export function auditorBanner(tradingName: string, expiresAt: Date): string {
  * keyed under HASH_PEPPER so an IPv4 address cannot be recovered by
  * enumerating the hash (retro finding 34).
  */
-export function hashAddress(address: string, pepper = hashPepper()): string {
+export function hashAddress(
+  address: string,
+  pepper: string | null = hashPepper(),
+): string {
   return pepperedHash(address.trim(), pepper).slice(0, 16);
 }

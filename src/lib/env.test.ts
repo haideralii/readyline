@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  DEVELOPMENT_HASH_PEPPER,
   EnvError,
   PRODUCTION_REQUIRED,
+  REQUIRED_LATER,
   REQUIRED,
   assertEnv,
   isProductionDeployment,
@@ -79,25 +79,15 @@ describe("validateEnv for the production deployment (REQ-010 FR-2, AC-2)", () =>
     expect(isProductionDeployment({})).toBe(false);
   });
 
-  it("requires HASH_PEPPER in production and reads it with a development stand-in elsewhere (retro finding 34)", () => {
-    expect(PRODUCTION_REQUIRED.map((v) => v.name)).toContain("HASH_PEPPER");
-    expect(readHashPepper({ HASH_PEPPER: " k " })).toEqual({
-      pepper: "k",
-      fallback: false,
-    });
-    expect(readHashPepper({})).toEqual({
-      pepper: DEVELOPMENT_HASH_PEPPER,
-      fallback: true,
-    });
+  it("reads HASH_PEPPER when set and answers null otherwise; no deployment refuses to start over it (retro finding 34, D-2238)", () => {
+    expect(PRODUCTION_REQUIRED.map((v) => v.name)).not.toContain("HASH_PEPPER");
+    expect(REQUIRED_LATER.map((v) => v.name)).toContain("HASH_PEPPER");
+    expect(readHashPepper({ HASH_PEPPER: " k " })).toBe("k");
+    expect(readHashPepper({})).toBeNull();
     expect(
       readHashPepper({ HASH_PEPPER: "  ", VERCEL_ENV: "preview" }),
-    ).toEqual({ pepper: DEVELOPMENT_HASH_PEPPER, fallback: true });
-    expect(() => readHashPepper({ VERCEL_ENV: "production" })).toThrow(
-      EnvError,
-    );
-    expect(() => readHashPepper({ VERCEL_ENV: "production" })).toThrow(
-      /HASH_PEPPER is missing/,
-    );
+    ).toBeNull();
+    expect(readHashPepper({ VERCEL_ENV: "production" })).toBeNull();
   });
 });
 
