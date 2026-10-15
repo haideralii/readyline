@@ -41,7 +41,10 @@ export async function fillRest(
 }
 
 /** Saves the practices step and completes workforce and existing through to the result. */
-export async function fillFromWorkforce(page: Page) {
+export async function fillFromWorkforce(
+  page: Page,
+  opts: { have?: string[] } = {},
+) {
   await page.getByRole("button", { name: "Save and continue" }).click();
   // workforce
   await expect(
@@ -63,7 +66,10 @@ export async function fillFromWorkforce(page: Page) {
     "insuranceCertificate",
     "workerInductionRecords",
   ]) {
-    await page.locator(`#${key}-no`).check();
+    // Batch 48 item 1: "yes" for the items named in `have`, "no" for the rest.
+    await page
+      .locator(`#${key}-${opts.have?.includes(key) ? "yes" : "no"}`)
+      .check();
   }
   await page.getByRole("button", { name: "See my result" }).click();
   await expect(

@@ -1,10 +1,8 @@
 "use client";
 import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
-import { ConfirmButton } from "@/components/confirm-button";
 import { ReadyLine } from "@/components/ready-line";
 import {
   readinessCounts,
@@ -72,7 +70,7 @@ export function ResultStep({
   /** Batch 47 item 1: the server page passes `subscriptionAvailable()`; off, the page says the one off-state sentence. */
   subscriptionOffered?: boolean;
 }) {
-  const { answers, clearDraft, mode, contactEmail } = useQuestionnaire();
+  const { answers, mode, contactEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -143,7 +141,6 @@ export function ResultStep({
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
       contactEmail={contactEmail}
-      onStartAgain={() => void clearDraft()}
     />
   );
 }
@@ -296,7 +293,6 @@ function ResultView({
   checklistTotal,
   signedIn,
   contactEmail,
-  onStartAgain,
   subscriptionOffered,
 }: {
   subscriptionOffered: boolean;
@@ -304,10 +300,8 @@ function ResultView({
   checklistTotal: number;
   signedIn: boolean;
   contactEmail: string | null;
-  onStartAgain: () => void;
 }) {
   const r = result;
-  const router = useRouter();
   const { open, toggle, remember } = useRememberedOpen();
   const pathwayWord =
     r.pathway === "verification" ? "verification" : "certification";
@@ -700,19 +694,6 @@ function ResultView({
         )}{" "}
         We answer product and process questions, not legal ones.
       </p>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <ConfirmButton
-          label="Clear the draft on this device"
-          question="Clear your answers on this device? Your result goes with them."
-          confirmLabel="Yes, clear them"
-          onConfirm={() => {
-            onStartAgain();
-            router.push("/start");
-          }}
-          testId="clear-draft"
-        />
-      </div>
     </div>
   );
 }

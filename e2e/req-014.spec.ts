@@ -112,26 +112,29 @@ test.describe("REQ-014 visual identity", () => {
     page,
   }) => {
     await toSupports(page);
-    const fill = page.getByTestId("progress-line-fill");
-    await expect(fill).toBeVisible();
-    await expect(page.getByRole("progressbar")).toHaveAttribute(
-      "aria-valuetext",
+    // Batch 48 item 2: the stepper replaced the progress line. A done step is
+    // the ochre circle and a link; the line beneath names the step; nothing
+    // animates, with or without reduced motion.
+    const stepper = page.getByRole("navigation", {
+      name: "Questionnaire steps",
+    });
+    await expect(stepper).toBeVisible();
+    await expect(page.getByTestId("progress-line-label")).toHaveText(
       "Step 2 of 6: Supports",
     );
-    await expect(fill).toHaveCSS("fill", "rgb(180, 70, 31)");
-    // R-2: step 2 of 6 fills about a third of the line.
-    await expect(fill).toHaveAttribute("width", "33");
-    const animated = await fill.evaluate(
+    const done = stepper.getByRole("link", { name: /Step 1, Business: done/ });
+    await expect(done).toHaveCSS("background-color", "rgb(180, 70, 31)");
+    const animated = await done.evaluate(
       (el) => getComputedStyle(el).animationDuration,
     );
-    expect(animated).toBe("0.7s");
+    // Chromium reports the global 0.01ms rule as 1e-05s; anything under a frame counts as off.
+    expect(parseFloat(animated)).toBeLessThan(0.01);
 
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.reload();
-    const reduced = await page
-      .getByTestId("progress-line-fill")
+    const reduced = await stepper
+      .getByRole("link", { name: /Step 1, Business: done/ })
       .evaluate((el) => getComputedStyle(el).animationDuration);
-    // Chromium reports the global 0.01ms rule as "1e-05s"; anything under a frame counts as off.
     expect(parseFloat(reduced)).toBeLessThan(0.01);
     await page.emulateMedia({ reducedMotion: "no-preference" });
 
