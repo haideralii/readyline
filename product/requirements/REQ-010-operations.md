@@ -1,5 +1,5 @@
 # REQ-010: Operations: first deploy, backups, monitoring, runbook, export and deletion
-Status: part 1 ready (written 13 Oct 2026)   Priority: must   Owner: Dev
+Status: part 1 delivered and accepted (13 Oct 2026, PR #20; AC-3 and AC-4 passed on the deployed site the same day); part 2 not yet written (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 53)   Priority: must   Owner: Dev
 Phase: 5   Depends on: REQ-004, REQ-005, REQ-007, REQ-008
 
 ## Why
@@ -14,9 +14,9 @@ Nothing can be trialled with a real provider until the app runs on a public addr
 
 ### Functional requirements
 - FR-1 **Deploy runbook** `supabase/ops/DEPLOY.md` (plain language, numbered, for a non-infra reader): create the Vercel project from the GitHub repo on a personal account; region; the full list of environment variable names with one line each on where the value comes from (Supabase dashboard, Stripe dashboard, Anthropic console, Resend, a generated `CRON_SECRET`), which are server-only, and which are safe as `NEXT_PUBLIC_`; the Supabase redirect URLs to add (`https://<domain>/auth/callback` and the Vercel preview pattern) and the Site URL; the Stripe webhook endpoint to create (`https://<domain>/api/stripe/webhook`, the events it needs) and where to paste the signing secret; how to confirm the cron fired. Values never appear in the file.
-- FR-2 **Environment check at boot**: a server-side check that every required variable is present (names only in the log) and the app refuses to start in production with one missing; `GENERATION_ENABLED` documented as the switch to turn the model on for the trial.
+- FR-2 **Environment check at boot**: a server-side check that every required variable is present (names only in the log) and the app refuses to start in production with one missing; `GENERATION_ENABLED` documented as the switch to turn the model on for the trial *(D-1002: `GENERATION_LIVE` is the model switch; `GENERATION_ENABLED` shows the free generate button; retro review 15 Oct 2026, finding 54)*.
 - FR-3 **`.env.example` is the single source of names**: reconcile it with what the code actually reads (the payments branch introduced `STRIPE_PRICE_PACK`, `PACK_PRICE_AUD_CENTS`, `GST_LINE`, `SUBSCRIPTION_PRICE_AUD_CENTS`; the example still lists `STRIPE_PRICE_DOCUMENT_SET` and `STRIPE_PRICE_SUBSCRIPTION_MONTHLY`). One name per setting; a unit test that every variable read through the env module appears in `.env.example`.
-- FR-4 **Health route** `/api/health` returning `{ ok, version, region }` with the git SHA, no secrets, no database call, rate-limited like the others; used by the smoke test.
+- FR-4 **Health route** `/api/health` returning `{ ok, version, region }` *(delivered `{ ok, version, sha, region, deployment }`; retro review 15 Oct 2026, finding 55)* with the git SHA, no secrets, no database call, rate-limited like the others; used by the smoke test.
 - FR-5 **Production smoke test** `npm run smoke -- --base https://<domain>`: health, home, pricing, legal pages (200 and the footer links), sign-in page, and the CSP header present. Read-only; no sign-in.
 - FR-6 **Preview deployments**: PR previews must not run the daily purge against production data; the cron route checks it is on the production deployment (`VERCEL_ENV === "production"`) before doing anything.
 
@@ -35,7 +35,7 @@ Nothing can be trialled with a real provider until the app runs on a public addr
 1. Does `next build` on Vercel need `GENERATION_ENABLED` at build time, or only at request time?
 2. Any env variable read in a client component that is not `NEXT_PUBLIC_`? (Should be none; confirm.)
 
-## Part 2 (later): backups (Supabase daily plus a weekly export to Haider's own storage), uptime check, error reporting (Sentry DSN already in the example), the incident runbook, account export and deletion jobs (REQ-004 FR-6 and the privacy policy promise of 30 days).
+## Part 2 (later): backups (Supabase daily plus a weekly export to Haider's own storage), uptime check, error reporting (Sentry DSN already in the example), the incident runbook, account export and deletion jobs (REQ-004 FR-6 and the privacy policy promise of 30 days) *(the purge job `/api/jobs/purge` and the account export exist since REQ-004 Session C; retro review 15 Oct 2026, finding 64)*.
 
 ## Dev response
 

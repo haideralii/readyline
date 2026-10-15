@@ -1,5 +1,5 @@
 # REQ-006: Readiness checklist
-Status: ready
+Status: delivered (Sessions A and B, 12 Oct 2026, branch `req-006-checklist`, merged); PO acceptance not yet recorded under "PO review" (retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 1)
 Phase: 4   Priority: must   Owner: Dev   Depends on: REQ-003 (result), REQ-005 (document set).
 
 ## Why
@@ -9,11 +9,11 @@ The result page tells a provider what they need; the checklist tells them what t
 In: a per-assessment checklist derived from the result (documents, registers, clearances, insurances, training, other evidence), with status per item, free-text notes, and a progress summary; printable; the "already have" answers pre-tick items. Out: uploading evidence files (parking lot; privacy risk), reminders (REQ-009), sharing with an auditor.
 
 ## Functional requirements
-- FR-1 **Derivation** `deriveChecklist(result)` in `src/lib/checklist/`: items grouped as Documents (one per document in the set), Registers (one per register), People (worker screening clearance for each key personnel and risk-assessed role as a count, NDIS Worker Orientation Module completion per worker, first-aid where the registration group requires it per `standards.json` evidence), Business (ABN, insurances: public liability, professional indemnity; workers compensation when workers > 1 or structure is company; the exact list comes from the Commission's registration requirements already in `standards.json`; anything not sourced is marked `unverified`), Audit (choose an approved auditor, book the audit, mid-term audit date for certification). Every item carries a `sourceRef` into `standards.json` or the Readyline content data, and a one-line "why" in plain words.
+- FR-1 **Derivation** `deriveChecklist(result)` in `src/lib/checklist/`: items grouped as Documents (one per document in the set), Registers (one per register), People (worker screening clearance for each key personnel and risk-assessed role as a count, NDIS Worker Orientation Module completion per worker, first-aid where the registration group requires it per `standards.json` evidence), Business (ABN, insurances: public liability, professional indemnity; workers compensation when workers > 1 or structure is company; the exact list comes from the Commission's registration requirements already in `standards.json`; anything not sourced is marked `unverified`), Audit (choose an approved auditor, book the audit, mid-term audit date for certification). Every item carries a `sourceRef` into `standards.json` or the Readyline content data, and a one-line "why" in plain words. *(Retro review 15 Oct 2026, finding 3: no first-aid item is derived; nothing in `standards.json` ties first aid to a registration group, see the Dev response.)*
 - FR-2 **Pre-fill** from the questionnaire's "already have" answers: items the provider said they have start as `have`; everything else `need`. Documents in a purchased pack start as `drafted` once generated, and `adopted` when the provider ticks them after review.
-- FR-3 **Page** `/checklist` (signed in; one per assessment): progress line ("14 of 31 items ready"), groups collapsed except the first incomplete one, each item with status (need / in progress / have), a note field (plain text, 500 chars, with the no-participant-data warning from REQ-004 shown once), and the why line. Status and notes persist per account (`checklist_items` table, RLS as REQ-004). Keyboard operable; status is a radio group with the human label as the accessible name (REQ-013 pattern).
+- FR-3 **Page** `/checklist` (signed in; one per account, derived from the saved questionnaire draft; retro review 15 Oct 2026, finding 5): progress line ("14 of 31 items ready"), groups collapsed except the first incomplete one, each item with status (need / in progress / have, shown as Need / In progress / Done since REQ-015; finding 11), a note field (plain text, 500 chars, with the no-participant-data warning from REQ-004 shown once), and the why line. Status and notes persist per account (`checklist_items` table, RLS as REQ-004). Keyboard operable; status is a radio group with the human label as the accessible name (REQ-013 pattern).
 - FR-4 **Print**: a print stylesheet that lists every item with its status and note, the provider's trading name, the date, and the not-legal-advice line.
-- FR-5 **Signed-out**: the result page shows a two-line teaser ("Your checklist has 31 items; sign in to track them") with the sign-in link; no checklist data is created before sign-in.
+- FR-5 **Signed-out**: the result page shows a two-line teaser ("Your checklist has 31 items; sign in to track them") with the sign-in link; no checklist data is created before sign-in. *(Delivered as "Open your checklist (N things)" plus the line "Your checklist has N items: the X above plus Y about your workers, insurance and the audit", batch 45 item 6; retro review finding 6.)*
 - FR-6 **Audit-type specifics**: certification shows the mid-term audit item and the site-visit preparation items (participant interviews consent, worker interview availability); verification shows the desktop-evidence items only.
 
 ## Security and privacy
@@ -22,7 +22,7 @@ In: a per-assessment checklist derived from the result (documents, registers, cl
 
 ## Acceptance criteria
 - AC-1 Unit tests: every document and register in the three reference cases appears exactly once; the People and Business items match the case (sole trader: no workers compensation item; company with 5 workers: present); every item has a `sourceRef`; unverified items are flagged.
-- AC-2 e2e: pre-fill from "already have"; tick an item, reload, it persists; progress line updates; print view renders; android-small and desktop; axe clean; Lighthouse accessibility 100.
+- AC-2 e2e: pre-fill from "already have"; tick an item, reload, it persists; progress line updates; print view renders; android-small and desktop; axe clean; Lighthouse accessibility 100 *(not run for `/checklist` at delivery or since; axe is asserted in the spec; retro review 15 Oct 2026, finding 2)*.
 - AC-3 RLS test passes.
 
 ## Evidence required on delivery
