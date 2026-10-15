@@ -4,6 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    # D-2206: a docs-only commit on main (product/, markdown) runs nothing here;
+    # every pull request still runs the whole workflow whatever it touches.
+    paths-ignore:
+      - "product/**"
+      - "**/*.md"
   pull_request:
 
 concurrency:
