@@ -132,7 +132,6 @@ export const PRODUCTION_REQUIRED: ReadonlyArray<{
       "STRIPE_WEBHOOK_SECRET",
       "STRIPE_PRICE_PACK",
       "PACK_PRICE_AUD_CENTS",
-      "HASH_PEPPER",
     ].includes(v.name),
   ),
   {
@@ -149,29 +148,18 @@ export function isProductionDeployment(
 }
 
 /**
- * The stand-in HMAC key for development, test and CI (retro review of
- * REQ-018 to 021, finding 34; PO decision 34). Never a production value: the
- * production deployment refuses to run without `HASH_PEPPER`.
- */
-export const DEVELOPMENT_HASH_PEPPER =
-  "readyline-development-pepper-not-for-production";
-
-/**
  * `HASH_PEPPER`, the key behind every hashed viewer address and invitation
- * email. Set: its value. Unset on the production deployment: refused, the
- * way the boot check refuses every production variable. Unset anywhere
- * else: the fixed development value, flagged so the caller can warn once.
+ * email (retro review of REQ-018 to 021, finding 34; PO decision 34). Set:
+ * its value. Unset, in any environment: null, and the hashes fall back to
+ * the plain SHA-256 they had before the pepper existed (D-2238); nothing
+ * refuses to start, the launch switchboard's "Hash pepper" row stays red,
+ * and `hashPepper()` logs one warning.
  */
 export function readHashPepper(
   source: Record<string, string | undefined> = process.env,
-): { pepper: string; fallback: boolean } {
+): string | null {
   const value = source.HASH_PEPPER?.trim();
-  if (value) return { pepper: value, fallback: false };
-  if (isProductionDeployment(source))
-    throw new EnvError([
-      "HASH_PEPPER is missing. Set it in .env.local locally; in production it lives in: Vercel project environment variables (server only).",
-    ]);
-  return { pepper: DEVELOPMENT_HASH_PEPPER, fallback: true };
+  return value ? value : null;
 }
 
 const schema = z.object({

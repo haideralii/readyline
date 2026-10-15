@@ -160,7 +160,73 @@ alter table public.incidents
   add column logged_by_ref text check (logged_by_ref is null or logged_by_ref ~ '^W-?[0-9]{1,6}$' or logged_by_ref in ('support worker', 'casual worker', 'team leader', 'volunteer', 'another person present')),
   add column rejected_reason text not null default '' check (char_length(rejected_reason) <= 500 and not public.looks_like_ndis_number(rejected_reason)),
   add column aware_at timestamptz not null default now(),
-  add column aware_on date not null default current_date;
+  add column aware_on date;
+-- Every row that exists was typed by the provider, aware no later than the
+-- day it happened (D-902: early, never late; run 38729625480 showed a
+-- default of today moving notify_by past the occurred date).
+update public.incidents set aware_on = occurred_on where aware_on is null;
+alter table public.incidents alter column aware_on set not null;
+
+-- The trigger that assigns the reference also fills aware_on from the
+-- occurred date when the row does not say (the owner's form always says;
+-- the report link's function sets the submission day). Before-insert
+-- triggers run before the NOT NULL check, so the column needs no default.
+create or replace function public.assign_incident_reference()
+returns trigger
+language plpgsql
+as $$
+begin
+  if new.reference = '' then
+    new.reference := public.next_register_reference(new.account_id, 'incidents');
+  end if;
+  if new.created_by is null then
+    new.created_by := auth.uid();
+  end if;
+  if new.aware_on is null then
+    new.aware_on := new.occurred_on;
+  end if;
+  return new;
+end;
+$$;
+
+-- A worker's own row takes a reference too: the counter admits the worker
+-- role beside members and the server (run 38729625480: 42501 "not a member
+-- of this account" on the worker's insert, because is_member no longer
+-- means a worker).
+create or replace function public.next_register_reference(p_account uuid, p_register text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_next integer;
+  v_prefix text;
+begin
+  if not (
+    public.is_member(p_account)
+    or public.is_worker(p_account)
+    or coalesce(auth.jwt() ->> 'role', '') = 'service_role'
+  ) then
+    raise exception 'not a member of this account' using errcode = '42501';
+  end if;
+  v_prefix := case p_register
+    when 'incidents' then 'INC'
+    when 'complaints' then 'CMP'
+    else null
+  end;
+  if v_prefix is null then
+    raise exception 'unknown register %', p_register;
+  end if;
+  insert into public.register_sequences (account_id, register, next)
+  values (p_account, p_register, 2)
+  on conflict (account_id, register)
+  do update set next = public.register_sequences.next + 1
+  returning public.register_sequences.next - 1 into v_next;
+  return v_prefix || '-' || lpad(v_next::text, 4, '0');
+end;
+$$;
+
 -- The notification clock runs from the later of the event and the day the provider became aware.
 alter table public.incidents drop column notify_by;
 alter table public.incidents

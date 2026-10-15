@@ -54,7 +54,8 @@ describe("the auditor token", () => {
       .digest("hex")
       .slice(0, 16);
     expect(a).not.toBe(plain);
-    expect(hashAddress("203.0.113.9")).not.toBe(plain);
+    // D-2238: without a pepper the hash is the plain SHA-256 it was before.
+    expect(hashAddress("203.0.113.9", null)).toBe(plain);
   });
 });
 
