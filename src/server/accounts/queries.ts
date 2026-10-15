@@ -10,6 +10,7 @@ import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 import { getOwnedAccount, type Account } from "./owned-account";
+import { getWorkerMembership, type WorkerMembership } from "./worker-membership";
 
 export { getOwnedAccount, type Account };
 
@@ -69,6 +70,8 @@ export type Viewer = {
   user: User;
   account: Account | null;
   deleted: DeletedAccount | null;
+  /** REQ-020 FR-4: the account this user logs for as a worker, when they own none. */
+  worker: WorkerMembership | null;
 };
 
 /** The signed-in user and their owned account, or null when signed out; once per request (D-1012). */
@@ -78,5 +81,15 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const supabase = await createSupabaseServerClient();
   const account = await getOwnedAccount(supabase, user.id);
   const deleted = account ? null : await getDeletedAccount(user.id);
-  return { user, account, deleted };
+  let worker: WorkerMembership | null = null;
+  if (!account && !deleted) {
+    let admin: ReturnType<typeof createSupabaseAdminClient> | null = null;
+    try {
+      admin = createSupabaseAdminClient();
+    } catch (e) {
+      if (!(e instanceof SupabaseEnvError)) throw e;
+    }
+    worker = await getWorkerMembership(supabase, admin, user.id);
+  }
+  return { user, account, deleted, worker };
 });

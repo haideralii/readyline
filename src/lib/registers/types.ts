@@ -41,7 +41,16 @@ export const INCIDENT_CATEGORIES_5BD: readonly IncidentCategory[] = [
 export const INCIDENT_SEVERITIES = ["low", "medium", "high"] as const;
 export type IncidentSeverity = (typeof INCIDENT_SEVERITIES)[number];
 
-export const INCIDENT_STATUSES = ["open", "under-review", "closed"] as const;
+/** REQ-020 Session B: a report through the link or by a worker starts as a draft; the owner confirms or rejects it. */
+export const INCIDENT_STATUSES = [
+  "draft",
+  "open",
+  "under-review",
+  "closed",
+  "rejected",
+] as const;
+/** The statuses the owner's form may set (a draft is confirmed on its own screen). */
+export const OWNER_INCIDENT_STATUSES = ["open", "under-review", "closed"] as const;
 export type IncidentStatus = (typeof INCIDENT_STATUSES)[number];
 
 export const INCIDENT_EVENT_KINDS = [
@@ -50,6 +59,10 @@ export const INCIDENT_EVENT_KINDS = [
   "status-change",
   "reportable-flagged",
   "notified",
+  // REQ-020 Session B: the report link's trail.
+  "reported",
+  "confirmed",
+  "rejected",
 ] as const;
 export type IncidentEventKind = (typeof INCIDENT_EVENT_KINDS)[number];
 
@@ -128,6 +141,8 @@ export const REMINDER_KINDS = [
   "support-plan-review",
   "emergency-drill",
   "register-review",
+  // REQ-020 Session B: the owner is nudged while a report waits.
+  "report-to-confirm",
 ] as const;
 export type ReminderKind = (typeof REMINDER_KINDS)[number];
 
@@ -193,10 +208,16 @@ export type IncidentRow = {
   reportable_notified_on: string | null;
   /** The reference the Commission gives back when told; "" until then (batch 45, REQ-018-gated item). */
   commission_reference: string;
-  /** Generated: 24 hours or 5 business days after `occurred_on` by category when reportable; else null. */
+  /** Generated: 24 hours or 5 business days after the later of `occurred_on` and `aware_on`, by category, when reportable; else null. */
   notify_by: string | null;
   status: IncidentStatus;
   closed_on: string | null;
+  /** REQ-020 Session B: who logged it (owner, a worker, or the report link), the code or role of the reporter, the rejection reason, and when the provider became aware. */
+  reported_via: "owner" | "worker" | "link";
+  logged_by_ref: string | null;
+  rejected_reason: string;
+  aware_at: string;
+  aware_on: string;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -220,6 +241,11 @@ export type IncidentInsert = Omit<
   | "closed_on"
   | "participant_ref"
   | "worker_ref"
+  | "reported_via"
+  | "logged_by_ref"
+  | "rejected_reason"
+  | "aware_at"
+  | "aware_on"
 > &
   Partial<
     Pick<
@@ -233,6 +259,9 @@ export type IncidentInsert = Omit<
       | "closed_on"
       | "participant_ref"
       | "worker_ref"
+      | "reported_via"
+      | "logged_by_ref"
+      | "created_by"
     >
   >;
 

@@ -58,9 +58,12 @@ function today() {
 export function IncidentFormView({
   id,
   initial,
+  afterSave,
 }: {
   id?: string;
   initial?: IncidentFormValues;
+  /** REQ-020 FR-4: where a worker lands after saving (the owner lands on the row). */
+  afterSave?: string;
 }) {
   const router = useRouter();
   const [v, setV] = useState<IncidentFormValues>(
@@ -113,7 +116,7 @@ export function IncidentFormView({
         setErrors({ ...(r.fieldErrors ?? {}), form: [r.message] });
         return;
       }
-      router.push(`/registers/incidents/${r.id}?saved=1`);
+      router.push(afterSave ?? `/registers/incidents/${r.id}?saved=1`);
     } finally {
       setPending(false);
     }
