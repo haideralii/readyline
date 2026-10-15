@@ -72,7 +72,11 @@ export type ReminderInput = {
   /** REQ-018 FR-10: every register row with a review date. */
   reviewRows?: {
     id: string;
-    table: "corporate_risks" | "participant_risks" | "conflicts_of_interest";
+    table:
+      | "corporate_risks"
+      | "participant_risks"
+      | "conflicts_of_interest"
+      | "hazards";
     review_on: string;
   }[];
   /** REQ-018 FR-10: the last emergency drill, recorded on the audit-day page. */

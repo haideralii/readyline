@@ -18,6 +18,11 @@ import { loadPathContext } from "@/server/path/state";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import {
+  lastSelfCheck,
+  openSelfCheckFindings,
+} from "@/server/registers/self-check-queries";
+import { selfCheckOffer } from "@/lib/registers/self-check";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { DrillForm } from "./drill-form";
 
@@ -79,6 +84,22 @@ export default async function AuditDayPage() {
   const lastDrill =
     (drill.data as { last_emergency_drill_on: string | null } | null)
       ?.last_emergency_drill_on ?? null;
+  // REQ-020 FR-9: the last walk and its open findings.
+  const [lastWalk, openFindings] = await Promise.all([
+    lastSelfCheck(supabase, viewer.account.id),
+    openSelfCheckFindings(supabase, viewer.account.id),
+  ]);
+  const selfCheck = selfCheckOffer({
+    lastWalkedOn: lastWalk?.walked_on ?? null,
+    lastFindings: lastWalk?.findings ?? 0,
+    openFindings,
+    today: new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Australia/Sydney",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date()),
+  });
   const shown = mergeChecklist({
     checklist: deriveChecklist(ctx.result, ctx.answers, dataset),
     stored,
@@ -250,6 +271,34 @@ export default async function AuditDayPage() {
             </ol>
           </div>
         ))}
+      </section>
+
+      {/* REQ-020 FR-9: the quarterly self-check, offered every three months and on demand. */}
+      <section
+        aria-labelledby="check-heading"
+        className="border-ochre mt-10 rounded-md border p-4 print:hidden"
+        data-testid="audit-day-check"
+        data-due={selfCheck.due ? "true" : "false"}
+      >
+        <h2 id="check-heading" className="text-xl font-semibold">
+          Check my systems
+        </h2>
+        <p
+          className="mt-2 leading-7 print:hidden"
+          data-testid="audit-day-check-line"
+        >
+          {selfCheck.line}
+        </p>
+        <p className="mt-3 print:hidden">
+          {/* Secondary: the page's one primary button is the next step (REQ-017 FR-5). */}
+          <Link
+            href="/path/audit-day/check"
+            className="btn-secondary"
+            data-testid="audit-day-check-start"
+          >
+            {lastWalk ? "Check my systems again" : "Check my systems"}
+          </Link>
+        </p>
       </section>
 
       {/* REQ-018 FR-10: the emergency drill date the reminder counts from. */}

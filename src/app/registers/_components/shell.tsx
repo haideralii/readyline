@@ -39,6 +39,7 @@ export function RegisterPage({
   addHref,
   addLabel,
   exportHref,
+  importHref,
   back,
   children,
 }: {
@@ -48,6 +49,8 @@ export function RegisterPage({
   addHref?: string;
   addLabel?: string;
   exportHref?: string;
+  /** REQ-020 FR-8: the spreadsheet import, shown only while writes are open. */
+  importHref?: string;
   back?: { href: string; label: string };
   children: ReactNode;
 }) {
@@ -100,6 +103,15 @@ export function RegisterPage({
             >
               Export CSV
             </a>
+          ) : null}
+          {canWrite && importHref ? (
+            <Link
+              href={importHref}
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
+              data-testid="register-import"
+            >
+              Import from a spreadsheet
+            </Link>
           ) : null}
         </div>
       ) : null}

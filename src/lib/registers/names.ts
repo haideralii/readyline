@@ -140,6 +140,13 @@ export const RECORD_NAMES: readonly RecordName[] = [
     href: "/registers/onboarding",
   },
   {
+    // REQ-020 FR-7.
+    id: "hazards",
+    name: "Hazard register",
+    aliases: ["hazard and WHS register", "WHS register", "hazards register"],
+    href: "/registers/hazards",
+  },
+  {
     id: "training",
     name: "Training register",
     aliases: ["training records", "training log"],

@@ -143,6 +143,8 @@ export const REMINDER_SUBJECT_TABLES = [
   "participant_risks",
   "corporate_risks",
   "conflicts_of_interest",
+  // REQ-020 FR-7: the hazard register's review date.
+  "hazards",
 ] as const;
 export type ReminderSubjectTable = (typeof REMINDER_SUBJECT_TABLES)[number];
 

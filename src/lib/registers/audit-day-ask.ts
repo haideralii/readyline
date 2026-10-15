@@ -27,7 +27,8 @@ export type AskLine = {
   paper: boolean;
 };
 
-export const ASK_COUNT = 12;
+/** The twelve records of REQ-018 plus the hazard register (REQ-020 FR-7); the pack's own "items to prepare" list stays the twelve. */
+export const ASK_COUNT = 13;
 
 function fromOverview(
   o: { total: number; attention: number; attentionLabel: string },
@@ -109,6 +110,12 @@ export function auditDayAskList(input: {
       id: "delegations",
       ask: "Your delegations register: who acts when you are away",
       ...fromOverview(a.delegations, "/registers/delegations", "Add a role"),
+    },
+    {
+      // REQ-020 FR-7: the hazard register, with its live state.
+      id: "hazards",
+      ask: "Your hazard register: what could hurt someone, what you did, and when you check it again",
+      ...fromOverview(a.hazards, "/registers/hazards", "Add a hazard"),
     },
     {
       id: "insurances",
