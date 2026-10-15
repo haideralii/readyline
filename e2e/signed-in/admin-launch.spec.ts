@@ -4,6 +4,7 @@ import {
   createAdminTenant,
   createTenant,
   deleteTenant,
+  setPlatformAdmin,
   signInContext,
   type TestTenant,
 } from "../helpers/session";
@@ -21,6 +22,11 @@ const STATES = ["set", "unset", "mismatched", "unverified"];
 
 test.describe("the launch switchboard (REQ-022 FR-1)", () => {
   test.skip(!enabled, "needs the Supabase variables");
+  // The admin is raised through SQL on the local stack (D-2210); never against the hosted project.
+  test.skip(
+    !process.env.SUPABASE_DB_URL?.trim(),
+    "needs SUPABASE_DB_URL (the local stack's database, exported by CI's Supabase job)",
+  );
 
   let admin: TestTenant;
   let customer: TestTenant;
@@ -36,7 +42,15 @@ test.describe("the launch switchboard (REQ-022 FR-1)", () => {
   });
 
   test.afterAll(async () => {
-    if (admin) await deleteTenant(admin);
+    if (admin) {
+      // Lowered the way it was raised, before the user goes.
+      try {
+        setPlatformAdmin(admin.userId, false);
+      } catch {
+        // The delete below removes the row either way.
+      }
+      await deleteTenant(admin);
+    }
     if (customer) await deleteTenant(customer);
   });
 
