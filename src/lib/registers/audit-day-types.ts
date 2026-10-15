@@ -88,6 +88,8 @@ export const IMPROVEMENT_SOURCES = [
   "internal-audit",
   "external-audit",
   "other",
+  // REQ-020 FR-9: a "no" in the quarterly self-check.
+  "self-check",
 ] as const;
 export type ImprovementSource = (typeof IMPROVEMENT_SOURCES)[number];
 
@@ -99,6 +101,16 @@ export const IMPROVEMENT_SOURCE_LABELS: Record<ImprovementSource, string> = {
   "internal-audit": "Our own check",
   "external-audit": "The audit",
   other: "Something else",
+  "self-check": "Our quarterly self-check",
+};
+
+/** REQ-020 FR-7: who a hazard could harm. */
+export const HARM_TO = ["participant", "worker", "visitor"] as const;
+export type HarmTo = (typeof HARM_TO)[number];
+export const HARM_TO_LABELS: Record<HarmTo, string> = {
+  participant: "A participant",
+  worker: "A worker",
+  visitor: "A visitor",
 };
 
 export const ONBOARDING_KINDS = ["worker", "participant"] as const;
@@ -113,6 +125,8 @@ export const AUDIT_DAY_REGISTERS = [
   "improvements",
   "staff_matrix",
   "onboarding_checklists",
+  // REQ-020 FR-7.
+  "hazards",
 ] as const;
 export type AuditDayRegister = (typeof AUDIT_DAY_REGISTERS)[number];
 
@@ -122,6 +136,8 @@ export const REGISTER_EVENT_KINDS = [
   "reviewed",
   "updated",
   "closed",
+  // REQ-020 FR-8: one line per row an import wrote.
+  "imported",
 ] as const;
 export type RegisterEventKind = (typeof REGISTER_EVENT_KINDS)[number];
 
@@ -214,6 +230,23 @@ export type InsuranceItemRow = {
   policy_number: string;
   expires_on: string;
   note: string;
+  created_at: string;
+  updated_at: string;
+};
+
+/** REQ-020 FR-7: a hazard, by site or vehicle code. */
+export type HazardRow = {
+  id: string;
+  account_id: string;
+  site_ref: string;
+  hazard: string;
+  harm_to: HarmTo;
+  likelihood: Likelihood;
+  severity: Likelihood;
+  controls: string;
+  due_on: string;
+  done_on: string | null;
+  review_on: string;
   created_at: string;
   updated_at: string;
 };

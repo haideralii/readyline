@@ -50,6 +50,8 @@ async function accountsWithRegisters(
     "participant_risks",
     "corporate_risks",
     "conflicts_of_interest",
+    // REQ-020 FR-7.
+    "hazards",
   ]) {
     const r = await admin.from(table).select("account_id").limit(10_000);
     for (const row of (r.data as { account_id: string }[] | null) ?? [])
@@ -81,7 +83,7 @@ export async function computeAccountReminders(
   today: string,
 ): Promise<ReminderDue[]> {
   // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
-  const [insurance, staff, participants, corporate, conflicts] =
+  const [insurance, staff, participants, corporate, conflicts, hazards] =
     await Promise.all([
       admin
         .from("insurance_items")
@@ -101,6 +103,11 @@ export async function computeAccountReminders(
         .eq("account_id", account.id),
       admin
         .from("conflicts_of_interest")
+        .select("id, review_on")
+        .eq("account_id", account.id),
+      // REQ-020 FR-7: the hazard register's review dates.
+      admin
+        .from("hazards")
         .select("id, review_on")
         .eq("account_id", account.id),
     ]);
@@ -131,6 +138,11 @@ export async function computeAccountReminders(
       ...rows<{ id: string; review_on: string }>(participants).map((r) => ({
         id: r.id,
         table: "participant_risks" as const,
+        review_on: r.review_on,
+      })),
+      ...rows<{ id: string; review_on: string }>(hazards).map((r) => ({
+        id: r.id,
+        table: "hazards" as const,
         review_on: r.review_on,
       })),
     ],
@@ -241,7 +253,9 @@ async function referenceFor(
               ? "area"
               : r.subject_table === "conflicts_of_interest"
                 ? "who_ref"
-                : "reference";
+                : r.subject_table === "hazards"
+                  ? "site_ref"
+                  : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)

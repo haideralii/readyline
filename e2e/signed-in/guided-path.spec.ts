@@ -478,10 +478,10 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       /download\?file=set\.zip$/,
     );
     await expect(page.getByTestId("audit-day-pack")).toContainText("(adopted)");
-    // REQ-018 FR-11, AC-4: the twelve records with live states, and the five audit kinds in plain words.
+    // REQ-018 FR-11, AC-4: the twelve records with live states, and the five audit kinds in plain words; REQ-020 FR-7 adds the hazard register.
     await expect(
       page.getByTestId("audit-day-ask").getByRole("listitem"),
-    ).toHaveCount(12);
+    ).toHaveCount(13);
     await expect(page.getByTestId("ask-document-control")).toHaveAttribute(
       "data-state",
       /filled|missing|overdue/,

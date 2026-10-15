@@ -126,6 +126,23 @@ export default async function IncidentPage({
         </p>
       ) : null}
       {ctx.canWrite && r.status !== "rejected" ? (
+        // REQ-020 FR-7: a hazard behind the incident goes to the hazard register in one tap.
+        <p
+          className="mt-3 rounded-md border border-zinc-300 p-3 text-sm leading-6 dark:border-zinc-700"
+          data-testid="hazard-offer"
+        >
+          Was a hazard behind this?{" "}
+          <Link
+            href="/registers/hazards/new"
+            className="underline underline-offset-2"
+            data-testid="hazard-link"
+          >
+            Add it to the hazard register
+          </Link>
+          .
+        </p>
+      ) : null}
+      {ctx.canWrite && r.status !== "rejected" ? (
         <p className="mt-5">
           <Link
             href={`/registers/incidents/${r.id}/edit`}

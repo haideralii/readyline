@@ -16,6 +16,9 @@ import {
   AUDIT_DAY_TEXT_CAPS,
   DELEGATION_ROLES,
   DELEGATION_ROLE_LABELS,
+  HARM_TO,
+  HARM_TO_LABELS,
+  type HazardRow,
   IMPROVEMENT_SOURCES,
   IMPROVEMENT_SOURCE_LABELS,
   INSURANCE_KINDS,
@@ -139,6 +142,71 @@ export const CORPORATE_RISK_FIELDS: FieldSpec[] = [
     help: "A role, never a person: Owner, Director, Team leader.",
     maxLength: AUDIT_DAY_TEXT_CAPS.role,
   },
+  { name: "review_on", label: "Review by", kind: "date" },
+];
+
+/* ---------- REQ-020 FR-7 hazards ---------- */
+
+const SEVERITY_LABELS = {
+  low: "Low: first aid at most",
+  medium: "Medium: medical treatment or time off",
+  high: "High: serious injury or worse",
+} as const;
+
+export const HazardForm = strictObject({
+  site_ref: refField(/^[A-Z]{1,3}-?[0-9]{1,6}$/, "S-01 or V-02"),
+  hazard: safeText(AUDIT_DAY_TEXT_CAPS.short, 1, "Say what the hazard is"),
+  harm_to: z.enum(HARM_TO, { error: "Choose who it could harm" }),
+  likelihood: z.enum(LIKELIHOODS, { error: "Choose how likely it is" }),
+  severity: z.enum(LIKELIHOODS, { error: "Choose how serious it could be" }),
+  controls: safeText(AUDIT_DAY_TEXT_CAPS.long, 1, "Say what you did about it"),
+  due_on: dateField("done-by date"),
+  done_on: optionalDate("date it was done"),
+  review_on: dateField("review date"),
+});
+export const HAZARD_FIELDS: FieldSpec[] = [
+  {
+    name: "site_ref",
+    label: "Where",
+    kind: "ref",
+    hint: "S-01 or V-02",
+    help: "A code for the site or the vehicle, never an address. Keep the list of what each code means in your own records.",
+  },
+  {
+    name: "hazard",
+    label: "The hazard",
+    kind: "textarea",
+    maxLength: AUDIT_DAY_TEXT_CAPS.short,
+    rows: 3,
+  },
+  {
+    name: "harm_to",
+    label: "Who it could harm",
+    kind: "select",
+    options: opts(HARM_TO, HARM_TO_LABELS),
+  },
+  {
+    name: "likelihood",
+    label: "How likely",
+    kind: "select",
+    options: opts(LIKELIHOODS, LIKELIHOOD_LABELS),
+  },
+  {
+    name: "severity",
+    label: "How serious",
+    kind: "select",
+    options: opts(LIKELIHOODS, SEVERITY_LABELS),
+  },
+  {
+    name: "controls",
+    label: "What we did",
+    kind: "textarea",
+    help: "The fix, the sign, the training, the new habit.",
+    maxLength: AUDIT_DAY_TEXT_CAPS.long,
+    rows: 4,
+  },
+  { name: "due_on", label: "Done by", kind: "date" },
+  { name: "done_on", label: "Done on", kind: "date", optional: true },
   { name: "review_on", label: "Review by", kind: "date" },
 ];
 
@@ -536,6 +604,8 @@ export const AUDIT_DAY_SLUGS = [
   "decisions",
   "staff-matrix",
   "onboarding",
+  // REQ-020 FR-7.
+  "hazards",
 ] as const;
 export type AuditDaySlug = (typeof AUDIT_DAY_SLUGS)[number];
 
@@ -611,6 +681,26 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
   } satisfies RegisterMeta<Statused<CorporateRiskRow>>,
+  hazards: {
+    slug: "hazards",
+    table: "hazards",
+    view: "hazards_status",
+    title: "Hazards",
+    singular: "hazard",
+    intro:
+      "One row per hazard to a participant, a worker or a visitor: where it is (a code for the site or vehicle), what you did about it, by when, and a review date. Auditors look for the fix and the date, not the form. If a hazard was behind an incident, add it from the incident.",
+    addLabel: "Add a hazard",
+    empty:
+      "No hazards yet. Walk your sites and vehicles once and add what you find; a trip hazard, a hot surface, a loose rail.",
+    fields: HAZARD_FIELDS,
+    schema: HazardForm,
+    filters: REVIEW_FILTERS,
+    titleOf: (r) => `${r.site_ref}: ${r.hazard}`,
+    detailOf: (r) =>
+      `Could harm ${HARM_TO_LABELS[r.harm_to].toLowerCase()}. ${r.likelihood[0].toUpperCase()}${r.likelihood.slice(1)} likelihood, ${r.severity} severity. ${r.done_on ? `Done ${r.done_on}.` : `Due ${r.due_on}.`}`,
+    statusOf: (r) => reviewTag(r.status, r.review_on),
+    orderBy: { column: "review_on", ascending: true },
+  } satisfies RegisterMeta<Statused<HazardRow>>,
   "participant-risks": {
     slug: "participant-risks",
     table: "participant_risks",

@@ -46,6 +46,8 @@ const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
 /** The REQ-018 registers you keep current: a date changes, the row changes. */
 const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
   "corporate-risks",
+  // REQ-020 FR-7.
+  "hazards",
   "participant-risks",
   "conflicts-of-interest",
   "delegations",
