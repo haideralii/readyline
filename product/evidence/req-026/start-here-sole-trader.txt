@@ -1,0 +1,195 @@
+Your audit: verification (an auditor checks your documents at a desk; nobody visits).
+15 documents and 5 registers.
+A document counts when it is filled in, read, and adopted.
+About how long: most documents take 15 to 30 minutes to fill in and read; the self-assessment about an hour.
+The owner's name, role and the approval date fill in from your account and on adoption.
+If a blank does not apply to you, write "not applicable" and why; do not delete the line.
+self-assessment: the form where you say how you meet each rule.
+adopt: sign and date a document so it is yours.
+You have 5 things to fill in across 3 documents.
+1. Governance policy: Who decides what; read first.
+2. Risk management policy and register: Every other document points here.
+3. Continuity of supports plan: What happens if you cannot.
+4. Conflict of interest policy: Auditors ask on day one.
+5. Privacy and information management policy: Participant information, the law behind it.
+6. Records management policy: Where every record lives.
+7. Complaints management policy, procedure and register: A Rules requirement with a register.
+8. Incident management policy, procedure and register: A Rules requirement with a register.
+9. Emergency and disaster management plan: Required since the 2021 changes.
+1. Governance policy (about 30 minutes; 0 to fill in, 0 to review)
+Open: governance-policy.docx
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 7, Our structure and delegations (generic text: add your details)
+Read once: fixed text in sections 3, 8 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+2. Risk management policy and register (about 30 minutes; 0 to fill in, 0 to review)
+Open: risk-management-policy-and-register.docx
+☐ Fill in Word: Section 8, Risk register: [Owner] (fill this in Word)
+☐ Fill in Word: Section 8, Risk register: [Risk] (fill this in Word)
+☐ Fill in Word: Section 8, Risk register: [Low / Medium / High] (fill this in Word)
+☐ Fill in Word: Section 8, Risk register: [Treatment] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 7, Risk areas we manage (generic text: add your details)
+Read once: fixed text in sections 3, 8 to 11.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+3. Continuity of supports plan (about 25 minutes; 0 to fill in, 0 to review)
+Open: continuity-of-supports-plan.docx
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Our services and where we deliver them (generic text: add your details)
+☐ Make it yours: Section 3, Scenarios we plan for (generic text: add your details)
+☐ Make it yours: Section 4, What we will do (generic text: add your details)
+☐ Make it yours: Section 5, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 6, Cover for the provider's own absence (generic text: add your details)
+Read once: fixed text in sections 7 to 9.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+4. Conflict of interest policy (about 20 minutes; 0 to fill in, 0 to review)
+Open: conflict-of-interest-policy.docx
+☐ Fill in Word: Section 7, Declaring a conflict: [Name and role] (fill this in Word)
+☐ Fill in Word: Section 7, Declaring a conflict: [nature of the conflict] (fill this in Word)
+☐ Fill in Word: Section 7, Declaring a conflict: [Steps agreed] (fill this in Word)
+☐ Fill in Word: Section 7, Declaring a conflict: [Review date] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+Read once: fixed text in sections 3, 7 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+5. Privacy and information management policy (about 30 minutes; 3 to fill in, 0 to review)
+Open: privacy-and-information-management-policy.docx
+☐ Fill in: Appendix: AI and digital tools: [other tool]
+☐ Fill in: Appendix: AI and digital tools: [allowed use]
+☐ Fill in: Appendix: AI and digital tools: [limits]
+☐ Fill in Word: Section 7, Consent form: [Yes / No] (fill this in Word)
+☐ Fill in Word: Section 7, Consent form: [Notes] (fill this in Word)
+☐ Fill in Word: Section 7, Consent form: [Who] (fill this in Word)
+☐ Fill in Word: Section 7, Consent form: [Purpose] (fill this in Word)
+☐ Fill in Word: Section 7, Consent form: [Tools] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+Read once: fixed text in sections 3, 7 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+6. Records management policy (about 20 minutes; 0 to fill in, 0 to review)
+Open: records-management-policy.docx
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+Read once: fixed text in sections 3, 7 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+7. Complaints management policy, procedure and register (about 25 minutes; 1 to fill in, 0 to review)
+Open: complaints-management-policy-and-register.docx
+☐ Fill in: Section 8, Complaints register: [Action and outcome]
+☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
+☐ Fill in Word: Section 8, Complaints register: [Code] (fill this in Word)
+☐ Fill in Word: Section 8, Complaints register: [Summary] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 7, Complaints procedure (generic text: add your details)
+Read once: fixed text in sections 3, 8 to 11.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+8. Incident management policy, procedure and register (about 30 minutes; 1 to fill in, 0 to review)
+Open: incident-management-policy-and-register.docx
+☐ Fill in: Section 9, Incident register: [Action and outcome]
+☐ Fill in Word: Section 9, Incident register: [Code] (fill this in Word)
+☐ Fill in Word: Section 9, Incident register: [Summary] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 8, Incident procedure (generic text: add your details)
+Read once: fixed text in sections 3, 7, 9 to 12.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+9. Emergency and disaster management plan (about 25 minutes; 0 to fill in, 0 to review)
+Open: emergency-and-disaster-management-plan.docx
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Our services and where we deliver them (generic text: add your details)
+☐ Make it yours: Section 3, Scenarios we plan for (generic text: add your details)
+☐ Make it yours: Section 4, What we will do (generic text: add your details)
+☐ Make it yours: Section 5, Responsibilities (generic text: add your details)
+Read once: fixed text in sections 6 to 8.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+10. Worker screening and recruitment procedure (about 25 minutes; 0 to fill in, 0 to review)
+Open: worker-screening-and-recruitment-procedure.docx
+☐ Fill in Word: Section 6, Worker screening clearance register: [NDIS worker screening clearance] (fill this in Word)
+☐ Fill in Word: Section 6, Worker screening clearance register: [Number] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, When this procedure applies (generic text: add your details)
+☐ Make it yours: Section 3, Steps (generic text: add your details)
+☐ Make it yours: Section 4, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 5, Our risk-assessed roles (generic text: add your details)
+Read once: fixed text in sections 6 to 9.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+11. Induction and training procedure and register (about 25 minutes; 0 to fill in, 0 to review)
+Open: induction-and-training-procedure-and-register.docx
+☐ Fill in Word: Section 6, Training register: [other training] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, When this procedure applies (generic text: add your details)
+☐ Make it yours: Section 3, Steps (generic text: add your details)
+☐ Make it yours: Section 4, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 5, Training we require (generic text: add your details)
+Read once: fixed text in sections 6 to 9.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+12. NDIS Code of Conduct acknowledgement (about 10 minutes; 0 to fill in, 0 to review)
+Open: code-of-conduct-acknowledgement.docx
+☐ Make it yours: Section 1, Why we ask you to sign this (generic text: add your details)
+☐ Make it yours: Section 3, What this means in our work (generic text: add your details)
+Read once: fixed text in sections 2, 4 to 6.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+13. Service agreement template (about 20 minutes; 0 to fill in, 0 to review)
+Open: service-agreement-template.docx
+☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
+☐ Make it yours: Section 2, Parties (generic text: add your details)
+☐ Make it yours: Section 3, Agreement terms (generic text: add your details)
+☐ Make it yours: Section 4, Easy-read summary (generic text: add your details)
+Read once: fixed text in sections 1, 5 to 7.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+14. Participant rights, choice and control policy (about 20 minutes; 0 to fill in, 0 to review)
+Open: participant-rights-and-choice-policy.docx
+☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 7, How we communicate and record preferences (generic text: add your details)
+Read once: fixed text in sections 3, 8 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+15. Safeguarding policy (about 25 minutes; 0 to fill in, 0 to review)
+Open: safeguarding-policy.docx
+☐ Make it yours: Section 1, Purpose (generic text: add your details)
+☐ Make it yours: Section 2, Scope (generic text: add your details)
+☐ Make it yours: Section 4, Policy statement (generic text: add your details)
+☐ Make it yours: Section 5, How we put this into practice (generic text: add your details)
+☐ Make it yours: Section 6, Responsibilities (generic text: add your details)
+☐ Make it yours: Section 7, Responding to an allegation (generic text: add your details)
+Read once: fixed text in sections 3, 8 to 10.
+☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
+Incident register: What happened, what you did, whether the Commission was told.
+Where: the template in your Risk management policy and register.
+Complaints register: Every complaint, how it was handled and resolved.
+Where: the template in your Risk management policy and register.
+Worker screening clearance register: Each worker's screening check and when it expires.
+Where: the template in your Worker screening and recruitment procedure.
+Training register: Who was inducted and trained, and when.
+Where: the template in your Induction and training procedure and register.
+Policy review register: When each document was adopted and is next reviewed.
+Where: the template in your Governance policy.
+Tick off your readiness checklist: /checklist
+See what the auditor asks for on the day: /path/audit-day

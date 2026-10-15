@@ -14,6 +14,9 @@ import {
   listLatestDocuments,
 } from "@/server/generation/queries";
 import { DOCX_TYPE } from "@/server/generation/run";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
+import { renderStartHere } from "@/server/generation/start-here";
+import { startHereForSet } from "@/server/generation/start-here-set";
 import { isOwnedPath, signedDownloadUrl } from "@/server/generation/storage";
 import { isSetLocked } from "@/server/payments/queries";
 import { isDocumentAdopted as isAdopted } from "@/server/registers/queries";
@@ -55,6 +58,21 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 });
 
   let path = `${set.account_id}/${set.id}/${query.data.file}`;
+  // REQ-026 FR-1, FR-5: the Start here sheet is rendered fresh from the set's
+  // models on every download, so a blank filled since the zip reads done.
+  if (query.data.file === START_HERE_FILE) {
+    const built = await startHereForSet(supabase, set);
+    if (!built) return new NextResponse("Not found", { status: 404 });
+    const bytes = await renderStartHere(built);
+    return new NextResponse(new Uint8Array(bytes), {
+      status: 200,
+      headers: {
+        "Content-Type": DOCX_TYPE,
+        "Content-Disposition": `attachment; filename="${START_HERE_FILE}"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
   if (query.data.file.endsWith(".docx")) {
     // Serve the latest version of that document, which may be a regenerated file.
     const docs = await listLatestDocuments(supabase, set.id);

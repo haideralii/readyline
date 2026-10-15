@@ -38,6 +38,8 @@ import {
   type SectionLog,
 } from "./run";
 import { objectPath } from "./storage";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
+import { renderStartHere, startHereFromRows } from "./start-here";
 import type { DocumentVersionRow, GenerationStore } from "./store";
 
 /** "attention" (REQ-021 S4, D-2101): every document was tried, one or more need another go, and the owner decides. */
@@ -658,6 +660,19 @@ export async function runGenerationTick(input: {
       "application/pdf",
     );
     const entries: Record<string, Uint8Array> = {};
+    // REQ-026 FR-1: the Start here sheet first in the zip (fflate keeps insertion order).
+    const startHere = startHereFromRows({
+      set: { derived_result: result, created_at: generatedAt },
+      first: docs,
+      latest: docs,
+      adopted: new Set(),
+      subscribed: false,
+      summaryVersion: "1",
+    });
+    if (startHere)
+      entries[START_HERE_FILE] = new Uint8Array(
+        await renderStartHere(startHere),
+      );
     for (const d of docs)
       entries[`${d.document_type_id}.docx`] = await store.getObject(
         d.storage_path,
