@@ -22,7 +22,8 @@ export async function registerContext(next: string): Promise<RegisterContext> {
   const viewer = await getViewer();
   if (!viewer) redirect(`/sign-in?next=${encodeURIComponent(next)}`);
   if (viewer.deleted) redirect("/account/deleted");
-  if (!viewer.account) redirect("/account/setup");
+  // REQ-020 FR-4, AC-3: a worker has a home of their own and no register list.
+  if (!viewer.account) redirect(viewer.worker ? "/worker" : "/account/setup");
   const supabase = await createSupabaseServerClient();
   const canWrite = await hasActiveSubscription(supabase, viewer.account.id);
   return {

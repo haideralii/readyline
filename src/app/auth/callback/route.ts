@@ -14,8 +14,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
 import { getDeletedAccount, getOwnedAccount } from "@/server/accounts/queries";
+import { getWorkerMembership } from "@/server/accounts/worker-membership";
 import { decideCallback } from "@/server/auth/callback";
 import { safeNextPath } from "@/server/auth/paths";
+import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -74,7 +76,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/account/deleted", url.origin));
     }
   }
-  const destination = account ? safeNextPath(decision.next) : "/account/setup";
+  // REQ-020 FR-4: a worker lands on their home; a user following an
+  // invitation goes back to it to accept, with no account of their own.
+  const next = safeNextPath(decision.next);
+  let destination: string;
+  if (account) destination = next;
+  else if (next.startsWith("/invite/")) destination = next;
+  else {
+    let admin: ReturnType<typeof createSupabaseAdminClient> | null = null;
+    try {
+      admin = createSupabaseAdminClient();
+    } catch (e) {
+      if (!(e instanceof SupabaseEnvError)) throw e;
+    }
+    const worker = await getWorkerMembership(supabase, admin, user.id);
+    destination = worker ? "/worker" : "/account/setup";
+  }
   log.info("auth.callback.ok", {
     userId: user.id,
     hasAccount: Boolean(account),

@@ -209,12 +209,14 @@ export async function registerOverview(
     notAdopted: number;
   };
 }> {
-  const [i, c, w, p] = await Promise.all([
+  const [all, c, w, p] = await Promise.all([
     listIncidents(supabase, accountId),
     listComplaints(supabase, accountId),
     listWorkerChecks(supabase, accountId),
     listPolicyReviews(supabase, accountId),
   ]);
+  // REQ-020 FR-5: a report counts in the register only once the owner confirms it; a rejected one never does.
+  const i = all.filter((x) => x.status !== "draft" && x.status !== "rejected");
   return {
     incidents: {
       total: i.length,
