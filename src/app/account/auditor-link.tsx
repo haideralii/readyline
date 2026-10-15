@@ -38,7 +38,11 @@ export function AuditorLinkPanel({
       hour: "numeric",
       minute: "2-digit",
     }).format(new Date(iso));
-  const live = current && !(revoked && revoked.ok);
+  // Live unless the link the server shows is the one this panel just revoked;
+  // the create and revoke actions revalidate the page, so `current` follows them.
+  const live =
+    current &&
+    !(revoked && revoked.ok && "id" in revoked && revoked.id === current.id);
   return (
     <div data-testid="auditor-link-panel">
       {created && created.ok && "url" in created ? (
