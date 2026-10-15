@@ -118,6 +118,52 @@ export default async function GuidePage({
           Commission&apos;s pages.
         </p>
       ) : null}
+      {/* Batch 49 item 5 (REQ-025 D-2218): the answer in three lines first, then where each section is. */}
+      <section
+        aria-labelledby="short-answer-heading"
+        className="border-ochre mt-6 rounded-md border p-4"
+        data-testid="guide-short-answer"
+      >
+        <h2
+          id="short-answer-heading"
+          className="text-lg font-semibold tracking-tight"
+        >
+          Short answer
+        </h2>
+        <ul className="mt-2 list-disc space-y-1 pl-5 leading-7">
+          {g.shortAnswer.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+      <nav
+        aria-label="Jump to"
+        className="mt-4 text-sm"
+        data-testid="guide-jump-to"
+      >
+        <span className="font-medium">Jump to: </span>
+        <ul className="inline">
+          {[
+            ...g.headings,
+            ...(g.faq.length
+              ? [{ id: "faq-heading", text: "Questions people ask" }]
+              : []),
+            ...(g.sources.length
+              ? [{ id: "sources-heading", text: "Sources" }]
+              : []),
+          ].map((h, i) => (
+            <li key={h.id} className="inline">
+              {i > 0 ? <span aria-hidden="true">, </span> : null}
+              <a
+                href={`#${h.id}`}
+                className="inline-flex min-h-11 items-center underline underline-offset-4"
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
       <Markdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
         {before}
       </Markdown>

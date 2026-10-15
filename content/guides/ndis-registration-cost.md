@@ -5,6 +5,7 @@ description: "What NDIS provider registration costs in 2026-27 for a sole trader
 updated: 2026-10-13
 reviewed: 2026-10-13
 owner: po
+shortAnswer: "There is no Commission application fee; you pay the auditor you choose. | A verification audit costs less than a certification audit, which includes a site visit. | Documents and consultants are the other costs; the calculator below gives your own number."
 status: draft (Dev first draft, 13 Oct 2026; every figure carries its source and date; the PO checks the UNVERIFIED lines)
 ---
 
@@ -50,7 +51,9 @@ Auditors quote per provider, so your own quotes will differ. Get at least two.
 
 ### Is there a fee to apply to the Commission?
 
-The Commission does not charge an application fee. You pay the approved quality auditor you choose; the Commission does not set audit prices. (Source: the Australian Government's ABLIS entry for NDIS provider registration, https://ablis.business.gov.au/service/ag/ndis-provider-registration/40940, read 13 October 2026. That is a government page rather than the Commission's own, which does not mention a fee either way.)
+The Commission does not charge an application fee. You pay the approved quality auditor you choose; the Commission does not set audit prices.
+
+(Source: the Australian Government's ABLIS entry for NDIS provider registration, https://ablis.business.gov.au/service/ag/ndis-provider-registration/40940, read 13 October 2026. That is a government page rather than the Commission's own, which does not mention a fee either way.)
 
 ### Why do audit quotes vary so much?
 

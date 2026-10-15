@@ -1,4 +1,5 @@
 import { isValidElement, type ReactNode } from "react";
+import { slugify } from "@/lib/text/slug";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { draftNote, formatUpdated, type LegalPage } from "@/lib/legal/pages";
@@ -52,13 +53,6 @@ function textOf(node: ReactNode): string {
   if (isValidElement<{ children?: ReactNode }>(node))
     return textOf(node.props.children);
   return "";
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 const body = "leading-7 text-zinc-700 dark:text-zinc-300";

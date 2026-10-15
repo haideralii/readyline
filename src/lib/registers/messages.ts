@@ -6,6 +6,12 @@
 export const LAPSE_MESSAGE =
   "Your subscription has lapsed; your records are safe and read-only. Renew to add to them.";
 
+/** Batch 49 item 2 (from the pricing card; REQ-018 FR-12): what the registers do that a spreadsheet does not. */
+export const REGISTERS_LINKED_LINE =
+  "The registers are linked: an incident becomes an improvement row, a worker check becomes a staff matrix row, and the reminders go out by email, which a spreadsheet does not do.";
+export const RENEWAL_SAVES_LINE =
+  "At the mid-term audit and at renewal the registers are already the evidence, so there is nothing to rebuild from paper.";
+
 export function plainDatabaseMessage(error: {
   code?: string;
   message?: string;
