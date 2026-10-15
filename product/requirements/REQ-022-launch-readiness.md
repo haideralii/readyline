@@ -107,4 +107,12 @@ Assumptions for Session A, recorded in `DECISIONS.md` as Dev decisions when buil
 
 ## Delivery evidence
 
-Not started.
+**Session A (Dev, 15 Oct 2026)** on `req-022-launch-readiness` d8dd643, PR to `next` (body: `product/evidence/req-022/pr-body-session-a.md`).
+
+- AC mapping: AC-1 → `src/lib/ops/launch.test.ts` (every row and state over fixed facts; the no-secrets marker test; LAUNCH.md names every row) and `e2e/signed-in/admin-launch.spec.ts` (three projects: every row has a valid state, the CI stack's expected states, no secret in the HTML, the visit audited, 404 for a non-admin session) plus `e2e/admin.spec.ts` (anonymous 404); the green-everywhere half of AC-1 is the preview pass in LAUNCH.md step 24 (manual). AC-2 → `src/lib/payments/live-guards.test.ts` (every condition and combination) and `src/lib/payments/price-startup.test.ts` (the boot verdict over an injected Price reader; the refusal store); the routes' behaviour is by construction (`paymentRefusal()` read by the three actions and the webhook; `generationProblems()` by the generate job). FR-2 → `scripts/ops/launch-check.test.ts` (the helpers); the script itself runs in LAUNCH.md step 21 against the domain. FR-4 → the LAUNCH.md test.
+- `npm run check`: green (119 files, 854 tests, 6 skipped); 34 new tests.
+- CI: the pull request's run once it is opened (public job, Supabase job with the admin e2e).
+- Screenshots at 360 px and desktop: owed; red from the Supabase job's evidence upload once the spec saves them (with Session B's push), green from the preview pass.
+- Accessibility: the page uses the admin page's structure (headings, lists, text); the signed-in accessibility pass does not cover admin pages (no admin fixture there); manual keyboard pass owed with the screenshots.
+- Negative and edge cases executed: no Stripe key, fake mode, test key, live key with each fault, permission-denied and not-found Price reads, a root commit for the ignored-build script (batch 46), an unreadable legal date, a job older than its window.
+- UNVERIFIED or deferred: the SES and Supabase SMTP specifics in the Dev response are from vendor documentation as known, to be confirmed in Session B; the "Supabase Site URL and redirects" row is by design never verified from the app.
