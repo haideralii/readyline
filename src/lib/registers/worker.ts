@@ -28,6 +28,12 @@ export type ReporterRole = (typeof REPORTER_ROLES)[number];
 export const INVITATION_DAYS = 7;
 export const DRAFT_LIMIT = 10;
 export const AWARE_HOURS = 24;
+/** FR-5: ten reports an hour per address, fifty a day per account (SR-4). Kept here because a "use server" module may export async functions only (run 38750817767). */
+export const REPORT_LIMIT = { limit: 10, windowSeconds: 3600 } as const;
+export const REPORT_ACCOUNT_LIMIT = {
+  limit: 50,
+  windowSeconds: 86_400,
+} as const;
 
 export const EMERGENCY_LINE = "If someone is in danger now, call 000 first.";
 export const WORKER_HOME_LINE =
