@@ -257,19 +257,17 @@ async function referenceFor(
     r.subject_table === "worker_clearances" ||
     r.subject_table === "staff_matrix"
       ? "worker_ref"
-      : r.subject_table === "policy_reviews"
-        ? "document_type_id"
-        : r.subject_table === "insurance_items"
-          ? "label"
-          : r.subject_table === "participant_risks"
-            ? "participant_ref"
-            : r.subject_table === "corporate_risks"
-              ? "area"
-              : r.subject_table === "conflicts_of_interest"
-                ? "who_ref"
-                : r.subject_table === "hazards"
-                  ? "site_ref"
-                  : "reference";
+      : r.subject_table === "insurance_items"
+        ? "label"
+        : r.subject_table === "participant_risks"
+          ? "participant_ref"
+          : r.subject_table === "corporate_risks"
+            ? "area"
+            : r.subject_table === "conflicts_of_interest"
+              ? "who_ref"
+              : r.subject_table === "hazards"
+                ? "site_ref"
+                : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)
