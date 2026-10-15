@@ -11,6 +11,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { CSV_COLUMNS } from "@/lib/registers/csv";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
 
 const enabled = hasSupabaseEnv();
@@ -122,6 +123,31 @@ describe.skipIf(!enabled)(
         .select("status, closed_on");
       expect(up.error).toBeNull();
       expect(up.data).toEqual([{ status: "closed", closed_on: "2026-10-12" }]);
+      // Batch 45 item 30: the Commission reference round-trips through the
+      // status view the pages and the export read (migration 20261015030000).
+      const ref = await a.client
+        .from("incidents")
+        .update({ reportable: true, commission_reference: "REF-2026/14" })
+        .eq("account_id", a.accountId)
+        .eq("reference", "INC-0001");
+      expect(ref.error).toBeNull();
+      const viaView = await a.client
+        .from("incidents_status")
+        .select("reference, commission_reference")
+        .eq("account_id", a.accountId)
+        .eq("reference", "INC-0001")
+        .single();
+      expect(viaView.error).toBeNull();
+      expect(viaView.data).toEqual({
+        reference: "INC-0001",
+        commission_reference: "REF-2026/14",
+      });
+      const bad = await a.client
+        .from("incidents")
+        .update({ commission_reference: "430123456" })
+        .eq("account_id", a.accountId)
+        .eq("reference", "INC-0001");
+      expect(bad.error?.code).toBe("23514");
     });
 
     it("references are per account, in order, and distinct under two concurrent inserts", async () => {
@@ -358,19 +384,42 @@ describe.skipIf(!enabled)(
         worker_ref: "W-2",
         role_label: "director",
         clearance_kind: "ndis-worker-screening",
+        clearance_number: "WWC1234567",
         issued_on: "2021-11-01",
         expires_on: new Date(Date.now() + 30 * 86_400_000)
           .toISOString()
           .slice(0, 10),
       });
       expect(soon.error).toBeNull();
+      // Batch 45 (PR #56): the view must carry the column added after it was
+      // created (migration 20261015030000), or the list and CSV read it empty.
       const view = await a.client
         .from("worker_clearances_status")
-        .select("worker_ref, status")
+        .select("worker_ref, status, clearance_number")
         .eq("account_id", a.accountId)
         .order("worker_ref");
       expect(view.error).toBeNull();
-      expect(view.data).toEqual([{ worker_ref: "W-2", status: "expiring" }]);
+      expect(view.data).toEqual([
+        {
+          worker_ref: "W-2",
+          status: "expiring",
+          clearance_number: "WWC1234567",
+        },
+      ]);
+      // Every column the CSV export writes exists on the view it reads from;
+      // a column added to the table without recreating the view fails here.
+      for (const [viewName, columns] of [
+        ["worker_clearances_status", CSV_COLUMNS.worker_clearances],
+        ["incidents_status", CSV_COLUMNS.incidents],
+        ["policy_reviews_status", CSV_COLUMNS.policy_reviews],
+      ] as const) {
+        const all = await a.client
+          .from(viewName)
+          .select(columns.join(","))
+          .eq("account_id", a.accountId)
+          .limit(1);
+        expect(all.error, viewName).toBeNull();
+      }
       const review = await a.client
         .from("policy_reviews")
         .insert({

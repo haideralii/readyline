@@ -33,7 +33,7 @@ export default async function WorkerChecksPage() {
   return (
     <RegisterPage
       title="Worker checks"
-      intro="Each worker's screening and other checks by code and expiry. We keep the kind and the date, never the check number or the name."
+      intro="Each worker's screening and other checks by code and expiry. We keep the kind, the dates and the check number, never the name."
       canWrite={ctx.canWrite}
       addHref="/registers/worker-checks/new"
       addLabel="Add a check"
