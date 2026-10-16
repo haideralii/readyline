@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 /*
- * Readyline identity v1 (REQ-014; product/domain/brand.md). Tokens live on
+ * Readyline identity v1 (REQ-014; product/domain/brand.md) and the REQ-028
+ * tokens (D-2802: surface, rule, line, track and the two washes). Tokens live on
  * :root with dark equivalents under prefers-color-scheme (unless the page
  * opts into light with data-theme="light") and under data-theme="dark".
  * src/lib/theme/tokens.ts declares the same values; a test keeps them equal
@@ -16,32 +17,50 @@
   --moss: #2f6b4f;
   --signal: #9a2b2b;
   --sky: #dce8e6;
+  --surface: #fffdf9;
+  --rule: #d4ccbf;
+  --line: #74807d;
+  --track: #cfc7b9;
+  --signal-wash: #f3e4e2;
+  --ochre-wash: #f6e6dc;
   --background: var(--paper);
   --foreground: var(--ink);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #141c1b;
-    --mist: #1f2a28;
+    --paper: #1b2422;
+    --mist: #27322f;
     --ink: #f1ede6;
     --slate: #b8c0bd;
     --ochre: #e0734a;
     --moss: #6fbf95;
     --signal: #e07a7a;
     --sky: #1e3330;
+    --surface: #222d2a;
+    --rule: #34403d;
+    --line: #737f7c;
+    --track: #3a4442;
+    --signal-wash: #33201f;
+    --ochre-wash: #3a2a22;
   }
 }
 
 :root[data-theme="dark"] {
-  --paper: #141c1b;
-  --mist: #1f2a28;
+  --paper: #1b2422;
+  --mist: #27322f;
   --ink: #f1ede6;
   --slate: #b8c0bd;
   --ochre: #e0734a;
   --moss: #6fbf95;
   --signal: #e07a7a;
   --sky: #1e3330;
+  --surface: #222d2a;
+  --rule: #34403d;
+  --line: #737f7c;
+  --track: #3a4442;
+  --signal-wash: #33201f;
+  --ochre-wash: #3a2a22;
 }
 
 @theme inline {
@@ -55,6 +74,12 @@
   --color-moss: var(--moss);
   --color-signal: var(--signal);
   --color-sky: var(--sky);
+  --color-surface: var(--surface);
+  --color-rule: var(--rule);
+  --color-line: var(--line);
+  --color-track: var(--track);
+  --color-signal-wash: var(--signal-wash);
+  --color-ochre-wash: var(--ochre-wash);
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-fraunces);
 }
@@ -76,7 +101,7 @@
   --color-zinc-700: #3a4442;
   --color-zinc-800: #2a3634;
   --color-zinc-900: #1c2b2a;
-  --color-zinc-950: #141c1b;
+  --color-zinc-950: #1b2422;
   --color-red-700: #9a2b2b;
   --color-red-400: #e07a7a;
 }
