@@ -74,6 +74,23 @@ describe("guides (REQ-011)", () => {
     }
   });
 
+  it("REQ-027 D-2267: a front-matter glossary list prettier folded over several lines parses to its ids", () => {
+    // registers-an-auditor-asks-for.md carries its list as a folded flow sequence; the page reads every id.
+    const registers = loadGuide("registers-an-auditor-asks-for");
+    expect(registers.glossary).toEqual([
+      "practice-standards",
+      "quality-indicator",
+      "reportable-incident",
+      "mid-term-audit",
+      "key-personnel",
+      "worker-screening-check",
+      "adopt",
+      "module",
+    ]);
+    for (const g of loadGuides())
+      for (const id of g.glossary) expect(id).toMatch(/^[a-z][a-z0-9-]*$/);
+  });
+
   it("parses FAQ and sources blocks", () => {
     expect(
       parseFaq("\n### One?\n\nAnswer one.\n\n### Two?\n\nAnswer two.\n"),

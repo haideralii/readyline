@@ -28,6 +28,7 @@ import {
 import { useQuestionnaire } from "../questionnaire-provider";
 import { PRESELECT_KEY } from "../start-intro";
 import { GlossaryTerms } from "@/components/glossary-terms";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 
 /** REQ-011 batch 31: the group a guide page asked to tick, kept by the intro in session storage; cleared once used. */
 function subscribeNothing() {
@@ -56,8 +57,11 @@ const YES_NO: { value: YesNo; label: string }[] = [
   { value: "no", label: "No" },
 ];
 
-/** REQ-027 FR-3 (D-2710): the glossary terms this step's words use, first appearance first. */
-const STEP_TERMS = ["registration-group", "module"] as const;
+const GROUPS_HELP =
+  "Tick everything you deliver or plan to deliver. The Commission calls these registration groups; the names and the audit type (desk audit or site audit) are theirs, and the short descriptions are ours to help you recognise your work. If any ticked group needs a site audit, your whole registration does.";
+const SDA_ONLY_LEAD = "Specialist disability accommodation on its own.";
+const SDA_ONLY_TEXT =
+  "The Commission's mapping document assesses an SDA-only provider against the SDA module without the core module. Adding any other group brings the core module in. Your result will show this.";
 
 const CATEGORIES = getGroupCategories();
 /** REQ-013 FR-11: the two most common groups start open; the rest open on wider screens, on search, or on a tap. */
@@ -232,11 +236,42 @@ export function SupportsStepForm() {
 
   const groupsErrors = errorsFor(errors, "groups");
 
+  // REQ-027 FR-3, D-2711, D-2267: the glossary words on this step as it stands,
+  // found at render: the question and its help, the headings and their short
+  // descriptions, the classes an open heading shows (a closed one shows its
+  // ticked classes alone), and the SDA note when it is shown. The groups'
+  // descriptions name restrictive practices and modules, so a fixed list would
+  // say too much or too little as headings open and close.
+  const searching = Boolean(query.trim());
+  const present = findGlossaryTerms(
+    [
+      GROUP_QUESTION,
+      GROUPS_HELP,
+      GROUP_HINT.text,
+      ...CATEGORIES.flatMap((c) => {
+        const items = byCategory.get(c.id) ?? [];
+        if (items.length === 0 && searching) return [];
+        const shown =
+          searching || isOpen(c.id)
+            ? items
+            : groupsInCategory(groups, c.id).filter((g) =>
+                current.includes(g.code),
+              );
+        return [
+          c.title,
+          c.description,
+          ...shown.flatMap((g) => [g.name, g.description]),
+        ];
+      }),
+      ...(sdaOnly ? [SDA_ONLY_LEAD, SDA_ONLY_TEXT] : []),
+    ].join("\n"),
+  );
+
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first question. */}
-      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
+      <GlossaryTerms ids={present} where="page" className="mb-4" />
 
       <fieldset
         className="mb-6"
@@ -249,11 +284,7 @@ export function SupportsStepForm() {
           id="groups-help"
           className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
         >
-          Tick everything you deliver or plan to deliver. The Commission calls
-          these registration groups; the names and the audit type (desk audit or
-          site audit) are theirs, and the short descriptions are ours to help
-          you recognise your work. If any ticked group needs a site audit, your
-          whole registration does.
+          {GROUPS_HELP}
         </p>
 
         <div
@@ -381,10 +412,7 @@ export function SupportsStepForm() {
 
       {sdaOnly ? (
         <div className="mb-6 rounded-md border border-zinc-300 bg-zinc-50 p-4 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
-          <strong>Specialist disability accommodation on its own.</strong> The
-          Commission&apos;s mapping document assesses an SDA-only provider
-          against the SDA module without the core module. Adding any other group
-          brings the core module in. Your result will show this.
+          <strong>{SDA_ONLY_LEAD}</strong> {SDA_ONLY_TEXT}
         </div>
       ) : null}
 

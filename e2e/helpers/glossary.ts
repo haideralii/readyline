@@ -123,9 +123,10 @@ export async function glossaryOnPage(
   }
   if (summary !== null) {
     const counted = present.filter((id) => id !== options.inline);
-    expect(summary, `${label}: the disclosure's count`).toBe(
-      `What these words mean (${counted.length})`,
-    );
+    expect(
+      summary,
+      `${label}: the disclosure's count (present on the page: ${counted.join(", ")}; listed: ${dds.map((d) => d.id).join(", ")})`,
+    ).toBe(`What these words mean (${counted.length})`);
     expect(
       Object.values(GLOSSARY_ATTRIBUTION) as string[],
       `${label}: the disclosure opens with D-2706's line`,

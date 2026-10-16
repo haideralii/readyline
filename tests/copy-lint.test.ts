@@ -699,11 +699,15 @@ function pagePieces(page: string) {
 function pageWays(page: string) {
   const own = meaningWays(sourceOf(page), page);
   const ids = new Set(own.ids);
+  let computed = own.computed === true;
   for (const [file, through] of Object.entries(GLOSSARY_RENDERED_THROUGH))
-    if (through === page)
-      for (const id of meaningWays(sourceOf(file), file).ids) ids.add(id);
-  // D-2267: a page whose list is computed at render carries that flag for its modules too.
-  return { ids, tokens: [] as string[], computed: own.computed };
+    if (through === page) {
+      const w = meaningWays(sourceOf(file), file);
+      for (const id of w.ids) ids.add(id);
+      if (w.computed) computed = true;
+    }
+  // D-2267: a list computed at render, on the page or in a module rendered through it, flags the page.
+  return { ids, tokens: [] as string[], computed };
 }
 
 describe("glossary presence (REQ-027 FR-2)", () => {

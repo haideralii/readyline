@@ -1,8 +1,10 @@
 import type { DocumentModel } from "@/lib/generator/document-model";
 import type { Block } from "@/lib/generator/section-schema";
 import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
+import { HOME_COPY as C } from "@/lib/home-copy";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 import { DataTable } from "./data-table";
-import { GlossaryBracket } from "./glossary-terms";
+import { GlossaryTerms } from "./glossary-terms";
 
 /**
  * The sample document preview (batch 24 item 2): every section of the
@@ -63,6 +65,54 @@ export function Blocks({ blocks }: { blocks: readonly Block[] }) {
 /** Document control, Purpose and Scope are open; the rest is one tap away. */
 const SHOWN_FIRST = 3;
 
+const MODE_LABEL = {
+  tailored: "Drafted from the answers",
+  fixed: "Fixed text, the same for every provider",
+} as const;
+const DOWNLOAD_LABEL = "Download this sample as a Word file";
+
+function sampleLine(doc: DocumentModel, tailored: number): string {
+  return `Sample: ${doc.facts.tradingName} (a fictional sole trader, household tasks, New South Wales, verification audit). Generated ${doc.generatedAt}; ${tailored} of ${doc.sections.length} sections drafted from the answers, the rest fixed text.`;
+}
+
+function blockText(b: Block): string[] {
+  switch (b.type) {
+    case "paragraph":
+    case "callout":
+      return [b.text];
+    case "bullets":
+    case "steps":
+      return [...b.items];
+    case "table":
+      return [...b.columns, ...b.rows.map((r) => r.join(" "))];
+  }
+}
+
+/**
+ * REQ-027 FR-3, D-2711, D-2267: the glossary words on the sample page, found at
+ * render in the page's own words and the sample document's text (its fixed
+ * sections name the Practice Standards and key personnel), so the page carries
+ * the disclosure rather than D-2715's one-term bracket.
+ */
+function samplePresent(doc: DocumentModel, tailored: number): string[] {
+  return findGlossaryTerms(
+    [
+      C.sampleHeading,
+      C.samplePageLead,
+      sampleLine(doc, tailored),
+      doc.title,
+      DOWNLOAD_LABEL,
+      MODE_LABEL.tailored,
+      MODE_LABEL.fixed,
+      ...doc.sections.flatMap((s) => [
+        s.heading,
+        ...s.blocks.flatMap(blockText),
+      ]),
+      doc.footer,
+    ].join("\n"),
+  );
+}
+
 type HeadingTag = "h2" | "h3" | "h4" | "h5";
 
 function Section({
@@ -88,9 +138,7 @@ function Section({
         {s.heading}
       </H>
       <p className="text-slate mt-1 text-xs font-medium tracking-wide uppercase">
-        {s.mode === "tailored"
-          ? "Drafted from the answers"
-          : "Fixed text, the same for every provider"}
+        {s.mode === "tailored" ? MODE_LABEL.tailored : MODE_LABEL.fixed}
       </p>
       <Blocks blocks={s.blocks} />
     </li>
@@ -113,15 +161,14 @@ export function SampleDocument({
       data-testid="sample-document"
     >
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        Sample: {doc.facts.tradingName} (a fictional sole trader, household
-        tasks, New South Wales, verification audit). Generated {doc.generatedAt}
-        ; {tailored} of {doc.sections.length} sections drafted from the answers,
-        the rest fixed text.
+        {sampleLine(doc, tailored)}
       </p>
-      {/* REQ-027 FR-3 (D-2715, D-2719; findings 55 and 130): the one term on this page, its bracket after the parenthetical and never inside it. */}
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        A <GlossaryBracket id="verification-audit" />.
-      </p>
+      {/* REQ-027 FR-3, D-2701: the words on this page, the document's own included, above the document. */}
+      <GlossaryTerms
+        ids={samplePresent(doc, tailored)}
+        where="page"
+        className="mt-2"
+      />
       <Title className="mt-2 text-2xl">{doc.title}</Title>
       <p className="mt-3">
         <a
@@ -129,7 +176,7 @@ export function SampleDocument({
           className="btn-secondary text-sm"
           data-testid="sample-download"
         >
-          Download this sample as a Word file
+          {DOWNLOAD_LABEL}
         </a>
       </p>
       <ol className="mt-6 space-y-5">

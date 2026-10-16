@@ -13,6 +13,9 @@ glossary:
     reportable-incident,
     mid-term-audit,
     key-personnel,
+    worker-screening-check,
+    adopt,
+    module,
   ]
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's)
 ---
