@@ -26,12 +26,17 @@ import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { getStandardsDataset } from "@/lib/standards/dataset";
+import {
+  ADOPT_NEEDS_NAME,
+  ADOPT_NEEDS_NAME_HREF,
+  ADOPT_NEEDS_NAME_LINK,
+} from "@/lib/path/adopt-copy";
 import { loadFacts, saveFact } from "./facts";
 import { loadQuestionnaire } from "./state";
 
 export type PathActionResult =
   | { ok: true; blanksLeft?: number; changed?: number }
-  | { ok: false; message: string };
+  | { ok: false; message: string; href?: string; hrefLabel?: string };
 
 const FactInput = strictObject({
   key: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
@@ -150,6 +155,17 @@ export async function adoptGroupAction(
       ok: false,
       message: `Finish your pack first: ${open} ${open === 1 ? "blank is" : "blanks are"} still open.`,
     };
+  // Retro finding 114 (D-2244): adoption is approval by a named person on a
+  // date, so it waits for the account's name fact; the register's "by whom"
+  // then carries it.
+  const facts = await loadFacts(supabase, accountId);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: ADOPT_NEEDS_NAME_HREF,
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
 
   const today = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Australia/Sydney",
@@ -172,7 +188,6 @@ export async function adoptGroupAction(
   // proven to be the account's above, and the writes carry its id.
   const admin = createSupabaseAdminClient();
   await seedPolicyReviews(admin, accountId);
-  const facts = await loadFacts(supabase, accountId);
   if (!facts.date) {
     const r = await saveFact(supabase, accountId, "date", todayWords);
     if (r.ok) facts.date = todayWords;

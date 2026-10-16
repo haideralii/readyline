@@ -116,6 +116,10 @@ test.describe("guides (REQ-011)", () => {
       slug: "registers-an-auditor-asks-for",
       h1: "The registers an auditor asks for",
       body: "Complaints register",
+      // Retro review of REQ-018, finding 13: the worker checks register is
+      // the companion to the provider's own worker list (Worker Screening
+      // Rules s 18), never that list.
+      also: "It is the companion to your own worker list",
     },
   ]) {
     test(`${guide.slug}: published (no draft note), tables, FAQ structured data, Commission sources, CTA`, async ({
@@ -137,6 +141,14 @@ test.describe("guides (REQ-011)", () => {
       await expect(page.getByTestId("data-table").first()).toContainText(
         guide.body,
       );
+      if ("also" in guide && guide.also) {
+        await expect(
+          page.getByTestId("data-table").filter({ hasText: guide.also }),
+        ).toHaveCount(1);
+        await expect(page.locator("main")).not.toContainText(
+          "Clearance numbers stay in your own file",
+        );
+      }
       const faq = page.getByTestId("guide-faq");
       expect(await faq.locator("details").count()).toBe(6);
       const ld = await page

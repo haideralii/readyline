@@ -135,6 +135,26 @@ describe("reminder rules (REQ-009 FR-3)", () => {
         dueReminders(base({ incidents: [incident({ status: "closed" })] })),
       ).toEqual([]);
     });
+    // Retro finding 62 (D-2244): a rejected report still marked reportable
+    // keeps its Commission clock and nothing else; one the owner has settled
+    // as not reportable never reaches the rules (the job filters it).
+    it("a rejected report still marked reportable raises the notification reminder only, never the quiet-30-days one", () => {
+      const r = dueReminders(
+        base({
+          incidents: [
+            incident({
+              status: "rejected",
+              reportable: true,
+              notify_by: addDays(TODAY, -1),
+            }),
+          ],
+        }),
+      );
+      expect(kinds(r)).toEqual([`reportable-not-notified@${TODAY}`]);
+      expect(
+        dueReminders(base({ incidents: [incident({ status: "rejected" })] })),
+      ).toEqual([]);
+    });
     it("reportable and not notified: the morning after notify_by", () => {
       const r = dueReminders(
         base({
@@ -330,9 +350,9 @@ describe("reminder rules (REQ-009 FR-3)", () => {
       );
       expect(r).toEqual([]);
     });
-    it("the line names the reference and the 24 hours, nothing else (SR-4)", () => {
+    it("the line names the reference and both windows, nothing else (SR-4; retro finding 68)", () => {
       expect(reminderLine("report-to-confirm", "INC-0007", TODAY)).toBe(
-        "Report INC-0007 is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report.",
+        "Report INC-0007 is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report for most kinds, or within 5 business days for an unauthorised restrictive practice that caused no harm.",
       );
     });
   });

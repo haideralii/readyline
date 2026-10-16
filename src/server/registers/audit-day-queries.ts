@@ -76,6 +76,24 @@ export async function listRegisterTrail(
   return (r.data as RegisterEventRow[] | null) ?? [];
 }
 
+/**
+ * Every line of the shared trail for one account, oldest first, for the
+ * audit pack (REQ-020 FR-1 "including the events trails"; retro review
+ * finding 25). The same cap as the incident and complaint trails' export.
+ */
+export async function listAccountRegisterEvents(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<RegisterEventRow[]> {
+  const r = await supabase
+    .from("register_events")
+    .select("*")
+    .eq("account_id", accountId)
+    .order("at", { ascending: true })
+    .limit(5000);
+  return (r.data as RegisterEventRow[] | null) ?? [];
+}
+
 export async function listOnboardingTicks(
   supabase: SupabaseClient,
   accountId: string,

@@ -74,6 +74,10 @@ export function auditorBanner(tradingName: string, expiresAt: Date): string {
   return `Read-only view shared by ${tradingName} for its audit; it expires on ${formatLinkTime(expiresAt)}.`;
 }
 
+/** The page and the pack route's answer once one address has opened the link sixty times in an hour (retro review of REQ-020, finding 21). */
+export const AUDITOR_OPEN_LIMITED_LINE =
+  "This link has been opened many times from your connection in the last hour. Wait an hour and open it again.";
+
 /**
  * A viewer's address for the audit log: hashed, never in clear (FR-2), and
  * keyed under HASH_PEPPER so an IPv4 address cannot be recovered by

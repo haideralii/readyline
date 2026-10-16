@@ -9,6 +9,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  adoptedBy,
   documentControlGaps,
   documentControlRows,
   documentControlSentence,
@@ -93,6 +94,16 @@ describe("document control register (REQ-018 FR-13)", () => {
     expect(rows[0].next_review_on).toBe("2027-10-13");
     expect(rows[1].next_review_on).toBe("2027-01-12");
     expect(rows[0].adopted_by).toBe("Owner");
+    // Retro finding 114 (D-2244): "by whom" names the person who adopted, with the role when there is one.
+    expect(
+      adoptedBy({ adoptedByRole: "Director", adoptedByName: "Jane Citizen" }),
+    ).toBe("Jane Citizen, Director");
+    expect(
+      adoptedBy({ adoptedByRole: null, adoptedByName: "Jane Citizen" }),
+    ).toBe("Jane Citizen");
+    expect(adoptedBy({ adoptedByRole: " Owner ", adoptedByName: "  " })).toBe(
+      "Owner",
+    );
     expect(documentControlGaps(rows)).toEqual([
       "Governance policy: not circulated to workers",
       "Complaints management policy and register: not circulated to workers",

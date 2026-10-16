@@ -9,6 +9,7 @@ import "server-only";
  */
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { adoptionsByType, applyAdoption } from "@/lib/generator/adoption";
 import { collectBlanks, type DocumentBlank } from "@/lib/generator/blanks";
 import { applyFacts } from "@/lib/generator/facts-fill";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
@@ -31,6 +32,7 @@ export async function rerenderSetWithFacts(input: {
   facts: Readonly<Record<string, string>>;
 }): Promise<{ changed: number; blanksLeft: number }> {
   const { admin, set, facts } = input;
+  const startedAt = Date.now();
   const store = new SupabaseGenerationStore(admin);
   const docs = await listLatestDocuments(admin, set.id);
   const ordered = auditOrder(docs.map((d) => d.document_type_id));
@@ -47,8 +49,18 @@ export async function rerenderSetWithFacts(input: {
   }[] = [];
   const blanks: DocumentBlank[] = [];
   let providerInputSections = 0;
+  // Retro review of REQ-018 to 021, finding 3 (PO decision 3): an adopted
+  // document's own control table carries the register's adoption date and
+  // next review date, so the Word file and the summary's first page agree.
+  // Read before the loop; the summary reads the register again after it so
+  // its version column is current.
+  const adoptions = adoptionsByType(
+    await documentControlForSet(admin, set.account_id, set.id),
+  );
   for (const d of sorted) {
-    const filled = applyFacts(d.model, facts);
+    const withFacts = applyFacts(d.model, facts);
+    const adoption = adoptions.get(d.document_type_id);
+    const filled = adoption ? applyAdoption(withFacts, adoption) : withFacts;
     const same = JSON.stringify(filled) === JSON.stringify(d.model);
     let row = d;
     if (!same) {
@@ -142,11 +154,15 @@ export async function rerenderSetWithFacts(input: {
       .update({ provider_input_section_count: providerInputSections })
       .eq("id", set.id);
   }
+  // The guided-path spec waits on this step; `ms` says how long a whole-set
+  // re-render took on the host (runs 38665790472 and 38826340580).
   log.info("path.finish.rerendered", {
     accountId: set.account_id,
     versionSetId: set.id,
     changed,
+    documents: sorted.length,
     blanksLeft: blanks.length,
+    ms: Date.now() - startedAt,
   });
   return { changed, blanksLeft: blanks.length };
 }
