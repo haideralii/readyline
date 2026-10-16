@@ -285,4 +285,22 @@ describe("the derived worker state (REQ-024 FR-3, FR-4)", () => {
     expect(after.label).toBe("Items outstanding");
     expect(after.exceptionRunning).toBe(false);
   });
+
+  it("a new worker with no rows derives without throwing, every list defaulting to empty (#85's run 38950408510)", () => {
+    const s = deriveWorkerState({
+      worker: { ...worker, role_assessed_on: null },
+      items,
+      states: undefined as unknown as ItemStateInput[],
+      clearances: undefined as unknown as ClearanceInput[],
+      today: TODAY,
+      exception: {
+        running: true,
+        offered: false,
+        supervisorClearances: undefined as unknown as ClearanceInput[],
+      },
+    });
+    expect(s.key).toBe("outstanding");
+    expect(s.supervisorClearanceEndedOn).toBeNull();
+    expect(s.roleAssessmentToRecord).toBe(true);
+  });
 });

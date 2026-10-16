@@ -64,7 +64,8 @@ export async function accountModuleIds(
     .maybeSingle();
   const stored = set.data?.derived_result as QuestionnaireResult | undefined;
   const result = stored ?? draftResult ?? null;
-  return result ? result.modules.map((m) => m.id) : [];
+  // A set seeded without `modules` (a test fixture, an older row) is no modules, not a throw (#85's run 38950408510).
+  return result?.modules?.map((m) => m.id) ?? [];
 }
 
 /** D-2416: the six closed roles, seeded once per account, unassessed; idempotent on `(account_id, seed_code)`. */

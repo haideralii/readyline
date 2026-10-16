@@ -101,7 +101,8 @@ test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
         account_id: tenant.accountId,
         created_by: tenant.userId,
         answers_snapshot_hash: "a2-e2e",
-        derived_result: { documents: [], registers: [] },
+        // The shape `loadQuestionnaire` reads: the account's modules decide the W-7 items.
+        derived_result: { documents: [], registers: [], modules: [] },
         status: "ready",
         document_count: 1,
         fallback_section_count: 0,

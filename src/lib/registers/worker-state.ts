@@ -131,12 +131,17 @@ export function deriveWorkerState(input: {
   today: string;
   exception?: ExceptionInput | null;
 }): WorkerState {
-  const { worker, items, clearances, today } = input;
+  // A new worker has no rows yet: every list defaults to empty, so the
+  // derivation never throws on a caller that could not load one (#85's run
+  // 38950408510, a TypeError on the save path).
+  const { worker, items, today } = input;
+  const clearances = input.clearances ?? [];
+  const stateRows = input.states ?? [];
   const exception = input.exception ?? null;
   const exceptionRunning = Boolean(exception?.running);
   // s 15(2)(f), finding 50: the supervisor's own clearance expiring or being decided ends the exception that day.
   const supervisorClearanceEndedOn = exceptionRunning
-    ? (exception!.supervisorClearances
+    ? ((exception!.supervisorClearances ?? [])
         .filter((c) => c.clearance_kind === "ndis-worker-screening")
         .map((c) =>
           c.decision_code && c.decision_on
@@ -147,7 +152,7 @@ export function deriveWorkerState(input: {
         )
         .find((d): d is string => d !== null) ?? null)
     : null;
-  const byId = new Map(input.states.map((s) => [s.item_id, s]));
+  const byId = new Map(stateRows.map((s) => [s.item_id, s]));
   const expiring = clearances
     .filter(
       (c) =>
