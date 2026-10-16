@@ -51,6 +51,8 @@ export type QuestionnaireResult = {
     largeProvider: boolean;
     silExcluded: boolean;
     hasUnverified: boolean;
+    /** REQ-027 D-2716, D-2726: a sole trader whatever the worker count; optional, since results stored before A2 lack it, read with `=== true`. */
+    soleTrader?: boolean;
   };
   notice: string;
 };
@@ -128,6 +130,7 @@ export function buildResult(
       flags: {
         restrictivePracticesAssumed: flags.restrictivePracticesAssumed,
         largeProvider: answers.workforce.workerCount > LARGE_PROVIDER_THRESHOLD,
+        soleTrader: answers.business.structure === "sole-trader",
         silExcluded:
           answers.supports.groups.includes(SIL_CODE) &&
           !applicability.groups.includes(SIL_CODE),

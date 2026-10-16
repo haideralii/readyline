@@ -16,8 +16,12 @@ import { getViewer } from "@/server/accounts/queries";
 import { BuyButton } from "@/app/documents/buy-button";
 import { SubscribeButton } from "@/app/account/subscribe-button";
 import { subscriptionAvailable } from "@/server/payments/stripe";
+import { GlossaryTerms } from "@/components/glossary-terms";
 
 export const metadata: Metadata = { title: "Pricing" };
+
+/** REQ-027 FR-3 (D-2701, D-2710): the glossary terms the pricing copy uses (`payments/copy.ts`), first appearance first. */
+const PRICING_TERMS = ["self-assessment", "adopt"] as const;
 
 /**
  * The pricing page (REQ-007 FR-1): the two offers as halves of equal weight
@@ -76,6 +80,8 @@ export default async function PricingPage() {
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
       <p className={body}>{C.intro}</p>
+      {/* REQ-027 FR-3, D-2701: the words on this page, above the first body section and inside no other disclosure. */}
+      <GlossaryTerms ids={PRICING_TERMS} where="page" className="mt-3" />
 
       {/* Batch 49 item 3: on a phone the pack price sat below the fold behind the
           subscription card (D-2001's order is right; the fold is the problem), so

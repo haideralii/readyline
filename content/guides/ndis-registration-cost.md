@@ -6,6 +6,8 @@ updated: 2026-10-13
 reviewed: 2026-10-13
 owner: po
 shortAnswer: "There is no Commission application fee; you pay the auditor you choose. | A verification audit costs less than a certification audit, which includes a site visit. | Documents and consultants are the other costs; the calculator below gives your own number."
+glossary:
+  [verification-audit, certification-audit, mid-term-audit, registration-group]
 status: draft (Dev first draft, 13 Oct 2026; every figure carries its source and date; the PO checks the UNVERIFIED lines)
 ---
 

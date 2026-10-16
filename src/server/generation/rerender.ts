@@ -18,6 +18,7 @@ import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { auditOrder } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
+import { reasonForCi } from "./failure-code";
 import { documentControlForSet } from "@/server/registers/document-control-queries";
 import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { listAdoptedTypeIds } from "@/server/path/state";
@@ -201,15 +202,20 @@ export async function rerenderSetWithFacts(input: {
       .eq("id", set.id);
   }
   // The guided-path spec waits on this step; `ms` says how long a whole-set
-  // re-render took on the host (runs 38665790472 and 38826340580).
-  log.info("path.finish.rerendered", {
+  // re-render took on the host (runs 38665790472 and 38826340580). D-2266
+  // (PO 16 Oct 21:30, #78's run 38881965824): CI's web server surfaces warn
+  // and above alone, so in CI the line is written at warn and the number
+  // reaches the job log; production keeps it at info.
+  const fields = {
     accountId: set.account_id,
     versionSetId: set.id,
     changed,
     documents: sorted.length,
     blanksLeft: blanks.length,
     ms: Date.now() - startedAt,
-  });
+  };
+  if (reasonForCi()) log.warn("path.finish.rerendered", fields);
+  else log.info("path.finish.rerendered", fields);
   return { changed, blanksLeft: blanks.length };
 }
 

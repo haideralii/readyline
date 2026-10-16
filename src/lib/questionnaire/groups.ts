@@ -75,6 +75,17 @@ export function getGroupCategories(): GroupCategory[] {
 export const GROUP_QUESTION = groupCategoriesContent.question;
 export const GROUP_HINT = groupCategoriesContent.hint;
 
+/**
+ * REQ-027 D-2730 (Haider's find on production's step 2): the "Not sure?"
+ * hint keys on the business structure. A sole trader reads the sole-trader
+ * sentence; every other structure, and a reader with no structure answer
+ * yet, reads the general one. The button and the two classes it selects
+ * are the same either way.
+ */
+export function groupHintText(structure: string | null | undefined): string {
+  return structure === "sole-trader" ? GROUP_HINT.text : GROUP_HINT.textGeneral;
+}
+
 /** Case-insensitive match over code, name, description and synonyms. */
 export function matchesGroupQuery(g: GroupOption, query: string): boolean {
   const q = query.trim().toLowerCase();

@@ -268,11 +268,11 @@ test.describe("REQ-015 Section E", () => {
       .locator("> summary")
       .click();
     await expect(page.getByTestId("have-legend")).toBeVisible();
-    // REQ-025 FR-4a: one vocabulary, the provider's status only.
+    // REQ-025 FR-4a as REQ-027 D-2718 amends it: one vocabulary, the reader's answers only.
     const tags = page
       .getByTestId("result-section-documents")
       .getByTestId("have-tag")
-      .filter({ hasText: /^.(You have this|To prepare|Not asked)$/ });
+      .filter({ hasText: /^.(You have one|You need one|You said not sure)$/ });
     expect(await tags.count()).toBeGreaterThan(0);
     await page.reload();
     await expect(page.getByTestId("result")).toBeVisible();

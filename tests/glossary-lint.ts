@@ -26,6 +26,14 @@ export type GlossaryFinding =
 export type MeaningWays = {
   ids: Set<string>;
   tokens: string[];
+  /**
+   * REQ-027 A2 (D-2267): the page renders `<GlossaryTerms ids={...}>` with a
+   * list computed at render from the strings it is about to show (the
+   * result page, the registration-group pages), so the AST cannot name the
+   * ids; the render check (`glossaryOnPage`) is the proof for such a page,
+   * and the lint takes every term present as reached.
+   */
+  computed?: boolean;
 };
 
 const INLINE_TAGS = new Set([
@@ -325,6 +333,7 @@ export function meaningWays(source: string, rel: string): MeaningWays {
     ts.ScriptKind.TSX,
   );
   const ids = new Set<string>();
+  let computed = false;
   const consts = new Map<string, string[]>();
   for (const st of sf.statements)
     if (ts.isVariableStatement(st))
@@ -350,8 +359,11 @@ export function meaningWays(source: string, rel: string): MeaningWays {
         const t = literalText(el);
         if (t) ids.add(t);
       }
-    else if (ts.isIdentifier(init))
+    else if (ts.isIdentifier(init) && consts.has(init.text))
       for (const t of consts.get(init.text) ?? []) ids.add(t);
+    // D-2267: a list the page computes at render (a call, a local variable
+    // of the component, a member access): the render check is the proof.
+    else computed = true;
   };
   const visit = (node: ts.Node) => {
     if (
@@ -397,7 +409,7 @@ export function meaningWays(source: string, rel: string): MeaningWays {
     ts.forEachChild(node, visit);
   };
   visit(sf);
-  return { ids, tokens: [] };
+  return { ids, tokens: [], computed };
 }
 
 /**
@@ -417,7 +429,7 @@ export function glossaryFindings(
   const tokens = [...ways.tokens, ...glossaryTokens(whole)];
   const satisfied = new Set([...ways.ids, ...tokens]);
   for (const id of present) {
-    if (satisfied.has(id)) continue;
+    if (satisfied.has(id) || ways.computed) continue;
     const piece = pieces.find((p) =>
       findGlossaryTerms(stripGlossaryBrackets(p.text), options).includes(id),
     );

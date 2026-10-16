@@ -6,6 +6,7 @@ updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
 shortAnswer: "Your registration groups decide: lower-risk groups get a verification audit; any higher-risk group makes it certification. | Verification is a desk audit of your documents; certification adds a site visit and interviews. | Certification brings a mid-term audit about 18 months in; verification does not."
+glossary: [registration-group, mid-term-audit, verification-audit, certification-audit, module, practice-standards, restrictive-practice, quality-indicator, self-assessment]
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 13 Oct 2026, updated 14 Oct 2026 with the Commission's types-of-audits page: the five kinds, stages, report times and ratings; one UNVERIFIED line stays marked in the text)
 ---
 

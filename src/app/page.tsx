@@ -11,6 +11,21 @@ import { siteUrl } from "@/lib/site";
 import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
 import { subscriptionAvailable } from "@/server/payments/stripe";
+import { GlossaryTerms } from "@/components/glossary-terms";
+
+/**
+ * REQ-027 FR-3 (D-2701, D-2710): the glossary terms the home page's copy
+ * uses (`home-copy.ts`), in the order they first appear, for the one
+ * "What these words mean" disclosure under the hero; the copy lint holds the
+ * list to the copy and the render check proves it against the page.
+ */
+const HOME_TERMS = [
+  "mid-term-audit",
+  "module",
+  "practice-standards",
+  "certification-audit",
+  "self-assessment",
+] as const;
 
 /**
  * Home page v2 (REQ-013 FR-8; batch 24): the audit question and the price in
@@ -120,6 +135,8 @@ export default function Home() {
           </p>
         ) : null}
         <TrustCounters />
+        {/* REQ-027 FR-3, D-2701: the words on this page, under the hero and inside no other disclosure. */}
+        <GlossaryTerms ids={HOME_TERMS} where="page" />
       </section>
 
       {/* REQ-025 FR-12: the sample left this page (13,400 px at 360 px with it); a card and two links point at /sample. */}
