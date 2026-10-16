@@ -49,23 +49,50 @@ const PROCEDURE = "worker-screening-and-recruitment-procedure";
 
 /**
  * After a save the page refreshes and the server's own state is what proves
- * it, not the panel's "Saved." line, which a refresh may take with it; when
- * the next state never comes, the panel's refusal is read into the assertion
- * so CI's log names it (PO 06:32).
+ * it, not the panel's "Saved." line; when the next state does not show in
+ * five seconds the page is reloaded once, so a save that landed without a
+ * refresh is told apart from no save (PO 07:40), and when it still does not
+ * show, the panel's refusal or its reasons list, the page's URL and any
+ * browser error are read into the assertion so CI's log names the cause.
  */
-async function afterSave(page: Page, nextTestId: string, step: string) {
+async function afterSave(
+  page: Page,
+  nextTestId: string,
+  step: string,
+  errors: string[],
+) {
   const next = page.getByTestId(nextTestId);
   const message = page.getByTestId("exception-message");
   const reasons = page.getByTestId("exception-reasons");
-  await expect(next.or(message).or(reasons)).toBeVisible({ timeout: 20_000 });
-  if (await next.isVisible().catch(() => false)) return;
+  const seen = async () =>
+    (await next.isVisible().catch(() => false)) ||
+    (await message.isVisible().catch(() => false));
+  await expect
+    .poll(seen, { timeout: 5_000, intervals: [250, 500] })
+    .toBe(true)
+    .catch(() => undefined);
+  let reloaded = false;
+  if (!(await seen())) {
+    reloaded = true;
+    await page.reload();
+    await expect(next.or(message).or(reasons)).toBeVisible({
+      timeout: 15_000,
+    });
+  }
+  if (await next.isVisible().catch(() => false)) {
+    if (reloaded)
+      throw new Error(
+        `${step}: the save landed but the page did not refresh to it until a reload (URL ${page.url()})`,
+      );
+    return;
+  }
+  const detail = `URL ${page.url()}; browser errors: ${errors.length ? errors.join(" | ") : "none"}`;
   if (await message.isVisible().catch(() => false))
     throw new Error(
-      `${step}: the panel refused the save: ${(await message.textContent()) ?? "(no message)"}`,
+      `${step}: the panel refused the save: ${(await message.textContent()) ?? "(no message)"}; ${detail}`,
     );
-  // The third state (PO 07:05): the option absent, the gates named on the page.
   throw new Error(
-    `${step}: the option is absent; the gates say: ${(await reasons.textContent()) ?? "(no reasons)"}`,
+    `${step}: no save and no refusal${reloaded ? " (after a reload)" : ""}; the gates say: ${(await reasons.textContent()) ?? "(no reasons)"}; ${detail}`,
   );
 }
 
@@ -176,6 +203,11 @@ test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
     baseURL,
   }, testInfo) => {
     const project = testInfo.project.name;
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
+    page.on("console", (m) => {
+      if (m.type() === "error") errors.push(`console: ${m.text()}`);
+    });
     await signInContext(context, tenant, baseURL!);
 
     // The worker in WA, risk assessed.
@@ -208,7 +240,12 @@ test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
     await page.locator("#application-state").selectOption("WA");
     await page.locator("#verified-on").fill("2026-10-30");
     await page.getByTestId("record-application").click();
-    await afterSave(page, "start-exception-form", "record the application");
+    await afterSave(
+      page,
+      "start-exception-form",
+      "record the application",
+      errors,
+    );
 
     // The four lines, verbatim in their shape (FR-4; AC-2).
     const start = page.getByTestId("start-exception-form");

@@ -14,6 +14,7 @@ import {
 } from "@/lib/generator/division3";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { log } from "@/lib/logging/logger";
+import { reasonForCi } from "@/server/generation/failure-code";
 import type {
   ScreeningExceptionRow,
   StaffMatrixRow,
@@ -149,6 +150,21 @@ async function matrixRow(
  * matrix row's role label copied in, and no issue date.
  */
 export async function recordApplicationAction(
+  input: unknown,
+): Promise<ExceptionActionResult> {
+  const r = await recordApplication(input);
+  // D-2266's pattern (PO 07:40, #85's run 38960767345): in CI the action's
+  // outcome reaches the job log at warn, so a silent step is told apart
+  // from one the browser never sent; production keeps nothing more.
+  if (reasonForCi())
+    log.warn(
+      r.ok ? "exception.application.recorded" : "exception.application.refused",
+      r.ok ? { id: r.id } : { message: r.message },
+    );
+  return r;
+}
+
+async function recordApplication(
   input: unknown,
 ): Promise<ExceptionActionResult> {
   const parsed = parseInput(RecordApplicationForm, input);

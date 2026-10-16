@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { ScreeningExceptionRow } from "@/lib/registers/audit-day-types";
 import {
   EXCEPTION_CODE_LABELS,
@@ -94,6 +94,17 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [result, setResult] = useState<ExceptionActionResult | null>(null);
+  // D-1012's rule for forms in the first HTML: inert until React is live, so
+  // a value typed before hydration is never lost and a click never submits
+  // the form natively (#85's run 38960767345: the record step's click on a
+  // production build landed before hydration and the page reloaded to its
+  // first state). Playwright waits for an enabled control, so the specs
+  // need no pause.
+  const live = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   async function run(name: string, call: () => Promise<ExceptionActionResult>) {
     setBusy(name);
@@ -262,34 +273,36 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                 );
               }}
             >
-              <SelectField
-                id="end-code"
-                label="How it ended"
-                errors={errorsOf(result, "endCode")}
-                value={endCode}
-                onChange={setEndCode}
-                options={END_CODES.map((c) => ({
-                  value: c,
-                  label: END_CODE_LABELS[c],
-                }))}
-              />
-              <DateField
-                id="ended-on"
-                label="Day it ended"
-                errors={errorsOf(result, "endedOn")}
-                value={endedOn}
-                onChange={setEndedOn}
-                max={p.today}
-              />
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={busy !== null}
-                aria-busy={busy === "end" || undefined}
-                data-testid="end-exception"
-              >
-                {busy === "end" ? "Saving…" : "Record the end"}
-              </button>
+              <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
+                <SelectField
+                  id="end-code"
+                  label="How it ended"
+                  errors={errorsOf(result, "endCode")}
+                  value={endCode}
+                  onChange={setEndCode}
+                  options={END_CODES.map((c) => ({
+                    value: c,
+                    label: END_CODE_LABELS[c],
+                  }))}
+                />
+                <DateField
+                  id="ended-on"
+                  label="Day it ended"
+                  errors={errorsOf(result, "endedOn")}
+                  value={endedOn}
+                  onChange={setEndedOn}
+                  max={p.today}
+                />
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={busy !== null}
+                  aria-busy={busy === "end" || undefined}
+                  data-testid="end-exception"
+                >
+                  {busy === "end" ? "Saving…" : "Record the end"}
+                </button>
+              </fieldset>
             </form>
           ) : null}
         </div>
@@ -312,68 +325,72 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                 );
               }}
             >
-              <p className="mb-3 font-medium">Record the application first</p>
-              <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                From the unit&apos;s written notice: the application number, the
-                state it was submitted in, and the day you confirmed the
-                application in the NDIS Worker Screening Database (s 15(3) and
-                (4)).
-              </p>
-              <div className="mb-6">
-                <label
-                  htmlFor="application-number"
-                  className="block text-base font-medium"
-                >
-                  Application number
-                </label>
-                <input
-                  id="application-number"
-                  name="application-number"
-                  type="text"
-                  value={appNumber}
-                  onChange={(e) => setAppNumber(e.target.value)}
-                  autoComplete="off"
-                  maxLength={40}
-                  aria-invalid={
-                    errorsOf(result, "applicationNumber").length > 0 ||
-                    undefined
-                  }
-                  className="mt-2 block min-h-12 w-full max-w-60 rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-base dark:border-zinc-700 dark:bg-zinc-950"
-                />
-                {errorsOf(result, "applicationNumber").map((e) => (
-                  <p
-                    key={e}
-                    className="mt-1 text-sm text-red-700 dark:text-red-400"
+              <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
+                <p className="mb-3 font-medium">Record the application first</p>
+                <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                  From the unit&apos;s written notice: the application number,
+                  the state it was submitted in, and the day you confirmed the
+                  application in the NDIS Worker Screening Database (s 15(3) and
+                  (4)).
+                </p>
+                <div className="mb-6">
+                  <label
+                    htmlFor="application-number"
+                    className="block text-base font-medium"
                   >
-                    {e}
-                  </p>
-                ))}
-              </div>
-              <SelectField
-                id="application-state"
-                label="State the application was submitted in"
-                errors={errorsOf(result, "state")}
-                value={appState}
-                onChange={setAppState}
-                options={STATES.map((s) => ({ value: s, label: s }))}
-              />
-              <DateField
-                id="verified-on"
-                label="Day you confirmed it in the database"
-                errors={errorsOf(result, "verifiedOn")}
-                value={verifiedOn}
-                onChange={setVerifiedOn}
-                max={p.today}
-              />
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={busy !== null}
-                aria-busy={busy === "application" || undefined}
-                data-testid="record-application"
-              >
-                {busy === "application" ? "Saving…" : "Record the application"}
-              </button>
+                    Application number
+                  </label>
+                  <input
+                    id="application-number"
+                    name="application-number"
+                    type="text"
+                    value={appNumber}
+                    onChange={(e) => setAppNumber(e.target.value)}
+                    autoComplete="off"
+                    maxLength={40}
+                    aria-invalid={
+                      errorsOf(result, "applicationNumber").length > 0 ||
+                      undefined
+                    }
+                    className="mt-2 block min-h-12 w-full max-w-60 rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-base dark:border-zinc-700 dark:bg-zinc-950"
+                  />
+                  {errorsOf(result, "applicationNumber").map((e) => (
+                    <p
+                      key={e}
+                      className="mt-1 text-sm text-red-700 dark:text-red-400"
+                    >
+                      {e}
+                    </p>
+                  ))}
+                </div>
+                <SelectField
+                  id="application-state"
+                  label="State the application was submitted in"
+                  errors={errorsOf(result, "state")}
+                  value={appState}
+                  onChange={setAppState}
+                  options={STATES.map((s) => ({ value: s, label: s }))}
+                />
+                <DateField
+                  id="verified-on"
+                  label="Day you confirmed it in the database"
+                  errors={errorsOf(result, "verifiedOn")}
+                  value={verifiedOn}
+                  onChange={setVerifiedOn}
+                  max={p.today}
+                />
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={busy !== null}
+                  aria-busy={busy === "application" || undefined}
+                  data-testid="record-application"
+                >
+                  {busy === "application"
+                    ? "Saving…"
+                    : "Record the application"}
+                </button>
+              </fieldset>
             </form>
           ) : null}
 
@@ -397,77 +414,79 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                 );
               }}
             >
-              <p className="font-medium">What this records</p>
-              <ol
-                className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6"
-                data-testid="exception-lines"
-              >
-                <li>{p.gate.lines.confirmed}</li>
-                <li>{p.gate.lines.supervised}</li>
-                <li>{p.gate.lines.plan}</li>
-                <li>{p.gate.lines.states}</li>
-              </ol>
-              <div className="mt-4">
-                <SelectField
-                  id="supervisor-ref"
-                  label="Supervised by"
-                  help="A worker in your account whose clearance you have checked in the database."
-                  errors={errorsOf(result, "supervisorRef")}
-                  value={supervisor}
-                  onChange={setSupervisor}
-                  options={p.gate.supervisors.map((s) => ({
-                    value: s,
-                    label: `${s} (holds a current clearance)`,
-                  }))}
-                />
-                <DateField
-                  id="start-verified-on"
-                  label="Day you confirmed the application in the database"
-                  errors={errorsOf(result, "verifiedOn")}
-                  value={verifiedOn}
-                  onChange={setVerifiedOn}
-                  max={p.today}
-                />
-                <DateField
-                  id="notice-seen-on"
-                  label="Day you saw the unit's written notice"
-                  errors={errorsOf(result, "noticeSeenOn")}
-                  value={noticeSeenOn}
-                  onChange={setNoticeSeenOn}
-                  max={p.today}
-                />
-                <DateField
-                  id="declaration-on"
-                  label="Day the worker gave the written declaration"
-                  errors={errorsOf(result, "declarationOn")}
-                  value={declarationOn}
-                  onChange={setDeclarationOn}
-                  max={p.today}
-                />
-                <DateField
-                  id="started-on"
-                  label="Day the worker starts under the exception"
-                  errors={errorsOf(result, "startedOn")}
-                  value={startedOn}
-                  onChange={setStartedOn}
-                />
-                <CheckboxField
-                  id="declaration"
-                  label={DECLARATION_LINE}
-                  help={DECLARATION_ASK}
-                  checked={declaration}
-                  onChange={setDeclaration}
-                />
-              </div>
-              <button
-                type="submit"
-                className="btn-primary"
-                disabled={busy !== null || !p.canWrite}
-                aria-busy={busy === "start" || undefined}
-                data-testid="start-exception"
-              >
-                {busy === "start" ? "Saving…" : "Record the exception"}
-              </button>
+              <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
+                <p className="font-medium">What this records</p>
+                <ol
+                  className="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6"
+                  data-testid="exception-lines"
+                >
+                  <li>{p.gate.lines.confirmed}</li>
+                  <li>{p.gate.lines.supervised}</li>
+                  <li>{p.gate.lines.plan}</li>
+                  <li>{p.gate.lines.states}</li>
+                </ol>
+                <div className="mt-4">
+                  <SelectField
+                    id="supervisor-ref"
+                    label="Supervised by"
+                    help="A worker in your account whose clearance you have checked in the database."
+                    errors={errorsOf(result, "supervisorRef")}
+                    value={supervisor}
+                    onChange={setSupervisor}
+                    options={p.gate.supervisors.map((s) => ({
+                      value: s,
+                      label: `${s} (holds a current clearance)`,
+                    }))}
+                  />
+                  <DateField
+                    id="start-verified-on"
+                    label="Day you confirmed the application in the database"
+                    errors={errorsOf(result, "verifiedOn")}
+                    value={verifiedOn}
+                    onChange={setVerifiedOn}
+                    max={p.today}
+                  />
+                  <DateField
+                    id="notice-seen-on"
+                    label="Day you saw the unit's written notice"
+                    errors={errorsOf(result, "noticeSeenOn")}
+                    value={noticeSeenOn}
+                    onChange={setNoticeSeenOn}
+                    max={p.today}
+                  />
+                  <DateField
+                    id="declaration-on"
+                    label="Day the worker gave the written declaration"
+                    errors={errorsOf(result, "declarationOn")}
+                    value={declarationOn}
+                    onChange={setDeclarationOn}
+                    max={p.today}
+                  />
+                  <DateField
+                    id="started-on"
+                    label="Day the worker starts under the exception"
+                    errors={errorsOf(result, "startedOn")}
+                    value={startedOn}
+                    onChange={setStartedOn}
+                  />
+                  <CheckboxField
+                    id="declaration"
+                    label={DECLARATION_LINE}
+                    help={DECLARATION_ASK}
+                    checked={declaration}
+                    onChange={setDeclaration}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={busy !== null || !p.canWrite}
+                  aria-busy={busy === "start" || undefined}
+                  data-testid="start-exception"
+                >
+                  {busy === "start" ? "Saving…" : "Record the exception"}
+                </button>
+              </fieldset>
             </form>
           ) : (
             <div
@@ -510,37 +529,39 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
               );
             }}
           >
-            <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              A code and a date, never the reason: the unit&apos;s letter is
-              your s 18(4) copy in the HR file.
-            </p>
-            <SelectField
-              id="decision-code"
-              label="The decision"
-              errors={errorsOf(result, "decisionCode")}
-              value={decision}
-              onChange={setDecision}
-              options={DECISION_CODES.map((c) => ({
-                value: c,
-                label: DECISION_LABELS[c],
-              }))}
-            />
-            <DateField
-              id="decision-on"
-              label="Day of the decision"
-              errors={errorsOf(result, "decisionOn")}
-              value={decisionOn}
-              onChange={setDecisionOn}
-              max={p.today}
-            />
-            <button
-              type="submit"
-              className="btn-secondary"
-              disabled={busy !== null}
-              data-testid="record-decision"
-            >
-              {busy === "decision" ? "Saving…" : "Record the decision"}
-            </button>
+            <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
+              <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                A code and a date, never the reason: the unit&apos;s letter is
+                your s 18(4) copy in the HR file.
+              </p>
+              <SelectField
+                id="decision-code"
+                label="The decision"
+                errors={errorsOf(result, "decisionCode")}
+                value={decision}
+                onChange={setDecision}
+                options={DECISION_CODES.map((c) => ({
+                  value: c,
+                  label: DECISION_LABELS[c],
+                }))}
+              />
+              <DateField
+                id="decision-on"
+                label="Day of the decision"
+                errors={errorsOf(result, "decisionOn")}
+                value={decisionOn}
+                onChange={setDecisionOn}
+                max={p.today}
+              />
+              <button
+                type="submit"
+                className="btn-secondary"
+                disabled={busy !== null}
+                data-testid="record-decision"
+              >
+                {busy === "decision" ? "Saving…" : "Record the decision"}
+              </button>
+            </fieldset>
           </form>
         </details>
       ) : null}
@@ -571,82 +592,84 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
               );
             }}
           >
-            <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              Readyline gates s 14(1)(a) and (2)(a) above. The other three are
-              your own call, recorded as a code and dates for your s 18 list.
-            </p>
-            <SelectField
-              id="own-code"
-              label="Which exception"
-              errors={errorsOf(result, "code")}
-              value={ownCode}
-              onChange={setOwnCode}
-              options={OWN_CALL_CODES.map((c) => ({
-                value: c,
-                label: EXCEPTION_CODE_LABELS[c],
-              }))}
-            />
-            {ownCode === "s14-1b" || ownCode === "s14-2b" ? (
-              <>
-                <SelectField
-                  id="part4-state"
-                  label="State whose Part 4 section applied"
-                  help={
-                    <>
-                      Every Part 4 arrangement has ended by its own date; s 29B
-                      ceased at the end of 1 February 2024 (s 29B(10)).{" "}
-                      {PART4_AFTER_MESSAGE}.
-                      {part4State && p.part4Ends[part4State]
-                        ? ` ${part4State}: the Rules' own years ran out on ${formatLongDay(p.part4Ends[part4State]!)}.`
-                        : ""}
-                      {part4State === "VIC" ? ` ${PART4_VIC_HELP}` : ""}
-                      {part4State === "QLD"
-                        ? " QLD: about three years from the card held at 31 January 2021, unverified until the yellow card's term is read."
-                        : ""}
-                    </>
-                  }
-                  errors={errorsOf(result, "part4State")}
-                  value={part4State}
-                  onChange={setPart4State}
-                  options={STATES.map((s) => ({ value: s, label: s }))}
-                />
-              </>
-            ) : null}
-            <DateField
-              id="own-started-on"
-              label="Day it started"
-              errors={errorsOf(result, "startedOn")}
-              value={ownStart}
-              onChange={setOwnStart}
-            />
-            <DateField
-              id="own-ended-on"
-              label="Day it ended"
-              errors={errorsOf(result, "endedOn")}
-              value={ownEnd}
-              onChange={setOwnEnd}
-              optional
-            />
-            <SelectField
-              id="own-end-code"
-              label="How it ended (optional)"
-              errors={errorsOf(result, "endCode")}
-              value={ownEndCode}
-              onChange={setOwnEndCode}
-              options={END_CODES.map((c) => ({
-                value: c,
-                label: END_CODE_LABELS[c],
-              }))}
-              placeholder="Still running"
-            />
-            <button
-              type="submit"
-              className="btn-secondary"
-              disabled={busy !== null}
-              data-testid="record-own-call"
-            >
-              {busy === "own-call" ? "Saving…" : "Record it"}
-            </button>
+            <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
+              <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Readyline gates s 14(1)(a) and (2)(a) above. The other three are
+                your own call, recorded as a code and dates for your s 18 list.
+              </p>
+              <SelectField
+                id="own-code"
+                label="Which exception"
+                errors={errorsOf(result, "code")}
+                value={ownCode}
+                onChange={setOwnCode}
+                options={OWN_CALL_CODES.map((c) => ({
+                  value: c,
+                  label: EXCEPTION_CODE_LABELS[c],
+                }))}
+              />
+              {ownCode === "s14-1b" || ownCode === "s14-2b" ? (
+                <>
+                  <SelectField
+                    id="part4-state"
+                    label="State whose Part 4 section applied"
+                    help={
+                      <>
+                        Every Part 4 arrangement has ended by its own date; s
+                        29B ceased at the end of 1 February 2024 (s 29B(10)).{" "}
+                        {PART4_AFTER_MESSAGE}.
+                        {part4State && p.part4Ends[part4State]
+                          ? ` ${part4State}: the Rules' own years ran out on ${formatLongDay(p.part4Ends[part4State]!)}.`
+                          : ""}
+                        {part4State === "VIC" ? ` ${PART4_VIC_HELP}` : ""}
+                        {part4State === "QLD"
+                          ? " QLD: about three years from the card held at 31 January 2021, unverified until the yellow card's term is read."
+                          : ""}
+                      </>
+                    }
+                    errors={errorsOf(result, "part4State")}
+                    value={part4State}
+                    onChange={setPart4State}
+                    options={STATES.map((s) => ({ value: s, label: s }))}
+                  />
+                </>
+              ) : null}
+              <DateField
+                id="own-started-on"
+                label="Day it started"
+                errors={errorsOf(result, "startedOn")}
+                value={ownStart}
+                onChange={setOwnStart}
+              />
+              <DateField
+                id="own-ended-on"
+                label="Day it ended"
+                errors={errorsOf(result, "endedOn")}
+                value={ownEnd}
+                onChange={setOwnEnd}
+                optional
+              />
+              <SelectField
+                id="own-end-code"
+                label="How it ended (optional)"
+                errors={errorsOf(result, "endCode")}
+                value={ownEndCode}
+                onChange={setOwnEndCode}
+                options={END_CODES.map((c) => ({
+                  value: c,
+                  label: END_CODE_LABELS[c],
+                }))}
+                placeholder="Still running"
+              />
+              <button
+                type="submit"
+                className="btn-secondary"
+                disabled={busy !== null}
+                data-testid="record-own-call"
+              >
+                {busy === "own-call" ? "Saving…" : "Record it"}
+              </button>
+            </fieldset>
           </form>
         </details>
       ) : null}
@@ -671,7 +694,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
           <button
             type="button"
             className="btn-secondary mt-3"
-            disabled={busy !== null}
+            disabled={busy !== null || !live}
             aria-busy={busy === "update" || undefined}
             data-testid="update-procedure"
             onClick={() =>
