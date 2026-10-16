@@ -24,7 +24,7 @@ const HOME_TERMS = [
   "module",
   "practice-standards",
   "certification-audit",
-  "self-assessment",
+  // "self-assessment" left with the "What you get" list (D-2810).
 ] as const;
 
 /**
