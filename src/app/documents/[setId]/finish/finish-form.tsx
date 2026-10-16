@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { ParticipantDataWarning } from "@/app/start/_components/fields";
 import type { FactQuestion } from "@/lib/generator/facts-fill";
 import { finishPackAction, saveFactAction } from "@/server/path/actions";
@@ -61,6 +61,15 @@ export function FinishForm({
   // step at a time, never a dead end).
   const UNREACHABLE =
     "Could not reach the server. Check your connection and try again.";
+  // QA pass, ninth item (D-2269 item 9; #83's run 38929762314, android-small):
+  // the server re-rendered the set five times inside eight seconds, each
+  // call under a second, while this tab's button stayed busy for 240 s, so
+  // the replies were lost on the way back and the tab had no way out. The
+  // finish call now waits this long at most; a lost reply ends with a
+  // refresh, which shows the summary when the server did finish, and the
+  // message with the button back when it did not.
+  const FINISH_REPLY_MS = 60_000;
+  const inFlight = useRef(false);
 
   async function saveOne(q: FactQuestion): Promise<boolean> {
     const value = (answers[q.key] ?? "").trim();
@@ -86,14 +95,22 @@ export function FinishForm({
     setMessage(null);
     let r: Awaited<ReturnType<typeof finishPackAction>> | null = null;
     try {
-      r = await finishPackAction({ setId });
+      r = await Promise.race([
+        finishPackAction({ setId }),
+        new Promise<null>((resolve) =>
+          setTimeout(() => resolve(null), FINISH_REPLY_MS),
+        ),
+      ]);
     } catch {
       r = null;
     } finally {
       setBusy(false);
     }
     if (!r) {
+      // The server may have finished without this tab hearing it: the
+      // refreshed page says so when it did, and asks again when it did not.
       setMessage(UNREACHABLE);
+      router.refresh();
       return;
     }
     if (!r.ok) {
@@ -105,16 +122,34 @@ export function FinishForm({
   }
 
   async function next(q: FactQuestion) {
+    // One submit at a time: a second one (a touch and a click both landing,
+    // a key held) while the first is out is ignored, not queued.
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setMessage(null);
-    const ok = await saveOne(q);
-    setBusy(false);
-    if (!ok) return;
-    if (index + 1 < questions.length) setIndex(index + 1);
-    else await finish();
+    try {
+      const ok = await saveOne(q);
+      setBusy(false);
+      if (!ok) return;
+      if (index + 1 < questions.length) setIndex(index + 1);
+      else await finish();
+    } finally {
+      inFlight.current = false;
+    }
   }
 
   async function saveAll() {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    try {
+      await saveAllOnce();
+    } finally {
+      inFlight.current = false;
+    }
+  }
+
+  async function saveAllOnce() {
     setBusy(true);
     setMessage(null);
     for (const q of questions) {
