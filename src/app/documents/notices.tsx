@@ -13,7 +13,7 @@ export function DocumentsNotices() {
       className="border-rule text-ink mt-10 rounded-md border p-4 text-sm leading-6"
       data-testid="documents-notices"
     >
-      <h2 id="notices-heading" className="text-base font-semibold">
+      <h2 id="notices-heading" className="">
         About these documents
       </h2>
       <p className="mt-2">{GENERAL_INFORMATION_NOTICE}</p>

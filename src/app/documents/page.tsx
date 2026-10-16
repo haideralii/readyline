@@ -122,7 +122,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-none"
         >
-          <h2 id="buy-heading" className="text-xl font-semibold">
+          <h2 id="buy-heading" className="">
             {C.buyHeading}
           </h2>
           <p className="text-ink mt-2 leading-7">{C.buyLead}</p>
@@ -174,7 +174,7 @@ function PurchaseSection({
             // REQ-021: the five honest phases from the job row; the words below stay for the status role.
             <WritingIndicator initial={writing} />
           ) : (
-            <h2 className="text-xl font-semibold">{C.preparingHeading}</h2>
+            <h2 className="">{C.preparingHeading}</h2>
           )}
           <p role="status" className="text-slate mt-3 text-sm leading-6">
             {C.preparing} {C.preparingProgress(state.documentsDone)}
@@ -189,7 +189,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-delayed"
         >
-          <h2 id="delayed-heading" className="text-xl font-semibold">
+          <h2 id="delayed-heading" className="">
             {C.preparingHeading}
           </h2>
           <p role="status" className="mt-2 leading-7">
@@ -209,7 +209,7 @@ function PurchaseSection({
             // REQ-021 S6, AC-3: the Ready state at once, leading with the next step of the guided path.
             <WritingIndicator initial={writing} />
           ) : (
-            <h2 id="ready-heading" className="text-xl font-semibold">
+            <h2 id="ready-heading" className="">
               {C.readyHeading}
             </h2>
           )}
@@ -247,7 +247,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-refunded"
         >
-          <h2 id="refunded-heading" className="text-xl font-semibold">
+          <h2 id="refunded-heading" className="">
             {C.refundedHeading}
           </h2>
           <p className="mt-2 leading-7">
@@ -301,7 +301,7 @@ export default async function DocumentsPage({
 
   return (
     <PageShell kind="grid">
-      <h1 className="text-3xl font-semibold tracking-tight">Your documents</h1>
+      <h1 className="">Your documents</h1>
       <p className="text-ink mt-3 leading-7">{C.intro}</p>
 
       {/* Batch 45 item 2: with generation off and nothing bought, no Buy box; the one line below says why. */}
@@ -319,7 +319,7 @@ export default async function DocumentsPage({
 
       {enabled ? (
         <section aria-labelledby="generate-heading" className="mt-10">
-          <h2 id="generate-heading" className="text-xl font-semibold">
+          <h2 id="generate-heading" className="">
             Generate a new set
           </h2>
           <p className="text-ink mt-2 text-sm leading-6">
@@ -344,7 +344,7 @@ export default async function DocumentsPage({
 
       {otherSets.length > 0 ? (
         <section aria-labelledby="sets-heading" className="mt-10">
-          <h2 id="sets-heading" className="text-xl font-semibold">
+          <h2 id="sets-heading" className="">
             {state.kind === "ready" ? "Other document sets" : "Document sets"}
           </h2>
           <ul className="divide-rule mt-3 divide-y">

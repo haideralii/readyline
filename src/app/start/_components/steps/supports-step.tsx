@@ -76,7 +76,7 @@ function subscribeWide(onChange: () => void) {
 
 function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
   return (
-    <span className="border-line text-slate rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
+    <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
       {auditType === "verification" ? "desk audit" : "site audit"}
     </span>
   );
@@ -225,7 +225,7 @@ export function SupportsStepForm() {
           <>
             <AuditTag auditType={g.auditType} />
             {g.mandatoryFrom ? (
-              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
+              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
                 registration mandatory from 1 July 2026
               </span>
             ) : null}
@@ -367,12 +367,12 @@ export function SupportsStepForm() {
                         ({all.length} {all.length === 1 ? "class" : "classes"}
                         {ticked.length ? `, ${ticked.length} ticked` : ""})
                       </span>
-                      <span className="text-slate block text-sm font-normal">
-                        {c.description}
-                      </span>
                     </span>
                   </button>
                 </h2>
+                <p className="text-slate -mt-1 px-3 pb-2 pl-9 text-sm leading-6">
+                  {c.description}
+                </p>
                 {open ? (
                   <ul
                     id={`category-${c.id}-list`}
@@ -421,9 +421,7 @@ export function SupportsStepForm() {
           className="border-rule mb-6 rounded-md border p-4"
           id="silEligibility"
         >
-          <h2 className="text-base font-semibold">
-            Two questions about supported independent living
-          </h2>
+          <h2 className="">Two questions about supported independent living</h2>
           <p className="text-slate mt-1 text-sm leading-6">
             The Commission says it is not supported independent living if either
             of these is true. If so, class 0138 is left out of your result and

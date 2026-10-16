@@ -207,7 +207,7 @@ export function SafeTextArea({
             aria-invalid={invalid || undefined}
             className={`${inputClass} min-h-24 ${invalid ? invalidClass : ""}`}
           />
-          <p className="text-slate mt-1 text-right text-xs">
+          <p className="text-slate mt-1 text-right text-sm">
             {value.length} of {maxLength} characters
           </p>
           {warnings.length ? (

@@ -69,9 +69,7 @@ export default async function ReviewDocumentPage({
           Back to the set
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        {current.model.title}
-      </h1>
+      <h1 className="mt-2">{current.model.title}</h1>
       <p className="text-slate mt-2 text-sm">
         Version {current.version} ·{" "}
         {current.status === "ready" ? "drafted" : "review needed"} ·{" "}
@@ -143,11 +141,11 @@ export default async function ReviewDocumentPage({
               className="border-rule rounded-md border p-4"
               data-testid={`section-${s.id}`}
             >
-              <h2 className="text-lg font-semibold">
+              <h2 className="">
                 {s.number ? `${s.number} ` : ""}
                 {s.heading}
               </h2>
-              <p className="text-slate mt-1 text-xs">
+              <p className="text-slate mt-1 text-sm">
                 {s.mode === "fixed"
                   ? "Fixed text"
                   : s.status === "generated"
@@ -174,7 +172,7 @@ export default async function ReviewDocumentPage({
                   <p className="font-medium">
                     What changed from version {previous!.version}
                   </p>
-                  <ul className="mt-2 space-y-1 font-mono text-xs">
+                  <ul className="mt-2 space-y-1 font-mono text-sm">
                     {diff.map((l, i) => (
                       <li
                         key={i}

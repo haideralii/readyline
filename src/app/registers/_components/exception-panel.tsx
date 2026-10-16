@@ -170,7 +170,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
       className="mt-8"
       data-testid="exception-panel"
     >
-      <h2 id="exception-heading" className="text-lg font-semibold">
+      <h2 id="exception-heading" className="">
         Starting before the clearance: the s 14 exception
       </h2>
       <p className="text-slate mt-1 text-sm leading-6">
@@ -501,7 +501,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                   <li key={r}>{r}</li>
                 ))}
               </ul>
-              <p className="text-slate mt-2 text-xs">
+              <p className="text-slate mt-2 text-sm">
                 Source: {SUPERVISOR_SOURCE}.
               </p>
             </div>

@@ -145,7 +145,7 @@ export function TextArea(props: {
       />
       <p
         id={counterId}
-        className="text-slate mt-1 text-right text-xs"
+        className="text-slate mt-1 text-right text-sm"
         aria-live="polite"
       >
         {rest.value.length} of {maxLength} characters
@@ -382,9 +382,7 @@ export function ErrorSummary({
       role="alert"
       className="mb-6 rounded-md border border-red-700 bg-red-50 p-4 outline-none dark:border-red-400 dark:bg-red-950"
     >
-      <h2 className="text-base font-semibold">
-        Please fix the following before continuing
-      </h2>
+      <h2 className="">Please fix the following before continuing</h2>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
         {entries.map(([name, msgs]) => (
           <li key={name}>

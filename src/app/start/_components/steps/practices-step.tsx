@@ -165,9 +165,7 @@ export function PracticesStepForm() {
           id="notSureHelper"
           data-testid="not-sure-helper"
         >
-          <h2 className="text-base font-semibold">
-            Three quick questions to work it out
-          </h2>
+          <h2 className="">Three quick questions to work it out</h2>
           <div className="mt-4">
             {HELPER.map((h) => (
               <RadioGroup

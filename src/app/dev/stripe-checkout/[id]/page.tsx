@@ -47,7 +47,7 @@ export default async function FakeCheckoutPage({
         Test environment only. This page stands in for Stripe Checkout; no
         payment is taken and no card details are asked for.
       </p>
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">
+      <h1 className="mt-6">
         {receipt
           ? "Fake receipt"
           : portal

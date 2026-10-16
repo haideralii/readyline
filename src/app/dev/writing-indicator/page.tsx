@@ -50,9 +50,7 @@ export default async function WritingIndicatorDemoPage({
         Test environment only. This page shows the writing indicator on a
         scripted feed; nothing here is a real document.
       </p>
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">
-        Your documents
-      </h1>
+      <h1 className="mt-6">Your documents</h1>
       <section className="border-rule mt-6 rounded-md border p-5">
         <WritingIndicator
           initial={initial}

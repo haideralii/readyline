@@ -13,9 +13,7 @@ export const metadata: Metadata = { title: "Page not found" };
 export default function NotFound() {
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        That page is not here.
-      </h1>
+      <h1 className="">That page is not here.</h1>
       <p className="text-ink mt-4 leading-7">
         The link may be old or mistyped. Start with the free questions, or read
         the guides.

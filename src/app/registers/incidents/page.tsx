@@ -107,7 +107,7 @@ export default async function IncidentsPage() {
           className="border-signal mt-5 rounded-md border p-3"
           data-testid="reports-to-confirm"
         >
-          <h2 id="to-confirm-heading" className="text-lg font-semibold">
+          <h2 id="to-confirm-heading" className="">
             {toConfirm}
           </h2>
           <p className="text-ink mt-1 text-sm leading-6">

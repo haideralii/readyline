@@ -15,9 +15,7 @@ export default async function AccountSetupPage() {
   if (viewer.worker) redirect("/worker");
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        About your business
-      </h1>
+      <h1 className="">About your business</h1>
       <p className="text-ink mt-3 leading-7">
         This creates your account. If you started the questionnaire on this
         device, we have filled in what you told us and will move your draft to

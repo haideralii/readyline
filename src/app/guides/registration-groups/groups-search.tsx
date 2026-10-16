@@ -78,7 +78,7 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
           className="mt-8"
           data-testid={`groups-category-${c.id}`}
         >
-          <h2 id={`cat-${c.id}`} className="text-xl font-semibold">
+          <h2 id={`cat-${c.id}`} className="">
             {c.title}
           </h2>
           <p className="text-slate mt-1 text-sm leading-6">{c.description}</p>

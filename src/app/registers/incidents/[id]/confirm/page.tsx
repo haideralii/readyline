@@ -64,15 +64,13 @@ export default async function ConfirmReportPage({
           </div>
         ))}
       </dl>
-      <h2 className="mt-6 text-lg font-semibold">What happened</h2>
+      <h2 className="mt-6">What happened</h2>
       <p className="mt-1 leading-7" data-testid="report-summary">
         {r.summary}
       </p>
       {r.actions_taken ? (
         <>
-          <h2 className="mt-4 text-lg font-semibold">
-            What was done straight away
-          </h2>
+          <h2 className="mt-4">What was done straight away</h2>
           <p className="mt-1 leading-7">{r.actions_taken}</p>
         </>
       ) : null}

@@ -137,7 +137,7 @@ function Section({
         {s.number ? `${s.number} ` : ""}
         {s.heading}
       </H>
-      <p className="text-slate mt-1 text-xs font-medium tracking-wide uppercase">
+      <p className="text-slate mt-1 text-sm font-medium tracking-wide uppercase">
         {s.mode === "tailored" ? MODE_LABEL.tailored : MODE_LABEL.fixed}
       </p>
       <Blocks blocks={s.blocks} />

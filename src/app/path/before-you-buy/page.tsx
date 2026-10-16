@@ -33,9 +33,7 @@ export default async function BeforeYouBuyPage() {
   const documents = ctx.result.documents.length + 1;
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Get your documents
-      </h1>
+      <h1 className="">Get your documents</h1>
       <p className="mt-4 text-lg leading-8" data-testid="buy-line-what">
         {documents} documents drafted for {viewer.account.trading_name}, as Word
         files you can edit.

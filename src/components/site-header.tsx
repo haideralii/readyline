@@ -40,7 +40,7 @@ export async function SiteHeader() {
         {/* Previews and local runs only (batch 26 item 6): trial providers on production never see it. */}
         {isProductionDeployment() ? null : (
           <span
-            className="border-line text-slate order-3 rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap sm:order-none"
+            className="border-line text-slate order-3 rounded-full border px-2.5 py-0.5 text-sm whitespace-nowrap sm:order-none"
             data-testid="dev-badge"
           >
             In development

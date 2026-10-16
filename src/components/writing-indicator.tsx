@@ -168,7 +168,7 @@ export function WritingIndicator({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="text-xl font-semibold outline-none"
+            className="outline-none"
             data-testid="wi-heading"
           >
             {status.phase === "ready"

@@ -224,7 +224,7 @@ export default async function RegistersPage() {
             className="mt-8"
             data-testid={`registers-${g.id}`}
           >
-            <h2 id={`${g.id}-heading`} className="text-xl font-semibold">
+            <h2 id={`${g.id}-heading`} className="">
               {g.heading}
             </h2>
             <p className="text-slate mt-1 text-sm">{g.intro}</p>
@@ -267,7 +267,7 @@ export default async function RegistersPage() {
         className="border-rule mt-10 rounded-md border p-4"
         data-testid="codes-panel"
       >
-        <h2 id="codes-heading" className="text-lg font-semibold">
+        <h2 id="codes-heading" className="">
           How codes work
         </h2>
         <p className="mt-2 leading-7">

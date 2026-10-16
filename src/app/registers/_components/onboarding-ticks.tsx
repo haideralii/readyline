@@ -63,7 +63,7 @@ export function OnboardingTicks({
       className="mt-6"
       data-testid="onboarding-ticks"
     >
-      <h2 id="ticks-heading" className="text-lg font-semibold">
+      <h2 id="ticks-heading" className="">
         {left === 0
           ? "Every item is ticked."
           : `${left} of ${items.length} items left`}

@@ -78,7 +78,7 @@ export default async function PricingPage() {
   const offered = subscriptionAvailable();
   return (
     <PageShell kind="grid">
-      <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
+      <h1 className="">{C.title}</h1>
       <p className={body}>{C.intro}</p>
       {/* REQ-027 FR-3, D-2701: the words on this page, above the first body section and inside no other disclosure. */}
       <GlossaryTerms ids={PRICING_TERMS} where="page" className="mt-3" />
@@ -134,7 +134,7 @@ export default async function PricingPage() {
           data-testid="pricing-subscription"
         >
           <p className={eyebrow}>{C.keepsEyebrow}</p>
-          <h2 id="sub-heading" className="mt-1 text-xl font-semibold">
+          <h2 id="sub-heading" className="mt-1">
             {C.subscriptionHeading}
           </h2>
           {offered ? (
@@ -193,12 +193,15 @@ export default async function PricingPage() {
           data-testid="pricing-pack"
         >
           <p className={eyebrow}>{C.startEyebrow}</p>
-          <h2 id="price-heading" className="mt-1 text-xl font-semibold">
+          <h2 id="price-heading" className="mt-1">
             {C.priceHeading}
           </h2>
           {pricing.packPriceCents ? (
             <p className="mt-2">
-              <span className="text-3xl font-semibold" data-testid="pack-price">
+              <span
+                className="text-3xl font-semibold tabular-nums"
+                data-testid="pack-price"
+              >
                 {formatAud(pricing.packPriceCents)}
               </span>{" "}
               <span className="text-slate">one-off, for the document pack</span>

@@ -28,9 +28,7 @@ export default async function WorkerNewIncidentPage() {
           Your entries
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Log an incident
-      </h1>
+      <h1 className="mt-2">Log an incident</h1>
       <p className="mt-3 leading-7" data-testid="emergency-line">
         {EMERGENCY_LINE}
       </p>

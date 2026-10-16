@@ -55,7 +55,7 @@ export default async function LaunchPage() {
   await writeAdminAudit(ctx.user.id, "admin.launch.viewed", "/admin/launch");
   return (
     <PageShell kind="list">
-      <h1 className="text-3xl font-semibold tracking-tight">Launch</h1>
+      <h1 className="">Launch</h1>
       <p className="text-slate mt-2 text-sm">
         Every launch condition by name and state, never by value. The launch
         checklist in the repository uses the same names. This visit is in the
@@ -75,7 +75,7 @@ export default async function LaunchPage() {
             className="mt-8"
             data-testid={`launch-group-${group}`}
           >
-            <h2 id={`launch-${group}`} className="text-xl font-semibold">
+            <h2 id={`launch-${group}`} className="">
               {LAUNCH_GROUP_TITLES[group]}
             </h2>
             <ul className="divide-rule mt-3 divide-y">

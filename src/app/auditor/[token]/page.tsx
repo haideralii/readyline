@@ -65,9 +65,7 @@ export default async function AuditorPage({
   if (!(await checkAuditorOpenAllowed(link.linkId, address)))
     return (
       <PageShell kind="reading">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Too many opens
-        </h1>
+        <h1 className="">Too many opens</h1>
         <p className="mt-3 leading-7" data-testid="auditor-limited">
           {AUDITOR_OPEN_LIMITED_LINE}
         </p>
@@ -85,9 +83,7 @@ export default async function AuditorPage({
       >
         {auditorBanner(link.tradingName, link.expiresAt)}
       </p>
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">
-        Audit view: {link.tradingName}
-      </h1>
+      <h1 className="mt-6">Audit view: {link.tradingName}</h1>
       <p className="mt-3 leading-7">{packIntro(link.tradingName, date)}</p>
       <p className="mt-4">
         <a
@@ -104,7 +100,7 @@ export default async function AuditorPage({
         className="mt-10"
         data-testid="auditor-records"
       >
-        <h2 id="records-heading" className="text-xl font-semibold">
+        <h2 id="records-heading" className="">
           The records, and the state of each
         </h2>
         <DataTable
@@ -124,7 +120,7 @@ export default async function AuditorPage({
         className="mt-10"
         data-testid="auditor-document-control"
       >
-        <h2 id="dc-heading" className="text-xl font-semibold">
+        <h2 id="dc-heading" className="">
           Document control register
         </h2>
         <DataTable
@@ -143,7 +139,7 @@ export default async function AuditorPage({
           className="mt-10"
           data-testid={`auditor-register-${t.id}`}
         >
-          <h2 id={`reg-${t.id}`} className="text-xl font-semibold">
+          <h2 id={`reg-${t.id}`} className="">
             {t.title}
           </h2>
           {t.rows.length ? (
@@ -158,7 +154,7 @@ export default async function AuditorPage({
         </section>
       ))}
 
-      <p className="text-slate mt-10 text-xs">
+      <p className="text-slate mt-10 text-sm">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
     </PageShell>

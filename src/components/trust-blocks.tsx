@@ -33,7 +33,7 @@ export function Testimonials() {
       aria-labelledby="testimonials-heading"
       data-testid="testimonials"
     >
-      <h2 id="testimonials-heading" className="text-xl font-semibold">
+      <h2 id="testimonials-heading" className="">
         In providers&apos; own words
       </h2>
       <ul className="mt-4 space-y-4">

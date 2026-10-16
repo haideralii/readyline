@@ -159,7 +159,7 @@ export function Stepper({
               {/* FR-6: labels under the circles from 640 px up; FR-8: on a phone the names are in the disclosure above. */}
               <span
                 aria-hidden="true"
-                className={`mt-1 hidden text-xs sm:block ${state === "current" ? "font-semibold" : state === "todo" ? "text-slate" : ""}`}
+                className={`mt-1 hidden text-sm sm:block ${state === "current" ? "font-semibold" : state === "todo" ? "text-slate" : ""}`}
               >
                 {STEP_SHORT[id]}
               </span>

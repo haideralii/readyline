@@ -103,7 +103,7 @@ export default async function GuidePage({
             ‹ Guides
           </Link>
         </p>
-        <h1 className="text-3xl font-semibold tracking-tight">{g.title}</h1>
+        <h1 className="">{g.title}</h1>
         <p className="text-slate mt-2 text-sm" data-testid="guide-reviewed">
           Last reviewed {formatUpdated(g.reviewed)}. Updated{" "}
           {formatUpdated(g.updated)}.
@@ -124,10 +124,7 @@ export default async function GuidePage({
           className="border-ochre mt-6 rounded-md border p-4"
           data-testid="guide-short-answer"
         >
-          <h2
-            id="short-answer-heading"
-            className="text-lg font-semibold tracking-tight"
-          >
+          <h2 id="short-answer-heading" className="">
             Short answer
           </h2>
           <ul className="mt-2 list-disc space-y-1 pl-5 leading-7">
@@ -186,10 +183,7 @@ export default async function GuidePage({
             className="mt-10"
             data-testid="guide-faq"
           >
-            <h2
-              id="faq-heading"
-              className="text-xl font-semibold tracking-tight"
-            >
+            <h2 id="faq-heading" className="">
               Questions people ask
             </h2>
             {g.faq.map((f) => (
@@ -217,7 +211,7 @@ export default async function GuidePage({
           className="border-ochre mt-10 rounded-md border p-4"
           data-testid="guide-cta"
         >
-          <h2 id="cta-heading" className="text-xl font-semibold tracking-tight">
+          <h2 id="cta-heading" className="">
             See which audit you need, free
           </h2>
           <p className="mt-2 leading-7">
@@ -237,10 +231,7 @@ export default async function GuidePage({
             className="mt-10"
             data-testid="guide-sources"
           >
-            <h2
-              id="sources-heading"
-              className="text-xl font-semibold tracking-tight"
-            >
+            <h2 id="sources-heading" className="">
               Sources
             </h2>
             <ul className="text-ink mt-3 list-disc space-y-2 pl-5 leading-7">

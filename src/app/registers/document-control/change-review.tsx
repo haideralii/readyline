@@ -89,7 +89,7 @@ export function ChangeReview(props: {
           <dd className="[overflow-wrap:anywhere]">{change.newSentence}</dd>
         </div>
       </dl>
-      <p className="text-slate mt-1 text-xs">Source: {change.source}</p>
+      <p className="text-slate mt-1 text-sm">Source: {change.source}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {canRegenerate ? (
           <button

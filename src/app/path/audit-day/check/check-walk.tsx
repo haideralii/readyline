@@ -108,7 +108,7 @@ export function CheckWalk({
       >
         {i + 1} of {total}
       </p>
-      <h2 className="mt-1 text-xl font-semibold" data-testid="check-record">
+      <h2 className="mt-1" data-testid="check-record">
         {current.name}
       </h2>
       <p

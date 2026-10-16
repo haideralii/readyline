@@ -31,7 +31,7 @@ export default function GuidesPage() {
   );
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">Guides</h1>
+      <h1 className="">Guides</h1>
       <p className="text-ink mt-3 leading-7">{LEAD}</p>
       {/* REQ-011 batch 31: the 38 registration-group pages have their own index. */}
       <p className="mt-4 leading-7" data-testid="guides-groups-link">
@@ -55,7 +55,7 @@ export default function GuidesPage() {
               {g.title}
             </Link>
             <p className="text-ink mt-1 text-sm leading-6">{g.description}</p>
-            <p className="text-slate mt-1 text-xs">
+            <p className="text-slate mt-1 text-sm">
               Last reviewed {formatUpdated(g.reviewed)}
             </p>
           </li>

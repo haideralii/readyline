@@ -53,9 +53,7 @@ export function DataTable({
             <dl>
               {r.map((cell, ci) => (
                 <div key={ci} className="mt-1">
-                  <dt className="text-slate text-xs tracking-wide uppercase">
-                    {columns[ci]}
-                  </dt>
+                  <dt className="text-slate text-sm">{columns[ci]}</dt>
                   <dd className="leading-6 break-normal [overflow-wrap:normal]">
                     {cellText(cell)}
                   </dd>
@@ -81,7 +79,7 @@ export function DataTable({
                 <th
                   key={c}
                   scope="col"
-                  className={`border-rule border-b py-1 pr-3 text-left font-semibold break-normal [overflow-wrap:normal] ${ci === 0 ? "min-w-36" : ""}`}
+                  className={`border-rule border-b py-1 pr-3 text-left text-xs font-semibold tracking-wide break-normal [overflow-wrap:normal] uppercase ${ci === 0 ? "min-w-36" : ""}`}
                 >
                   {c}
                 </th>

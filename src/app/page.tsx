@@ -77,9 +77,7 @@ export default function Home() {
       />
       <section data-testid="home-hero">
         <p className="text-slate text-sm font-medium">{C.eyebrow}</p>
-        <h1 className="mt-2 text-3xl tracking-tight sm:text-4xl">
-          {heroHeadline(price)}
-        </h1>
+        <h1 className="mt-2">{heroHeadline(price)}</h1>
         <p className="text-ink mt-4 text-lg leading-8">{C.lead}</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link href="/start" className="btn-primary" data-testid="home-cta">
@@ -140,7 +138,7 @@ export default function Home() {
         aria-labelledby="sample-heading"
         data-testid="home-sample"
       >
-        <h2 id="sample-heading" className="text-xl font-semibold">
+        <h2 id="sample-heading" className="">
           {C.sampleHeading}
         </h2>
         <ul className="text-ink mt-2 list-disc space-y-1 pl-5 leading-7">
@@ -187,7 +185,7 @@ export default function Home() {
         aria-labelledby="trust-heading"
         data-testid="home-trust"
       >
-        <h2 id="trust-heading" className="text-xl font-semibold">
+        <h2 id="trust-heading" className="">
           {C.trustHeading}
         </h2>
         <ul className="text-ink mt-4 space-y-3 leading-7">
@@ -205,7 +203,7 @@ export default function Home() {
         aria-labelledby="example-heading"
         data-testid="home-example"
       >
-        <h2 id="example-heading" className="text-xl font-semibold">
+        <h2 id="example-heading" className="">
           {C.exampleHeading}
         </h2>
         <p className="text-slate mt-2 text-sm leading-6">{C.exampleLead}</p>
@@ -239,7 +237,7 @@ export default function Home() {
         aria-labelledby="mission-heading"
         data-testid="home-mission"
       >
-        <h2 id="mission-heading" className="text-xl font-semibold">
+        <h2 id="mission-heading" className="">
           {C.missionHeading}
         </h2>
         {[

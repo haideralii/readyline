@@ -18,9 +18,7 @@ export default async function AdminMfaPage() {
       : { kind: "enrol" as const };
   return (
     <PageShell kind="form">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Authenticator check
-      </h1>
+      <h1 className="">Authenticator check</h1>
       <p className="text-ink mt-3 leading-7">
         {mode.kind === "enrol"
           ? "Admin pages need a second factor. Scan the code with an authenticator app, then enter the 6-digit code it shows."

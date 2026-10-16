@@ -67,9 +67,7 @@ export function StartIntro() {
       <p className="text-slate text-sm font-medium">
         About ten minutes, five steps
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-        Find out what registration needs from you
-      </h1>
+      <h1 className="mt-2">Find out what registration needs from you</h1>
       <p className="text-ink mt-4 text-lg leading-8">
         Answer a few questions about your business and the supports you deliver.
         You will see which Practice Standards modules apply, whether you face a

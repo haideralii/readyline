@@ -432,7 +432,7 @@ export async function AuditDayDetailPage({
           className="mt-6"
           data-testid="worker-clearances"
         >
-          <h2 id="worker-clearances-heading" className="text-lg font-semibold">
+          <h2 id="worker-clearances-heading" className="">
             Checks and training on the worker checks register
           </h2>
           <ul className="divide-rule mt-2 divide-y text-sm">

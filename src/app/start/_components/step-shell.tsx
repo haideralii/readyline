@@ -70,7 +70,7 @@ export function StepShell({
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="focus-quiet mt-4 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
+        className="focus-quiet mt-4 outline-none"
       >
         {STEP_TITLES[step]}
       </h1>
@@ -78,7 +78,7 @@ export function StepShell({
       <div className="mt-6">{children}</div>
 
       <p
-        className="text-slate mt-8 text-xs"
+        className="text-slate mt-8 text-sm"
         role="status"
         data-testid="draft-status"
       >

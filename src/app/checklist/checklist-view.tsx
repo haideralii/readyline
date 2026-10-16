@@ -56,7 +56,7 @@ function StatusTag({ status }: { status: ShownStatus }) {
   const t = TAG[status];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.tone}`}
       data-testid="status-tag"
     >
       <span aria-hidden="true">{t.icon}</span>
@@ -235,9 +235,7 @@ export function ChecklistView({
 
   return (
     <div className="print:hidden">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Readiness checklist
-      </h1>
+      <h1 className="">Readiness checklist</h1>
       <p className="text-ink mt-3 leading-7">
         For <strong>{tradingName}</strong>, a {pathway} audit. Tap an item to
         set its status. <strong>Done</strong> means reviewed and adopted.
@@ -267,7 +265,7 @@ export function ChecklistView({
           className="border-ochre mt-5 rounded-md border p-4"
           data-testid="checklist-next"
         >
-          <h2 id="next-three-heading" className="text-lg font-semibold">
+          <h2 id="next-three-heading" className="">
             Next three things to do
           </h2>
           <ol className="mt-2 list-decimal space-y-1 pl-5">

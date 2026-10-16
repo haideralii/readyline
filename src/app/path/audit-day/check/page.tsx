@@ -64,9 +64,7 @@ export default async function CheckPage() {
           ‹ Audit day
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Check my systems
-      </h1>
+      <h1 className="mt-2">Check my systems</h1>
       <p className="text-ink mt-3 leading-7">
         One question per record, yes or no. Every no becomes a row in your
         improvement register with a date 30 days out. About ten minutes.

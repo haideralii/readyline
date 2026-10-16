@@ -97,9 +97,7 @@ export function ResultStep({
   if (!response.ok) {
     return (
       <div role="alert" className="border-rule rounded-md border p-4">
-        <h2 className="text-lg font-semibold">
-          We need a change to your answers
-        </h2>
+        <h2 className="">We need a change to your answers</h2>
         <p className="mt-2 leading-7">
           {response.kind === "derivation"
             ? response.message
@@ -240,7 +238,7 @@ function HaveTag({ have }: { have: string }) {
   if (!t) return null;
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.tone}`}
       data-testid="have-tag"
     >
       <span aria-hidden="true">{t.icon}</span>
@@ -345,7 +343,7 @@ function ResultView({
         className="border-line bg-mist rounded-md border p-4"
         data-testid="summary"
       >
-        <h2 id="summary-heading" className="text-2xl font-semibold">
+        <h2 id="summary-heading" className="">
           Your audit: {pathwayWord}
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
@@ -357,7 +355,7 @@ function ResultView({
           {r.groups.map((g) => (
             <li
               key={g.code}
-              className="border-line text-ink rounded-full border px-2 py-0.5 text-xs"
+              className="border-line text-ink rounded-full border px-2 py-0.5 text-sm"
             >
               {g.name} <span className="text-slate font-mono">{g.code}</span>
             </li>
@@ -375,7 +373,9 @@ function ResultView({
           className="mt-2 space-y-1 text-base leading-6 sm:mt-3 sm:leading-7"
           data-testid="summary-list"
         >
-          <li data-testid="summary-documents">{lines.documents}</li>
+          <li className="tabular-nums" data-testid="summary-documents">
+            {lines.documents}
+          </li>
           <li data-testid="summary-registers">{lines.registers}</li>
           {/* REQ-027 FR-3a (finding 33): one sign-in nudge per card, the "Next:" line's. */}
           <li data-testid="checklist-count-line">{lines.checklist}</li>
@@ -487,7 +487,7 @@ function ResultView({
             </li>
           ))}
         </ul>
-        <h3 className="mt-5 text-base font-semibold">
+        <h3 className="mt-5">
           {MODULES_HEADING} ({r.modules.length})
         </h3>
         <ul className="mt-2 space-y-3">
@@ -517,7 +517,7 @@ function ResultView({
             </li>
           ))}
         </ul>
-        <h3 className="mt-5 text-base font-semibold">{MID_TERM_HEADING}</h3>
+        <h3 className="mt-5">{MID_TERM_HEADING}</h3>
         <p className="mt-1 text-sm leading-6" data-testid="mid-term">
           {r.midTermAudit.applies
             ? MID_TERM_APPLIES.replace(
@@ -669,7 +669,7 @@ function ResultView({
         className="border-rule rounded-md border p-4"
         data-testid="what-next"
       >
-        <h2 id="next-heading" className="text-lg font-semibold">
+        <h2 id="next-heading" className="">
           What happens next
         </h2>
         <p className="mt-2 text-sm leading-6">

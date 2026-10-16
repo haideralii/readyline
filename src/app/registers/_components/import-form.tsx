@@ -206,7 +206,7 @@ export function ImportForm({
       ) : null}
       {recent.length > 0 ? (
         <section aria-labelledby="recent-imports" className="mt-8">
-          <h2 id="recent-imports" className="text-lg font-semibold">
+          <h2 id="recent-imports" className="">
             Recent imports
           </h2>
           <ul className="divide-rule mt-2 divide-y text-sm">

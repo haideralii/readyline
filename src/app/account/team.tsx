@@ -63,7 +63,7 @@ export function TeamPanel({
 
   return (
     <div data-testid="team-panel">
-      <h3 className="mt-4 text-lg font-semibold">Workers</h3>
+      <h3 className="mt-4">Workers</h3>
       <p className="text-ink mt-1 text-sm leading-6">{INVITE_LINE}</p>
       {workers.length > 0 ? (
         <ul className="divide-rule mt-2 divide-y">
@@ -98,7 +98,7 @@ export function TeamPanel({
 
       {invitations.length > 0 ? (
         <>
-          <h3 className="mt-5 text-base font-semibold">Invitations waiting</h3>
+          <h3 className="mt-5">Invitations waiting</h3>
           <ul className="divide-rule mt-1 divide-y">
             {invitations.map((i) => (
               <li
@@ -148,7 +148,7 @@ export function TeamPanel({
         </div>
       ) : null}
       <form action={invite} className="mt-4" data-testid="team-invite-form">
-        <h3 className="text-base font-semibold">Invite a worker</h3>
+        <h3 className="">Invite a worker</h3>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="invite-email" className="block text-sm font-medium">
@@ -180,7 +180,7 @@ export function TeamPanel({
               aria-describedby="invite-worker-ref-help"
               className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
             />
-            <p id="invite-worker-ref-help" className="text-slate mt-1 text-xs">
+            <p id="invite-worker-ref-help" className="text-slate mt-1 text-sm">
               The same code as in your worker checks register, never a name.
             </p>
           </div>
@@ -197,7 +197,7 @@ export function TeamPanel({
         {alert(invited)}
       </form>
 
-      <h3 className="mt-8 text-lg font-semibold">Report link</h3>
+      <h3 className="mt-8">Report link</h3>
       <p className="text-ink mt-1 text-sm leading-6">
         One link anyone on your team can open, signed out, to report an incident
         to you. Each report waits for you to confirm it. Turn it off at any

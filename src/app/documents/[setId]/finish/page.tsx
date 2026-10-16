@@ -63,9 +63,7 @@ export default async function FinishPackPage({
           Back to the set
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Finish your pack
-      </h1>
+      <h1 className="mt-2">Finish your pack</h1>
       {ownerBlank ? (
         <p className="mt-3 leading-7" data-testid="finish-owner">
           Your name and role go on the approval line of every document.{" "}

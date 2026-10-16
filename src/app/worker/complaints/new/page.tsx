@@ -27,9 +27,7 @@ export default async function WorkerNewComplaintPage() {
           Your entries
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Log a complaint
-      </h1>
+      <h1 className="mt-2">Log a complaint</h1>
       <ComplaintFormView afterSave="/worker?saved=1" />
     </PageShell>
   );

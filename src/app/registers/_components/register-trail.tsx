@@ -108,7 +108,7 @@ export function RegisterTrail({
       className="mt-8"
       data-testid="register-trail"
     >
-      <h2 id="trail-heading" className="text-lg font-semibold">
+      <h2 id="trail-heading" className="">
         What has happened since ({events.length})
       </h2>
       <ol className="divide-rule mt-2 divide-y text-sm">

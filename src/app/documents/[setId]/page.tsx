@@ -46,9 +46,7 @@ export default async function DocumentSetPage({
             All document sets
           </Link>
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Document set
-        </h1>
+        <h1 className="mt-2">Document set</h1>
         <p
           role="status"
           className="text-ink mt-3 leading-7"
@@ -81,9 +79,7 @@ export default async function DocumentSetPage({
           All document sets
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Document set
-      </h1>
+      <h1 className="mt-2">Document set</h1>
       <p className="text-ink mt-3 leading-7" data-testid="set-summary">
         Drafted{" "}
         {new Date(set.created_at).toLocaleString("en-AU", {
@@ -139,14 +135,14 @@ export default async function DocumentSetPage({
       </div>
 
       <section aria-labelledby="docs-heading" className="mt-10">
-        <h2 id="docs-heading" className="text-xl font-semibold">
+        <h2 id="docs-heading" className="">
           Documents, in audit order
         </h2>
         {/* Batch 45b item 1: one "set-list" wrapper; each group's list has its own id, so a locator is never ambiguous. */}
         <div data-testid="set-list">
           {groups.map((g) => (
             <div key={g.title} className="mt-4" data-testid="set-group">
-              <h3 className="text-ink text-base font-semibold">{g.title}</h3>
+              <h3 className="text-ink">{g.title}</h3>
               <ol
                 className="divide-rule mt-1 divide-y"
                 data-testid="set-group-list"

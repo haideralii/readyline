@@ -46,9 +46,7 @@ export default async function InvitePage({
   if (viewer?.account) redirect("/account");
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        {preview.trading_name} has invited you
-      </h1>
+      <h1 className="">{preview.trading_name} has invited you</h1>
       <p className="mt-3 leading-7" data-testid="invite-line">
         You would log as worker {preview.worker_ref}. {INVITE_LINE}
       </p>

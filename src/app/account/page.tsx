@@ -138,7 +138,7 @@ export default async function AccountPage() {
   ]);
   return (
     <PageShell kind="grid">
-      <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
+      <h1 className="">Your account</h1>
       <p className="text-ink mt-3 leading-7">
         Signed in as the owner of <strong>{a.trading_name}</strong>.{" "}
         <Link href="/start" className="underline underline-offset-2">
@@ -153,7 +153,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-registers"
       >
-        <h2 id="registers-heading" className="text-xl font-semibold">
+        <h2 id="registers-heading" className="">
           Registers
         </h2>
         <div className="mt-3">
@@ -174,7 +174,7 @@ export default async function AccountPage() {
           .
         </p>
         {/* REQ-009 FR-3: the same rows the reminder emails are sent from. */}
-        <h3 className="mt-4 text-base font-semibold">Due soon</h3>
+        <h3 className="mt-4">Due soon</h3>
         {dueSoon.length === 0 ? (
           <p className="text-slate mt-1 text-sm" data-testid="due-soon-empty">
             Nothing due in the next 30 days.
@@ -200,7 +200,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-registration"
       >
-        <h2 id="registration-heading" className="text-xl font-semibold">
+        <h2 id="registration-heading" className="">
           Your registration
         </h2>
         <p className="text-ink mt-2 text-sm leading-6">
@@ -214,9 +214,7 @@ export default async function AccountPage() {
         />
         {period ? (
           <>
-            <h3 className="mt-6 text-base font-semibold">
-              Your registration timeline
-            </h3>
+            <h3 className="mt-6">Your registration timeline</h3>
             <RegistrationTimeline
               rows={timelineRows(period)}
               caption="Your registration timeline"
@@ -255,7 +253,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-auditor-link"
       >
-        <h2 id="auditor-heading" className="text-xl font-semibold">
+        <h2 id="auditor-heading" className="">
           Share a read-only view with your auditor
         </h2>
         {/* Retro finding 59: the link is the provider's own disclosure, so the copy says what the view holds, not less. */}
@@ -294,7 +292,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-team"
       >
-        <h2 id="team-heading" className="text-xl font-semibold">
+        <h2 id="team-heading" className="">
           Your team
         </h2>
         <TeamPanel
@@ -322,7 +320,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-subscription"
       >
-        <h2 id="subscription-heading" className="text-xl font-semibold">
+        <h2 id="subscription-heading" className="">
           Registers subscription
         </h2>
         {subscribed ? (
@@ -385,7 +383,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="details-heading" className="mt-8">
-        <h2 id="details-heading" className="text-xl font-semibold">
+        <h2 id="details-heading" className="">
           Business details
         </h2>
         <AccountForm
@@ -402,7 +400,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="session-heading" className="mt-10">
-        <h2 id="session-heading" className="text-xl font-semibold">
+        <h2 id="session-heading" className="">
           Sessions
         </h2>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
@@ -425,7 +423,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="data-heading" className="mt-10">
-        <h2 id="data-heading" className="text-xl font-semibold">
+        <h2 id="data-heading" className="">
           Your data
         </h2>
         <p className="text-ink mt-2 text-sm leading-6">
@@ -443,7 +441,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="purchases-heading" className="mt-10">
-        <h2 id="purchases-heading" className="text-xl font-semibold">
+        <h2 id="purchases-heading" className="">
           Purchases
         </h2>
         {purchases.length === 0 ? (
@@ -491,7 +489,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="delete-heading" className="mt-10">
-        <h2 id="delete-heading" className="text-xl font-semibold">
+        <h2 id="delete-heading" className="">
           Delete this account
         </h2>
         <DeleteAccountForm tradingName={a.trading_name} />

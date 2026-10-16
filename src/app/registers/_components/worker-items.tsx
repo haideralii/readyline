@@ -93,7 +93,7 @@ export function WorkerItems({
       className="mt-6"
       data-testid="worker-items"
     >
-      <h2 id="worker-items-heading" className="text-lg font-semibold">
+      <h2 id="worker-items-heading" className="">
         <span data-testid="worker-state">{derived.label}</span>
         {derived.outstanding.length > 0 ? (
           <span className="text-slate">
@@ -164,12 +164,12 @@ export function WorkerItems({
                   <p>
                     {item.text}
                     {item.beforeFirstShift ? (
-                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
+                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
                         before the first shift
                       </span>
                     ) : null}
                     {item.yourCall ? (
-                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
+                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
                         your call
                       </span>
                     ) : null}
@@ -187,7 +187,7 @@ export function WorkerItems({
                   <p className="text-slate mt-1 text-sm">
                     The auditor asks: {item.ask}
                   </p>
-                  <p className="text-slate mt-1 text-xs">
+                  <p className="text-slate mt-1 text-sm">
                     Source: {sourceLine(item.source)}
                   </p>
                   {s?.done_on || s?.confirmed_on ? (

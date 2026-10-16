@@ -14,7 +14,7 @@ import { DOCUMENTS_COPY as C } from "@/lib/payments/documents-copy";
 export default function Loading() {
   return (
     <PageShell kind="grid">
-      <h1 className="text-3xl font-semibold tracking-tight">Your documents</h1>
+      <h1 className="">Your documents</h1>
       <p className="text-ink mt-3 leading-7">{C.intro}</p>
       <div className="min-h-[70vh]" role="status" aria-live="polite">
         <p className="text-slate mt-6">Loading your documents…</p>

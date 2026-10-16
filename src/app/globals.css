@@ -88,22 +88,52 @@ html {
   color-scheme: light dark;
 }
 
+/* REQ-028 FR-12 (D-2811): body 16 at every width and 17 from lg, at leading-7. */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.75rem;
+}
+@media (min-width: 1024px) {
+  body {
+    font-size: 1.0625rem;
+  }
 }
 
-/* Headings in the serif: established and human; weight 500, tight tracking (REQ-014). */
+/* Headings in the serif: established and human; weight 500, tight tracking
+   (REQ-014). REQ-028 FR-12: the optical size follows the rendered size (the
+   fixed opsz 48 goes) and the scale is the stylesheet's, phone / lg: h1 32 /
+   44, h2 24 / 28, h3 19 / 20; no size or weight utility sits on a heading. */
 h1,
 h2,
 h3 {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-weight: 500;
   letter-spacing: -0.01em;
-  font-variation-settings: "opsz" 48;
+  font-optical-sizing: auto;
+  line-height: 1.2;
+}
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.1875rem;
+}
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 2.75rem;
+  }
+  h2 {
+    font-size: 1.75rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
 }
 
 /* Counts read as columns. */

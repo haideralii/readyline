@@ -27,9 +27,7 @@ export default function SamplePage() {
           ‹ Home
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        {C.sampleHeading}
-      </h1>
+      <h1 className="mt-2">{C.sampleHeading}</h1>
       <p className="text-ink mt-3 leading-7">{C.samplePageLead}</p>
       <div className="mt-6">
         <SampleDocument level={2} />

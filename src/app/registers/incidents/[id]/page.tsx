@@ -99,13 +99,13 @@ export default async function IncidentPage({
           </div>
         ))}
       </dl>
-      <h2 className="mt-6 text-lg font-semibold">What happened</h2>
+      <h2 className="mt-6">What happened</h2>
       <p className="mt-1 leading-7" data-testid="incident-summary">
         {r.summary}
       </p>
       {r.actions_taken ? (
         <>
-          <h2 className="mt-4 text-lg font-semibold">What you did about it</h2>
+          <h2 className="mt-4">What you did about it</h2>
           <p className="mt-1 leading-7">{r.actions_taken}</p>
         </>
       ) : null}

@@ -54,7 +54,7 @@ export function SiteFooter() {
           Hosted in Australia. Independent of the NDIA and the NDIS Quality and
           Safeguards Commission.
         </p>
-        <p className="text-xs" data-testid="footer-brand">
+        <p className="text-sm" data-testid="footer-brand">
           {BRAND}
           {abn ? ` (ABN ${abn})` : ""}. NDIS is a registered trade mark of the
           National Disability Insurance Agency and is used here descriptively

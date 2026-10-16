@@ -9,9 +9,7 @@ export const metadata: Metadata = { title: "Account deleted" };
 export default function AccountDeletedPage() {
   return (
     <PageShell kind="reading">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Your account was deleted
-      </h1>
+      <h1 className="">Your account was deleted</h1>
       <p className="text-ink mt-3 leading-7">
         You have been signed out of every device and sign-in for this account is
         refused from now on. The data is hidden immediately and permanently

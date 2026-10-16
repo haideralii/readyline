@@ -48,9 +48,7 @@ export default function RegistrationGroupsIndexPage() {
           ‹ Guides
         </Link>
       </p>
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Registration groups
-      </h1>
+      <h1 className="">Registration groups</h1>
       <p className="text-ink mt-3 leading-7">
         The Commission registers providers by class of support. Each page below
         says which audit that class needs, which Practice Standards modules

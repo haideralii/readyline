@@ -81,7 +81,7 @@ export function CostCalculator({
                 <span className="text-slate font-mono">{g.code}</span>
               </span>
               <span
-                className={`ml-auto rounded-full border px-2 py-0.5 text-xs whitespace-nowrap ${g.auditType === "verification" ? "border-moss text-moss" : "border-ochre text-ochre"}`}
+                className={`ml-auto rounded-full border px-2 py-0.5 text-sm whitespace-nowrap ${g.auditType === "verification" ? "border-moss text-moss" : "border-ochre text-ochre"}`}
               >
                 {g.auditType === "verification" ? "desk audit" : "site audit"}
               </span>

@@ -50,7 +50,7 @@ export function RegistrationTimeline({
             >
               {r.label}
               {r.plain ? (
-                <span className="text-slate block text-xs">{r.plain}</span>
+                <span className="text-slate block text-sm">{r.plain}</span>
               ) : null}
             </th>
             <td className="py-2 pr-3 break-words">{formatLongDate(r.date)}</td>

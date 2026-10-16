@@ -82,9 +82,7 @@ export default async function StartHerePage({
           ‹ Document set
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Start here: {s.tradingName}
-      </h1>
+      <h1 className="mt-2">Start here: {s.tradingName}</h1>
       <p className="mt-3 text-lg leading-7" data-testid="start-here-counts">
         {countsLine(s.counts)}
       </p>
@@ -99,7 +97,7 @@ export default async function StartHerePage({
       </p>
 
       <section aria-labelledby="one-minute" className="mt-8">
-        <h2 id="one-minute" className="text-xl font-semibold">
+        <h2 id="one-minute" className="">
           1. Your pack in one minute
         </h2>
         <ul
@@ -118,7 +116,7 @@ export default async function StartHerePage({
       </section>
 
       <section aria-labelledby="first" className="mt-8">
-        <h2 id="first" className="text-xl font-semibold">
+        <h2 id="first" className="">
           2. Do these first
         </h2>
         <ol
@@ -134,7 +132,7 @@ export default async function StartHerePage({
       </section>
 
       <section aria-labelledby="each" className="mt-8">
-        <h2 id="each" className="text-xl font-semibold">
+        <h2 id="each" className="">
           3. For each document
         </h2>
         <ol className="mt-2 space-y-6" data-testid="sheet-documents">
@@ -145,7 +143,7 @@ export default async function StartHerePage({
               data-testid={`sheet-document-${d.typeId}`}
               data-adopted={d.adopted ? "true" : "false"}
             >
-              <h3 className="text-base font-semibold">
+              <h3 className="">
                 {d.n}. {d.title}{" "}
                 <span className="text-slate font-normal">
                   (about {d.minutes} minutes; {documentCountsLine(d)})
@@ -208,7 +206,7 @@ export default async function StartHerePage({
       </section>
 
       <section aria-labelledby="registers" className="mt-8">
-        <h2 id="registers" className="text-xl font-semibold">
+        <h2 id="registers" className="">
           4. Registers
         </h2>
         <ul
@@ -225,7 +223,7 @@ export default async function StartHerePage({
       </section>
 
       <section aria-labelledby="done" className="mt-8">
-        <h2 id="done" className="text-xl font-semibold">
+        <h2 id="done" className="">
           5. When you are done
         </h2>
         <ol

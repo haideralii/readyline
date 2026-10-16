@@ -61,14 +61,14 @@ export default async function AdminPage() {
 
   return (
     <PageShell kind="list">
-      <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
+      <h1 className="">Admin</h1>
       <p className="text-slate mt-2 text-sm">
         Signed in with a verified authenticator. Every visit and action here is
         written to the audit log.
       </p>
 
       <section aria-labelledby="counts-heading" className="mt-8">
-        <h2 id="counts-heading" className="text-xl font-semibold">
+        <h2 id="counts-heading" className="">
           Counts
         </h2>
         <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -86,7 +86,7 @@ export default async function AdminPage() {
         className="mt-10"
         data-testid="admin-counters"
       >
-        <h2 id="counters-heading" className="text-xl font-semibold">
+        <h2 id="counters-heading" className="">
           Last 30 days
         </h2>
         <p className="text-slate mt-1 text-sm">
@@ -110,7 +110,7 @@ export default async function AdminPage() {
 
       {/* REQ-013 batch 36 item 2: the evidence-confidence flag lives here and in the evidence files, never on a customer page. */}
       <section aria-labelledby="confidence-heading" className="mt-10">
-        <h2 id="confidence-heading" className="text-xl font-semibold">
+        <h2 id="confidence-heading" className="">
           Evidence confidence: checklist items the Commission&apos;s text does
           not state
         </h2>
@@ -127,7 +127,7 @@ export default async function AdminPage() {
       </section>
 
       <section aria-labelledby="audit-heading" className="mt-10">
-        <h2 id="audit-heading" className="text-xl font-semibold">
+        <h2 id="audit-heading" className="">
           Recent audit log
         </h2>
         <div className="mt-3 overflow-x-auto">
@@ -159,10 +159,10 @@ export default async function AdminPage() {
                       .slice(0, 19)}
                   </td>
                   <td className="py-2 pr-3">{e.action}</td>
-                  <td className="py-2 pr-3 font-mono text-xs">
+                  <td className="py-2 pr-3 font-mono text-sm">
                     {e.account_id ?? "–"}
                   </td>
-                  <td className="py-2 font-mono text-xs">
+                  <td className="py-2 font-mono text-sm">
                     {e.actor_user_id ?? "system"}
                   </td>
                 </tr>

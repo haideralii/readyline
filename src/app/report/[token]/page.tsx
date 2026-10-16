@@ -63,9 +63,7 @@ export default async function ReportPage({
   if (!name) notFound();
   return (
     <PageShell kind="form">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Report an incident to {name}
-      </h1>
+      <h1 className="">Report an incident to {name}</h1>
       <p
         className="mt-3 text-lg leading-7 font-medium"
         data-testid="emergency-line"

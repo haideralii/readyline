@@ -49,9 +49,7 @@ export default async function ChecklistPage() {
   if (!answers?.success || !built?.ok) {
     return (
       <PageShell kind="grid">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Readiness checklist
-        </h1>
+        <h1 className="">Readiness checklist</h1>
         <p className="mt-3 leading-7" data-testid="checklist-needs-answers">
           Your checklist is built from your questionnaire answers.{" "}
           <Link href="/start" className="underline underline-offset-2">
@@ -103,15 +101,13 @@ export default async function ChecklistPage() {
         className="hidden print:block"
         data-testid="checklist-print"
       >
-        <h1 className="text-2xl font-semibold">
-          Readiness checklist: {viewer.account.trading_name}
-        </h1>
+        <h1 className="">Readiness checklist: {viewer.account.trading_name}</h1>
         <p className="mt-1 text-sm">
           Printed {today}. {progressLine(shown.ready, shown.total)}.
         </p>
         {shown.groups.map((g) => (
           <div key={g.id} className="mt-4">
-            <h2 className="text-lg font-semibold">
+            <h2 className="">
               {g.title} ({g.ready} of {g.items.length} ready)
             </h2>
             <ul className="mt-1 list-disc pl-5 text-sm leading-6">
@@ -127,7 +123,7 @@ export default async function ChecklistPage() {
             </ul>
           </div>
         ))}
-        <p className="mt-4 text-xs">{GENERAL_INFORMATION_STATEMENT}</p>
+        <p className="mt-4 text-sm">{GENERAL_INFORMATION_STATEMENT}</p>
       </section>
     </PageShell>
   );

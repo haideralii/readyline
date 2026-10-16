@@ -85,7 +85,7 @@ export function EventsTrail({
       className="mt-8"
       data-testid="events-trail"
     >
-      <h2 id="trail-heading" className="text-lg font-semibold">
+      <h2 id="trail-heading" className="">
         What has happened since ({events.length})
       </h2>
       <ol

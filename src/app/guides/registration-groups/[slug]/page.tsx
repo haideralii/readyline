@@ -117,7 +117,7 @@ export default async function RegistrationGroupPage({
           </Link>
         </p>
         <p className="text-slate text-sm">{p.category.title}</p>
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="">
           {p.name} <span className="text-slate">(class {p.code})</span>
         </h1>
         <p className="mt-3 leading-7" data-testid="group-description">
@@ -206,9 +206,7 @@ export default async function RegistrationGroupPage({
               <li key={d}>{d}</li>
             ))}
           </ul>
-          <h3 className="mt-6 text-base font-semibold">
-            Registers to keep ({p.registers.length})
-          </h3>
+          <h3 className="mt-6">Registers to keep ({p.registers.length})</h3>
           <ul className={list}>
             {p.registers.map((r) => (
               <li key={r}>{r}</li>
@@ -221,10 +219,7 @@ export default async function RegistrationGroupPage({
           className="border-ochre mt-10 rounded-md border p-4"
           data-testid="group-price"
         >
-          <h2
-            id="price-heading"
-            className="text-xl font-semibold tracking-tight"
-          >
+          <h2 id="price-heading" className="">
             {price
               ? `${price} once for the whole pack`
               : "One fixed price for the whole pack"}

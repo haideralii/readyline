@@ -17,7 +17,7 @@ export default async function SignInPage({
   const next = typeof params.next === "string" ? params.next : undefined;
   return (
     <PageShell kind="form">
-      <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>
+      <h1 className="">Sign in</h1>
       <p className="text-ink mt-3 leading-7">
         We email you a link; there is no password. Use the address you want your
         account under.

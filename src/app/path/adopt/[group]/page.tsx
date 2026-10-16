@@ -83,9 +83,7 @@ export default async function AdoptGroupPage({
       <p className="text-slate text-sm">
         Adopt your documents: group {index + 1} of {groups.length}
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        {group.title}
-      </h1>
+      <h1 className="mt-2">{group.title}</h1>
       <p className="mt-3 leading-7">{ADOPT_INTRO}</p>
       <GlossaryTerms ids={present} where="page" className="mt-3" />
       <ul className="divide-rule mt-6 divide-y" data-testid="adopt-list">

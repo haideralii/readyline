@@ -33,9 +33,7 @@ export default async function WorkerHome() {
   ]);
   return (
     <PageShell kind="list">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Your entries for {viewer.worker.trading_name}
-      </h1>
+      <h1 className="">Your entries for {viewer.worker.trading_name}</h1>
       <p className="mt-3 leading-7" data-testid="worker-home-line">
         {WORKER_HOME_LINE}
         {viewer.worker.worker_ref
@@ -64,7 +62,7 @@ export default async function WorkerHome() {
         className="mt-10"
         data-testid="worker-entries"
       >
-        <h2 id="mine-heading" className="text-xl font-semibold">
+        <h2 id="mine-heading" className="">
           What you logged
         </h2>
         {incidents.length === 0 && complaints.length === 0 ? (
