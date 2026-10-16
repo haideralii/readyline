@@ -416,8 +416,8 @@ function ResultView({
               <dt className="font-semibold">What keeps you audit-ready</dt>
               {subscriptionOffered ? (
                 <dd className="text-zinc-700 dark:text-zinc-300">
-                  The registers and reminders, a monthly subscription with the
-                  evidence already in place at renewal.{" "}
+                  The registers and reminders, a monthly subscription that keeps
+                  your evidence in one place for renewal.{" "}
                   <Link
                     href="/pricing#keeps"
                     className="underline underline-offset-2"
