@@ -18,6 +18,7 @@ import { unzipSync } from "fflate";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { inflateSync } from "node:zlib";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   buildSkeleton,
@@ -82,13 +83,40 @@ async function signUp(
   return { userId: created.data.user.id, email, client, accountId };
 }
 
-/** The literal and hex strings pdf-lib draws, decoded, so the summary's first page can be read back. */
+/**
+ * The strings pdf-lib draws, decoded, so the summary's first page can be
+ * read back. `pdf.save()` writes the page content streams FlateDecode-
+ * compressed (#77's first run: no `Tj` visible raw), so each
+ * `stream ... endstream` body is inflated first, the raw body kept where
+ * inflate throws, and the `Tj` and `TJ` operators are scanned over the
+ * result.
+ */
 function pdfText(bytes: Uint8Array): string {
-  const raw = Buffer.from(bytes).toString("latin1");
+  const buf = Buffer.from(bytes);
+  const raw = buf.toString("latin1");
+  const parts: string[] = [];
+  const stream = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+  for (const m of raw.matchAll(stream)) {
+    const start = (m.index ?? 0) + m[0].indexOf(m[1]);
+    const body = buf.subarray(start, start + m[1].length);
+    try {
+      parts.push(inflateSync(body).toString("latin1"));
+    } catch {
+      parts.push(m[1]);
+    }
+  }
+  const text = parts.join("\n");
   const out: string[] = [];
-  for (const m of raw.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g))
+  for (const m of text.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g))
     out.push(Buffer.from(m[1], "hex").toString("latin1"));
-  for (const m of raw.matchAll(/\(((?:\\.|[^\\)])*)\)\s*Tj/g)) out.push(m[1]);
+  for (const m of text.matchAll(/\(((?:\\.|[^\\)])*)\)\s*Tj/g)) out.push(m[1]);
+  for (const m of text.matchAll(/\[((?:[^\]\\]|\\.)*)\]\s*TJ/g)) {
+    const pieces: string[] = [];
+    for (const h of m[1].matchAll(/<([0-9A-Fa-f]+)>/g))
+      pieces.push(Buffer.from(h[1], "hex").toString("latin1"));
+    for (const l of m[1].matchAll(/\(((?:\\.|[^\\)])*)\)/g)) pieces.push(l[1]);
+    out.push(pieces.join(""));
+  }
   return out.join("\n");
 }
 
