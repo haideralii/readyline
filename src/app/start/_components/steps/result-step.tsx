@@ -9,11 +9,11 @@ import {
   readyLineCounts,
   summaryLines,
 } from "@/lib/questionnaire/readiness";
+import { GlossaryTerms } from "@/components/glossary-terms";
 import {
   documentGroupId,
   documentGroupsContent,
   glossarySentence,
-  glossaryTerm,
 } from "@/lib/questionnaire/content";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
@@ -354,9 +354,13 @@ function ResultView({
         {/* REQ-025 FR-3: the summary as a list, not a sentence; every number derived
             from the result. The phone spacing is 16 px tighter than the wider
             layout so the one button still ends inside the first screen on a
-            681 px iPhone (REQ-015 FR-4). */}
+            681 px iPhone (REQ-015 FR-4). REQ-027 A1 (#79's run 38882058792):
+            D-2709's certification meaning takes two lines where the old one
+            took one, 18 px, so the list's phone line height is 24 px over its
+            five lines (28 px from sm up) and the button ends inside the screen
+            again with every word kept. */}
         <ul
-          className="mt-2 space-y-1 text-base leading-7 sm:mt-3"
+          className="mt-2 space-y-1 text-base leading-6 sm:mt-3 sm:leading-7"
           data-testid="summary-list"
         >
           <li data-testid="summary-documents">{lines.documents}</li>
@@ -512,23 +516,10 @@ function ResultView({
             </li>
           ))}
         </ul>
-        {/* REQ-025 FR-13: the audit words on this page, each with its plain meaning, on the page itself. */}
-        <details className="mt-4" data-testid="glossary-terms">
-          <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
-            What these words mean ({PAGE_TERMS.length})
-          </summary>
-          <dl className="mt-1 space-y-1 text-sm leading-6">
-            {PAGE_TERMS.map((id) => {
-              const t = glossaryTerm(id);
-              return (
-                <div key={id} data-testid={`glossary-${id}`}>
-                  <dt className="inline font-medium">{t.term}: </dt>
-                  <dd className="inline">{t.meaning}.</dd>
-                </div>
-              );
-            })}
-          </dl>
-        </details>
+        {/* REQ-025 FR-13: the audit words on this page, each with its plain meaning, on the page itself.
+            REQ-027 A1 (D-2717): the shared component in this place with these six ids; A2 moves it
+            under the summary card with the terms counted at render. */}
+        <GlossaryTerms ids={PAGE_TERMS} where="result" />
         <h3 className="mt-5 text-base font-semibold">
           Practice Standards modules that apply ({r.modules.length})
         </h3>

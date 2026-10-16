@@ -113,6 +113,10 @@ export const auditTypesContent = AuditTypesContent.parse(auditTypesJson);
  * REQ-025 FR-13, D-2219: the audit words with one plain meaning each, the
  * one source the pages read (decision 12 of the review). A meaning is a
  * clause without a full stop; `glossarySentence` capitalises it and adds one.
+ * REQ-027 D-2713: `more` is the optional second field, at most two sentences
+ * and 240 characters, shown only in the "What these words mean" disclosure
+ * under the term, never inline, never in a bracket, never composed into
+ * another file's sentence.
  */
 export const GlossaryContent = z.object({
   ...reviewed,
@@ -122,7 +126,7 @@ export const GlossaryContent = z.object({
         id: slug,
         term: z.string().min(3),
         meaning: z.string().min(10).max(160),
-        verify: z.string().min(10).optional(),
+        more: z.string().min(10).max(240).optional(),
       }),
     )
     .min(1),
@@ -130,26 +134,41 @@ export const GlossaryContent = z.object({
 export const glossaryContent = GlossaryContent.parse(glossaryJson);
 export type GlossaryId = (typeof glossaryContent.items)[number]["id"];
 
-export function glossaryTerm(id: string): { term: string; meaning: string } {
+export function glossaryTerm(id: string): {
+  term: string;
+  meaning: string;
+  more?: string;
+} {
   const t = glossaryContent.items.find((x) => x.id === id);
   if (!t) throw new Error(`glossary: no term "${id}"`);
-  return { term: t.term, meaning: t.meaning };
+  return { term: t.term, meaning: t.meaning, more: t.more };
 }
 
 export function glossaryMeaning(id: string): string {
   return glossaryTerm(id).meaning;
 }
 
-/** The meaning as a sentence: "A check about halfway through your three years." */
+/** The meaning as a sentence: "A second audit that most certification providers must have." */
 export function glossarySentence(id: string): string {
   const m = glossaryMeaning(id);
   return `${m[0].toUpperCase()}${m.slice(1)}.`;
 }
 
-/** `{{glossary:<id>}}` in a content file becomes that term's sentence, so a JSON file reads from the glossary too. */
+/** The one-term page's inline form (REQ-027 D-2715): `term (meaning)`, lower-case clause, no full stop. */
+export function glossaryBracket(id: string): string {
+  const t = glossaryTerm(id);
+  return `${t.term} (${t.meaning})`;
+}
+
+/**
+ * `{{glossary:<id>}}` in a content file becomes that term's bracket form
+ * (REQ-027 D-2715, D-2724): plain text, `term (meaning)`, so a JSON file or
+ * a guide reads from the glossary too and the sentence around the token
+ * carries on. A token is for a one-term page alone; the lint holds that rule.
+ */
 export function resolveGlossaryTokens(text: string): string {
   return text.replace(/\{\{glossary:([a-z0-9-]+)\}\}/g, (_, id: string) =>
-    glossarySentence(id),
+    glossaryBracket(id),
   );
 }
 

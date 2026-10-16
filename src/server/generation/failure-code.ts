@@ -20,6 +20,17 @@ export const GENERATION_FAILURE_CODES = [
 ] as const;
 export type GenerationFailureCode = (typeof GENERATION_FAILURE_CODES)[number];
 
+/**
+ * PO 16 Oct 2026 19:44 (after #75's run, three `owner-missing` lines at
+ * 07:36:07Z): an account deleted, or left without an owner, before its job
+ * ran is the account's end and not a failure anyone can act on, so the job
+ * logs these two at `warn`; every other permanent failure stays an alert.
+ */
+export const QUIET_FAILURE_CODES: readonly GenerationFailureCode[] = [
+  "account-deleted",
+  "owner-missing",
+];
+
 const BY_PREFIX: [string, GenerationFailureCode][] = [
   ["entitlement read:", "entitlement-read"],
   ["entitlement missing", "entitlement-missing"],

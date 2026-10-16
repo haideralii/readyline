@@ -43,9 +43,24 @@ export const INTERNAL_PATH: readonly RegExp[] = [
   /\b[\w-]+\.(json|tsx?|mjs|cjs|md|mdx|sql|yml)\b/,
 ];
 
+/**
+ * REQ-027 FR-1 (D-2702): a file's sentences average under 20 words by the
+ * style rule and never pass 30 by D-2219; the lint fails a file whose
+ * average passes 25 over the counted population (paragraph-like blocks, the
+ * copy modules' and content files' strings of ten words or more, a guide's
+ * paragraphs and front-matter lines), beside the 35-word hard limit.
+ */
+export const AVERAGE_MAX_WORDS = 25;
+/** A copy module's or content file's string joins the average from this many words (FR-1). */
+export const AVERAGE_MIN_STRING_WORDS = 10;
+
 export type CopyViolation = {
   rule:
-    "paragraph-length" | "sentence-length" | "banned-word" | "internal-path";
+    | "paragraph-length"
+    | "sentence-length"
+    | "average-sentence-length"
+    | "banned-word"
+    | "internal-path";
   detail: string;
 };
 
@@ -119,4 +134,26 @@ export function lintText(
     }
   }
   return out;
+}
+
+/** The mean sentence length over a file's counted sentences, to one decimal; null when there is none (FR-1). */
+export function averageSentenceWords(
+  sentences: readonly string[],
+): number | null {
+  const counts = sentences.map(countWords).filter((n) => n > 0);
+  if (counts.length === 0) return null;
+  const total = counts.reduce((a, b) => a + b, 0);
+  return Math.round((total / counts.length) * 10) / 10;
+}
+
+/** FR-1 (D-2702): the file fails when its average passes 25; the hard limit on one sentence stays `lintText`'s. */
+export function lintAverage(
+  sentences: readonly string[],
+): CopyViolation | null {
+  const avg = averageSentenceWords(sentences);
+  if (avg === null || avg <= AVERAGE_MAX_WORDS) return null;
+  return {
+    rule: "average-sentence-length",
+    detail: `${avg} words a sentence on average over ${sentences.length} sentences (max ${AVERAGE_MAX_WORDS})`,
+  };
 }
