@@ -247,6 +247,9 @@ test.describe("the registration timeline (REQ-023 Session A)", () => {
 
     // FR-4 (AC-7): the dated items replace the booking and calendar items; a date sets Done.
     await page.goto("/checklist");
+    // The audit group's <details> is closed by default (#73's third run), as
+    // checklist.spec.ts opens it before asserting on its items.
+    await page.getByTestId("checklist-group-audit").locator("summary").click();
     await expect(
       page.getByTestId("checklist-item-audit-mid-term-audit-started"),
     ).toBeVisible();

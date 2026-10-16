@@ -17,7 +17,10 @@ export function RegistrationTimeline({
   testId: string;
 }) {
   return (
-    <table className="mt-3 w-full text-sm" data-testid={testId}>
+    // #73's third run: at 360 px and 130% text the three columns overflowed the
+    // viewport (scrollWidth 401), so the columns share the width and every
+    // cell wraps, the date included.
+    <table className="mt-3 w-full table-fixed text-sm" data-testid={testId}>
       <caption className="sr-only">{caption}</caption>
       <thead>
         <tr className="text-left text-zinc-600 dark:text-zinc-400">
@@ -41,7 +44,10 @@ export function RegistrationTimeline({
             data-source={r.source}
             className="align-top"
           >
-            <th scope="row" className="py-2 pr-3 text-left font-normal">
+            <th
+              scope="row"
+              className="py-2 pr-3 text-left font-normal break-words"
+            >
               {r.label}
               {r.plain ? (
                 <span className="block text-xs text-zinc-600 dark:text-zinc-400">
@@ -49,10 +55,8 @@ export function RegistrationTimeline({
                 </span>
               ) : null}
             </th>
-            <td className="py-2 pr-3 whitespace-nowrap">
-              {formatLongDate(r.date)}
-            </td>
-            <td className="py-2 text-zinc-700 dark:text-zinc-300">
+            <td className="py-2 pr-3 break-words">{formatLongDate(r.date)}</td>
+            <td className="py-2 break-words text-zinc-700 dark:text-zinc-300">
               {r.source}
             </td>
           </tr>
