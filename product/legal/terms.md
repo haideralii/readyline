@@ -39,6 +39,8 @@ You own the documents Readyline produces for you. You can edit, copy and use the
 
 Do not enter personal, health or disability information about NDIS participants into Readyline. Do not use Readyline to produce documents for a business you do not run or represent. Do not try to break, overload or reverse-engineer the service. We may suspend an account that breaks these rules, and we will tell you why.
 
+When you share a link to your registers or your audit pack, you share your records with whoever you send it to, exactly as you typed them; that is your disclosure, so check them for names before you share.
+
 ## Availability and changes
 
 We aim to keep Readyline available at all times but cannot promise it. We may change features, prices for future purchases, and these terms. We give at least 30 days' notice of changes to prices or terms that affect a subscription. Documents you have already bought stay available for download for at least 12 months after purchase.

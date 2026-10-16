@@ -18,7 +18,7 @@ We collect only what we need to run the service:
 - Your account email address, so you can sign in and we can send receipts and service emails.
 - Your questionnaire answers: trading name, ABN if you give it, business structure, states and territories, the supports you deliver, your number of workers and key personnel, whether you use restrictive practices, and which documents you already have.
 - The documents we draft for you and the notes you add to your checklist or registers.
-- Worker codes, the kind of check, its dates and, if you choose, the check number you enter in the worker checks register. We never hold a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself.
+- Worker codes, the kind of check, its dates and, if you choose, the check number you enter in the worker checks register. We ask you to use codes for workers; we never ask for a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself.
 - Purchase records: what you bought, when, the amount, and the payment reference. We never see or store your card number; our payment provider, Stripe, handles it.
 - Basic technical records such as the time of a sign-in and errors, kept to run and secure the service. We do not use advertising trackers or third-party analytics.
 
