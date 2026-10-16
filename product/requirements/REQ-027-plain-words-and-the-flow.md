@@ -372,7 +372,24 @@ First review 16 Oct 2026 (`product/qa/req-reviews/2026-10-16-req-027.md`, SHA 64
 
 ## Delivery evidence
 
-(none; draft)
+### Session A1 (Dev, 16 Oct 2026)
+
+Branch `req-027-session-a1` at 0565315 (cut from `next` a9cd6cf; the four A1 commits, 257f95d's `status: reviewed` and D-2729, then one merge of `next` 8a658ea, DECISIONS.md resolved as both sides with D-2245 before D-2701 to D-2728), PR into `next` opened by the PO from the compare link in CHAT. `npm run check` green (137 files, 1016 tests, 6 skipped); `home`, `req-015-a11y` and `security-headers` green on desktop from the main tree.
+
+What is in it (D-2704, D-2706 to D-2717, D-2719 to D-2729): the twelve glossary pairs typed from D-2709 with `more` as the second field (`meaning` at most 20 words with no full stop, `more` at most 240 characters and two sentences; D-2727's two trims; D-2729's `reportable-incident` sentence), `registration group or class`, the `note` as finding 151 words it, `status: reviewed` after the NDIS expert's named step (`product/qa/req-reviews/2026-10-16-glossary-read.md`, 9ef92a9); `content.ts` with `more`, `glossaryBracket` and the `{{glossary:id}}` token resolving to the bracket form `term (meaning)`; `src/components/glossary-terms.tsx` (`GlossaryTerms` with D-2706's attribution line for the result page, a guide and a page; `GlossaryBracket` with D-2719's `title`); the result page rendering `GlossaryTerms` in its old place; `audit-kinds.json`'s mid-term description as D-2728 words it. FR-1: `averageSentenceWords` and `lintAverage` in `src/lib/copy-lint/rules.ts` (`AVERAGE_MAX_WORDS` 25 over strings of ten words or more), the copy lint collecting each file's population as it walks (`p`, `dd`, `li`, `blockquote`; a module's or content file's strings; a guide's paragraphs, list items, short answer and description), failing a file over 25 and reporting the named files. FR-2: `src/lib/copy-lint/glossary.ts` (the forms table, the exclusions, bracket stripping), `tests/glossary-lint.ts` (AST extraction of JSX text and the `legend`, `help`, `label`, `summary` and `placeholder` props, `options[].label` and `help`, the step files' top-level string consts; the ways a page gives a meaning: `glossarySentence`, `glossaryMeaning`, `glossaryBracket`, `${x}-audit`, `<GlossaryTerms ids>`, `<GlossaryBracket id>`, a guide's front-matter `glossary:` list or a token), and the copy lint's named list `GLOSSARY_PAGES` with `GLOSSARY_RENDERED_THROUGH`, the files named outside the list, and `A1_FAILING_PAGES`, each required to still fail until A2 (`passingAllowListed` must be empty).
+
+FR-1 averages at A1 (every file under 25; the four the lint reports):
+
+| File | Sentences | Words a sentence |
+| --- | --- | --- |
+| `src/app/start/_components/steps/result-step.tsx` | 31 | 10.0 |
+| `src/app/pricing/page.tsx` | 6 | 5.2 |
+| `src/lib/payments/copy.ts` | 22 | 12.4 |
+| `content/guides/which-ndis-audit.md` | 70 | 14.1 |
+
+Files FR-2 failed at A1's starting SHA (`next` a9cd6cf), allow-listed by name and each still failing, for A2: `src/app/page.tsx` (through `home-copy.ts`: mid-term audit, module, Practice Standards, certification audit, self-assessment), `src/app/sample/page.tsx` (`sample-document.tsx`: verification audit), `src/app/pricing/page.tsx` (`payments/copy.ts`: self-assessment, adopt), `src/app/guides/page.tsx` (registration group), `src/app/guides/registration-groups/page.tsx` (registration group, module, Practice Standards), `src/app/guides/registration-groups/[slug]/page.tsx` (registration group, mid-term audit, module, Practice Standards, self-assessment), `src/app/start/[step]/page.tsx` (`schema.ts`: registration group, key personnel), `src/app/start/_components/start-intro.tsx` (registration group, restrictive practice, certification audit, module, Practice Standards), `supports-step.tsx` (module, registration group), `practices-step.tsx` (module, restrictive practice, registration group), `workforce-step.tsx` (key personnel, worker screening check), `result-step.tsx` (restrictive practice, outside `PAGE_TERMS`'s six; A2 counts "present" at render), `src/app/checklist/checklist-view.tsx` (adopt; `derive.ts`: restrictive practice, module, worker screening check, Practice Standards, mid-term audit), `src/app/path/adopt/[group]/page.tsx` (adopt); and the guides `ndis-registration-cost.md` (verification audit, certification audit, mid-term audit), `registers-an-auditor-asks-for.md` (Practice Standards, quality indicator, reportable incident), `what-happens-at-an-ndis-audit.md`, `which-ndis-audit.md`.
+
+Tests: `data/readyline-content/glossary.test.ts` (the pair rules, `more`, the status), `src/lib/copy-lint/rules.test.ts` (the average over and under), `src/lib/copy-lint/glossary.test.ts` (the matcher: forms, exclusions, brackets), `tests/copy-lint.test.ts` (FR-1 population and report; FR-2 list, rendered-through map, outside list, allow-list), `e2e/req-025.spec.ts` and `e2e/req-015-a11y.spec.ts` on the new meanings. The lawyer role's reads (9.1, 9.3, 9.4) change nothing in A1.
 
 ## PO review
 
