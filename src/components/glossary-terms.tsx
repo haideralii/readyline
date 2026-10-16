@@ -1,5 +1,9 @@
 import { glossaryTerm } from "@/lib/questionnaire/content";
-import { GLOSSARY_ATTRIBUTION, GLOSSARY_BRACKET_TITLE } from "./glossary-copy";
+import {
+  GLOSSARY_ATTRIBUTION,
+  GLOSSARY_BRACKET_TITLE,
+  splitHyphenated,
+} from "./glossary-copy";
 
 /**
  * "What these words mean" (REQ-025 FR-13; REQ-027 D-2701, D-2706, D-2713):
@@ -42,8 +46,17 @@ export function GlossaryTerms({
             <div key={id} data-testid={`glossary-${id}`}>
               <dt className="inline font-medium">{t.term}: </dt>
               <dd className="inline">
-                {sentence}
-                {t.more ? ` ${t.more}` : ""}
+                {splitHyphenated(
+                  `${sentence}${t.more ? ` ${t.more}` : ""}`,
+                ).map((part, i) =>
+                  part.nowrap ? (
+                    <span key={i} className="whitespace-nowrap">
+                      {part.text}
+                    </span>
+                  ) : (
+                    <span key={i}>{part.text}</span>
+                  ),
+                )}
               </dd>
             </div>
           );

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { GlossaryBracket } from "@/components/glossary-terms";
+import { GlossaryTerms } from "@/components/glossary-terms";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import {
@@ -16,6 +17,12 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AdoptButton } from "../adopt-button";
 
 export const metadata: Metadata = { title: "Adopt your documents" };
+
+const ADOPT_INTRO =
+  "Read the names below. Tap a name to read the document. When they say what you do, press the button and they become your policies. That is what it means to adopt.";
+const ADOPTED_LINE = "Adopted. These are your policies now.";
+const NAMED_PERSON_LINE =
+  "The documents are adopted by a named person on a date, and that name goes into your document control register.";
 
 /**
  * Step 5, one screen per document group (REQ-017 FR-3, FR-5, D-1703): the
@@ -52,6 +59,24 @@ export default async function AdoptGroupPage({
   // for the name before it offers the button; the action refuses as well.
   const facts = adopted ? null : await loadFacts(supabase, viewer.account.id);
   const needsName = facts !== null && !facts.name?.trim();
+  // REQ-027 FR-3, D-2711, D-2267 (#81's run 38909477898): the document names
+  // and their purposes carry glossary words of their own (the incident
+  // register names reportable incidents), so the page is not one-term and
+  // takes the disclosure, computed at render from the words it shows.
+  const present = findGlossaryTerms(
+    [
+      ADOPT_INTRO,
+      group.title,
+      ...group.documents.flatMap((d) => [
+        d.model.title,
+        documentTypeById(d.document_type_id)?.purpose ?? "",
+      ]),
+      ADOPTED_LINE,
+      ADOPT_NEEDS_NAME,
+      ADOPT_NEEDS_NAME_LINK,
+      NAMED_PERSON_LINE,
+    ].join("\n"),
+  );
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -60,11 +85,8 @@ export default async function AdoptGroupPage({
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         {group.title}
       </h1>
-      <p className="mt-3 leading-7">
-        Read the names below. Tap a name to read the document. When they say
-        what you do, press the button and they become your policies. That is
-        what it means to <GlossaryBracket id="adopt" />.
-      </p>
+      <p className="mt-3 leading-7">{ADOPT_INTRO}</p>
+      <GlossaryTerms ids={present} where="page" className="mt-3" />
       <ul
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
         data-testid="adopt-list"
@@ -88,7 +110,7 @@ export default async function AdoptGroupPage({
       </ul>
       {adopted ? (
         <p role="status" className="mt-6 leading-7" data-testid="adopt-done">
-          Adopted. These are your policies now.{" "}
+          {ADOPTED_LINE}{" "}
           <Link href={nextHref} className="underline underline-offset-2">
             {next ? "Next group" : "Open your checklist"}
           </Link>
@@ -108,8 +130,7 @@ export default async function AdoptGroupPage({
           >
             {ADOPT_NEEDS_NAME_LINK}
           </Link>
-          . The documents are adopted by a named person on a date, and that name
-          goes into your document control register.
+          . {NAMED_PERSON_LINE}
         </p>
       ) : (
         <AdoptButton
