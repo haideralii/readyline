@@ -56,6 +56,45 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
       summary: "Near miss in the kitchen; no harm.",
     });
     if (ins.error) throw ins.error;
+    // Retro review of REQ-020, finding 30: an unconfirmed report (a draft)
+    // and a rejected one are not in the register, so neither reaches the
+    // auditor's view or the pack.
+    for (const [status, ref] of [
+      ["draft", "P-098"],
+      ["rejected", "P-099"],
+    ] as const) {
+      const r = await tenant.admin.from("incidents").insert({
+        account_id: tenant.accountId,
+        occurred_on: "2026-10-10",
+        reported_on: "2026-10-10",
+        category: "near-miss",
+        severity: "low",
+        participant_ref: ref,
+        summary: `A ${status} report; not in the register.`,
+        status,
+        reported_via: "link",
+        logged_by_ref: "support worker",
+      });
+      if (r.error) throw r.error;
+    }
+    // Retro finding 62 (D-2244): a rejected report in a reportable category
+    // is an alleged reportable incident; the auditor sees it as received,
+    // not recorded, with its status read so.
+    const alleged = await tenant.admin.from("incidents").insert({
+      account_id: tenant.accountId,
+      occurred_on: "2026-10-10",
+      reported_on: "2026-10-10",
+      category: "abuse-or-neglect",
+      severity: "medium",
+      participant_ref: "P-097",
+      summary: "An alleged report the owner rejected; still reportable.",
+      status: "rejected",
+      reportable: true,
+      rejected_reason: "Not one of our participants.",
+      reported_via: "link",
+      logged_by_ref: "support worker",
+    });
+    if (alleged.error) throw alleged.error;
   });
 
   test.afterAll(async () => {
@@ -97,7 +136,17 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
     await expect(view.getByTestId("auditor-register-incidents")).toContainText(
       "P-014",
     );
+    // Finding 30: the draft and the rejected report are not in the register.
     const html = await view.content();
+    expect(html.includes("P-098")).toBe(false);
+    expect(html.includes("P-099")).toBe(false);
+    // Finding 62: the rejected report that is still reportable is, as received, not recorded.
+    await expect(view.getByTestId("auditor-register-incidents")).toContainText(
+      "P-097",
+    );
+    await expect(view.getByTestId("auditor-register-incidents")).toContainText(
+      "received, not recorded",
+    );
     expect(html.includes(tenant.email)).toBe(false);
     expect(html.includes(tenant.userId)).toBe(false);
     expect(html.includes(tenant.accountId)).toBe(false);
@@ -108,9 +157,8 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
 
     const packViaLink = await auditor.request.get(`${url}/audit-pack.zip`);
     expect(packViaLink.status()).toBe(200);
-    const names = Object.keys(
-      unzipSync(new Uint8Array(await packViaLink.body())),
-    );
+    const unzipped = unzipSync(new Uint8Array(await packViaLink.body()));
+    const names = Object.keys(unzipped);
     expect(names).toEqual(
       expect.arrayContaining([
         "cover-sheet.pdf",
@@ -121,8 +169,19 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
         expect.stringMatching(/^policy-reviews-\d{4}-\d{2}-\d{2}\.csv$/),
         expect.stringMatching(/^document-control-\d{4}-\d{2}-\d{2}\.csv$/),
         expect.stringMatching(/^corporate-risks-\d{4}-\d{2}-\d{2}\.csv$/),
+        // Finding 25: the audit-day registers' shared event trail is a file too.
+        expect.stringMatching(/^register-events-\d{4}-\d{2}-\d{2}\.csv$/),
       ]),
     );
+    // Finding 30 again, on the file: the register's CSV holds the confirmed row only.
+    const incidentsCsv = Buffer.from(
+      unzipped[names.find((n) => /^incidents-\d/.test(n))!],
+    ).toString("utf8");
+    expect(incidentsCsv).toContain("P-014");
+    expect(incidentsCsv).not.toContain("P-098");
+    expect(incidentsCsv).not.toContain("P-099");
+    expect(incidentsCsv).toContain("P-097");
+    expect(incidentsCsv).toContain("received, not recorded");
     await auditor.close();
 
     // The owner revokes; the link is a plain 404 after that.
@@ -178,5 +237,91 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
       .eq("account_id", tenant.accountId)
       .eq("action", "audit_pack.downloaded");
     expect(audit.data?.length).toBeGreaterThanOrEqual(4);
+  });
+
+  // Retro review of REQ-020, finding 21: every open of the signed-out page
+  // writes a row, so one viewer address gets sixty opens of a link an hour.
+  // The first open happens for real; the next fifty-nine are counted through
+  // the limiter's own statement under the key the server builds (the link id
+  // and the address hash the audit line carries), so the test does not spend
+  // a minute rendering the page sixty times. The sixty-first open is refused
+  // in plain words and writes nothing; the pack route answers 429.
+  test("the sixty-first open of a link from one address in an hour is refused", async ({
+    page,
+    context,
+    browser,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+    await page.goto("/account");
+    await page.getByTestId("auditor-link-create").click();
+    const url = await page.getByTestId("auditor-link-url").inputValue();
+    expect(url).toMatch(/\/auditor\/[A-Za-z0-9_-]{43}$/);
+
+    const auditor = await browser.newContext();
+    const view = await auditor.newPage();
+    expect((await view.goto(url))?.status()).toBe(200);
+    await expect(view.getByTestId("auditor-records")).toBeVisible();
+
+    const live = await tenant.admin
+      .from("auditor_links")
+      .select("id")
+      .eq("account_id", tenant.accountId)
+      .is("revoked_at", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+    if (live.error) throw live.error;
+    const opened = await tenant.admin
+      .from("audit_log")
+      .select("target")
+      .eq("account_id", tenant.accountId)
+      .eq("action", "auditor_link.opened")
+      .like("target", `${live.data.id} viewer:%`)
+      .order("at", { ascending: false })
+      .limit(1)
+      .single();
+    if (opened.error) throw opened.error;
+    const viewer = /viewer:([0-9a-f]{16}|unknown)$/.exec(
+      opened.data.target as string,
+    )?.[1];
+    expect(viewer).toBeTruthy();
+    const key = `auditor-open:${live.data.id}:${viewer}`;
+    for (let i = 0; i < 59; i += 1) {
+      const hit = await tenant.admin.rpc("auth_rate_limit_hit", {
+        p_key: key,
+        p_limit: 60,
+        p_window_seconds: 3600,
+      });
+      if (hit.error) throw hit.error;
+    }
+    const before = await tenant.admin
+      .from("auditor_links")
+      .select("opened_count")
+      .eq("id", live.data.id)
+      .single();
+
+    const refused = await view.goto(url);
+    expect(refused?.status()).toBe(200);
+    await expect(view.getByTestId("auditor-limited")).toContainText(
+      "opened many times from your connection",
+    );
+    await expect(view.getByTestId("auditor-records")).toHaveCount(0);
+    const pack = await auditor.request.get(`${url}/audit-pack.zip`);
+    expect(pack.status()).toBe(429);
+    expect(await pack.text()).toContain("opened many times");
+    await auditor.close();
+
+    // Nothing was written by the refused open.
+    const after = await tenant.admin
+      .from("auditor_links")
+      .select("opened_count")
+      .eq("id", live.data.id)
+      .single();
+    expect(after.data?.opened_count).toBe(before.data?.opened_count);
+
+    await page.goto("/account");
+    await page.getByTestId("auditor-link-revoke").click();
+    await expect(page.getByTestId("auditor-link-state")).toHaveCount(0);
   });
 });

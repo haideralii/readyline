@@ -63,10 +63,17 @@ export const CSV_COLUMNS = {
     "updated_at",
   ],
   complaint_events: ["reference", "at", "kind", "note"],
+  /** The audit-day registers' shared trail in the pack (REQ-020 FR-1; retro finding 25): the register, the row as its list names it, then the line. */
+  register_events: ["register", "row", "at", "kind", "note"],
   worker_clearances: [
     "worker_ref",
     "role_label",
     "clearance_kind",
+    // Retro review of REQ-018 to 021, finding 35 (PO decision 35; D-2407 as
+    // amended): the check number travels in the owner's export, the audit
+    // pack and the auditor's view, because the Worker Screening Rules
+    // s 18(3)(d) list it and it is not a name. Names never do; the worker is
+    // its code.
     "clearance_number",
     "issued_on",
     "expires_on",

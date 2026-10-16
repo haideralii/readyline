@@ -6,9 +6,15 @@
 export const LAPSE_MESSAGE =
   "Your subscription has lapsed; your records are safe and read-only. Renew to add to them.";
 
-/** Batch 49 item 2 (from the pricing card; REQ-018 FR-12): what the registers do that a spreadsheet does not. */
+/**
+ * Batch 49 item 2 (from the pricing card; REQ-018 FR-12): what the registers
+ * do that a spreadsheet does not. Retro review of REQ-018, finding 6: a
+ * worker check does not create a staff matrix row (the row is typed); the
+ * staff matrix status view reads the worker's checks, so the check shows on
+ * the row. The words say that and nothing more (CLAUDE.md 4.3).
+ */
 export const REGISTERS_LINKED_LINE =
-  "The registers are linked: an incident becomes an improvement row, a worker check becomes a staff matrix row, and the reminders go out by email, which a spreadsheet does not do.";
+  "The registers are linked: an incident becomes an improvement row, a worker check shows on the worker's staff matrix row, and the reminders go out by email, which a spreadsheet does not do.";
 export const RENEWAL_SAVES_LINE =
   "At the mid-term audit and at renewal the registers are already the evidence, so there is nothing to rebuild from paper.";
 

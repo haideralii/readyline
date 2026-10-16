@@ -4,6 +4,7 @@ import "server-only";
  * session so RLS applies; the status views compute the status for the tag.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { auditorVisibleIncidents } from "@/lib/registers/audit-pack";
 import type {
   ComplaintEventRow,
   ComplaintRow,
@@ -215,12 +216,15 @@ export async function registerOverview(
     listWorkerChecks(supabase, accountId),
     listPolicyReviews(supabase, accountId),
   ]);
-  // REQ-020 FR-5: a report counts in the register only once the owner confirms it; a rejected one never does.
-  const i = all.filter((x) => x.status !== "draft" && x.status !== "rejected");
+  // REQ-020 FR-5: a report counts in the register only once the owner confirms
+  // it; a rejected one never does, except one in a reportable category, which
+  // stays as received, not recorded, with its clock (retro finding 62, D-2244).
+  const i = auditorVisibleIncidents(all);
   return {
     incidents: {
       total: i.length,
-      open: i.filter((x) => x.status !== "closed").length,
+      open: i.filter((x) => x.status === "open" || x.status === "under-review")
+        .length,
       overdueNotification: i.filter(
         (x) => x.notification_status === "overdue-notification",
       ).length,

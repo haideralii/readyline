@@ -48,7 +48,10 @@ export default async function ConfirmReportPage({
         role="status"
         data-testid="aware-line"
       >
-        {awareSentence(new Date(r.aware_at))}
+        {awareSentence(new Date(r.aware_at), {
+          category: r.category,
+          severity: r.severity,
+        })}
       </p>
       <dl
         className="mt-5 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2"

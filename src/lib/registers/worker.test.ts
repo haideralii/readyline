@@ -5,6 +5,7 @@ import {
   INVITATION_DAYS,
   InviteForm,
   REPORTER_ROLES,
+  REPORT_WINDOW_WORDS,
   ReportForm,
   ReporterField,
   awareSentence,
@@ -128,6 +129,36 @@ describe("the owner's lines (FR-5, FR-6; PO review 14 Oct)", () => {
     // 09:30 UTC on 14 Oct is 20:30 in Sydney (AEDT, UTC+11).
     expect(awareSentence(new Date("2026-10-14T09:30:00Z"))).toBe(
       "Reported 14 October, 8:30 pm; if this is a reportable incident the Commission must be told by 15 October, 8:30 pm.",
+    );
+  });
+  // Retro finding 68: s 21's five business days for an unauthorised
+  // restrictive practice that caused no harm; 24 hours for every other kind
+  // and for one that caused harm (D-902).
+  it("the awareness sentence takes the report's kind: five business days for a no-harm unauthorised restrictive practice, 24 hours otherwise", () => {
+    const at = new Date("2026-10-14T09:30:00Z"); // Wednesday 14 Oct, 8:30 pm Sydney
+    expect(
+      awareSentence(at, {
+        category: "restrictive-practice-unauthorised",
+        severity: "low",
+      }),
+    ).toBe(
+      "Reported 14 October, 8:30 pm; if this is a reportable incident the Commission must be told by 21 October 2026 (five business days, for an unauthorised restrictive practice that caused no harm; 24 hours if it did).",
+    );
+    expect(
+      awareSentence(at, {
+        category: "restrictive-practice-unauthorised",
+        severity: "high",
+      }),
+    ).toBe(
+      "Reported 14 October, 8:30 pm; if this is a reportable incident the Commission must be told by 15 October, 8:30 pm.",
+    );
+    expect(
+      awareSentence(at, { category: "abuse-or-neglect", severity: "low" }),
+    ).toBe(
+      "Reported 14 October, 8:30 pm; if this is a reportable incident the Commission must be told by 15 October, 8:30 pm.",
+    );
+    expect(REPORT_WINDOW_WORDS).toBe(
+      "within 24 hours of the report for most kinds, or within 5 business days for an unauthorised restrictive practice that caused no harm",
     );
   });
   it("counts reports in words and says nothing at zero", () => {

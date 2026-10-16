@@ -89,6 +89,7 @@ export async function documentControlForSet(
             }[]
           | null) ?? [],
       adoptedByRole: facts.role ?? null,
+      adoptedByName: facts.name ?? null,
     },
     todaySydney(),
   );

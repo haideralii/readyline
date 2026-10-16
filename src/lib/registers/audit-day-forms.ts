@@ -39,6 +39,10 @@ import {
 } from "./audit-day-types";
 import { NDIS_NUMBER_SHAPE } from "./types";
 import { dateField } from "./forms";
+// #74's run 38858109250: a raw ISO date in a list's detail line breaks at its
+// hyphen at 360 px (`2027-02-13` read "2027-02-" and "13."), so every date a
+// `detailOf` prints is the long form, "13 February 2027".
+import { formatLongDate } from "./status";
 
 const optionalDate = (label: string) =>
   z
@@ -530,14 +534,16 @@ export const STAFF_MATRIX_FIELDS: FieldSpec[] = [
     name: "last_supervision_on",
     label: "Last supervision",
     kind: "date",
-    help: "At least monthly. We remind you when a month has passed.",
+    // Readyline's suggestion, not a rule: the Practice Standards ask for
+    // timely supervision and set no interval (retro review of REQ-018, finding 10).
+    help: "We suggest monthly; we remind you when a month has passed.",
     optional: true,
   },
   {
     name: "last_appraisal_on",
     label: "Last appraisal",
     kind: "date",
-    help: "At least yearly.",
+    help: "We suggest yearly.",
     optional: true,
   },
   {
@@ -697,7 +703,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     filters: REVIEW_FILTERS,
     titleOf: (r) => `${r.site_ref}: ${r.hazard}`,
     detailOf: (r) =>
-      `Could harm ${HARM_TO_LABELS[r.harm_to].toLowerCase()}. ${r.likelihood[0].toUpperCase()}${r.likelihood.slice(1)} likelihood, ${r.severity} severity. ${r.done_on ? `Done ${r.done_on}.` : `Due ${r.due_on}.`}`,
+      `Could harm ${HARM_TO_LABELS[r.harm_to].toLowerCase()}. ${r.likelihood[0].toUpperCase()}${r.likelihood.slice(1)} likelihood, ${r.severity} severity. ${r.done_on ? `Done ${formatLongDate(r.done_on)}.` : `Due ${formatLongDate(r.due_on)}.`}`,
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
   } satisfies RegisterMeta<Statused<HazardRow>>,
@@ -718,7 +724,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     titleOf: (r) => `${r.participant_ref}: ${r.risk}`,
     detailOf: (r) =>
       r.support_plan_review_on
-        ? `Support plan review ${r.support_plan_review_on}.`
+        ? `Support plan review ${formatLongDate(r.support_plan_review_on)}.`
         : "No support plan review date yet.",
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
@@ -738,7 +744,8 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     schema: ConflictOfInterestForm,
     filters: REVIEW_FILTERS,
     titleOf: (r) => `${r.who_ref}: ${r.conflict}`,
-    detailOf: (r) => `Declared ${r.declared_on}. ${r.managed_by}`,
+    detailOf: (r) =>
+      `Declared ${formatLongDate(r.declared_on)}. ${r.managed_by}`,
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
   } satisfies RegisterMeta<Statused<ConflictOfInterestRow>>,
@@ -789,7 +796,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     ],
     titleOf: (r) => `${INSURANCE_KIND_LABELS[r.kind]}: ${r.label}`,
     detailOf: (r) =>
-      `${r.policy_number ? `Policy ${r.policy_number}. ` : ""}Expires ${r.expires_on}.`,
+      `${r.policy_number ? `Policy ${r.policy_number}. ` : ""}Expires ${formatLongDate(r.expires_on)}.`,
     statusOf: (r) =>
       r.status === "expired"
         ? { key: "expired", label: `Expired ${r.expires_on}`, tone: "signal" }
@@ -852,7 +859,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     filters: [],
     titleOf: (r) => r.decision,
     detailOf: (r) =>
-      `${r.decided_on}, ${r.decided_by}.${r.note ? ` ${r.note}` : ""}`,
+      `${formatLongDate(r.decided_on)}, ${r.decided_by}.${r.note ? ` ${r.note}` : ""}`,
     statusOf: (r) => ({
       key: "recorded",
       label: r.decided_on,
@@ -880,7 +887,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     ],
     titleOf: (r) => `${r.worker_ref}: ${r.role_label}`,
     detailOf: (r) =>
-      `${r.risk_assessed ? "Risk-assessed role. " : ""}${r.expired_checks ? `${r.expired_checks} check${r.expired_checks === 1 ? "" : "s"} expired. ` : ""}${r.expiring_checks ? `${r.expiring_checks} expiring. ` : ""}${r.last_supervision_on ? `Supervised ${r.last_supervision_on}.` : "No supervision recorded."}`,
+      `${r.risk_assessed ? "Risk-assessed role. " : ""}${r.expired_checks ? `${r.expired_checks} check${r.expired_checks === 1 ? "" : "s"} expired. ` : ""}${r.expiring_checks ? `${r.expiring_checks} expiring. ` : ""}${r.last_supervision_on ? `Supervised ${formatLongDate(r.last_supervision_on)}.` : "No supervision recorded."}`,
     statusOf: (r) =>
       r.status === "supervision-overdue"
         ? {
@@ -921,7 +928,8 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     ],
     titleOf: (r) =>
       `${r.kind === "worker" ? "New worker" : "New participant"} ${r.subject_ref}`,
-    detailOf: (r) => `Started ${r.started_on}. ${r.ticked} ticked.`,
+    detailOf: (r) =>
+      `Started ${formatLongDate(r.started_on)}. ${r.ticked} ticked.`,
     statusOf: (r) =>
       r.status === "complete"
         ? { key: "complete", label: `Complete ${r.completed_on}`, tone: "moss" }

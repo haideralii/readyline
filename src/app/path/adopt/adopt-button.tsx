@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { adoptGroupAction } from "@/server/path/actions";
@@ -26,6 +27,9 @@ export function AdoptButton({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [link, setLink] = useState<{ href: string; label: string } | null>(
+    null,
+  );
   const [workers, setWorkers] = useState("");
   const [on, setOn] = useState(today);
   const hydrated = useSyncExternalStore(
@@ -51,6 +55,8 @@ export function AdoptButton({
     }
     setPending(false);
     setMessage(r.message);
+    // Retro finding 114: the refusal names the one step to take and links to it.
+    setLink(r.href ? { href: r.href, label: r.hrefLabel ?? "Go there" } : null);
   }
   return (
     <div className="mt-6">
@@ -111,6 +117,15 @@ export function AdoptButton({
       {message ? (
         <p role="alert" className="mt-3 text-sm leading-6">
           {message}
+          {link ? (
+            <>
+              {" "}
+              <Link href={link.href} className="underline underline-offset-2">
+                {link.label}
+              </Link>
+              .
+            </>
+          ) : null}
         </p>
       ) : null}
     </div>

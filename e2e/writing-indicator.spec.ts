@@ -150,6 +150,30 @@ test.describe("the writing indicator (REQ-021)", () => {
     await shot(page, "phase-5-ready", testInfo.project.name);
   });
 
+  // AC-4's keyboard walk (retro review of REQ-021, finding 42): from the
+  // focused heading, the first Tab lands on the next step and the second on
+  // Download, so the order of the two actions holds for the keyboard as it
+  // does for the eye (AC-3). Headless WebKit does not move keyboard focus
+  // onto links at all (home.spec.ts), so the walk runs on the two Chromium
+  // projects; the iphone project keeps the focus-on-heading check above.
+  test("AC-4: Tab from the ready heading reaches the next step first and Download second", async ({
+    page,
+    browserName,
+  }) => {
+    test.skip(browserName === "webkit", "WebKit does not tab to links");
+    await page.goto("/dev/writing-indicator?scenario=ready&t0=1");
+    await expect(indicator(page)).toHaveAttribute("data-phase", "ready");
+    await expect(page.getByTestId("wi-heading")).toBeFocused();
+    const ready = page.getByTestId("wi-ready");
+    await page.keyboard.press("Tab");
+    await expect(ready.getByTestId("wi-next-step")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(ready.getByTestId("wi-download")).toBeFocused();
+    // Back the same way: Shift+Tab returns to the next step.
+    await page.keyboard.press("Shift+Tab");
+    await expect(ready.getByTestId("wi-next-step")).toBeFocused();
+  });
+
   test("S3: a quiet feed stops the animation within the rule and says so; a long one says the page can be closed", async ({
     page,
   }, testInfo) => {
