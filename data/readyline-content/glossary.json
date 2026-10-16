@@ -1,7 +1,7 @@
 {
   "note": "The audit words a provider meets, each with one plain meaning and, where it helps, one or two more sentences shown only in the 'What these words mean' disclosure (REQ-025 FR-13; REQ-027 D-2709, D-2713). The one source: audit-kinds.json, the checklist's audit items, the home example and the result page read their meanings from here, so the site never carries two texts for one term. Written by the product owner on 15 October 2026 (REQ-025, with the review's decisions 16 and 17); NOT NDIS Quality and Safeguards Commission text. Meanings read against the NDIS Act 2013, the Practice Standards Rules and the Worker Screening Rules on 16 Oct 2026 (product/qa/req-reviews/2026-10-16-glossary-read.md); every entry status reviewed.",
   "author": "readyline",
-  "status": "draft",
+  "status": "reviewed",
   "items": [
     {
       "id": "verification-audit",
@@ -72,7 +72,7 @@
       "id": "reportable-incident",
       "term": "reportable incident",
       "meaning": "an incident the law and the Rules list, which a registered provider must report to the Commission",
-      "more": "The list covers death, serious injury, abuse or neglect, unlawful contact or assault, sexual misconduct, and a restrictive practice used without authorisation."
+      "more": "The list covers death, serious injury, abuse or neglect, unlawful contact or assault, sexual misconduct, and a restrictive practice used without authorisation or outside a behaviour support plan."
     },
     {
       "id": "adopt",
