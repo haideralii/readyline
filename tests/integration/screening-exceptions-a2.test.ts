@@ -14,7 +14,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { exceptionContext } from "@/server/registers/exception-queries";
 import { participantRiskSnapshot } from "@/server/registers/participant-risk-snapshot";
+import type { StaffMatrixRow } from "@/lib/registers/audit-day-types";
+import type { WorkerClearanceRow } from "@/lib/registers/types";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
 
 const enabled = hasSupabaseEnv();
@@ -171,9 +174,26 @@ describe.skipIf(!enabled)("REQ-024 A2: the s 14 exception's data", () => {
         version: 1,
         status: "ready",
         storage_path: "a2-test/procedure.v1.docx",
+        adopted_on: "2026-10-20",
         model: {
           typeId: "worker-screening-and-recruitment-procedure",
-          sections: [],
+          title: "Worker screening and recruitment procedure",
+          kind: "procedure",
+          version: "1",
+          generatedAt: "2026-10-01",
+          reviewDueAt: "2027-10-01",
+          facts: { tradingName: "Exceptions owner" },
+          sections: [
+            {
+              id: "division-3-plan",
+              number: "8",
+              heading: "Risk management plan for workers awaiting clearance",
+              mode: "fixed",
+              status: "fixed",
+              blocks: [],
+            },
+          ],
+          footer: "",
         },
       })
       .select("id")
@@ -411,6 +431,51 @@ describe.skipIf(!enabled)("REQ-024 A2: the s 14 exception's data", () => {
     expect(theirs.rows).toEqual([
       { code: "P-99", risk: "Other account's risk, never copied." },
     ]);
+  });
+
+  it("PO 07:05: the gates read as the owner on the journey's fixture offer the option, every reason in the message", async () => {
+    // A fresh pending application for W-4 (the earlier case ended its first with an exclusion on the row).
+    const fresh = await owner.client
+      .from("worker_clearances")
+      .insert({
+        account_id: owner.accountId,
+        worker_ref: "W-4",
+        role_label: "support worker",
+        clearance_kind: "ndis-worker-screening",
+        application_number: "WA-2026-0442",
+        verified_in_database_on: "2026-10-30",
+        state: "WA",
+      })
+      .select("id")
+      .single();
+    expect(fresh.error).toBeNull();
+    const matrix = await owner.client
+      .from("staff_matrix")
+      .select("*")
+      .eq("account_id", owner.accountId)
+      .eq("worker_ref", "W-4")
+      .single();
+    expect(matrix.error).toBeNull();
+    const clearances = await owner.client
+      .from("worker_clearances")
+      .select("*")
+      .eq("account_id", owner.accountId)
+      .eq("worker_ref", "W-4");
+    const ctx = await exceptionContext(
+      owner.client,
+      owner.accountId,
+      matrix.data as StaffMatrixRow,
+      {
+        clearances: (clearances.data as WorkerClearanceRow[]) ?? [],
+        ownerRow: false,
+        today: "2026-11-02",
+      },
+    );
+    expect(ctx.plan, "the adopted version carrying the section").not.toBeNull();
+    expect(ctx.registerRowCount).toBeGreaterThan(0);
+    expect(ctx.gate.supervisors).toEqual(["W-2"]);
+    expect(ctx.gate.reasons, ctx.gate.reasons.join(" | ")).toEqual([]);
+    expect(ctx.gate.offered).toBe(true);
   });
 
   it("the trail takes the two new kinds under the new register with words, never a uuid", async () => {

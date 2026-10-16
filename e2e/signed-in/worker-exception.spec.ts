@@ -56,12 +56,17 @@ const PROCEDURE = "worker-screening-and-recruitment-procedure";
 async function afterSave(page: Page, nextTestId: string, step: string) {
   const next = page.getByTestId(nextTestId);
   const message = page.getByTestId("exception-message");
-  await expect(next.or(message)).toBeVisible({ timeout: 20_000 });
-  if (!(await next.isVisible().catch(() => false))) {
+  const reasons = page.getByTestId("exception-reasons");
+  await expect(next.or(message).or(reasons)).toBeVisible({ timeout: 20_000 });
+  if (await next.isVisible().catch(() => false)) return;
+  if (await message.isVisible().catch(() => false))
     throw new Error(
       `${step}: the panel refused the save: ${(await message.textContent()) ?? "(no message)"}`,
     );
-  }
+  // The third state (PO 07:05): the option absent, the gates named on the page.
+  throw new Error(
+    `${step}: the option is absent; the gates say: ${(await reasons.textContent()) ?? "(no reasons)"}`,
+  );
 }
 
 test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
