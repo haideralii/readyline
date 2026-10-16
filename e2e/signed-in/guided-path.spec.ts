@@ -521,15 +521,21 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         .locator("li[data-state='adopted']"),
     ).toHaveCount(controlRows);
     await checkWidths(page, "document control");
-    // REQ-024 A0 (D-2435): the policy review register shows a catalogue
-    // type's adopted date from the pack's version column, read-only.
-    await page.goto("/registers/policy-reviews/new");
-    await page
-      .getByLabel("Document")
-      .selectOption("complaints-management-policy-and-register");
-    await expect(page.getByTestId("adopted-on-from-pack")).toContainText(
-      /\d{4}-\d{2}-\d{2}, from your pack\./,
+    // REQ-024 A0 (D-2435; #77's run 38892064423, PO 22:50): after the adopt
+    // step every catalogue type carries its mirror row, so the new-row page has
+    // no catalogue type left to offer; the register's own list is where the
+    // pack's day shows, read-only, with nothing to type. The complaints row
+    // reads the adopted day the adopt step wrote (D-2448, D-2449).
+    await page.goto("/registers/policy-reviews");
+    const complaintsRow = page
+      .getByTestId("policy-reviews-list")
+      .locator('[data-testid^="row-"]')
+      .filter({ hasText: /^Complaints management/ });
+    await expect(complaintsRow).toHaveCount(1);
+    await expect(complaintsRow).toContainText(
+      /Adopted \d{4}-\d{2}-\d{2}; every \d+ months\./,
     );
+    await expect(complaintsRow).not.toContainText(/Not adopted/);
     await expect(page.getByLabel(/Date adopted/)).toHaveCount(0);
     await page.goto("/path/audit-day");
     await checkWidths(page, "audit day");
