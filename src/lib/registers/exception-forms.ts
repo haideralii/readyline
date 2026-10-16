@@ -42,10 +42,8 @@ export const StartExceptionForm = strictObject({
   noticeSeenOn: dateField("day you saw the unit's written notice"),
   startedOn: dateField("day the worker starts under the exception"),
   declarationOn: dateField("day the worker gave the written declaration"),
-  /** Gate (iv): the tick itself; the date above is its record. */
-  declaration: z.literal(true, {
-    error: "Tick the declaration line before the exception can start",
-  }),
+  /** Gate (iv): the tick as sent; an unticked declaration is the gate's refusal in the Rules' words (s 15(2)(a) and (b)), never a form error (PO 08:10). */
+  declaration: z.boolean(),
 });
 export type StartExceptionValues = z.input<typeof StartExceptionForm>;
 
