@@ -128,6 +128,7 @@ export async function rerenderSetWithFacts(input: {
   facts: Readonly<Record<string, string>>;
 }): Promise<{ changed: number; blanksLeft: number }> {
   const { admin, set, facts } = input;
+  const startedAt = Date.now();
   const store = new SupabaseGenerationStore(admin);
   const sorted = inAuditOrder(await listLatestDocuments(admin, set.id));
   let changed = 0;
@@ -199,11 +200,15 @@ export async function rerenderSetWithFacts(input: {
       .update({ provider_input_section_count: providerInputSections })
       .eq("id", set.id);
   }
+  // The guided-path spec waits on this step; `ms` says how long a whole-set
+  // re-render took on the host (runs 38665790472 and 38826340580).
   log.info("path.finish.rerendered", {
     accountId: set.account_id,
     versionSetId: set.id,
     changed,
+    documents: sorted.length,
     blanksLeft: blanks.length,
+    ms: Date.now() - startedAt,
   });
   return { changed, blanksLeft: blanks.length };
 }

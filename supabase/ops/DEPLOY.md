@@ -160,6 +160,15 @@ grants exist. If a merge happened while the workflow was broken, run it by
 hand from GitHub → Actions → "migrate" → Run workflow, then check
 `https://<domain>/api/health` still answers.
 
+Retro note, 16 Oct 2026 (D-2245; #76's run 38875536646): the hosted project
+never had the CLI stack's default privileges, so until `20261016030000` the
+member's `audit_log` insert policy had no grant behind it there, and the
+three app paths that wrote under it (`account.exported`,
+`audit_pack.downloaded`, `account.updated`) answered 42501: production's
+audit log lacks those three actions for every account up to that migration.
+From it on every table grant is stated per verb, and the integration suite
+reads them back and checks every write policy has its grant.
+
 ## 7. Stripe webhook
 
 Stripe dashboard (test mode) → Developers → Webhooks → **Add endpoint**.

@@ -47,12 +47,20 @@ export async function GET(request: Request) {
     tradingName: viewer.account.trading_name,
     now: new Date(),
   });
-  await supabase.from("audit_log").insert({
+  // The write is checked (PO 16 Oct 19:47): on the hosted project it had
+  // answered 42501 unseen since it was written, the insert grant missing.
+  const audit = await supabase.from("audit_log").insert({
     account_id: accountId,
     actor_user_id: viewer.user.id,
     action: "audit_pack.downloaded",
     target: accountId,
   });
+  if (audit.error)
+    log.warn("audit.write.failed", {
+      accountId,
+      action: "audit_pack.downloaded",
+      code: audit.error.code,
+    });
   log.info("audit-pack.downloaded", { accountId, files: pack.files.length });
   return new NextResponse(new Uint8Array(pack.body), {
     status: 200,

@@ -274,7 +274,13 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
                   : "busy";
             return seen;
           },
-          { timeout: 120_000, intervals: [250, 500, 1000] },
+          // Runs 38665790472 and 38826340580, android-small alone, the last
+          // click busy for the whole 120 s while the other two projects passed
+          // the same step: the whole-set re-render of 22 documents runs on the
+          // shared runner beside the other projects' finish steps, so the wait
+          // is the re-render's worst case and not a round number; the
+          // server-side `path.finish.rerendered` line now carries `ms`.
+          { timeout: 240_000, intervals: [250, 500, 1000] },
         )
         .not.toBe("busy");
       if (seen === "server-done") {

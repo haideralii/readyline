@@ -141,7 +141,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   accounts: ["SELECT", "UPDATE"],
   memberships: ["DELETE", "SELECT"],
   questionnaire_drafts: ["DELETE", "INSERT", "SELECT", "UPDATE"],
-  audit_log: ["SELECT"],
+  // The member's own-account insert policy needs the verb (#76's run 38875536646).
+  audit_log: ["INSERT", "SELECT"],
   account_facts: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   // Documents, payments and the subscription.
   version_sets: ["SELECT"],
@@ -237,6 +238,38 @@ describe.skipIf(!enabled)(
       }
       for (const [table, verbs] of Object.entries(AUTHENTICATED_TABLE_GRANTS))
         expect(held[table] ?? [], table).toEqual([...verbs]);
+    });
+
+    // PO 16 Oct 2026 19:47 (#76's run): a row policy for a write verb that no
+    // table grant backs is reachable only through the CLI stack's default
+    // privileges and refused on the hosted project, so each such policy must
+    // name a table whose grant holds its verb. Policies `for all` are left to
+    // the per-verb map above, since a narrower grant under one is by design.
+    it("every insert, update or delete policy for authenticated has the table grant behind it", () => {
+      if (!dbUrl) return;
+      const held = new Map<string, Set<string>>();
+      for (const line of sql(
+        "select table_name, privilege_type from information_schema.role_table_grants where grantee = 'authenticated' and table_schema = 'public' order by 1, 2",
+      )) {
+        const [table, verb] = line.split("|");
+        if (!held.has(table)) held.set(table, new Set());
+        held.get(table)!.add(verb);
+      }
+      const unbacked: string[] = [];
+      for (const line of sql(
+        "select tablename, policyname, cmd from pg_policies where schemaname = 'public' and cmd in ('INSERT', 'UPDATE', 'DELETE') and ('authenticated' = any(roles) or 'public' = any(roles)) order by 1, 2",
+      )) {
+        const [table, policy, cmd] = line.split("|");
+        const verbs = held.get(table) ?? new Set<string>();
+        const column =
+          cmd === "UPDATE" &&
+          sql(
+            `select count(*) from information_schema.column_privileges where grantee = 'authenticated' and table_schema = 'public' and table_name = '${table}' and privilege_type = 'UPDATE'`,
+          )[0] !== "0";
+        if (!verbs.has(cmd) && !column)
+          unbacked.push(`${table}.${policy} (${cmd})`);
+      }
+      expect(unbacked, "policies without their table grant").toEqual([]);
     });
 
     it("authenticated may update one column of imports, and anon holds nothing anywhere", () => {
