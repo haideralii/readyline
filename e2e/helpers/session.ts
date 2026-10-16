@@ -250,12 +250,19 @@ export async function createAdminTenant(label: string): Promise<TestTenant> {
   };
 }
 
-/** Removes the user (cascading to the account and its rows) and the set's objects. */
+/** Removes the set's objects, the account row (cascading to its rows) and then the user. */
 export async function deleteTenant(tenant: TestTenant): Promise<void> {
   // After-window item 8 (PO 16 Oct 02:05): a job still queued or running when
   // the tenant goes would be claimed by the job route after the account is
   // gone and fail loud (`payments.generation.failed`, run 38750817767), so
   // it is failed here first, with the reason, and the claim never sees it.
+  // PO 16 Oct 19:44, after #75's run: `accounts` has no key to a user, so
+  // `deleteUser` alone took the owner's membership (through `public.users`)
+  // and left the account and its jobs standing; a job claimed in the window
+  // after that met an account with no owner (`owner-missing`, three lines at
+  // 07:36:07Z). The account row is deleted below, before the user, so the
+  // cascade takes its jobs, sets, versions and memberships and no window is
+  // left.
   if (tenant.accountId)
     await tenant.admin
       .from("generation_jobs")
@@ -284,6 +291,16 @@ export async function deleteTenant(tenant: TestTenant): Promise<void> {
         .from("documents")
         .remove(names)
         .catch(() => undefined);
+  }
+  if (tenant.accountId) {
+    const gone = await tenant.admin
+      .from("accounts")
+      .delete()
+      .eq("id", tenant.accountId);
+    if (gone.error)
+      console.warn(
+        `deleteTenant: account ${tenant.accountId} not deleted (${gone.error.code})`,
+      );
   }
   await tenant.admin.auth.admin
     .deleteUser(tenant.userId)

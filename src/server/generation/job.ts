@@ -22,7 +22,11 @@ import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { log } from "@/lib/logging/logger";
-import { generationFailureCode, reasonForCi } from "./failure-code";
+import {
+  QUIET_FAILURE_CODES,
+  generationFailureCode,
+  reasonForCi,
+} from "./failure-code";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -289,15 +293,21 @@ export async function runGenerationTick(input: {
     // After-window item 9: the closed code beside the omitted free text, so the
     // log reads without it; in CI alone the raw reason follows at warn (runs
     // 38750817767 and 38826340580 left three failures unreadable).
+    const code = generationFailureCode(reason, kind);
     const fields = {
       jobId: job.id,
       purchaseId: job.purchase_id,
       accountId: job.account_id,
-      code: generationFailureCode(reason, kind),
+      code,
       reason,
     };
-    if (alert) log.error("payments.generation.failed", fields);
-    else log.info("payments.generation.cancelled", fields);
+    // PO 16 Oct 19:44: an account deleted or left without an owner before its
+    // job ran is the account's end, not a failure anyone can act on, so those
+    // two codes log at warn; every other permanent failure stays an alert.
+    if (!alert) log.info("payments.generation.cancelled", fields);
+    else if (QUIET_FAILURE_CODES.includes(code))
+      log.warn("payments.generation.failed", fields);
+    else log.error("payments.generation.failed", fields);
     if (alert && reasonForCi())
       log.warn("payments.generation.failed-reason", {
         jobId: job.id,
