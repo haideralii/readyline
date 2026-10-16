@@ -84,7 +84,11 @@ delete from public.reminders where kind in ('mid-term-audit', 'renewal') and sen
 -- granted, so the owner's direct delete matched zero rows under RLS instead
 -- of raising 42501. A table's grants are explicit per verb or the default
 -- gives everything; the job writes under the service role, which keeps all.
-revoke insert, update, delete on public.reminders from anon, authenticated;
+-- Run 38840999461 (PO 14:00): the defaults also hand `references`, `trigger`
+-- and `truncate`, so the revoke is of everything and the one grant follows
+-- (the D-2241 order); the hosted project holds `select` alone already (D-422).
+revoke all on public.reminders from anon, authenticated;
+grant select on public.reminders to authenticated;
 
 -- Finding 61: the owner's session holds no delete on reminders, so the save
 -- clears its unsent timeline rows through this function, owner-only.
