@@ -11,6 +11,7 @@
  * the human label of each option.
  */
 import { useEffect, useRef, type ReactNode } from "react";
+import { numberText } from "@/lib/questionnaire/number-text";
 
 export type FieldErrors = Record<string, string[]>;
 
@@ -99,13 +100,15 @@ export function NumberInput(props: {
   max?: number;
 }) {
   const { onChange, describedBy, invalid, ...rest } = props;
+  // QA pass N8: what is typed survives as a number would read it (digits,
+  // one point, a leading minus) and the schema refuses "2.5" or "-1" in
+  // words; the old digit-only strip turned them into 25 and 1 silently.
   return (
     <input
       type="text"
-      inputMode="numeric"
-      pattern="[0-9]*"
+      inputMode="decimal"
       {...rest}
-      onChange={(e) => onChange(e.target.value.replace(/[^\d]/g, ""))}
+      onChange={(e) => onChange(numberText(e.target.value))}
       aria-describedby={describedBy}
       aria-invalid={invalid || undefined}
       className={`${inputClass} max-w-40 ${invalid ? invalidClass : ""}`}
