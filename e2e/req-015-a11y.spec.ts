@@ -247,7 +247,7 @@ test.describe("REQ-015 Section E", () => {
     await expect(card).toContainText(/Your audit: certification/);
     // REQ-025 FR-13: the audit kind's meaning under the heading comes from the glossary.
     await expect(card.getByTestId("audit-kind")).toContainText(
-      /An auditor reads your documents and visits you/,
+      /An approved auditor reads your documents, visits where you work and talks to people/,
     );
     // REQ-017 step 1: the one button is "Start getting ready"; the checklist and the price are plain links under it.
     const button = card.getByRole("link", { name: "Start getting ready" });
