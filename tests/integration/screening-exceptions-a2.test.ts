@@ -348,7 +348,8 @@ describe.skipIf(!enabled)("REQ-024 A2: the s 14 exception's data", () => {
     });
     const own = await worker.client
       .from("worker_clearances_worker")
-      .select("decision_code, decision_on, note")
+      // SR-1, D-2429: every column but `note`; the owner reads the note through the table.
+      .select("decision_code, decision_on")
       .eq("id", pendingId)
       .maybeSingle();
     expect(own.error).toBeNull();
