@@ -252,6 +252,19 @@ export async function createAdminTenant(label: string): Promise<TestTenant> {
 
 /** Removes the user (cascading to the account and its rows) and the set's objects. */
 export async function deleteTenant(tenant: TestTenant): Promise<void> {
+  // After-window item 8 (PO 16 Oct 02:05): a job still queued or running when
+  // the tenant goes would be claimed by the job route after the account is
+  // gone and fail loud (`payments.generation.failed`, run 38750817767), so
+  // it is failed here first, with the reason, and the claim never sees it.
+  if (tenant.accountId)
+    await tenant.admin
+      .from("generation_jobs")
+      .update({
+        status: "failed",
+        last_error: "cancelled: the test tenant was deleted",
+      })
+      .eq("account_id", tenant.accountId)
+      .in("status", ["queued", "running"]);
   // A user created without an account (item 28) has no sets to clear, and the
   // account the form created is removed with the user.
   const sets = tenant.accountId

@@ -19,6 +19,7 @@ import {
   type RegistrationReminderInput,
 } from "./timeline";
 import type { ReminderKind, ReminderSubjectTable } from "./types";
+import { REPORT_WINDOW_WORDS } from "./worker";
 
 // REQ-023 Session A: the month arithmetic moved to status.ts; kept here for its importers.
 export { addMonths } from "./status";
@@ -49,7 +50,8 @@ export type ReminderInput = {
   period?: RegistrationReminderInput;
   incidents: {
     id: string;
-    status: "open" | "under-review" | "closed";
+    /** `rejected` only for a rejected report still marked reportable (retro finding 62): its clock runs, nothing else does. */
+    status: "open" | "under-review" | "closed" | "rejected";
     reportable: boolean;
     notify_by: string | null;
     reportable_notified_on: string | null;
@@ -170,8 +172,8 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   }
 
   for (const i of input.incidents) {
-    // Open for 30 days with no event.
-    if (i.status !== "closed") {
+    // Open for 30 days with no event (a rejected report is not open).
+    if (i.status !== "closed" && i.status !== "rejected") {
       const quiet = addDays(i.last_activity_on, INCIDENT_OPEN_DAYS);
       push("incident-open", "incidents", i.id, quiet, quiet);
     }
@@ -301,6 +303,7 @@ export function reminderLine(
     case "register-review":
       return `Register row ${reference} is due for review on ${dueOn}. Open it and tap Reviewed today.`;
     case "report-to-confirm":
-      return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report.`;
+      // Retro finding 68: the line has no category, so it names both windows.
+      return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told ${REPORT_WINDOW_WORDS}.`;
   }
 }

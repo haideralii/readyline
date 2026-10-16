@@ -8,11 +8,20 @@
 import { z } from "zod";
 import { strictObject, text } from "@/lib/validation";
 import {
+  HARM_SEVERITIES,
+  RESTRICTIVE_PRACTICE_BUSINESS_DAYS,
+  addBusinessDays,
+} from "./status";
+import {
   INCIDENT_CATEGORIES,
+  INCIDENT_CATEGORIES_24H,
+  INCIDENT_CATEGORIES_5BD,
   INCIDENT_SEVERITIES,
   NDIS_NUMBER_SHAPE,
   REF_PATTERNS,
   TEXT_CAPS,
+  type IncidentCategory,
+  type IncidentSeverity,
 } from "./types";
 
 /** The name-free roles a reporter may choose instead of a worker code (PO edit to FR-5). */
@@ -122,8 +131,33 @@ export function reportPath(token: string): string {
   return `/report/${token}`;
 }
 
-/** The sentence on the confirmation screen: when the provider became aware, and the 24-hour mark from it. */
-export function awareSentence(awareAt: Date): string {
+/**
+ * Retro finding 68: the window depends on the kind (Incident Rules s 20:
+ * 24 hours; s 21: 5 business days for an unauthorised restrictive practice,
+ * 24 hours when it caused harm, D-902). The lines that carry no category
+ * (the nudge email and the reminder line) name both windows.
+ */
+export const REPORT_WINDOW_WORDS =
+  "within 24 hours of the report for most kinds, or within 5 business days for an unauthorised restrictive practice that caused no harm";
+
+/** The categories whose report is an alleged reportable incident whatever the owner decides (Incident Rules s 17; retro finding 62). */
+export function isReportableCategory(category: IncidentCategory): boolean {
+  return (
+    INCIDENT_CATEGORIES_24H.includes(category) ||
+    INCIDENT_CATEGORIES_5BD.includes(category)
+  );
+}
+
+/**
+ * The sentence on the confirmation screen: when the provider became aware,
+ * and the mark the report's kind sets from it (finding 68): the 24-hour
+ * mark for most kinds; for an unauthorised restrictive practice that caused
+ * no harm, five business days from the day the provider became aware.
+ */
+export function awareSentence(
+  awareAt: Date,
+  kind?: { category: IncidentCategory; severity: IncidentSeverity },
+): string {
   const fmt = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
     day: "numeric",
@@ -132,8 +166,32 @@ export function awareSentence(awareAt: Date): string {
     minute: "2-digit",
     hour12: true,
   });
+  const reported = `Reported ${fmt.format(awareAt).replace(" at ", ", ")}`;
+  if (
+    kind &&
+    INCIDENT_CATEGORIES_5BD.includes(kind.category) &&
+    !HARM_SEVERITIES.includes(kind.severity)
+  ) {
+    const awareOn = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Australia/Sydney",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(awareAt);
+    const by = new Intl.DateTimeFormat("en-AU", {
+      timeZone: "UTC",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(
+      new Date(
+        `${addBusinessDays(awareOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS)}T00:00:00Z`,
+      ),
+    );
+    return `${reported}; if this is a reportable incident the Commission must be told by ${by} (five business days, for an unauthorised restrictive practice that caused no harm; 24 hours if it did).`;
+  }
   const by = new Date(awareAt.getTime() + AWARE_HOURS * 3_600_000);
-  return `Reported ${fmt.format(awareAt).replace(" at ", ", ")}; if this is a reportable incident the Commission must be told by ${fmt.format(by).replace(" at ", ", ")}.`;
+  return `${reported}; if this is a reportable incident the Commission must be told by ${fmt.format(by).replace(" at ", ", ")}.`;
 }
 
 /** "1 report to confirm" / "3 reports to confirm", or null. */

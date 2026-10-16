@@ -285,6 +285,57 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
       "2 entries",
     );
 
+    // Retro finding 62 (D-2244): a second report, in a reportable category,
+    // rejected by the owner. The reject form says the clock runs on; the row
+    // reads received, not recorded, with its notify-by date; the owner then
+    // records the date the Commission was told and the clock stops.
+    const reporter2 = await browser.newContext();
+    const r2 = await reporter2.newPage();
+    expect((await r2.goto(url))?.status()).toBe(200);
+    await r2.getByLabel("Who are you").selectOption("casual worker");
+    await r2.getByLabel("Date it happened").fill("2026-10-13");
+    await r2
+      .getByLabel("What happened", { exact: true })
+      .selectOption("abuse-or-neglect");
+    await r2.getByLabel("How serious it was").selectOption("medium");
+    await r2
+      .getByLabel(/What happened, in a sentence/)
+      .fill("A family member says a worker shouted at the participant.");
+    await r2.getByTestId("report-submit").click();
+    await expect(r2.getByTestId("report-done")).toContainText(/INC-\d{4}/);
+    await reporter2.close();
+    await page.goto("/registers/incidents");
+    await page.getByTestId("confirm-report-link").click();
+    await expect(page.getByTestId("reject-report")).toBeVisible();
+    await page.getByText("Not an incident? Reject it").click();
+    await expect(page.getByTestId("reject-still-reportable")).toContainText(
+      "An allegation of this kind is still reportable; rejecting the report does not stop the Commission's clock.",
+    );
+    await page
+      .getByLabel("Why you are rejecting it")
+      .fill(
+        "Not one of our participants; the person named is not on our books.",
+      );
+    await page.getByTestId("reject-report-submit").click();
+    await expect(page).toHaveURL(/\/registers\/incidents\/[0-9a-f-]{36}$/);
+    await expect(page.getByTestId("status-tag")).toContainText(
+      "Received, not recorded",
+    );
+    await expect(page.getByTestId("incident-facts")).toContainText(
+      "Notify the Commission by",
+    );
+    await shot(page, "rejected-still-reportable", project);
+    await page.getByLabel("Date you told the Commission").fill("2026-10-14");
+    await page.getByTestId("rejected-notified-submit").click();
+    await expect(page).toHaveURL(/\?saved=1$/);
+    await expect(page.getByTestId("status-tag")).toContainText(
+      "Received, not recorded; Commission told",
+    );
+    await page.goto("/registers");
+    await expect(page.getByTestId("register-incidents")).toContainText(
+      "3 entries",
+    );
+
     // Off: the link is a plain 404.
     await page.goto("/account");
     await page.getByTestId("team-report-link-revoke").click();
@@ -304,6 +355,8 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
       "report_link.created",
       "report.submitted",
       "report.confirmed",
+      "report.rejected",
+      "report.notified",
       "report_link.revoked",
     ])
       expect(actions, a).toContain(a);

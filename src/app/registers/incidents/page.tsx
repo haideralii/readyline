@@ -15,13 +15,34 @@ export const metadata: Metadata = { title: "Incidents register" };
  * An unconfirmed report outranks everything (REQ-020 FR-5: the 24 hours run
  * from the report); then an overdue notification; otherwise a closed
  * incident reads as closed even if a notification date is still open. A
- * rejected report keeps its row, marked, and counts nowhere.
+ * rejected report keeps its row, marked, and counts nowhere, except one in
+ * a reportable category (retro finding 62, Incident Rules s 17): received,
+ * not recorded, with its Commission clock until the owner settles it.
  */
 export function incidentStatus(r: IncidentListRow): ListRow["status"] {
   if (r.status === "draft")
     return { key: "draft", label: "To confirm", tone: "signal" };
-  if (r.status === "rejected")
+  if (r.status === "rejected") {
+    if (r.reportable && r.notification_status === "overdue-notification")
+      return {
+        key: "received-not-recorded",
+        label: "Received, not recorded; overdue to notify",
+        tone: "signal",
+      };
+    if (r.reportable && r.notification_status === "notification-due")
+      return {
+        key: "received-not-recorded",
+        label: `Received, not recorded; notify by ${r.notify_by}`,
+        tone: "signal",
+      };
+    if (r.reportable)
+      return {
+        key: "received-not-recorded",
+        label: "Received, not recorded; Commission told",
+        tone: "slate",
+      };
     return { key: "rejected", label: "Rejected", tone: "slate" };
+  }
   if (r.notification_status === "overdue-notification")
     return {
       key: "overdue-notification",
@@ -48,6 +69,7 @@ export const INCIDENT_FILTERS = [
   { key: "notification-due", label: "To notify" },
   { key: "overdue-notification", label: "Overdue" },
   { key: "closed", label: "Closed" },
+  { key: "received-not-recorded", label: "Received, not recorded" },
   { key: "rejected", label: "Rejected" },
 ];
 

@@ -265,12 +265,20 @@ export default async function AccountPage() {
         <h2 id="auditor-heading" className="text-xl font-semibold">
           Share a read-only view with your auditor
         </h2>
+        {/* Retro finding 59: the link is the provider's own disclosure, so the copy says what the view holds, not less. */}
         <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
           A link that opens your registers, your document control register and
-          your audit pack, read-only, with participants shown as codes only. It
-          expires when you say and you can revoke it at any time. You copy it
-          and send it yourself; we send nothing and we do not list or recommend
-          auditors.
+          your audit pack, read-only. It expires when you say and you can revoke
+          it at any time. You copy it and send it yourself; we send nothing and
+          we do not list or recommend auditors.
+        </p>
+        <p
+          className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+          data-testid="auditor-link-disclosure"
+        >
+          Participants appear as the codes you typed. Everything you typed into
+          a register is in the view exactly as you typed it, so check your
+          summaries and notes for names before you share.
         </p>
         <AuditorLinkPanel
           current={

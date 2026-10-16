@@ -8,7 +8,7 @@ import {
   signInContext,
   type TestTenant,
 } from "../helpers/session";
-import { checkWidths } from "../helpers/width";
+import { checkWidths, expectNoBrokenWords } from "../helpers/width";
 
 /**
  * REQ-018 Session B on all three projects: a subscribed owner opens the
@@ -59,6 +59,41 @@ async function axeClean(page: Page, label: string) {
 const future = (days: number) =>
   new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
 
+/**
+ * AC-1 "no letter-by-letter table wrapping" (retro review of REQ-018,
+ * finding 1): at 360 px no word inside the register's list or a row's facts
+ * is painted across two lines, and no table cell is squeezed under 48 px.
+ * Every project sets the width, so the desktop run checks the phone layout too.
+ */
+async function noLetterWrap(page: Page, testId: string, label: string) {
+  const original = page.viewportSize();
+  await page.setViewportSize({ width: 360, height: original?.height ?? 740 });
+  const root = `[data-testid="${testId}"]`;
+  await expect(page.locator(root)).toBeVisible();
+  await expectNoBrokenWords(page, `${label} @360`, root);
+  const narrow = await page
+    .locator(`${root} td`)
+    .evaluateAll((cells) =>
+      cells
+        .map((c) => Math.round(c.getBoundingClientRect().width))
+        .filter((w) => w > 0 && w < 48),
+    );
+  expect(narrow, `${label}: table cells narrower than 48 px`).toEqual([]);
+  if (original) await page.setViewportSize(original);
+}
+
+const AUDIT_DAY_SLUGS = [
+  "corporate-risks",
+  "participant-risks",
+  "conflicts-of-interest",
+  "delegations",
+  "insurances",
+  "improvements",
+  "decisions",
+  "staff-matrix",
+  "onboarding",
+] as const;
+
 test.describe("audit-day registers (REQ-018 Session B)", () => {
   test.skip(!enabled, "needs the Supabase variables");
   test.describe.configure({ mode: "serial", timeout: 240_000 });
@@ -93,11 +128,14 @@ test.describe("audit-day registers (REQ-018 Session B)", () => {
     await expect(list.locator("li")).toHaveCount(9);
     await expect(list).toContainText("Starter row: check this and change it");
     await checkWidths(page, "corporate risks list");
+    await noLetterWrap(page, "corporate-risks-list", "corporate risks list");
     await axeClean(page, "corporate risks list");
     await shot(page, "corporate-risks", project);
 
     await list.locator("li a").first().click();
     await expect(page.getByTestId("starter-note")).toBeVisible();
+    // AC-1 on a row's facts too (the stacked definition list).
+    await noLetterWrap(page, "row-facts", "corporate risk row");
     await page.getByTestId("row-edit").locator("summary").click();
     await page
       .locator("#controls")
@@ -245,19 +283,24 @@ test.describe("audit-day registers (REQ-018 Session B)", () => {
     await shot(page, "improvements", project);
 
     await page.goto("/registers");
-    for (const slug of [
-      "corporate-risks",
-      "participant-risks",
-      "conflicts-of-interest",
-      "delegations",
-      "insurances",
-      "improvements",
-      "decisions",
-      "staff-matrix",
-      "onboarding",
-    ])
+    for (const slug of AUDIT_DAY_SLUGS)
       await expect(page.getByTestId(`register-${slug}`)).toBeVisible();
     await checkWidths(page, "registers index");
     await shot(page, "registers-index", project);
+  });
+
+  test("AC-1: no register list wraps a word letter by letter at 360 px", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+    // Every list has rows by now (the starter rows and the rows the earlier
+    // tests added); the conflicts register may be empty, which is its empty
+    // state, also a list.
+    for (const slug of AUDIT_DAY_SLUGS) {
+      await page.goto(`/registers/${slug}`);
+      await noLetterWrap(page, `${slug}-list`, `${slug} list`);
+    }
   });
 });

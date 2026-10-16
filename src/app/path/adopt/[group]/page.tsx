@@ -3,7 +3,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
+import {
+  ADOPT_NEEDS_NAME,
+  ADOPT_NEEDS_NAME_HREF,
+  ADOPT_NEEDS_NAME_LINK,
+} from "@/lib/path/adopt-copy";
 import { getViewer } from "@/server/accounts/queries";
+import { loadFacts } from "@/server/path/facts";
 import { loadPathContext } from "@/server/path/state";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AdoptButton } from "../adopt-button";
@@ -41,6 +47,10 @@ export default async function AdoptGroupPage({
   const next = groups[index + 1];
   const nextHref = next ? `/path/adopt/${groupSlug(next.title)}` : "/checklist";
   const previous = groups[index - 1];
+  // Retro finding 114 (D-2244): adoption names a person, so the screen asks
+  // for the name before it offers the button; the action refuses as well.
+  const facts = adopted ? null : await loadFacts(supabase, viewer.account.id);
+  const needsName = facts !== null && !facts.name?.trim();
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -81,6 +91,23 @@ export default async function AdoptGroupPage({
             {next ? "Next group" : "Open your checklist"}
           </Link>
           .
+        </p>
+      ) : needsName ? (
+        <p
+          role="status"
+          className="border-ochre mt-6 rounded-md border p-3 leading-7"
+          data-testid="adopt-needs-name"
+        >
+          {ADOPT_NEEDS_NAME}{" "}
+          <Link
+            href={ADOPT_NEEDS_NAME_HREF}
+            className="underline underline-offset-2"
+            data-testid="adopt-needs-name-link"
+          >
+            {ADOPT_NEEDS_NAME_LINK}
+          </Link>
+          . The documents are adopted by a named person on a date, and that name
+          goes into your document control register.
         </p>
       ) : (
         <AdoptButton

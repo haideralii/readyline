@@ -44,7 +44,20 @@ export type DocumentControlInput = {
   }[];
   /** The owner's role from the account facts (D-1704), or a plain default. */
   adoptedByRole: string | null;
+  /** The owner's name from the account facts; adoption needs it (retro finding 114, D-2244), so "by whom" names a person. */
+  adoptedByName?: string | null;
 };
+
+/** "Jane Citizen, Director"; the name alone; the role alone; "Owner" when the facts hold neither (packs adopted before D-2244). */
+export function adoptedBy(input: {
+  adoptedByRole: string | null;
+  adoptedByName?: string | null;
+}): string {
+  const name = input.adoptedByName?.trim() ?? "";
+  const role = input.adoptedByRole?.trim() ?? "";
+  if (name && role) return `${name}, ${role}`;
+  return name || role || "Owner";
+}
 
 export type DocumentControlRow = {
   document_type_id: string;
@@ -126,7 +139,7 @@ export function documentControlRows(
       title: d.title,
       version: String(d.version),
       adopted_on: adopted,
-      adopted_by: adopted ? (input.adoptedByRole ?? "Owner") : "",
+      adopted_by: adopted ? adoptedBy(input) : "",
       next_review_on: nextReview,
       circulated: circulation
         ? {

@@ -199,6 +199,8 @@ export async function saveIncidentAction(
       reference: up.data.reference as string,
     };
   }
+  // The aware date comes from the form (Session B, D-2237: it defaults to the
+  // day it happened), so a back-filled row's clock never starts on the typing day.
   const ins = await ctx.supabase
     .from("incidents")
     .insert(row)

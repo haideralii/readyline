@@ -11,7 +11,11 @@ import { log } from "@/lib/logging/logger";
 import { purgeGenerationArtifacts, runPurge } from "@/server/accounts/purge";
 import { createEmailProvider } from "@/server/email/provider";
 import { recordJobRun } from "@/server/jobs/record-run";
-import { purgeOldAuditorLinks } from "@/server/registers/auditor-links";
+import {
+  purgeOldAuditorLinks,
+  purgeOldInvitations,
+  purgeOldReportLinks,
+} from "@/server/registers/auditor-links";
 import {
   isAuthorisedCronRequest,
   mayRunScheduledJobs,
@@ -49,8 +53,11 @@ export async function GET(request: Request) {
       dryRun,
     });
     const generation = await purgeGenerationArtifacts({ admin, dryRun });
-    // REQ-020 Data: auditor links go 30 days after they ended.
+    // REQ-020 Data: auditor links, invitations and report links go 30 days
+    // after they ended (retro review finding 27 added the last two).
     const auditorLinks = dryRun ? 0 : await purgeOldAuditorLinks(admin);
+    const invitations = dryRun ? 0 : await purgeOldInvitations(admin);
+    const reportLinks = dryRun ? 0 : await purgeOldReportLinks(admin);
     log.info("jobs.purge.ran", {
       dryRun,
       purged: report.purged.length,
@@ -63,7 +70,7 @@ export async function GET(request: Request) {
         errors: report.errors.length,
       });
     return NextResponse.json(
-      { ...report, generation, auditorLinks },
+      { ...report, generation, auditorLinks, invitations, reportLinks },
       {
         status: report.errors.length ? 207 : 200,
       },

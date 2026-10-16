@@ -166,4 +166,15 @@ describe("audit-day register meta (REQ-018 Session B)", () => {
     expect(reviewTag("current", "2027-04-01").label).toContain("2027-04-01");
     expect(reviewTag("no-date", null).key).toBe("no-date");
   });
+
+  it("the staff matrix cadences read as Readyline's suggestion, never as a rule (retro review of REQ-018, finding 10)", () => {
+    const fields = AUDIT_DAY_META["staff-matrix"].fields;
+    const help = (name: string) => fields.find((f) => f.name === name)?.help;
+    expect(help("last_supervision_on")).toBe(
+      "We suggest monthly; we remind you when a month has passed.",
+    );
+    expect(help("last_appraisal_on")).toBe("We suggest yearly.");
+    for (const f of fields)
+      expect(f.help ?? "", f.name).not.toMatch(/^At least/);
+  });
 });

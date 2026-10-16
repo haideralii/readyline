@@ -221,7 +221,9 @@ export async function computeAccountReminders(
     if (!lastEvent.has(e.incident_id))
       lastEvent.set(e.incident_id, e.at.slice(0, 10));
   // REQ-020 FR-5: a draft report raises only the nudge to confirm it; it joins
-  // the incident rules once confirmed. A rejected report raises nothing.
+  // the incident rules once confirmed. A rejected report raises nothing,
+  // unless it is still marked reportable (retro finding 62, D-2244): then its
+  // Commission clock runs as for any reportable incident.
   const incidentRows =
     (inc.data as
       | {
@@ -244,8 +246,11 @@ export async function computeAccountReminders(
       .map((i) => ({ id: i.id, aware_at: i.aware_at })),
     incidents: incidentRows
       .filter(
-        (i): i is typeof i & { status: "open" | "under-review" | "closed" } =>
-          i.status !== "draft" && i.status !== "rejected",
+        (
+          i,
+        ): i is typeof i & {
+          status: "open" | "under-review" | "closed" | "rejected";
+        } => i.status !== "draft" && (i.status !== "rejected" || i.reportable),
       )
       .map((i) => ({
         ...i,
