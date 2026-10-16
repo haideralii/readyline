@@ -1,6 +1,6 @@
 # REQ-028: Desktop layout and the design system
 
-Status: draft (PO, 17 Oct 2026 02:40; written from the UI/UX designer and researcher audit of 17 Oct 2026, `product/qa/role-reviews/2026-10-17/ux-audit.md` (7450511, findings 1 to 68, the desktop layout proposal, the colour and type system, the top-10 plan) and the QA pass of the same day, `qa-pass.md` (ac72e9b, F3, F8, F10, F11, N3, N7, N8); goes to the `req-review`, the lawyer role and the NDIS expert (D-2222) before "ready"; nothing starts until then. Haider's ask of 17 Oct 2026: "it should be better for desktop as well, because zip files will be downloaded on laptops not phones, so we need to cater for both correctly".)
+Status: draft (PO, 17 Oct 2026 02:40, D-2810 added 02:50; written from the UI/UX designer and researcher audit of 17 Oct 2026, `product/qa/role-reviews/2026-10-17/ux-audit.md` (7450511, findings 1 to 68, the desktop layout proposal, the colour and type system, the top-10 plan) and the QA pass of the same day, `qa-pass.md` (ac72e9b, F3, F8, F10, F11, N3, N7, N8); goes to the `req-review`, the lawyer role and the NDIS expert (D-2222) before "ready"; nothing starts until then. Haider's ask of 17 Oct 2026: "it should be better for desktop as well, because zip files will be downloaded on laptops not phones, so we need to cater for both correctly".)
 Phase: 6 Priority: should Owner: Dev
 
 ## Why
@@ -84,6 +84,7 @@ Screenshots of every page at 360, 768, 1280 and 1536 in both schemes, before and
 - D-2807 (PO, 17 Oct 2026) Errors clear on change, per field, once the field validates; the summary keeps the fields that still fail; the next submit rebuilds it. This is the GOV.UK pattern and the audit's finding 9 and the QA pass's F8.
 - D-2808 (PO, 17 Oct 2026) A theme toggle is out; the `data-theme` token blocks stay, the `dark:` variant stays on `prefers-color-scheme`, and `color-scheme` is set from the same token block so native controls follow (audit 33, 68 noted, not built).
 - D-2809 (PO, 17 Oct 2026) Session order A, B, C; A is the measuring stick and lands alone, so B and C diff against the system; the hallway test and the VoiceOver note wait for C.
+- D-2810 (PO, 17 Oct 2026 02:47; #82 run 38924374914, `req-025-c.spec.ts:31`) The home page's "What you get" list goes now, ahead of Session C, on the `qa-pass-fixes` branch: its five bullets restate the hero and the sample card (audit 27), and with A2's glossary disclosure and Session E's subscription sentence the page sat exactly on REQ-025 FR-12's 5,000 px cap at 360 px. `whatHeading` and `what` leave `home-copy.ts` and `page.tsx`; no other word moves; the cap stands and is not raised. FR-10's layout would have removed the list in any case.
 
 ## Questions for Dev to answer before building
 
