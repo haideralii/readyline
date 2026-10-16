@@ -78,6 +78,61 @@ describe("product/legal copy (REQ-008)", () => {
     });
   }
 
+  // REQ-022 Session E, FR-14 and AC-9 (D-2250 to D-2264): every sentence the
+  // PO fixed after the lawyer role's read is present verbatim on its page, and
+  // the pages' updated dates moved to the session's day.
+  const FIXED: Record<LegalSlug, string[]> = {
+    terms: [
+      "If you need advice about your specific situation, speak to a lawyer.",
+      "When the payment goes through, access resumes and the paused period is covered by it.",
+      "While access is paused, your account export, including your worker records, stays available.",
+      "A suspended account keeps its export, and you can email us to have the decision looked at again.",
+      "If you do not accept a change, you can cancel before it takes effect and nothing further is charged.",
+      "Nothing in these terms limits rights you have under the Australian Consumer Law; where a consumer guarantee applies, your remedies are the ones that law gives. For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim. We are not liable for loss that comes from documents you did not review or adopt, or from information you entered that was not true.",
+    ],
+    refunds: [
+      "We want you to be happy with what you buy. If you are not, tell us and we will put it right or refund you as set out below.",
+    ],
+    privacy: [
+      "Its servers are in Sydney where we can choose, and otherwise in the United States.",
+      "Stripe may process data in the United States and elsewhere under its own privacy policy.",
+      "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
+      "If you are a worker whose provider uses Readyline: your worker home shows what we hold about you, except your provider's own notes. Ask us by email for anything else; we answer within a reasonable period, and if we refuse we say why in writing.",
+      "we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
+      "Readyline has not registered a choice to be covered by the Privacy Act; what this page promises is our own undertaking to you, and the Australian Consumer Law holds us to it.",
+      "The owner decides and tells you the outcome in writing.",
+    ],
+    ai: [
+      "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
+      "so it sits with your privacy commitments, where an auditor would look for it.",
+    ],
+    about: [
+      "Readyline tells you which audit type and standards the Rules point to for your answers",
+    ],
+  };
+  const GONE: Partial<Record<LegalSlug, string[]>> = {
+    terms: ["or a qualified consultant"],
+    privacy: [
+      "handled elsewhere briefly",
+      "we tell you and the regulator as the law requires",
+    ],
+    ai: ["so an auditor finds it with your privacy commitments"],
+    about: ["works out your audit type"],
+  };
+
+  for (const slug of LEGAL_SLUGS) {
+    it(`product/legal/${slug}.md: carries the second draft's sentences verbatim and none of the old ones (FR-14, AC-9)`, () => {
+      const page = loadLegalPage(slug);
+      for (const sentence of FIXED[slug])
+        expect(page.body, sentence).toContain(sentence);
+      for (const old of GONE[slug] ?? [])
+        expect(page.body, old).not.toContain(old);
+      expect(page.updated, "updated moved to the session's day").toBe(
+        "2026-10-16",
+      );
+    });
+  }
+
   it("warns when CONTACT_EMAIL is not set (the footer then has no Contact link)", () => {
     if (!contactEmail()) {
       warn(

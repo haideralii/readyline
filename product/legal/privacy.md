@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-15
+updated: 2026-10-16
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -37,9 +37,9 @@ We do not sell your information. We do not share it with anyone except the servi
 ## Who helps us run the service
 
 - Supabase stores your account and data on servers in Sydney, Australia.
-- Vercel runs the website. Its servers are in Sydney where we can choose; some requests may be handled elsewhere briefly.
+- Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States.
 - Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}. Anthropic processes our requests in the United States.
-- Stripe takes payments and keeps card details. Stripe may process data outside Australia under its own privacy policy.
+- Stripe takes payments and keeps card details. Stripe may process data in the United States and elsewhere under its own privacy policy.
 - An email provider sends service emails.
 
 ## How long we keep it
@@ -51,15 +51,16 @@ Your data stays while your account is open. If you delete your account, we remov
 - Export: you can download everything we hold about you from your account page at any time.
 - Delete: you can delete your account from your account page. We confirm by email.
 - Correct: you can change your answers and regenerate your documents.
+- If you are a worker whose provider uses Readyline: your worker home shows what we hold about you, except your provider's own notes. Ask us by email for anything else; we answer within a reasonable period, and if we refuse we say why in writing.
 
 ## Security
 
-Data is encrypted in transit and at rest. Each account can only see its own data, enforced in the database. Sign-in uses a one-time email link; administrators use a second factor. We log security events and review them. If a breach happens that is likely to cause serious harm, we tell you and the regulator as the law requires.
+Data is encrypted in transit and at rest. Each account can only see its own data, enforced in the database. Sign-in uses a one-time email link; administrators use a second factor. We log security events and review them. If a breach happens that is likely to cause serious harm, we tell you, and the Office of the Australian Information Commissioner where the law requires it.
 
 ## The Privacy Act
 
-Some small businesses are not covered by the Privacy Act 1988. We follow the Australian Privacy Principles anyway, because that is what our customers expect and what the Commission expects of providers.
+Some small businesses are not covered by the Privacy Act 1988. We follow the Australian Privacy Principles anyway, because that is what our customers expect and what the Commission expects of providers. Readyline has not registered a choice to be covered by the Privacy Act; what this page promises is our own undertaking to you, and the Australian Consumer Law holds us to it.
 
 ## Complaints and contact
 
-Email us at the contact address in the footer. We reply within five business days. If you are not satisfied, you can contact the Office of the Australian Information Commissioner at oaic.gov.au.
+Email us at the contact address in the footer. We reply within five business days. The owner decides and tells you the outcome in writing. If you are not satisfied, you can contact the Office of the Australian Information Commissioner at oaic.gov.au.
