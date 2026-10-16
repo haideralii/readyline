@@ -12,7 +12,8 @@ import "server-only";
  * review) and no last-reviewed column.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ParticipantRiskSnapshot } from "@/lib/generator/fixed-text";
+import type { ParticipantRiskSnapshot } from "@/lib/generator/division3";
+import { sydneyDay } from "@/lib/metrics/counters";
 
 export async function participantRiskSnapshot(
   admin: SupabaseClient,
@@ -41,17 +42,7 @@ export async function participantRiskSnapshot(
     rows: (
       (rows.data as { participant_ref: string; risk: string }[] | null) ?? []
     ).map((r) => ({ code: r.participant_ref, risk: r.risk })),
-    lastReviewedOn: at ? sydneyDay(at) : null,
+    lastReviewedOn: at ? sydneyDay(new Date(at)) : null,
     takenOn: today,
   };
-}
-
-/** The Sydney calendar day of an instant (D-2242). */
-export function sydneyDay(instant: string): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(instant));
 }

@@ -701,12 +701,6 @@
           "heading": "Who these steps apply to",
           "mode": "fixed",
           "brief": "Batch 45 item 15 (provider review): the recruitment and referee steps are written for workers; for the owner with no workers, one sentence says they apply to the first person recruited."
-        },
-        {
-          "id": "division-3-plan",
-          "heading": "Risk management plan for workers awaiting clearance",
-          "mode": "fixed",
-          "brief": "REQ-024 A2 (FR-4a; D-2421, D-2424, D-2428): the Division 3 plan (Worker Screening Rules ss 11 and 12): fixed controls, the review triggers, and a snapshot of the participant risk register by code taken by the job or by Update the procedure."
         }
       ],
       "basis": "practice-standard"

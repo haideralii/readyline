@@ -353,11 +353,24 @@ export type WorkerClearanceRow = {
   expires_on: string | null;
   /** REQ-024 A1: the day the owner checked the row in the NDIS Worker Screening Database (s 15(4)); the owner's alone. */
   verified_in_database_on: string | null;
+  /** REQ-024 A2 (D-2413, D-2434): the unit's decision as a closed code with its date, both or neither; read as not cleared. */
+  decision_code: DecisionCode | null;
+  decision_on: string | null;
   state: AuState | null;
   note: string;
   created_at: string;
   updated_at: string;
 };
+
+/** D-2413: the five closed codes a screening unit's decision may take. */
+export const DECISION_CODES = [
+  "interim-bar",
+  "suspended",
+  "revoked",
+  "excluded",
+  "other",
+] as const;
+export type DecisionCode = (typeof DECISION_CODES)[number];
 
 export type WorkerClearanceInsert = Pick<
   WorkerClearanceRow,

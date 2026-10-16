@@ -375,3 +375,33 @@ export type RegisterEventRow = {
   kind: RegisterEventKind;
   note: string;
 };
+
+/** REQ-024 A2 (D-2434): one s 14 exception as the table holds it; the pinned version is an id, the notes carry words. */
+export type ScreeningExceptionRow = {
+  id: string;
+  account_id: string;
+  worker_ref: string;
+  clearance_id: string | null;
+  code: "s14-1a" | "s14-1b" | "s14-1c" | "s14-2a" | "s14-2b";
+  part4_state: string | null;
+  started_on: string;
+  verified_on: string | null;
+  notice_seen_on: string | null;
+  supervisor_ref: string | null;
+  declaration_on: string | null;
+  plan_version_id: string | null;
+  plan_register_date: string | null;
+  ended_on: string | null;
+  end_code:
+    | "clearance-issued"
+    | "excluded"
+    | "interim-bar"
+    | "supervision-stopped"
+    | "plan-stopped"
+    | "withdrawn"
+    | "closed"
+    | "supervisor-clearance-expired"
+    | null;
+  created_at: string;
+  updated_at: string;
+};

@@ -42,7 +42,7 @@ const safeText = (max: number, min = 0, required?: string) =>
     "This looks like an NDIS participant number. Use a reference code instead.",
   );
 
-const refField = (pattern: RegExp, hint: string) =>
+export const refField = (pattern: RegExp, hint: string) =>
   z
     .string()
     .trim()

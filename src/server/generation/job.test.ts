@@ -48,10 +48,21 @@ class MemoryStore implements GenerationStore {
   logs: GenerationLogRow[] = [];
   objects = new Map<string, { bytes: Uint8Array; contentType: string }>();
   failPut = false;
+  /** REQ-024 A2: the register the Division 3 section snapshots; empty unless a test fills it. */
+  participantRiskRows: { code: string; risk: string }[] = [];
+  participantRisksTaken = 0;
   private n = 0;
   private id() {
     this.n++;
     return `${this.n.toString(16).padStart(8, "0")}-0000-4000-8000-000000000000`;
+  }
+  async participantRisks(_accountId: string, today: string) {
+    this.participantRisksTaken++;
+    return {
+      rows: this.participantRiskRows,
+      lastReviewedOn: this.participantRiskRows.length ? today : null,
+      takenOn: today,
+    };
   }
   async createVersionSet(input: {
     accountId: string;
