@@ -77,6 +77,24 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
       });
       if (r.error) throw r.error;
     }
+    // Retro finding 62 (D-2244): a rejected report in a reportable category
+    // is an alleged reportable incident; the auditor sees it as received,
+    // not recorded, with its status read so.
+    const alleged = await tenant.admin.from("incidents").insert({
+      account_id: tenant.accountId,
+      occurred_on: "2026-10-10",
+      reported_on: "2026-10-10",
+      category: "abuse-or-neglect",
+      severity: "medium",
+      participant_ref: "P-097",
+      summary: "An alleged report the owner rejected; still reportable.",
+      status: "rejected",
+      reportable: true,
+      rejected_reason: "Not one of our participants.",
+      reported_via: "link",
+      logged_by_ref: "support worker",
+    });
+    if (alleged.error) throw alleged.error;
   });
 
   test.afterAll(async () => {
@@ -122,6 +140,13 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
     const html = await view.content();
     expect(html.includes("P-098")).toBe(false);
     expect(html.includes("P-099")).toBe(false);
+    // Finding 62: the rejected report that is still reportable is, as received, not recorded.
+    await expect(view.getByTestId("auditor-register-incidents")).toContainText(
+      "P-097",
+    );
+    await expect(view.getByTestId("auditor-register-incidents")).toContainText(
+      "received, not recorded",
+    );
     expect(html.includes(tenant.email)).toBe(false);
     expect(html.includes(tenant.userId)).toBe(false);
     expect(html.includes(tenant.accountId)).toBe(false);
@@ -155,6 +180,8 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
     expect(incidentsCsv).toContain("P-014");
     expect(incidentsCsv).not.toContain("P-098");
     expect(incidentsCsv).not.toContain("P-099");
+    expect(incidentsCsv).toContain("P-097");
+    expect(incidentsCsv).toContain("received, not recorded");
     await auditor.close();
 
     // The owner revokes; the link is a plain 404 after that.

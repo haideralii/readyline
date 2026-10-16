@@ -130,6 +130,24 @@ describe.skipIf(!enabled)(
         });
         if (draft.error) throw draft.error;
       }
+      // Retro finding 62 (D-2244): a rejected report in a reportable category
+      // keeps its Commission clock, so the job raises the notification
+      // reminder for it; the view lets the notification state through.
+      const rejected = await admin.from("incidents").insert({
+        account_id: accountId,
+        occurred_on: addDays(TODAY, -2),
+        reported_on: addDays(TODAY, -2),
+        category: "abuse-or-neglect",
+        severity: "medium",
+        summary: "Alleged, rejected by the owner.",
+        reportable: true,
+        status: "rejected",
+        rejected_reason:
+          "Not one of ours; the person named is not a participant.",
+        reported_via: "link",
+        logged_by_ref: "support worker",
+      });
+      if (rejected.error) throw rejected.error;
       // REQ-018 Session C (AC-3): one row per new reminder kind with a fixed date that fires today.
       const drill = await admin
         .from("accounts")
@@ -215,6 +233,8 @@ describe.skipIf(!enabled)(
           `clearance-expiry@${TODAY}`,
           `policy-review@${TODAY}`,
           `reportable-not-notified@${TODAY}`,
+          // Retro finding 62: the rejected report in a reportable category, its clock still running.
+          `reportable-not-notified@${TODAY}`,
           "complaint-unacknowledged@2026-10-12",
           `mid-term-audit@${TODAY}`,
           // REQ-018 Session C (AC-3): the six new kinds, each from the fixed date seeded above.
@@ -233,9 +253,9 @@ describe.skipIf(!enabled)(
       expect(
         (rows.data ?? []).filter((r) => r.subject_table === "hazards"),
       ).toHaveLength(1);
-      expect(rows.data?.length).toBe(13);
-      expect(first.inserted).toBe(13);
-      expect(first.emailed).toBe(13);
+      expect(rows.data?.length).toBe(14);
+      expect(first.inserted).toBe(14);
+      expect(first.emailed).toBe(14);
       expect((rows.data ?? []).every((r) => r.sent_at)).toBe(true);
       // SR-4: the message names registers and references, never the summary text.
       const sent = provider.sent.find((m) => m.to === email);

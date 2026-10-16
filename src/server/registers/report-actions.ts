@@ -14,11 +14,15 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import { hashAuditorToken } from "@/lib/registers/auditor-link";
-import { NDIS_NUMBER_SHAPE } from "@/lib/registers/types";
+import {
+  NDIS_NUMBER_SHAPE,
+  type IncidentCategory,
+} from "@/lib/registers/types";
 import {
   REPORT_ACCOUNT_LIMIT,
   REPORT_LIMIT,
   ReportForm,
+  isReportableCategory,
   type ReportFormValues,
 } from "@/lib/registers/worker";
 import { parseInput, strictObject, text } from "@/lib/validation";
@@ -279,7 +283,16 @@ const RejectInput = strictObject({
   ),
 });
 
-/** The rejected report is kept, append-only, with the reason; it counts nowhere. */
+/**
+ * The rejected report is kept, append-only, with the reason. Retro finding
+ * 62: a report in a reportable category is an alleged reportable incident
+ * the provider is now aware of (Incident Rules s 17), so it is marked
+ * reportable as it is rejected: `notify_by` is generated, the row reads
+ * "received, not recorded" in the register and the auditor's view, and the
+ * reportable-not-notified reminder runs until the owner records the date
+ * the Commission was told or that it is not reportable after all
+ * (`settleRejectedReportAction`). Any other rejected report counts nowhere.
+ */
 export async function rejectReportAction(
   input: unknown,
 ): Promise<ConfirmResult> {
@@ -289,10 +302,28 @@ export async function rejectReportAction(
   if (!viewer?.account || viewer.deleted)
     return { ok: false, message: "Sign in to reject a report." };
   const supabase = await createSupabaseServerClient();
+  const draft = await supabase
+    .from("incidents")
+    .select("id, category")
+    .eq("id", parsed.data.id)
+    .eq("account_id", viewer.account.id)
+    .eq("status", "draft")
+    .maybeSingle();
+  const row = draft.data as { id: string; category: IncidentCategory } | null;
+  if (!row)
+    return {
+      ok: false,
+      message: "That report was not found or is already confirmed.",
+    };
+  const reportable = isReportableCategory(row.category);
   const up = await supabase
     .from("incidents")
-    .update({ status: "rejected", rejected_reason: parsed.data.reason })
-    .eq("id", parsed.data.id)
+    .update({
+      status: "rejected",
+      rejected_reason: parsed.data.reason,
+      ...(reportable ? { reportable: true } : {}),
+    })
+    .eq("id", row.id)
     .eq("account_id", viewer.account.id)
     .eq("status", "draft")
     .select("id");
@@ -305,13 +336,101 @@ export async function rejectReportAction(
     incident_id: parsed.data.id,
     account_id: viewer.account.id,
     kind: "rejected",
-    note: `Rejected by the owner: ${parsed.data.reason}`,
+    note: reportable
+      ? `Rejected by the owner: ${parsed.data.reason}. An allegation of this kind is still reportable; the notify-by date stands.`
+      : `Rejected by the owner: ${parsed.data.reason}`,
   });
   await supabase.from("audit_log").insert({
     account_id: viewer.account.id,
     actor_user_id: viewer.user.id,
     action: "report.rejected",
     target: parsed.data.id,
+  });
+  return { ok: true };
+}
+
+const SettleInput = strictObject({
+  id: z.string().uuid(),
+  /** The date the Commission was told; empty when the owner says it is not reportable after all. */
+  notifiedOn: z
+    .union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+    .transform((s) => (s === "" ? null : s)),
+  commissionReference: z
+    .string()
+    .trim()
+    .max(40)
+    .regex(/^[A-Za-z0-9 /-]*$/)
+    .refine((s) => !NDIS_NUMBER_SHAPE.test(s))
+    .default(""),
+  notReportable: z.boolean(),
+  /** Why it is not reportable after all; required with `notReportable`. */
+  reason: text(500, 0, "Say why, in a sentence")
+    .refine(
+      (s) => !NDIS_NUMBER_SHAPE.test(s),
+      "This looks like an NDIS participant number. Use a reference code instead.",
+    )
+    .default(""),
+});
+
+/**
+ * Retro finding 62: a rejected report in a reportable category reads
+ * "received, not recorded" until the owner records the date the Commission
+ * was told (the notification trail as for any incident) or that it is not
+ * reportable after all, with the reason as an event. Either stops the
+ * reminder; the second takes the row out of the auditor's view.
+ */
+export async function settleRejectedReportAction(
+  input: unknown,
+): Promise<ConfirmResult> {
+  const parsed = parseInput(SettleInput, input);
+  if (!parsed.ok)
+    return { ok: false, message: "Check the date and the reference." };
+  const d = parsed.data;
+  if (!d.notReportable && !d.notifiedOn)
+    return {
+      ok: false,
+      message:
+        "Enter the date you told the Commission, or say why it is not reportable.",
+    };
+  if (d.notReportable && d.reason.trim().length === 0)
+    return {
+      ok: false,
+      message: "Say why it is not reportable, in a sentence.",
+    };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to update a report." };
+  const supabase = await createSupabaseServerClient();
+  const up = await supabase
+    .from("incidents")
+    .update(
+      d.notReportable
+        ? { reportable: false, reportable_notified_on: null }
+        : {
+            reportable_notified_on: d.notifiedOn,
+            commission_reference: d.commissionReference,
+          },
+    )
+    .eq("id", d.id)
+    .eq("account_id", viewer.account.id)
+    .eq("status", "rejected")
+    .eq("reportable", true)
+    .select("id");
+  if (up.error || !up.data?.length)
+    return { ok: false, message: "That report was not found." };
+  await supabase.from("incident_events").insert({
+    incident_id: d.id,
+    account_id: viewer.account.id,
+    kind: d.notReportable ? "note" : "notified",
+    note: d.notReportable
+      ? `Not reportable after all, the owner records: ${d.reason.trim()}`
+      : `Commission notified on ${d.notifiedOn}${d.commissionReference ? ` (reference ${d.commissionReference})` : ""}`,
+  });
+  await supabase.from("audit_log").insert({
+    account_id: viewer.account.id,
+    actor_user_id: viewer.user.id,
+    action: d.notReportable ? "report.not-reportable" : "report.notified",
+    target: d.id,
   });
   return { ok: true };
 }

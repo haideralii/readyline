@@ -111,19 +111,30 @@ export function packIntro(tradingName: string, date: string): string {
  * Retro review of REQ-020, finding 30: a report through the link is a draft
  * until the owner confirms it and a rejected one never joins the register
  * (FR-5, D-2231), so neither reaches the auditor's view or the pack. The
- * overview and the register totals apply the same rule.
+ * overview and the register totals apply the same rule. Finding 62 (D-2244):
+ * a rejected report in a reportable category is an alleged reportable
+ * incident (Incident Rules s 17), so it stays, with its status read as
+ * "received, not recorded", until the owner records that it is not
+ * reportable after all.
  */
 export const INCIDENT_STATUSES_NOT_IN_REGISTER: readonly string[] = [
   "draft",
   "rejected",
 ];
+export const RECEIVED_NOT_RECORDED = "received, not recorded";
 
-export function auditorVisibleIncidents<T extends { status: string }>(
-  rows: readonly T[],
-): T[] {
-  return rows.filter(
-    (r) => !INCIDENT_STATUSES_NOT_IN_REGISTER.includes(r.status),
-  );
+export function auditorVisibleIncidents<
+  T extends { status: string; reportable?: boolean },
+>(rows: readonly T[]): T[] {
+  const out: T[] = [];
+  for (const r of rows) {
+    if (r.status === "rejected") {
+      if (r.reportable) out.push({ ...r, status: RECEIVED_NOT_RECORDED });
+      continue;
+    }
+    if (!INCIDENT_STATUSES_NOT_IN_REGISTER.includes(r.status)) out.push(r);
+  }
+  return out;
 }
 
 export type TrailEvent = {

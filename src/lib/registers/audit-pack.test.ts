@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 import {
   PACK_HIDDEN_COLUMNS,
+  RECEIVED_NOT_RECORDED,
   auditPackFileName,
   auditorVisibleIncidents,
   lastEntryDate,
@@ -140,6 +141,28 @@ describe("the audit pack's rules", () => {
       "INC-0005",
     ]);
     expect(auditorVisibleIncidents([])).toEqual([]);
+  });
+
+  // Retro finding 62 (D-2244): a rejected report in a reportable category is
+  // an alleged reportable incident (Incident Rules s 17); the auditor sees it
+  // as received, not recorded. A rejected report the owner has recorded as
+  // not reportable after all is a plain rejection and stays out.
+  it("shows a rejected report that is still reportable as received, not recorded", () => {
+    const rows = [
+      { reference: "INC-0001", status: "rejected", reportable: true },
+      { reference: "INC-0002", status: "rejected", reportable: false },
+      { reference: "INC-0003", status: "draft", reportable: true },
+      { reference: "INC-0004", status: "open", reportable: true },
+    ];
+    expect(auditorVisibleIncidents(rows)).toEqual([
+      {
+        reference: "INC-0001",
+        status: RECEIVED_NOT_RECORDED,
+        reportable: true,
+      },
+      { reference: "INC-0004", status: "open", reportable: true },
+    ]);
+    expect(RECEIVED_NOT_RECORDED).toBe("received, not recorded");
   });
 
   // Retro finding 25: the audit-day registers' shared trail is one file in

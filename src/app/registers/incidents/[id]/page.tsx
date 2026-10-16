@@ -8,6 +8,7 @@ import { EventsTrail } from "../../_components/events-trail";
 import { StatusTag } from "../../_components/register-list";
 import { RegisterPage, registerContext } from "../../_components/shell";
 import { incidentStatus } from "../page";
+import { RejectedReportForm } from "./rejected-form";
 
 export const metadata: Metadata = { title: "Incident" };
 
@@ -107,6 +108,10 @@ export default async function IncidentPage({
           <h2 className="mt-4 text-lg font-semibold">What you did about it</h2>
           <p className="mt-1 leading-7">{r.actions_taken}</p>
         </>
+      ) : null}
+      {ctx.canWrite && r.status === "rejected" && r.reportable ? (
+        // Retro finding 62: the allegation keeps its clock; the owner settles it here.
+        <RejectedReportForm id={r.id} notifiedOn={r.reportable_notified_on} />
       ) : null}
       {ctx.canWrite && r.status === "closed" ? (
         // REQ-018 FR-6, AC-2: one tap to turn a closed incident into an improvement row, source pre-filled.

@@ -4,6 +4,7 @@
  * contains anything about participants.
  */
 import { BRAND } from "@/lib/brand";
+import { REPORT_WINDOW_WORDS } from "@/lib/registers/worker";
 import type { EmailMessage } from "./provider";
 
 const SIGN_OFF = `${BRAND} provides general information and document templates for your own review; it is not legal advice.`;
@@ -99,7 +100,8 @@ export function reportToConfirmEmail(input: {
     text: [
       `${line} for ${input.tradingName}.`,
       "",
-      "If a report is a reportable incident, the Commission must be told within 24 hours of the report, so please confirm it today.",
+      // Retro finding 68: the window depends on the kind (Incident Rules ss 20 and 21), and this email has no category.
+      `If a report is a reportable incident, the Commission must be told ${REPORT_WINDOW_WORDS}, so please confirm it today.`,
       "",
       "Sign in, open Registers, then Incidents, and confirm or reject each report.",
       "",
