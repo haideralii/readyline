@@ -92,8 +92,10 @@ create table public.screening_exceptions (
   )),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  -- The Part 4 codes carry their state and nothing else does (finding 227).
-  constraint screening_exceptions_part4_state_check check ((code in ('s14-1b', 's14-2b')) = (part4_state is not null)),
+  -- The Part 4 codes carry their state and nothing else does (finding 227). Named for what it checks: the
+  -- column's own inline CHECK above takes the generated name `screening_exceptions_part4_state_check`
+  -- (#85's run 38945982046, 42710).
+  constraint screening_exceptions_part4_state_for_own_call_check check ((code in ('s14-1b', 's14-2b')) = (part4_state is not null)),
   -- No Part 4 arrangement started after 31 January 2026, for every state (D-2439 as amended; findings 208, 246).
   constraint screening_exceptions_part4_start_check check (code not in ('s14-1b', 's14-2b') or started_on <= date '2026-01-31'),
   constraint screening_exceptions_end_check check ((ended_on is null) = (end_code is null)),
