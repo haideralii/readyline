@@ -115,6 +115,9 @@ test.describe("REQ-015 Section E", () => {
   test("every public page: one h1 in order, a unique title, axe clean (FR-17, FR-19)", async ({
     page,
   }, testInfo) => {
+    // QA pass F2: twenty axe passes (fifteen pages, the five guides again in
+    // the dark scheme) run past 30 s beside other workers; slow, as N2 did.
+    test.slow();
     const titles = new Set<string>();
     for (const path of PAGES) {
       await page.goto(path);
