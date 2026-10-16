@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import {
   canOpenStep,
   firstIncompleteStep,
@@ -29,14 +29,20 @@ export function StepPage({
   children: ReactNode;
 }) {
   const router = useRouter();
-  const { ready, answers, touchStep } = useQuestionnaire();
+  const { ready, answers, touchStep, clearing } = useQuestionnaire();
   const allowed = ready && canOpenStep(step, answers);
 
   // FR-4: a later step is unreachable until the earlier ones are valid.
+  // QA pass F7 (D-2269): not on the page where "Start again" is emptying the
+  // answers, since its own push to the intro is the navigation that should
+  // land. A step opened while the flag is still up (typed in after the
+  // clear) mounted with it, so the guard holds there as before.
+  const mountedClearing = useRef(clearing);
   useEffect(() => {
-    if (ready && !allowed)
+    const clearingHere = clearing && !mountedClearing.current;
+    if (ready && !allowed && !clearingHere)
       router.replace(stepHref(firstIncompleteStep(answers)));
-  }, [ready, allowed, answers, router]);
+  }, [ready, allowed, answers, router, clearing]);
 
   useEffect(() => {
     if (ready && allowed) touchStep(step);

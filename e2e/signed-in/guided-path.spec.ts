@@ -535,8 +535,9 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       .locator('[data-testid^="row-"]')
       .filter({ hasText: /^Complaints management/ });
     await expect(complaintsRow).toHaveCount(1);
+    // QA pass F5: the day in the product's words, "16 October 2026".
     await expect(complaintsRow).toContainText(
-      /Adopted \d{4}-\d{2}-\d{2}; every \d+ months\./,
+      /Adopted \d{1,2} [A-Z][a-z]+ \d{4}; every \d+ months\./,
     );
     await expect(complaintsRow).not.toContainText(/Not adopted/);
     await expect(page.getByLabel(/Date adopted/)).toHaveCount(0);

@@ -34,7 +34,9 @@ import {
   ADOPT_NEEDS_NAME,
   ADOPT_NEEDS_NAME_HREF,
   ADOPT_NEEDS_NAME_LINK,
+  NOT_CURRENT_PACK,
 } from "@/lib/path/adopt-copy";
+import { latestReadySet } from "@/server/checklist/queries";
 import { loadFacts, saveFact } from "./facts";
 import { loadQuestionnaire } from "./state";
 
@@ -208,6 +210,55 @@ export async function adoptGroupAction(
     if (r.ok) facts.date = todayWords;
   }
 
+  // QA pass F1 (17 Oct 2026, D-2269): the set must be the account's newest
+  // ready set, the rule `adopt_document_version` holds, said here in plain
+  // words before anything is written; the adopt step's page may be open while
+  // a regeneration finishes.
+  const newest = await latestReadySet(supabase, accountId);
+  if (newest.setId !== set.id) return { ok: false, message: NOT_CURRENT_PACK };
+
+  // REQ-024 A0 (D-2433, D-2441): re-render first, so the version adopted is
+  // the one that carries the approval date; then adopt the newest version of
+  // each document in the group through the function; then refresh the zip's
+  // summary and Start here sheet, which read adoption per version.
+  // D-2448 and D-2449 (#77's signed-in run): this re-render also writes the
+  // adoption dates into the control tables of groups adopted earlier, a new
+  // version of each with the same words, so their adoption is carried onto
+  // that version here, with the earlier version's own day, rather than left
+  // as a "new version to adopt" the owner never asked for; a facts edit on
+  // the Finish page still leaves the nudge.
+  // QA pass F1 and N6 (D-2269): the adoption comes first and its result is
+  // read, as `adoptDocumentVersionAction` reads it; the checklist and the
+  // circulation rows are written only once every document of the group is
+  // adopted, so a refusal or a throw in the re-render leaves nothing ticked.
+  const adoptedBefore = await listAdoptedDates(admin, accountId);
+  const out = await rerenderSetWithFacts({ admin, set, facts });
+  const own = new Set(group.documents.map((d) => d.document_type_id));
+  const notAdopted: string[] = [];
+  for (const d of await listLatestDocuments(admin, set.id)) {
+    const earlier = adoptedBefore.get(d.document_type_id);
+    if (own.has(d.document_type_id)) {
+      const day = await markAdopted(
+        admin,
+        accountId,
+        d.document_type_id,
+        set.id,
+      );
+      if (!day) notAdopted.push(d.document_type_id);
+    } else if (earlier && !d.adopted_on)
+      await markAdopted(admin, accountId, d.document_type_id, set.id, earlier);
+  }
+  if (notAdopted.length > 0) {
+    log.warn("path.adopt.group.not-adopted", {
+      accountId,
+      versionSetId: set.id,
+      group: parsed.data.group,
+      documents: notAdopted.length,
+    });
+    return { ok: false, message: NOT_CURRENT_PACK };
+  }
+  await refreshSetSummary(admin, set.id);
+
   // Checklist Done for each document in the group (REQ-006 items keyed by document type).
   const { answers, result } = await loadQuestionnaire();
   const items =
@@ -252,27 +303,6 @@ export async function adoptGroupAction(
         code: ins.error.code,
       });
   }
-  // REQ-024 A0 (D-2433, D-2441): re-render first, so the version adopted is
-  // the one that carries the approval date; then adopt the newest version of
-  // each document in the group through the function; then refresh the zip's
-  // summary and Start here sheet, which read adoption per version.
-  // D-2448 and D-2449 (#77's signed-in run): this re-render also writes the
-  // adoption dates into the control tables of groups adopted earlier, a new
-  // version of each with the same words, so their adoption is carried onto
-  // that version here, with the earlier version's own day, rather than left
-  // as a "new version to adopt" the owner never asked for; a facts edit on
-  // the Finish page still leaves the nudge.
-  const adoptedBefore = await listAdoptedDates(admin, accountId);
-  const out = await rerenderSetWithFacts({ admin, set, facts });
-  const own = new Set(group.documents.map((d) => d.document_type_id));
-  for (const d of await listLatestDocuments(admin, set.id)) {
-    const earlier = adoptedBefore.get(d.document_type_id);
-    if (own.has(d.document_type_id))
-      await markAdopted(admin, accountId, d.document_type_id, set.id);
-    else if (earlier && !d.adopted_on)
-      await markAdopted(admin, accountId, d.document_type_id, set.id, earlier);
-  }
-  await refreshSetSummary(admin, set.id);
   log.info("path.adopt.group", {
     accountId,
     versionSetId: set.id,

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { formatDateAu } from "@/lib/generator/fixed-text";
 import { fromPolicyReviewRow } from "@/lib/registers/labels";
 import { sydneyDay } from "@/lib/metrics/counters";
 import { listAdoptedDates } from "@/server/path/state";
@@ -47,7 +48,10 @@ export default async function PolicyReviewPage({
         <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           {(
             [
-              ["Adopted", row.adopted_on ?? "Not yet"],
+              [
+                "Adopted",
+                row.adopted_on ? formatDateAu(row.adopted_on) : "Not yet",
+              ],
               ["Months between reviews", String(row.review_cycle_months)],
               ["Last reviewed", row.last_reviewed_on ?? "Not yet"],
               ["Next review", row.next_review_on ?? "After adoption"],

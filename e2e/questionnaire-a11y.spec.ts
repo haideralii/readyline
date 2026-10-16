@@ -38,6 +38,9 @@ async function scan(page: Page, label: string, heading: string) {
 test("every questionnaire step has no serious or critical accessibility violations", async ({
   page,
 }) => {
+  // QA pass N2: six axe passes in one test need about eleven seconds alone and
+  // more beside other workers; CI runs one worker, a local run several.
+  test.slow();
   const summary: Record<string, string[]> = {};
   await page.goto("/start");
   summary.intro = await scan(
