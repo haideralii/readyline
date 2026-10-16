@@ -67,12 +67,16 @@ export async function seedPolicyReviews(
  * for `next_review_on`. When the type has no version there, nothing is
  * written and nothing errors (finding 179). The caller proves the account
  * first; the function checks it again and refuses with 42501 otherwise.
+ * D-2449: `adoptedOn` carries an earlier version's day onto a re-rendered
+ * version (the adopt step's own re-render); the function honours it for the
+ * service role alone and dates every owner's call today.
  */
 export async function markAdopted(
   supabase: SupabaseClient,
   accountId: string,
   documentTypeId: string,
   setId: string | null,
+  adoptedOn: string | null = null,
 ): Promise<string | null> {
   let set = setId;
   if (!set) {
@@ -101,6 +105,7 @@ export async function markAdopted(
   const r = await supabase.rpc("adopt_document_version", {
     p_account: accountId,
     p_version: versionId,
+    ...(adoptedOn ? { p_adopted_on: adoptedOn } : {}),
   });
   if (r.error) {
     log.warn("registers.adopt.failed", {

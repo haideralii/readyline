@@ -9,7 +9,7 @@
  * admin client the way the job does, after the set is proven to be theirs.
  */
 import { z } from "zod";
-import { listAdoptedTypeIds, openBlanks } from "./state";
+import { listAdoptedDates, openBlanks } from "./state";
 import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
@@ -240,19 +240,21 @@ export async function adoptGroupAction(
   // the one that carries the approval date; then adopt the newest version of
   // each document in the group through the function; then refresh the zip's
   // summary and Start here sheet, which read adoption per version.
-  // D-2448 (#77's signed-in run): this re-render also writes the adoption
-  // dates into the control tables of groups adopted earlier, a new version
-  // of each with the same words, so their adoption is carried onto that
-  // version here rather than left as a "new version to adopt" the owner
-  // never asked for; a facts edit on the Finish page still leaves the nudge.
-  const adoptedBefore = await listAdoptedTypeIds(admin, accountId);
+  // D-2448 and D-2449 (#77's signed-in run): this re-render also writes the
+  // adoption dates into the control tables of groups adopted earlier, a new
+  // version of each with the same words, so their adoption is carried onto
+  // that version here, with the earlier version's own day, rather than left
+  // as a "new version to adopt" the owner never asked for; a facts edit on
+  // the Finish page still leaves the nudge.
+  const adoptedBefore = await listAdoptedDates(admin, accountId);
   const out = await rerenderSetWithFacts({ admin, set, facts });
   const own = new Set(group.documents.map((d) => d.document_type_id));
   for (const d of await listLatestDocuments(admin, set.id)) {
+    const earlier = adoptedBefore.get(d.document_type_id);
     if (own.has(d.document_type_id))
       await markAdopted(admin, accountId, d.document_type_id, set.id);
-    else if (adoptedBefore.has(d.document_type_id) && !d.adopted_on)
-      await markAdopted(admin, accountId, d.document_type_id, set.id);
+    else if (earlier && !d.adopted_on)
+      await markAdopted(admin, accountId, d.document_type_id, set.id, earlier);
   }
   await refreshSetSummary(admin, set.id);
   log.info("path.adopt.group", {

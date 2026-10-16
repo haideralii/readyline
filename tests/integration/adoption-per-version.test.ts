@@ -548,6 +548,65 @@ describe.skipIf(!enabled)(
       expect(pr.data).toEqual({ adopted_on: today, last_reviewed_on: today });
     });
 
+    it("the carried adoption keeps the earlier version's day for the service role; an owner's call is dated today whatever it passes; the mirror is unmoved (D-2449)", async () => {
+      // The adopt step's own re-render writes version 3 with the dates filled
+      // in; the carry adopts it with the earlier version's day.
+      versionIds[`${typeA}-v3`] = await insertVersion(
+        owner.accountId,
+        setId,
+        typeA,
+        3,
+        false,
+      );
+      const carried = await markAdopted(
+        admin,
+        owner.accountId,
+        typeA,
+        setId,
+        "2026-10-01",
+      );
+      expect(carried).toBe("2026-10-01");
+      const v3 = await admin
+        .from("document_versions")
+        .select("adopted_on")
+        .eq("id", versionIds[`${typeA}-v3`])
+        .single();
+      expect(v3.data?.adopted_on).toBe("2026-10-01");
+      expect((await listAdoptedDates(admin, owner.accountId)).get(typeA)).toBe(
+        "2026-10-01",
+      );
+      const rows = await documentControlForSet(admin, owner.accountId, setId);
+      expect(rows.find((r) => r.document_type_id === typeA)).toMatchObject({
+        state: "adopted",
+        version: "3",
+        adopted_on: "2026-10-01",
+      });
+      // The mirror keeps its first date and its review date never moves back.
+      const pr = await admin
+        .from("policy_reviews")
+        .select("adopted_on, last_reviewed_on")
+        .eq("account_id", owner.accountId)
+        .eq("document_type_id", typeA)
+        .eq("title", "")
+        .single();
+      expect(pr.data).toEqual({ adopted_on: today, last_reviewed_on: today });
+      // An owner passing a day is dated today all the same.
+      versionIds[`${typeA}-v4`] = await insertVersion(
+        owner.accountId,
+        setId,
+        typeA,
+        4,
+        false,
+      );
+      const own = await owner.client.rpc("adopt_document_version", {
+        p_account: owner.accountId,
+        p_version: versionIds[`${typeA}-v4`],
+        p_adopted_on: "2026-10-01",
+      });
+      expect(own.error).toBeNull();
+      expect(own.data).toBe(today);
+    });
+
     it("the backfill takes the seeded row's date onto the latest version, ignores a titled second row, caps a future date at today, and the row then reads adopted (D-2432)", async () => {
       const dbUrl = process.env.SUPABASE_DB_URL?.trim();
       if (!dbUrl) {

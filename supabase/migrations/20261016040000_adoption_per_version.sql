@@ -101,8 +101,17 @@ create trigger policy_reviews_adopted_on_guard
 --    D-1706), adopts the latest version of a type in the account's newest
 --    ready set; the policy review row is upserted as the mirror. Every
 --    refusal is 42501 "not allowed", as `next_register_reference` does.
+--    D-2449: `p_adopted_on` carries an earlier version's day onto the
+--    version the adopt step's own re-render wrote (the same words with the
+--    dates filled in); null means Sydney today, and a date is honoured for
+--    the service role alone, so every owner's call is dated today.
 -- ---------------------------------------------------------------------------
-create or replace function public.adopt_document_version(p_account uuid, p_version uuid)
+drop function if exists public.adopt_document_version(uuid, uuid);
+create or replace function public.adopt_document_version(
+  p_account uuid,
+  p_version uuid,
+  p_adopted_on date default null
+)
 returns date
 language plpgsql
 security definer
@@ -111,9 +120,11 @@ as $$
 declare
   v_today date := (now() at time zone 'Australia/Sydney')::date;
   v_service boolean := coalesce(auth.jwt() ->> 'role', '') = 'service_role';
+  v_day date;
   v_row record;
   v_newest uuid;
 begin
+  v_day := case when v_service and p_adopted_on is not null then least(p_adopted_on, v_today) else v_today end;
   if not (public.is_owner(p_account) or v_service) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
@@ -148,29 +159,34 @@ begin
     raise exception 'not allowed' using errcode = '42501';
   end if;
 
-  update public.document_versions set adopted_on = v_today where id = p_version;
+  update public.document_versions set adopted_on = v_day where id = p_version;
 
   -- The mirror (D-2443): the seeded row's shape (seed.ts), created when the
   -- checklist tick comes before the register was seeded; `adopted_on` keeps
-  -- its first date, `last_reviewed_on` moves to today or the adoption date,
-  -- whichever is later, so the row's CHECK holds.
+  -- its first date, `last_reviewed_on` never moves backwards (the carried
+  -- day of D-2449 is at or before the first adoption's), so the row's CHECK
+  -- holds.
   perform set_config('readyline.adopting', 'on', true);
   insert into public.policy_reviews
     (account_id, document_type_id, title, review_cycle_months, adopted_on, last_reviewed_on)
   values (
     p_account, v_row.document_type_id, '',
     case when v_row.document_type_id ~ 'register' then 3 else 12 end,
-    v_today, v_today
+    v_day, v_day
   )
   on conflict (account_id, document_type_id, title) do update
     set adopted_on = coalesce(public.policy_reviews.adopted_on, excluded.adopted_on),
-        last_reviewed_on = greatest(excluded.last_reviewed_on, public.policy_reviews.adopted_on);
+        last_reviewed_on = greatest(
+          excluded.last_reviewed_on,
+          public.policy_reviews.last_reviewed_on,
+          public.policy_reviews.adopted_on
+        );
   perform set_config('readyline.adopting', '', true);
-  return v_today;
+  return v_day;
 end;
 $$;
 
-revoke all on function public.adopt_document_version(uuid, uuid) from public, anon;
-grant execute on function public.adopt_document_version(uuid, uuid) to authenticated, service_role;
+revoke all on function public.adopt_document_version(uuid, uuid, date) from public, anon;
+grant execute on function public.adopt_document_version(uuid, uuid, date) to authenticated, service_role;
 
 notify pgrst, 'reload schema';
