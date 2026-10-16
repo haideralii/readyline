@@ -11,12 +11,17 @@
  * CATCH_UP_DAYS rather than silently skipping them or flooding an account
  * that enters an old date.
  */
-import { addBusinessDays, addDays, daysBetween } from "./status";
-import type {
-  RegistrationKind,
-  ReminderKind,
-  ReminderSubjectTable,
-} from "./types";
+import { addBusinessDays, addDays, addMonths, daysBetween } from "./status";
+import {
+  registrationReminderLine,
+  registrationReminders,
+  isRegistrationReminderKind,
+  type RegistrationReminderInput,
+} from "./timeline";
+import type { ReminderKind, ReminderSubjectTable } from "./types";
+
+// REQ-023 Session A: the month arithmetic moved to status.ts; kept here for its importers.
+export { addMonths } from "./status";
 
 export const CATCH_UP_DAYS = 7;
 // REQ-018 Session C (FR-5, FR-8, FR-10; D-1905).
@@ -30,18 +35,18 @@ export const CLEARANCE_OFFSETS = [90, 30, 7, 0] as const;
 export const REVIEW_OFFSETS = [60, 14, 0] as const;
 export const INCIDENT_OPEN_DAYS = 30;
 export const COMPLAINT_ACK_BUSINESS_DAYS = 2;
-export const MID_TERM_MONTHS = [12, 15, 17] as const;
-export const MID_TERM_DUE_MONTHS = 18;
-export const RENEWAL_MONTHS_BEFORE = [6, 3] as const;
-export const REGISTRATION_TERM_MONTHS = 36;
+// REQ-023 Session A (finding 59): the registration dates and their reminders
+// come from the registration period (`./timeline`), never from a three-year
+// assumption; `MID_TERM_MONTHS`, `RENEWAL_MONTHS_BEFORE` and
+// `REGISTRATION_TERM_MONTHS` went with the two old kinds.
 
 export type ReminderInput = {
   today: string;
   account: {
     id: string;
-    registration_date: string | null;
-    registration_kind: RegistrationKind | null;
   };
+  /** REQ-023 FR-3: the current registration period and what the job knows about it; none means no timeline reminders. */
+  period?: RegistrationReminderInput;
   incidents: {
     id: string;
     status: "open" | "under-review" | "closed";
@@ -98,19 +103,6 @@ export type ReminderDue = {
   due_on: string;
   send_on: string;
 };
-
-/** Calendar months added to an ISO date; a day past the month's end clamps (31 Jan + 1 month = 28 Feb). */
-export function addMonths(date: string, months: number): string {
-  const [y, m, d] = date.split("-").map(Number);
-  const first = new Date(Date.UTC(y, m - 1 + months, 1));
-  const lastDay = new Date(
-    Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
-  ).getUTCDate();
-  const dt = new Date(
-    Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), Math.min(d, lastDay)),
-  );
-  return dt.toISOString().slice(0, 10);
-}
 
 /** True when a reminder dated `sendOn` should go out on `today`: today or within the catch-up window. */
 export function inWindow(sendOn: string, today: string): boolean {
@@ -202,32 +194,16 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
     push("complaint-unacknowledged", "complaints", c.id, by, by);
   }
 
-  // Registration: the mid-term audit (certification only) and the renewal (both kinds).
-  const reg = input.account.registration_date;
-  if (reg) {
-    if (input.account.registration_kind === "certification") {
-      const due = addMonths(reg, MID_TERM_DUE_MONTHS);
-      for (const m of MID_TERM_MONTHS)
-        push(
-          "mid-term-audit",
-          "accounts",
-          input.account.id,
-          due,
-          addMonths(reg, m),
-        );
-    }
-    if (input.account.registration_kind) {
-      const expiry = addMonths(reg, REGISTRATION_TERM_MONTHS);
-      for (const m of RENEWAL_MONTHS_BEFORE)
-        push(
-          "renewal",
-          "accounts",
-          input.account.id,
-          expiry,
-          addMonths(expiry, -m),
-        );
-    }
-  }
+  // REQ-023 FR-3: the five timeline kinds from the current period, the period row as the subject (finding 58).
+  if (input.period)
+    for (const r of registrationReminders(input.period))
+      push(
+        r.kind,
+        "registration_periods",
+        input.period.period.id,
+        r.due_on,
+        r.send_on,
+      );
 
   // REQ-018 FR-5: insurances and vehicles, 30 and 7 days before expiry and on the day.
   for (const i of input.insuranceItems ?? [])
@@ -299,6 +275,8 @@ export function reminderLine(
   reference: string,
   dueOn: string,
 ): string {
+  if (isRegistrationReminderKind(kind))
+    return registrationReminderLine(kind, dueOn);
   switch (kind) {
     case "clearance-expiry":
       return `Worker check ${reference} expires on ${dueOn}.`;
@@ -310,10 +288,6 @@ export function reminderLine(
       return `Complaint ${reference} has not been acknowledged.`;
     case "reportable-not-notified":
       return `Incident ${reference} was due to the Commission by ${dueOn} and is not marked as notified.`;
-    case "mid-term-audit":
-      return `Your mid-term audit is due around ${dueOn}. Start preparing.`;
-    case "renewal":
-      return `Your registration ends on ${dueOn}. Plan the renewal audit.`;
     case "insurance-expiry":
       return `${reference} expires on ${dueOn}. Renew it and type the new expiry into the insurances register.`;
     case "supervision-due":

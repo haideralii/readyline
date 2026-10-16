@@ -13,6 +13,8 @@ export type StoredItem = {
   itemId: string;
   status: ChecklistStatus;
   note: string;
+  /** REQ-023 FR-4: the date a dated audit item was done; null when not recorded. */
+  doneOn?: string | null;
 };
 
 /** What a row shows: the stored status, else `drafted` for a generated document, else the pre-fill. */
@@ -23,6 +25,8 @@ export type ShownItem = ChecklistItem & {
   note: string;
   /** True when the provider has set something (a row exists). */
   stored: boolean;
+  /** REQ-023 FR-4: the recorded date of a dated item, or null. */
+  doneOn: string | null;
 };
 
 export type ShownGroup = {
@@ -59,7 +63,13 @@ export function mergeChecklist(input: {
       status === "need"
     )
       status = "drafted";
-    return { ...item, status, note: row?.note ?? "", stored: Boolean(row) };
+    return {
+      ...item,
+      status,
+      note: row?.note ?? "",
+      stored: Boolean(row),
+      doneOn: row?.doneOn ?? null,
+    };
   });
   const ready = items.filter((i) => i.status === "have").length;
   let opened = false;

@@ -58,14 +58,16 @@ describe.skipIf(!enabled)(
       });
       if (rpc.error) throw rpc.error;
       accountId = rpc.data as string;
-      // Certification registered 12 months ago: a mid-term reminder today.
-      const reg = await admin
-        .from("accounts")
-        .update({
-          registration_date: addMonths(TODAY, -12),
-          registration_kind: "certification",
-        })
-        .eq("id", accountId);
+      // REQ-023 FR-3: a certification period that began 12 months ago, so the
+      // prepare-from reminder (start plus 12 months) fires today, about the
+      // must-start-by date (start plus 18 months).
+      const reg = await admin.from("registration_periods").insert({
+        account_id: accountId,
+        period_starts_on: addMonths(TODAY, -12),
+        period_ends_on: addMonths(TODAY, 24),
+        audit_type: "certification",
+        midterm_applies: true,
+      });
       if (reg.error) throw reg.error;
       const sub = await admin
         .from("entitlements")
@@ -216,7 +218,7 @@ describe.skipIf(!enabled)(
           `policy-review@${TODAY}`,
           `reportable-not-notified@${TODAY}`,
           "complaint-unacknowledged@2026-10-12",
-          `mid-term-audit@${TODAY}`,
+          `midterm-prepare@${TODAY}`,
           // REQ-018 Session C (AC-3): the six new kinds, each from the fixed date seeded above.
           `insurance-expiry@${TODAY}`,
           `supervision-due@${TODAY}`,
@@ -243,6 +245,24 @@ describe.skipIf(!enabled)(
       expect(sent?.text).toContain("INC-0001");
       expect(sent?.text).toContain("CMP-0001");
       expect(sent?.text).not.toMatch(/kitchen|Late twice/);
+      // REQ-023 AC-2: the timeline line, the fixed sentence once, and the audit line with the period id.
+      expect(sent?.text).toContain("Start preparing for your mid-term audit");
+      expect(
+        sent?.text.split("The dates on your certificate rule").length,
+      ).toBe(2);
+      const periodRow = await admin
+        .from("registration_periods")
+        .select("id")
+        .eq("account_id", accountId)
+        .single();
+      const sentLine = await admin
+        .from("audit_log")
+        .select("action, target")
+        .eq("account_id", accountId)
+        .eq("action", "reminder.midterm-prepare.sent");
+      expect(sentLine.data).toEqual([
+        { action: "reminder.midterm-prepare.sent", target: periodRow.data?.id },
+      ]);
 
       const sentBefore = provider.sent.filter((m) => m.to === email).length;
       const second = await runRemindersJob({

@@ -14,7 +14,7 @@ const TODAY = "2026-10-13"; // a Tuesday
 function base(over: Partial<ReminderInput> = {}): ReminderInput {
   return {
     today: TODAY,
-    account: { id: "acc", registration_date: null, registration_kind: null },
+    account: { id: "acc" },
     incidents: [],
     complaints: [],
     workerChecks: [],
@@ -248,69 +248,43 @@ describe("reminder rules (REQ-009 FR-3)", () => {
     });
   });
 
-  describe("registration: mid-term audit and renewal", () => {
-    it.each([12, 15, 17])("certification: month %i after registration", (m) => {
-      const reg = addMonths(TODAY, -m);
-      const r = dueReminders(
-        base({
-          account: {
-            id: "acc",
-            registration_date: reg,
-            registration_kind: "certification",
-          },
-        }),
-      );
-      expect(kinds(r)).toEqual([`mid-term-audit@${TODAY}`]);
-      expect(r[0].due_on).toBe(addMonths(reg, 18));
-      expect(r[0].subject_table).toBe("accounts");
-    });
-    it("verification has no mid-term audit", () => {
-      const reg = addMonths(TODAY, -12);
-      expect(
-        dueReminders(
-          base({
-            account: {
-              id: "acc",
-              registration_date: reg,
-              registration_kind: "verification",
-            },
-          }),
-        ),
-      ).toEqual([]);
-    });
-    it.each([6, 3])(
-      "renewal %i months before the three-year end, both kinds",
-      (m) => {
-        const reg = addMonths(addMonths(TODAY, m), -36);
-        for (const kind of ["verification", "certification"] as const) {
-          const r = dueReminders(
-            base({
-              account: {
-                id: "acc",
-                registration_date: reg,
-                registration_kind: kind,
-              },
-            }),
-          );
-          const renewal = r.filter((x) => x.kind === "renewal");
-          expect(renewal).toHaveLength(1);
-          expect(renewal[0].due_on).toBe(addMonths(reg, 36));
-          expect(renewal[0].send_on).toBe(TODAY);
-        }
+  describe("registration: the timeline kinds come from the period row (REQ-023 FR-3)", () => {
+    const period = (starts: string, ends: string) => ({
+      period: {
+        id: "per-1",
+        period_starts_on: starts,
+        period_ends_on: ends,
+        audit_type: "certification" as const,
+        midterm_applies: true,
+        midterm_exempt_reason: null,
+        midterm_start_by_override: null,
+        midterm_override_source: null,
+        last_audit_on: null,
+        midterm_audit_on: null,
       },
-    );
-    it("no registration date, no registration reminders", () => {
+    });
+    it("twelve months in, the prepare reminder goes out with the period as its subject", () => {
+      const starts = addMonths(TODAY, -12);
+      const r = dueReminders(
+        base({ period: period(starts, addMonths(starts, 36)) }),
+      );
+      expect(kinds(r)).toEqual([`midterm-prepare@${TODAY}`]);
+      expect(r[0].subject_table).toBe("registration_periods");
+      expect(r[0].subject_id).toBe("per-1");
+      expect(r[0].due_on).toBe(addMonths(starts, 18));
+    });
+    it("fourteen days before the period ends, the last call goes out, unless the subscription was cancelled", () => {
+      const ends = addDays(TODAY, 14);
+      const p = period(addMonths(ends, -36), ends);
+      expect(kinds(dueReminders(base({ period: p })))).toEqual([
+        `renewal-last-call@${TODAY}`,
+      ]);
       expect(
-        dueReminders(
-          base({
-            account: {
-              id: "acc",
-              registration_date: null,
-              registration_kind: "certification",
-            },
-          }),
-        ),
+        dueReminders(base({ period: { ...p, subscriptionCancelled: true } })),
       ).toEqual([]);
+    });
+    it("no period, no registration reminders", () => {
+      expect(dueReminders(base({}))).toEqual([]);
     });
   });
 
@@ -381,8 +355,11 @@ describe("reminder rules (REQ-009 FR-3)", () => {
       "policy-review",
       "incident-open",
       "complaint-unacknowledged",
-      "mid-term-audit",
-      "renewal",
+      "midterm-prepare",
+      "midterm-start-by",
+      "renewal-window",
+      "renewal-apply-by",
+      "renewal-last-call",
     ] as const)
       expect(reminderLine(k, "X-1", "2027-01-01")).not.toMatch(
         /participant|summary/i,
