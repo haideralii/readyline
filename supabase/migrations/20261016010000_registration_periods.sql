@@ -78,6 +78,14 @@ alter table public.reminders add constraint reminders_subject_table_check check 
 -- Finding 59: nothing of the two old kinds may reach an email as an unknown line.
 delete from public.reminders where kind in ('mid-term-audit', 'renewal') and sent_at is null;
 
+-- #73's run 38836764150 (PO 16 Oct 13:28; D-052, D-2241): `20261013000000`
+-- grants `select` on reminders to `authenticated` and revokes nothing, and a
+-- stack with default privileges on `public` (the CLI's) then leaves `delete`
+-- granted, so the owner's direct delete matched zero rows under RLS instead
+-- of raising 42501. A table's grants are explicit per verb or the default
+-- gives everything; the job writes under the service role, which keeps all.
+revoke insert, update, delete on public.reminders from anon, authenticated;
+
 -- Finding 61: the owner's session holds no delete on reminders, so the save
 -- clears its unsent timeline rows through this function, owner-only.
 create or replace function public.clear_registration_reminders(p_account uuid)

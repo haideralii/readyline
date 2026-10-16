@@ -9,6 +9,7 @@
  * variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
@@ -188,6 +189,32 @@ describe.skipIf(!enabled)(
         },
       ]);
       expect(seeded.error).toBeNull();
+      // Run 38836764150: on a stack with default privileges the owner's delete
+      // matched zero rows instead of raising, so the grant itself is read
+      // (the `req-020-session-c-rls` pattern): `authenticated` holds select
+      // on reminders and nothing else, whatever the defaults gave.
+      const dbUrl = process.env.SUPABASE_DB_URL?.trim();
+      if (dbUrl) {
+        const grants = execFileSync(
+          "psql",
+          [
+            dbUrl,
+            "-v",
+            "ON_ERROR_STOP=1",
+            "-At",
+            "-c",
+            "select privilege_type from information_schema.role_table_grants where grantee = 'authenticated' and table_schema = 'public' and table_name = 'reminders' order by 1",
+          ],
+          { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+        )
+          .split("\n")
+          .filter(Boolean);
+        expect(grants, "authenticated holds select alone on reminders").toEqual(
+          ["SELECT"],
+        );
+      } else {
+        expect(process.env.CI, "SUPABASE_DB_URL is not set").toBeFalsy();
+      }
       const direct = await a.client
         .from("reminders")
         .delete()
