@@ -1,6 +1,6 @@
 ---
 title: About Readyline
-updated: 2026-10-15
+updated: 2026-10-16
 owner: po
 status: draft (plain-language draft by the product owner)
 ---
@@ -11,7 +11,7 @@ status: draft (plain-language draft by the product owner)
 
 Registering as an NDIS provider means passing an audit against the NDIS Practice Standards. For a sole trader or a small team, the hardest part is not the audit itself. It is working out which standards apply, which documents you need, and writing policies that describe your business rather than a template's idea of a business. Consultants charge thousands for this. Template packs are cheap but generic.
 
-Readyline sits in between. You answer plain questions about what you do. Readyline works out your audit type and the standards that apply, drafts the documents to fit your answers, and shows you what is still missing. You review and adopt the documents. When you are registered, the registers help you stay ready for the mid-term audit.
+Readyline sits in between. You answer plain questions about what you do. Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing. You review and adopt the documents. When you are registered, the registers help you stay ready for the mid-term audit.
 
 ## Who runs it
 

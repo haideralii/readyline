@@ -1,6 +1,6 @@
 ---
 title: How Readyline uses AI
-updated: 2026-10-12
+updated: 2026-10-16
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -19,7 +19,7 @@ Every document shows which sections are which.
 
 ## Which model, and where your data goes
 
-We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models.
+We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
 
 ## How we check the drafts
 
@@ -27,7 +27,7 @@ Each tailored section is checked by software before you see it: it must be about
 
 ## Your own statement on AI and digital tools
 
-Your pack does not carry a separate AI policy. Your statement on AI and digital tools, which tools you allow and for what, that no participant information goes into public tools, and who reviews what a tool produces, is an appendix to the privacy policy in your pack, so an auditor finds it with your privacy commitments. You find it with your other documents on [your documents page](/documents).
+Your pack does not carry a separate AI policy. Your statement on AI and digital tools, which tools you allow and for what, that no participant information goes into public tools, and who reviews what a tool produces, is an appendix to the privacy policy in your pack, so it sits with your privacy commitments, where an auditor would look for it. You find it with your other documents on [your documents page](/documents).
 
 ## What you must do
 
