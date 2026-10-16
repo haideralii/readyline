@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { test, expect, type Page } from "@playwright/test";
+import { mkdirSync, readFileSync } from "node:fs";
 import { hasSupabaseForE2e } from "../helpers/env";
 import { checkWidths } from "../helpers/width";
 import {
@@ -80,6 +80,20 @@ test.describe("a new customer creates the account through the setup form (batch 
   });
 });
 
+/** REQ-023 Session A evidence: the screenshots the Supabase job saves under EVIDENCE=1. */
+const EVIDENCE_DIR = "product/evidence/req-023";
+async function shot(page: Page, name: string, project: string) {
+  if (!process.env.EVIDENCE) return;
+  mkdirSync(EVIDENCE_DIR, { recursive: true });
+  await page.screenshot({
+    path: `${EVIDENCE_DIR}/${name}-${project}.jpg`,
+    fullPage: true,
+    type: "jpeg",
+    quality: 40,
+    scale: "css",
+  });
+}
+
 /** The product's calendar is Australia/Sydney (D-2242): every date the page derives is read against it. */
 const sydney = (days: number) =>
   new Intl.DateTimeFormat("en-CA", {
@@ -136,7 +150,8 @@ test.describe("the registration timeline (REQ-023 Session A)", () => {
     page,
     context,
     baseURL,
-  }) => {
+  }, testInfo) => {
+    const project = testInfo.project.name;
     // Seven months in, as AC-1's fixture; three years long, as is usual.
     const starts = sydney(-213);
     const ends = plusMonths(starts, 36);
@@ -200,11 +215,13 @@ test.describe("the registration timeline (REQ-023 Session A)", () => {
       "The dates on your certificate rule",
     );
     await checkWidths(page, "account with the timeline");
+    await shot(page, "timeline", project);
 
     // D-2314: the audit-day copy shows the legal rows only.
     await page.goto("/path/audit-day");
     const auditDay = page.getByTestId("audit-day-timeline");
     await expect(auditDay).toBeVisible();
+    await shot(page, "audit-day-dates", project);
     await expect(
       auditDay.getByTestId("timeline-row-midterm-start-by"),
     ).toBeVisible();
