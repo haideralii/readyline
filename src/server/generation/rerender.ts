@@ -5,7 +5,9 @@ import "server-only";
  * changed, a fresh readiness summary and a fresh zip, so the provider never
  * opens Word to fill a blank. Deterministic and model-free: the stored
  * models are the input. Uses the admin client for storage and the version
- * rows the way the job does (D-538).
+ * rows the way the job does (D-538). REQ-024 A0 (D-2441): the summary and
+ * the zip can also be rebuilt on their own, after an adoption, with no new
+ * version row.
  */
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -20,11 +22,105 @@ import { documentControlForSet } from "@/server/registers/document-control-queri
 import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { listAdoptedTypeIds } from "@/server/path/state";
 import { hasActiveSubscription } from "@/server/registers/queries";
-import { listFirstDocuments, listLatestDocuments } from "./queries";
+import {
+  getVersionSet,
+  listFirstDocuments,
+  listLatestDocuments,
+} from "./queries";
 import { DOCX_TYPE, documentStatus, readmeText } from "./run";
 import { renderStartHere, startHereFromRows } from "./start-here";
 import { objectPath } from "./storage";
-import { SupabaseGenerationStore, type VersionSetRow } from "./store";
+import {
+  SupabaseGenerationStore,
+  type DocumentVersionRow,
+  type VersionSetRow,
+} from "./store";
+
+type Summary = {
+  title: string;
+  status: "ready" | "review";
+  fallbackSections: number;
+};
+
+function inAuditOrder(
+  docs: readonly DocumentVersionRow[],
+): DocumentVersionRow[] {
+  const ordered = auditOrder(docs.map((d) => d.document_type_id));
+  return [...docs].sort(
+    (a, b) =>
+      ordered.indexOf(a.document_type_id) - ordered.indexOf(b.document_type_id),
+  );
+}
+
+/**
+ * The summary PDF, the README, the Start here sheet and the zip for a set's
+ * latest rows, written to storage: the tail of a re-render and the whole of
+ * a summary refresh. Reads the document control register and the adopted
+ * types afresh, so an adoption made just before shows in the zip.
+ */
+async function writeSummaryAndZip(input: {
+  admin: SupabaseClient;
+  store: SupabaseGenerationStore;
+  set: VersionSetRow;
+  rows: readonly DocumentVersionRow[];
+  entries: Record<string, Uint8Array>;
+  summaries: Summary[];
+  blanks: DocumentBlank[];
+}): Promise<void> {
+  const { admin, store, set, rows, entries, summaries, blanks } = input;
+  const first = rows[0]?.model;
+  if (!first) return;
+  const generatedAt = set.created_at.slice(0, 10);
+  // REQ-018 FR-13: the document control register as the summary's first page (adoption re-renders here).
+  const documentControl = await documentControlForSet(
+    admin,
+    set.account_id,
+    set.id,
+  );
+  const pdf = await renderSummaryPdf({
+    facts: first.facts,
+    result: set.derived_result,
+    documents: summaries,
+    blanks,
+    documentControl,
+    generatedAt,
+    version: "1",
+  });
+  await store.putObject(
+    objectPath(set.account_id, set.id, "readiness-summary.pdf"),
+    pdf,
+    "application/pdf",
+  );
+  entries["readiness-summary.pdf"] = pdf;
+  entries["README.txt"] = strToU8(
+    readmeText(first.facts.tradingName, generatedAt),
+  );
+  // REQ-026 FR-5: the sheet regenerates with the pack, first in the zip; filled lines read done.
+  const [shipped, adopted, subscribed] = await Promise.all([
+    listFirstDocuments(admin, set.id),
+    listAdoptedTypeIds(admin, set.account_id),
+    hasActiveSubscription(admin, set.account_id),
+  ]);
+  const startHere = startHereFromRows({
+    set,
+    first: shipped,
+    latest: rows,
+    adopted,
+    subscribed,
+    summaryVersion: "1",
+  });
+  const ordered: Record<string, Uint8Array> = startHere
+    ? {
+        [START_HERE_FILE]: new Uint8Array(await renderStartHere(startHere)),
+        ...entries,
+      }
+    : entries;
+  await store.putObject(
+    objectPath(set.account_id, set.id, "set.zip"),
+    zipSync(ordered, { level: 6 }),
+    "application/zip",
+  );
+}
 
 export async function rerenderSetWithFacts(input: {
   admin: SupabaseClient;
@@ -33,20 +129,12 @@ export async function rerenderSetWithFacts(input: {
 }): Promise<{ changed: number; blanksLeft: number }> {
   const { admin, set, facts } = input;
   const store = new SupabaseGenerationStore(admin);
-  const docs = await listLatestDocuments(admin, set.id);
-  const ordered = auditOrder(docs.map((d) => d.document_type_id));
-  const sorted = [...docs].sort(
-    (a, b) =>
-      ordered.indexOf(a.document_type_id) - ordered.indexOf(b.document_type_id),
-  );
+  const sorted = inAuditOrder(await listLatestDocuments(admin, set.id));
   let changed = 0;
   const entries: Record<string, Uint8Array> = {};
-  const summaries: {
-    title: string;
-    status: "ready" | "review";
-    fallbackSections: number;
-  }[] = [];
+  const summaries: Summary[] = [];
   const blanks: DocumentBlank[] = [];
+  const rows: DocumentVersionRow[] = [];
   let providerInputSections = 0;
   // Retro review of REQ-018 to 021, finding 3 (PO decision 3): an adopted
   // document's own control table carries the register's adoption date and
@@ -83,6 +171,7 @@ export async function rerenderSetWithFacts(input: {
       });
       changed += 1;
     }
+    rows.push(row);
     const s = documentStatus(row.model);
     summaries.push({
       title: row.model.title,
@@ -95,59 +184,16 @@ export async function rerenderSetWithFacts(input: {
       row.storage_path,
     );
   }
-  const first = sorted[0]?.model;
-  if (first) {
-    const generatedAt = set.created_at.slice(0, 10);
-    // REQ-018 FR-13: the document control register as the summary's first page (adoption re-renders here).
-    const documentControl = await documentControlForSet(
+  if (rows.length) {
+    await writeSummaryAndZip({
       admin,
-      set.account_id,
-      set.id,
-    );
-    const pdf = await renderSummaryPdf({
-      facts: first.facts,
-      result: set.derived_result,
-      documents: summaries,
-      blanks,
-      documentControl,
-      generatedAt,
-      version: "1",
-    });
-    await store.putObject(
-      objectPath(set.account_id, set.id, "readiness-summary.pdf"),
-      pdf,
-      "application/pdf",
-    );
-    entries["readiness-summary.pdf"] = pdf;
-    entries["README.txt"] = strToU8(
-      readmeText(first.facts.tradingName, generatedAt),
-    );
-    // REQ-026 FR-5: the sheet regenerates with the pack, first in the zip; filled lines read done.
-    const [shipped, adopted, subscribed] = await Promise.all([
-      listFirstDocuments(admin, set.id),
-      listAdoptedTypeIds(admin, set.account_id),
-      hasActiveSubscription(admin, set.account_id),
-    ]);
-    const latestRows = await listLatestDocuments(admin, set.id);
-    const startHere = startHereFromRows({
+      store,
       set,
-      first: shipped,
-      latest: latestRows,
-      adopted,
-      subscribed,
-      summaryVersion: "1",
+      rows,
+      entries,
+      summaries,
+      blanks,
     });
-    const ordered: Record<string, Uint8Array> = startHere
-      ? {
-          [START_HERE_FILE]: new Uint8Array(await renderStartHere(startHere)),
-          ...entries,
-        }
-      : entries;
-    await store.putObject(
-      objectPath(set.account_id, set.id, "set.zip"),
-      zipSync(ordered, { level: 6 }),
-      "application/zip",
-    );
     await admin
       .from("version_sets")
       .update({ provider_input_section_count: providerInputSections })
@@ -160,4 +206,51 @@ export async function rerenderSetWithFacts(input: {
     blanksLeft: blanks.length,
   });
   return { changed, blanksLeft: blanks.length };
+}
+
+/**
+ * REQ-024 A0 (D-2441): the summary-only pass after an adoption. The latest
+ * rows are read, their stored docx bytes reused, the register and the Start
+ * here sheet re-read, the summary PDF and the zip rewritten; no document
+ * version is inserted and `provider_input_section_count` is left alone, so
+ * the pack the owner downloads reads the adoption and nothing else moves.
+ */
+export async function refreshSetSummary(
+  admin: SupabaseClient,
+  setId: string,
+): Promise<{ documents: number }> {
+  const set = await getVersionSet(admin, setId);
+  if (!set) return { documents: 0 };
+  const store = new SupabaseGenerationStore(admin);
+  const rows = inAuditOrder(await listLatestDocuments(admin, set.id));
+  const entries: Record<string, Uint8Array> = {};
+  const summaries: Summary[] = [];
+  const blanks: DocumentBlank[] = [];
+  for (const row of rows) {
+    const s = documentStatus(row.model);
+    summaries.push({
+      title: row.model.title,
+      status: s.status,
+      fallbackSections: s.fallbackSections,
+    });
+    blanks.push(...collectBlanks(row.model));
+    entries[`${row.document_type_id}.docx`] = await store.getObject(
+      row.storage_path,
+    );
+  }
+  await writeSummaryAndZip({
+    admin,
+    store,
+    set,
+    rows,
+    entries,
+    summaries,
+    blanks,
+  });
+  log.info("path.adopt.summary-refreshed", {
+    accountId: set.account_id,
+    versionSetId: set.id,
+    documents: rows.length,
+  });
+  return { documents: rows.length };
 }

@@ -501,6 +501,19 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         .getByTestId("document-control-list")
         .locator("li[data-state='not-adopted']"),
     ).toHaveCount(0);
+    // REQ-024 A0 (D-2433, AC-17): adoption is per version, the adopt button
+    // re-renders first and adopts what it leaves newest, so every row reads
+    // adopted straight after the button and none "new version to adopt".
+    const controlRows = await page
+      .getByTestId("document-control-list")
+      .getByRole("listitem")
+      .count();
+    expect(controlRows).toBeGreaterThan(0);
+    await expect(
+      page
+        .getByTestId("document-control-list")
+        .locator("li[data-state='adopted']"),
+    ).toHaveCount(controlRows);
     await checkWidths(page, "document control");
     await page.goto("/path/audit-day");
     await checkWidths(page, "audit day");

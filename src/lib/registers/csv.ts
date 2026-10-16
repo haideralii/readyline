@@ -18,11 +18,25 @@ function cell(value: unknown): string {
 export function toCsv(
   columns: readonly string[],
   rows: readonly Record<string, unknown>[],
+  /** A header shown under another name than its column (`CSV_HEADER_LABELS`). */
+  labels: Readonly<Record<string, string>> = {},
 ): string {
-  const lines = [columns.map(cell).join(",")];
+  const lines = [columns.map((c) => cell(labels[c] ?? c)).join(",")];
   for (const r of rows) lines.push(columns.map((c) => cell(r[c])).join(","));
   return `${CSV_BOM}${lines.join("\r\n")}\r\n`;
 }
+
+/**
+ * REQ-024 A0 (D-2432, findings 234 and 244): the policy review row's
+ * `adopted_on` is the type's first adoption (the function's upsert keeps
+ * it), while the version column and the document control file carry the
+ * latest adopted version's day, so the two dates in one zip are each named.
+ */
+export const CSV_HEADER_LABELS: Readonly<
+  Record<string, Readonly<Record<string, string>>>
+> = {
+  policy_reviews: { adopted_on: "first adopted on" },
+};
 
 /** The column order per register; the same names as the database columns, references first. */
 export const CSV_COLUMNS = {

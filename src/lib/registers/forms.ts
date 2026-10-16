@@ -243,6 +243,15 @@ export const PolicyReviewForm = strictObject({
       path: ["lastReviewedOn"],
       message: "Cannot be before the date it was adopted",
     });
+  // REQ-024 A0 (D-2435, finding 203): a document of the owner's own is
+  // adopted on a day that has come; a catalogue type's date is the pack's and
+  // the action never writes it, so only "other" is checked here.
+  if (v.documentTypeId === "other" && v.adoptedOn && v.adoptedOn > sydneyDay())
+    ctx.addIssue({
+      code: "custom",
+      path: ["adoptedOn"],
+      message: "Cannot be after today",
+    });
 });
 export type PolicyReviewFormValues = z.input<typeof PolicyReviewForm>;
 

@@ -159,6 +159,40 @@ describe("register forms (REQ-009 FR-5, SR-1)", () => {
       PolicyReviewForm.safeParse({ ...base, reviewCycleMonths: "40" }).success,
     ).toBe(false);
   });
+
+  // REQ-024 A0 (D-2435, finding 203): an "other" document's adoption is capped
+  // at today; a catalogue type's date is the pack's and is never written, so
+  // the form does not judge it.
+  it("policy reviews: an other document cannot be adopted after today; a catalogue type's date is not the form's to judge", () => {
+    const other = {
+      documentTypeId: "other",
+      title: "Fire plan",
+      reviewCycleMonths: "12",
+      lastReviewedOn: "",
+      reviewerRef: "",
+      note: "",
+    };
+    const future = new Date(Date.now() + 3 * 86_400_000)
+      .toISOString()
+      .slice(0, 10);
+    const r = PolicyReviewForm.safeParse({ ...other, adoptedOn: future });
+    expect(r.success).toBe(false);
+    if (!r.success)
+      expect(r.error.issues.map((i) => i.path.join("."))).toContain(
+        "adoptedOn",
+      );
+    expect(
+      PolicyReviewForm.safeParse({ ...other, adoptedOn: "2026-01-15" }).success,
+    ).toBe(true);
+    expect(
+      PolicyReviewForm.safeParse({
+        ...other,
+        documentTypeId: "complaints-management-policy-and-register",
+        title: "",
+        adoptedOn: future,
+      }).success,
+    ).toBe(true);
+  });
 });
 
 describe("the aware date on an incident (retro review finding 23, PO decision 23)", () => {

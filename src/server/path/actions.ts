@@ -19,7 +19,10 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
-import { rerenderSetWithFacts } from "@/server/generation/rerender";
+import {
+  refreshSetSummary,
+  rerenderSetWithFacts,
+} from "@/server/generation/rerender";
 import { countEvent } from "@/server/metrics/counters";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
@@ -167,12 +170,8 @@ export async function adoptGroupAction(
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
 
-  const today = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  // REQ-024 A0 (D-2437): the adoption day itself is written in Sydney by
+  // `adopt_document_version`; only the words for the date fact are made here.
   const todayWords = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
     day: "numeric",
@@ -219,7 +218,6 @@ export async function adoptGroupAction(
           code: up.error.code,
         });
     }
-    await markAdopted(admin, accountId, d.document_type_id, today);
   }
   // REQ-018 FR-14: the circulation record, one row per document in the group (append only; codes only).
   const circulation = parsed.data.circulation;
@@ -238,7 +236,14 @@ export async function adoptGroupAction(
         code: ins.error.code,
       });
   }
+  // REQ-024 A0 (D-2433, D-2441): re-render first, so the version adopted is
+  // the one that carries the approval date; then adopt the newest version of
+  // each document in the group through the function; then refresh the zip's
+  // summary and Start here sheet, which read adoption per version.
   const out = await rerenderSetWithFacts({ admin, set, facts });
+  for (const d of group.documents)
+    await markAdopted(admin, accountId, d.document_type_id, set.id);
+  await refreshSetSummary(admin, set.id);
   log.info("path.adopt.group", {
     accountId,
     versionSetId: set.id,
@@ -246,4 +251,58 @@ export async function adoptGroupAction(
     documents: group.documents.length,
   });
   return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
+}
+
+const ReadoptInput = strictObject({
+  setId: z.string().uuid(),
+  typeId: z.string().regex(/^[a-z0-9-]{1,80}$/),
+});
+
+/**
+ * REQ-024 A0 (D-2427, D-2436): the document page's "Adopt this version"
+ * for a type whose newest version is unadopted while an older one was
+ * adopted (a facts edit or a regeneration wrote it). The function refuses a
+ * version that is not the latest of its type in the account's newest ready
+ * set, so the page offers the action on that set alone.
+ */
+export async function adoptDocumentVersionAction(
+  input: unknown,
+): Promise<PathActionResult> {
+  const parsed = parseInput(ReadoptInput, input);
+  if (!parsed.ok) return { ok: false, message: "That document was not found." };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to adopt your documents." };
+  const supabase = await createSupabaseServerClient();
+  const set = await getVersionSet(supabase, parsed.data.setId);
+  if (!set || set.account_id !== viewer.account.id || set.status !== "ready")
+    return { ok: false, message: "That document was not found." };
+  const facts = await loadFacts(supabase, viewer.account.id);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: ADOPT_NEEDS_NAME_HREF,
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
+  const admin = createSupabaseAdminClient();
+  const adopted = await markAdopted(
+    admin,
+    viewer.account.id,
+    parsed.data.typeId,
+    set.id,
+  );
+  if (!adopted)
+    return {
+      ok: false,
+      message:
+        "This version could not be adopted. It must be the newest version in your current pack.",
+    };
+  await refreshSetSummary(admin, set.id);
+  log.info("path.adopt.version", {
+    accountId: viewer.account.id,
+    versionSetId: set.id,
+    documentTypeId: parsed.data.typeId,
+  });
+  return { ok: true };
 }
