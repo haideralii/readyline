@@ -283,8 +283,10 @@ select
   ) as expiring_checks
 from public.staff_matrix s;
 
+-- D-2245 (#82's run 38911618628): a re-created view takes the CLI stack's default privileges, every verb for
+-- `authenticated`, so the revoke comes first and `select` alone is re-stated.
+revoke all on public.worker_clearances_status, public.staff_matrix_status from anon, authenticated;
 grant select on public.worker_clearances_status, public.staff_matrix_status to authenticated, service_role;
-revoke all on public.worker_clearances_status, public.staff_matrix_status from anon;
 
 -- The worker's two views (D-2429; findings 153 and 182): every column but `note`, listed by name, the
 -- membership filter inside, run as the view's owner (the worker holds no select policy on either base table),
@@ -314,8 +316,8 @@ where exists (
   where m.account_id = c.account_id and m.user_id = auth.uid() and m.role = 'worker'
     and m.worker_ref = c.worker_ref and a.deleted_at is null
 );
+revoke all on public.staff_matrix_worker, public.worker_clearances_worker from anon, authenticated;
 grant select on public.staff_matrix_worker, public.worker_clearances_worker to authenticated, service_role;
-revoke all on public.staff_matrix_worker, public.worker_clearances_worker from anon;
 
 -- The worker's own notice (AC-11, finding 106): an instant, so `timestamptz`.
 alter table public.memberships add column notice_seen_at timestamptz;

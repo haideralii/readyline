@@ -310,8 +310,9 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
         worker_ref: "W-7",
         role_label: "support worker",
         clearance_kind: "cpr",
-        issued_on: "2026-01-10",
-        expires_on: "2027-01-10",
+        issued_on: "2027-01-10",
+        // Well past the 90-day window whenever the suite runs, so the expiring count below is the first aid row alone (#82's run 38911618628 ran on 17 Oct 2026, 85 days before 10 Jan 2027).
+        expires_on: "2031-01-10",
       })
       .select("id")
       .single();
@@ -542,13 +543,26 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
   });
 
   it("D-2431: set_owner_worker_ref links the owner's membership once and refuses a member, a worker, a shared code, an absent code and a re-point (finding 184)", async () => {
-    const membership = await admin
+    // The owner's membership `create_account` wrote (role owner, the signing user); every row of the account is in the message when it is not there (#82's run 38911618628 read null here).
+    const all = await admin
       .from("memberships")
-      .select("id")
-      .eq("user_id", owner.userId)
-      .eq("account_id", owner.accountId)
-      .single();
-    const membershipId = membership.data!.id as string;
+      .select("id, user_id, role, worker_ref")
+      .eq("account_id", owner.accountId);
+    expect(all.error).toBeNull();
+    const rows = (all.data ?? []) as {
+      id: string;
+      user_id: string;
+      role: string;
+      worker_ref: string | null;
+    }[];
+    const membership = rows.find(
+      (m) => m.user_id === owner.userId && m.role === "owner",
+    );
+    expect(
+      membership,
+      `the owner's membership for ${owner.userId}: ${JSON.stringify(rows)}`,
+    ).toBeDefined();
+    const membershipId = membership!.id;
     // W-7 is the worker's code: shared, refused.
     expect(
       (
