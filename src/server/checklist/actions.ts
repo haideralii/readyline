@@ -20,8 +20,6 @@ import { parseInput, strictObject } from "@/lib/validation";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
-import { markAdopted } from "@/server/registers/seed";
-import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 const Input = strictObject({
@@ -97,20 +95,10 @@ export async function saveChecklistItemAction(
     });
     return { ok: false, message: "We could not save that just now." };
   }
-  // REQ-009 FR-7: "Done" on a document adopts it. REQ-024 A0 (D-2427,
-  // D-2437): the newest version of the type in the account's newest ready set
-  // is dated through `adopt_document_version`, in Sydney, and the policy
-  // review row follows as the mirror. With the admin client (D-1706): a pack
-  // buyer ticking Done need not have a subscription; the account id is the
-  // viewer's own, and the function checks it again.
-  if (status === "have") {
-    if (item.documentTypeId)
-      await markAdopted(
-        createSupabaseAdminClient(),
-        viewer.account.id,
-        item.documentTypeId,
-        null,
-      );
-  }
+  // D-2450 (REQ-024, PO, 17 Oct 2026; QA pass F4): "Done" records `have`
+  // alone. Adoption is approval with the adopt step's gates (no open blanks,
+  // D-2211; a named approver, D-2244), so the adopt step and the document
+  // page's own action are the only writers of a version's adopted date; the
+  // REQ-009 FR-7 rule that a tick adopted the document is withdrawn.
   return { ok: true };
 }

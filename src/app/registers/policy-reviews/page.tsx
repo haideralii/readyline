@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatDateAu } from "@/lib/generator/fixed-text";
 import { documentTitle } from "@/lib/questionnaire/content";
 import {
   listPolicyReviews,
@@ -46,7 +47,7 @@ export default async function PolicyReviewsPage() {
   return (
     <RegisterPage
       title="Policy reviews"
-      intro="When each policy was adopted and when it is next due. Ticking Done on the checklist sets the adopted date; the review date follows the cycle."
+      intro="When each policy was adopted and when it is next due. Adopting a document on the adopt step or its own page sets the date; the review date follows the cycle."
       canWrite={ctx.canWrite}
       addHref="/registers/policy-reviews/new"
       addLabel="Add a policy"
@@ -59,8 +60,9 @@ export default async function PolicyReviewsPage() {
           id: r.id,
           href: `/registers/policy-reviews/${r.id}`,
           title: reviewTitle(r),
+          // QA pass F5: the day in the product's words ("16 October 2026"), as the adopt step and the legal pages print it.
           detail: r.adopted_on
-            ? `Adopted ${r.adopted_on}; every ${r.review_cycle_months} months.`
+            ? `Adopted ${formatDateAu(r.adopted_on)}; every ${r.review_cycle_months} months.`
             : `Not adopted yet; every ${r.review_cycle_months} months once adopted.`,
           status: reviewStatusTag(r),
         }))}

@@ -54,6 +54,9 @@ export function StepShell({
             question="Clear your answers and start again? Your result goes with them."
             confirmLabel="Yes, start again"
             className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+            // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the
+            // provider's `clearing` flag holds the result step's guard back while the
+            // answers empty, so this push is the one navigation.
             onConfirm={() => {
               void clearDraft();
               router.push("/start");
