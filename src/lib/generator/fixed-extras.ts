@@ -16,6 +16,7 @@ import {
 import { reviewCyclesFor } from "./catalogue";
 import type { Block } from "./section-schema";
 import type { FixedContext } from "./fixed-text";
+import { formatLongDay as formatDateAu } from "@/lib/registers/state-facts";
 
 const NO_PARTICIPANT_DETAILS =
   "We record a reference code for each person, never a name, date of birth, NDIS number, address or health detail.";
@@ -456,6 +457,81 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
           : "These steps apply to every worker and key person we recruit, and to the referees we contact about them.",
     },
   ],
+  // REQ-024 A2 (FR-4a, W-1b; D-2421, D-2424 as amended, D-2428; findings 72,
+  // 95, 111, 136, 147, 154, 158, 169 and 192): the Division 3 risk management
+  // plan for a worker in a risk assessed role while in the process of
+  // obtaining a clearance (Worker Screening Rules ss 11 and 12). The controls
+  // are fixed; the risks are not: s 12(2)(a) wants each risk to a person the
+  // provider supports, and the product holds those by code in the participant
+  // risk register, so the section carries a snapshot of that register taken by
+  // the job or by "Update the procedure" and retaken by nothing else. With no
+  // snapshot, or an empty register, the section says so and the s 14
+  // exception's third line stays unavailable. Rows are codes, never a name.
+  "division-3-plan": (ctx) => {
+    const snapshot = ctx.participantRisks;
+    const rows = snapshot?.rows ?? [];
+    const blocks: Block[] = [
+      {
+        type: "paragraph",
+        text: `This is our written risk management plan under Division 3 of the NDIS (Practice Standards—Worker Screening) Rules 2018 (ss 11 and 12). It applies while any worker or key person of ${ctx.facts.tradingName} is engaged in a risk assessed role and is in the process of obtaining a clearance (s 12(1)). We implement it from the day the first such exception starts (s 12(4)).`,
+      },
+      {
+        type: "paragraph",
+        text: "How we manage each risk while a worker awaits clearance:",
+      },
+      {
+        type: "bullets",
+        items: [
+          "The worker is supervised by a named worker who holds a current clearance, in every shift and every contact with a participant (s 14(1)(a)(ii)).",
+          "The worker does no lone work, no personal care, no transport alone, and no overnight or sleepover shift until the clearance is issued.",
+          "The worker does not handle a participant's money, medication or keys, and does not use or help with any restrictive practice, until the clearance is issued.",
+          "The supervisor's own clearance is checked in the NDIS Worker Screening Database before the exception starts and the exception ends the day it expires or is suspended (s 15(2)(f)).",
+          "We record the start and end of every exception, the supervisor and the dates in our worker screening records (s 18), and we keep them for seven years (s 21).",
+        ],
+      },
+      {
+        type: "paragraph",
+        text: "The risks to the people we support (s 12(2)(a)):",
+      },
+      {
+        type: "paragraph",
+        text: "Our participant risk register is the list of each risk to a person we support and how each is managed. The rows below are the register as it stood when this version of the procedure was written; the register itself is kept current and this section is updated from it when we update the procedure.",
+      },
+    ];
+    if (!snapshot) {
+      blocks.push({
+        type: "callout",
+        text: "[The participant risk register has not been copied into this version yet. Open the worker's page in Readyline and choose \"Update the procedure\" to bring the register's rows, by code, into this section, then adopt the new version.]",
+      });
+    } else if (rows.length === 0) {
+      blocks.push({
+        type: "callout",
+        text: `[Our participant risk register had no rows on ${formatDateAu(snapshot.takenOn)}. This plan is complete only once the register lists each risk to the people we support; add the rows, choose "Update the procedure" and adopt the new version before any exception starts.]`,
+      });
+    } else {
+      blocks.push({
+        type: "paragraph",
+        text: `${rows.length} ${rows.length === 1 ? "row" : "rows"}, by participant code, as the register stood on ${formatDateAu(snapshot.takenOn)}; the register was last reviewed on ${snapshot.lastReviewedOn ? formatDateAu(snapshot.lastReviewedOn) : formatDateAu(snapshot.takenOn)}.`,
+      });
+      blocks.push({
+        type: "table",
+        columns: ["Participant code", "Risk"],
+        rows: rows.map((r) => [r.code, r.risk]),
+      });
+    }
+    blocks.push(
+      { type: "paragraph", text: "When we review this plan (s 12(3)):" },
+      {
+        type: "bullets",
+        items: [
+          "After any reportable incident involving a worker or any of our personnel, whether or not the incident register names them (s 12(3)(b)).",
+          "Whenever the NDIS Quality and Safeguards Commissioner requires us to (s 12(3)(a)).",
+          "Whenever we update the procedure, which copies the participant risk register into this section again.",
+        ],
+      },
+    );
+    return blocks;
+  },
   "training-register": () => [
     {
       type: "table",

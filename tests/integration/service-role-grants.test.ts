@@ -172,6 +172,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   // REQ-024 A1 (D-2416, Data): the s 17 roles, owner-only through RLS; the items, derived and never removed.
   risk_assessed_roles: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   onboarding_items: ["INSERT", "SELECT", "UPDATE"],
+  // REQ-024 A2 (D-2434): the s 14 exception, ended and never removed, so no delete.
+  screening_exceptions: ["INSERT", "SELECT", "UPDATE"],
   decisions: ["DELETE", "INSERT", "SELECT"],
   onboarding_ticks: ["DELETE", "INSERT", "SELECT"],
   register_events: ["DELETE", "INSERT", "SELECT"],

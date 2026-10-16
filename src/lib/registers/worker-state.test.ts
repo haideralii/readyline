@@ -7,6 +7,7 @@ import {
   clearanceRecorded,
   deriveWorkerState,
   FROM_THE_DATES_LINE,
+  PENDING_SUPERVISED_LABEL,
   ROLE_ASSESSMENT_TO_RECORD,
   TYPE_THE_STATES_FIRST,
   type ClearanceInput,
@@ -194,5 +195,94 @@ describe("the derived worker state (REQ-024 FR-3, FR-4)", () => {
     });
     expect(s.roleAssessmentToRecord).toBe(true);
     expect(s.next).toBe(ROLE_ASSESSMENT_TO_RECORD);
+  });
+
+  it("A2 (AC-2, AC-14): the pending-supervised label while the option is offered or the exception runs, W-1 counted by the running exception, and the supervisor's own clearance ending flagged with its day", () => {
+    const pending: ClearanceInput = {
+      clearance_kind: "ndis-worker-screening",
+      issued_on: null,
+      expires_on: null,
+      application_number: "APP 1",
+    };
+    const supervisor: ClearanceInput = {
+      ...cleared,
+      expires_on: "2026-11-01",
+    };
+    // Offered, not started: the label changes, W-1 stays outstanding.
+    const offered = deriveWorkerState({
+      worker,
+      items,
+      states: allDone(),
+      clearances: [pending],
+      today: TODAY,
+      exception: { running: false, offered: true, supervisorClearances: [] },
+    });
+    expect(offered.key).toBe("outstanding");
+    expect(offered.label).toBe(PENDING_SUPERVISED_LABEL);
+    expect(offered.outstanding).toContain("w1-clearance");
+    expect(offered.exceptionRunning).toBe(false);
+    // Running under a supervisor still cleared on 31 October: W-1 counts, the label stays, nothing else next.
+    const running = deriveWorkerState({
+      worker,
+      items,
+      states: allDone(),
+      clearances: [pending],
+      today: "2026-10-31",
+      exception: {
+        running: true,
+        offered: false,
+        supervisorClearances: [supervisor],
+      },
+    });
+    expect(running.key).toBe("outstanding");
+    expect(running.label).toBe(PENDING_SUPERVISED_LABEL);
+    expect(running.outstanding).toEqual([]);
+    expect(running.exceptionRunning).toBe(true);
+    expect(running.supervisorClearanceEndedOn).toBeNull();
+    // The supervisor's clearance expired on 1 November: flagged on 2 November with the day, W-1 outstanding again.
+    const ended = deriveWorkerState({
+      worker,
+      items,
+      states: allDone(),
+      clearances: [pending],
+      today: TODAY,
+      exception: {
+        running: true,
+        offered: false,
+        supervisorClearances: [supervisor],
+      },
+    });
+    expect(ended.supervisorClearanceEndedOn).toBe("2026-11-01");
+    expect(ended.next).toBe(
+      "supervisor's clearance expired on 1 November 2026; record the end of the exception with that date",
+    );
+    expect(ended.outstanding).toContain("w1-clearance");
+    // A decision on the supervisor's row ends it on the decision's day.
+    const decided = deriveWorkerState({
+      worker,
+      items,
+      states: allDone(),
+      clearances: [pending],
+      today: TODAY,
+      exception: {
+        running: true,
+        offered: false,
+        supervisorClearances: [
+          { ...cleared, decision_code: "suspended", decision_on: "2026-10-30" },
+        ],
+      },
+    });
+    expect(decided.supervisorClearanceEndedOn).toBe("2026-10-30");
+    // Ended: the plain label is back (AC-14).
+    const after = deriveWorkerState({
+      worker,
+      items,
+      states: allDone(),
+      clearances: [pending],
+      today: TODAY,
+      exception: null,
+    });
+    expect(after.label).toBe("Items outstanding");
+    expect(after.exceptionRunning).toBe(false);
   });
 });

@@ -22,6 +22,21 @@ import {
   itemsToPrepareByTier,
 } from "@/lib/registers/names";
 
+/**
+ * REQ-024 A2 (FR-4a; D-2421, D-2424 as amended, D-2428): the participant risk
+ * register as the Division 3 section reads it, taken by one named server
+ * function (`participantRiskSnapshot`) whose tenancy is its account argument,
+ * carried into this context alone and never into a prompt. Codes and risks,
+ * never a name.
+ */
+export type ParticipantRiskSnapshot = {
+  rows: { code: string; risk: string }[];
+  /** The register's last-reviewed day: the latest `reviewed` or `created` event under `participant_risks` (finding 158); null with no rows. */
+  lastReviewedOn: string | null;
+  /** The Sydney day the snapshot was taken. */
+  takenOn: string;
+};
+
 export type FixedContext = {
   type: DocumentTypeSpec;
   facts: ProviderFacts;
@@ -31,6 +46,8 @@ export type FixedContext = {
   version: string;
   generatedAt: string;
   reviewDueAt: string;
+  /** Present when the caller took the register snapshot (the job, "Update the procedure"); absent in every other render. */
+  participantRisks?: ParticipantRiskSnapshot;
 };
 
 export function formatDateAu(iso: string): string {

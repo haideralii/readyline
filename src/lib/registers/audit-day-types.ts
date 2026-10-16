@@ -130,6 +130,8 @@ export const AUDIT_DAY_REGISTERS = [
   // REQ-024 A1 (finding 66): the derived items' state and the s 17 roles.
   "onboarding_items",
   "risk_assessed_roles",
+  // REQ-024 A2 (D-2434): the s 14 exception's rows.
+  "screening_exceptions",
 ] as const;
 export type AuditDayRegister = (typeof AUDIT_DAY_REGISTERS)[number];
 
@@ -145,6 +147,9 @@ export const REGISTER_EVENT_KINDS = [
   "confirmed",
   "role-changed",
   "ended",
+  // REQ-024 A2 (D-2434): the s 14 exception's start and end, their notes in words, never a uuid.
+  "exception-started",
+  "exception-ended",
 ] as const;
 export type RegisterEventKind = (typeof REGISTER_EVENT_KINDS)[number];
 
