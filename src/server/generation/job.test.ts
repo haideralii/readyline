@@ -434,6 +434,51 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
     }
   });
 
+  // PO 16 Oct 2026 19:44, after #75's run: an account deleted or left without
+  // an owner before its job ran is the account's end, not a failure anyone
+  // can act on; the job still fails permanently with its code, at warn.
+  it("an account deleted or without an owner fails the job at warn with its code; a missing account stays an alert", async () => {
+    const error = vi.spyOn(log, "error").mockImplementation(() => undefined);
+    const warn = vi.spyOn(log, "warn").mockImplementation(() => undefined);
+    try {
+      for (const [reason, code] of [
+        ["owner missing", "owner-missing"],
+        ["account deleted", "account-deleted"],
+      ] as const) {
+        error.mockClear();
+        warn.mockClear();
+        const h = harness();
+        h.backend.enqueue();
+        h.backend.contextError = reason;
+        const report = await h.tick();
+        expect(report).toMatchObject({ claimed: true, outcome: "failed" });
+        expect(h.backend.jobs[0].status).toBe("failed");
+        const quiet = warn.mock.calls.find(
+          (c) => c[0] === "payments.generation.failed",
+        );
+        expect(quiet?.[1], reason).toMatchObject({ code });
+        expect(
+          error.mock.calls.some((c) => c[0] === "payments.generation.failed"),
+          reason,
+        ).toBe(false);
+      }
+      error.mockClear();
+      warn.mockClear();
+      const h = harness();
+      h.backend.enqueue();
+      h.backend.contextError = "account missing";
+      await h.tick();
+      expect(
+        error.mock.calls.find(
+          (c) => c[0] === "payments.generation.failed",
+        )?.[1],
+      ).toMatchObject({ code: "account-missing" });
+    } finally {
+      error.mockRestore();
+      warn.mockRestore();
+    }
+  });
+
   it("cancels a job whose entitlement was revoked before it ran, generating nothing", async () => {
     const h = harness();
     h.backend.enqueue();

@@ -415,7 +415,8 @@ export function deriveChecklist(
         : "When is the desktop review booked, and what will you send?",
       // REQ-025 FR-13: the audit kind's meaning comes from the glossary, the one source.
       why: certification
-        ? `Certification audit: ${glossaryMeaning("certification-audit")}; the visit includes participant and worker interviews.`
+        ? // REQ-027 D-2709: the meaning now carries the visit and the interviews itself.
+          `Certification audit: ${glossaryMeaning("certification-audit")}.`
         : `Verification audit: ${glossaryMeaning("verification-audit")}.`,
       sourceRef: audits,
       unverified: false,

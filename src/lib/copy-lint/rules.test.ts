@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  AVERAGE_MAX_WORDS,
   TIGHT_PARAGRAPH_MAX_WORDS,
+  averageSentenceWords,
   countWords,
+  lintAverage,
   lintText,
   splitSentences,
 } from "./rules";
@@ -72,6 +75,26 @@ describe("copy lint rules (REQ-015 FR-2, AC-3)", () => {
     expect(
       lintText("Download the pack as a .docx and a PDF from readyline.com.au."),
     ).toEqual([]);
+  });
+
+  // REQ-027 FR-1, AC-1 (D-2702): one file over the average and one under.
+  it("fails a file whose sentences average over 25 words and passes one at 25", () => {
+    expect(AVERAGE_MAX_WORDS).toBe(25);
+    const words = (n: number) =>
+      `${Array.from({ length: n }, (_, i) => `w${i}`).join(" ")}.`;
+    // 30 and 22 words: 26 on average, over; neither sentence passes the 35-word limit.
+    const over = [words(30), words(22)];
+    expect(averageSentenceWords(over)).toBe(26);
+    expect(lintAverage(over)?.rule).toBe("average-sentence-length");
+    expect(lintAverage(over)?.detail).toContain("26 words a sentence");
+    // 30 and 20: exactly 25, the cap, passes; a page of short lines with one long legal sentence passes too.
+    expect(lintAverage([words(30), words(20)])).toBeNull();
+    expect(
+      lintAverage([words(34), words(6), words(8), words(7), words(5)]),
+    ).toBeNull();
+    // Nothing counted: no average, no finding.
+    expect(averageSentenceWords([])).toBeNull();
+    expect(lintAverage(["   "])).toBeNull();
   });
 
   it("keeps abbreviations inside a sentence and ignores whitespace noise", () => {
