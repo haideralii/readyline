@@ -176,6 +176,8 @@ const COPY_MODULES = [
   // REQ-027 A1 (decision 8, finding 121): a `.ts` under `src/app` the TSX walk never read; its
   // strings are the practices step's legends, helps and examples.
   "src/app/start/_components/steps/practices-copy.ts",
+  // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend, the tags and the "Next:" line.
+  "src/app/start/_components/steps/result-copy.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";
 
@@ -592,7 +594,10 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/lib/checklist/derive.ts": "src/app/checklist/checklist-view.tsx",
   "src/lib/checklist/state.ts": "src/app/checklist/checklist-view.tsx",
   "src/lib/questionnaire/navigation.ts": "src/app/start/[step]/page.tsx",
-  "src/lib/questionnaire/schema.ts": "src/app/start/[step]/page.tsx",
+  // REQ-027 A2 (D-2267): the schema's two messages with a term ("Choose a registration group from
+  // the list", "Enter the number of key personnel") render inside the supports and workforce
+  // steps, each of which carries that term's disclosure; the render check proves them there.
+  "src/lib/questionnaire/schema.ts": null,
   "src/lib/questionnaire/result.ts":
     "src/app/start/_components/steps/result-step.tsx",
   "src/lib/legal/nav.ts": null,
@@ -603,6 +608,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/lib/path/next-step.ts": "src/app/checklist/checklist-view.tsx",
   "src/app/start/_components/steps/practices-copy.ts":
     "src/app/start/_components/steps/practices-step.tsx",
+  "src/app/start/_components/steps/result-copy.ts":
+    "src/app/start/_components/steps/result-step.tsx",
 };
 
 /**
@@ -657,25 +664,9 @@ const VERIFY_TERMS: string[] = [];
  * fail, so one A2 has fixed leaves the list in the same change.
  */
 const A1_FAILING_PAGES: string[] = [
-  // The lint's first run at next a9cd6cf (A1's starting SHA), 16 Oct 2026; each line names what fails there.
-  "src/app/page.tsx", // home-copy.ts: mid-term audit, module, Practice Standards, certification audit, self-assessment
-  "src/app/sample/page.tsx", // sample-document.tsx: verification audit
-  "src/app/pricing/page.tsx", // payments/copy.ts: self-assessment, adopt
-  "src/app/guides/page.tsx", // registration group
-  "src/app/guides/registration-groups/page.tsx", // registration group, module, Practice Standards
-  "src/app/guides/registration-groups/[slug]/page.tsx", // registration group, mid-term audit, module, Practice Standards, self-assessment
-  "src/app/start/[step]/page.tsx", // schema.ts: registration group, key personnel
-  "src/app/start/_components/start-intro.tsx", // registration group, restrictive practice, certification audit, module, Practice Standards
-  "src/app/start/_components/steps/supports-step.tsx", // module, registration group
-  "src/app/start/_components/steps/practices-step.tsx", // module, restrictive practice, registration group
-  "src/app/start/_components/steps/workforce-step.tsx", // key personnel, NDIS Worker Screening clearance
-  "src/app/start/_components/steps/result-step.tsx", // restrictive practice, outside PAGE_TERMS's six; A2 counts "present" at render
-  "src/app/checklist/checklist-view.tsx", // adopt; derive.ts: restrictive practice, module, worker screening clearance, Practice Standards, mid-term audit
-  "src/app/path/adopt/[group]/page.tsx", // adopt
-  "content/guides/ndis-registration-cost.md",
-  "content/guides/registers-an-auditor-asks-for.md",
-  "content/guides/what-happens-at-an-ndis-audit.md",
-  "content/guides/which-ndis-audit.md",
+  // A1's run at next a9cd6cf listed fourteen pages and the four guides here (REQ-027's Delivery
+  // evidence holds that list); A2 gave each its disclosure or bracket and the list is empty, as
+  // D-2717 asks. A page added here again must still fail, so the mechanism stays.
 ];
 
 function relOf(file: string): string {
@@ -706,11 +697,17 @@ function pagePieces(page: string) {
 
 /** The ways a meaning reaches a page: its own and those of the files rendered through it. */
 function pageWays(page: string) {
-  const ids = new Set(meaningWays(sourceOf(page), page).ids);
+  const own = meaningWays(sourceOf(page), page);
+  const ids = new Set(own.ids);
+  let computed = own.computed === true;
   for (const [file, through] of Object.entries(GLOSSARY_RENDERED_THROUGH))
-    if (through === page)
-      for (const id of meaningWays(sourceOf(file), file).ids) ids.add(id);
-  return { ids, tokens: [] as string[] };
+    if (through === page) {
+      const w = meaningWays(sourceOf(file), file);
+      for (const id of w.ids) ids.add(id);
+      if (w.computed) computed = true;
+    }
+  // D-2267: a list computed at render, on the page or in a module rendered through it, flags the page.
+  return { ids, tokens: [] as string[], computed };
 }
 
 describe("glossary presence (REQ-027 FR-2)", () => {
@@ -807,6 +804,25 @@ describe("glossary presence (REQ-027 FR-2)", () => {
     expect(
       glossaryFindings(extractTsxText(viaConst, at), meaningWays(viaConst, at)),
     ).toEqual([]);
+    // REQ-027 A2 (D-2267): a list the page computes at render is a way the AST cannot name; the
+    // render check is that page's proof, and the lint takes every term present as reached, a
+    // token still failing on two terms.
+    const computed = `export function P({ names }: { names: string[] }) {\n  const present = findGlossaryTerms(names.join(" "));\n  return <main><p>Adopt each module.</p><GlossaryTerms ids={present} where="page" /></main>;\n}\n`;
+    expect(meaningWays(computed, at).computed).toBe(true);
+    expect(
+      glossaryFindings(extractTsxText(computed, at), meaningWays(computed, at)),
+    ).toEqual([]);
+    const computedToken = computed.replace(
+      "Adopt each module.",
+      'Adopt each module. {"{{glossary:module}}"}',
+    );
+    expect(
+      glossaryFindings(
+        extractTsxText(computedToken, at),
+        meaningWays(computedToken, at),
+      ).map((x) => x.kind),
+    ).toEqual(["token"]);
+    expect(meaningWays(viaConst, at).computed).toBe(false);
     // A template literal ending in -audit reaches both audit terms (finding 48).
     const audits = `export function P({ kind }: { kind: string }) {\n  return <main><p>A verification audit or a certification audit.</p><p>{glossarySentence(\`\${kind}-audit\`)}</p></main>;\n}\n`;
     expect(

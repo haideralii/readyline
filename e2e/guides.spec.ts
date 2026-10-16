@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
+import { glossaryOnPage } from "./helpers/glossary";
 import { checkTables, checkWidths } from "./helpers/width";
 
 /**
@@ -50,6 +51,8 @@ test.describe("guides (REQ-011)", () => {
     await expect(list).toContainText("What happens at an NDIS audit");
     await expect(list).toContainText("The registers an auditor asks for");
     await expect(list).toContainText(/Last reviewed \d+ \w+ 2026/);
+    // REQ-027 AC-3: the words on each page with their meanings; axe is axeClean below.
+    await glossaryOnPage(page, { label: "guides index", axe: false });
     await checkWidths(page, "guides index");
     await axeClean(page, "guides index");
     await shot(page, "guides-index", testInfo.project.name);
@@ -97,6 +100,7 @@ test.describe("guides (REQ-011)", () => {
     ).toHaveAttribute("href", "/start");
     // Visible text only: the dev server's inline payload carries module paths (".../metadata/...").
     expect(await page.locator("body").innerText()).not.toMatch(/data\/|\.json/);
+    await glossaryOnPage(page, { label: "which-audit guide", axe: false });
     await checkWidths(page, "which-audit guide");
     // REQ-013 batch 36 item 1: the registration-groups table stacks on phones; no word splits.
     expect(await page.getByTestId("data-table").count()).toBeGreaterThan(0);
@@ -174,6 +178,7 @@ test.describe("guides (REQ-011)", () => {
       expect(text).not.toMatch(/data\/|\.json/);
       // Sector-webinar material is labelled as practice, never stated as a rule.
       expect(text).toMatch(/not a rule|not rules/);
+      await glossaryOnPage(page, { label: guide.slug, axe: false });
       await checkWidths(page, guide.slug);
       await axeClean(page, guide.slug);
       await shot(page, guide.slug, testInfo.project.name);
@@ -202,6 +207,7 @@ test.describe("guides (REQ-011)", () => {
     await expect(page.getByTestId("calculator-result")).toContainText(
       "Your audit: certification",
     );
+    await glossaryOnPage(page, { label: "cost guide", axe: false });
     await checkWidths(page, "cost guide");
     await axeClean(page, "cost guide");
     await shot(page, "cost", testInfo.project.name);
@@ -223,7 +229,11 @@ test.describe("guides (REQ-011)", () => {
     ).toBeGreaterThan(30);
     // WebKit can accept the typing before React has hydrated the controlled
     // input, and hydration then resets it: type again until the count reacts.
+    // REQ-027 A2: React's value tracker takes the pre-hydration text as the
+    // input's value, so typing the same word again raises no change event;
+    // each retry clears the field first so the word is a change.
     await expect(async () => {
+      await page.getByLabel(/Search by what you do/).fill("");
       await page.getByLabel(/Search by what you do/).fill("cleaning");
       await expect(page.getByTestId("groups-count")).toContainText(/of 38/, {
         timeout: 1_500,
@@ -235,6 +245,10 @@ test.describe("guides (REQ-011)", () => {
     await expect(page.getByTestId("groups-category-personal-care")).toHaveCount(
       0,
     );
+    await glossaryOnPage(page, {
+      label: "registration groups index",
+      axe: false,
+    });
     await checkWidths(page, "registration groups index");
     await axeClean(page, "registration groups index");
     await shot(page, "groups-index", testInfo.project.name);
@@ -285,6 +299,7 @@ test.describe("guides (REQ-011)", () => {
     expect(await page.locator("body").innerText()).not.toMatch(
       /data\/|\.json|Never restate/,
     );
+    await glossaryOnPage(page, { label: "group page", axe: false });
     await checkWidths(page, "group page");
     await axeClean(page, "group page");
     await shot(page, "group-page", testInfo.project.name);

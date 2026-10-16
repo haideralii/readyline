@@ -7,6 +7,7 @@ import {
   type KeyboardWalk,
 } from "../helpers/a11y";
 import { e2eCronSecret, hasSupabaseForE2e } from "../helpers/env";
+import { glossaryOnPage } from "../helpers/glossary";
 import { checkWidths } from "../helpers/width";
 import {
   createTenant,
@@ -387,6 +388,8 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     for (let i = 0; i < 8; i += 1) {
       await expect(page.getByTestId("adopt-list")).toBeVisible();
       if (i === 0) {
+        // REQ-027 AC-3: the bracket after the paragraph, with the attribution title; axe is pagePass below.
+        await glossaryOnPage(page, { label: "adopt a group", axe: false });
         await checkWidths(page, "adopt a group");
         await pagePass(page, "adopt a group");
         await shot(page, "adopt-group", project);

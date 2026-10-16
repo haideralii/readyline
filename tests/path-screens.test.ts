@@ -19,7 +19,11 @@ const PATH_FILES = [
   ...walk(join(ROOT, "src/app/path")),
   join(ROOT, "src/app/documents/[setId]/finish/page.tsx"),
   join(ROOT, "src/app/documents/[setId]/finish/finish-form.tsx"),
+  // REQ-027 FR-3a (findings 6 and 50): the result page's card is the path's first screen; its
+  // "Next:" line sits under the control and is counted after it, never among the three above.
+  join(ROOT, "src/app/start/_components/steps/result-step.tsx"),
 ];
+const RESULT_STEP = "src/app/start/_components/steps/result-step.tsx";
 
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
@@ -30,17 +34,30 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-type Counts = { primary: number; h1: number; textAboveControl: number };
-const ZERO: Counts = { primary: 0, h1: 0, textAboveControl: 0 };
+type Counts = {
+  primary: number;
+  h1: number;
+  textAboveControl: number;
+  /** REQ-027 FR-3a: paragraphs that follow the first control, where the "Next:" line sits. */
+  textAfterControl: number;
+};
+const ZERO: Counts = {
+  primary: 0,
+  h1: 0,
+  textAboveControl: 0,
+  textAfterControl: 0,
+};
 const add = (a: Counts, b: Counts): Counts => ({
   primary: a.primary + b.primary,
   h1: a.h1 + b.h1,
   textAboveControl: a.textAboveControl + b.textAboveControl,
+  textAfterControl: a.textAfterControl + b.textAfterControl,
 });
 const max = (a: Counts, b: Counts): Counts => ({
   primary: Math.max(a.primary, b.primary),
   h1: Math.max(a.h1, b.h1),
   textAboveControl: Math.max(a.textAboveControl, b.textAboveControl),
+  textAfterControl: Math.max(a.textAfterControl, b.textAfterControl),
 });
 
 /** Counts for one rendered branch of a node. */
@@ -71,6 +88,8 @@ function branch(node: ts.Node): Counts {
       if (tag === "h1") own = add(own, { ...ZERO, h1: 1 });
       if (tag === "p" && !seenControl && !/print:hidden|text-sm/.test(attrs))
         own = add(own, { ...ZERO, textAboveControl: 1 });
+      if (tag === "p" && seenControl)
+        own = add(own, { ...ZERO, textAfterControl: 1 });
       if (isControl) seenControl = true;
     }
     ts.forEachChild(n, visit);
@@ -101,6 +120,12 @@ describe("the guided path's screens (REQ-017 FR-5)", () => {
         c.textAboveControl,
         "paragraphs above the control",
       ).toBeLessThanOrEqual(3);
+      // REQ-027 FR-3a, AC-4: the result card's "Next:" line follows its control.
+      if (rel === RESULT_STEP)
+        expect(
+          c.textAfterControl,
+          "paragraphs after the control",
+        ).toBeGreaterThanOrEqual(1);
     });
   }
 });

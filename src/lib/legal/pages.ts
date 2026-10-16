@@ -37,10 +37,18 @@ export function parseFrontMatter(raw: string): {
   const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(raw);
   if (!m) return { data: {}, content: raw };
   const data: Record<string, string> = {};
+  let key: string | null = null;
   for (const line of m[1].split(/\r?\n/)) {
     const kv = /^([A-Za-z][\w-]*):\s*(.*)$/.exec(line);
-    if (!kv) continue;
-    data[kv[1]] = kv[2].trim().replace(/^(["'])(.*)\1$/, "$2");
+    if (kv) {
+      key = kv[1];
+      data[key] = kv[2].trim().replace(/^(["'])(.*)\1$/, "$2");
+      continue;
+    }
+    // REQ-027 A2 (D-2267): a value continued on indented lines, as prettier folds
+    // a long "glossary: [a, b, …]" list, joins its key with single spaces.
+    if (key && /^\s+\S/.test(line))
+      data[key] = `${data[key]} ${line.trim()}`.trim();
   }
   return { data, content: m[2] };
 }

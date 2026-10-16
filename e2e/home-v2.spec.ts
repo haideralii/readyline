@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
+import { glossaryOnPage } from "./helpers/glossary";
 import { checkTables } from "./helpers/width";
 
 /**
@@ -84,6 +85,8 @@ test.describe("home page v2 (batch 24)", () => {
     await expect(page).toHaveURL(/\/sample$/);
     const sample = page.getByTestId("sample-document");
     await expect(sample).toBeVisible();
+    // REQ-027 AC-3 (D-2715, D-2719): the one-term page, its bracket with the attribution title.
+    await glossaryOnPage(page, { label: "sample" });
     await expect(sample).toContainText("Example Supports");
     await expect(sample).not.toContainText("Sunrise Supports");
     const tailored = sample.locator('[data-mode="tailored"]');

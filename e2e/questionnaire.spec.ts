@@ -6,6 +6,7 @@ import { test, expect } from "@playwright/test";
  * for the AC-1 and AC-2 reference cases.
  */
 
+import { glossaryOnPage } from "./helpers/glossary";
 import {
   chooseGroups,
   fillBusiness,
@@ -18,6 +19,8 @@ test.describe("questionnaire", () => {
     page,
   }) => {
     await page.goto("/start");
+    // REQ-027 AC-3: the intro's words carry their meanings.
+    await glossaryOnPage(page, { label: "/start" });
     await page.getByRole("link", { name: "Start the questionnaire" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "About your business" }),
@@ -50,20 +53,27 @@ test.describe("questionnaire", () => {
     );
     // PO batch 5: legend and labels, and the claim-free "what happens next" block.
     // REQ-013 batch 36 item 3: the customer's words; no internal label.
-    // REQ-025 FR-4a: the pack's part is the line above the list; the tags say the provider's status only.
+    // REQ-025 FR-4a as REQ-027 D-2718 amends it: the pack's part is the line above the list; the
+    // tags are the reader's answers, and a row step 5 did not ask about carries no tag (finding 143).
     await expect(page.getByTestId("have-legend")).toContainText(
-      "Your pack includes a draft of every document below",
+      "Your pack drafts every document below",
     );
     await expect(page.getByText("Not asked yet")).toHaveCount(0);
     await expect(
-      page.getByText(/not asked about yet|drafts this|You said:/),
+      page.getByText(
+        /not asked about yet|drafts this|You said:|Not asked|To prepare|You have this/,
+      ),
     ).toHaveCount(0);
     expect(
       await page
         .getByTestId("have-tag")
-        .filter({ hasText: "To prepare" })
+        .filter({ hasText: "You need one" })
         .count(),
     ).toBeGreaterThan(0);
+    for (const tag of await page.getByTestId("have-tag").allTextContents())
+      expect(tag.trim()).toMatch(
+        /^.(You have one|You need one|You said not sure)$/,
+      );
     await expect(page.getByTestId("what-next")).toContainText(
       "What happens next",
     );

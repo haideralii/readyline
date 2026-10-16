@@ -128,8 +128,12 @@ export function stripGlossaryBrackets(text: string): string {
   let out = text;
   for (const g of glossaryContent.items) {
     const t = glossaryTerm(g.id);
+    // The render check joins text nodes with spaces, so a bracket's parts may carry them.
     out = out.replace(
-      new RegExp(`${escape(t.term)}\\s*\\(${escape(t.meaning)}\\)`, "gi"),
+      new RegExp(
+        `${escape(t.term)}\\s*\\(\\s*${escape(t.meaning)}\\s*\\)`,
+        "gi",
+      ),
       " ",
     );
   }

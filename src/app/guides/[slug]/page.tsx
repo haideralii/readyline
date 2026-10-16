@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { GlossaryTerms } from "@/components/glossary-terms";
 import { markdownComponents } from "@/components/legal-article";
 import { BRAND } from "@/lib/brand";
 import { registrationGroupsTable } from "@/lib/guides/groups-table";
@@ -136,6 +137,8 @@ export default async function GuidePage({
           ))}
         </ul>
       </section>
+      {/* REQ-027 FR-3, D-2715: the words in this guide, the ids its front matter names, under the short answer. */}
+      <GlossaryTerms ids={g.glossary} where="guide" className="mt-3" />
       <nav
         aria-label="Jump to"
         className="mt-4 text-sm"

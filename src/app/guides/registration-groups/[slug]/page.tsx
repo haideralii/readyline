@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { GlossaryTerms } from "@/components/glossary-terms";
 import { JsonLd } from "@/components/json-ld";
 import { BRAND } from "@/lib/brand";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 import { buildGroupPages, findGroupPage } from "@/lib/guides/groups";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
 import { getStandardsDataset } from "@/lib/standards/dataset";
@@ -53,6 +55,33 @@ export default async function RegistrationGroupPage({
     : null;
   const url = `${siteUrl()}/guides/registration-groups/${p.slug}`;
   const updated = dataset.generatedAt.slice(0, 10);
+  // REQ-027 FR-3, D-2711: the glossary terms this page is about to show, found
+  // in its own words and the builder's, in the order they first appear.
+  const present = findGlossaryTerms(
+    [
+      "Registration groups",
+      p.category.title,
+      p.description,
+      "Generated from the Commission's tables.",
+      p.mandatoryFrom
+        ? "Registration for this class is mandatory under the Commission's staged roll-out."
+        : "",
+      `Your audit: ${p.pathwayLabel}`,
+      p.pathwayDescription,
+      p.pathwayRule.text,
+      p.midTermAudit.applies
+        ? "A mid-term audit follows about N months after registration; prepare from month N."
+        : "",
+      ...p.notes.map((n) => n.text),
+      "Practice Standards modules",
+      ...p.modules.flatMap((m) => [m.name, m.description]),
+      "The documents the pack produces. Drafted from your questionnaire answers for your review, as Word files, with a Practice Standards self-assessment. Registers to keep",
+      ...p.documents,
+      ...p.registers,
+      "once for the whole pack. First see your result free: the questionnaire ticks for you and shows the audit and the documents for everything you deliver.",
+      ...p.faq.flatMap((f) => [f.question, f.answer]),
+    ].join("\n"),
+  );
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <JsonLd
@@ -104,6 +133,8 @@ export default async function RegistrationGroupPage({
           ? " Registration for this class is mandatory under the Commission's staged roll-out."
           : ""}
       </p>
+      {/* REQ-027 FR-3, D-2701: the words on this page, above the first section and inside no other disclosure. */}
+      <GlossaryTerms ids={present} where="page" className="mt-3" />
 
       <section aria-labelledby="audit-heading" data-testid="group-audit">
         <h2 id="audit-heading" className={h2}>

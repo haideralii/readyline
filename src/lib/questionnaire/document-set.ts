@@ -35,6 +35,18 @@ const EXISTING_TO_REGISTER: Partial<Record<keyof ExistingStep, string>> = {
   workerInductionRecords: "training",
 };
 
+/**
+ * REQ-027 D-2718 (finding 115): how many of the set's documents step 5 asked
+ * about, the numeral the result page's legend renders, so the legend and its
+ * test share one number and a fourth question or an id leaving the `always`
+ * list never leaves the line stale.
+ */
+export function askedDocumentCount(
+  set: Pick<DocumentSet, "documents">,
+): number {
+  return set.documents.filter((d) => d.have !== "unknown").length;
+}
+
 export function deriveDocumentSet(
   moduleIds: readonly string[],
   groupCodes: readonly string[],
