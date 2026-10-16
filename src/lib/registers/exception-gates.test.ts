@@ -10,6 +10,7 @@ import {
   exceptionEndedNote,
   exceptionGate,
   exceptionStartedNote,
+  FILE_FACTS,
   type ExceptionGateInput,
   type StateFactsAdapter,
 } from "./exception-gates";
@@ -316,6 +317,28 @@ describe("the s 14 exception's gates (FR-4, AC-2)", () => {
     );
     expect(exceptionEndedNote("clearance-issued", "2026-11-05")).toBe(
       "the clearance was issued (s 15(1)) on 5 November 2026",
+    );
+  });
+
+  it("over the real state file (PO 04:58, #84): NSW's verified reads offer the option for an application and work in NSW; VIC's prohibit; WA allows", () => {
+    const real = (over: Partial<ExceptionGateInput>) =>
+      exceptionGate(base({ facts: FILE_FACTS, ...over }));
+    const nsw = real({});
+    expect(nsw.offered).toBe(true);
+    expect(nsw.lines.states).toContain("applied in New South Wales:");
+    expect(nsw.lines.states).toContain("works in NSW: New South Wales:");
+    const wa = real({
+      application: { state: "WA", application_number: "WA-1" },
+      states: ["WA"],
+    });
+    expect(wa.offered).toBe(true);
+    const vic = real({
+      application: { state: "VIC", application_number: "V-1" },
+    });
+    expect(vic.offered).toBe(false);
+    expect(vic.reasons[0]).toContain("applied in Victoria:");
+    expect(vic.reasons[0]).toContain(
+      "New South Wales: no acceptable state check applies after 31 January 2026 (Rules s 23(7), as the Rules read on 15 October 2026)",
     );
   });
 });
