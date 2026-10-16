@@ -93,7 +93,12 @@ export const GroupCategoriesContent = z.object({
   author: z.literal("readyline"),
   status: z.string(),
   question: z.string().min(1),
-  hint: z.object({ text: z.string().min(1), selects: z.array(code).min(1) }),
+  // REQ-027 D-2730: the sole-trader sentence and the general one; the step picks by the business structure.
+  hint: z.object({
+    text: z.string().min(1),
+    textGeneral: z.string().min(1),
+    selects: z.array(code).min(1),
+  }),
   categories: z
     .array(
       z.object({

@@ -5,6 +5,7 @@ import {
   getGroupCategories,
   GROUP_HINT,
   GROUP_QUESTION,
+  groupHintText,
   groupsInCategory,
   matchesGroupQuery,
   type GroupOption,
@@ -243,11 +244,13 @@ export function SupportsStepForm() {
   // descriptions name restrictive practices and modules, so a fixed list would
   // say too much or too little as headings open and close.
   const searching = Boolean(query.trim());
+  // REQ-027 D-2730: the hint's sentence follows the business structure answered at step 1.
+  const hintText = groupHintText(answers.business?.structure);
   const present = findGlossaryTerms(
     [
       GROUP_QUESTION,
       GROUPS_HELP,
-      GROUP_HINT.text,
+      hintText,
       ...CATEGORIES.flatMap((c) => {
         const items = byCategory.get(c.id) ?? [];
         if (items.length === 0 && searching) return [];
@@ -291,7 +294,7 @@ export function SupportsStepForm() {
           className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
           data-testid="groups-hint"
         >
-          <p>{GROUP_HINT.text}</p>
+          <p data-testid="groups-hint-text">{hintText}</p>
           <button
             type="button"
             onClick={applyHint}
