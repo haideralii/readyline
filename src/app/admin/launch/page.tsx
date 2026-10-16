@@ -55,7 +55,7 @@ export default async function LaunchPage() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">Launch</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-2 text-sm">
         Every launch condition by name and state, never by value. The launch
         checklist in the repository uses the same names. This visit is in the
         audit log.
@@ -77,7 +77,7 @@ export default async function LaunchPage() {
             <h2 id={`launch-${group}`} className="text-xl font-semibold">
               {LAUNCH_GROUP_TITLES[group]}
             </h2>
-            <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ul className="divide-rule mt-3 divide-y">
               {inGroup.map((r) => (
                 <li
                   key={r.id}
@@ -91,14 +91,12 @@ export default async function LaunchPage() {
                   <span className="min-w-0 flex-1">
                     <span className="font-medium">{r.name}</span>{" "}
                     <span
-                      className="text-zinc-700 dark:text-zinc-300"
+                      className="text-ink"
                       data-testid={`launch-state-${r.id}`}
                     >
                       {LAUNCH_STATE_WORDS[r.state]}.
                     </span>{" "}
-                    <span className="text-zinc-700 dark:text-zinc-300">
-                      {r.sentence}
-                    </span>
+                    <span className="text-ink">{r.sentence}</span>
                   </span>
                 </li>
               ))}

@@ -161,7 +161,7 @@ export async function AuditDayListPage({
       ) : null}
       {slug === "staff-matrix" ? (
         <p
-          className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mt-3 text-sm leading-6"
           data-testid="from-the-dates-line"
         >
           {FROM_THE_DATES_LINE}
@@ -342,7 +342,7 @@ export async function AuditDayDetailPage({
       >
         {facts.map(([k, v]) => (
           <div key={k}>
-            <dt className="text-zinc-600 dark:text-zinc-400">{k}</dt>
+            <dt className="text-slate">{k}</dt>
             <dd className="font-medium [overflow-wrap:anywhere]">{v}</dd>
           </div>
         ))}
@@ -435,7 +435,7 @@ export async function AuditDayDetailPage({
           <h2 id="worker-clearances-heading" className="text-lg font-semibold">
             Checks and training on the worker checks register
           </h2>
-          <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="divide-rule mt-2 divide-y text-sm">
             {file.clearances.map((c) => (
               <li key={c.id} className="py-2 leading-6">
                 <Link
@@ -484,7 +484,7 @@ export async function AuditDayDetailPage({
         </details>
       ) : null}
       {meta.appendOnly ? (
-        <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-slate mt-6 text-sm">
           A decision is never edited. If it changes,{" "}
           <Link
             href={`/registers/${slug}/new`}

@@ -96,14 +96,14 @@ export function WorkerItems({
       <h2 id="worker-items-heading" className="text-lg font-semibold">
         <span data-testid="worker-state">{derived.label}</span>
         {derived.outstanding.length > 0 ? (
-          <span className="text-zinc-600 dark:text-zinc-400">
+          <span className="text-slate">
             {" "}
             ({derived.outstanding.length} before the first shift)
           </span>
         ) : null}
       </h2>
       <p
-        className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-1 text-sm leading-6"
         data-testid="from-the-dates-line"
       >
         {FROM_THE_DATES_LINE}
@@ -123,7 +123,7 @@ export function WorkerItems({
         </p>
       ) : null}
       {canWrite && checklistId && derived.key !== "ended" ? (
-        <div className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+        <div className="border-rule mt-3 rounded-md border p-3">
           <RefField
             id="ticked-by"
             label="Who is recording this"
@@ -142,7 +142,7 @@ export function WorkerItems({
           />
         </div>
       ) : null}
-      <ol className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+      <ol className="divide-rule mt-3 divide-y">
         {items.map((item) => {
           const s = byId.get(item.id);
           const t = lastTick.get(item.id);
@@ -164,34 +164,34 @@ export function WorkerItems({
                   <p>
                     {item.text}
                     {item.beforeFirstShift ? (
-                      <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
                         before the first shift
                       </span>
                     ) : null}
                     {item.yourCall ? (
-                      <span className="ml-2 rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+                      <span className="border-line text-slate ml-2 rounded-full border px-2 py-0.5 text-xs whitespace-nowrap">
                         your call
                       </span>
                     ) : null}
                   </p>
                   {item.stateLines?.length ? (
-                    <ul className="mt-1 space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    <ul className="text-ink mt-1 space-y-1 text-sm">
                       {item.stateLines.map((line) => (
                         <li key={line}>{line}</li>
                       ))}
                     </ul>
                   ) : null}
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="text-slate mt-1 text-sm">
                     {WHO[item.who]}; what counts: {COUNTS[item.counts]}.
                   </p>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  <p className="text-slate mt-1 text-sm">
                     The auditor asks: {item.ask}
                   </p>
-                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+                  <p className="text-slate mt-1 text-xs">
                     Source: {sourceLine(item.source)}
                   </p>
                   {s?.done_on || s?.confirmed_on ? (
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-slate mt-1 text-sm">
                       {s.done_on ? `Done ${s.done_on}` : "Not yet done"}
                       {s.recorded_by_owner ? " (recorded by your manager)" : ""}
                       {s.confirmed_on

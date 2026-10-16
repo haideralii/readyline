@@ -71,7 +71,7 @@ export default async function DocumentControlPage() {
       {rows.length ? (
         // Stacked rows, one definition list each: nothing scrolls sideways on a phone (AC-1).
         <ol
-          className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
+          className="divide-rule mt-6 divide-y"
           data-testid="document-control-list"
         >
           {rows.map((r) => (
@@ -110,7 +110,7 @@ export default async function DocumentControlPage() {
                   ] as [string, string][]
                 ).map(([k, v]) => (
                   <div key={k}>
-                    <dt className="text-zinc-600 dark:text-zinc-400">{k}</dt>
+                    <dt className="text-slate">{k}</dt>
                     <dd className="[overflow-wrap:anywhere]">{v}</dd>
                   </div>
                 ))}

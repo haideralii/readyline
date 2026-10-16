@@ -66,7 +66,7 @@ export default async function CheckPage() {
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         Check my systems
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         One question per record, yes or no. Every no becomes a row in your
         improvement register with a date 30 days out. About ten minutes.
       </p>

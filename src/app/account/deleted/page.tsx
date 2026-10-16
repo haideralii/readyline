@@ -11,13 +11,13 @@ export default function AccountDeletedPage() {
       <h1 className="text-3xl font-semibold tracking-tight">
         Your account was deleted
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         You have been signed out of every device and sign-in for this account is
         refused from now on. The data is hidden immediately and permanently
         removed after {RETENTION_DAYS} days. A confirmation has been sent to
         your email address, and another will follow when the removal happens.
       </p>
-      <p className="mt-4 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-4 leading-7">
         If this was a mistake, reply to the confirmation email before the
         removal date. {BRAND} keeps no participant information, so nothing about
         the people you support is affected.

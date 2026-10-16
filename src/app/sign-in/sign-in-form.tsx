@@ -42,7 +42,7 @@ export function SignInForm({ next }: { next?: string }) {
     return (
       <p
         role="status"
-        className="mt-6 rounded-md border border-zinc-300 p-4 leading-7 dark:border-zinc-700"
+        className="border-rule mt-6 rounded-md border p-4 leading-7"
         data-testid="magic-link-sent"
       >
         {done.message}

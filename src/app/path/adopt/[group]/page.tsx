@@ -79,7 +79,7 @@ export default async function AdoptGroupPage({
   );
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate text-sm">
         Adopt your documents: group {index + 1} of {groups.length}
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
@@ -87,10 +87,7 @@ export default async function AdoptGroupPage({
       </h1>
       <p className="mt-3 leading-7">{ADOPT_INTRO}</p>
       <GlossaryTerms ids={present} where="page" className="mt-3" />
-      <ul
-        className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
-        data-testid="adopt-list"
-      >
+      <ul className="divide-rule mt-6 divide-y" data-testid="adopt-list">
         {group.documents.map((d) => {
           const type = documentTypeById(d.document_type_id);
           return (
@@ -101,7 +98,7 @@ export default async function AdoptGroupPage({
               >
                 {d.model.title}
               </Link>
-              <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+              <p className="text-ink mt-1 text-sm leading-6">
                 {type?.purpose ?? ""}
               </p>
             </li>

@@ -32,8 +32,7 @@ export async function generateMetadata({
 }
 
 const h2 = "mt-10 text-xl font-semibold tracking-tight";
-const list =
-  "mt-3 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300";
+const list = "mt-3 list-disc space-y-1 pl-5 leading-7 text-ink";
 
 /**
  * One registration group (REQ-011 batch 31 item 1, D-1105): plain name and
@@ -115,19 +114,14 @@ export default async function RegistrationGroupPage({
           ‹ Registration groups
         </Link>
       </p>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        {p.category.title}
-      </p>
+      <p className="text-slate text-sm">{p.category.title}</p>
       <h1 className="text-3xl font-semibold tracking-tight">
-        {p.name}{" "}
-        <span className="text-zinc-600 dark:text-zinc-400">
-          (class {p.code})
-        </span>
+        {p.name} <span className="text-slate">(class {p.code})</span>
       </h1>
       <p className="mt-3 leading-7" data-testid="group-description">
         {p.description}
       </p>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-2 text-sm">
         Generated from the Commission&apos;s tables, dataset of {updated}.
         {p.mandatoryFrom
           ? " Registration for this class is mandatory under the Commission's staged roll-out."
@@ -141,7 +135,7 @@ export default async function RegistrationGroupPage({
           Your audit: {p.pathwayLabel}
         </h2>
         <p className="mt-3 leading-7">{p.pathwayDescription}</p>
-        <p className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 leading-7">
           {p.pathwayRule.text}{" "}
           <a
             href={p.pathwayRule.source.url}
@@ -153,7 +147,7 @@ export default async function RegistrationGroupPage({
           </a>
         </p>
         {p.midTermAudit.applies ? (
-          <p className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300">
+          <p className="text-ink mt-2 leading-7">
             A mid-term audit follows about{" "}
             {p.midTermAudit.monthsAfterRegistration} months after registration;
             prepare from month {p.midTermAudit.prepareFromMonth}.
@@ -162,7 +156,7 @@ export default async function RegistrationGroupPage({
         {p.notes.map((n) => (
           <p
             key={n.text}
-            className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-2 leading-7"
             data-testid="group-note"
           >
             {n.unverified ? "Not settled by the Commission's material: " : ""}
@@ -200,7 +194,7 @@ export default async function RegistrationGroupPage({
         <h2 id="documents-heading" className={h2}>
           The documents the pack produces ({p.documents.length})
         </h2>
-        <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-3 leading-7">
           Drafted from your questionnaire answers for your review, as Word
           files, with a Practice Standards self-assessment.
         </p>
@@ -252,7 +246,7 @@ export default async function RegistrationGroupPage({
         {p.faq.map((f) => (
           <details
             key={f.question}
-            className="mt-3 rounded-md border border-zinc-200 dark:border-zinc-800"
+            className="border-rule mt-3 rounded-md border"
           >
             <summary className="min-h-12 cursor-pointer px-4 py-3 text-base font-medium">
               {f.question}

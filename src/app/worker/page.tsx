@@ -67,11 +67,9 @@ export default async function WorkerHome() {
           What you logged
         </h2>
         {incidents.length === 0 && complaints.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Nothing yet.
-          </p>
+          <p className="text-slate mt-2 text-sm">Nothing yet.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-rule mt-3 divide-y">
             {incidents.map((r) => (
               <li
                 key={r.id}
@@ -81,7 +79,7 @@ export default async function WorkerHome() {
                 <span className="font-medium">
                   {r.reference}: {CATEGORY_LABELS[r.category]}
                 </span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-ink">
                   {r.occurred_on}
                   {r.participant_ref ? `, ${r.participant_ref}` : ""}.{" "}
                   {r.summary.slice(0, 80)}
@@ -98,7 +96,7 @@ export default async function WorkerHome() {
                 <span className="font-medium">
                   {r.reference}: complaint by {CHANNEL_LABELS[r.channel]}
                 </span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-ink">
                   {r.received_on}. {r.summary.slice(0, 80)}
                   {r.summary.length > 80 ? "…" : ""}
                 </span>

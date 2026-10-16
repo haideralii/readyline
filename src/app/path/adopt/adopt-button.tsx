@@ -67,7 +67,7 @@ export function AdoptButton({
           wrapper with focus-within as well; the global input[type="date"]:focus
           rule stays for the browsers that honour it. */}
       <div
-        className="focus-within:outline-ochre rounded-md border border-zinc-200 p-3 focus-within:outline-2 focus-within:outline-offset-2 dark:border-zinc-800"
+        className="focus-within:outline-ochre border-rule rounded-md border p-3 focus-within:outline-2 focus-within:outline-offset-2"
         data-testid="circulation"
       >
         <label htmlFor="circulation-workers" className="block font-medium">
@@ -75,7 +75,7 @@ export function AdoptButton({
         </label>
         <p
           id="circulation-workers-help"
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mt-1 text-sm leading-6"
         >
           Worker codes, separated by spaces: W-1 W-2. Auditors ask how workers
           were told about a policy; this is the record.
@@ -88,7 +88,7 @@ export function AdoptButton({
           onChange={(e) => setWorkers(e.target.value)}
           aria-describedby="circulation-workers-help"
           maxLength={200}
-          className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
+          className="border-line mt-2 block w-full rounded-md border px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2"
         />
         <label
           htmlFor="circulation-on"
@@ -102,7 +102,7 @@ export function AdoptButton({
           type="date"
           value={on}
           onChange={(e) => setOn(e.target.value)}
-          className="mt-1 block min-h-11 rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
+          className="border-line mt-1 block min-h-11 rounded-md border px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2"
         />
       </div>
       <button

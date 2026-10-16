@@ -71,7 +71,7 @@ export default async function ReviewDocumentPage({
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         {current.model.title}
       </h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-2 text-sm">
         Version {current.version} ·{" "}
         {current.status === "ready" ? "drafted" : "review needed"} ·{" "}
         {current.adopted_on ? (
@@ -86,7 +86,7 @@ export default async function ReviewDocumentPage({
           Download .docx
         </a>
       </p>
-      <p className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 text-sm leading-6">
         Each tailored section shows which of your answers it used. Regenerating
         a section records a new version of this document and shows what changed.
       </p>
@@ -139,14 +139,14 @@ export default async function ReviewDocumentPage({
           return (
             <li
               key={s.id}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+              className="border-rule rounded-md border p-4"
               data-testid={`section-${s.id}`}
             >
               <h2 className="text-lg font-semibold">
                 {s.number ? `${s.number} ` : ""}
                 {s.heading}
               </h2>
-              <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mt-1 text-xs">
                 {s.mode === "fixed"
                   ? "Fixed text"
                   : s.status === "generated"
@@ -154,7 +154,7 @@ export default async function ReviewDocumentPage({
                     : "Not drafted: review and complete"}
               </p>
               {s.mode === "tailored" && s.usedFacts?.length ? (
-                <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <p className="text-ink mt-2 text-sm">
                   Used your answers:{" "}
                   {describeFactSources(s.usedFacts)
                     .map((f) => `${f.question} (step ${f.step})`)
@@ -167,7 +167,7 @@ export default async function ReviewDocumentPage({
               </div>
               {diff ? (
                 <div
-                  className="mt-3 rounded-md bg-zinc-50 p-3 text-sm dark:bg-zinc-900"
+                  className="bg-mist mt-3 rounded-md p-3 text-sm"
                   data-testid="section-diff"
                 >
                   <p className="font-medium">
@@ -182,7 +182,7 @@ export default async function ReviewDocumentPage({
                             ? "text-green-800 dark:text-green-300"
                             : l.kind === "removed"
                               ? "text-red-800 line-through dark:text-red-300"
-                              : "text-zinc-600 dark:text-zinc-400"
+                              : "text-slate"
                         }
                       >
                         {l.kind === "added"

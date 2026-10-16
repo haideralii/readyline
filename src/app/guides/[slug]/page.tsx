@@ -102,10 +102,7 @@ export default async function GuidePage({
         </Link>
       </p>
       <h1 className="text-3xl font-semibold tracking-tight">{g.title}</h1>
-      <p
-        className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-        data-testid="guide-reviewed"
-      >
+      <p className="text-slate mt-2 text-sm" data-testid="guide-reviewed">
         Last reviewed {formatUpdated(g.reviewed)}. Updated{" "}
         {formatUpdated(g.updated)}.
       </p>
@@ -190,7 +187,7 @@ export default async function GuidePage({
           {g.faq.map((f) => (
             <details
               key={f.question}
-              className="mt-3 rounded-md border border-zinc-200 dark:border-zinc-800"
+              className="border-rule mt-3 rounded-md border"
             >
               <summary className="min-h-12 cursor-pointer px-4 py-3 text-base font-medium">
                 {f.question}
@@ -237,7 +234,7 @@ export default async function GuidePage({
           >
             Sources
           </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+          <ul className="text-ink mt-3 list-disc space-y-2 pl-5 leading-7">
             {g.sources.map((s) => (
               <li key={s.label}>
                 {s.url ? (

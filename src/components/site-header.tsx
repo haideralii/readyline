@@ -15,7 +15,7 @@ export async function SiteHeader() {
   const viewer = user ? await getViewer() : null;
   const worker = Boolean(viewer && !viewer.account && viewer.worker);
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
+    <header className="border-rule border-b">
       {/*
        * REQ-015 FR-16a: this row was the shared cause of the sideways scroll
        * on phones. Signed in, the badge plus three links ran to 438 px on a
@@ -37,7 +37,7 @@ export async function SiteHeader() {
         {/* Previews and local runs only (batch 26 item 6): trial providers on production never see it. */}
         {isProductionDeployment() ? null : (
           <span
-            className="order-3 rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs whitespace-nowrap text-zinc-600 sm:order-none dark:border-zinc-700 dark:text-zinc-400"
+            className="border-line text-slate order-3 rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap sm:order-none"
             data-testid="dev-badge"
           >
             In development

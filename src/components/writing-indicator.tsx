@@ -199,16 +199,13 @@ export function WritingIndicator({
             </p>
           ) : null}
           {status.usualMinutes && status.phase !== "ready" && !single ? (
-            <p
-              className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-              data-testid="wi-usual"
-            >
+            <p className="text-slate mt-1 text-sm" data-testid="wi-usual">
               {USUAL_TIME_LINE(status.usualMinutes, status.total)}
             </p>
           ) : null}
           {reconnecting && !finished ? (
             <p
-              className="mt-1 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400"
+              className="text-slate mt-1 flex items-center gap-2 text-sm"
               data-testid="wi-reconnecting"
             >
               <span aria-hidden="true" className="wi-dot" />
@@ -238,21 +235,16 @@ export function WritingIndicator({
               Download all (zip)
             </a>
           ) : null}
-          <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-            {READY_WARM_LINE}
-          </p>
+          <p className="text-ink mt-3 leading-7">{READY_WARM_LINE}</p>
         </div>
       ) : null}
 
       {status.phase === "attention" && status.failed.length > 0 ? (
         <ul className="mt-4 space-y-3" data-testid="wi-failed">
           {status.failed.map((f) => (
-            <li
-              key={f.typeId}
-              className="rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
-            >
+            <li key={f.typeId} className="border-rule rounded-md border p-3">
               <p className="font-medium">{f.title}</p>
-              <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+              <p className="text-ink mt-1 text-sm leading-6">
                 {f.kind === "degraded"
                   ? "We wrote this one, but too much of it is generic. Try again, or keep it as it is and fill the gaps yourself."
                   : "We could not write this one. Try again, or continue without it and we will show it as missing on your documents page."}
@@ -319,7 +311,7 @@ export function WritingIndicator({
               <span
                 className={
                   d.state === "waiting"
-                    ? "text-zinc-500 dark:text-zinc-400"
+                    ? "text-slate"
                     : d.state === "failed"
                       ? "text-signal"
                       : ""

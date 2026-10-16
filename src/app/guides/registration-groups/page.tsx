@@ -50,7 +50,7 @@ export default function RegistrationGroupsIndexPage() {
       <h1 className="text-3xl font-semibold tracking-tight">
         Registration groups
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         The Commission registers providers by class of support. Each page below
         says which audit that class needs, which Practice Standards modules
         apply, and which documents the pack produces for it, from the

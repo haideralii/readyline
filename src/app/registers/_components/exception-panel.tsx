@@ -173,7 +173,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
       <h2 id="exception-heading" className="text-lg font-semibold">
         Starting before the clearance: the s 14 exception
       </h2>
-      <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-1 text-sm leading-6">
         Worker Screening Rules s 14(1)(a) and s 15. Readyline records what you
         did and when; the unit&apos;s database and you decide.
       </p>
@@ -206,7 +206,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
 
       {p.exception ? (
         <div
-          className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+          className="border-rule mt-3 rounded-md border p-3"
           data-testid="exception-running"
         >
           <p className="font-medium">
@@ -311,7 +311,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
           {!p.application && p.canWrite ? (
             <form
               noValidate
-              className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+              className="border-rule mt-3 rounded-md border p-3"
               data-testid="record-application-form"
               onSubmit={(e) => {
                 e.preventDefault();
@@ -327,7 +327,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             >
               <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
                 <p className="mb-3 font-medium">Record the application first</p>
-                <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                <p className="text-slate mb-3 text-sm leading-6">
                   From the unit&apos;s written notice: the application number,
                   the state it was submitted in, and the day you confirmed the
                   application in the NDIS Worker Screening Database (s 15(3) and
@@ -352,7 +352,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                       errorsOf(result, "applicationNumber").length > 0 ||
                       undefined
                     }
-                    className="mt-2 block min-h-12 w-full max-w-60 rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-base dark:border-zinc-700 dark:bg-zinc-950"
+                    className="border-line bg-surface mt-2 block min-h-12 w-full max-w-60 rounded-md border px-3 py-2 font-mono text-base"
                   />
                   {errorsOf(result, "applicationNumber").map((e) => (
                     <p
@@ -397,7 +397,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
           {p.gate.offered ? (
             <form
               noValidate
-              className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+              className="border-rule mt-3 rounded-md border p-3"
               data-testid="start-exception-form"
               onSubmit={(e) => {
                 e.preventDefault();
@@ -490,7 +490,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             </form>
           ) : (
             <div
-              className="mt-3 rounded-md border border-zinc-200 p-3 text-sm leading-6 dark:border-zinc-800"
+              className="border-rule mt-3 rounded-md border p-3 text-sm leading-6"
               data-testid="exception-reasons"
             >
               <p className="font-medium">
@@ -501,7 +501,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
                   <li key={r}>{r}</li>
                 ))}
               </ul>
-              <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mt-2 text-xs">
                 Source: {SUPERVISOR_SOURCE}.
               </p>
             </div>
@@ -510,7 +510,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
       )}
 
       {p.application && !p.application.decision_code && p.canWrite ? (
-        <details className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+        <details className="border-rule mt-3 rounded-md border p-3">
           <summary className="cursor-pointer font-medium">
             The unit made a decision about this application
           </summary>
@@ -530,7 +530,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             }}
           >
             <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
-              <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mb-3 text-sm leading-6">
                 A code and a date, never the reason: the unit&apos;s letter is
                 your s 18(4) copy in the HR file.
               </p>
@@ -568,7 +568,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
 
       {p.canWrite ? (
         <details
-          className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+          className="border-rule mt-3 rounded-md border p-3"
           data-testid="own-call-details"
         >
           <summary className="cursor-pointer font-medium">
@@ -593,7 +593,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             }}
           >
             <fieldset disabled={!live} className="m-0 min-w-0 border-0 p-0">
-              <p className="mb-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mb-3 text-sm leading-6">
                 Readyline gates s 14(1)(a) and (2)(a) above. The other three are
                 your own call, recorded as a code and dates for your s 18 list.
               </p>
@@ -676,7 +676,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
 
       {p.setId && p.canWrite ? (
         <details
-          className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+          className="border-rule mt-3 rounded-md border p-3"
           data-testid="update-procedure-details"
         >
           <summary className="cursor-pointer font-medium">
@@ -711,7 +711,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
       {p.history.filter((h) => h.ended_on).length ? (
         <div className="mt-3" data-testid="exception-history">
           <p className="text-sm font-medium">Earlier exceptions</p>
-          <ul className="mt-1 space-y-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          <ul className="text-ink mt-1 space-y-1 text-sm leading-6">
             {p.history
               .filter((h) => h.ended_on)
               .map((h) => (

@@ -71,15 +71,11 @@ export function RegisterPage({
       <h1 id="register-title" className="text-3xl font-semibold tracking-tight">
         {title}
       </h1>
-      {intro ? (
-        <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-          {intro}
-        </p>
-      ) : null}
+      {intro ? <p className="text-ink mt-3 leading-7">{intro}</p> : null}
       {!canWrite ? (
         <p
           role="status"
-          className="mt-4 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+          className="border-rule bg-mist mt-4 rounded-md border p-3 text-sm leading-6"
           data-testid="register-lapsed"
         >
           {LAPSE_MESSAGE}

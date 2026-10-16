@@ -55,7 +55,7 @@ function textOf(node: ReactNode): string {
   return "";
 }
 
-const body = "leading-7 text-zinc-700 dark:text-zinc-300";
+const body = "leading-7 text-ink ";
 
 /** The markdown renderers; the guides (REQ-011) reuse them so every page reads the same. */
 export const markdownComponents: Components = {
@@ -107,10 +107,7 @@ export function LegalArticle({ page }: { page: LegalPage }) {
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <h1 className="text-3xl font-semibold tracking-tight">{page.title}</h1>
-      <p
-        className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-        data-testid="legal-updated"
-      >
+      <p className="text-slate mt-2 text-sm" data-testid="legal-updated">
         Last updated {formatUpdated(page.updated)}
       </p>
       {note ? (

@@ -140,13 +140,13 @@ export default async function StartHerePage({
           {s.documents.map((d) => (
             <li
               key={d.typeId}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+              className="border-rule rounded-md border p-4"
               data-testid={`sheet-document-${d.typeId}`}
               data-adopted={d.adopted ? "true" : "false"}
             >
               <h3 className="text-base font-semibold">
                 {d.n}. {d.title}{" "}
-                <span className="font-normal text-zinc-600 dark:text-zinc-400">
+                <span className="text-slate font-normal">
                   (about {d.minutes} minutes; {documentCountsLine(d)})
                 </span>
               </h3>
@@ -217,9 +217,7 @@ export default async function StartHerePage({
           {s.registers.map((r) => (
             <li key={r.title}>
               <span className="font-medium">{r.title}</span>: {r.purpose}{" "}
-              <span className="text-zinc-600 dark:text-zinc-400">
-                {r.where}
-              </span>
+              <span className="text-slate">{r.where}</span>
             </li>
           ))}
         </ul>
@@ -242,7 +240,7 @@ export default async function StartHerePage({
           ))}
         </ol>
       </section>
-      <p className="mt-8 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-8 text-sm">
         Generated {s.generatedAt}; readiness summary version {s.summaryVersion}.
       </p>
     </div>

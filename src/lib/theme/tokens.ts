@@ -162,20 +162,3 @@ export function contrastRatio(a: string, b: string): number {
   const [hi, lo] = la >= lb ? [la, lb] : [lb, la];
   return (hi + 0.05) / (lo + 0.05);
 }
-
-/** The zinc scale Tailwind utilities map to: a warm, monotonic ramp from paper to ink (D-1402). */
-export const WARM_SCALE: Record<string, string> = {
-  "50": "#F7F3EC",
-  "100": "#E6E0D6",
-  "200": "#D6CFC3",
-  "300": "#BFB7AA",
-  "400": "#8E9593",
-  // 5.2:1 on paper: the class codes and counters use zinc-500 as text.
-  "500": "#5E6866",
-  "600": "#4A5553",
-  "700": "#3A4442",
-  "800": "#2A3634",
-  "900": "#1C2B2A",
-  // REQ-028 FR-2: the dark paper lifted to D-2802's value; the ramp and this record go with the mapping pass.
-  "950": "#1B2422",
-};

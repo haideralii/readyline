@@ -27,7 +27,7 @@ export function Blocks({ blocks }: { blocks: readonly Block[] }) {
             return (
               <p
                 key={i}
-                className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 leading-7 dark:border-zinc-700 dark:bg-zinc-900"
+                className="border-rule bg-mist mt-2 rounded-md border p-3 leading-7"
               >
                 {b.text}
               </p>
@@ -128,7 +128,7 @@ function Section({
       className={
         s.mode === "tailored"
           ? "border-ochre border-l-4 pl-4"
-          : "border-l-4 border-zinc-200 pl-4 dark:border-zinc-800"
+          : "border-rule border-l-4 pl-4"
       }
       data-testid={`sample-section-${s.id}`}
       data-mode={s.mode}
@@ -157,12 +157,10 @@ export function SampleDocument({
   const sectionHeading: HeadingTag = level === 2 ? "h3" : "h4";
   return (
     <div
-      className="bg-paper rounded-md border border-zinc-300 p-4 sm:p-6 dark:border-zinc-700"
+      className="bg-paper border-rule rounded-md border p-4 sm:p-6"
       data-testid="sample-document"
     >
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
-        {sampleLine(doc, tailored)}
-      </p>
+      <p className="text-slate text-sm">{sampleLine(doc, tailored)}</p>
       {/* REQ-027 FR-3, D-2701: the words on this page, the document's own included, above the document. */}
       <GlossaryTerms
         ids={samplePresent(doc, tailored)}
@@ -199,9 +197,7 @@ export function SampleDocument({
           ))}
         </ol>
       </details>
-      <p className="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
-        {doc.footer}
-      </p>
+      <p className="text-slate mt-6 text-sm">{doc.footer}</p>
     </div>
   );
 }

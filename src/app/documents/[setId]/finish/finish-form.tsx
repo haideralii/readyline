@@ -180,7 +180,7 @@ export function FinishForm({
       </label>
       <p
         id={`fact-${q.key}-help`}
-        className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-1 text-sm leading-6"
       >
         {q.example}
       </p>
@@ -197,7 +197,7 @@ export function FinishForm({
         value={answers[q.key] ?? ""}
         aria-describedby={`fact-${q.key}-help`}
         onChange={(e) => setAnswers((a) => ({ ...a, [q.key]: e.target.value }))}
-        className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
+        className="border-line mt-2 block w-full rounded-md border px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2"
       />
     </div>
   );
@@ -247,10 +247,7 @@ export function FinishForm({
       noValidate
       data-testid="finish-form"
     >
-      <p
-        className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-        data-testid="finish-progress"
-      >
+      <p className="text-slate mt-2 text-sm" data-testid="finish-progress">
         Question {index + 1} of {questions.length}
       </p>
       {index === 0 ? <ParticipantDataWarning /> : null}

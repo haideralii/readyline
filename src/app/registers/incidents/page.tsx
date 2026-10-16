@@ -110,7 +110,7 @@ export default async function IncidentsPage() {
           <h2 id="to-confirm-heading" className="text-lg font-semibold">
             {toConfirm}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          <p className="text-ink mt-1 text-sm leading-6">
             Read each one and confirm it, or reject it with a reason. Until you
             confirm it, it is not in your register.
           </p>

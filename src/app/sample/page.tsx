@@ -29,9 +29,7 @@ export default function SamplePage() {
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         {C.sampleHeading}
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-        {C.samplePageLead}
-      </p>
+      <p className="text-ink mt-3 leading-7">{C.samplePageLead}</p>
       <div className="mt-6">
         <SampleDocument level={2} />
       </div>

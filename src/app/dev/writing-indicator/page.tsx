@@ -52,7 +52,7 @@ export default async function WritingIndicatorDemoPage({
       <h1 className="mt-6 text-3xl font-semibold tracking-tight">
         Your documents
       </h1>
-      <section className="mt-6 rounded-md border border-zinc-300 p-5 dark:border-zinc-700">
+      <section className="border-rule mt-6 rounded-md border p-5">
         <WritingIndicator
           initial={initial}
           pollUrl={`/api/dev/writing-status?scenario=${scenario}&t0=${t0}`}

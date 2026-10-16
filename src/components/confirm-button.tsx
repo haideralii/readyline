@@ -44,7 +44,7 @@ export function ConfirmButton({
     <div
       role="group"
       aria-labelledby={id}
-      className="rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+      className="border-rule rounded-md border p-3"
       data-testid={testId ? `${testId}-confirm` : undefined}
     >
       <p id={id} className="text-sm leading-6">

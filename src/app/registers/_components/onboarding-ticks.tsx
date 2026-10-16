@@ -69,7 +69,7 @@ export function OnboardingTicks({
           : `${left} of ${items.length} items left`}
       </h2>
       {canWrite && left > 0 ? (
-        <div className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+        <div className="border-rule mt-3 rounded-md border p-3">
           <RefField
             id="ticked-by"
             label="Who is ticking"
@@ -88,7 +88,7 @@ export function OnboardingTicks({
           />
         </div>
       ) : null}
-      <ol className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+      <ol className="divide-rule mt-3 divide-y">
         {items.map((item) => {
           const t = byItem.get(item.id);
           return (
@@ -103,7 +103,7 @@ export function OnboardingTicks({
               <span className="min-w-0 flex-1">
                 <span className="block">{item.text}</span>
                 {t ? (
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">
+                  <span className="text-slate block text-sm">
                     Ticked {t.ticked_on} by {t.ticked_by_ref}.
                   </span>
                 ) : canWrite ? (

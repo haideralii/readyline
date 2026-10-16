@@ -227,7 +227,7 @@ export default async function AuditDayPage() {
             <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
               {ASK[g.id] ?? g.title}
             </h2>
-            <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ul className="divide-rule mt-3 divide-y">
               {g.items.map((i) => {
                 const t = tick(i);
                 return (
@@ -238,9 +238,7 @@ export default async function AuditDayPage() {
                     <span>
                       {/* Batch 45 item 4: what the auditor says, never the provider's instruction. */}
                       <span className="font-medium">&quot;{i.ask}&quot;</span>{" "}
-                      <span className="text-zinc-700 dark:text-zinc-300">
-                        {t.word}
-                      </span>
+                      <span className="text-ink">{t.word}</span>
                     </span>
                   </li>
                 );
@@ -282,7 +280,7 @@ export default async function AuditDayPage() {
         <h2 id="ask-records-heading" className="text-xl font-semibold">
           What the auditor will ask to see
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           Policies are one third of an audit. The rest is records: a register
           with every field filled and a review date on every row. A record
           marked &quot;{KEPT_ON_PAPER}&quot; is a signed or issued document you
@@ -294,7 +292,7 @@ export default async function AuditDayPage() {
             <h3 className="mt-5 text-base font-semibold">
               {AUDIT_RECORD_TIER_TITLES[tier]}
             </h3>
-            <ol className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ol className="divide-rule mt-1 divide-y">
               {asks
                 .filter((a) => a.tier === tier)
                 .map((a) => (
@@ -316,13 +314,9 @@ export default async function AuditDayPage() {
                         &quot;Show me: {a.ask}.&quot;
                       </span>{" "}
                       {a.paper ? (
-                        <span className="text-zinc-700 dark:text-zinc-300">
-                          ({KEPT_ON_PAPER})
-                        </span>
+                        <span className="text-ink">({KEPT_ON_PAPER})</span>
                       ) : null}{" "}
-                      <span className="text-zinc-700 dark:text-zinc-300">
-                        {a.word}
-                      </span>{" "}
+                      <span className="text-ink">{a.word}</span>{" "}
                       <Link
                         href={a.href}
                         className="underline underline-offset-2 print:hidden"
@@ -371,7 +365,7 @@ export default async function AuditDayPage() {
         <h2 id="drill-heading" className="text-xl font-semibold">
           Your emergency drill
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           {lastDrill
             ? `Last drill ${lastDrill}. Run one every six months and record it here.`
             : "No drill recorded yet. Walk through your emergency plan with your workers, then record the date here."}
@@ -388,18 +382,16 @@ export default async function AuditDayPage() {
         <h2 id="kinds-heading" className="text-xl font-semibold">
           The kinds of audit, in plain words
         </h2>
-        <dl className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <dl className="divide-rule mt-3 divide-y">
           {auditKindsContent.items.map((k) => (
             <div key={k.id} className="py-3" data-testid={`audit-kind-${k.id}`}>
               <dt className="font-medium">{k.name}</dt>
-              <dd className="leading-7 text-zinc-700 dark:text-zinc-300">
-                {k.description}
-              </dd>
+              <dd className="text-ink leading-7">{k.description}</dd>
             </div>
           ))}
         </dl>
       </section>
-      <p className="mt-10 text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-xs">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
     </div>

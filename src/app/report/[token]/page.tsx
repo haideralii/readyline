@@ -71,7 +71,7 @@ export default async function ReportPage({
       >
         {EMERGENCY_LINE}
       </p>
-      <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-2 text-sm leading-6">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
       <p className="mt-4 leading-7">

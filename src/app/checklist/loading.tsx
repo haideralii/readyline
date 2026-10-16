@@ -11,9 +11,7 @@ export default function Loading() {
       role="status"
       aria-live="polite"
     >
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Loading your checklist…
-      </p>
+      <p className="text-slate">Loading your checklist…</p>
     </div>
   );
 }

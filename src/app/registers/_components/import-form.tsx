@@ -209,7 +209,7 @@ export function ImportForm({
           <h2 id="recent-imports" className="text-lg font-semibold">
             Recent imports
           </h2>
-          <ul className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
+          <ul className="divide-rule mt-2 divide-y text-sm">
             {recent.map((r) => (
               <li
                 key={r.id}
@@ -230,7 +230,7 @@ export function ImportForm({
                     Undo this import
                   </button>
                 ) : (
-                  <span className="text-zinc-600 dark:text-zinc-400">
+                  <span className="text-slate">
                     Kept (the hour to undo has passed)
                   </span>
                 )}

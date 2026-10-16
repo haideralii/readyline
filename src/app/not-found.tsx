@@ -15,7 +15,7 @@ export default function NotFound() {
       <h1 className="text-3xl font-semibold tracking-tight">
         That page is not here.
       </h1>
-      <p className="mt-4 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-4 leading-7">
         The link may be old or mistyped. Start with the free questions, or read
         the guides.
       </p>

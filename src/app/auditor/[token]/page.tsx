@@ -79,7 +79,7 @@ export default async function AuditorPage({
     <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <p
         role="status"
-        className="rounded-md border border-zinc-300 p-3 text-sm leading-6 dark:border-zinc-700"
+        className="border-rule rounded-md border p-3 text-sm leading-6"
         data-testid="auditor-banner"
       >
         {auditorBanner(link.tradingName, link.expiresAt)}
@@ -152,14 +152,12 @@ export default async function AuditorPage({
               rows={t.rows.map((r) => t.columns.map((c) => cell(r[c])))}
             />
           ) : (
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Nothing recorded yet.
-            </p>
+            <p className="text-slate mt-2 text-sm">Nothing recorded yet.</p>
           )}
         </section>
       ))}
 
-      <p className="mt-10 text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-xs">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
     </div>

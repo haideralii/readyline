@@ -238,7 +238,7 @@ export function ChecklistView({
       <h1 className="text-3xl font-semibold tracking-tight">
         Readiness checklist
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         For <strong>{tradingName}</strong>, a {pathway} audit. Tap an item to
         set its status. <strong>Done</strong> means reviewed and adopted.
       </p>
@@ -254,7 +254,7 @@ export function ChecklistView({
       </p>
       {/* FR-11: the participant-data warning once, at the top. */}
       <p
-        className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+        className="border-rule bg-mist mt-3 rounded-md border p-3 text-sm leading-6"
         data-testid="checklist-privacy"
         id="checklist-note-warning"
       >
@@ -299,7 +299,7 @@ export function ChecklistView({
         <span
           role="status"
           aria-live="polite"
-          className="inline-flex min-h-11 items-center gap-2 text-zinc-600 dark:text-zinc-400"
+          className="text-slate inline-flex min-h-11 items-center gap-2"
           data-testid="checklist-save-status"
         >
           {feedback?.kind === "saved" ? (
@@ -345,16 +345,16 @@ export function ChecklistView({
                 s[g.id] === isOpen ? s : { ...s, [g.id]: isOpen },
               );
             }}
-            className="mt-6 rounded-md border border-zinc-200 dark:border-zinc-800"
+            className="border-rule mt-6 rounded-md border"
             data-testid={`checklist-group-${g.id}`}
           >
             <summary className="min-h-12 cursor-pointer px-4 py-3 text-lg font-semibold">
               {g.title}{" "}
-              <span className="text-base font-normal text-zinc-600 dark:text-zinc-400">
+              <span className="text-slate text-base font-normal">
                 ({groupReady} of {g.items.length} ready)
               </span>
             </summary>
-            <ul className="divide-y divide-zinc-200 px-4 dark:divide-zinc-800">
+            <ul className="divide-rule divide-y px-4">
               {g.items.map((item) => (
                 <ChecklistRow
                   key={item.id}
@@ -441,16 +441,13 @@ function ChecklistRow({
         <span className="min-w-0 text-base font-medium">{item.title}</span>
         <span className="flex shrink-0 items-center gap-2">
           <StatusTag status={status} />
-          <span aria-hidden="true" className="text-zinc-500">
+          <span aria-hidden="true" className="text-slate">
             {open ? "▴" : "▾"}
           </span>
         </span>
       </button>
       <div id={panelId} hidden={!open} className="pb-3">
-        <p
-          id={whyId}
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={whyId} className="text-slate mt-1 text-sm leading-6">
           {item.why}{" "}
           {item.sourceRef.kind === "content" ? (
             <span>{item.sourceRef.title}.</span>
@@ -472,7 +469,7 @@ function ChecklistRow({
         {item.haveNote ? (
           // REQ-025 FR-4, D-2216: "already have" means review, not skip.
           <p
-            className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-1 text-sm leading-6"
             data-testid={`checklist-have-note-${b}`}
           >
             {item.haveNote}
@@ -480,7 +477,7 @@ function ChecklistRow({
         ) : null}
         {item.unverified ? (
           <p
-            className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+            className="text-slate mt-1 text-sm leading-6"
             data-testid={`checklist-check-${b}`}
           >
             Check this against the Commission&apos;s page before you rely on it;
@@ -516,7 +513,7 @@ function ChecklistRow({
               Date it happened
             </label>
             {item.dueDate ? (
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mt-1 text-sm">
                 Measured against {item.dueDate}.
               </p>
             ) : null}
@@ -526,10 +523,10 @@ function ChecklistRow({
               value={doneOn ?? ""}
               onChange={(e) => onDate(e.target.value)}
               aria-describedby={whyId}
-              className="mt-1 rounded-md border border-zinc-300 px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950"
+              className="border-rule mt-1 rounded-md border px-3 py-2 text-base"
             />
             <span
-              className="ml-3 inline-flex min-h-11 items-center text-sm text-zinc-600 dark:text-zinc-400"
+              className="text-slate ml-3 inline-flex min-h-11 items-center text-sm"
               aria-live="polite"
               data-testid={`item-feedback-${b}`}
             >
@@ -547,7 +544,7 @@ function ChecklistRow({
         <fieldset className="mt-3" aria-describedby={whyId} hidden={item.dated}>
           <legend className="text-sm font-medium">Status</legend>
           <div
-            className="mt-1 inline-flex max-w-full overflow-hidden rounded-md border border-zinc-400 dark:border-zinc-600"
+            className="border-line mt-1 inline-flex max-w-full overflow-hidden rounded-md border"
             role="radiogroup"
             aria-label={`Status for ${item.title}`}
           >
@@ -559,7 +556,7 @@ function ChecklistRow({
                   key={s}
                   htmlFor={id}
                   className={`relative inline-flex min-h-11 min-w-16 cursor-pointer items-center justify-center px-3 text-sm ${
-                    i > 0 ? "border-l border-zinc-400 dark:border-zinc-600" : ""
+                    i > 0 ? "border-line border-l" : ""
                   } ${checked ? "bg-ink text-paper" : "hover:bg-mist"} has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-2`}
                 >
                   <input
@@ -583,7 +580,7 @@ function ChecklistRow({
           </div>
           {item.dated ? null : (
             <span
-              className="ml-3 inline-flex min-h-11 items-center text-sm text-zinc-600 dark:text-zinc-400"
+              className="text-slate ml-3 inline-flex min-h-11 items-center text-sm"
               aria-live="polite"
               data-testid={`item-feedback-${b}`}
             >
@@ -610,7 +607,7 @@ function ChecklistRow({
               onChange={(e) => onNote(e.target.value)}
               aria-describedby="checklist-note-warning"
               placeholder="Your reminder. No participant names or health details."
-              className="mt-1 w-full rounded-md border border-zinc-300 px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950"
+              className="border-line mt-1 w-full rounded-md border px-3 py-2 text-base"
             />
           </>
         ) : (

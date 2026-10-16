@@ -20,7 +20,7 @@ export default async function AdminMfaPage() {
       <h1 className="text-3xl font-semibold tracking-tight">
         Authenticator check
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         {mode.kind === "enrol"
           ? "Admin pages need a second factor. Scan the code with an authenticator app, then enter the 6-digit code it shows."
           : "Enter the current 6-digit code from your authenticator app."}

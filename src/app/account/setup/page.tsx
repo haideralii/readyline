@@ -17,7 +17,7 @@ export default async function AccountSetupPage() {
       <h1 className="text-3xl font-semibold tracking-tight">
         About your business
       </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mt-3 leading-7">
         This creates your account. If you started the questionnaire on this
         device, we have filled in what you told us and will move your draft to
         your account so you can continue from any device.

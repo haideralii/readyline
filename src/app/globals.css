@@ -84,28 +84,6 @@
   --font-serif: var(--font-fraunces);
 }
 
-/*
- * The zinc utilities the pages were built with now resolve to a warm ramp
- * from paper to ink (D-1402), so every existing surface and text colour
- * takes the identity without a rewrite; the ramp stays monotonic so the
- * light and dark variants keep their meaning. Errors use signal.
- */
-@theme {
-  --color-zinc-50: #f7f3ec;
-  --color-zinc-100: #e6e0d6;
-  --color-zinc-200: #d6cfc3;
-  --color-zinc-300: #bfb7aa;
-  --color-zinc-400: #8e9593;
-  --color-zinc-500: #5e6866;
-  --color-zinc-600: #4a5553;
-  --color-zinc-700: #3a4442;
-  --color-zinc-800: #2a3634;
-  --color-zinc-900: #1c2b2a;
-  --color-zinc-950: #1b2422;
-  --color-red-700: #9a2b2b;
-  --color-red-400: #e07a7a;
-}
-
 html {
   color-scheme: light dark;
 }

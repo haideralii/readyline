@@ -47,7 +47,7 @@ export function CostCalculator({
 
   return (
     <div
-      className="my-6 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+      className="border-rule my-6 rounded-md border p-4"
       data-testid="cost-calculator"
     >
       <label htmlFor="calc-search" className="block text-base font-medium">
@@ -59,10 +59,10 @@ export function CostCalculator({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Household tasks, personal care, SIL…"
-        className="mt-1 block min-h-12 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950"
+        className="border-line bg-surface mt-1 block min-h-12 w-full rounded-md border px-3 py-2 text-base"
       />
       <ul
-        className="mt-3 max-h-64 overflow-y-auto rounded-md border border-zinc-200 dark:border-zinc-800"
+        className="border-rule mt-3 max-h-64 overflow-y-auto rounded-md border"
         aria-label="Registration groups"
       >
         {shown.map((g) => (
@@ -78,9 +78,7 @@ export function CostCalculator({
               <span className="min-w-0 text-sm">
                 {g.name}{" "}
                 {/* QA pass F2: the muted pair the site uses, 4.5:1 in both schemes (dark zinc-500 on the dark paper was 3.01:1). */}
-                <span className="font-mono text-zinc-500 dark:text-zinc-400">
-                  {g.code}
-                </span>
+                <span className="text-slate font-mono">{g.code}</span>
               </span>
               <span
                 className={`ml-auto rounded-full border px-2 py-0.5 text-xs whitespace-nowrap ${g.auditType === "verification" ? "border-moss text-moss" : "border-ochre text-ochre"}`}
@@ -92,7 +90,7 @@ export function CostCalculator({
         ))}
       </ul>
       <div
-        className="mt-4 rounded-md bg-zinc-50 p-3 dark:bg-zinc-900"
+        className="bg-mist mt-4 rounded-md p-3"
         role="status"
         aria-live="polite"
         data-testid="calculator-result"

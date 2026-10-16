@@ -71,7 +71,7 @@ export function RegisterList({
             <label
               key={f.key}
               // The radio is invisible, so the label shows its focus (WCAG 2.4.7; backlog 1, D-1508).
-              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
+              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-line"}`}
             >
               <input
                 type="radio"
@@ -87,15 +87,12 @@ export function RegisterList({
         </div>
       </fieldset>
       {shown.length === 0 ? (
-        <p
-          className="mt-6 text-zinc-600 dark:text-zinc-400"
-          data-testid={`${testId}-empty`}
-        >
+        <p className="text-slate mt-6" data-testid={`${testId}-empty`}>
           {rows.length === 0 ? empty : "Nothing with that status."}
         </p>
       ) : (
         <ul
-          className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800"
+          className="divide-rule mt-4 divide-y"
           aria-labelledby="register-title"
         >
           {shown.map((r) => (
@@ -107,13 +104,11 @@ export function RegisterList({
               >
                 <span className="min-w-0">
                   <span className="block text-base font-medium">{r.title}</span>
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">
-                    {r.detail}
-                  </span>
+                  <span className="text-slate block text-sm">{r.detail}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
                   <StatusTag status={r.status} />
-                  <span aria-hidden="true" className="text-zinc-500">
+                  <span aria-hidden="true" className="text-slate">
                     ›
                   </span>
                 </span>

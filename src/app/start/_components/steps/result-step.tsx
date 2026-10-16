@@ -88,7 +88,7 @@ export function ResultStep({
   }
   if (!current?.response) {
     return (
-      <p role="status" className="text-zinc-600 dark:text-zinc-400">
+      <p role="status" className="text-slate">
         Working out which standards apply…
       </p>
     );
@@ -96,10 +96,7 @@ export function ResultStep({
   const response = current.response;
   if (!response.ok) {
     return (
-      <div
-        role="alert"
-        className="rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
-      >
+      <div role="alert" className="border-rule rounded-md border p-4">
         <h2 className="text-lg font-semibold">
           We need a change to your answers
         </h2>
@@ -218,8 +215,8 @@ function Disclosure({
       }}
       className={
         nested
-          ? "mt-2 rounded-md border border-zinc-200 dark:border-zinc-800"
-          : "mt-4 rounded-md border border-zinc-300 dark:border-zinc-700"
+          ? "border-rule mt-2 rounded-md border"
+          : "border-rule mt-4 rounded-md border"
       }
       data-testid={`result-section-${id}`}
     >
@@ -345,7 +342,7 @@ function ResultView({
       {/* FR-4: the first screen is one card: the answer, one sentence, the counts, the line, one button. */}
       <section
         aria-labelledby="summary-heading"
-        className="rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
+        className="border-line bg-mist rounded-md border p-4"
         data-testid="summary"
       >
         <h2 id="summary-heading" className="text-2xl font-semibold">
@@ -353,29 +350,23 @@ function ResultView({
           {r.modifiedCertification ? " (modified scope)" : ""}
         </h2>
         {/* Batch 42 item 6 (D-549), REQ-025 FR-13: what the word means, from the glossary, in one line under the heading. */}
-        <p
-          className="mt-1 text-sm text-zinc-700 dark:text-zinc-300"
-          data-testid="audit-kind"
-        >
+        <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
           {glossarySentence(`${pathwayWord}-audit`)}
         </p>
         <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
           {r.groups.map((g) => (
             <li
               key={g.code}
-              className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+              className="border-line text-ink rounded-full border px-2 py-0.5 text-xs"
             >
-              {g.name}{" "}
-              <span className="font-mono text-zinc-500 dark:text-zinc-400">
-                {g.code}
-              </span>
+              {g.name} <span className="text-slate font-mono">{g.code}</span>
             </li>
           ))}
         </ul>
         {/* REQ-025 FR-3: the summary as a list, not a sentence; every number derived
-            from the result. The phone spacing is 16 px tighter than the wider
-            layout so the one button still ends inside the first screen on a
-            681 px iPhone (REQ-015 FR-4). REQ-027 A1 (#79's run 38882058792):
+ from the result. The phone spacing is 16 px tighter than the wider
+ layout so the one button still ends inside the first screen on a
+ 681 px iPhone (REQ-015 FR-4). REQ-027 A1 (#79's run 38882058792):
             D-2709's certification meaning takes two lines where the old one
             took one, 18 px, so the list's phone line height is 24 px over its
             five lines (28 px from sm up) and the button ends inside the screen
@@ -429,7 +420,7 @@ function ResultView({
           {/* REQ-027 FR-3a, D-2707: signed out, what happens next in one line under the primary action; signed in, the REQ-017 strip says it. */}
           {signedIn ? null : (
             <p
-              className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              className="text-ink mt-3 text-sm leading-6"
               data-testid="next-line"
             >
               {NEXT_LINE}
@@ -439,7 +430,7 @@ function ResultView({
       </section>
 
       {/* REQ-027 D-2701, D-2711: the one disclosure for the words on this page, under the card and inside no other
-          disclosure, listing the terms present at render minus the audit kind the heading already explains. */}
+ disclosure, listing the terms present at render minus the audit kind the heading already explains. */}
       <GlossaryTerms ids={present} where="result" className="mt-2" />
 
       {/* FR-5: three closed disclosures with counts in their summaries. */}
@@ -452,28 +443,25 @@ function ResultView({
       >
         {r.flags.silExcluded ? (
           <p
-            className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+            className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6"
             data-testid="sil-excluded"
           >
             {SIL_EXCLUDED_TEXT}
           </p>
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
-          <p className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
+          <p className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6">
             {RP_ASSUMED_TEXT}
           </p>
         ) : null}
         {r.flags.largeProvider ? (
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <p className="text-slate mt-2 text-sm leading-6">
             {BRAND} focuses on providers with up to about 10 workers. The
             standards below still apply to you.
           </p>
         ) : null}
         {/* REQ-025 FR-5: one list item per reason, the source as the link text; "opens in a new tab" said once. */}
-        <p
-          className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-          data-testid="reasons-intro"
-        >
+        <p className="text-slate mt-2 text-sm" data-testid="reasons-intro">
           Each reason links to its source; the sources open in a new tab.
         </p>
         <ul className="mt-2 space-y-2">
@@ -506,18 +494,16 @@ function ResultView({
           {r.modules.map((m) => (
             <li
               key={m.id}
-              className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
+              className="border-rule rounded-md border p-3"
               data-testid={`module-${m.id}`}
             >
               <p className="text-base font-medium">
                 {m.name}{" "}
-                <span className="font-normal text-zinc-600 dark:text-zinc-400">
+                <span className="text-slate font-normal">
                   ({m.standardCount} standards)
                 </span>
               </p>
-              <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-                {m.description}
-              </p>
+              <p className="text-ink mt-1 text-sm leading-6">{m.description}</p>
               <details className="mt-1">
                 <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
                   {MODULE_STANDARDS_SUMMARY}
@@ -551,7 +537,7 @@ function ResultView({
       >
         {/* REQ-025 FR-4a, REQ-027 D-2718 and D-2722: the pack's part and the reader's own answers, five sentences above the list, never per row. */}
         <p
-          className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mt-2 text-sm leading-6"
           data-testid="have-legend"
         >
           {legend}
@@ -578,7 +564,7 @@ function ResultView({
                 data-testid="sole-trader-line"
               >
                 <p>{SOLE_TRADER_LINE}</p>
-                <p className="mt-1 text-zinc-700 dark:text-zinc-300">
+                <p className="text-ink mt-1">
                   {UNCONFIRMED_SOURCE_HEDGE} {SOLE_TRADER_SOURCE.text}{" "}
                   <a
                     href={SOLE_TRADER_SOURCE.source.url}
@@ -591,7 +577,7 @@ function ResultView({
               </div>
             ) : null}
             <ul
-              className="divide-y divide-zinc-200 dark:divide-zinc-800"
+              className="divide-rule divide-y"
               data-testid={`doc-group-${g.id}`}
             >
               {g.items.map((d) => (
@@ -616,12 +602,12 @@ function ResultView({
         summary={`Registers to keep (${r.registers.length})`}
       >
         <p
-          className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mt-2 text-sm leading-6"
           data-testid="registers-legend"
         >
           {REGISTERS_LEGEND}
         </p>
-        <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul className="divide-rule mt-2 divide-y">
           {r.registers.map((x) => (
             <li
               key={x.id}
@@ -638,13 +624,13 @@ function ResultView({
           REQ-027 FR-4 (decision 9 of the third pass): below the disclosures and above "What happens
           next", because a first-time reader does not need the price before the result. */}
       <dl
-        className="grid gap-2 rounded-md border border-zinc-200 p-4 text-sm sm:grid-cols-2 dark:border-zinc-800"
+        className="border-rule grid gap-2 rounded-md border p-4 text-sm sm:grid-cols-2"
         data-testid="result-two-halves"
       >
         <div>
           <dt className="font-semibold">What keeps you audit-ready</dt>
           {subscriptionOffered ? (
-            <dd className="text-zinc-700 dark:text-zinc-300">
+            <dd className="text-ink">
               The registers and reminders, a monthly subscription that keeps
               your evidence in one place for renewal.{" "}
               <Link
@@ -656,10 +642,7 @@ function ResultView({
               .
             </dd>
           ) : (
-            <dd
-              className="text-zinc-700 dark:text-zinc-300"
-              data-testid="result-subscription-off"
-            >
+            <dd className="text-ink" data-testid="result-subscription-off">
               The registers and reminders, with the evidence already in place at
               renewal. {SUBSCRIPTION_OFF}
             </dd>
@@ -667,7 +650,7 @@ function ResultView({
         </div>
         <div>
           <dt className="font-semibold">Where you start</dt>
-          <dd className="text-zinc-700 dark:text-zinc-300">
+          <dd className="text-ink">
             The document pack, one price paid once; nothing is bundled and
             nothing is discounted.{" "}
             <Link
@@ -683,7 +666,7 @@ function ResultView({
 
       <section
         aria-labelledby="next-heading"
-        className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+        className="border-rule rounded-md border p-4"
         data-testid="what-next"
       >
         <h2 id="next-heading" className="text-lg font-semibold">
@@ -701,18 +684,12 @@ function ResultView({
         </p>
       </section>
 
-      <p
-        className="text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        data-testid="result-notice"
-      >
+      <p className="text-slate text-sm leading-6" data-testid="result-notice">
         {r.notice}
       </p>
 
       {/* REQ-013 FR-9, REQ-015 FR-6: one line, the address as a link. */}
-      <p
-        className="text-sm leading-6 text-zinc-700 dark:text-zinc-300"
-        data-testid="result-contact"
-      >
+      <p className="text-ink text-sm leading-6" data-testid="result-contact">
         Questions about your result?{" "}
         {contactEmail ? (
           <>

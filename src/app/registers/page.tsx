@@ -203,7 +203,7 @@ export default async function RegistersPage() {
         </p>
         {period ? (
           <p
-            className="mt-2 text-sm text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-2 text-sm"
             data-testid="registration-timeline-link"
           >
             Your registration period ends on{" "}
@@ -227,11 +227,9 @@ export default async function RegistersPage() {
             <h2 id={`${g.id}-heading`} className="text-xl font-semibold">
               {g.heading}
             </h2>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              {g.intro}
-            </p>
+            <p className="text-slate mt-1 text-sm">{g.intro}</p>
             <ul
-              className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800"
+              className="divide-rule mt-2 divide-y"
               aria-labelledby={`${g.id}-heading`}
             >
               {g.rows.map((r) => (
@@ -245,14 +243,14 @@ export default async function RegistersPage() {
                       <span className="block text-lg font-medium">
                         {r.title}
                       </span>
-                      <span className="block text-sm text-zinc-600 dark:text-zinc-400">
+                      <span className="text-slate block text-sm">
                         {r.total} {r.total === 1 ? "entry" : "entries"}.{" "}
                         {r.attention}.
                       </span>
                     </span>
                     <span
                       aria-hidden="true"
-                      className={r.urgent ? "text-signal" : "text-zinc-500"}
+                      className={r.urgent ? "text-signal" : "text-slate"}
                     >
                       {r.urgent ? "!" : "›"}
                     </span>
@@ -266,7 +264,7 @@ export default async function RegistersPage() {
       <section
         id="codes"
         aria-labelledby="codes-heading"
-        className="mt-10 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+        className="border-rule mt-10 rounded-md border p-4"
         data-testid="codes-panel"
       >
         <h2 id="codes-heading" className="text-lg font-semibold">
@@ -287,7 +285,7 @@ export default async function RegistersPage() {
             else.
           </li>
         </ul>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-slate mt-2 text-sm">
           The same code means the same person in every register, so an auditor
           can follow an incident to a complaint without a name.
         </p>

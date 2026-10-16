@@ -60,10 +60,10 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
         inputMode="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="mt-1 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:bg-zinc-900"
+        className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2"
       />
       <p
-        className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-2 text-sm"
         aria-live="polite"
         data-testid="groups-count"
       >
@@ -81,10 +81,8 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
           <h2 id={`cat-${c.id}`} className="text-xl font-semibold">
             {c.title}
           </h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            {c.description}
-          </p>
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <p className="text-slate mt-1 text-sm leading-6">{c.description}</p>
+          <ul className="divide-rule mt-3 divide-y">
             {c.groups.map((g) => (
               <li key={g.code} className="py-3">
                 <Link
@@ -93,11 +91,11 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
                 >
                   {g.name}
                 </Link>{" "}
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="text-slate text-sm">
                   {g.code},{" "}
                   {g.pathway === "verification" ? "desk audit" : "site audit"}
                 </span>
-                <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+                <p className="text-ink mt-1 text-sm leading-6">
                   {g.description}
                 </p>
               </li>
