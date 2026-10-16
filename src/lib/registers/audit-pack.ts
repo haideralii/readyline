@@ -41,6 +41,33 @@ export const PACK_HIDDEN_COLUMNS: readonly string[] = [
   "version_id",
 ];
 
+/**
+ * REQ-024 A0 (D-2436, finding 233): the pack ships, per document type, the
+ * newest version that carries `adopted_on` (its own storage path, from any
+ * set), never a latest version the owner has not adopted. Newest by the day
+ * it was adopted, then by its version number within that day.
+ */
+export function newestAdoptedVersions<
+  T extends {
+    document_type_id: string;
+    adopted_on: string | null;
+    version: number;
+  },
+>(rows: readonly T[]): T[] {
+  const best = new Map<string, T>();
+  for (const r of rows) {
+    if (!r.adopted_on) continue;
+    const have = best.get(r.document_type_id);
+    if (
+      !have ||
+      r.adopted_on > have.adopted_on! ||
+      (r.adopted_on === have.adopted_on && r.version > have.version)
+    )
+      best.set(r.document_type_id, r);
+  }
+  return [...best.values()];
+}
+
 /** The columns of a register's rows in their stored order, minus the hidden ones. */
 export function packColumns(
   rows: readonly Record<string, unknown>[],

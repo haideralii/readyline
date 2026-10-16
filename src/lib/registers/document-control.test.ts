@@ -13,23 +13,30 @@ import {
   documentControlGaps,
   documentControlRows,
   documentControlSentence,
+  newVersionsAsk,
 } from "./document-control";
 
 const TODAY = "2026-10-14";
+// REQ-024 A0 (D-2427): adoption is the version's own column; the policy
+// review row is the mirror for the review date alone. Each fixture document
+// carries the day its latest version was adopted.
 const docs = [
   {
     document_type_id: "governance-policy",
     title: "Governance policy",
     version: 2,
     created_at: "2026-10-10T03:00:00Z",
+    adopted_on: "2026-10-12",
   },
   {
     document_type_id: "complaints-management-policy-and-register",
     title: "Complaints management policy and register",
     version: 1,
     created_at: "2026-10-09T03:00:00Z",
+    adopted_on: "2026-10-12",
   },
 ];
+const unadopted = docs.map((d) => ({ ...d, adopted_on: null }));
 
 describe("document control register (REQ-018 FR-13)", () => {
   it("a newly adopted pack has no empty cell and a next review 12 months after adoption (AC-5)", () => {
@@ -113,7 +120,7 @@ describe("document control register (REQ-018 FR-13)", () => {
   it("a document that is not adopted has an empty adopted cell, no review date and the not-adopted state; an overdue review is flagged", () => {
     const rows = documentControlRows(
       {
-        documents: docs,
+        documents: [{ ...docs[0], adopted_on: "2025-01-01" }, unadopted[1]],
         reviews: [
           {
             document_type_id: "governance-policy",
@@ -172,6 +179,115 @@ describe("document control register (REQ-018 FR-13)", () => {
       TODAY,
     );
     expect(rows[0].circulated).toEqual({ on: "2026-10-11", workers: 3 });
+  });
+
+  it("the version column is the truth: a review row with a date does not adopt a version without one (REQ-024 A0, D-2427)", () => {
+    const rows = documentControlRows(
+      {
+        documents: unadopted,
+        reviews: docs.map((d) => ({
+          document_type_id: d.document_type_id,
+          adopted_on: "2026-10-12",
+          review_cycle_months: 12,
+          last_reviewed_on: null,
+          next_review_on: "2027-10-12",
+        })),
+        circulations: [],
+        adoptedByRole: "Owner",
+      },
+      TODAY,
+    );
+    expect(rows.every((r) => r.state === "not-adopted")).toBe(true);
+    expect(rows.every((r) => r.adopted_on === null)).toBe(true);
+    expect(documentControlSentence(rows)).toBe(
+      "0 of 2 adopted, 0 circulated to workers.",
+    );
+  });
+});
+
+/** REQ-024 A0 (D-2436, finding 217): the sixth state and the cells of its row. */
+describe("new version to adopt (REQ-024 A0, D-2436)", () => {
+  const reviews = docs.map((d) => ({
+    document_type_id: d.document_type_id,
+    adopted_on: "2026-10-12",
+    review_cycle_months: 12,
+    last_reviewed_on: null,
+    next_review_on: "2027-10-12",
+  }));
+  const circulations = docs.map((d) => ({
+    document_type_id: d.document_type_id,
+    circulated_on: "2026-10-12",
+    worker_refs: "W-1",
+  }));
+
+  it("a latest version without a date whose type has an older adopted version reads new-version, with the older date, the adopter and the type's review date", () => {
+    const rows = documentControlRows(
+      {
+        documents: [
+          {
+            ...docs[0],
+            version: 3,
+            created_at: "2026-10-13T03:00:00Z",
+            adopted_on: null,
+            older_adopted_on: "2026-10-12",
+          },
+          docs[1],
+        ],
+        reviews,
+        circulations,
+        adoptedByRole: "Director",
+        adoptedByName: "Jane Citizen",
+      },
+      TODAY,
+    );
+    expect(rows[0]).toMatchObject({
+      state: "new-version",
+      version: "3",
+      adopted_on: "2026-10-12",
+      adopted_by: "Jane Citizen, Director",
+      next_review_on: "2027-10-12",
+    });
+    expect(rows[1].state).toBe("adopted");
+    // The sentence keeps its leading "N of T adopted" and appends the clause.
+    expect(documentControlSentence(rows)).toBe(
+      "2 of 2 adopted, 1 circulated to workers, 1 with a new version to adopt.",
+    );
+    expect(documentControlSentence(rows)).toMatch(/^\d+ of \d+ adopted/);
+    expect(documentControlGaps(rows)).toEqual([
+      "Governance policy: new version to adopt",
+    ]);
+    expect(newVersionsAsk(rows)).toBe("1 document has a new version to adopt");
+  });
+
+  it("a regenerated set reads new-version on every row; a type never adopted reads not-adopted; no new versions gives no ask", () => {
+    const regenerated = documentControlRows(
+      {
+        documents: unadopted.map((d) => ({
+          ...d,
+          version: 1,
+          older_adopted_on: "2026-10-12",
+        })),
+        reviews,
+        circulations: [],
+        adoptedByRole: "Owner",
+      },
+      TODAY,
+    );
+    expect(regenerated.every((r) => r.state === "new-version")).toBe(true);
+    expect(newVersionsAsk(regenerated)).toBe(
+      "2 documents have a new version to adopt",
+    );
+    const fresh = documentControlRows(
+      {
+        documents: unadopted.map((d) => ({ ...d, older_adopted_on: null })),
+        reviews: [],
+        circulations: [],
+        adoptedByRole: "Owner",
+      },
+      TODAY,
+    );
+    expect(fresh.every((r) => r.state === "not-adopted")).toBe(true);
+    expect(newVersionsAsk(fresh)).toBeNull();
   });
 });
 
@@ -271,7 +387,7 @@ describe("living policies in the document control register (backlog 8)", () => {
     const notAdopted = documentControlRows(
       {
         ...base,
-        documents: withText("x"),
+        documents: withText("x").map((d) => ({ ...d, adopted_on: null })),
         reviews: base.reviews.map((r) => ({ ...r, adopted_on: null })),
       },
       TODAY,

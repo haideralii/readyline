@@ -39,11 +39,17 @@ export function PolicyReviewFormView({
   id,
   initial,
   documentOptions,
+  adoptedDates = {},
+  today,
 }: {
   id?: string;
   initial?: PolicyReviewFormValues;
   /** The catalogue: id and title of every document type, plus "other". */
   documentOptions: readonly { value: string; label: string }[];
+  /** REQ-024 A0 (D-2435): the day each catalogue type's newest version was adopted, from the pack; shown, never typed. */
+  adoptedDates?: Readonly<Record<string, string>>;
+  /** The Sydney day, the latest an "other" document can be adopted on. */
+  today?: string;
 }) {
   const router = useRouter();
   const [v, setV] = useState<PolicyReviewFormValues>(
@@ -121,15 +127,30 @@ export function PolicyReviewFormView({
           )}
         </Field>
       ) : null}
-      <DateField
-        id="adoptedOn"
-        label={LABELS.adoptedOn}
-        help="Leave blank until you have reviewed and adopted it."
-        errors={errorsFor(errors, "adoptedOn")}
-        value={v.adoptedOn ?? ""}
-        onChange={(x) => set("adoptedOn", x)}
-        optional
-      />
+      {v.documentTypeId === "other" ? (
+        <DateField
+          id="adoptedOn"
+          label={LABELS.adoptedOn}
+          help="Leave blank until you have reviewed and adopted it."
+          errors={errorsFor(errors, "adoptedOn")}
+          value={v.adoptedOn ?? ""}
+          onChange={(x) => set("adoptedOn", x)}
+          optional
+          max={today}
+        />
+      ) : v.documentTypeId ? (
+        // REQ-024 A0 (D-2435): a catalogue document's date is the pack's own,
+        // written when the owner adopts it on the path or the documents page;
+        // the register shows it and cannot move it.
+        <div className="mt-4 text-sm" data-testid="adopted-on-from-pack">
+          <p className="font-medium">{LABELS.adoptedOn}</p>
+          <p className="mt-1 leading-6">
+            {adoptedDates[v.documentTypeId]
+              ? `${adoptedDates[v.documentTypeId]}, from your pack.`
+              : "Not yet adopted. Adopt it from your documents page; the date fills in here."}
+          </p>
+        </div>
+      ) : null}
       <Field
         id="reviewCycleMonths"
         label={LABELS.reviewCycleMonths}

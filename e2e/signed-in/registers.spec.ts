@@ -246,9 +246,21 @@ test.describe("registers (REQ-009 Session B)", () => {
     await axeClean(page, "worker checks");
 
     await page.goto("/registers/policy-reviews/new");
+    // REQ-024 A0 (D-2435; #77's run 38880262268): a catalogue type's adopted
+    // date is the pack's own and the form shows it read-only, so the typed
+    // date lives on a document of the owner's own ("Other" with a title); the
+    // overdue computation is the same. With no pack on this tenant the
+    // catalogue type reads "Not yet adopted"; the guided-path spec reads the
+    // date from a pack it adopted.
     await page
       .getByLabel("Document")
       .selectOption("complaints-management-policy-and-register");
+    await expect(page.getByTestId("adopted-on-from-pack")).toContainText(
+      "Not yet adopted",
+    );
+    await expect(page.getByLabel(/Date adopted/)).toHaveCount(0);
+    await page.getByLabel("Document").selectOption("other");
+    await page.getByLabel("Title").fill("Fire plan");
     await page.getByLabel(/Date adopted/).fill("2025-01-15");
     await page.getByTestId("register-submit").click();
     await expect(page.getByTestId("policy-reviews-list")).toContainText(

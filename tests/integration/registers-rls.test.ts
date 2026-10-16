@@ -460,7 +460,17 @@ describe.skipIf(!enabled)(
           .limit(1);
         expect(all.error, viewName).toBeNull();
       }
-      const review = await a.client
+      // REQ-024 A0 (D-2442; #77's run 38880262268): a client may not plant a
+      // catalogue type's adopted date, so the owner's insert is refused by
+      // `policy_reviews_adopted_on_guard` and the fixture row goes in through
+      // the service role, which passes the gate.
+      const planted = await a.client.from("policy_reviews").insert({
+        account_id: a.accountId,
+        document_type_id: "complaints-management-policy-and-register",
+        adopted_on: "2025-01-15",
+      });
+      expect(planted.error?.code).toBe("42501");
+      const review = await admin
         .from("policy_reviews")
         .insert({
           account_id: a.accountId,

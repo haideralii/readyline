@@ -26,6 +26,60 @@ const registersEmpty = {
   policyReviews: { total: 0, dueSoon: 0, overdue: 0, notAdopted: 0 },
 };
 
+/** REQ-024 A0 (D-2436, finding 217): a set whose rows carry new versions and nothing missing names them and sends the owner to the path. */
+describe("the document control line with a new version to adopt (REQ-024 A0)", () => {
+  const row = {
+    document_type_id: "governance-policy",
+    title: "Governance policy",
+    version: "2",
+    adopted_on: "2026-10-12",
+    adopted_by: "Owner",
+    next_review_on: "2027-10-12",
+    circulated: { on: "2026-10-12", workers: 1 },
+    state: "new-version" as const,
+    version_id: null,
+    reviewNeeded: [],
+  };
+  it("reads the sentence then the count, offers Adopt the new versions, and stays filled", () => {
+    const lines = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: empty,
+      documentControl: [
+        row,
+        { ...row, document_type_id: "x", state: "adopted" },
+      ],
+    });
+    const dc = lines.find((l) => l.id === "document-control")!;
+    expect(dc).toMatchObject({
+      state: "filled",
+      word: "2 of 2 adopted, 2 circulated to workers, 1 with a new version to adopt. 1 document has a new version to adopt.",
+      href: "/path/adopt",
+      action: "Adopt the new versions",
+    });
+    expect(lintText(dc.word, { block: true })).toEqual([]);
+    expect(findProhibitedClaims(dc.word)).toEqual([]);
+  });
+  it("a row not adopted at all still reads missing with the adopt action", () => {
+    const lines = auditDayAskList({
+      registers: registersEmpty,
+      auditDay: empty,
+      documentControl: [
+        row,
+        {
+          ...row,
+          document_type_id: "x",
+          adopted_on: null,
+          state: "not-adopted",
+        },
+      ],
+    });
+    expect(lines.find((l) => l.id === "document-control")).toMatchObject({
+      state: "missing",
+      action: "Adopt your documents",
+    });
+  });
+});
+
 describe("audit-day ask list (REQ-018 FR-11)", () => {
   it("lists the twelve items with a tap each, all missing on an empty account, every word plain", () => {
     const lines = auditDayAskList({

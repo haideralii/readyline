@@ -36,6 +36,8 @@ export type DocumentVersionRow = {
   storage_path: string;
   model: DocumentModel;
   created_at: string;
+  /** REQ-024 A0 (D-2427): the Sydney day this version was adopted, written by `adopt_document_version` alone; null until then. */
+  adopted_on?: string | null;
 };
 
 export type GenerationLogRow = {

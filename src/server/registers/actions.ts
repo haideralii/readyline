@@ -502,11 +502,16 @@ export async function savePolicyReviewAction(
       message: "Too many changes in a minute. Wait a moment and try again.",
     };
   const v = parsed.data.values;
+  // REQ-024 A0 (D-2435, D-2442): a catalogue type's `adopted_on` is the
+  // pack's, written by `adopt_document_version` alone, so the register never
+  // sends it (the table's guard would refuse the change anyway); the review
+  // date stays the owner's, since a review is not an adoption. An "other"
+  // document of the owner's own keeps both dates typed.
   const row = {
     account_id: ctx.account.id,
     document_type_id: v.documentTypeId,
     title: v.title,
-    adopted_on: v.adoptedOn,
+    ...(v.documentTypeId === "other" ? { adopted_on: v.adoptedOn } : {}),
     review_cycle_months: v.reviewCycleMonths,
     last_reviewed_on: v.lastReviewedOn,
     reviewer_ref: v.reviewerRef,

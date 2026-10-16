@@ -97,17 +97,19 @@ export async function saveChecklistItemAction(
     });
     return { ok: false, message: "We could not save that just now." };
   }
-  // REQ-009 FR-7: "Done" on a document sets the policy review's adopted date
-  // when it is still empty. With the admin client (D-1706): the policy
-  // reviews' update policy needs an active subscription, which a pack buyer
-  // ticking Done need not have; the account id is the viewer's own.
+  // REQ-009 FR-7: "Done" on a document adopts it. REQ-024 A0 (D-2427,
+  // D-2437): the newest version of the type in the account's newest ready set
+  // is dated through `adopt_document_version`, in Sydney, and the policy
+  // review row follows as the mirror. With the admin client (D-1706): a pack
+  // buyer ticking Done need not have a subscription; the account id is the
+  // viewer's own, and the function checks it again.
   if (status === "have") {
     if (item.documentTypeId)
       await markAdopted(
         createSupabaseAdminClient(),
         viewer.account.id,
         item.documentTypeId,
-        new Date().toISOString().slice(0, 10),
+        null,
       );
   }
   return { ok: true };

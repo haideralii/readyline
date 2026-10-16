@@ -65,6 +65,7 @@ export function DateField({
   value,
   onChange,
   optional = false,
+  max,
 }: {
   id: string;
   label: string;
@@ -73,6 +74,8 @@ export function DateField({
   value: string;
   onChange: (v: string) => void;
   optional?: boolean;
+  /** The latest day the picker offers, as ISO (REQ-024 A0, D-2435: today for an adoption of the owner's own document). */
+  max?: string;
 }) {
   return (
     <Field
@@ -87,6 +90,7 @@ export function DateField({
           id={id}
           name={id}
           value={value}
+          max={max}
           onChange={(e) => onChange(e.target.value)}
           aria-describedby={describedBy}
           aria-invalid={invalid || undefined}
