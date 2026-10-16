@@ -248,6 +248,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
           ) : null}
           {p.canWrite ? (
             <form
+              noValidate
               className="mt-3"
               data-testid="end-exception-form"
               onSubmit={(e) => {
@@ -296,6 +297,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
         <>
           {!p.application && p.canWrite ? (
             <form
+              noValidate
               className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
               data-testid="record-application-form"
               onSubmit={(e) => {
@@ -377,6 +379,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
 
           {p.gate.offered ? (
             <form
+              noValidate
               className="mt-3 rounded-md border border-zinc-200 p-3 dark:border-zinc-800"
               data-testid="start-exception-form"
               onSubmit={(e) => {
@@ -493,6 +496,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             The unit made a decision about this application
           </summary>
           <form
+            noValidate
             className="mt-3"
             data-testid="record-decision-form"
             onSubmit={(e) => {
@@ -550,6 +554,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
             Record another s 14 exception (your own call)
           </summary>
           <form
+            noValidate
             className="mt-3"
             data-testid="own-call-form"
             onSubmit={(e) => {
