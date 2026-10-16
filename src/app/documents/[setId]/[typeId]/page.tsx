@@ -17,6 +17,7 @@ import {
 } from "@/server/generation/queries";
 import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { AdoptVersionButton } from "./adopt-version-button";
 import { RegenerateButton } from "./regenerate-button";
 
 export const metadata: Metadata = { title: "Review document" };
@@ -40,6 +41,10 @@ export default async function ReviewDocumentPage({
   const current = versions[0];
   const previous = versions[1] ?? null;
   const changedSection = typeof sp.changed === "string" ? sp.changed : null;
+  // REQ-024 A0 (D-2427, D-2436): adoption is per version. The newest adopted
+  // version of this document in the set, if any, for the line and the
+  // re-adopt action when this latest version is not the one adopted.
+  const olderAdopted = versions.find((v) => v.adopted_on)?.adopted_on ?? null;
   // Backlog 8 (D-551): rule changes applied since this version was drafted that it does not carry.
   const ruleChanges = changesForDocument(
     {
@@ -69,6 +74,11 @@ export default async function ReviewDocumentPage({
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
         Version {current.version} ·{" "}
         {current.status === "ready" ? "drafted" : "review needed"} ·{" "}
+        {current.adopted_on ? (
+          <span data-testid="version-adopted-on">
+            adopted {current.adopted_on} ·{" "}
+          </span>
+        ) : null}
         <a
           href={`/documents/${set.id}/download?file=${typeId}.docx`}
           className="underline underline-offset-2"
@@ -80,6 +90,14 @@ export default async function ReviewDocumentPage({
         Each tailored section shows which of your answers it used. Regenerating
         a section records a new version of this document and shows what changed.
       </p>
+      {!current.adopted_on && olderAdopted ? (
+        <AdoptVersionButton
+          setId={set.id}
+          typeId={typeId}
+          version={current.version}
+          olderAdoptedOn={olderAdopted}
+        />
+      ) : null}
       {ruleChanges.length ? (
         <div
           className="border-ochre mt-4 rounded-md border p-3 text-sm leading-6"

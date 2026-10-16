@@ -7,13 +7,14 @@ import {
   auditPackFileName,
   auditorVisibleIncidents,
   lastEntryDate,
+  newestAdoptedVersions,
   packColumns,
   packIntro,
   packLine,
   packStateWord,
   trailRows,
 } from "./audit-pack";
-import { CSV_COLUMNS, toCsv } from "./csv";
+import { CSV_COLUMNS, CSV_HEADER_LABELS, toCsv } from "./csv";
 import { renderCoverSheet } from "./audit-pack-pdf";
 
 describe("the audit pack's rules", () => {
@@ -70,6 +71,39 @@ describe("the audit pack's rules", () => {
       "W-1,Support worker,ndis-worker-screening,WWC1234567",
     );
     expect(csv).not.toContain("11111111-1111");
+  });
+
+  // REQ-024 A0 (D-2436, finding 233): per type the newest adopted version
+  // ships, from any set; a latest version the owner has not adopted (a
+  // `new-version` row) never does, and a type never adopted ships nothing.
+  it("ships the newest adopted version per type and never an unadopted latest version", () => {
+    const rows = [
+      { document_type_id: "a", version: 1, adopted_on: "2026-10-01", set: 1 },
+      { document_type_id: "a", version: 2, adopted_on: "2026-10-05", set: 1 },
+      { document_type_id: "a", version: 3, adopted_on: null, set: 1 },
+      { document_type_id: "b", version: 1, adopted_on: "2026-10-05", set: 1 },
+      { document_type_id: "b", version: 1, adopted_on: "2026-10-05", set: 2 },
+      { document_type_id: "c", version: 4, adopted_on: null, set: 2 },
+    ];
+    const picked = newestAdoptedVersions(rows).sort((x, y) =>
+      x.document_type_id.localeCompare(y.document_type_id),
+    );
+    expect(picked).toEqual([rows[1], rows[3]]);
+    expect(newestAdoptedVersions([])).toEqual([]);
+  });
+
+  // REQ-024 A0 (D-2432, findings 234 and 244): the policy review file names
+  // its date the first adoption, since the version column carries the latest.
+  it("names the policy review file's adopted column 'first adopted on' and nothing else", () => {
+    const csv = toCsv(
+      ["document_type_id", "adopted_on", "note"],
+      [{ document_type_id: "x", adopted_on: "2026-10-01", note: "" }],
+      CSV_HEADER_LABELS.policy_reviews,
+    );
+    expect(csv).toContain("document_type_id,first adopted on,note");
+    expect(csv).toContain("x,2026-10-01,");
+    expect(CSV_COLUMNS.policy_reviews).toContain("adopted_on");
+    expect(Object.keys(CSV_HEADER_LABELS)).toEqual(["policy_reviews"]);
   });
 
   it("finds the latest date on any row, by the date columns a register carries", () => {

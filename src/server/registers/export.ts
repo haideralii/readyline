@@ -8,7 +8,7 @@ import "server-only";
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { auditorVisibleIncidents } from "@/lib/registers/audit-pack";
-import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import { CSV_COLUMNS, CSV_HEADER_LABELS, toCsv } from "@/lib/registers/csv";
 import {
   listComplaints,
   listIncidents,
@@ -81,7 +81,9 @@ export async function registerFiles(
   const name =
     register === "worker_clearances" ? "worker-checks" : "policy-reviews";
   return {
-    [`${name}-${stamp}.csv`]: strToU8(toCsv(CSV_COLUMNS[register], rows)),
+    [`${name}-${stamp}.csv`]: strToU8(
+      toCsv(CSV_COLUMNS[register], rows, CSV_HEADER_LABELS[register]),
+    ),
   };
 }
 

@@ -62,6 +62,8 @@ function registerRow(model: DocumentModel) {
           title: model.title,
           version: 1,
           created_at: `${DRAFTED}T03:00:00Z`,
+          // REQ-024 A0 (D-2427): the version's own adoption date is the register's truth.
+          adopted_on: ADOPTED,
         },
       ],
       changes: [],

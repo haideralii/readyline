@@ -60,19 +60,60 @@ export async function seedPolicyReviews(
 }
 
 /**
- * FR-7, the other direction: a checklist item ticked "Done" (adopted) sets
- * `adopted_on` on the matching policy review when it is still empty.
+ * REQ-024 A0 (D-2427, D-2437, D-2443): adoption is per version. The latest
+ * version of the type in the named set, or in the account's newest ready
+ * set when none is named, is adopted through `adopt_document_version`,
+ * which dates it in Sydney and upserts the policy review row as the mirror
+ * for `next_review_on`. When the type has no version there, nothing is
+ * written and nothing errors (finding 179). The caller proves the account
+ * first; the function checks it again and refuses with 42501 otherwise.
+ * D-2449: `adoptedOn` carries an earlier version's day onto a re-rendered
+ * version (the adopt step's own re-render); the function honours it for the
+ * service role alone and dates every owner's call today.
  */
 export async function markAdopted(
   supabase: SupabaseClient,
   accountId: string,
   documentTypeId: string,
-  adoptedOn: string,
-): Promise<void> {
-  await supabase
-    .from("policy_reviews")
-    .update({ adopted_on: adoptedOn })
+  setId: string | null,
+  adoptedOn: string | null = null,
+): Promise<string | null> {
+  let set = setId;
+  if (!set) {
+    const newest = await supabase
+      .from("version_sets")
+      .select("id")
+      .eq("account_id", accountId)
+      .eq("status", "ready")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    set = (newest.data?.id as string | undefined) ?? null;
+  }
+  if (!set) return null;
+  const latest = await supabase
+    .from("document_versions")
+    .select("id")
+    .eq("version_set_id", set)
     .eq("account_id", accountId)
     .eq("document_type_id", documentTypeId)
-    .is("adopted_on", null);
+    .order("version", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const versionId = latest.data?.id as string | undefined;
+  if (!versionId) return null;
+  const r = await supabase.rpc("adopt_document_version", {
+    p_account: accountId,
+    p_version: versionId,
+    ...(adoptedOn ? { p_adopted_on: adoptedOn } : {}),
+  });
+  if (r.error) {
+    log.warn("registers.adopt.failed", {
+      accountId,
+      documentTypeId,
+      code: r.error.code,
+    });
+    return null;
+  }
+  return r.data as string;
 }

@@ -20,6 +20,7 @@ import { auditDayAskList } from "@/lib/registers/audit-day-ask";
 import {
   auditPackFileName,
   auditorVisibleIncidents,
+  newestAdoptedVersions,
   packColumns,
   packLine,
   trailRows,
@@ -28,8 +29,6 @@ import {
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
 import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
 import { log } from "@/lib/logging/logger";
-import { listAdoptedTypeIds } from "@/server/path/state";
-import { listLatestDocuments } from "@/server/generation/queries";
 import { downloadObject, objectPath } from "@/server/generation/storage";
 import {
   auditDayOverview,
@@ -249,12 +248,26 @@ export async function buildAuditPack(input: {
     } catch (e) {
       log.warn("audit-pack.summary-missing", { accountId, error: e });
     }
-    const [documents, adopted] = await Promise.all([
-      listLatestDocuments(supabase, setId),
-      listAdoptedTypeIds(supabase, accountId),
-    ]);
+    // REQ-024 A0 (D-2436, finding 233): per type, the newest version with
+    // `adopted_on` set, from any set, read over the partial index; a latest
+    // version the owner has not adopted never ships.
+    const adoptedRows = await supabase
+      .from("document_versions")
+      .select("document_type_id, version, adopted_on, storage_path")
+      .eq("account_id", accountId)
+      .not("adopted_on", "is", null)
+      .limit(2000);
+    const documents = newestAdoptedVersions(
+      (adoptedRows.data as
+        | {
+            document_type_id: string;
+            version: number;
+            adopted_on: string | null;
+            storage_path: string;
+          }[]
+        | null) ?? [],
+    );
     for (const d of documents) {
-      if (!adopted.has(d.document_type_id)) continue;
       try {
         files[`documents/${d.document_type_id}.docx`] = await downloadObject(
           admin,

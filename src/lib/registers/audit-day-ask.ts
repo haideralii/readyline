@@ -8,7 +8,7 @@
 import type { AuditDayOverview } from "@/server/registers/audit-day-queries";
 import type { RegisterOverview } from "./overview";
 import type { DocumentControlRow } from "./document-control";
-import { documentControlSentence } from "./document-control";
+import { documentControlSentence, newVersionsAsk } from "./document-control";
 import {
   AUDIT_DAY_RECORDS,
   auditRecordTier,
@@ -69,13 +69,22 @@ export function auditDayAskList(input: {
   const { registers: r, auditDay: a, documentControl: dc } = input;
   const dcOverdue = dc.filter((d) => d.state === "overdue").length;
   const dcMissing = dc.length === 0 || dc.some((d) => !d.adopted_on);
+  // REQ-024 A0 (D-2436): a set whose rows carry new versions and nothing missing names them.
+  const dcNewVersions = newVersionsAsk(dc);
   const lines: Omit<AskLine, "ask" | "tier" | "paper">[] = [
     {
       id: "document-control",
       state: dcOverdue ? "overdue" : dcMissing ? "missing" : "filled",
-      word: documentControlSentence(dc),
-      href: "/registers/document-control",
-      action: dcMissing ? "Adopt your documents" : "Open",
+      word:
+        !dcMissing && dcNewVersions
+          ? `${documentControlSentence(dc)} ${dcNewVersions}.`
+          : documentControlSentence(dc),
+      href: dcNewVersions ? "/path/adopt" : "/registers/document-control",
+      action: dcMissing
+        ? "Adopt your documents"
+        : dcNewVersions
+          ? "Adopt the new versions"
+          : "Open",
     },
     {
       id: "decisions",

@@ -26,6 +26,8 @@ export type SummaryControlRow = {
   adopted_by: string;
   next_review_on: string | null;
   circulated: { on: string; workers: number } | null;
+  /** REQ-024 A0 (D-2436): "new-version" when the newest version is unadopted and an older one was. */
+  state?: string;
 };
 
 export type SummaryInput = {
@@ -101,8 +103,13 @@ export async function renderSummaryPdf(
     gap(8);
     input.documentControl.forEach((r, i) => {
       line(`${i + 1}. ${r.title}`, 11, bold);
+      // REQ-024 A0 (D-2436): a newest version not yet adopted says so beside the older adoption.
+      const adoptedWords =
+        r.state === "new-version"
+          ? `Adopted ${r.adopted_on}; version ${r.version} not yet adopted`
+          : `Adopted ${r.adopted_on ?? "not yet"}${r.adopted_by ? ` by ${r.adopted_by}` : ""}`;
       line(
-        `Version ${r.version}. Adopted ${r.adopted_on ?? "not yet"}${r.adopted_by ? ` by ${r.adopted_by}` : ""}. Next review ${r.next_review_on ?? "not set"}. Circulated ${r.circulated ? `${r.circulated.on} to ${r.circulated.workers} worker${r.circulated.workers === 1 ? "" : "s"}` : "not yet"}.`,
+        `Version ${r.version}. ${adoptedWords}. Next review ${r.next_review_on ?? "not set"}. Circulated ${r.circulated ? `${r.circulated.on} to ${r.circulated.workers} worker${r.circulated.workers === 1 ? "" : "s"}` : "not yet"}.`,
         10,
       );
     });
