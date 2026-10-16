@@ -127,18 +127,21 @@ test.describe("the registration timeline (REQ-023 Session A)", () => {
   test.skip(!enabled, "needs the Supabase variables");
 
   let tenant: TestTenant;
+  // The fixture is the answers object itself (`answersVersion`, `business`,
+  // `supports` at the top level), passed whole as `accessibility-pass.spec.ts`
+  // does; #73's third run failed at `session.ts:81` on `answers.answers`.
   const answers = JSON.parse(
     readFileSync(
       "fixtures/reference-cases/certification-personal-care.json",
       "utf8",
     ),
-  ) as { answers: Record<string, unknown> };
+  ) as Record<string, unknown>;
 
   test.beforeAll(async ({}, testInfo) => {
     tenant = await createTenant({
       label: `timeline-${testInfo.project.name}`,
       tradingName: "Sunrise Supports",
-      answers: answers.answers,
+      answers,
     });
   });
 
