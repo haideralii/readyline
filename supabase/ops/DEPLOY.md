@@ -51,16 +51,23 @@ prints the names; previews and local builds only need
 
 1. Settings → General → **Node.js Version**: 22.x.
 2. Settings → Functions → **Function Region**: Sydney (`syd1`).
-3. Settings → Git: production branch `main`. **Ignored Build Step** (batch
-   46, D-2206): paste `bash scripts/ops/vercel-ignore-build.sh`. With it,
-   Vercel builds only a commit on `main` that changes something other than
-   `product/` and markdown; a status or chat commit deploys nothing and
-   pull requests get no preview (CI's Playwright run against a production
-   build covers what previews did). The script's own tests are in
-   `scripts/ops/vercel-ignore-build.test.ts`. If previews are ever turned
-   back on, a preview build needs two variables ticked for the Preview
-   environment, `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME` (see
-   section 3); without them every preview fails at `check-env`.
+3. Settings → Git: production branch `main`. Previews are off in
+   `vercel.json` (`git.deploymentEnabled`: every branch `false`, `main`
+   `true`; D-2239): a push to a pull-request branch creates no deployment
+   at all. That is the only setting that saves the Hobby cap, because a
+   build the Ignored Build Step cancels still counts as a created
+   deployment (Vercel, project settings, "Ignored Build Step", read 16 Oct
+   2026). Nothing to paste for it; it ships with the code. **Ignored Build
+   Step** (batch 46, D-2206) is the second layer, for `main` itself: paste
+   `bash scripts/ops/vercel-ignore-build.sh`; with it a commit on `main`
+   that changes only `product/` and markdown builds nothing (tests in
+   `scripts/ops/vercel-ignore-build.test.ts`). CI's Playwright run against
+   a production build covers what previews did. If a preview of `next` is
+   ever wanted, set `"next": true` beside `main` in `vercel.json`, and
+   first tick two variables for the Preview environment,
+   `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_BRAND_NAME` (see section 3);
+   without them every preview fails at `check-env`, and each merge to
+   `next` then spends one of the day's deployments.
 4. Settings → Domains: add your domain when you have it; until then the
    `*.vercel.app` address is the production domain. Whatever it is, that
    is `<domain>` below.
@@ -279,12 +286,13 @@ Every service here is on a free tier, and the limits shape how work ships.
 Anything that would push against one of them is said in `product/CHAT.md`
 before it is done, by the PO or by Dev.
 
-| Service        | Limit                                                 | What we do about it                                                                                                                                                                                   |
-| -------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vercel Hobby   | 100 deployments a day; 100 GB bandwidth a month       | Work merges to `next`; the PO merges `next` into `main` once a day, twice at most (D-2205). The Ignored Build Step (section 2) skips docs-only commits and previews (D-2206).                         |
-| GitHub Actions | 2,000 minutes a month while the repository is private | A full CI run is about 45 job minutes. No re-run of a red job without reading its trace or annotations first; `cancel-in-progress` stays on; docs-only pushes to `main` run nothing (`paths-ignore`). |
-| Supabase Free  | Two projects; a project pauses after 7 idle days      | The daily crons (section 8) keep the project warm. Migrations reach it once a day with the `next` merge, through `migrate.yml`.                                                                       |
-| Stripe         | Test mode only until launch                           | Live keys arrive with REQ-022's launch pass, never before every row on `/admin/launch` is green (D-2202).                                                                                             |
+| Service           | Limit                                                                                                                                                                                                           | What we do about it                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vercel Hobby      | 100 deployments created a day, 100 an hour, 60 in five minutes; 100 GB bandwidth a month (vercel.com/docs/limits, page dated 16 Sep 2026, read 16 Oct 2026)                                                     | Work merges to `next`; the PO merges `next` into `main` once a day, twice at most (D-2205). Previews are off at the Git integration, so a branch push creates no deployment (D-2239); the Ignored Build Step (section 2) skips docs-only commits on `main` (D-2206). A cancelled build still counts, so the script alone never saved the cap. Forward-merge a chain once, after the last fix, not after every fix; PRs to `next` one or two at a time (the `free-tier` skill). |
+| GitHub Actions    | 2,000 minutes a month while the repository is private                                                                                                                                                           | A full CI run is about 45 job minutes. No re-run of a red job without reading its trace or annotations first; `cancel-in-progress` stays on; docs-only pushes to `main` run nothing (`paths-ignore`).                                                                                                                                                                                                                                                                          |
+| Supabase Free     | Two projects; a project pauses after 7 idle days                                                                                                                                                                | The daily crons (section 8) keep the project warm. Migrations reach it once a day with the `next` merge, through `migrate.yml`.                                                                                                                                                                                                                                                                                                                                                |
+| Amazon ECR Public | Unauthenticated pulls: 500 GB a month and 1 pull a second (AWS docs, read 16 Oct 2026); CI's `supabase start` pulls the local stack's images this way, sharing the allowance with every anonymous GitHub runner | A "toomanyrequests: Data limit exceeded" line in the Supabase job means the stack is incomplete; read that job's failures against the log, no re-run until the pull succeeds (the `free-tier` skill, rule 7). Credentials or an image cache would remove the dependency; not done.                                                                                                                                                                                             |
+| Stripe            | Test mode only until launch                                                                                                                                                                                     | Live keys arrive with REQ-022's launch pass, never before every row on `/admin/launch` is green (D-2202).                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## If something fails
 

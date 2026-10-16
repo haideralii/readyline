@@ -6,6 +6,7 @@
  * and stored only as its hash; every step writes its audit line. Plain form
  * posts that work without JavaScript.
  */
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
 import {
@@ -23,7 +24,7 @@ import { latestAuditorLink, liveLink } from "./auditor-links";
 
 export type AuditorLinkActionResult =
   | { ok: true; url: string; expiresAt: string }
-  | { ok: true; revoked: true }
+  | { ok: true; revoked: true; id: string }
   | { ok: false; message: string };
 
 const CreateInput = strictObject({
@@ -90,6 +91,9 @@ export async function createAuditorLinkAction(
     action: "auditor_link.created",
     target: `${ins.data.id as string} ${hours}h`,
   });
+  // The account page reads the live link on the server; without this the panel
+  // never shows the new link's state (run 38721614254, PR #61).
+  revalidatePath("/account");
   return {
     ok: true,
     url: `${siteUrl()}${auditorLinkPath(token)}`,
@@ -121,5 +125,6 @@ export async function revokeAuditorLinkAction(
     action: "auditor_link.revoked",
     target: parsed.data.id,
   });
-  return { ok: true, revoked: true };
+  revalidatePath("/account");
+  return { ok: true, revoked: true, id: parsed.data.id };
 }
