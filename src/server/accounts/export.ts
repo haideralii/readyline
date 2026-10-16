@@ -17,6 +17,8 @@ export type AccountExport = {
   /** REQ-006 SR-1: the checklist statuses and notes the provider set. */
   checklistItems: Record<string, unknown>[];
   auditLog: Record<string, unknown>[];
+  /** REQ-023 FR-2 (finding 66): the registration periods, dates as typed. */
+  registrationPeriods: Record<string, unknown>[];
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -34,7 +36,7 @@ export async function buildAccountExport(
     .maybeSingle();
   if (account.error || !account.data) return null;
 
-  const [memberships, draft, checklist, audit] = await Promise.all([
+  const [memberships, draft, checklist, audit, periods] = await Promise.all([
     supabase
       .from("memberships")
       .select("user_id, role, created_at")
@@ -54,6 +56,14 @@ export async function buildAccountExport(
       .select("id, actor_user_id, action, target, at")
       .eq("account_id", accountId)
       .order("at", { ascending: true }),
+    // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
+    supabase
+      .from("registration_periods")
+      .select(
+        "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("period_starts_on", { ascending: true }),
   ]);
 
   return {
@@ -64,6 +74,7 @@ export async function buildAccountExport(
     questionnaireDraft: draft.data ?? null,
     checklistItems: checklist.data ?? [],
     auditLog: audit.data ?? [],
+    registrationPeriods: periods.data ?? [],
   };
 }
 

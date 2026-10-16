@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
-import { deriveChecklist, progressLine } from "@/lib/checklist/derive";
+import {
+  checklistPeriod,
+  deriveChecklist,
+  progressLine,
+} from "@/lib/checklist/derive";
 import {
   DRAFTED_LABEL,
   mergeChecklist,
@@ -14,6 +18,7 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { latestReadySet, listChecklistItems } from "@/server/checklist/queries";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { ChecklistView } from "./checklist-view";
 
@@ -58,11 +63,18 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, latest] = await Promise.all([
+  const [stored, latest, period] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     latestReadySet(supabase, viewer.account.id),
+    currentPeriod(supabase, viewer.account.id),
   ]);
-  const checklist = deriveChecklist(built.result, answers.data, dataset);
+  // REQ-023 FR-4: the dated audit items once a registration period exists.
+  const checklist = deriveChecklist(
+    built.result,
+    answers.data,
+    dataset,
+    checklistPeriod(period),
+  );
   const shown = mergeChecklist({
     checklist,
     stored,
