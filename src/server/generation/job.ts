@@ -22,6 +22,7 @@ import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { log } from "@/lib/logging/logger";
+import { generationFailureCode, reasonForCi } from "./failure-code";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -265,7 +266,11 @@ export async function runGenerationTick(input: {
     fields: Omit<JobPatch, "last_progress_at">,
   ): JobPatch => ({ ...fields, last_progress_at: now().toISOString() });
 
-  const failPermanently = async (reason: string, alert: boolean) => {
+  const failPermanently = async (
+    reason: string,
+    alert: boolean,
+    kind: "context" | "build" | "attempts" = "context",
+  ) => {
     await backend.update(job.id, {
       status: "failed",
       phase: "failed",
@@ -281,14 +286,24 @@ export async function runGenerationTick(input: {
           status: "failed",
         })
         .catch(() => undefined);
+    // After-window item 9: the closed code beside the omitted free text, so the
+    // log reads without it; in CI alone the raw reason follows at warn (runs
+    // 38750817767 and 38826340580 left three failures unreadable).
     const fields = {
       jobId: job.id,
       purchaseId: job.purchase_id,
       accountId: job.account_id,
+      code: generationFailureCode(reason, kind),
       reason,
     };
     if (alert) log.error("payments.generation.failed", fields);
     else log.info("payments.generation.cancelled", fields);
+    if (alert && reasonForCi())
+      log.warn("payments.generation.failed-reason", {
+        jobId: job.id,
+        accountId: job.account_id,
+        reasonText: reason.slice(0, 500),
+      });
     return {
       claimed: true as const,
       jobId: job.id,
@@ -313,7 +328,7 @@ export async function runGenerationTick(input: {
         accountId: job.account_id,
       });
     const built = buildResult(dataset, ctx.answers);
-    if (!built.ok) return await failPermanently(built.message, true);
+    if (!built.ok) return await failPermanently(built.message, true, "build");
     const result = built.result;
     const facts = buildProviderFacts(ctx.answers, result);
     const generatedAt = job.created_at.slice(0, 10);
@@ -743,7 +758,7 @@ export async function runGenerationTick(input: {
     const message = (e instanceof Error ? e.message : String(e)).slice(0, 500);
     if (attempts >= MAX_ATTEMPTS) {
       await backend.update(job.id, { attempts });
-      return await failPermanently(message, true);
+      return await failPermanently(message, true, "attempts");
     }
     await backend.update(job.id, {
       status: "queued",
