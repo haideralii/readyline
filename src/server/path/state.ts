@@ -77,9 +77,15 @@ export async function loadQuestionnaire(): Promise<{
 
 /**
  * Document type ids adopted in the account's newest ready set (REQ-024 A0,
- * D-2440): a type counts when its latest version in that set carries
- * `adopted_on`, so a regenerated or re-rendered set offers its groups again
- * and the register, the pack and the Start here sheet read one truth. The
+ * D-2448, which narrows D-2440 after #77's signed-in run): a type counts
+ * when any version of it in that set carries `adopted_on`, the first
+ * adoption, so the guided path's adopt step, the checklist tick and the
+ * Start here sheet read one truth and a facts re-render of an adopted
+ * document never re-opens its group. A newer unadopted version is the
+ * register's `new-version` state and the document page's "Adopt this
+ * version" box, a nudge, never the path's gate; the pack keeps D-2440's rule
+ * and ships the newest adopted version per type (`newestAdoptedVersions`).
+ * A regenerated set is a new set, so its groups are offered again. The
  * policy review row is the mirror for `next_review_on` only.
  */
 export async function listAdoptedTypeIds(
@@ -89,7 +95,7 @@ export async function listAdoptedTypeIds(
   return new Set((await listAdoptedDates(supabase, accountId)).keys());
 }
 
-/** The same read with the day: each type adopted in the newest ready set and its latest version's `adopted_on` (D-2435: the register shows it). */
+/** The same read with the day: each type adopted in the newest ready set and its newest adopted version's `adopted_on` (D-2435: the register shows it read-only). */
 export async function listAdoptedDates(
   supabase: SupabaseClient,
   accountId: string,
@@ -108,16 +114,16 @@ export async function listAdoptedDates(
     .from("document_versions")
     .select("document_type_id, version, adopted_on")
     .eq("version_set_id", setId)
+    .not("adopted_on", "is", null)
     .order("version", { ascending: false })
     .limit(2000);
-  const latest = new Map<string, string | null>();
-  for (const row of (r.data as
-    | { document_type_id: string; version: number; adopted_on: string | null }[]
-    | null) ?? [])
-    if (!latest.has(row.document_type_id))
-      latest.set(row.document_type_id, row.adopted_on);
+  // Newest version first, so the first row per type is the newest adopted one.
   const out = new Map<string, string>();
-  for (const [id, on] of latest) if (on) out.set(id, on);
+  for (const row of (r.data as
+    | { document_type_id: string; version: number; adopted_on: string }[]
+    | null) ?? [])
+    if (!out.has(row.document_type_id))
+      out.set(row.document_type_id, row.adopted_on);
   return out;
 }
 

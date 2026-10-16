@@ -521,6 +521,16 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
         .locator("li[data-state='adopted']"),
     ).toHaveCount(controlRows);
     await checkWidths(page, "document control");
+    // REQ-024 A0 (D-2435): the policy review register shows a catalogue
+    // type's adopted date from the pack's version column, read-only.
+    await page.goto("/registers/policy-reviews/new");
+    await page
+      .getByLabel("Document")
+      .selectOption("complaints-management-policy-and-register");
+    await expect(page.getByTestId("adopted-on-from-pack")).toContainText(
+      /\d{4}-\d{2}-\d{2}, from your pack\./,
+    );
+    await expect(page.getByLabel(/Date adopted/)).toHaveCount(0);
     await page.goto("/path/audit-day");
     await checkWidths(page, "audit day");
     await pagePass(page, "audit day with a pack");

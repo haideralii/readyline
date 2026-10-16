@@ -36,7 +36,7 @@ import { refreshSetSummary } from "@/server/generation/rerender";
 import { DOCUMENTS_BUCKET } from "@/server/generation/storage";
 import { documentControlForSet } from "@/server/registers/document-control-queries";
 import { markAdopted } from "@/server/registers/seed";
-import { listAdoptedTypeIds } from "@/server/path/state";
+import { listAdoptedDates, listAdoptedTypeIds } from "@/server/path/state";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
 
 const enabled = hasSupabaseEnv();
@@ -515,9 +515,15 @@ describe.skipIf(!enabled)(
       expect(rows.find((r) => r.document_type_id === typeB)?.state).toBe(
         "adopted",
       );
+      // D-2448: the path counts the first adoption, so the type stays adopted
+      // for the path while the register nudges; the register's date is the
+      // newest adopted version's (version 1's, today).
       const before = await listAdoptedTypeIds(admin, owner.accountId);
-      expect(before.has(typeA)).toBe(false);
+      expect(before.has(typeA)).toBe(true);
       expect(before.has(typeB)).toBe(true);
+      expect((await listAdoptedDates(admin, owner.accountId)).get(typeA)).toBe(
+        today,
+      );
       // The re-adopt: the owner's call on the newest version.
       const r = await owner.client.rpc("adopt_document_version", {
         p_account: owner.accountId,
