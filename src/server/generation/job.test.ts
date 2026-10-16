@@ -11,6 +11,8 @@ import { documentTypeById } from "@/lib/generator/catalogue";
 import { FakeClient, ReplayClient } from "@/lib/generator/model-client";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { getStandardsDataset } from "@/lib/standards/dataset";
+import { log } from "@/lib/logging/logger";
+import { OMITTED, redact } from "@/lib/logging/redact";
 import { LogOnlyEmailProvider } from "@/server/email/provider";
 import {
   MAX_ATTEMPTS,
@@ -359,6 +361,77 @@ describe("runGenerationTick (REQ-007 FR-5, D-706)", () => {
     expect(h.email.sent).toHaveLength(0);
     // A failed job is not claimable again.
     expect(await h.tick()).toEqual({ claimed: false });
+  });
+
+  // After-window item 9 (PO decision, 16 Oct 2026 15:43): the failed line
+  // carries a closed code and the redactor omits its free-text reason as
+  // before; the raw reason follows at `warn` only when `CI` is "true" and
+  // never on a Vercel deployment, so production logs stay as they were.
+  it("logs the failure code with the reason omitted in production, and the raw reason at warn in CI alone", async () => {
+    const error = vi.spyOn(log, "error").mockImplementation(() => undefined);
+    const warn = vi.spyOn(log, "warn").mockImplementation(() => undefined);
+    const saved = { CI: process.env.CI, VERCEL_ENV: process.env.VERCEL_ENV };
+    const exhaust = async () => {
+      const h = harness();
+      h.backend.enqueue();
+      h.store.failPut = true;
+      await h.tick();
+      for (let i = 1; i < MAX_ATTEMPTS; i++) {
+        h.backend.jobs[0].next_run_at = "2026-10-12T00:00:00.000Z";
+        await h.tick();
+      }
+      expect(h.backend.jobs[0].status).toBe("failed");
+    };
+    try {
+      // Production: no CI flag, a Vercel deployment.
+      delete process.env.CI;
+      process.env.VERCEL_ENV = "production";
+      await exhaust();
+      const failed = error.mock.calls.find(
+        (c) => c[0] === "payments.generation.failed",
+      );
+      expect(failed?.[1]).toMatchObject({ code: "attempts-exhausted" });
+      // What the logger writes: the redactor omits `reason` by its key.
+      expect(redact(failed?.[1])).toMatchObject({ reason: OMITTED });
+      expect(
+        warn.mock.calls.some(
+          (c) => c[0] === "payments.generation.failed-reason",
+        ),
+      ).toBe(false);
+
+      // CI: the same failed line, and the raw reason under a key the redactor leaves in clear.
+      error.mockClear();
+      warn.mockClear();
+      process.env.CI = "true";
+      delete process.env.VERCEL_ENV;
+      await exhaust();
+      const line = warn.mock.calls.find(
+        (c) => c[0] === "payments.generation.failed-reason",
+      );
+      expect(line?.[1]).toMatchObject({ reasonText: expect.any(String) });
+      expect(redact(line?.[1])).toMatchObject({
+        reasonText: (line?.[1] as { reasonText: string }).reasonText,
+      });
+
+      // A Vercel deployment with CI set still redacts: never in production.
+      error.mockClear();
+      warn.mockClear();
+      process.env.CI = "true";
+      process.env.VERCEL_ENV = "production";
+      await exhaust();
+      expect(
+        warn.mock.calls.some(
+          (c) => c[0] === "payments.generation.failed-reason",
+        ),
+      ).toBe(false);
+    } finally {
+      if (saved.CI === undefined) delete process.env.CI;
+      else process.env.CI = saved.CI;
+      if (saved.VERCEL_ENV === undefined) delete process.env.VERCEL_ENV;
+      else process.env.VERCEL_ENV = saved.VERCEL_ENV;
+      error.mockRestore();
+      warn.mockRestore();
+    }
   });
 
   it("cancels a job whose entitlement was revoked before it ran, generating nothing", async () => {
