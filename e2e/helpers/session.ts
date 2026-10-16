@@ -263,43 +263,59 @@ export async function deleteTenant(tenant: TestTenant): Promise<void> {
   // 07:36:07Z). The account row is deleted below, before the user, so the
   // cascade takes its jobs, sets, versions and memberships and no window is
   // left.
-  if (tenant.accountId)
-    await tenant.admin
+  // #78's run 38881965824 (PO 21:01): the lines came back with the account
+  // delete in place, so the account was not the one the helper knew. A tenant
+  // created without an account (item 28) has `accountId` empty while the
+  // setup form gives it one, and any other path that leaves the user owning
+  // an account the helper never saw ends the same way; so every account the
+  // user owns is read from `memberships` and taken down, each one's jobs
+  // deleted outright (any status, so nothing is left for a claim), its
+  // objects removed, then the row; a row that survives is printed as an
+  // error, never swallowed.
+  const owned = await tenant.admin
+    .from("memberships")
+    .select("account_id")
+    .eq("user_id", tenant.userId)
+    .eq("role", "owner");
+  const accountIds = new Set<string>(
+    ((owned.data as { account_id: string }[] | null) ?? []).map(
+      (m) => m.account_id,
+    ),
+  );
+  if (tenant.accountId) accountIds.add(tenant.accountId);
+  for (const accountId of accountIds) {
+    const jobs = await tenant.admin
       .from("generation_jobs")
-      .update({
-        status: "failed",
-        last_error: "cancelled: the test tenant was deleted",
-      })
-      .eq("account_id", tenant.accountId)
-      .in("status", ["queued", "running"]);
-  // A user created without an account (item 28) has no sets to clear, and the
-  // account the form created is removed with the user.
-  const sets = tenant.accountId
-    ? await tenant.admin
-        .from("version_sets")
-        .select("id")
-        .eq("account_id", tenant.accountId)
-    : { data: [] as { id: string }[] };
-  for (const s of sets.data ?? []) {
-    const prefix = `${tenant.accountId}/${s.id}`;
-    const listed = await tenant.admin.storage
-      .from("documents")
-      .list(prefix, { limit: 1000 });
-    const names = (listed.data ?? []).map((o) => `${prefix}/${o.name}`);
-    if (names.length)
-      await tenant.admin.storage
+      .delete()
+      .eq("account_id", accountId);
+    if (jobs.error)
+      console.error(
+        `deleteTenant: jobs of ${accountId} not deleted (${jobs.error.code} ${jobs.error.message})`,
+      );
+    const sets = await tenant.admin
+      .from("version_sets")
+      .select("id")
+      .eq("account_id", accountId);
+    for (const s of sets.data ?? []) {
+      const prefix = `${accountId}/${s.id}`;
+      const listed = await tenant.admin.storage
         .from("documents")
-        .remove(names)
-        .catch(() => undefined);
-  }
-  if (tenant.accountId) {
+        .list(prefix, { limit: 1000 });
+      const names = (listed.data ?? []).map((o) => `${prefix}/${o.name}`);
+      if (names.length)
+        await tenant.admin.storage
+          .from("documents")
+          .remove(names)
+          .catch(() => undefined);
+    }
     const gone = await tenant.admin
       .from("accounts")
       .delete()
-      .eq("id", tenant.accountId);
-    if (gone.error)
-      console.warn(
-        `deleteTenant: account ${tenant.accountId} not deleted (${gone.error.code})`,
+      .eq("id", accountId)
+      .select("id");
+    if (gone.error || (gone.data ?? []).length !== 1)
+      console.error(
+        `deleteTenant: account ${accountId} not deleted (${gone.error?.code ?? "no row returned"} ${gone.error?.message ?? ""})`,
       );
   }
   await tenant.admin.auth.admin
