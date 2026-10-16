@@ -19,7 +19,7 @@ Every document shows which sections are which.
 
 ## Which model, and where your data goes
 
-We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models.
+We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
 
 ## How we check the drafts
 

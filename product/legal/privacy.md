@@ -38,7 +38,7 @@ We do not sell your information. We do not share it with anyone except the servi
 
 - Supabase stores your account and data on servers in Sydney, Australia.
 - Vercel runs the website. Its servers are in Sydney where we can choose; some requests may be handled elsewhere briefly.
-- Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models. Anthropic processes our requests in the United States.
+- Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}. Anthropic processes our requests in the United States.
 - Stripe takes payments and keeps card details. Stripe may process data outside Australia under its own privacy policy.
 - An email provider sends service emails.
 
