@@ -16,6 +16,7 @@ The PO walked the questionnaire on 12 Oct 2026 at phone size as a first-time, no
 
 ### P2: soon after launch
 - FR-6 Number fields use `inputmode="numeric"`; sole traders get defaults (workers 1, key personnel 1, risk-assessed role yes) that they can change.
+  - *QA pass N8 (Dev, 17 Oct 2026; #86): the number fields take `inputmode="decimal"` from then, and keep what a number would read (digits, one point, a leading minus) rather than stripping to digits, so a typed "2.5" reaches the schema and is refused as "Enter a whole number of workers" instead of becoming 25; `e2e/req-013-p2.spec.ts` pins `decimal`.*
 - FR-7 Step indicator wraps to two rows on phones; replace with "Step 2 of 6: Supports" plus a progress bar, keeping the links for completed steps.
 - FR-8 Home page before launch: replace "is being built" with the value proposition, "free, about ten minutes", and trust cues (Australian-hosted, no participant data, independent of the NDIA and the Commission), plus one example result.
 - FR-9 A visible way to ask a question (contact email) in the footer and on the result page.
