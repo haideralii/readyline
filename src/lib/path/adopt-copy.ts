@@ -8,3 +8,11 @@
 export const ADOPT_NEEDS_NAME = "Type your name on the account page first.";
 export const ADOPT_NEEDS_NAME_HREF = "/account#ownerName";
 export const ADOPT_NEEDS_NAME_LINK = "Go to your account page";
+
+/**
+ * QA pass F1 (17 Oct 2026, D-2269): the adopt step's refusal when the set its
+ * page holds is no longer the account's newest ready pack (the rule
+ * `adopt_document_version` holds), said before anything is written.
+ */
+export const NOT_CURRENT_PACK =
+  "This set is no longer your current pack. Open your documents and adopt from the newest pack.";

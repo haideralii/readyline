@@ -154,7 +154,7 @@ test.describe("REQ-025 Session B: one stepper", () => {
     await expect(page.getByText("Back to:")).toHaveCount(0);
     expect(await axeSerious(page, "result with the stepper")).toEqual([]);
 
-    // AC-6: "Start again" asks first; Keep leaves everything; Yes clears and goes to the first step.
+    // AC-6: "Start again" asks first; Keep leaves everything; Yes clears and goes to the intro.
     await expect(page.getByTestId("clear-draft")).toHaveText("Start again");
     await page.getByTestId("clear-draft").click();
     await expect(page.getByTestId("clear-draft-confirm")).toContainText(
@@ -164,7 +164,8 @@ test.describe("REQ-025 Session B: one stepper", () => {
     await expect(page.getByTestId("result")).toBeVisible();
     await page.getByTestId("clear-draft").click();
     await page.getByTestId("clear-draft-yes").click();
-    await expect(page).toHaveURL(/\/start(\/business)?$/);
+    // QA pass F7 (D-2269): the intro is where "Start again" lands, not step 1.
+    await expect(page).toHaveURL(/\/start$/);
     await page.goto("/start/business");
     await expect(page.getByLabel("Trading name")).toHaveValue("");
     await expect(page.getByTestId("stepper-supports")).toHaveAttribute(

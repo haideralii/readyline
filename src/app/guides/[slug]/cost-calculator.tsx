@@ -77,7 +77,10 @@ export function CostCalculator({
               />
               <span className="min-w-0 text-sm">
                 {g.name}{" "}
-                <span className="font-mono text-zinc-500">{g.code}</span>
+                {/* QA pass F2: the muted pair the site uses, 4.5:1 in both schemes (dark zinc-500 on the dark paper was 3.01:1). */}
+                <span className="font-mono text-zinc-500 dark:text-zinc-400">
+                  {g.code}
+                </span>
               </span>
               <span
                 className={`ml-auto rounded-full border px-2 py-0.5 text-xs whitespace-nowrap ${g.auditType === "verification" ? "border-moss text-moss" : "border-ochre text-ochre"}`}
@@ -109,8 +112,11 @@ export function CostCalculator({
             <p className="mt-2 text-sm leading-6">
               Readyline document pack:{" "}
               <strong>{packPrice ?? "one fixed price"}</strong> one-off, drafted
-              for these {chosen.length}{" "}
-              {chosen.length === 1 ? "group" : "groups"}.{" "}
+              for{" "}
+              {chosen.length === 1
+                ? "this group"
+                : `these ${chosen.length} groups`}
+              .{" "}
               <Link href="/start" className="underline underline-offset-2">
                 Get the full result with sources
               </Link>
