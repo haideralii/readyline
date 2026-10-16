@@ -8,6 +8,7 @@
  * `standards.json` ties first aid to a class.
  */
 import { glossaryMeaning } from "@/lib/questionnaire/content";
+import { mustStartBy, type RegistrationPeriod } from "@/lib/registers/timeline";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -75,6 +76,18 @@ export type ChecklistItem = {
   count?: number;
   /** For Documents: the document type id, so a generated set can mark it drafted. */
   documentTypeId?: string;
+  /** REQ-023 FR-4: a dated audit item; the provider records the date it happened, which sets the status (finding 80). */
+  dated?: boolean;
+  /** REQ-023 FR-4: the date the item is measured against, shown beside it. */
+  dueDate?: string;
+};
+
+/** REQ-023 FR-4: what the checklist needs from the current registration period (finding 62). */
+export type ChecklistPeriod = {
+  midtermApplies: boolean;
+  /** The must-start-by date (Rules s 13B, or the override), when the mid-term audit applies. */
+  mustStartBy: string;
+  periodEndsOn: string;
 };
 
 export type ChecklistGroup = {
@@ -214,10 +227,23 @@ function haveNote(answer: "yes" | "no" | "not-sure" | "unknown") {
   return answer === "yes" ? ALREADY_HAVE_LINE : undefined;
 }
 
+/** REQ-023 FR-4: what the checklist reads from the current period, or nothing without one. */
+export function checklistPeriod(
+  period: RegistrationPeriod | null | undefined,
+): ChecklistPeriod | undefined {
+  if (!period) return undefined;
+  return {
+    midtermApplies: period.midterm_applies,
+    mustStartBy: mustStartBy(period),
+    periodEndsOn: period.period_ends_on,
+  };
+}
+
 export function deriveChecklist(
   result: QuestionnaireResult,
   answers: QuestionnaireAnswers,
   dataset: StandardsDataset,
+  period?: ChecklistPeriod,
 ): Checklist {
   const moduleIds = result.modules.map((m) => m.id);
   const moduleNames = new Map(result.modules.map((m) => [m.id, m.name]));
@@ -373,23 +399,28 @@ export function deriveChecklist(
     unverified: false,
     initialStatus: "need",
   });
-  items.push({
-    id: "audit:book-audit",
-    group: "audit",
-    title: certification
-      ? "Book your certification audit with the auditor; it includes a site visit"
-      : "Book your verification audit with the auditor; it is a desktop review of your documents",
-    ask: certification
-      ? "When is the site visit booked, and who will be there?"
-      : "When is the desktop review booked, and what will you send?",
-    // REQ-025 FR-13: the audit kind's meaning comes from the glossary, the one source.
-    why: certification
-      ? `Certification audit: ${glossaryMeaning("certification-audit")}; the visit includes participant and worker interviews.`
-      : `Verification audit: ${glossaryMeaning("verification-audit")}.`,
-    sourceRef: audits,
-    unverified: false,
-    initialStatus: "need",
-  });
+  // REQ-023 FR-4 (finding 62): with a registration period the first-audit
+  // booking item and the mid-term calendar item give way to the dated items
+  // at the end; without one, both stay, because the applicant still has a
+  // first audit to book.
+  if (!period)
+    items.push({
+      id: "audit:book-audit",
+      group: "audit",
+      title: certification
+        ? "Book your certification audit with the auditor; it includes a site visit"
+        : "Book your verification audit with the auditor; it is a desktop review of your documents",
+      ask: certification
+        ? "When is the site visit booked, and who will be there?"
+        : "When is the desktop review booked, and what will you send?",
+      // REQ-025 FR-13: the audit kind's meaning comes from the glossary, the one source.
+      why: certification
+        ? `Certification audit: ${glossaryMeaning("certification-audit")}; the visit includes participant and worker interviews.`
+        : `Verification audit: ${glossaryMeaning("verification-audit")}.`,
+      sourceRef: audits,
+      unverified: false,
+      initialStatus: "need",
+    });
   // Batch 45 item 11 (auditor review): a signed service agreement is the first thing sampled from a participant file.
   items.push({
     id: "audit:service-agreements",
@@ -430,7 +461,7 @@ export function deriveChecklist(
       unverified: false,
       initialStatus: "need",
     });
-    if (result.midTermAudit.applies) {
+    if (result.midTermAudit.applies && !period) {
       items.push({
         id: "audit:mid-term-audit-date",
         group: "audit",
@@ -447,6 +478,55 @@ export function deriveChecklist(
         initialStatus: "need",
       });
     }
+  }
+
+  // REQ-023 FR-4: the dated audit items once a registration period exists.
+  // The change-of-ownership item waits for Session D's changes register,
+  // which is the only thing that can say a change of ownership happened.
+  if (period) {
+    const midTermRef: SourceRef = {
+      kind: "rule",
+      id: "midTermAudit",
+      title: sourceTitle(dataset, dataset.rules.midTermAudit.sourceId),
+      url: sourceUrl(dataset, dataset.rules.midTermAudit.sourceId),
+    };
+    if (period.midtermApplies)
+      items.push({
+        id: "audit:mid-term-audit-started",
+        group: "audit",
+        title: `Type the date your mid-term audit started; it must start by ${period.mustStartBy}`,
+        ask: "Which auditing company did your mid-term audit, and on what date did it start?",
+        why: "A certification provider's mid-term audit must start within 18 months of the period beginning, or by the date the Commissioner allows (Rules s 13B(4)); an approved quality auditor carries it out (s 13B(2)).",
+        sourceRef: midTermRef,
+        unverified: false,
+        initialStatus: "need",
+        dated: true,
+        dueDate: period.mustStartBy,
+      });
+    items.push({
+      id: "audit:renewal-application-submitted",
+      group: "audit",
+      title: "Type the date you applied for renewal in the Commission's portal",
+      ask: "When did you apply for renewal, and was it inside the six months before your period ends?",
+      why: "An application made within six months before the period ends keeps your registration in force while the Commission decides (NDIS Act s 73K); your period ends on the date your certificate states.",
+      sourceRef: audits,
+      unverified: false,
+      initialStatus: "need",
+      dated: true,
+      dueDate: period.periodEndsOn,
+    });
+    items.push({
+      id: "audit:renewal-audit-done",
+      group: "audit",
+      title: "Type the date your renewal audit was done",
+      ask: "When was your renewal audit, and which auditing company did it?",
+      why: "The renewal follows the same steps as the application: you apply, the Commission sends the scope of audit, an approved quality auditor audits you, and the Commission decides.",
+      sourceRef: audits,
+      unverified: false,
+      initialStatus: "need",
+      dated: true,
+      dueDate: period.periodEndsOn,
+    });
   }
 
   const groups: ChecklistGroup[] = CHECKLIST_GROUP_IDS.map((id) => ({

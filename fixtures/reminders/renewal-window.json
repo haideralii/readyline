@@ -1,0 +1,36 @@
+{
+  "kind": "renewal-window",
+  "today": "2026-10-13",
+  "note": "A verification period that ends on 13 April 2027: the renewal window opens six months before (NDIS Act s 73K), today; a verification period has no mid-term kinds. The reminder is about the period end.",
+  "input": {
+    "account": { "id": "acc" },
+    "period": {
+      "period": {
+        "id": "per-1",
+        "period_starts_on": "2024-04-13",
+        "period_ends_on": "2027-04-13",
+        "audit_type": "verification",
+        "midterm_applies": false,
+        "midterm_exempt_reason": "a verification audit has no mid-term audit (Rules s 13B(1))",
+        "midterm_start_by_override": null,
+        "midterm_override_source": null,
+        "last_audit_on": null,
+        "midterm_audit_on": null
+      }
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "renewal-window",
+      "subject_table": "registration_periods",
+      "subject_id": "per-1",
+      "due_on": "2027-04-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

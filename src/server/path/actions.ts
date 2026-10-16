@@ -10,7 +10,7 @@
  */
 import { z } from "zod";
 import { openBlanks } from "./state";
-import { deriveChecklist } from "@/lib/checklist/derive";
+import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
@@ -21,6 +21,7 @@ import {
 } from "@/server/generation/queries";
 import { rerenderSetWithFacts } from "@/server/generation/rerender";
 import { countEvent } from "@/server/metrics/counters";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -196,7 +197,12 @@ export async function adoptGroupAction(
   const { answers, result } = await loadQuestionnaire();
   const items =
     answers && result
-      ? deriveChecklist(result, answers, getStandardsDataset()).items
+      ? deriveChecklist(
+          result,
+          answers,
+          getStandardsDataset(),
+          checklistPeriod(await currentPeriod(supabase, accountId)),
+        ).items
       : [];
   for (const d of group.documents) {
     const item = items.find((i) => i.documentTypeId === d.document_type_id);

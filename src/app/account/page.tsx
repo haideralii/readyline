@@ -22,8 +22,20 @@ import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import { subscriptionAvailable } from "@/server/payments/stripe";
 import { getSubscription } from "@/server/payments/subscription-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import {
+  PAUSED_EXPORT_SENTENCE,
+  TIMELINE_FIXED_SENTENCE,
+  midtermFor,
+  positionSentence,
+  timelineRows,
+} from "@/lib/registers/timeline";
+import type { RegistrationKind } from "@/lib/registers/types";
+import { loadQuestionnaire } from "@/server/path/state";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
+import { RegistrationForm } from "./registration-form";
+import { RegistrationTimeline } from "./registration-timeline";
 import { BillingPortalButton, SubscribeButton } from "./subscribe-button";
 import { AuditorLinkPanel } from "./auditor-link";
 import { TeamPanel } from "./team";
@@ -53,16 +65,66 @@ export default async function AccountPage() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  const [purchases, overview, subscription, subscribed, dueSoon, facts] =
-    await Promise.all([
-      listPurchases(supabase, a.id),
-      registerOverview(supabase, a.id),
-      getSubscription(supabase, a.id),
-      hasActiveSubscription(supabase, a.id),
-      // Batch 45 item 5: every notify-by and review date inside 30 days from the live rows, the incident first.
-      dueSoonForAccount(supabase, a, today),
-      loadFacts(supabase, a.id),
-    ]);
+  const [
+    purchases,
+    overview,
+    subscription,
+    subscribed,
+    dueSoon,
+    facts,
+    period,
+    questionnaire,
+    kindRow,
+  ] = await Promise.all([
+    listPurchases(supabase, a.id),
+    registerOverview(supabase, a.id),
+    getSubscription(supabase, a.id),
+    hasActiveSubscription(supabase, a.id),
+    // Batch 45 item 5: every notify-by and review date inside 30 days from the live rows, the incident first.
+    dueSoonForAccount(supabase, a, today),
+    loadFacts(supabase, a.id),
+    // REQ-023 FR-1, FR-2: the current period, the questionnaire's reading for the mid-term rule, the mirrored audit type.
+    currentPeriod(supabase, a.id),
+    loadQuestionnaire(),
+    supabase
+      .from("accounts")
+      .select("registration_kind")
+      .eq("id", a.id)
+      .maybeSingle(),
+  ]);
+  const mirroredKind =
+    (kindRow.data as { registration_kind: RegistrationKind | null } | null)
+      ?.registration_kind ?? null;
+  const registrationInitial = period
+    ? {
+        id: period.id,
+        periodStartsOn: period.period_starts_on,
+        periodEndsOn: period.period_ends_on,
+        auditType: period.audit_type,
+        midtermStartByOverride: period.midterm_start_by_override ?? "",
+        midtermOverrideSource: period.midterm_override_source ?? ("" as const),
+        lastAuditOn: period.last_audit_on ?? "",
+        midtermAuditOn: period.midterm_audit_on ?? "",
+      }
+    : {
+        // D-2312: pre-filled from the accounts columns where set, else from the result; both editable.
+        periodStartsOn: a.registration_date ?? "",
+        periodEndsOn: "",
+        auditType:
+          mirroredKind ?? questionnaire.result?.pathway ?? "certification",
+        midtermStartByOverride: "",
+        midtermOverrideSource: "" as const,
+        lastAuditOn: "",
+        midtermAuditOn: "",
+      };
+  const midterm = period
+    ? { applies: period.midterm_applies, reason: period.midterm_exempt_reason }
+    : questionnaire.result
+      ? midtermFor(
+          registrationInitial.auditType,
+          questionnaire.result.midTermAudit,
+        )
+      : null;
   const registers = registersLine(overview);
   const pricing = readPricing();
   const subscriptionOffered = subscriptionAvailable();
@@ -137,6 +199,61 @@ export default async function AccountPage() {
             ))}
           </ul>
         )}
+      </section>
+
+      {/* REQ-023 FR-1, FR-2: the dates from the certificate, the timeline the product derives, the one sentence that says which rules. */}
+      <section
+        aria-labelledby="registration-heading"
+        className="mt-8"
+        data-testid="account-registration"
+      >
+        <h2 id="registration-heading" className="text-xl font-semibold">
+          Your registration
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          Type the dates from your certificate of registration. We work out the
+          mid-term audit and renewal dates from them and remind you by email.
+        </p>
+        <RegistrationForm
+          initial={registrationInitial}
+          midterm={midterm}
+          questionnaireDone={Boolean(questionnaire.result)}
+        />
+        {period ? (
+          <>
+            <h3 className="mt-6 text-base font-semibold">
+              Your registration timeline
+            </h3>
+            <RegistrationTimeline
+              rows={timelineRows(period)}
+              caption="Your registration timeline"
+              testId="registration-timeline"
+            />
+            <p
+              className="mt-3 text-sm leading-6"
+              data-testid="registration-position"
+            >
+              {positionSentence(period, today)}
+            </p>
+            <p
+              className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+              data-testid="registration-fixed-sentence"
+            >
+              {TIMELINE_FIXED_SENTENCE}
+            </p>
+            <p className="mt-2 text-sm leading-6">
+              <a
+                href="/registers/audit-pack.zip"
+                className="underline underline-offset-2"
+                data-testid="registration-pack-link"
+              >
+                Download your audit pack (every register)
+              </a>
+              : a provider who ceases to be registered must keep its records for
+              three years from that day (NDIS Act s 73R).
+            </p>
+          </>
+        ) : null}
       </section>
 
       {/* REQ-020 FR-2, FR-3: one read-only auditor link at a time; the owner sends it, Readyline never does. */}
@@ -236,6 +353,22 @@ export default async function AccountPage() {
                 ? "Your subscription has lapsed; your records are safe and read-only. Renew to add to them."
                 : "Not subscribed. The registers are read-only without a subscription."}
             </p>
+            {subscription ? (
+              // REQ-023 FR-2 (findings 40, 66, 85): the s 73Q records outlive the payment; the pack holds every register.
+              <p
+                className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+                data-testid="paused-export"
+              >
+                {PAUSED_EXPORT_SENTENCE}{" "}
+                <a
+                  href="/registers/audit-pack.zip"
+                  className="underline underline-offset-2"
+                >
+                  Download your audit pack
+                </a>
+                .
+              </p>
+            ) : null}
             {subscriptionOffered ? (
               <SubscribeButton
                 label={

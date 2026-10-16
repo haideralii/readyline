@@ -4,6 +4,7 @@
  * contains anything about participants.
  */
 import { BRAND } from "@/lib/brand";
+import { TIMELINE_FIXED_SENTENCE } from "@/lib/registers/timeline";
 import { REPORT_WINDOW_WORDS } from "@/lib/registers/worker";
 import type { EmailMessage } from "./provider";
 
@@ -114,6 +115,8 @@ export function remindersEmail(input: {
   to: string;
   tradingName: string;
   lines: string[];
+  /** REQ-023 FR-3: true when a timeline line is among them; the fixed sentence and the account-page pointer follow once (finding 56). */
+  registration?: boolean;
 }): EmailMessage {
   return {
     to: input.to,
@@ -123,6 +126,13 @@ export function remindersEmail(input: {
       "",
       ...input.lines.map((l) => `- ${l}`),
       "",
+      ...(input.registration
+        ? [
+            TIMELINE_FIXED_SENTENCE,
+            "Your registration timeline is on your account page.",
+            "",
+          ]
+        : []),
       "Sign in and open Registers to update them.",
       "",
       SIGN_OFF,

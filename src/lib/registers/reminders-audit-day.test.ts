@@ -29,7 +29,7 @@ const TODAY = "2026-10-13";
 function base(over: Partial<ReminderInput> = {}): ReminderInput {
   return {
     today: TODAY,
-    account: { id: "acc", registration_date: null, registration_kind: null },
+    account: { id: "acc" },
     incidents: [],
     complaints: [],
     workerChecks: [],

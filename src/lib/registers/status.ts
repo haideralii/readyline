@@ -56,6 +56,40 @@ export function daysBetween(from: string, to: string): number {
   return parseIsoDate(to) - parseIsoDate(from);
 }
 
+/** Calendar months added to an ISO date; a day past the month's end clamps (31 Jan + 1 month = 28 Feb). */
+export function addMonths(date: string, months: number): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const first = new Date(Date.UTC(y, m - 1 + months, 1));
+  const lastDay = new Date(
+    Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  const dt = new Date(
+    Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), Math.min(d, lastDay)),
+  );
+  return dt.toISOString().slice(0, 10);
+}
+
+/** Whole calendar months from `from` to `to` (0 when `to` is earlier). */
+export function monthsBetween(from: string, to: string): number {
+  if (parseIsoDate(to) < parseIsoDate(from)) return 0;
+  const [fy, fm, fd] = from.split("-").map(Number);
+  const [ty, tm, td] = to.split("-").map(Number);
+  let months = (ty - fy) * 12 + (tm - fm);
+  if (td < fd) months -= 1;
+  return Math.max(0, months);
+}
+
+/** "1 March 2027" from an ISO date, with no timezone in play. */
+export function formatLongDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
 export function addDays(date: string, days: number): string {
   return formatIsoDate(parseIsoDate(date) + days);
 }
