@@ -19,6 +19,10 @@ import {
   ownerWorkerRef,
 } from "@/server/registers/worker-onboarding";
 import { WorkerItems } from "./worker-items";
+import { ExceptionPanel } from "./exception-panel";
+import { part4EndFor } from "@/lib/registers/state-facts";
+import { AU_STATES } from "@/lib/registers/types";
+import { latestReadySet } from "@/server/checklist/queries";
 import {
   getAuditDayRow,
   listAuditDayRows,
@@ -344,15 +348,60 @@ export async function AuditDayDetailPage({
         ))}
       </dl>
       {file ? (
-        <WorkerItems
-          checklistId={file.checklist?.id ?? null}
-          items={file.items}
-          states={file.states}
-          ticks={workerTicks}
-          derived={file.derived}
-          canWrite={ctx.canWrite}
-          today={todaySydney()}
-        />
+        <>
+          <WorkerItems
+            checklistId={file.checklist?.id ?? null}
+            items={file.items}
+            states={file.states}
+            ticks={workerTicks}
+            derived={file.derived}
+            canWrite={ctx.canWrite}
+            today={todaySydney()}
+          />
+          {file.exception && slug === "staff-matrix" ? (
+            <ExceptionPanel
+              workerRef={file.row.worker_ref}
+              ownerRow={file.ownerRow}
+              canWrite={ctx.canWrite}
+              today={todaySydney()}
+              gate={file.exception.gate}
+              exception={file.exception.exception}
+              history={file.exception.history}
+              application={
+                file.exception.application
+                  ? {
+                      id: file.exception.application.id,
+                      application_number:
+                        file.exception.application.application_number,
+                      state: file.exception.application.state,
+                      verified_in_database_on:
+                        file.exception.application.verified_in_database_on,
+                      decision_code:
+                        file.exception.application.decision_code ?? null,
+                    }
+                  : null
+              }
+              plan={
+                file.exception.plan
+                  ? {
+                      version: file.exception.plan.version,
+                      adopted_on: file.exception.plan.adopted_on,
+                    }
+                  : null
+              }
+              setId={
+                (await latestReadySet(ctx.supabase, ctx.viewer.account.id))
+                  .setId
+              }
+              supervisorClearanceEndedOn={
+                file.derived.supervisorClearanceEndedOn
+              }
+              part4Ends={Object.fromEntries(
+                AU_STATES.map((s) => [s, part4EndFor(s)]),
+              )}
+            />
+          ) : null}
+        </>
       ) : slug === "onboarding" && row.kind === "worker" ? (
         <p
           className="border-ochre mt-6 rounded-md border p-3 text-sm leading-6"

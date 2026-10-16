@@ -101,6 +101,10 @@ class MemoryStore implements GenerationStore {
     if (!o) throw new Error(`no object at ${path}`);
     return o.bytes;
   }
+  /** REQ-024 A2: no register in the reference runs; the Division 3 section renders its empty-register line. */
+  async participantRisks(_accountId: string, today: string) {
+    return { rows: [], lastReviewedOn: null, takenOn: today };
+  }
 }
 
 /** A model that answers every section with a short, lint-clean paragraph naming the provider. */

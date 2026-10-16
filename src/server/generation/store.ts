@@ -6,7 +6,9 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DocumentModel } from "@/lib/generator/document-model";
+import type { ParticipantRiskSnapshot } from "@/lib/generator/division3";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
+import { participantRiskSnapshot } from "@/server/registers/participant-risk-snapshot";
 import { downloadObject, removePrefix, uploadObject } from "./storage";
 
 export type VersionSetRow = {
@@ -90,10 +92,22 @@ export interface GenerationStore {
   ): Promise<void>;
   /** Reads an object back; the paid job zips documents written in earlier ticks (REQ-007 FR-5). */
   getObject(path: string): Promise<Uint8Array>;
+  /** REQ-024 A2 (FR-4a, D-2424): the participant risk register by code for the Division 3 section, taken once per run; the account is the argument, never the request. */
+  participantRisks(
+    accountId: string,
+    today: string,
+  ): Promise<ParticipantRiskSnapshot>;
 }
 
 export class SupabaseGenerationStore implements GenerationStore {
   constructor(private readonly admin: SupabaseClient) {}
+
+  participantRisks(
+    accountId: string,
+    today: string,
+  ): Promise<ParticipantRiskSnapshot> {
+    return participantRiskSnapshot(this.admin, accountId, today);
+  }
 
   async createVersionSet(input: {
     accountId: string;

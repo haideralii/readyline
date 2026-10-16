@@ -17,6 +17,11 @@ import {
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
 import { applyFacts } from "@/lib/generator/facts-fill";
+import {
+  insertDivision3Plan,
+  WORKER_SCREENING_PROCEDURE_ID,
+  type ParticipantRiskSnapshot,
+} from "@/lib/generator/division3";
 import type { SectionFailure } from "@/lib/generator/generate-section";
 import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
@@ -373,6 +378,7 @@ export async function runGenerationTick(input: {
     const stored = new Set(
       (await backend.listDocuments(setId)).map((d) => d.document_type_id),
     );
+    let participantRisks: ParticipantRiskSnapshot | undefined;
     const handBack = async (): Promise<TickReport> => {
       await backend.update(job.id, {
         status: "queued",
@@ -478,6 +484,19 @@ export async function runGenerationTick(input: {
           },
           ctx.facts,
         );
+        // REQ-024 A2 (FR-4a; D-2424, D-2428): the worker screening procedure
+        // gains the Division 3 plan with the participant risk register as it
+        // stands when the pack is drafted, taken once per run by the store
+        // under the job's own account id, inserted into the finished model
+        // after the prompts have run so no recorded prompt hash moves, and
+        // read by that section alone, never by a prompt.
+        if (typeId === WORKER_SCREENING_PROCEDURE_ID) {
+          participantRisks ??= await store.participantRisks(
+            job.account_id,
+            generatedAt,
+          );
+          model = insertDivision3Plan(model, participantRisks);
+        }
       } catch (e) {
         // REQ-021 S4: a document that throws twice is recorded as needing
         // another go and the rest continue; the first time the tick retries
