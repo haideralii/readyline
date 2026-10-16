@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildGroupPages, groupPagesByCategory } from "@/lib/guides/groups";
@@ -38,7 +39,7 @@ export default function RegistrationGroupsIndexPage() {
     })),
   }));
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm">
         <Link
           href="/guides"
@@ -59,6 +60,6 @@ export default function RegistrationGroupsIndexPage() {
       {/* REQ-027 FR-3, D-2701: the words on this page, above the search and inside no other disclosure. */}
       <GlossaryTerms ids={INDEX_TERMS} where="page" className="mt-3" />
       <GroupsSearch categories={categories} />
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -54,7 +55,7 @@ export default async function CheckPage() {
     };
   });
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <p className="text-sm">
         <Link
           href="/path/audit-day"
@@ -71,6 +72,6 @@ export default async function CheckPage() {
         improvement register with a date 30 days out. About ten minutes.
       </p>
       <CheckWalk records={records} today={todaySydney()} />
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -18,7 +19,7 @@ export default async function WorkerNewIncidentPage() {
   if (viewer.account) redirect("/registers/incidents/new");
   if (!viewer.worker) redirect("/account/setup");
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <p className="text-sm">
         <Link
           href="/worker"
@@ -34,6 +35,6 @@ export default async function WorkerNewIncidentPage() {
         {EMERGENCY_LINE}
       </p>
       <IncidentFormView afterSave="/worker?saved=1" />
-    </div>
+    </PageShell>
   );
 }

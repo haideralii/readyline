@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -299,7 +300,7 @@ export default async function DocumentsPage({
   );
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="grid">
       <h1 className="text-3xl font-semibold tracking-tight">Your documents</h1>
       <p className="text-ink mt-3 leading-7">{C.intro}</p>
 
@@ -370,6 +371,6 @@ export default async function DocumentsPage({
           </ul>
         </section>
       ) : null}
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { decodeFakeSession } from "@/lib/payments/fake-session";
@@ -41,7 +42,7 @@ export default async function FakeCheckoutPage({
     "inline-flex min-h-12 items-center justify-center rounded-md border border-line px-5 text-base font-medium hover:bg-mist focus-visible:outline-2 focus-visible:outline-offset-2";
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <p className="rounded-md border border-amber-700 bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-200">
         Test environment only. This page stands in for Stripe Checkout; no
         payment is taken and no card details are asked for.
@@ -162,6 +163,6 @@ export default async function FakeCheckoutPage({
           </form>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }

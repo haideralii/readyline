@@ -26,7 +26,10 @@ export async function SiteHeader() {
        * size the nav itself wraps whole links onto a second row rather than
        * widening the page (the signed-in width check at 360 px and 130 %).
        */}
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6 sm:py-3">
+      <div
+        data-shell="header"
+        className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 sm:px-6 sm:py-3 lg:px-8"
+      >
         <Link
           href="/"
           className="inline-flex min-h-11 items-center text-xl focus-visible:outline-2 focus-visible:outline-offset-2"

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -7,7 +8,7 @@ export const metadata: Metadata = { title: "Account deleted" };
 
 export default function AccountDeletedPage() {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <h1 className="text-3xl font-semibold tracking-tight">
         Your account was deleted
       </h1>
@@ -27,6 +28,6 @@ export default function AccountDeletedPage() {
           Back to the home page
         </Link>
       </p>
-    </div>
+    </PageShell>
   );
 }

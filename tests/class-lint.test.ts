@@ -1,10 +1,11 @@
 // @vitest-environment node
 /**
- * REQ-028 FR-2 (D-2802): after Session A1 no file under `src/` names a zinc
- * or white utility; the colours live in the tokens (ink, slate, paper,
- * surface, mist, sky, rule, line, track, the washes). Allow-list zero: a new
- * site fails here, in CI, with the file, the line and the class. FR-1's
- * width rule joins this file with the shell.
+ * REQ-028 FR-1 and FR-2 (D-2802): after Session A1 no page under `src/app`
+ * carries its own width (the widths live in `PageShell`, `max-w-6xl`, and on
+ * prose, `max-w-prose`) and no file under `src/` names a zinc or white
+ * utility (the colours live in the tokens: ink, slate, paper, surface, mist,
+ * sky, rule, line, track, the washes). Allow-list zero: a new site fails
+ * here, in CI, with the file, the line and the class.
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -23,6 +24,10 @@ function walkDir(dir: string, out: string[] = []): string[] {
 const COLOUR =
   /[A-Za-z0-9:\-[\]()=&>*_.%/]*?(?:(?:text|bg|border|divide|ring|outline|placeholder|fill|stroke|decoration|from|to|via)-zinc-\d{2,3}|(?<![\w-])(?:bg|text)-white)(?![\w-])/g;
 
+/** FR-1's forbidden set under `src/app`, with any variant prefix. */
+const WIDTH =
+  /(?<![w-])(?:[a-z-]+:)?max-w-(?:md|lg|xl|2xl|3xl|4xl|5xl)(?![w-])/g;
+
 function findings(files: string[], re: RegExp): string[] {
   const out: string[] = [];
   for (const file of files) {
@@ -35,9 +40,13 @@ function findings(files: string[], re: RegExp): string[] {
   return out;
 }
 
-describe("the class lint (REQ-028 FR-2; D-2802)", () => {
+describe("the class lint (REQ-028 FR-1, FR-2; D-2802)", () => {
   it("no zinc or white utility under src/ (the tokens carry every colour)", () => {
     expect(findings(walkDir("src"), COLOUR)).toEqual([]);
+  });
+
+  it("no page width under src/app but the shell's and prose's", () => {
+    expect(findings(walkDir("src/app"), WIDTH)).toEqual([]);
   });
 
   it("the pattern sees what it is for", () => {
@@ -53,5 +62,11 @@ describe("the class lint (REQ-028 FR-2; D-2802)", () => {
       "border-zinc-300",
     ]);
     expect([...sample[1].matchAll(COLOUR)]).toEqual([]);
+    expect([...sample[1].matchAll(WIDTH)]).toEqual([]);
+    expect(
+      [...'className="mx-auto max-w-2xl sm:max-w-3xl"'.matchAll(WIDTH)].map(
+        (m) => m[0],
+      ),
+    ).toEqual(["max-w-2xl", "sm:max-w-3xl"]);
   });
 });

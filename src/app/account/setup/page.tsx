@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/server/accounts/queries";
@@ -13,7 +14,7 @@ export default async function AccountSetupPage() {
   // REQ-020 FR-4, AC-3: every owner page sends a user with no account here; a worker goes on to their home.
   if (viewer.worker) redirect("/worker");
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <h1 className="text-3xl font-semibold tracking-tight">
         About your business
       </h1>
@@ -23,6 +24,6 @@ export default async function AccountSetupPage() {
         your account so you can continue from any device.
       </p>
       <AccountForm mode="setup" />
-    </div>
+    </PageShell>
   );
 }

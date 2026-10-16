@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -47,7 +48,7 @@ export default async function ChecklistPage() {
   const built = answers?.success ? buildResult(dataset, answers.data) : null;
   if (!answers?.success || !built?.ok) {
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+      <PageShell kind="grid">
         <h1 className="text-3xl font-semibold tracking-tight">
           Readiness checklist
         </h1>
@@ -58,7 +59,7 @@ export default async function ChecklistPage() {
           </Link>{" "}
           to see it.
         </p>
-      </div>
+      </PageShell>
     );
   }
 
@@ -88,7 +89,7 @@ export default async function ChecklistPage() {
   }).format(new Date());
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="grid">
       <ChecklistView
         tradingName={viewer.account.trading_name}
         pathway={built.result.pathway}
@@ -128,6 +129,6 @@ export default async function ChecklistPage() {
         ))}
         <p className="mt-4 text-xs">{GENERAL_INFORMATION_STATEMENT}</p>
       </section>
-    </div>
+    </PageShell>
   );
 }

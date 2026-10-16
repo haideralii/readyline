@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -63,20 +64,20 @@ export default async function AuditorPage({
   // the plain message stands in, and nothing is written or shown.
   if (!(await checkAuditorOpenAllowed(link.linkId, address)))
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+      <PageShell kind="reading">
         <h1 className="text-3xl font-semibold tracking-tight">
           Too many opens
         </h1>
         <p className="mt-3 leading-7" data-testid="auditor-limited">
           {AUDITOR_OPEN_LIMITED_LINE}
         </p>
-      </div>
+      </PageShell>
     );
   await recordAuditorOpen(admin, link, address, "opened");
   const view = await collectAuditView(admin, link.accountId);
   const date = new Date().toISOString().slice(0, 10);
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p
         role="status"
         className="border-rule rounded-md border p-3 text-sm leading-6"
@@ -160,6 +161,6 @@ export default async function AuditorPage({
       <p className="text-slate mt-10 text-xs">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
-    </div>
+    </PageShell>
   );
 }

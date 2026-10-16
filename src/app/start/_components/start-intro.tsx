@@ -1,4 +1,5 @@
 "use client";
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
@@ -62,7 +63,7 @@ export function StartIntro() {
   const preselect = groups.find((g) => g.code === preselectCode) ?? null;
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-slate text-sm font-medium">
         About ten minutes, five steps
       </p>
@@ -131,6 +132,6 @@ export function StartIntro() {
           blocked). You can still complete the questionnaire in one sitting.
         </p>
       ) : null}
-    </div>
+    </PageShell>
   );
 }

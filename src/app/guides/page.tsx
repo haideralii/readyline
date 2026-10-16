@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GlossaryTerms } from "@/components/glossary-terms";
@@ -29,7 +30,7 @@ export default function GuidesPage() {
     ].join("\n"),
   );
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <h1 className="text-3xl font-semibold tracking-tight">Guides</h1>
       <p className="text-ink mt-3 leading-7">{LEAD}</p>
       {/* REQ-011 batch 31: the 38 registration-group pages have their own index. */}
@@ -60,6 +61,6 @@ export default function GuidesPage() {
           </li>
         ))}
       </ul>
-    </div>
+    </PageShell>
   );
 }

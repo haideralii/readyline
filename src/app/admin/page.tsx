@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { unverifiedChecklistItems } from "@/lib/checklist/confidence";
 import { requireAdmin, writeAdminAudit } from "@/server/admin/access";
@@ -59,7 +60,7 @@ export default async function AdminPage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
       <p className="text-slate mt-2 text-sm">
         Signed in with a verified authenticator. Every visit and action here is
@@ -176,6 +177,6 @@ export default async function AdminPage() {
         purge route with the cron secret and{" "}
         <code className="mx-1">?dryRun=1</code> first.
       </p>
-    </div>
+    </PageShell>
   );
 }

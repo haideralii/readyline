@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -76,7 +77,7 @@ export default async function PricingPage() {
   const docs = await documentsForVisitor();
   const offered = subscriptionAvailable();
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="grid">
       <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
       <p className={body}>{C.intro}</p>
       {/* REQ-027 FR-3, D-2701: the words on this page, above the first body section and inside no other disclosure. */}
@@ -327,6 +328,6 @@ export default async function PricingPage() {
         Questions before you buy? Email {BRAND} at the contact address in the
         footer.
       </p>
-    </div>
+    </PageShell>
   );
 }

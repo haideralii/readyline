@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -31,7 +32,7 @@ export default async function WorkerHome() {
     listComplaints(supabase, viewer.worker.id),
   ]);
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <h1 className="text-3xl font-semibold tracking-tight">
         Your entries for {viewer.worker.trading_name}
       </h1>
@@ -115,6 +116,6 @@ export default async function WorkerHome() {
           Sign out
         </button>
       </form>
-    </div>
+    </PageShell>
   );
 }

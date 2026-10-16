@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -53,7 +54,7 @@ export default async function FinishPackPage({
   const dateBlank = blanks.some((b) => factKeyFor(b.blank) === "date");
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <p className="text-sm">
         <Link
           href={`/documents/${set.id}`}
@@ -107,6 +108,6 @@ export default async function FinishPackPage({
           />
         </>
       )}
-    </div>
+    </PageShell>
   );
 }

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import {
@@ -53,7 +54,7 @@ export default async function LaunchPage() {
   const counts = countByState(rows);
   await writeAdminAudit(ctx.user.id, "admin.launch.viewed", "/admin/launch");
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <h1 className="text-3xl font-semibold tracking-tight">Launch</h1>
       <p className="text-slate mt-2 text-sm">
         Every launch condition by name and state, never by value. The launch
@@ -104,6 +105,6 @@ export default async function LaunchPage() {
           </section>
         );
       })}
-    </div>
+    </PageShell>
   );
 }

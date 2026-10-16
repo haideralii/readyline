@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = { title: "Page not found" };
  */
 export default function NotFound() {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
+    <PageShell kind="reading">
       <h1 className="text-3xl font-semibold tracking-tight">
         That page is not here.
       </h1>
@@ -34,6 +35,6 @@ export default function NotFound() {
           </Link>
         </li>
       </ul>
-    </div>
+    </PageShell>
   );
 }

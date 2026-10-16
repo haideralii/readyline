@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -59,7 +60,7 @@ export default async function ReviewDocumentPage({
   );
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm">
         <Link
           href={`/documents/${set.id}`}
@@ -208,6 +209,6 @@ export default async function ReviewDocumentPage({
           );
         })}
       </ol>
-    </div>
+    </PageShell>
   );
 }

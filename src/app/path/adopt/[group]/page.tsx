@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -78,7 +79,7 @@ export default async function AdoptGroupPage({
     ].join("\n"),
   );
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <p className="text-slate text-sm">
         Adopt your documents: group {index + 1} of {groups.length}
       </p>
@@ -158,6 +159,6 @@ export default async function AdoptGroupPage({
           All documents
         </Link>
       </p>
-    </div>
+    </PageShell>
   );
 }

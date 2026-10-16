@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -56,7 +57,7 @@ export function RegisterPage({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       {back ? (
         <p className="text-sm">
           <Link
@@ -113,6 +114,6 @@ export function RegisterPage({
         </div>
       ) : null}
       {children}
-    </div>
+    </PageShell>
   );
 }

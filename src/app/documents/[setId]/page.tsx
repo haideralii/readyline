@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -39,7 +40,7 @@ export default async function DocumentSetPage({
   // FR-8: a refunded pack keeps its data but serves nothing.
   if (await isSetLocked(supabase, set.id)) {
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+      <PageShell kind="list">
         <p className="text-sm">
           <Link href="/documents" className="underline underline-offset-2">
             All document sets
@@ -55,7 +56,7 @@ export default async function DocumentSetPage({
         >
           {DOCUMENTS_COPY.lockedSet}
         </p>
-      </div>
+      </PageShell>
     );
   }
   const documents = await listLatestDocuments(supabase, set.id);
@@ -74,7 +75,7 @@ export default async function DocumentSetPage({
   const blanks = formBlanks(documents.flatMap((d) => collectBlanks(d.model)));
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <p className="text-sm">
         <Link href="/documents" className="underline underline-offset-2">
           All document sets
@@ -182,6 +183,6 @@ export default async function DocumentSetPage({
         </div>
       </section>
       <DocumentsNotices />
-    </div>
+    </PageShell>
   );
 }

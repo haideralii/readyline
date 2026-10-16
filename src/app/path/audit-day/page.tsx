@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -130,7 +131,7 @@ export default async function AuditDayPage() {
   const groups = setId ? orderDocuments(ctx.documents) : [];
   const have = shown.items.filter((i) => i.status === "have").length;
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <h1 className="text-3xl font-semibold tracking-tight">
         Audit day: {viewer.account.trading_name}
       </h1>
@@ -394,6 +395,6 @@ export default async function AuditDayPage() {
       <p className="text-slate mt-10 text-xs">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
-    </div>
+    </PageShell>
   );
 }

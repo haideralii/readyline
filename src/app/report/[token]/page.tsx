@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
@@ -61,7 +62,7 @@ export default async function ReportPage({
   }
   if (!name) notFound();
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="form">
       <h1 className="text-3xl font-semibold tracking-tight">
         Report an incident to {name}
       </h1>
@@ -79,6 +80,6 @@ export default async function ReportPage({
         codes for people, never names.
       </p>
       <ReportForm token={token} workerCodes={codes} />
-    </div>
+    </PageShell>
   );
 }

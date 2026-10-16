@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -136,7 +137,7 @@ export default async function AccountPage() {
     liveReportLink(supabase, a.id),
   ]);
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="grid">
       <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
       <p className="text-ink mt-3 leading-7">
         Signed in as the owner of <strong>{a.trading_name}</strong>.{" "}
@@ -495,6 +496,6 @@ export default async function AccountPage() {
         </h2>
         <DeleteAccountForm tradingName={a.trading_name} />
       </section>
-    </div>
+    </PageShell>
   );
 }

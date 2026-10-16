@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { WritingIndicator } from "@/components/writing-indicator";
@@ -44,7 +45,7 @@ export default async function WritingIndicatorDemoPage({
     now,
   });
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="rounded-md border border-amber-700 bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-200">
         Test environment only. This page shows the writing indicator on a
         scripted feed; nothing here is a real document.
@@ -60,6 +61,6 @@ export default async function WritingIndicatorDemoPage({
           downloadHrefTemplate="/documents"
         />
       </section>
-    </div>
+    </PageShell>
   );
 }

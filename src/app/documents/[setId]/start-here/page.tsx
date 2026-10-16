@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -72,7 +73,7 @@ export default async function StartHerePage({
   if (!built) notFound();
   const s = built.sheet;
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm print:hidden">
         <Link
           href={`/documents/${set.id}`}
@@ -243,6 +244,6 @@ export default async function StartHerePage({
       <p className="text-slate mt-8 text-sm">
         Generated {s.generatedAt}; readiness summary version {s.summaryVersion}.
       </p>
-    </div>
+    </PageShell>
   );
 }

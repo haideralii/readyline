@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
 import { readyLineCounts } from "@/lib/questionnaire/readiness";
@@ -52,7 +53,7 @@ export default function Home() {
     (s) => s.mode === "tailored",
   ).length;
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <PageShell kind="grid">
       {/* REQ-011: Organization structured data; the ABN joins once BUSINESS_ABN is set. */}
       <JsonLd
         data={{
@@ -74,7 +75,7 @@ export default function Home() {
             : {}),
         }}
       />
-      <section className="max-w-2xl" data-testid="home-hero">
+      <section data-testid="home-hero">
         <p className="text-slate text-sm font-medium">{C.eyebrow}</p>
         <h1 className="mt-2 text-3xl tracking-tight sm:text-4xl">
           {heroHeadline(price)}
@@ -135,7 +136,7 @@ export default function Home() {
       {/* REQ-025 FR-12: the sample left this page (13,400 px at 360 px with it); a card and two links point at /sample. */}
       <section
         id="sample"
-        className="mt-12 max-w-2xl scroll-mt-6"
+        className="mt-12 scroll-mt-6"
         aria-labelledby="sample-heading"
         data-testid="home-sample"
       >
@@ -182,7 +183,7 @@ export default function Home() {
       </section>
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="trust-heading"
         data-testid="home-trust"
       >
@@ -200,7 +201,7 @@ export default function Home() {
       </section>
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="example-heading"
         data-testid="home-example"
       >
@@ -234,7 +235,7 @@ export default function Home() {
       <Testimonials />
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="mission-heading"
         data-testid="home-mission"
       >
@@ -272,7 +273,7 @@ export default function Home() {
           five bullets restated the hero and the sample card, and with the
           glossary disclosure and the subscription sentence the page sat on
           REQ-025 FR-12's 5,000 px cap at 360 px. The pricing line stays. */}
-      <section className="mt-12 max-w-2xl">
+      <section className="mt-12">
         <p className="text-slate text-sm leading-6">
           {C.pricingLead}{" "}
           <Link href="/pricing" className="underline underline-offset-2">
@@ -281,6 +282,6 @@ export default function Home() {
           . {BRAND} {C.closing}
         </p>
       </section>
-    </div>
+    </PageShell>
   );
 }

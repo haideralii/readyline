@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SampleDocument } from "@/components/sample-document";
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function SamplePage() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm">
         <Link
           href="/"
@@ -38,6 +39,6 @@ export default function SamplePage() {
           See which audit I need
         </Link>
       </p>
-    </div>
+    </PageShell>
   );
 }
