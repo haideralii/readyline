@@ -28,6 +28,11 @@ import {
   type WorkerState,
 } from "@/lib/registers/worker-state";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
+import {
+  exceptionContext,
+  listOpenExceptions,
+  type ExceptionContext,
+} from "./exception-queries";
 
 /** The request's Sydney day (D-2242). */
 export function todaySydney(): string {
@@ -263,6 +268,8 @@ export type WorkerFile = {
   derived: WorkerState;
   role: RiskAssessedRoleRow | null;
   ownerRow: boolean;
+  /** REQ-024 A2 (FR-4): the s 14 exception's gates, the open row and its history; null for a worker who is not risk assessed. */
+  exception: ExceptionContext | null;
 };
 
 /** FR-3: one worker's file for the owner's page: the row, the derived list and state, the items' state rows and the clearances. */
@@ -310,6 +317,15 @@ export async function loadWorkerFile(
           .then((r) => (r.data as RiskAssessedRoleRow | null) ?? null)
       : Promise.resolve(null),
   ]);
+  // REQ-024 A2 (FR-4): the exception is a risk-assessed worker's; the gates
+  // read with the declaration taken as ticked, the start form holding the tick.
+  const exception = row.risk_assessed
+    ? await exceptionContext(supabase, accountId, row, {
+        clearances,
+        ownerRow: ctx.ownerRow,
+        today: input.today,
+      })
+    : null;
   const derived = deriveWorkerState({
     worker: {
       worker_ref: row.worker_ref,
@@ -323,6 +339,13 @@ export async function loadWorkerFile(
     states,
     clearances,
     today: input.today,
+    exception: exception
+      ? {
+          running: exception.exception !== null,
+          offered: exception.exception === null && exception.gate.offered,
+          supervisorClearances: exception.supervisorClearances,
+        }
+      : null,
   });
   return {
     row,
@@ -333,6 +356,7 @@ export async function loadWorkerFile(
     derived,
     role,
     ownerRow: ctx.ownerRow,
+    exception,
   };
 }
 
@@ -347,7 +371,7 @@ export async function listWorkerStates(
     today: string;
   },
 ): Promise<Map<string, WorkerState>> {
-  const [lists, items, clearances, roles] = await Promise.all([
+  const [lists, items, clearances, roles, open] = await Promise.all([
     supabase
       .from("onboarding_checklists")
       .select("id, subject_ref")
@@ -356,6 +380,7 @@ export async function listWorkerStates(
     supabase.from("onboarding_items").select("*").eq("account_id", accountId),
     supabase.from("worker_clearances").select("*").eq("account_id", accountId),
     listRoles(supabase, accountId),
+    listOpenExceptions(supabase, accountId),
   ]);
   const listByRef = new Map(
     ((lists.data as { id: string; subject_ref: string }[] | null) ?? []).map(
@@ -388,6 +413,22 @@ export async function listWorkerStates(
           (c) => c.worker_ref === row.worker_ref,
         ),
         today: input.today,
+        // REQ-024 A2 (FR-4, AC-14): a running exception on the list reads its
+        // label and the supervisor's own screening rows for s 15(2)(f).
+        exception: (() => {
+          const running = open.get(row.worker_ref);
+          return running
+            ? {
+                running: true,
+                offered: false,
+                supervisorClearances: clearanceRows.filter(
+                  (c) =>
+                    c.clearance_kind === "ndis-worker-screening" &&
+                    c.worker_ref === running.supervisor_ref,
+                ),
+              }
+            : null;
+        })(),
       }),
     );
   }

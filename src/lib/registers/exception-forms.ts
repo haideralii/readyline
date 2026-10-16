@@ -30,7 +30,6 @@ export const RecordApplicationForm = strictObject({
   state: z.enum(AU_STATES, {
     error: "Choose the state the application was submitted in",
   }),
-  noticeSeenOn: dateField("day you saw the unit's written notice"),
   verifiedOn: dateField("day you confirmed the application in the database"),
 });
 export type RecordApplicationValues = z.input<typeof RecordApplicationForm>;
@@ -39,6 +38,8 @@ export type RecordApplicationValues = z.input<typeof RecordApplicationForm>;
 export const StartExceptionForm = strictObject({
   workerRef: refField(REF_PATTERNS.worker, "W-003"),
   supervisorRef: refField(REF_PATTERNS.worker, "W-002"),
+  verifiedOn: dateField("day you confirmed the application in the database"),
+  noticeSeenOn: dateField("day you saw the unit's written notice"),
   startedOn: dateField("day the worker starts under the exception"),
   declarationOn: dateField("day the worker gave the written declaration"),
   /** Gate (iv): the tick itself; the date above is its record. */
