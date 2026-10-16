@@ -122,7 +122,7 @@ export async function resultInlineTerm(page: Page): Promise<string> {
     .getByTestId("summary")
     .getByRole("heading", { level: 2 })
     .textContent();
-  const kind = heading?.match(/Your audit: (w+)/)?.[1];
+  const kind = heading?.match(/Your audit: (\w+)/)?.[1];
   if (!kind) throw new Error(`no audit kind in the result heading: ${heading}`);
   return `${kind}-audit`;
 }

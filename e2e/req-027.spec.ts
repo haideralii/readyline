@@ -46,6 +46,11 @@ async function reachResult(page: Page, structure: "Sole trader" | "Company") {
   await page.locator("#restrictivePractices-no").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
   await page.getByLabel("Number of workers").fill("3");
+  // A company names its key personnel; the sole-trader fixture leaves the field as req-025.spec does.
+  if (structure === "Company") {
+    await page.getByLabel("Number of key personnel").fill("1");
+    await page.locator("#hasRiskAssessedRoles-yes").check();
+  }
   await page.locator("#allRiskAssessedScreened-yes").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
   await expect(

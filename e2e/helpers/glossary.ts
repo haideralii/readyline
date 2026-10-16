@@ -73,8 +73,18 @@ export async function glossaryOnPage(
         const v = el.getAttribute(a);
         if (v) attrs.push(v);
       }
-    const full = main.textContent ?? "";
-    const text = `${clone.textContent ?? ""}\n${attrs.join("\n")}`;
+    // Text nodes joined with a space: textContent glues adjacent elements
+    // ("Complaints registerWorker screening clearance register"), which hides
+    // a term at an element boundary from the whole-word match.
+    const textOf = (root: Node) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const parts: string[] = [];
+      let n: Node | null;
+      while ((n = walker.nextNode())) parts.push(n.nodeValue ?? "");
+      return parts.join(" ").replace(/\s+/g, " ");
+    };
+    const full = textOf(main);
+    const text = `${textOf(clone)}\n${attrs.join("\n")}`;
     const disclosure = main.querySelector('[data-testid="glossary-terms"]');
     const summary =
       disclosure?.querySelector("summary")?.textContent?.trim() ?? null;
