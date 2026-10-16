@@ -6,8 +6,12 @@
  */
 import { NextResponse } from "next/server";
 import { log } from "@/lib/logging/logger";
+import { AUDITOR_OPEN_LIMITED_LINE } from "@/lib/registers/auditor-link";
 import { parseInput, strictObject } from "@/lib/validation";
-import { checkRegisterExportAllowed } from "@/server/auth/rate-limit";
+import {
+  checkAuditorOpenAllowed,
+  checkRegisterExportAllowed,
+} from "@/server/auth/rate-limit";
 import { buildAuditPack } from "@/server/registers/audit-pack";
 import {
   recordAuditorOpen,
@@ -42,6 +46,18 @@ export async function GET(
   }
   const link = await resolveAuditorToken(admin, token);
   if (!link) return new NextResponse("Not found", { status: 404 });
+  const address =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  // Retro review of REQ-020, finding 21: the viewer's address shares the
+  // page's bucket (sixty opens of this link an hour), checked before the
+  // account's export limit so a hostile address never burns the owner's five.
+  if (!(await checkAuditorOpenAllowed(link.linkId, address))) {
+    log.warn("audit-pack.address-rate-limited", { linkId: link.linkId });
+    return new NextResponse(AUDITOR_OPEN_LIMITED_LINE, {
+      status: 429,
+      headers: { "Retry-After": "3600" },
+    });
+  }
   if (!(await checkRegisterExportAllowed(link.accountId))) {
     log.warn("audit-pack.rate-limited", { accountId: link.accountId });
     return new NextResponse(
@@ -49,12 +65,7 @@ export async function GET(
       { status: 429, headers: { "Retry-After": "3600" } },
     );
   }
-  await recordAuditorOpen(
-    admin,
-    link,
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
-    "pack-downloaded",
-  );
+  await recordAuditorOpen(admin, link, address, "pack-downloaded");
   const pack = await buildAuditPack({
     supabase: admin,
     admin,

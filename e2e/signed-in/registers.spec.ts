@@ -236,6 +236,11 @@ test.describe("registers (REQ-009 Session B)", () => {
     await expect(page.getByTestId("status-tag").first()).toContainText(
       "Valid to 2031-02-01",
     );
+    // Retro review of REQ-018, finding 13: the register is the companion to
+    // the provider's own worker list (names stay with the provider).
+    await expect(page.locator("main")).toContainText(
+      "This register is the companion to your own worker list",
+    );
     await checkWidths(page, "worker checks");
     await shot(page, "worker-checks", project);
     await axeClean(page, "worker checks");

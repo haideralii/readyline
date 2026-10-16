@@ -116,25 +116,67 @@ export async function recordAuditorOpen(
   });
 }
 
+/** The retention cutoff: rows that ended before it go (REQ-020 Data). */
+export function purgeCutoff(now = new Date()): string {
+  return new Date(
+    now.getTime() - AUDITOR_LINK_RETENTION_DAYS * 86_400_000,
+  ).toISOString();
+}
+
+/** Deletes the table's rows whose `column` is before the cutoff; one statement per ended-state column. */
+async function purgeEnded(
+  admin: SupabaseClient,
+  table: "auditor_links" | "invitations" | "report_links",
+  columns: readonly string[],
+  cutoff: string,
+): Promise<number> {
+  let total = 0;
+  for (const column of columns) {
+    const r = await admin
+      .from(table)
+      .delete({ count: "exact" })
+      .lt(column, cutoff);
+    if (r.error)
+      log.warn("auditor-link.purge-failed", { table, code: r.error.code });
+    total += r.count ?? 0;
+  }
+  return total;
+}
+
 /** Rows whose link ended more than the retention period ago (REQ-020 Data). */
 export async function purgeOldAuditorLinks(
   admin: SupabaseClient,
   now = new Date(),
 ): Promise<number> {
-  const cutoff = new Date(
-    now.getTime() - AUDITOR_LINK_RETENTION_DAYS * 86_400_000,
-  ).toISOString();
-  const expired = await admin
-    .from("auditor_links")
-    .delete({ count: "exact" })
-    .lt("expires_at", cutoff);
-  const revoked = await admin
-    .from("auditor_links")
-    .delete({ count: "exact" })
-    .lt("revoked_at", cutoff);
-  if (expired.error)
-    log.warn("auditor-link.purge-failed", { code: expired.error.code });
-  if (revoked.error)
-    log.warn("auditor-link.purge-failed", { code: revoked.error.code });
-  return (expired.count ?? 0) + (revoked.count ?? 0);
+  return purgeEnded(
+    admin,
+    "auditor_links",
+    ["expires_at", "revoked_at"],
+    purgeCutoff(now),
+  );
+}
+
+/**
+ * Retro review of REQ-020, finding 27: an invitation (the worker's email
+ * hash and token hash, Session B) ends when it is accepted, revoked or
+ * expires, and goes 30 days later like an auditor link.
+ */
+export async function purgeOldInvitations(
+  admin: SupabaseClient,
+  now = new Date(),
+): Promise<number> {
+  return purgeEnded(
+    admin,
+    "invitations",
+    ["accepted_at", "revoked_at", "expires_at"],
+    purgeCutoff(now),
+  );
+}
+
+/** A report link has no expiry; a revoked one goes 30 days after the revocation (finding 27). */
+export async function purgeOldReportLinks(
+  admin: SupabaseClient,
+  now = new Date(),
+): Promise<number> {
+  return purgeEnded(admin, "report_links", ["revoked_at"], purgeCutoff(now));
 }

@@ -33,7 +33,7 @@ export default async function WorkerChecksPage() {
   return (
     <RegisterPage
       title="Worker checks"
-      intro="Each worker's screening and other checks by code and expiry. We keep the kind, the dates and the check number, never the name."
+      intro="Each worker's screening and other checks by code and expiry. We keep the kind, the dates and the check number, never the name. This register is the companion to your own worker list, which holds each worker's name and stays in your own file."
       canWrite={ctx.canWrite}
       addHref="/registers/worker-checks/new"
       addLabel="Add a check"
