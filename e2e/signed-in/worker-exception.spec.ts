@@ -271,6 +271,8 @@ test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
     // Without the tick the server refuses with the s 15(2)(a) and (b) line (AC-2).
     await page.locator("#notice-seen-on").fill("2026-10-29");
     await page.locator("#declaration-on").fill("2026-11-01");
+    // The dates are fixed values ahead of the runner's day by design (D-2270 item 9); the forms are noValidate, so the browser never judges them.
+    await page.locator("#started-on").fill("2026-11-02");
     await page.getByTestId("start-exception").click();
     await expect(page.getByTestId("exception-message")).toContainText(
       "s 15(2)(a) and (b)",
