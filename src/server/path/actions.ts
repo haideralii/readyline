@@ -19,6 +19,7 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { reasonForCi } from "@/server/generation/failure-code";
 import { rerenderSetWithFacts } from "@/server/generation/rerender";
 import { countEvent } from "@/server/metrics/counters";
 import { currentPeriod } from "@/server/registers/registration-queries";
@@ -91,11 +92,26 @@ export async function finishPackAction(
   if (!set || set.account_id !== viewer.account.id || set.status !== "ready")
     return { ok: false, message: "That set was not found." };
   const facts = await loadFacts(supabase, viewer.account.id);
-  const out = await rerenderSetWithFacts({
-    admin: createSupabaseAdminClient(),
-    set,
-    facts,
-  });
+  let out: Awaited<ReturnType<typeof rerenderSetWithFacts>>;
+  try {
+    out = await rerenderSetWithFacts({
+      admin: createSupabaseAdminClient(),
+      set,
+      facts,
+    });
+  } catch (e) {
+    // D-2266 (#78's run 38881965824: the android-small finish went quiet,
+    // not loud): in CI the throw's name and text reach the job log at warn
+    // before it goes on; production logs nothing more than it did.
+    if (reasonForCi())
+      log.warn("path.finish.failed", {
+        accountId: viewer.account.id,
+        versionSetId: set.id,
+        errorName: e instanceof Error ? e.name : typeof e,
+        reasonText: (e instanceof Error ? e.message : String(e)).slice(0, 300),
+      });
+    throw e;
+  }
   // Batch 45 item 12 (D-2002): a pack finished, counted per day, nothing per user.
   if (out.blanksLeft === 0) countEvent("finish-completed");
   return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
