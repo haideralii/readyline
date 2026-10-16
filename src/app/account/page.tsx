@@ -278,7 +278,8 @@ export default async function AccountPage() {
         >
           Participants appear as the codes you typed. Everything you typed into
           a register is in the view exactly as you typed it, so check your
-          summaries and notes for names before you share.
+          summaries and notes for names, and for any worker named in a note,
+          before you share.
         </p>
         <AuditorLinkPanel
           current={

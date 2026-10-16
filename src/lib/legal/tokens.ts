@@ -10,6 +10,8 @@
  *                                registers subscription cannot be bought,
  *                                or nothing
  *   {{#subscription}}...{{/subscription}}   kept only while it can be bought
+ *   {{vendor-terms-date}}        the day the vendors' terms were read, in
+ *                                words (REQ-022 Session E, D-2258, D-2248)
  *
  * Pure; the server helper supplies the values.
  */
@@ -20,6 +22,8 @@ export type LegalTokenValues = {
   /** The sentence to show, or null while the name or the ABN is unset. */
   businessLine: string | null;
   subscriptionOff: string;
+  /** "16 October 2026": the bundle index's date, or the page's own updated date while no bundle exists. */
+  vendorTermsDate: string;
 };
 
 export const LEGAL_TOKEN_PATTERN = /\{\{[#/]?[a-z-]+\}\}/;
@@ -37,6 +41,7 @@ export function applyLegalTokens(
     values.subscriptionOffered ? "" : values.subscriptionOff,
   );
   out = out.replace(/\{\{business-line\}\}/g, values.businessLine ?? "");
+  out = out.replace(/\{\{vendor-terms-date\}\}/g, values.vendorTermsDate);
   // A token that produced nothing leaves double spaces or an empty line behind.
   return out
     .replace(/[ \t]{2,}/g, " ")

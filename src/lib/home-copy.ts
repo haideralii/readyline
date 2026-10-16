@@ -24,9 +24,9 @@ export const HOME_COPY = {
   ctaNote: "Free, about ten minutes, no account needed.",
   keepsEyebrow: "What keeps you audit-ready",
   /** The first screen says what it costs and what the deal is (batch 24 item 1). */
-  /** Batch 45 item 9 (D-2001): the subscription first, as what keeps a provider audit-ready; the pack second, as where they start. */
+  /** Batch 45 item 9 (D-2001): the subscription first, as what keeps a provider audit-ready; the pack second, as where they start. REQ-022 D-2265: the line says what the product does to the evidence (keeps it in one place), nothing about its state. */
   subscriptionLine: (price: string) =>
-    `${price} a month keeps you audit-ready: the registers, the reminders and the mid-term audit countdown, with the evidence already in place at renewal. Cancel at any time.`,
+    `${price} a month keeps you audit-ready: the registers, the reminders and the mid-term audit countdown, so your evidence sits in one place when renewal comes. Cancel at any time.`,
   startLine: "Where you start:",
   priceLine: (price: string) =>
     `${price} one-off for the document pack. No subscription needed, no instalments, no interest.`,
