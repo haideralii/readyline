@@ -63,7 +63,7 @@ test.describe("REQ-025 Session A", () => {
     const card = page.getByTestId("summary");
     await expect(card).toContainText("Your audit: certification");
     await expect(card.getByTestId("audit-kind")).toHaveText(
-      "An auditor reads your documents and visits you.",
+      "An approved auditor reads your documents, visits where you work and talks to people.",
     );
 
     // AC-2, FR-3: the list's numbers equal what the page shows elsewhere.
@@ -149,12 +149,18 @@ test.describe("REQ-025 Session A", () => {
       "What these words mean (6)",
     );
     await glossary.locator("> summary").click();
-    await expect(glossary.getByTestId("glossary-mid-term-audit")).toHaveText(
-      "mid-term audit: a check about halfway through your three years.",
+    // REQ-027 A1 (D-2709, D-2713): the shared component renders the meaning as a sentence, then `more`.
+    const midTerm = glossary.getByTestId("glossary-mid-term-audit");
+    await expect(midTerm).toContainText("mid-term audit");
+    await expect(midTerm).toContainText(
+      "A second audit that most certification providers must have.",
+    );
+    await expect(midTerm).toContainText(
+      "The Rules say it must begin within 18 months of your registration starting",
     );
     await expect(
       glossary.getByTestId("glossary-practice-standards"),
-    ).toContainText("the rules every registered provider is audited against");
+    ).toContainText("The quality rules in the law for registered providers.");
     await checkWidths(page, "result (open)");
     expect(await axeSerious(page, "result (open)")).toEqual([]);
   });
