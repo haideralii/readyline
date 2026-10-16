@@ -12,14 +12,20 @@ export async function listChecklistItems(
 ): Promise<StoredItem[]> {
   const r = await supabase
     .from("checklist_items")
-    .select("item_id, status, note")
+    .select("item_id, status, note, done_on")
     .eq("account_id", accountId)
     .limit(500);
-  type Row = { item_id: string; status: StoredItem["status"]; note: string };
+  type Row = {
+    item_id: string;
+    status: StoredItem["status"];
+    note: string;
+    done_on: string | null;
+  };
   return ((r.data as Row[] | null) ?? []).map((row) => ({
     itemId: row.item_id,
     status: row.status,
     note: row.note ?? "",
+    doneOn: row.done_on ?? null,
   }));
 }
 

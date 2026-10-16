@@ -9,25 +9,16 @@ import {
   REGISTERS_LINKED_LINE,
   RENEWAL_SAVES_LINE,
 } from "@/lib/registers/messages";
-import { MID_TERM_DUE_MONTHS, addMonths } from "@/lib/registers/reminders";
 import { reportsToConfirmLine } from "@/lib/registers/worker";
+import { formatLongDate } from "@/lib/registers/status";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { RegisterPage, registerContext } from "./_components/shell";
 
 export const metadata: Metadata = { title: "Registers" };
-
-/** "15 April 2028", the way the reminder emails say a date. */
-function formatLongDate(iso: string): string {
-  return new Intl.DateTimeFormat("en-AU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${iso}T00:00:00Z`));
-}
 
 type Row = {
   href: string;
@@ -66,28 +57,15 @@ const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const [o, a, dc, toConfirm, reg] = await Promise.all([
+  const [o, a, dc, toConfirm, period] = await Promise.all([
     registerOverview(ctx.supabase, ctx.viewer.account.id),
     auditDayOverview(ctx.supabase, ctx.viewer.account.id),
     documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
     countReportsToConfirm(ctx.supabase, ctx.viewer.account.id),
-    ctx.supabase
-      .from("accounts")
-      .select("registration_date, registration_kind")
-      .eq("id", ctx.viewer.account.id)
-      .maybeSingle(),
+    // REQ-023 FR-1: batch 45 item 8's "due around" line is now one link to the
+    // timeline, so the two never disagree.
+    currentPeriod(ctx.supabase, ctx.viewer.account.id),
   ]);
-  // Batch 45 item 8: a certification provider with a registration date is told
-  // when the mid-term audit falls, from REQ-009's column (18 months in).
-  const registration = reg.data as {
-    registration_date: string | null;
-    registration_kind: "certification" | "verification" | null;
-  } | null;
-  const midTermDue =
-    registration?.registration_date &&
-    registration.registration_kind === "certification"
-      ? addMonths(registration.registration_date, MID_TERM_DUE_MONTHS)
-      : null;
   const auditDayRow = (slug: AuditDaySlug): Row => ({
     href: `/registers/${slug}`,
     title: AUDIT_DAY_META[slug].title,
@@ -223,12 +201,20 @@ export default async function RegistersPage() {
             Download my audit pack
           </a>
         </p>
-        {midTermDue ? (
+        {period ? (
           <p
             className="mt-2 text-sm text-zinc-700 dark:text-zinc-300"
-            data-testid="mid-term-due"
+            data-testid="registration-timeline-link"
           >
-            Your mid-term audit is due around {formatLongDate(midTermDue)}.
+            Your registration period ends on{" "}
+            {formatLongDate(period.period_ends_on)}.{" "}
+            <Link
+              href="/account#registration-heading"
+              className="underline underline-offset-2"
+            >
+              See your registration timeline
+            </Link>
+            .
           </p>
         ) : null}
         {groups.map((g) => (

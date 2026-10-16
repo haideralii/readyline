@@ -1,0 +1,36 @@
+{
+  "kind": "midterm-prepare",
+  "today": "2026-10-13",
+  "note": "A certification period that began 12 months ago: the prepare-from reminder fires today (our suggestion, start plus 12 months); its date is the must-start-by day, start plus 18 months (Rules s 13B(4)). The subject is the period row.",
+  "input": {
+    "account": { "id": "acc" },
+    "period": {
+      "period": {
+        "id": "per-1",
+        "period_starts_on": "2025-10-13",
+        "period_ends_on": "2028-10-13",
+        "audit_type": "certification",
+        "midterm_applies": true,
+        "midterm_exempt_reason": null,
+        "midterm_start_by_override": null,
+        "midterm_override_source": null,
+        "last_audit_on": null,
+        "midterm_audit_on": null
+      }
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "midterm-prepare",
+      "subject_table": "registration_periods",
+      "subject_id": "per-1",
+      "due_on": "2027-04-13",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

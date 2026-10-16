@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
-import { deriveChecklist } from "@/lib/checklist/derive";
+import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
+import { legalRows, timelineRows } from "@/lib/registers/timeline";
+import { RegistrationTimeline } from "@/app/account/registration-timeline";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { auditKindsContent } from "@/lib/questionnaire/content";
 import { auditDayAskList } from "@/lib/registers/audit-day-ask";
@@ -19,6 +21,7 @@ import { loadPathContext } from "@/server/path/state";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   lastSelfCheck,
   openSelfCheckFindings,
@@ -72,6 +75,7 @@ export default async function AuditDayPage() {
     documentControl,
     toConfirm,
     drill,
+    period,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -84,6 +88,8 @@ export default async function AuditDayPage() {
       .select("last_emergency_drill_on")
       .eq("id", viewer.account.id)
       .maybeSingle(),
+    // REQ-023 FR-2, FR-4: the registration period's legal rows and dated items.
+    currentPeriod(supabase, viewer.account.id),
   ]);
   // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
   const asks = auditDayAskList({
@@ -111,7 +117,12 @@ export default async function AuditDayPage() {
     }).format(new Date()),
   });
   const shown = mergeChecklist({
-    checklist: deriveChecklist(ctx.result, ctx.answers, dataset),
+    checklist: deriveChecklist(
+      ctx.result,
+      ctx.answers,
+      dataset,
+      checklistPeriod(period),
+    ),
     stored,
     draftedDocumentTypeIds: drafted,
   });
@@ -170,6 +181,23 @@ export default async function AuditDayPage() {
             Readiness summary (PDF)
           </a>
         </p>
+      ) : null}
+      {/* REQ-023 FR-2 (D-2314): the dates the Rules and the Act fix, the period end and the done dates; the suggestions stay on the account page. */}
+      {period ? (
+        <section
+          aria-labelledby="registration-dates-heading"
+          className="mt-6"
+          data-testid="audit-day-registration"
+        >
+          <h2 id="registration-dates-heading" className="text-xl font-semibold">
+            Your registration dates
+          </h2>
+          <RegistrationTimeline
+            rows={legalRows(timelineRows(period))}
+            caption="Your registration dates, from your certificate, the Rules and the Act"
+            testId="audit-day-timeline"
+          />
+        </section>
       ) : null}
       {/* REQ-020 FR-1: everything the auditor asks for, in one zip, built when you click. */}
       <p className="mt-3 text-sm print:hidden">

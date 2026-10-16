@@ -1,0 +1,36 @@
+{
+  "kind": "renewal-last-call",
+  "today": "2026-10-13",
+  "note": "A verification period that ends on 27 October 2026 with no application recorded inside the window: the last call fires 14 days before the end, today, and is about the end (NDIS Act s 73K). The apply-by reminder's day (30 June 2026) is outside the catch-up window.",
+  "input": {
+    "account": { "id": "acc" },
+    "period": {
+      "period": {
+        "id": "per-1",
+        "period_starts_on": "2023-10-27",
+        "period_ends_on": "2026-10-27",
+        "audit_type": "verification",
+        "midterm_applies": false,
+        "midterm_exempt_reason": "a verification audit has no mid-term audit (Rules s 13B(1))",
+        "midterm_start_by_override": null,
+        "midterm_override_source": null,
+        "last_audit_on": null,
+        "midterm_audit_on": null
+      }
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "renewal-last-call",
+      "subject_table": "registration_periods",
+      "subject_id": "per-1",
+      "due_on": "2026-10-27",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

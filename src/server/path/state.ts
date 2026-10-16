@@ -7,7 +7,7 @@ import "server-only";
  * page costs at most a few small queries.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { deriveChecklist } from "@/lib/checklist/derive";
+import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist } from "@/lib/checklist/state";
 import { collectBlanks } from "@/lib/generator/blanks";
 import { formBlanks } from "@/lib/generator/facts-fill";
@@ -35,6 +35,7 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   listEntitlements,
   listGenerationJobs,
@@ -155,12 +156,19 @@ export async function loadPathContext(
   state.groupsToAdopt = groupsLeftToAdopt(documents, adopted);
 
   const dataset = getStandardsDataset();
-  const [stored, drafted] = await Promise.all([
+  const [stored, drafted, period] = await Promise.all([
     listChecklistItems(supabase, accountId),
     listDraftedDocumentTypeIds(supabase, accountId),
+    // REQ-023 FR-4: the dated audit items once a registration period exists.
+    currentPeriod(supabase, accountId),
   ]);
   const shown = mergeChecklist({
-    checklist: deriveChecklist(result, answers, dataset),
+    checklist: deriveChecklist(
+      result,
+      answers,
+      dataset,
+      checklistPeriod(period),
+    ),
     stored,
     draftedDocumentTypeIds: drafted,
   });

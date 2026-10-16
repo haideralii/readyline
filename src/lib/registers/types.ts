@@ -133,8 +133,14 @@ export type AuState = (typeof AU_STATES)[number];
 export const REMINDER_KINDS = [
   "clearance-expiry",
   "policy-review",
-  "mid-term-audit",
-  "renewal",
+  // REQ-023 Session A (FR-3): the five timeline kinds, from the registration
+  // period; `mid-term-audit` and `renewal` stay in the database CHECK for
+  // the rows already sent and are no longer produced (finding 59).
+  "midterm-prepare",
+  "midterm-start-by",
+  "renewal-window",
+  "renewal-apply-by",
+  "renewal-last-call",
   "incident-open",
   "complaint-unacknowledged",
   "reportable-not-notified",
@@ -164,6 +170,8 @@ export const REMINDER_SUBJECT_TABLES = [
   "conflicts_of_interest",
   // REQ-020 FR-7: the hazard register's review date.
   "hazards",
+  // REQ-023 FR-3: the five timeline kinds point at the period row (finding 58).
+  "registration_periods",
 ] as const;
 export type ReminderSubjectTable = (typeof REMINDER_SUBJECT_TABLES)[number];
 
