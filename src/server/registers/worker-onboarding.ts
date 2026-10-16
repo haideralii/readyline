@@ -120,19 +120,17 @@ export async function ownerWorkerRef(
   supabase: SupabaseClient,
   accountId: string,
   userId: string,
-): Promise<{ membershipId: string; workerRef: string | null } | null> {
+): Promise<{ workerRef: string | null } | null> {
+  // `memberships` is keyed `(user_id, account_id)`; it has no id of its own.
   const m = await supabase
     .from("memberships")
-    .select("id, worker_ref")
+    .select("worker_ref")
     .eq("account_id", accountId)
     .eq("user_id", userId)
     .eq("role", "owner")
     .maybeSingle();
   if (!m.data) return null;
-  return {
-    membershipId: m.data.id as string,
-    workerRef: (m.data.worker_ref as string | null) ?? null,
-  };
+  return { workerRef: (m.data.worker_ref as string | null) ?? null };
 }
 
 /** FR-2: the worker's item context from the matrix row, the account's modules and whether the row is the owner's own. */
@@ -438,7 +436,7 @@ export async function afterStaffMatrixSave(
   // The owner's own row (FR-1, finding 64): link once; a refusal is a plain message, the row stays saved.
   if (input.isMe && owner && owner.workerRef !== row.worker_ref) {
     const link = await supabase.rpc("set_owner_worker_ref", {
-      p_membership: owner.membershipId,
+      p_account: input.accountId,
       p_ref: row.worker_ref,
     });
     if (link.error)

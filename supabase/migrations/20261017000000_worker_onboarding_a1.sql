@@ -449,7 +449,9 @@ grant execute on function public.worker_notice_seen() to authenticated;
 -- The owner's own row (D-2431 as amended; findings 64, 143 and 184): the membership takes the row's code once;
 -- a code another membership of the account holds, a code no matrix row carries, or a membership already pointed
 -- are each refused, so the owner never reads a worker's rows through the worker views by sharing a code.
-create or replace function public.set_owner_worker_ref(p_membership uuid, p_ref text)
+-- `memberships` has no `id`: its key is `(user_id, account_id)` (20261011000000_init_accounts.sql), so the
+-- function takes the account and keys on the signing user (#82's run 38917603175 read 42703 on `m.id`).
+create or replace function public.set_owner_worker_ref(p_account uuid, p_ref text)
 returns void
 language plpgsql
 security definer
@@ -458,9 +460,9 @@ as $$
 declare
   v_m record;
 begin
-  select m.id, m.account_id, m.user_id, m.role, m.worker_ref into v_m
-  from public.memberships m where m.id = p_membership;
-  if v_m.id is null or v_m.user_id <> auth.uid() or v_m.role <> 'owner' or not public.is_owner(v_m.account_id) then
+  select m.user_id, m.account_id, m.role, m.worker_ref into v_m
+  from public.memberships m where m.user_id = auth.uid() and m.account_id = p_account;
+  if v_m.user_id is null or v_m.role <> 'owner' or not public.is_owner(p_account) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
   if v_m.worker_ref is not null then
@@ -469,13 +471,13 @@ begin
   if p_ref is null or p_ref !~ '^W-?[0-9]{1,6}$' then
     raise exception 'not allowed' using errcode = '42501';
   end if;
-  if exists (select 1 from public.memberships m where m.account_id = v_m.account_id and m.worker_ref = p_ref) then
+  if exists (select 1 from public.memberships m where m.account_id = p_account and m.worker_ref = p_ref) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
-  if not exists (select 1 from public.staff_matrix s where s.account_id = v_m.account_id and s.worker_ref = p_ref) then
+  if not exists (select 1 from public.staff_matrix s where s.account_id = p_account and s.worker_ref = p_ref) then
     raise exception 'not allowed' using errcode = '42501';
   end if;
-  update public.memberships set worker_ref = p_ref where id = p_membership;
+  update public.memberships set worker_ref = p_ref where user_id = auth.uid() and account_id = p_account;
 end;
 $$;
 revoke all on function public.set_owner_worker_ref(uuid, text) from public, anon;

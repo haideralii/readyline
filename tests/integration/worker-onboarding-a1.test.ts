@@ -543,31 +543,29 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
   });
 
   it("D-2431: set_owner_worker_ref links the owner's membership once and refuses a member, a worker, a shared code, an absent code and a re-point (finding 184)", async () => {
-    // The owner's membership `create_account` wrote (role owner, the signing user); every row of the account is in the message when it is not there (#82's run 38911618628 read null here).
+    // The owner's membership `create_account` wrote (role owner, the signing user). `memberships` is keyed
+    // `(user_id, account_id)` with no id of its own (#82's run 38917603175 read 42703 on `memberships.id`),
+    // so the function takes the account and keys on the signing user; every row of the account is in the
+    // message when the owner's is not there.
     const all = await admin
       .from("memberships")
-      .select("id, user_id, role, worker_ref")
+      .select("user_id, role, worker_ref")
       .eq("account_id", owner.accountId);
     expect(all.error).toBeNull();
     const rows = (all.data ?? []) as {
-      id: string;
       user_id: string;
       role: string;
       worker_ref: string | null;
     }[];
-    const membership = rows.find(
-      (m) => m.user_id === owner.userId && m.role === "owner",
-    );
     expect(
-      membership,
+      rows.find((m) => m.user_id === owner.userId && m.role === "owner"),
       `the owner's membership for ${owner.userId}: ${JSON.stringify(rows)}`,
     ).toBeDefined();
-    const membershipId = membership!.id;
     // W-7 is the worker's code: shared, refused.
     expect(
       (
         await owner.client.rpc("set_owner_worker_ref", {
-          p_membership: membershipId,
+          p_account: owner.accountId,
           p_ref: "W-7",
         })
       ).error?.code,
@@ -576,7 +574,7 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
     expect(
       (
         await owner.client.rpc("set_owner_worker_ref", {
-          p_membership: membershipId,
+          p_account: owner.accountId,
           p_ref: "W-1",
         })
       ).error?.code,
@@ -592,7 +590,7 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
       expect(
         (
           await client.rpc("set_owner_worker_ref", {
-            p_membership: membershipId,
+            p_account: owner.accountId,
             p_ref: "W-1",
           })
         ).error?.code,
@@ -600,7 +598,7 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
     expect(
       (
         await owner.client.rpc("set_owner_worker_ref", {
-          p_membership: membershipId,
+          p_account: owner.accountId,
           p_ref: "W-1",
         })
       ).error,
@@ -608,14 +606,15 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
     const linked = await admin
       .from("memberships")
       .select("worker_ref")
-      .eq("id", membershipId)
+      .eq("user_id", owner.userId)
+      .eq("account_id", owner.accountId)
       .single();
     expect(linked.data?.worker_ref).toBe("W-1");
     // Never re-pointed.
     expect(
       (
         await owner.client.rpc("set_owner_worker_ref", {
-          p_membership: membershipId,
+          p_account: owner.accountId,
           p_ref: "W-9",
         })
       ).error?.code,
@@ -624,8 +623,9 @@ describe.skipIf(!enabled)("REQ-024 A1: worker onboarding data", () => {
     const direct = await owner.client
       .from("memberships")
       .update({ worker_ref: "W-9" })
-      .eq("id", membershipId)
-      .select("id");
+      .eq("user_id", owner.userId)
+      .eq("account_id", owner.accountId)
+      .select("user_id");
     expect(direct.error?.code).toBe("42501");
   });
 
