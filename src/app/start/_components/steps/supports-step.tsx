@@ -225,7 +225,7 @@ export function SupportsStepForm() {
           <>
             <AuditTag auditType={g.auditType} />
             {g.mandatoryFrom ? (
-              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
+              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm">
                 registration mandatory from 1 July 2026
               </span>
             ) : null}
