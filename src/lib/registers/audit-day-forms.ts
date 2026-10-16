@@ -37,7 +37,13 @@ import {
   type ParticipantRiskRow,
   type StaffMatrixRow,
 } from "./audit-day-types";
-import { NDIS_NUMBER_SHAPE } from "./types";
+import {
+  RISK_PARAGRAPH_LABELS,
+  RISK_PARAGRAPHS,
+  WORKER_ROLE_LABELS,
+  WORKER_ROLES,
+} from "./onboarding-items";
+import { AU_STATES, NDIS_NUMBER_SHAPE } from "./types";
 import { dateField } from "./forms";
 // #74's run 38858109250: a raw ISO date in a list's detail line breaks at its
 // hyphen at 360 px (`2027-02-13` read "2027-02-" and "13."), so every date a
@@ -72,7 +78,15 @@ const optionalRef = (pattern: RegExp, hint: string) =>
 export type FieldSpec = {
   name: string;
   label: string;
-  kind: "text" | "textarea" | "date" | "ref" | "select" | "checkbox";
+  kind:
+    | "text"
+    | "textarea"
+    | "date"
+    | "ref"
+    | "select"
+    | "checkbox"
+    // REQ-024 A1 (FR-1): the states a worker works in, a checkbox per state, kept as a comma-joined string in the form.
+    | "states";
   /** For a ref field: the example code. */
   hint?: string;
   help?: string;
@@ -490,12 +504,43 @@ export const DECISION_FIELDS: FieldSpec[] = [
 
 /* ---------- FR-8 staff matrix ---------- */
 
+/** REQ-024 A1 (FR-1): the states a worker works in, typed in the form as "NSW,VIC" and stored as an array. */
+const StatesField = z
+  .string()
+  .default("")
+  .transform((s) =>
+    s
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean),
+  )
+  .pipe(
+    z.array(z.enum(AU_STATES), {
+      error: "Choose the states from the list",
+    }),
+  );
+
 export const StaffMatrixForm = strictObject({
   worker_ref: refField(AUDIT_DAY_REF_PATTERNS.worker, "W-003"),
+  // REQ-024 A1 (FR-1): the closed role beside the free label; "" means not chosen yet (existing rows).
+  role: z
+    .union([z.literal(""), z.enum(WORKER_ROLES)])
+    .default("")
+    .transform((v) => (v === "" ? null : v)),
   role_label: safeText(AUDIT_DAY_TEXT_CAPS.role, 1, "Enter the role"),
   qualifications: safeText(AUDIT_DAY_TEXT_CAPS.short),
   risk_assessed: z.boolean(),
+  risk_paragraph: z
+    .union([z.literal(""), z.enum(RISK_PARAGRAPHS)])
+    .default("")
+    .transform((v) => (v === "" ? null : v)),
+  states: StatesField,
+  works_with_children: z.boolean().default(false),
+  may_use_restrictive_practice: z.boolean().default(false),
+  // FR-1 (finding 64): the owner's own row; the action links the membership to the code through `set_owner_worker_ref`.
+  is_me: z.boolean().default(false),
   started_on: optionalDate("start date"),
+  ended_on: optionalDate("end date"),
   last_supervision_on: optionalDate("last supervision date"),
   last_appraisal_on: optionalDate("last appraisal date"),
   onboarding_signed_on: optionalDate("onboarding sign-off date"),
@@ -507,11 +552,25 @@ export const STAFF_MATRIX_FIELDS: FieldSpec[] = [
     label: "Worker code",
     kind: "ref",
     hint: "W-003",
-    help: "The same code as in the worker checks register, so training and clearance dates line up.",
+    help: "The same code as in the worker checks register, so training and clearance dates line up. Never a name.",
+  },
+  {
+    name: "is_me",
+    label: "This row is me",
+    kind: "checkbox",
+    help: "Tick once for your own row: you are a worker too, and your clearance is checked like everyone's.",
+  },
+  {
+    name: "role",
+    label: "Kind of role",
+    kind: "select",
+    options: opts(WORKER_ROLES, WORKER_ROLE_LABELS),
+    optional: true,
+    help: "Key personnel are always risk assessed, and so is your own row.",
   },
   {
     name: "role_label",
-    label: "Role",
+    label: "Role title",
     kind: "text",
     maxLength: AUDIT_DAY_TEXT_CAPS.role,
   },
@@ -527,9 +586,42 @@ export const STAFF_MATRIX_FIELDS: FieldSpec[] = [
     name: "risk_assessed",
     label: "Risk-assessed role",
     kind: "checkbox",
-    help: "Tick if the role needs an NDIS Worker Screening clearance.",
+    help: "Tick if the role needs an NDIS Worker Screening clearance: key personnel, direct delivery of supports, or more than incidental contact with a participant.",
+  },
+  {
+    name: "risk_paragraph",
+    label: "Which paragraph of the definition applies",
+    kind: "select",
+    options: opts(RISK_PARAGRAPHS, RISK_PARAGRAPH_LABELS),
+    optional: true,
+    help: "Worker Screening Rules s 5. Delivering equipment with training is more than incidental contact; the back-office accountant is not.",
+  },
+  {
+    name: "states",
+    label: "States this worker works in",
+    kind: "states",
+    help: "The clearance rules differ by state; the worker's list uses these.",
+  },
+  {
+    name: "works_with_children",
+    label: "Works with children",
+    kind: "checkbox",
+    help: "Tick if the role is child-related work; the working with children check joins the list.",
+  },
+  {
+    name: "may_use_restrictive_practice",
+    label: "May use a restrictive practice",
+    kind: "checkbox",
+    help: "Tick if this worker may use one under a behaviour support plan.",
   },
   { name: "started_on", label: "Started on", kind: "date", optional: true },
+  {
+    name: "ended_on",
+    label: "Ended on",
+    kind: "date",
+    optional: true,
+    help: "A worker who has left stays on the list under past workers for seven years.",
+  },
   {
     name: "last_supervision_on",
     label: "Last supervision",
@@ -880,10 +972,12 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
       "No workers yet. Add one row per worker by code; their checks and training expiries join from the worker checks register.",
     fields: STAFF_MATRIX_FIELDS,
     schema: StaffMatrixForm,
+    // REQ-024 A1 (FR-3, D-2411): the list page replaces the status with the derived state; these are its keys.
     filters: [
-      { key: "supervision-overdue", label: "Supervision overdue" },
-      { key: "appraisal-overdue", label: "Appraisal overdue" },
-      { key: "current", label: "Current" },
+      { key: "outstanding", label: "Items outstanding" },
+      { key: "all-recorded", label: "All before-first-shift items recorded" },
+      { key: "check-expiring", label: "A check expiring" },
+      { key: "ended", label: "Ended" },
     ],
     titleOf: (r) => `${r.worker_ref}: ${r.role_label}`,
     detailOf: (r) =>
@@ -968,6 +1062,8 @@ export function rowToValues(
     fields.map((f) => {
       const v = row[f.name];
       if (f.kind === "checkbox") return [f.name, Boolean(v)];
+      // REQ-024 A1: an array column (the worker's states) is the form's comma-joined string.
+      if (Array.isArray(v)) return [f.name, v.join(",")];
       return [f.name, v === null || v === undefined ? "" : String(v)];
     }),
   );

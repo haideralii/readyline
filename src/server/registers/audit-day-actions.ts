@@ -16,8 +16,27 @@ import {
   OnboardingTickForm,
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
-import { onboardingItemsFor } from "@/lib/registers/onboarding-items";
-import type { OnboardingKind } from "@/lib/registers/audit-day-types";
+import {
+  onboardingItemsFor,
+  UNKNOWN_WORKER_CONTEXT,
+  workerOnboardingItems,
+} from "@/lib/registers/onboarding-items";
+import type {
+  OnboardingKind,
+  StaffMatrixRow,
+} from "@/lib/registers/audit-day-types";
+import { deriveWorkerState } from "@/lib/registers/worker-state";
+import { loadQuestionnaire } from "@/server/path/state";
+import {
+  accountModuleIds,
+  afterStaffMatrixSave,
+  contextFor,
+  ensureItems,
+  listItems,
+  listWorkerClearances,
+  ownerWorkerRef,
+  todaySydney,
+} from "@/server/registers/worker-onboarding";
 import { plainDatabaseMessage } from "@/lib/registers/messages";
 import { dateField } from "@/lib/registers/forms";
 import { parseInput, strictObject, text } from "@/lib/validation";
@@ -121,9 +140,27 @@ export async function saveAuditDayRowAction(
   const ctx = await context();
   if (!ctx) return SIGN_IN;
   if (ctx === "limited") return LIMITED;
+  // REQ-024 A1 (FR-1): "this row is me" is not a column; the row's previous flags feed the s 20 dates after the save.
+  const { is_me: isMe, ...values } = parsed.data as Record<string, unknown> & {
+    is_me?: boolean;
+  };
+  const before =
+    slug === "staff-matrix" && outer.data.id
+      ? ((
+          await ctx.supabase
+            .from("staff_matrix")
+            .select("risk_assessed, role, risk_assessed_from, role_ref")
+            .eq("id", outer.data.id)
+            .eq("account_id", ctx.account.id)
+            .maybeSingle()
+        ).data as Pick<
+          StaffMatrixRow,
+          "risk_assessed" | "role" | "risk_assessed_from" | "role_ref"
+        > | null)
+      : null;
   const row = {
     account_id: ctx.account.id,
-    ...(parsed.data as Record<string, unknown>),
+    ...values,
     // A starter row edited by the provider is theirs from then on (FR-1).
     ...(slug === "corporate-risks" && outer.data.id ? { starter: false } : {}),
   };
@@ -154,6 +191,21 @@ export async function saveAuditDayRowAction(
     `register.${meta.table}.${outer.data.id ? "updated" : "created"}`,
     id,
   );
+  if (slug === "staff-matrix") {
+    // REQ-024 A1 (FR-1, FR-2): the roles, the forced flag, the s 20 dates, the owner's link and the worker's derived list.
+    const { result } = await loadQuestionnaire();
+    const after = await afterStaffMatrixSave(ctx.supabase, {
+      accountId: ctx.account.id,
+      userId: ctx.viewer.user.id,
+      rowId: id,
+      before,
+      isMe: Boolean(isMe),
+      effectiveOn: todaySydney(),
+      moduleIds: await accountModuleIds(ctx.supabase, ctx.account.id, result),
+      today: todaySydney(),
+    });
+    if (!after.ok) return { ok: false, message: after.message };
+  }
   return { ok: true, id };
 }
 
@@ -233,6 +285,8 @@ export async function tickOnboardingItemAction(
     .maybeSingle();
   if (!list.data)
     return { ok: false, message: "That checklist was not found." };
+  if (list.data.kind === "worker")
+    return recordWorkerItem(ctx, list.data as WorkerList, parsed.data);
   const items = onboardingItemsFor(list.data.kind as OnboardingKind);
   if (!items.some((i) => i.id === parsed.data.item_id))
     return { ok: false, message: "That item is not on this checklist." };
@@ -244,6 +298,7 @@ export async function tickOnboardingItemAction(
       item_id: parsed.data.item_id,
       ticked_on: parsed.data.ticked_on,
       ticked_by_ref: parsed.data.ticked_by_ref,
+      actor_user_id: ctx.viewer.user.id,
     })
     .select("id")
     .single();
@@ -286,6 +341,156 @@ export async function tickOnboardingItemAction(
     tick.data.id as string,
   );
   return { ok: true, id: tick.data.id as string };
+}
+
+type WorkerList = {
+  id: string;
+  kind: "worker";
+  subject_ref: string;
+  completed_on: string | null;
+};
+
+/**
+ * REQ-024 A1 (FR-2, FR-4, FR-8; D-2423, D-2430, D-2438): the owner's tick on
+ * a worker's derived item confirms it, records the worker's own date where
+ * the worker never signs in ("recorded by your manager"), appends one tick
+ * and one `confirmed` event, and when every before-first-shift item is
+ * recorded under the derived rule sets the checklist's and the matrix row's
+ * dates. The derived state is the one path that completes a worker list
+ * (finding 148).
+ */
+async function recordWorkerItem(
+  ctx: Exclude<Awaited<ReturnType<typeof context>>, null | "limited">,
+  list: WorkerList,
+  tick: z.infer<typeof OnboardingTickForm>,
+): Promise<AuditDayActionResult> {
+  const today = todaySydney();
+  const matrix = await ctx.supabase
+    .from("staff_matrix")
+    .select("*")
+    .eq("account_id", ctx.account.id)
+    .eq("worker_ref", list.subject_ref)
+    .maybeSingle();
+  const { result } = await loadQuestionnaire();
+  const moduleIds = await accountModuleIds(
+    ctx.supabase,
+    ctx.account.id,
+    result,
+  );
+  const owner = await ownerWorkerRef(
+    ctx.supabase,
+    ctx.account.id,
+    ctx.viewer.user.id,
+  );
+  const row = (matrix.data as StaffMatrixRow | null) ?? null;
+  const items = workerOnboardingItems(
+    row
+      ? contextFor(row, moduleIds, owner?.workerRef ?? null, today)
+      : { ...UNKNOWN_WORKER_CONTEXT, today },
+  );
+  const item = items.find((i) => i.id === tick.item_id);
+  if (!item) return { ok: false, message: "That item is not on this list." };
+  await ensureItems(ctx.supabase, ctx.account.id, list.id, items);
+  const current = await ctx.supabase
+    .from("onboarding_items")
+    .select("id, done_on, confirmed_on")
+    .eq("checklist_id", list.id)
+    .eq("item_id", item.id)
+    .maybeSingle();
+  if (!current.data) return { ok: false, message: "That item was not found." };
+  const recordedByOwner = item.who !== "owner" && !current.data.done_on;
+  const upd = await ctx.supabase
+    .from("onboarding_items")
+    .update({
+      confirmed_on: tick.ticked_on,
+      done_on: current.data.done_on ?? tick.ticked_on,
+      recorded_by_owner: recordedByOwner,
+    })
+    .eq("id", current.data.id)
+    .eq("account_id", ctx.account.id);
+  if (upd.error) return { ok: false, message: plainDatabaseMessage(upd.error) };
+  const inserted = await ctx.supabase
+    .from("onboarding_ticks")
+    .insert({
+      checklist_id: list.id,
+      account_id: ctx.account.id,
+      item_id: item.id,
+      ticked_on: tick.ticked_on,
+      ticked_by_ref: tick.ticked_by_ref,
+      actor_user_id: ctx.viewer.user.id,
+    })
+    .select("id")
+    .single();
+  if (inserted.error)
+    return { ok: false, message: plainDatabaseMessage(inserted.error) };
+  await ctx.supabase.from("register_events").insert({
+    account_id: ctx.account.id,
+    register: "onboarding_items",
+    row_id: current.data.id,
+    kind: "confirmed",
+    note: `${item.id} confirmed on ${tick.ticked_on}${recordedByOwner ? ", recorded by the manager" : ""}`,
+  });
+  // The completion rule is the derived state (FR-2, finding 148).
+  if (row && !list.completed_on) {
+    const states = await listItems(ctx.supabase, ctx.account.id, list.id);
+    const clearances = await listWorkerClearances(
+      ctx.supabase,
+      ctx.account.id,
+      row.worker_ref,
+    );
+    const role = row.role_ref
+      ? await ctx.supabase
+          .from("risk_assessed_roles")
+          .select("assessed_on")
+          .eq("id", row.role_ref)
+          .maybeSingle()
+      : null;
+    const derived = deriveWorkerState({
+      worker: {
+        worker_ref: row.worker_ref,
+        states: row.states ?? [],
+        risk_assessed: row.risk_assessed,
+        ended_on: row.ended_on,
+        role_assessed_on:
+          (role?.data as { assessed_on: string | null } | null)?.assessed_on ??
+          null,
+        role_ref: row.role_ref,
+      },
+      items,
+      states,
+      clearances,
+      today,
+    });
+    if (derived.key === "all-recorded" || derived.key === "check-expiring") {
+      await ctx.supabase
+        .from("onboarding_checklists")
+        .update({ completed_on: tick.ticked_on })
+        .eq("id", list.id)
+        .eq("account_id", ctx.account.id);
+      await ctx.supabase
+        .from("staff_matrix")
+        .update({ onboarding_signed_on: tick.ticked_on })
+        .eq("id", row.id)
+        .eq("account_id", ctx.account.id)
+        .is("onboarding_signed_on", null);
+      await trail(
+        ctx.supabase,
+        ctx.account.id,
+        "onboarding_checklists",
+        list.id,
+        "closed",
+        "Every before-first-shift item recorded.",
+      );
+    }
+  }
+  await audit(
+    ctx.supabase,
+    ctx.account.id,
+    ctx.viewer.user.id,
+    "register.onboarding_items.confirmed",
+    inserted.data.id as string,
+  );
+  return { ok: true, id: inserted.data.id as string };
 }
 
 const ReviewInput = strictObject({

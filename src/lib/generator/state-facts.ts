@@ -86,9 +86,12 @@ export function stateFactsFor(stateNames: readonly string[]): StateFactLines[] {
 
 /** The whole block body: the national facts once, then each state. */
 export function renderStateFacts(entries: readonly StateFactLines[]): string {
-  const national = Object.entries(STATE_REFERENCE.national).map(([key, f]) =>
-    line(NATIONAL_LABELS[key] ?? key, f),
-  );
+  // The labelled entries alone (REQ-024 A1 added `acceptableChecks` for the
+  // onboarding reader, `src/lib/registers/state-facts.ts`; the prompt is
+  // unchanged, so the recorded fixtures still match, finding 113).
+  const national = Object.entries(NATIONAL_LABELS)
+    .filter(([key]) => key in STATE_REFERENCE.national)
+    .map(([key, label]) => line(label, STATE_REFERENCE.national[key]));
   return [
     "National:",
     ...national,

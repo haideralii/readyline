@@ -34,8 +34,13 @@ export default async function WorkerCheckPage({
             [
               ["Role", row.role_label],
               ["Check number", row.clearance_number || "Not recorded"],
-              ["Issued", row.issued_on],
+              ["Application number", row.application_number || "Not recorded"],
+              ["Issued", row.issued_on ?? "Pending"],
               ["Expires", row.expires_on ?? "No expiry"],
+              [
+                "Checked in the NDIS Worker Screening Database",
+                row.verified_in_database_on ?? "Not yet",
+              ],
               ["State", row.state ?? "Not set"],
               ["Note", row.note || "None"],
             ] as [string, string][]

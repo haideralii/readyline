@@ -114,6 +114,12 @@ export const CLEARANCE_KINDS = [
   "police-check",
   "first-aid",
   "ndis-worker-orientation-module",
+  // REQ-018 FR-8: the two mandatory-training kinds.
+  "manual-handling",
+  "medication",
+  // REQ-024 A1 (FR-5, finding 128): CPR and the driver licence for transport supports.
+  "cpr",
+  "driver-licence",
   "other",
 ] as const;
 export type ClearanceKind = (typeof CLEARANCE_KINDS)[number];
@@ -153,6 +159,8 @@ export const REMINDER_KINDS = [
   "register-review",
   // REQ-020 Session B: the owner is nudged while a report waits.
   "report-to-confirm",
+  // REQ-024 A1 (D-2416): a risk assessed role a current worker holds, unassessed, at 10 and 20 business days.
+  "role-assessment-due",
 ] as const;
 export type ReminderKind = (typeof REMINDER_KINDS)[number];
 
@@ -170,6 +178,8 @@ export const REMINDER_SUBJECT_TABLES = [
   "conflicts_of_interest",
   // REQ-020 FR-7: the hazard register's review date.
   "hazards",
+  // REQ-024 A1: the s 17 list's roles.
+  "risk_assessed_roles",
   // REQ-023 FR-3: the five timeline kinds point at the period row (finding 58).
   "registration_periods",
 ] as const;
@@ -333,11 +343,16 @@ export type WorkerClearanceRow = {
   worker_ref: string;
   role_label: string;
   clearance_kind: ClearanceKind;
-  /** Batch 45 item 22: the check (or application) number, optional; Worker Screening Rules s 18(3)(d). */
+  /** Batch 45 item 22: the check number; Worker Screening Rules s 18(3)(d)(ii). */
   clearance_number: string;
-  issued_on: string;
+  /** REQ-024 A1 (D-2419): the application number, s 18(3)(d)(i); a pending application is a row with this and no issue date. */
+  application_number: string;
+  /** Null while the application is pending (REQ-024 A1, finding 157). */
+  issued_on: string | null;
   /** Null means no expiry (the orientation module). */
   expires_on: string | null;
+  /** REQ-024 A1: the day the owner checked the row in the NDIS Worker Screening Database (s 15(4)); the owner's alone. */
+  verified_in_database_on: string | null;
   state: AuState | null;
   note: string;
   created_at: string;
@@ -346,12 +361,18 @@ export type WorkerClearanceRow = {
 
 export type WorkerClearanceInsert = Pick<
   WorkerClearanceRow,
-  "account_id" | "worker_ref" | "role_label" | "clearance_kind" | "issued_on"
+  "account_id" | "worker_ref" | "role_label" | "clearance_kind"
 > &
   Partial<
     Pick<
       WorkerClearanceRow,
-      "expires_on" | "state" | "note" | "clearance_number"
+      | "issued_on"
+      | "expires_on"
+      | "state"
+      | "note"
+      | "clearance_number"
+      | "application_number"
+      | "verified_in_database_on"
     >
   >;
 

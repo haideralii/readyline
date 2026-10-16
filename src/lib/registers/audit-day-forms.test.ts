@@ -23,8 +23,20 @@ import {
 } from "./audit-day-forms";
 import {
   PARTICIPANT_ONBOARDING_ITEMS,
-  WORKER_ONBOARDING_ITEMS,
+  workerOnboardingItems,
 } from "./onboarding-items";
+
+// REQ-024 A1: the worker list is derived; the lint reads it for a worker with every item (children, restrictive practice, every training module) in one state.
+const WORKER_ONBOARDING_ITEMS = workerOnboardingItems({
+  role: "support-worker",
+  states: ["NSW"],
+  worksWithChildren: true,
+  mayUseRestrictivePractice: true,
+  ownerRow: false,
+  riskAssessed: true,
+  moduleIds: ["core", "hidpa", "sbs"],
+  today: "2026-11-02",
+});
 
 function schemaKeys(schema: unknown): string[] {
   const s = schema as {

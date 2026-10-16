@@ -10,6 +10,49 @@
         "url": "https://www.ndiscommission.gov.au/sites/default/files/2026-01/FAQs%20%E2%80%93%20NDIS%20Worker%20Screening%20Check%20Renewal%20Cycle%20External.docx",
         "readAt": "2026-10-13"
       }
+    },
+    "acceptableChecks": {
+      "text": "Every check s 14A(2) of the Worker Screening Rules names is a Part 4 transitional arrangement that has ended by its own date, so no acceptable state check applies today and the s 14A bar has no escape; s 29B ceased at the end of 1 February 2024 (s 29B(10)).",
+      "status": "verified",
+      "source": {
+        "title": "NDIS (Practice Standards—Worker Screening) Rules 2018, compilation No. 4, F2021C00788, s 14A(2) and Part 4 (currency confirmed on legislation.gov.au 15 October 2026)",
+        "url": "https://www.legislation.gov.au/F2018L00887/2021-07-31/2021-07-31/text/original/word",
+        "readAt": "2026-10-15"
+      },
+      "byState": {
+        "NSW": {
+          "section": "23(7)",
+          "endedOn": "2026-01-31"
+        },
+        "VIC": {
+          "section": "25(3)",
+          "endedOn": "2021-01-31"
+        },
+        "QLD": {
+          "section": "26(3)",
+          "endedOn": "2021-01-31"
+        },
+        "WA": {
+          "section": "29A(5)",
+          "endedOn": "2023-01-31"
+        },
+        "SA": {
+          "section": "24(6B)",
+          "endedOn": "2026-01-31"
+        },
+        "TAS": {
+          "section": "27(3)",
+          "endedOn": "2021-01-31"
+        },
+        "ACT": {
+          "section": "28(3)",
+          "endedOn": "2021-01-31"
+        },
+        "NT": {
+          "section": "29(3)",
+          "endedOn": "2021-06-30"
+        }
+      }
     }
   },
   "states": {
@@ -22,6 +65,37 @@
           "title": "Service NSW, NDIS Worker Check",
           "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "The NSW unit allows a worker to start in a risk assessed role once the employer has verified the application in the NDIS Worker Screening Database. The PO read this on the Office of the Children's Guardian's page on 16 October 2026; the repository holds no URL for that page, so the line is unverified here until the watch file records it.",
+          "status": "unverified",
+          "source": {
+            "title": "Service NSW, NDIS Worker Check (the Office of the Children's Guardian's page was read by the PO; its URL is not in the repository)",
+            "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "allowed": true
+        },
+        "applicationProhibitsPending": {
+          "text": "The NSW unit does not prohibit work while an application it has verified is pending (the Office of the Children's Guardian's page, read by the PO 16 October 2026; URL not in the repository).",
+          "status": "unverified",
+          "source": {
+            "title": "Service NSW, NDIS Worker Check (the Office of the Children's Guardian's page was read by the PO; its URL is not in the repository)",
+            "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In New South Wales the NDIS Worker Check and the Working With Children Check are two separate checks.",
+          "status": "verified",
+          "source": {
+            "title": "Service NSW, NDIS Worker Check (the Office of the Children's Guardian's page was read by the PO; its URL is not in the repository)",
+            "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "separate"
         }
       },
       "childrenCheck": {
@@ -31,7 +105,8 @@
           "title": "Service NSW, NDIS Worker Check",
           "url": "https://www.service.nsw.gov.au/guide/ndis-worker-check",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 5
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised by a Restrictive Practices Authorisation (RPA) Panel convened by the implementing provider under the Department of Communities and Justice RPA Policy; the framework is policy-based, not a statute; a senior manager may give an interim authorisation for up to six months.",
@@ -52,6 +127,37 @@
           "title": "Victorian Government, NDIS Worker Screening Check",
           "url": "https://www.vic.gov.au/ndis-worker-screening-check",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "Victoria: no clearance, no start. A worker may not begin in a risk assessed role until the clearance is issued.",
+          "status": "verified",
+          "source": {
+            "title": "Victorian Government, NDIS Worker Screening Check",
+            "url": "https://www.vic.gov.au/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "allowed": false
+        },
+        "applicationProhibitsPending": {
+          "text": "Victoria prohibits work in a risk assessed role until the clearance is issued: no clearance, no start.",
+          "status": "verified",
+          "source": {
+            "title": "Victorian Government, NDIS Worker Screening Check",
+            "url": "https://www.vic.gov.au/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": true
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In Victoria the NDIS Worker Screening Check and the Working with Children Check are two separate checks.",
+          "status": "verified",
+          "source": {
+            "title": "Victorian Government, NDIS Worker Screening Check",
+            "url": "https://www.vic.gov.au/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "separate"
         }
       },
       "childrenCheck": {
@@ -61,7 +167,8 @@
           "title": "Victorian Government, Working with Children Check",
           "url": "https://www.vic.gov.au/working-with-children-check",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 5
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised under the Disability Act 2006 (Vic) Part 7 as amended in 2023: the provider's Authorised Program Officer for chemical and environmental restraint, and the Victorian Senior Practitioner (Department of Families, Fairness and Housing) for seclusion, physical and mechanical restraint.",
@@ -82,6 +189,37 @@
           "title": "Worker Screening Queensland, fees for workers",
           "url": "https://www.workerscreening.qld.gov.au/workers/fees",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "Queensland: a worker can't start work until they have been issued a clearance, and employers must verify the engagement before the application is considered valid.",
+          "status": "verified",
+          "source": {
+            "title": "Worker Screening Queensland, before you start",
+            "url": "https://www.workerscreening.qld.gov.au/workers/before-you-start",
+            "readAt": "2026-10-16"
+          },
+          "allowed": false
+        },
+        "applicationProhibitsPending": {
+          "text": "Queensland prohibits work in a risk assessed role until the clearance is issued.",
+          "status": "verified",
+          "source": {
+            "title": "Worker Screening Queensland, before you start",
+            "url": "https://www.workerscreening.qld.gov.au/workers/before-you-start",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": true
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In Queensland the NDIS clearance and the Blue Card are one combined application with one fee; the two clearances are still recorded separately.",
+          "status": "verified",
+          "source": {
+            "title": "Worker Screening Queensland, before you start",
+            "url": "https://www.workerscreening.qld.gov.au/workers/before-you-start",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "one-application"
         }
       },
       "childrenCheck": {
@@ -91,7 +229,8 @@
           "title": "Worker Screening Queensland, fees for workers",
           "url": "https://www.workerscreening.qld.gov.au/workers/fees",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 3
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised under the Disability Services Act 2006 (Qld): short-term approvals from the Department of Families, Seniors, Disability Services and Child Safety; the Public Guardian and QCAT for containment and seclusion.",
@@ -112,6 +251,37 @@
           "title": "WA Department of Communities, NDIS Worker Screening Check",
           "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "Western Australia allows a worker to start on a complete, verified application with no interim bar in place.",
+          "status": "verified",
+          "source": {
+            "title": "WA Department of Communities, NDIS Worker Screening Check",
+            "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "allowed": true
+        },
+        "applicationProhibitsPending": {
+          "text": "Western Australia does not prohibit work on a complete, verified application with no interim bar.",
+          "status": "verified",
+          "source": {
+            "title": "WA Department of Communities, NDIS Worker Screening Check",
+            "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In Western Australia the NDIS Worker Screening Check and the Working with Children Check are two separate checks.",
+          "status": "verified",
+          "source": {
+            "title": "WA Department of Communities, NDIS Worker Screening Check",
+            "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "separate"
         }
       },
       "childrenCheck": {
@@ -121,7 +291,8 @@
           "title": "WA Department of Communities, NDIS Worker Screening Check",
           "url": "https://www.wa.gov.au/organisation/department-of-communities/ndis-worker-screening-check",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 3
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised by a Quality Assurance Panel (a senior manager of the provider plus an independent practitioner) under the Authorisation of Restrictive Practices in Funded Disability Services Policy 2020; the framework is policy-based.",
@@ -142,6 +313,37 @@
           "title": "SA Department of Human Services Screening Unit",
           "url": "https://www.sa.gov.au",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "South Australia's apply page is silent on pending work and says the employer learns the outcome through the database; most applications are completed within 4 weeks.",
+          "status": "unverified",
+          "source": {
+            "title": "SA Department of Human Services Screening Unit, NDIS Worker Check (apply page)",
+            "url": "https://www.sa.gov.au",
+            "readAt": "2026-10-16"
+          },
+          "allowed": false
+        },
+        "applicationProhibitsPending": {
+          "text": "South Australia's page is silent on whether an applicant may work while the application is pending.",
+          "status": "unverified",
+          "source": {
+            "title": "SA Department of Human Services Screening Unit, NDIS Worker Check (apply page)",
+            "url": "https://www.sa.gov.au",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In South Australia the NDIS Worker Check and the Working With Children Check are two separate checks.",
+          "status": "verified",
+          "source": {
+            "title": "SA Department of Human Services Screening Unit, NDIS Worker Check (apply page)",
+            "url": "https://www.sa.gov.au",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "separate"
         }
       },
       "childrenCheck": {
@@ -151,7 +353,8 @@
           "title": "SA Department of Human Services Screening Unit",
           "url": "https://www.sa.gov.au",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 5
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised under the Disability Inclusion Act 2018 (SA) Part 6A: the Senior Authorising Officer in the Restrictive Practices Unit, with provider Authorised Program Officers for level 1 practices; an interim authorisation lasts up to 8 months and a comprehensive one up to 15.",
@@ -172,6 +375,37 @@
           "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
           "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "Tasmania's page is silent on pending work; the database asks the employer to verify the application.",
+          "status": "unverified",
+          "source": {
+            "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
+            "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "allowed": false
+        },
+        "applicationProhibitsPending": {
+          "text": "Tasmania's page is silent on whether an applicant may work while the application is pending.",
+          "status": "unverified",
+          "source": {
+            "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
+            "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In Tasmania one Registration to Work with Vulnerable People carries the NDIS check, requested as part of the application, valid for 5 years or the duration of the registration.",
+          "status": "verified",
+          "source": {
+            "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
+            "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "one-registration"
         }
       },
       "childrenCheck": {
@@ -181,7 +415,8 @@
           "title": "Tasmanian Department of Justice, RWVP: NDIS worker check",
           "url": "https://www.justice.tas.gov.au/rwvp/apply-or-renew/ndis-worker-check",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 5
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised by the Senior Practitioner in the Department of Premier and Cabinet under the Disability Rights, Inclusion and Safeguarding Act 2024 (Tas), in force from 1 July 2025, which replaced TASCAT approvals under the 2011 Act; an authorisation lasts up to 12 months.",
@@ -202,6 +437,37 @@
           "title": "Access Canberra, WWVP and the NDIS",
           "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "The ACT's page is silent on pending work.",
+          "status": "unverified",
+          "source": {
+            "title": "Access Canberra, WWVP and the NDIS",
+            "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
+            "readAt": "2026-10-16"
+          },
+          "allowed": false
+        },
+        "applicationProhibitsPending": {
+          "text": "The ACT's page is silent on whether an applicant may work while the application is pending.",
+          "status": "unverified",
+          "source": {
+            "title": "Access Canberra, WWVP and the NDIS",
+            "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In the ACT the NDIS worker check is part of the Working with Vulnerable People registration: one registration carries both.",
+          "status": "verified",
+          "source": {
+            "title": "Access Canberra, WWVP and the NDIS",
+            "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "one-registration"
         }
       },
       "childrenCheck": {
@@ -211,7 +477,8 @@
           "title": "Access Canberra, WWVP and the NDIS",
           "url": "https://www.accesscanberra.act.gov.au/business-and-work/working-with-vulnerable-people/wwvp-and-the-ndis",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 5
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised under the Senior Practitioner Act 2018 (ACT): a positive behaviour support plan is approved by a panel and registered with the ACT Senior Practitioner; a registration lapses after 12 months.",
@@ -232,6 +499,37 @@
           "title": "NT Police, Fire and Emergency Services, SAFE NT: NDIS Worker Screening Check",
           "url": "https://pfes.nt.gov.au/NDISCheck",
           "readAt": "2026-10-13"
+        },
+        "pendingWorkAllowed": {
+          "text": "The Northern Territory allows a worker to start with the employer's agreement, risk management in place and a cleared supervisor.",
+          "status": "verified",
+          "source": {
+            "title": "SAFE NT, NDIS Worker Screening Check",
+            "url": "https://pfes.nt.gov.au/NDISCheck",
+            "readAt": "2026-10-16"
+          },
+          "allowed": true
+        },
+        "applicationProhibitsPending": {
+          "text": "The Northern Territory does not prohibit work pending the clearance where the employer agrees, manages the risk and a cleared worker supervises.",
+          "status": "verified",
+          "source": {
+            "title": "SAFE NT, NDIS Worker Screening Check",
+            "url": "https://pfes.nt.gov.au/NDISCheck",
+            "readAt": "2026-10-16"
+          },
+          "prohibits": false
+        },
+        "verificationWindow": null,
+        "combinedScheme": {
+          "text": "In the Northern Territory the NDIS Worker Screening Clearance and the Ochre Card are two separate checks.",
+          "status": "verified",
+          "source": {
+            "title": "SAFE NT, NDIS Worker Screening Check",
+            "url": "https://pfes.nt.gov.au/NDISCheck",
+            "readAt": "2026-10-16"
+          },
+          "scheme": "separate"
         }
       },
       "childrenCheck": {
@@ -241,7 +539,8 @@
           "title": "Northern Territory Government, changes to working with children clearances",
           "url": "https://nt.gov.au/emergency/child-safety/wwcc-changes",
           "readAt": "2026-10-13"
-        }
+        },
+        "termYears": 2
       },
       "restrictivePractice": {
         "text": "Restrictive practices are authorised by the NT Senior Practitioner in the Department of Health under the NT Restrictive Practices Authorisation Framework and the NDIS (Authorisations) Act 2019 (NT).",
@@ -252,6 +551,23 @@
           "readAt": "2026-10-13"
         }
       }
+    }
+  },
+  "part4Ends": {
+    "text": "The latest day a Part 4 arrangement under s 14(1)(b) could run to, per state, by the Rules' own years; Queensland's depends on the card held at 31 January 2021 and is unverified until the yellow card's term is read; Victoria's s 25(5)(d)(iii) has no end date in the text and is unverified (SR-5).",
+    "status": "verified",
+    "source": {
+      "title": "NDIS (Practice Standards—Worker Screening) Rules 2018, compilation No. 4, F2021C00788, Part 4 ss 23 to 29B",
+      "url": "https://www.legislation.gov.au/F2018L00887/2021-07-31/2021-07-31/text/original/word",
+      "readAt": "2026-10-15"
+    },
+    "byState": {
+      "NSW": "2026-01-31",
+      "SA": "2026-01-31",
+      "WA": "2023-01-31",
+      "TAS": "2024-01-31",
+      "ACT": "2024-01-31",
+      "NT": "2023-06-30"
     }
   }
 }

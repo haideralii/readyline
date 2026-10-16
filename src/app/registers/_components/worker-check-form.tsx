@@ -52,8 +52,10 @@ export function WorkerCheckFormView({
       roleLabel: "",
       clearanceKind: "" as WorkerCheckFormValues["clearanceKind"],
       clearanceNumber: "",
+      applicationNumber: "",
       issuedOn: "",
       expiresOn: "",
+      verifiedInDatabaseOn: "",
       state: "",
       note: "",
     },
@@ -177,12 +179,33 @@ export function WorkerCheckFormView({
           />
         )}
       </Field>
+      {/* REQ-024 A1 (D-2419, finding 157): the application number from the unit's notice; with it a pending application is a row with no issue date. */}
+      <Field
+        id="applicationNumber"
+        label={`${CLEARANCE_COLUMNS.application_number} (optional)`}
+        help="From the screening unit's written notice. Leave the issue date blank while the application is pending; the row then reads 'pending'."
+        errors={errorsFor(errors, "applicationNumber")}
+      >
+        {(describedBy, invalid) => (
+          <TextInput
+            id="applicationNumber"
+            name="applicationNumber"
+            value={v.applicationNumber ?? ""}
+            onChange={(x) => set("applicationNumber", x)}
+            describedBy={describedBy}
+            invalid={invalid}
+            maxLength={40}
+          />
+        )}
+      </Field>
       <DateField
         id="issuedOn"
         label={LABELS.issuedOn}
+        help="Blank while the application is pending."
         errors={errorsFor(errors, "issuedOn")}
-        value={v.issuedOn}
+        value={v.issuedOn ?? ""}
         onChange={(x) => onKindOrIssued(v.clearanceKind, x)}
+        optional
       />
       <DateField
         id="expiresOn"
@@ -191,6 +214,16 @@ export function WorkerCheckFormView({
         errors={errorsFor(errors, "expiresOn")}
         value={v.expiresOn ?? ""}
         onChange={(x) => set("expiresOn", x)}
+        optional
+      />
+      {/* REQ-024 A1 (s 15(4); finding 151): the day the owner checked the row in the NDIS Worker Screening Database; the owner's alone, never the worker's. */}
+      <DateField
+        id="verifiedInDatabaseOn"
+        label={CLEARANCE_COLUMNS.verified_in_database_on}
+        help="For the NDIS Worker Screening Check: the day you looked the worker up in the database and saw 'Eligible to work'. The worker's list reads this date."
+        errors={errorsFor(errors, "verifiedInDatabaseOn")}
+        value={v.verifiedInDatabaseOn ?? ""}
+        onChange={(x) => set("verifiedInDatabaseOn", x)}
         optional
       />
       <SelectField

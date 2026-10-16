@@ -90,12 +90,23 @@ export type ReminderInput = {
   lastEmergencyDrillOn?: string | null;
   /** REQ-020 FR-5: draft reports waiting for the owner, by when the provider became aware. */
   reports?: { id: string; aware_at: string }[];
+  /** REQ-024 FR-6a (D-2416): the s 17 roles; only a role a current worker holds and nobody has assessed reminds, from the day it was first held. */
+  riskAssessedRoles?: {
+    id: string;
+    first_held_on: string | null;
+    assessed_on: string | null;
+    held: boolean;
+  }[];
   /** The moment the rules run (ISO), for the hour-based rules; defaults to the end of `today`. */
   now?: string;
 };
 
 /** A draft report nudges the owner again once this many hours have passed since it came in (PO edit to FR-5). */
 export const REPORT_NUDGE_HOURS = 12;
+
+/** Worker Screening Rules s 17(2)(b): the list is updated within 20 business days of a new or reclassified role; the warning goes at 10 (REQ-024 FR-6a). */
+export const ROLE_ASSESSMENT_BUSINESS_DAYS = 20;
+export const ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS = 10;
 
 export type ReminderDue = {
   account_id: string;
@@ -231,6 +242,22 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
     }
   }
 
+  // REQ-024 FR-6a (D-2416; findings 44, 66, 80 and 83): a new or reclassified role's assessment is due within
+  // 20 business days of the day the first current worker was given it (s 17(2)(b)); the reminder at 10 business
+  // days is the warning and the one at 20 is the deadline (D-902); an unheld or assessed role sends nothing.
+  for (const r of input.riskAssessedRoles ?? []) {
+    if (!r.held || r.assessed_on || !r.first_held_on) continue;
+    const due = addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_BUSINESS_DAYS);
+    push(
+      "role-assessment-due",
+      "risk_assessed_roles",
+      r.id,
+      due,
+      addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS),
+    );
+    push("role-assessment-due", "risk_assessed_roles", r.id, due, due);
+  }
+
   // REQ-018 FR-10: the support plan review per participant, 30 and 7 days before and on the day.
   for (const p of input.participantRisks ?? []) {
     if (!p.support_plan_review_on) continue;
@@ -302,6 +329,8 @@ export function reminderLine(
       return `Your emergency drill is due by ${dueOn}. Run it and record the date on the audit-day page.`;
     case "register-review":
       return `Register row ${reference} is due for review on ${dueOn}. Open it and tap Reviewed today.`;
+    case "role-assessment-due":
+      return `Role assessment due by ${dueOn}: the role ${reference} is a risk assessed role a worker holds and its assessment is not recorded. Record who assessed it and when on the roles list.`;
     case "report-to-confirm":
       // Retro finding 68: the line has no category, so it names both windows.
       return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told ${REPORT_WINDOW_WORDS}.`;

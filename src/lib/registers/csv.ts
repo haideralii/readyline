@@ -89,6 +89,9 @@ export const CSV_COLUMNS = {
     // s 18(3)(d) list it and it is not a name. Names never do; the worker is
     // its code.
     "clearance_number",
+    // REQ-024 A1 (D-2419; finding 109): the application number, s 18(3)(d)(i), and the day the database was checked.
+    "application_number",
+    "verified_in_database_on",
     "issued_on",
     "expires_on",
     "state",

@@ -449,7 +449,10 @@ export async function saveWorkerCheckAction(
     role_label: v.roleLabel,
     clearance_kind: v.clearanceKind,
     clearance_number: v.clearanceNumber,
-    issued_on: v.issuedOn,
+    // REQ-024 A1 (D-2419, finding 157): the application number and the database check; a pending row has no issue date.
+    application_number: v.applicationNumber,
+    verified_in_database_on: v.verifiedInDatabaseOn || null,
+    issued_on: v.issuedOn || null,
     expires_on: v.expiresOn,
     state: v.state,
     note: v.note,
