@@ -141,7 +141,17 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
   const [decisionOn, setDecisionOn] = useState(p.today);
 
   const message = result && !result.ok ? result.message : null;
-  const formErrors = result && !result.ok ? (result.formErrors ?? []) : [];
+  // Every refusal is legible on the page: the form errors and any field error
+  // the panel has no field for, so a reader (and CI's log) sees why.
+  const formErrors =
+    result && !result.ok
+      ? [
+          ...(result.formErrors ?? []),
+          ...Object.entries(result.fieldErrors ?? {}).flatMap(([k, v]) =>
+            v.map((e) => `${k}: ${e}`),
+          ),
+        ]
+      : [];
 
   return (
     <section
@@ -164,7 +174,7 @@ export function ExceptionPanel(p: ExceptionPanelProps) {
           data-testid="exception-message"
         >
           <p>{message}</p>
-          {formErrors.length > 1 ? (
+          {formErrors.length > 0 ? (
             <ul className="mt-1 list-disc pl-5">
               {formErrors.map((e) => (
                 <li key={e}>{e}</li>

@@ -47,6 +47,23 @@ async function shot(page: Page, name: string, project: string) {
 
 const PROCEDURE = "worker-screening-and-recruitment-procedure";
 
+/**
+ * After a save the page refreshes and the server's own state is what proves
+ * it, not the panel's "Saved." line, which a refresh may take with it; when
+ * the next state never comes, the panel's refusal is read into the assertion
+ * so CI's log names it (PO 06:32).
+ */
+async function afterSave(page: Page, nextTestId: string, step: string) {
+  const next = page.getByTestId(nextTestId);
+  const message = page.getByTestId("exception-message");
+  await expect(next.or(message)).toBeVisible({ timeout: 20_000 });
+  if (!(await next.isVisible().catch(() => false))) {
+    throw new Error(
+      `${step}: the panel refused the save: ${(await message.textContent()) ?? "(no message)"}`,
+    );
+  }
+}
+
 test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
   test.skip(!enabled, "needs the Supabase variables");
   test.describe.configure({ timeout: 180_000 });
@@ -186,7 +203,7 @@ test.describe("REQ-024 A2: the s 14 exception with its four lines", () => {
     await page.locator("#application-state").selectOption("WA");
     await page.locator("#verified-on").fill("2026-10-30");
     await page.getByTestId("record-application").click();
-    await expect(page.getByTestId("exception-saved")).toBeVisible();
+    await afterSave(page, "start-exception-form", "record the application");
 
     // The four lines, verbatim in their shape (FR-4; AC-2).
     const start = page.getByTestId("start-exception-form");
