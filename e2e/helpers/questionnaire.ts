@@ -4,13 +4,24 @@
  * the same way the questionnaire spec does).
  */
 import { expect, type Page } from "@playwright/test";
+import { glossaryOnPage } from "./glossary";
 import { tickGroup } from "./groups";
 import { openResultSections } from "./result";
 
+/**
+ * REQ-027 AC-3 (D-2721, D-2267): the render check once per step after it renders, inside the
+ * helpers every questionnaire spec calls, so no spec loads a step again for it. axe is not run
+ * here: the accessibility pass (req-015-a11y) runs it on every step on all three projects, and
+ * D-2207 keeps the minutes.
+ */
 export async function fillBusiness(
   page: Page,
   opts: { abn?: string; structure?: string } = {},
 ) {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "About your business" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 1", axe: false });
   await page.getByLabel("Trading name").fill("Sunrise Supports");
   await page
     .getByRole("radio", { name: opts.structure ?? "Sole trader" })
@@ -21,6 +32,10 @@ export async function fillBusiness(
 }
 
 export async function chooseGroups(page: Page, codes: string[]) {
+  await expect(
+    page.getByRole("heading", { level: 1, name: "The supports you deliver" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 2", axe: false });
   for (const code of codes) await tickGroup(page, code);
 }
 
@@ -29,6 +44,10 @@ export async function fillRest(
   restrictive: "Yes" | "No" | "Not sure" = "No",
 ) {
   // practices
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Restrictive practices" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 3", axe: false });
   const rp = { Yes: "yes", No: "no", "Not sure": "not-sure" }[restrictive];
   await page.locator(`#restrictivePractices-${rp}`).check();
   if (restrictive === "Not sure") {
@@ -50,6 +69,7 @@ export async function fillFromWorkforce(
   await expect(
     page.getByRole("heading", { level: 1, name: "Your workforce" }),
   ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 4", axe: false });
   await page.getByLabel("Number of workers").fill("2");
   await page.getByLabel("Number of key personnel").fill("1");
   await page.locator("#hasRiskAssessedRoles-yes").check();
@@ -59,6 +79,7 @@ export async function fillFromWorkforce(
   await expect(
     page.getByRole("heading", { level: 1, name: "What you already have" }),
   ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 5", axe: false });
   for (const key of [
     "policies",
     "incidentRegister",
@@ -76,6 +97,12 @@ export async function fillFromWorkforce(
     page.getByRole("heading", { level: 1, name: "Your result" }),
   ).toBeVisible();
   await expect(page.getByTestId("result")).toBeVisible();
+  // REQ-027 D-2711: the result page's inline first term is its audit kind; the disclosure counts the rest.
+  await glossaryOnPage(page, {
+    label: "result",
+    inline: await resultInlineTerm(page),
+    axe: false,
+  });
   // REQ-015 Section B: the detail sits in closed disclosures; open them for the assertions below.
   await openResultSections(page);
 }
@@ -87,4 +114,15 @@ export async function reachResult(page: Page) {
   await chooseGroups(page, ["0107"]);
   await page.getByRole("button", { name: "Save and continue" }).click();
   await fillRest(page);
+}
+
+/** The result page's audit kind, `verification-audit` or `certification-audit`, read from its heading. */
+export async function resultInlineTerm(page: Page): Promise<string> {
+  const heading = await page
+    .getByTestId("summary")
+    .getByRole("heading", { level: 2 })
+    .textContent();
+  const kind = heading?.match(/Your audit: (w+)/)?.[1];
+  if (!kind) throw new Error(`no audit kind in the result heading: ${heading}`);
+  return `${kind}-audit`;
 }

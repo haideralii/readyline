@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { GlossaryBracket } from "@/components/glossary-terms";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import {
@@ -61,7 +62,8 @@ export default async function AdoptGroupPage({
       </h1>
       <p className="mt-3 leading-7">
         Read the names below. Tap a name to read the document. When they say
-        what you do, press the button and they become your policies.
+        what you do, press the button and they become your policies. That is
+        what it means to <GlossaryBracket id="adopt" />.
       </p>
       <ul
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"

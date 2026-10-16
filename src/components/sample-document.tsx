@@ -2,6 +2,7 @@ import type { DocumentModel } from "@/lib/generator/document-model";
 import type { Block } from "@/lib/generator/section-schema";
 import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
 import { DataTable } from "./data-table";
+import { GlossaryBracket } from "./glossary-terms";
 
 /**
  * The sample document preview (batch 24 item 2): every section of the
@@ -116,6 +117,10 @@ export function SampleDocument({
         tasks, New South Wales, verification audit). Generated {doc.generatedAt}
         ; {tailored} of {doc.sections.length} sections drafted from the answers,
         the rest fixed text.
+      </p>
+      {/* REQ-027 FR-3 (D-2715, D-2719; findings 55 and 130): the one term on this page, its bracket after the parenthetical and never inside it. */}
+      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        A <GlossaryBracket id="verification-audit" />.
       </p>
       <Title className="mt-2 text-2xl">{doc.title}</Title>
       <p className="mt-3">

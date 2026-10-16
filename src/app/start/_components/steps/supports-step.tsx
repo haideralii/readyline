@@ -27,6 +27,7 @@ import {
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { PRESELECT_KEY } from "../start-intro";
+import { GlossaryTerms } from "@/components/glossary-terms";
 
 /** REQ-011 batch 31: the group a guide page asked to tick, kept by the intro in session storage; cleared once used. */
 function subscribeNothing() {
@@ -54,6 +55,9 @@ const YES_NO: { value: YesNo; label: string }[] = [
   { value: "yes", label: "Yes" },
   { value: "no", label: "No" },
 ];
+
+/** REQ-027 FR-3 (D-2710): the glossary terms this step's words use, first appearance first. */
+const STEP_TERMS = ["registration-group", "module"] as const;
 
 const CATEGORIES = getGroupCategories();
 /** REQ-013 FR-11: the two most common groups start open; the rest open on wider screens, on search, or on a tap. */
@@ -231,6 +235,8 @@ export function SupportsStepForm() {
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
+      {/* REQ-027 FR-3, D-2701: the words on this step, above its first question. */}
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
 
       <fieldset
         className="mb-6"

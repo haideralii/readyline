@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GlossaryBracket } from "@/components/glossary-terms";
 import { loadGuides } from "@/lib/guides/pages";
 import { formatUpdated } from "@/lib/legal/pages";
 import { siteUrl } from "@/lib/site";
@@ -29,7 +30,10 @@ export default function GuidesPage() {
           Registration groups: which audit and which documents each of the 38
           classes needs
         </Link>
-        .
+        .{" "}
+        {/* REQ-027 FR-3 (D-2715, D-2719): the one term on this page, in brackets after the link that carries it. */}
+        A <GlossaryBracket id="registration-group" /> is how the Commission
+        names what you deliver.
       </p>
       <ul
         className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"

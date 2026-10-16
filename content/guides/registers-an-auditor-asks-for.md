@@ -6,6 +6,14 @@ updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
 shortAnswer: "Auditors ask for twelve records; two are required by the Rules, the rest by the Practice Standards or by practice. | Each register proves what happened, what you did and what changed. | Keep them as things happen, with codes instead of names."
+glossary:
+  [
+    practice-standards,
+    quality-indicator,
+    reportable-incident,
+    mid-term-audit,
+    key-personnel,
+  ]
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's)
 ---
 

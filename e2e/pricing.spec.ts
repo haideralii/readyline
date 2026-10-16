@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
+import { glossaryOnPage } from "./helpers/glossary";
 
 /**
  * REQ-007 Session A, both projects: the pricing page works signed out with
@@ -19,6 +20,8 @@ test.describe("pricing page (REQ-007 FR-1, AC-4)", () => {
       page.getByRole("heading", { level: 1, name: "Your document pack" }),
     ).toBeVisible();
     // The e2e server runs with PACK_PRICE_AUD_CENTS=39900 and a GST line (playwright.config).
+    // REQ-027 AC-3: the words on the page with their meanings (axe runs below).
+    await glossaryOnPage(page, { label: "pricing", axe: false });
     await expect(page.getByTestId("pack-price")).toHaveText("AUD 399");
     await expect(page.getByTestId("gst-line")).toContainText(/GST/);
     await expect(page.getByTestId("refund-promise")).toContainText(

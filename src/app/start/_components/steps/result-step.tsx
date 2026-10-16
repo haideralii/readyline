@@ -10,53 +10,37 @@ import {
   summaryLines,
 } from "@/lib/questionnaire/readiness";
 import { GlossaryTerms } from "@/components/glossary-terms";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 import {
   documentGroupId,
   documentGroupsContent,
   glossarySentence,
 } from "@/lib/questionnaire/content";
+import { askedDocumentCount } from "@/lib/questionnaire/document-set";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import { deriveResult, type DeriveResultResponse } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
+import {
+  HAVE_TAG,
+  NEXT_LINE,
+  SOLE_TRADER_LINE,
+  SOLE_TRADER_SOURCE,
+  UNCONFIRMED_SOURCE_HEDGE,
+  haveCounts,
+  haveLegend,
+} from "./result-copy";
 
 /**
  * The result page (REQ-015 Section B): the answer first, in one card that
  * fits a phone screen, with one primary button; everything else folded into
  * three disclosures whose state is remembered on this device (FR-4 to FR-7).
- * The earlier REQ-013 and REQ-014 test ids are kept.
+ * The earlier REQ-013 and REQ-014 test ids are kept. REQ-027 A2: the badge
+ * words, the legend, the "Next:" line and the sole-trader pair live in
+ * `result-copy.ts`; the "What these words mean" disclosure sits under the
+ * card with the terms counted at render (D-2701, D-2711).
  */
-
-/**
- * One badge vocabulary for the result lists and the checklist (REQ-025
- * FR-4a): the provider's status only; the pack's part is one line above
- * each list, never per row. "Not sure" reads "To prepare" with the detail.
- */
-const HAVE_TAG: Record<
-  string,
-  { label: string; icon: string; tone: string; detail?: string }
-> = {
-  yes: { label: "You have this", icon: "✓", tone: "text-moss border-moss" },
-  no: { label: "To prepare", icon: "○", tone: "text-ochre border-ochre" },
-  "not-sure": {
-    label: "To prepare",
-    icon: "○",
-    tone: "text-ochre border-ochre",
-    detail: "you said not sure",
-  },
-  unknown: { label: "Not asked", icon: "○", tone: "text-slate border-slate" },
-};
-
-/** The glossary terms a reader meets on this page, with their meanings on first use (REQ-025 FR-13). */
-const PAGE_TERMS = [
-  "practice-standards",
-  "module",
-  "quality-indicator",
-  "registration-group",
-  "mid-term-audit",
-  "adopt",
-] as const;
 
 type Fetch = {
   key: string;
@@ -253,40 +237,77 @@ function Disclosure({
   );
 }
 
+/** REQ-027 D-2716, D-2718: a row step 5 did not ask about carries no tag, on both lists; a value the table lacks renders nothing too. */
 function HaveTag({ have }: { have: string }) {
-  const t = HAVE_TAG[have] ?? HAVE_TAG.unknown;
+  const t = HAVE_TAG[have as keyof typeof HAVE_TAG];
+  if (!t) return null;
   return (
-    <span className="inline-flex items-center gap-2">
-      <span
-        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
-        data-testid="have-tag"
-      >
-        <span aria-hidden="true">{t.icon}</span>
-        {t.label}
-      </span>
-      {t.detail ? (
-        <span className="text-xs text-zinc-600 dark:text-zinc-400">
-          ({t.detail})
-        </span>
-      ) : null}
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.tone}`}
+      data-testid="have-tag"
+    >
+      <span aria-hidden="true">{t.icon}</span>
+      {t.label}
     </span>
   );
 }
 
-/** "2 you have, 3 to prepare": the FR-4a words in a group's summary. */
-function haveCounts(items: readonly { have: string }[]) {
-  const c = { yes: 0, toPrepare: 0, notAsked: 0 };
-  for (const i of items) {
-    if (i.have === "yes") c.yes += 1;
-    else if (i.have === "unknown") c.notAsked += 1;
-    else c.toPrepare += 1;
-  }
-  const parts: string[] = [];
-  if (c.yes) parts.push(`${c.yes} you have`);
-  if (c.toPrepare) parts.push(`${c.toPrepare} to prepare`);
-  if (c.notAsked) parts.push(`${c.notAsked} not asked`);
-  return parts.join(", ");
+/**
+ * REQ-027 FR-3, D-2711: the glossary terms the page is about to show, found
+ * in the strings it renders in the order they first appear, the audit kind's
+ * own term left out (it is the page's inline first use under the heading).
+ */
+function termsPresent(r: QuestionnaireResult, legend: string): string[] {
+  const inline = `${r.pathway === "verification" ? "verification" : "certification"}-audit`;
+  const text = [
+    GROUPS_LABEL,
+    ...r.groups.map((g) => g.name),
+    ...r.reasons.map((x) => x.text),
+    ...(r.flags.silExcluded ? [SIL_EXCLUDED_TEXT] : []),
+    ...(r.flags.restrictivePracticesAssumed ? [RP_ASSUMED_TEXT] : []),
+    MODULES_HEADING,
+    ...r.modules.flatMap((m) => [
+      m.name,
+      m.description,
+      MODULE_STANDARDS_SUMMARY,
+      ...m.standards.map((s) => s.name),
+    ]),
+    MID_TERM_HEADING,
+    r.midTermAudit.applies
+      ? MID_TERM_APPLIES
+      : `${MID_TERM_NONE} ${r.midTermAudit.exemptReason ?? ""}`,
+    legend,
+    ...r.documents.map((d) => d.title),
+    REGISTERS_LEGEND,
+    ...r.registers.map((x) => x.title),
+    ...(r.flags.soleTrader === true
+      ? [
+          SOLE_TRADER_LINE,
+          UNCONFIRMED_SOURCE_HEDGE,
+          SOLE_TRADER_SOURCE.text,
+          SOLE_TRADER_SOURCE.source.title,
+        ]
+      : []),
+    WHAT_NEXT_TEXT,
+  ].join("\n");
+  return findGlossaryTerms(text).filter((id) => id !== inline);
 }
+
+const GROUPS_LABEL = "Registration groups in scope";
+const MODULE_STANDARDS_SUMMARY = "The standards in this module";
+const SIL_EXCLUDED_TEXT =
+  "The service you described is not supported independent living under the Commission's definition. Class 0138 and the SIL module are not in your result.";
+const RP_ASSUMED_TEXT =
+  "You were not sure about restrictive practices, and at least one of your answers to the three helper questions pointed to yes, so we included the implementing behaviour support plans module. Change the answer on the restrictive practices step and the module drops out.";
+const MODULES_HEADING = "Practice Standards modules that apply";
+const MID_TERM_HEADING = "Mid-term audit";
+const MID_TERM_APPLIES =
+  "Applies: about N months after registration, against the provider governance and operational management standards. Start preparing from month N.";
+const MID_TERM_NONE = "Does not apply.";
+const REGISTERS_LEGEND =
+  "Your pack includes a template for every register below; the subscription keeps them for you. An auditor samples them at the mid-term audit and at renewal.";
+const WHAT_NEXT_TEXT =
+  "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already have one.";
 
 function ResultView({
   result,
@@ -315,6 +336,9 @@ function ResultView({
   // REQ-025 FR-3: the summary as a list over derived counts, never a literal.
   const counts = readinessCounts(r);
   const lines = summaryLines(counts, checklistTotal);
+  // REQ-027 D-2718: the legend's numeral; D-2711: the words present, counted at render.
+  const legend = haveLegend(askedDocumentCount(r));
+  const present = termsPresent(r, legend);
 
   return (
     <div className="space-y-6" data-testid="result">
@@ -335,10 +359,7 @@ function ResultView({
         >
           {glossarySentence(`${pathwayWord}-audit`)}
         </p>
-        <ul
-          className="mt-2 flex flex-wrap gap-1.5"
-          aria-label="Registration groups in scope"
-        >
+        <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
           {r.groups.map((g) => (
             <li
               key={g.code}
@@ -365,10 +386,8 @@ function ResultView({
         >
           <li data-testid="summary-documents">{lines.documents}</li>
           <li data-testid="summary-registers">{lines.registers}</li>
-          <li data-testid="checklist-count-line">
-            {lines.checklist}
-            {signedIn ? "" : "; sign in to track them"}
-          </li>
+          {/* REQ-027 FR-3a (finding 33): one sign-in nudge per card, the "Next:" line's. */}
+          <li data-testid="checklist-count-line">{lines.checklist}</li>
         </ul>
         {/* REQ-013 batch 36 item 3: two segments (have / still to do); the sentence is the pack line (REQ-025 FR-3). */}
         <div className="mt-2 sm:mt-3">
@@ -407,52 +426,21 @@ function ResultView({
               See the price
             </Link>
           </div>
-          {/* Batch 45 item 9 (D-2001): the two offers as halves of equal weight, the subscription first. */}
-          <dl
-            className="mt-3 grid gap-2 text-sm sm:grid-cols-2"
-            data-testid="result-two-halves"
-          >
-            <div>
-              <dt className="font-semibold">What keeps you audit-ready</dt>
-              {subscriptionOffered ? (
-                <dd className="text-zinc-700 dark:text-zinc-300">
-                  The registers and reminders, a monthly subscription with the
-                  evidence already in place at renewal.{" "}
-                  <Link
-                    href="/pricing#keeps"
-                    className="underline underline-offset-2"
-                  >
-                    The subscription
-                  </Link>
-                  .
-                </dd>
-              ) : (
-                <dd
-                  className="text-zinc-700 dark:text-zinc-300"
-                  data-testid="result-subscription-off"
-                >
-                  The registers and reminders, with the evidence already in
-                  place at renewal. {SUBSCRIPTION_OFF}
-                </dd>
-              )}
-            </div>
-            <div>
-              <dt className="font-semibold">Where you start</dt>
-              <dd className="text-zinc-700 dark:text-zinc-300">
-                The document pack, one price paid once; nothing is bundled and
-                nothing is discounted.{" "}
-                <Link
-                  href="/pricing#start"
-                  className="underline underline-offset-2"
-                >
-                  The pack
-                </Link>
-                .
-              </dd>
-            </div>
-          </dl>
+          {/* REQ-027 FR-3a, D-2707: signed out, what happens next in one line under the primary action; signed in, the REQ-017 strip says it. */}
+          {signedIn ? null : (
+            <p
+              className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              data-testid="next-line"
+            >
+              {NEXT_LINE}
+            </p>
+          )}
         </div>
       </section>
+
+      {/* REQ-027 D-2701, D-2711: the one disclosure for the words on this page, under the card and inside no other
+          disclosure, listing the terms present at render minus the audit kind the heading already explains. */}
+      <GlossaryTerms ids={present} where="result" className="mt-2" />
 
       {/* FR-5: three closed disclosures with counts in their summaries. */}
       <Disclosure
@@ -467,17 +455,12 @@ function ResultView({
             className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
             data-testid="sil-excluded"
           >
-            The service you described is not supported independent living under
-            the Commission&apos;s definition. Class 0138 and the SIL module are
-            not in your result.
+            {SIL_EXCLUDED_TEXT}
           </p>
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
           <p className="mt-2 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
-            You were not sure about restrictive practices, and at least one of
-            your answers to the three helper questions pointed to yes, so we
-            included the implementing behaviour support plans module. Change the
-            answer on the restrictive practices step and the module drops out.
+            {RP_ASSUMED_TEXT}
           </p>
         ) : null}
         {r.flags.largeProvider ? (
@@ -516,12 +499,8 @@ function ResultView({
             </li>
           ))}
         </ul>
-        {/* REQ-025 FR-13: the audit words on this page, each with its plain meaning, on the page itself.
-            REQ-027 A1 (D-2717): the shared component in this place with these six ids; A2 moves it
-            under the summary card with the terms counted at render. */}
-        <GlossaryTerms ids={PAGE_TERMS} where="result" />
         <h3 className="mt-5 text-base font-semibold">
-          Practice Standards modules that apply ({r.modules.length})
+          {MODULES_HEADING} ({r.modules.length})
         </h3>
         <ul className="mt-2 space-y-3">
           {r.modules.map((m) => (
@@ -541,7 +520,7 @@ function ResultView({
               </p>
               <details className="mt-1">
                 <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
-                  The standards in this module
+                  {MODULE_STANDARDS_SUMMARY}
                 </summary>
                 <ul className="mt-1 list-disc space-y-1 pl-5 text-sm">
                   {m.standards.map((s) => (
@@ -552,11 +531,14 @@ function ResultView({
             </li>
           ))}
         </ul>
-        <h3 className="mt-5 text-base font-semibold">Mid-term audit</h3>
+        <h3 className="mt-5 text-base font-semibold">{MID_TERM_HEADING}</h3>
         <p className="mt-1 text-sm leading-6" data-testid="mid-term">
           {r.midTermAudit.applies
-            ? `Applies: about ${r.midTermAudit.monthsAfterRegistration} months after registration, against the provider governance and operational management standards. Start preparing from month ${r.midTermAudit.prepareFromMonth}.`
-            : `Does not apply. ${r.midTermAudit.exemptReason ?? ""}`}
+            ? MID_TERM_APPLIES.replace(
+                "about N months",
+                `about ${r.midTermAudit.monthsAfterRegistration} months`,
+              ).replace("month N.", `month ${r.midTermAudit.prepareFromMonth}.`)
+            : `${MID_TERM_NONE} ${r.midTermAudit.exemptReason ?? ""}`}
         </p>
       </Disclosure>
 
@@ -567,13 +549,12 @@ function ResultView({
         onRemember={remember}
         summary={`Documents you will need (${r.documents.length})`}
       >
-        {/* REQ-025 FR-4a: the pack's part is one line above the list, never per row. */}
+        {/* REQ-025 FR-4a, REQ-027 D-2718 and D-2722: the pack's part and the reader's own answers, five sentences above the list, never per row. */}
         <p
           className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
           data-testid="have-legend"
         >
-          Your pack includes a draft of every document below. The tags are what
-          you told us in the last step.
+          {legend}
         </p>
         {groups.map((g) => (
           <Disclosure
@@ -590,6 +571,25 @@ function ResultView({
               </>
             }
           >
+            {/* REQ-027 D-2716, D-2723: for a sole trader, the "Your workers" group opens with the rule and its source, in the reasons' convention. */}
+            {g.id === "your-workers" && r.flags.soleTrader === true ? (
+              <div
+                className="mt-2 text-sm leading-6"
+                data-testid="sole-trader-line"
+              >
+                <p>{SOLE_TRADER_LINE}</p>
+                <p className="mt-1 text-zinc-700 dark:text-zinc-300">
+                  {UNCONFIRMED_SOURCE_HEDGE} {SOLE_TRADER_SOURCE.text}{" "}
+                  <a
+                    href={SOLE_TRADER_SOURCE.source.url}
+                    className="underline underline-offset-2"
+                    data-testid="sole-trader-source"
+                  >
+                    {SOLE_TRADER_SOURCE.source.title}
+                  </a>
+                </p>
+              </div>
+            ) : null}
             <ul
               className="divide-y divide-zinc-200 dark:divide-zinc-800"
               data-testid={`doc-group-${g.id}`}
@@ -619,9 +619,7 @@ function ResultView({
           className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
           data-testid="registers-legend"
         >
-          Your pack includes a template for every register below; the
-          subscription keeps them for you. An auditor samples them at the
-          mid-term audit and at renewal.
+          {REGISTERS_LEGEND}
         </p>
         <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
           {r.registers.map((x) => (
@@ -635,6 +633,53 @@ function ResultView({
           ))}
         </ul>
       </Disclosure>
+
+      {/* Batch 45 item 9 (D-2001): the two offers as halves of equal weight, the subscription first.
+          REQ-027 FR-4 (decision 9 of the third pass): below the disclosures and above "What happens
+          next", because a first-time reader does not need the price before the result. */}
+      <dl
+        className="grid gap-2 rounded-md border border-zinc-200 p-4 text-sm sm:grid-cols-2 dark:border-zinc-800"
+        data-testid="result-two-halves"
+      >
+        <div>
+          <dt className="font-semibold">What keeps you audit-ready</dt>
+          {subscriptionOffered ? (
+            <dd className="text-zinc-700 dark:text-zinc-300">
+              The registers and reminders, a monthly subscription with the
+              evidence already in place at renewal.{" "}
+              <Link
+                href="/pricing#keeps"
+                className="underline underline-offset-2"
+              >
+                The subscription
+              </Link>
+              .
+            </dd>
+          ) : (
+            <dd
+              className="text-zinc-700 dark:text-zinc-300"
+              data-testid="result-subscription-off"
+            >
+              The registers and reminders, with the evidence already in place at
+              renewal. {SUBSCRIPTION_OFF}
+            </dd>
+          )}
+        </div>
+        <div>
+          <dt className="font-semibold">Where you start</dt>
+          <dd className="text-zinc-700 dark:text-zinc-300">
+            The document pack, one price paid once; nothing is bundled and
+            nothing is discounted.{" "}
+            <Link
+              href="/pricing#start"
+              className="underline underline-offset-2"
+            >
+              The pack
+            </Link>
+            .
+          </dd>
+        </div>
+      </dl>
 
       <section
         aria-labelledby="next-heading"

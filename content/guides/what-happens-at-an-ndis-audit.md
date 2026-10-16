@@ -6,6 +6,18 @@ updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
 shortAnswer: "The Commission names five kinds of audit; your registration groups decide which you face. | The auditor reads your documents and registers, then talks to workers and some participants. | You check a draft report; the Commission then decides on registration."
+glossary:
+  [
+    registration-group,
+    certification-audit,
+    verification-audit,
+    module,
+    worker-screening-check,
+    practice-standards,
+    quality-indicator,
+    mid-term-audit,
+    adopt,
+  ]
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; sourced to the Commission's types-of-audits page; the sector-webinar lines are labelled as practice, not rules)
 ---
 

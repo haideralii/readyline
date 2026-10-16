@@ -27,6 +27,8 @@ const FrontMatter = z.object({
   status: z.string().trim().optional(),
   /** Batch 49 item 5: three lines, separated by " | ", shown in the "Short answer" box at the top. */
   shortAnswer: z.string().trim().min(30),
+  /** REQ-027 D-2715: the glossary ids the guide's disclosure carries, `[a, b]`; the lint reads the same list. */
+  glossary: z.string().trim().optional(),
 });
 
 export type GuideFaq = { question: string; answer: string };
@@ -43,6 +45,8 @@ export type Guide = {
   markdown: string;
   /** Batch 49 item 5: the three lines of the "Short answer" box. */
   shortAnswer: string[];
+  /** REQ-027 D-2715: the glossary ids named in the front matter, in order. */
+  glossary: string[];
   /** The body's section headings with the ids the renderer gives them, for the "Jump to" list. */
   headings: { id: string; text: string }[];
   faq: GuideFaq[];
@@ -124,6 +128,11 @@ export function loadGuide(slug: string, dir: string = GUIDES_DIR): Guide {
     shortAnswer: front.data.shortAnswer
       .split(" | ")
       .map((s) => s.trim())
+      .filter(Boolean),
+    glossary: (front.data.glossary ?? "")
+      .replace(/^\[|\]$/g, "")
+      .split(",")
+      .map((s) => s.trim().replace(/^["']|["']$/g, ""))
       .filter(Boolean),
     headings: [...markdown.matchAll(/^## (.+?)\s*$/gm)].map((m) => ({
       id: slugify(m[1]),

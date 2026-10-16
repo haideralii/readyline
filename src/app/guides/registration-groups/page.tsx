@@ -4,6 +4,14 @@ import { buildGroupPages, groupPagesByCategory } from "@/lib/guides/groups";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { siteUrl } from "@/lib/site";
 import { GroupsSearch } from "./groups-search";
+import { GlossaryTerms } from "@/components/glossary-terms";
+
+/** REQ-027 FR-3 (D-2710): the glossary terms this page's own words use, first appearance first. */
+const INDEX_TERMS = [
+  "registration-group",
+  "practice-standards",
+  "module",
+] as const;
 
 export const metadata: Metadata = {
   title:
@@ -48,6 +56,8 @@ export default function RegistrationGroupsIndexPage() {
         apply, and which documents the pack produces for it, from the
         Commission&apos;s published tables.
       </p>
+      {/* REQ-027 FR-3, D-2701: the words on this page, above the search and inside no other disclosure. */}
+      <GlossaryTerms ids={INDEX_TERMS} where="page" className="mt-3" />
       <GroupsSearch categories={categories} />
     </div>
   );

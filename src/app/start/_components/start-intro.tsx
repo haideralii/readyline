@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
+import { GlossaryTerms } from "@/components/glossary-terms";
 import { firstIncompleteStep, stepHref } from "@/lib/questionnaire/navigation";
 import { useQuestionnaire } from "./questionnaire-provider";
 
@@ -30,6 +31,15 @@ function readPreselect(): string | null {
     return null;
   }
 }
+
+/** REQ-027 FR-3 (D-2710): the glossary terms this page's words use, first appearance first. */
+const INTRO_TERMS = [
+  "practice-standards",
+  "module",
+  "certification-audit",
+  "registration-group",
+  "restrictive-practice",
+] as const;
 
 const STEPS = [
   "About your business: trading name, structure, states, ABN (optional).",
@@ -65,6 +75,8 @@ export function StartIntro() {
         verification or certification audit, and the documents and registers you
         will need, with the Commission source for each decision.
       </p>
+      {/* REQ-027 FR-3, D-2701: the words on this page, above the steps and inside no other disclosure. */}
+      <GlossaryTerms ids={INTRO_TERMS} where="page" className="mt-3" />
       <ol className="mt-6 list-decimal space-y-2 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
         {STEPS.map((s) => (
           <li key={s}>{s}</li>

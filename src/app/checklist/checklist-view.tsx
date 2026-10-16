@@ -14,6 +14,8 @@ import {
   type ShownStatus,
 } from "@/lib/checklist/state";
 import { saveChecklistItemAction } from "@/server/checklist/actions";
+import { GlossaryTerms } from "@/components/glossary-terms";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 
 /**
  * The checklist as a task list (REQ-015 Section C): the counts line and the
@@ -220,6 +222,17 @@ export function ChecklistView({
     return feedback.message;
   })();
 
+  // REQ-027 FR-3, D-2711: the glossary terms this checklist is about to show,
+  // from the page's own words and every item's title and detail, in the
+  // order they first appear.
+  const present = findGlossaryTerms(
+    [
+      `For ${tradingName}, a ${pathway} audit. Tap an item to set its status. Done means reviewed and adopted.`,
+      ...shown.groups.map((g) => g.title),
+      ...shown.items.flatMap((i) => [i.title, i.ask, i.why, i.haveNote ?? ""]),
+    ].join("\n"),
+  );
+
   return (
     <div className="print:hidden">
       <h1 className="text-3xl font-semibold tracking-tight">
@@ -229,6 +242,8 @@ export function ChecklistView({
         For <strong>{tradingName}</strong>, a {pathway} audit. Tap an item to
         set its status. <strong>Done</strong> means reviewed and adopted.
       </p>
+      {/* REQ-027 FR-3, D-2701, D-2711: the words on this page, counted at render from the items it shows, above the first body section. */}
+      <GlossaryTerms ids={present} where="page" className="mt-3" />
       <p
         className="mt-4 text-lg font-medium"
         role="status"

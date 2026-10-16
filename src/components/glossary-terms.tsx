@@ -1,4 +1,5 @@
 import { glossaryTerm } from "@/lib/questionnaire/content";
+import { GLOSSARY_ATTRIBUTION, GLOSSARY_BRACKET_TITLE } from "./glossary-copy";
 
 /**
  * "What these words mean" (REQ-025 FR-13; REQ-027 D-2701, D-2706, D-2713):
@@ -9,16 +10,7 @@ import { glossaryTerm } from "@/lib/questionnaire/content";
  * the element the render check skips when it counts the terms present
  * (D-2714), so a meaning may use another glossary word without a cascade.
  */
-export const GLOSSARY_ATTRIBUTION = {
-  result:
-    "Our plain words, not the Commission's; the sources are linked under each reason.",
-  guide:
-    "Our plain words, not the Commission's; the sources are at the end of this guide.",
-  page: "Our plain words, not the Commission's; the sources are on the result page and in the guides.",
-} as const;
-
-/** D-2719: the attribution's first clause, as the `title` on a one-term page's bracket. */
-export const GLOSSARY_BRACKET_TITLE = "Our plain words, not the Commission's";
+export { GLOSSARY_ATTRIBUTION, GLOSSARY_BRACKET_TITLE };
 
 export function GlossaryTerms({
   ids,
