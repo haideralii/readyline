@@ -287,16 +287,12 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="mt-12 max-w-2xl" aria-labelledby="what-heading">
-        <h2 id="what-heading" className="text-xl font-semibold">
-          {C.whatHeading}
-        </h2>
-        <ul className="mt-4 list-disc space-y-2 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
-          {C.what.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+      {/* D-2810 (REQ-028, PO, 17 Oct 2026): the "What you get" list went; its
+          five bullets restated the hero and the sample card, and with the
+          glossary disclosure and the subscription sentence the page sat on
+          REQ-025 FR-12's 5,000 px cap at 360 px. The pricing line stays. */}
+      <section className="mt-12 max-w-2xl">
+        <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
           {C.pricingLead}{" "}
           <Link href="/pricing" className="underline underline-offset-2">
             {C.pricingLink}
