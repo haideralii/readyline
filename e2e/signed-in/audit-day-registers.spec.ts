@@ -208,11 +208,22 @@ test.describe("audit-day registers (REQ-018 Session B)", () => {
     await page.locator("#worker_ref").fill("w-1");
     await page.locator("#role_label").fill("support worker");
     await page.locator("#risk_assessed").check();
+    // REQ-024 A1 (FR-2a, finding 81): the states a worker works in come first.
+    await page.locator("#states-NSW").check();
     await page.locator("#last_supervision_on").fill(future(-40));
     await page.getByRole("button", { name: "Add a worker" }).click();
-    await expect(page.getByTestId("staff-matrix-list")).toContainText(
-      "Supervision overdue",
-    );
+    // REQ-024 A1 (FR-3, D-2411; #82 run 38924374914): the list shows the
+    // derived state, not the supervision status. A new worker with no
+    // clearance or induction recorded has before-first-shift items
+    // outstanding, which outrank a supervision date on the row's tag, so the
+    // tag reads "Items outstanding" and the next line is an item's ask, not
+    // "type the states" now that NSW is given. The supervision date still
+    // feeds W-8 on the worker's own page.
+    const staffList = page.getByTestId("staff-matrix-list");
+    await expect(staffList).toContainText("W-1: support worker");
+    await expect(staffList).toContainText("Items outstanding");
+    await expect(staffList).toContainText(/Next: Show me/);
+    await expect(staffList).not.toContainText("type the states");
     await checkWidths(page, "staff matrix list");
     await shot(page, "staff-matrix", project);
   });
