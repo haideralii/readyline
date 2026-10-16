@@ -15,12 +15,59 @@ import {
   GENERAL_INFORMATION_STATEMENT,
 } from "@/lib/brand";
 import {
+  AVERAGE_MIN_STRING_WORDS,
   TIGHT_PARAGRAPH_MAX_WORDS,
+  averageSentenceWords,
+  countWords,
+  lintAverage,
   lintText,
+  splitSentences,
   type CopyViolation,
 } from "@/lib/copy-lint/rules";
 
 const ROOT = process.cwd();
+
+/**
+ * REQ-027 FR-1 (D-2702): the sentences a file's average is taken over. On a
+ * page: the text of `p`, `dd`, `li` and `blockquote` blocks; in a copy
+ * module or a content file: the strings of ten words or more; in a guide:
+ * the paragraphs and list items with the front matter's short answer and
+ * description. Headings, summaries, labels and text attributes are not
+ * counted, and nor is an allow-listed constant. Filled by the walkers below,
+ * read by `averageFindings` after each walk.
+ */
+const AVERAGE_POPULATION = new Map<string, string[]>();
+/** The block tags whose text joins the average (FR-1, finding 1). */
+const AVERAGE_TAGS = new Set(["p", "dd", "li", "blockquote"]);
+/** The files whose averages the evidence carries (question 2), logged with each run. */
+const AVERAGE_REPORT_FILES = [
+  "src/app/start/_components/steps/result-step.tsx",
+  "src/app/pricing/page.tsx",
+  "src/lib/payments/copy.ts",
+  "content/guides/which-ndis-audit.md",
+];
+
+function countSentences(rel: string, text: string) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (!clean || ALLOWED_CONSTANTS.has(clean)) return;
+  const key = rel.replace(/\\/g, "/");
+  const list = AVERAGE_POPULATION.get(key) ?? [];
+  for (const s of splitSentences(clean)) if (countWords(s) > 0) list.push(s);
+  AVERAGE_POPULATION.set(key, list);
+}
+
+/** FR-1: one finding per file whose average passes 25, and the report lines for the named files. */
+function averageFindings(findings: Finding[]) {
+  for (const [file, sentences] of AVERAGE_POPULATION) {
+    const v = lintAverage(sentences);
+    if (v) findings.push({ file, where: "whole file", violation: v });
+    if (AVERAGE_REPORT_FILES.includes(file))
+      console.log(
+        `FR-1 average: ${file}: ${sentences.length} sentences, ${averageSentenceWords(sentences)} words a sentence`,
+      );
+  }
+  AVERAGE_POPULATION.clear();
+}
 
 /**
  * REQ-025 FR-10, D-2218: the result page, the pricing page and the guides
@@ -112,6 +159,9 @@ const COPY_MODULES = [
   "src/server/payments/messages.ts",
   // REQ-021: every line the writing indicator can show.
   "src/lib/generation/writing-state.ts",
+  // REQ-027 A1 (decision 8, finding 121): a `.ts` under `src/app` the TSX walk never read; its
+  // strings are the practices step's legends, helps and examples.
+  "src/app/start/_components/steps/practices-copy.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";
 
@@ -249,6 +299,7 @@ function lintTsx(file: string, findings: Finding[]) {
         });
       if (BLOCK_TAGS.has(tag)) {
         const text = inlineText(node.children, sf);
+        if (AVERAGE_TAGS.has(tag)) countSentences(rel, text);
         for (const v of lintText(text, {
           block: true,
           maxWords: maxWordsFor(rel, tag, text),
@@ -314,6 +365,8 @@ function lintCopyModule(file: string, findings: Finding[]) {
       ].join("");
     if (text !== null && text.trim().split(/\s+/).length >= 3) {
       const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+      if (countWords(text) >= AVERAGE_MIN_STRING_WORDS)
+        countSentences(rel, text);
       // A copy module's strings are paragraphs or list items alike; the tight
       // cap applies to strings outside an array (a list's items are exempt).
       const inList = ts.isArrayLiteralExpression(node.parent);
@@ -336,6 +389,7 @@ function lintJson(file: string, findings: Finding[]) {
   const rel = relative(ROOT, file);
   const walk = (v: unknown, path: string) => {
     if (typeof v === "string") {
+      if (countWords(v) >= AVERAGE_MIN_STRING_WORDS) countSentences(rel, v);
       if (v.trim().split(/\s+/).length >= 3)
         for (const x of lintText(v, { block: true }))
           findings.push({ file: rel, where: path, violation: x });
@@ -363,33 +417,41 @@ function format(f: Finding) {
   return `${f.file} (${f.where}) ${f.violation.rule}: ${f.violation.detail}`;
 }
 
-describe("customer-facing copy (REQ-015 FR-2)", () => {
-  it("pages and components: no paragraph over 60 words, sentence over 35, banned word or internal path", () => {
+describe("customer-facing copy (REQ-015 FR-2; REQ-027 FR-1)", () => {
+  it("pages and components: no paragraph over 60 words, sentence over 35, average over 25, banned word or internal path", () => {
     const findings: Finding[] = [];
+    AVERAGE_POPULATION.clear();
     for (const dir of ["src/app", "src/components"])
       for (const f of walkDir(join(ROOT, dir))) lintTsx(f, findings);
+    averageFindings(findings);
     expect(findings.map(format)).toEqual([]);
   });
 
   it("copy modules", () => {
     const findings: Finding[] = [];
+    AVERAGE_POPULATION.clear();
     for (const f of COPY_MODULES) lintCopyModule(join(ROOT, f), findings);
+    averageFindings(findings);
     expect(findings.map(format)).toEqual([]);
   });
 
   it("content JSON the UI renders", () => {
     const findings: Finding[] = [];
+    AVERAGE_POPULATION.clear();
     for (const name of readdirSync(join(ROOT, CONTENT_JSON_DIR)))
       if (name.endsWith(".json"))
         lintJson(join(ROOT, CONTENT_JSON_DIR, name), findings);
+    averageFindings(findings);
     expect(findings.map(format)).toEqual([]);
   });
 
-  it("guides (REQ-011): every paragraph and list item", () => {
+  it("guides (REQ-011): every paragraph and list item, and the front matter's short answer and description (REQ-027 D-2711)", () => {
     const findings: Finding[] = [];
+    AVERAGE_POPULATION.clear();
     for (const name of readdirSync(join(ROOT, GUIDES_DIR)))
       if (name.endsWith(".md"))
         lintMarkdown(join(ROOT, GUIDES_DIR, name), findings);
+    averageFindings(findings);
     expect(findings.map(format)).toEqual([]);
   });
 });
@@ -399,7 +461,26 @@ const GUIDES_DIR = "content/guides";
 /** Markdown paragraphs (blank-line separated); headings, tables, code fences, placeholders and front matter are skipped; a list is linted item by item. */
 function lintMarkdown(file: string, findings: Finding[]) {
   const rel = relative(ROOT, file);
-  const raw = readFileSync(file, "utf8").replace(/^---[\s\S]*?\n---\n/, "");
+  const whole = readFileSync(file, "utf8");
+  // REQ-027 FR-1, D-2711 (finding 54): the front matter's short answer (its
+  // " | "-separated lines) and description are customer text the page renders,
+  // so they are linted and counted like the paragraphs.
+  const front = /^---([\s\S]*?)\n---\n/.exec(whole)?.[1] ?? "";
+  for (const key of ["shortAnswer", "description"]) {
+    const m = new RegExp(`^${key}:\\s*(.*)$`, "m").exec(front);
+    if (!m) continue;
+    const value = m[1].trim().replace(/^["']|["']$/g, "");
+    for (const part of key === "shortAnswer" ? value.split(" | ") : [value]) {
+      countSentences(rel, part);
+      for (const v of lintText(part, { block: true }))
+        findings.push({
+          file: rel,
+          where: `front matter ${key}`,
+          violation: v,
+        });
+    }
+  }
+  const raw = whole.replace(/^---[\s\S]*?\n---\n/, "");
   const plain = (l: string) =>
     l
       .replace(/^\s*(?:[-*+]|\d+\.)\s+/, "")
@@ -427,6 +508,7 @@ function lintMarkdown(file: string, findings: Finding[]) {
     const isList = kept.every((l) => /^\s*(?:[-*+]|\d+\.)\s+/.test(l));
     const items = isList ? kept.map(plain) : [kept.map(plain).join(" ")];
     // REQ-025 FR-10: a guide's paragraph is held to 45 words; its list items are not.
+    for (const item of items) countSentences(rel, item);
     for (const item of items)
       for (const v of lintText(item, {
         block: true,
