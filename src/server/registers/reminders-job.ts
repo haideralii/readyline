@@ -109,7 +109,7 @@ export async function computeAccountReminders(
   today: string,
 ): Promise<ReminderDue[]> {
   // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
-  const [insurance, staff, participants, corporate, conflicts, hazards] =
+  const [insurance, staff, participants, corporate, conflicts, hazards, roles] =
     await Promise.all([
       admin
         .from("insurance_items")
@@ -135,6 +135,13 @@ export async function computeAccountReminders(
       admin
         .from("hazards")
         .select("id, review_on")
+        .eq("account_id", account.id),
+      // REQ-024 FR-6a (D-2416): the s 17 roles with whether a current worker holds each.
+      admin
+        .from("risk_assessed_roles")
+        .select(
+          "id, first_held_on, assessed_on, staff_matrix!role_ref(ended_on)",
+        )
         .eq("account_id", account.id),
     ]);
   const rows = <T>(r: { data: unknown }) => (r.data as T[] | null) ?? [];
@@ -173,6 +180,20 @@ export async function computeAccountReminders(
       })),
     ],
     lastEmergencyDrillOn: account.last_emergency_drill_on,
+    riskAssessedRoles: rows<{
+      id: string;
+      first_held_on: string | null;
+      assessed_on: string | null;
+      staff_matrix: { ended_on: string | null }[] | null;
+    }>(roles).map((r) => ({
+      id: r.id,
+      first_held_on: r.first_held_on,
+      assessed_on: r.assessed_on,
+      // Held: at least one matrix row references the role and has not ended by today.
+      held: (r.staff_matrix ?? []).some(
+        (s) => s.ended_on === null || s.ended_on > today,
+      ),
+    })),
   };
   // REQ-023 FR-3: the current period, the kinds already sent for it (the once
   // rule), the last-call exception and the subscription's state (D-2313).
@@ -303,7 +324,9 @@ async function referenceFor(
                 ? "who_ref"
                 : r.subject_table === "hazards"
                   ? "site_ref"
-                  : "reference";
+                  : r.subject_table === "risk_assessed_roles"
+                    ? "title"
+                    : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)
