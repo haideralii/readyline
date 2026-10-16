@@ -21,7 +21,11 @@ grant select, update on public.users to authenticated;
 grant select, update on public.accounts to authenticated;
 grant select, delete on public.memberships to authenticated;
 grant select, insert, update, delete on public.questionnaire_drafts to authenticated;
-grant select on public.audit_log to authenticated;
+-- `audit_log_insert_member` (20261011020000) lets a member write their own
+-- account's rows, but no migration granted insert; the CLI stack's defaults
+-- carried it, the hosted project never did (#76's run 38875536646), so the
+-- three app paths writing under it had answered 42501 there since written.
+grant select, insert on public.audit_log to authenticated;
 grant select, insert, update, delete on public.account_facts to authenticated;
 
 -- 3. Documents, payments and the subscription: members read; the server writes.
