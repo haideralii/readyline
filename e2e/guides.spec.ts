@@ -229,7 +229,11 @@ test.describe("guides (REQ-011)", () => {
     ).toBeGreaterThan(30);
     // WebKit can accept the typing before React has hydrated the controlled
     // input, and hydration then resets it: type again until the count reacts.
+    // REQ-027 A2: React's value tracker takes the pre-hydration text as the
+    // input's value, so typing the same word again raises no change event;
+    // each retry clears the field first so the word is a change.
     await expect(async () => {
+      await page.getByLabel(/Search by what you do/).fill("");
       await page.getByLabel(/Search by what you do/).fill("cleaning");
       await expect(page.getByTestId("groups-count")).toContainText(/of 38/, {
         timeout: 1_500,
