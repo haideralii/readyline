@@ -47,7 +47,8 @@ export default async function WorkerChecksPage() {
           id: r.id,
           href: `/registers/worker-checks/${r.id}`,
           title: `${r.worker_ref}: ${CLEARANCE_LABELS[r.clearance_kind]}`,
-          detail: `${r.role_label}. Issued ${r.issued_on}${r.state ? `, ${r.state}` : ""}.`,
+          // REQ-024 A1 (finding 157): a pending application has no issue date; it reads pending with its application number.
+          detail: `${r.role_label}. ${r.issued_on ? `Issued ${r.issued_on}` : `Pending${r.application_number ? `, application ${r.application_number}` : ""}`}${r.state ? `, ${r.state}` : ""}.`,
           status: checkStatus(r),
         }))}
         filters={CHECK_FILTERS}

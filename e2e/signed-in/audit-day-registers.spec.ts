@@ -224,22 +224,50 @@ test.describe("audit-day registers (REQ-018 Session B)", () => {
   }, testInfo) => {
     const project = testInfo.project.name;
     await signInContext(context, tenant, baseURL!);
+    // REQ-024 A1 (FR-2): a worker's list is derived from the staff matrix row,
+    // so the row comes first (the earlier test adds W-1 when it ran before this one).
+    await page.goto("/registers/staff-matrix");
+    if (
+      !(await page.getByTestId("staff-matrix-list").textContent())?.includes(
+        "W-1",
+      )
+    ) {
+      await page.goto("/registers/staff-matrix/new");
+      await page.locator("#worker_ref").fill("w-1");
+      await page.locator("#role_label").fill("support worker");
+      await page.locator("#risk_assessed").check();
+      await page.getByRole("button", { name: "Add a worker" }).click();
+      await expect(page).toHaveURL(/\/registers\/staff-matrix\?saved=/);
+    }
     await page.goto("/registers/onboarding/new");
     await page.locator("#kind").selectOption("worker");
     await page.locator("#subject_ref").fill("w-1");
     await page.locator("#started_on").fill(future(0));
     await page.getByRole("button", { name: "Start a checklist" }).click();
-    await page.getByTestId("onboarding-list").locator("li a").first().click();
-    await expect(page.getByTestId("onboarding-ticks")).toContainText(
-      "items left",
+    // The row's own page may have created the checklist already: either way the list shows one for W-1.
+    await page.goto("/registers/onboarding");
+    await page
+      .getByTestId("onboarding-list")
+      .getByRole("link", { name: /New worker W-1/ })
+      .first()
+      .click();
+    await expect(page.getByTestId("worker-items")).toBeVisible();
+    await expect(page.getByTestId("worker-state")).toHaveText(
+      "Items outstanding",
+    );
+    await expect(page.getByTestId("from-the-dates-line")).toContainText(
+      "From the dates you typed",
     );
     await checkWidths(page, "onboarding checklist");
     await axeClean(page, "onboarding checklist");
     await page.locator("#ticked-by").fill("kp-1");
-    await page.getByTestId("tick-identity-and-agreement").click();
+    await page.getByTestId("record-identity-and-agreement").click();
     await expect(
-      page.getByTestId("onboarding-item-identity-and-agreement"),
+      page.getByTestId("worker-item-identity-and-agreement"),
     ).toContainText("by KP-1");
+    await expect(
+      page.getByTestId("worker-item-identity-and-agreement"),
+    ).toHaveAttribute("data-state", "recorded");
     await shot(page, "onboarding", project);
   });
 
