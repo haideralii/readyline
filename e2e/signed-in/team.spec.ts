@@ -9,6 +9,7 @@ import {
   type TestTenant,
 } from "../helpers/session";
 import { checkWidths } from "../helpers/width";
+import { addDays, minusBusinessDays, todaySydney } from "../helpers/dates";
 
 /**
  * REQ-020 Session B, AC-3 and AC-4 on the three projects: the owner invites
@@ -23,6 +24,8 @@ import { checkWidths } from "../helpers/width";
  */
 const EVIDENCE_DIR = "product/evidence/req-020";
 const enabled = hasSupabaseForE2e();
+// D-2272: every date the spec types follows the runner's Sydney day.
+const today = todaySydney();
 
 async function shot(page: Page, name: string, project: string) {
   if (!process.env.EVIDENCE) return;
@@ -120,8 +123,10 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
       w.getByRole("heading", { level: 1, name: "Log an incident" }),
     ).toBeVisible();
     await expect(w.getByTestId("emergency-line")).toContainText("call 000");
-    await w.getByLabel("Date it happened").fill("2026-10-09");
-    await w.getByLabel("Date it was reported").fill("2026-10-09");
+    // D-2272: dates follow the runner's Sydney day.
+    const occurred = minusBusinessDays(today, 2);
+    await w.getByLabel("Date it happened").fill(occurred);
+    await w.getByLabel("Date it was reported").fill(occurred);
     await w
       .getByLabel("What happened", { exact: true })
       .selectOption("near-miss");
@@ -224,7 +229,7 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
     expect(html.includes(owner.email)).toBe(false);
     expect(html.includes(owner.accountId)).toBe(false);
     await r.getByLabel("Who are you").selectOption("support worker");
-    await r.getByLabel("Date it happened").fill("2026-10-12");
+    await r.getByLabel("Date it happened").fill(today);
     await r
       .getByLabel("What happened", { exact: true })
       .selectOption("serious-injury");
@@ -293,7 +298,7 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
     const r2 = await reporter2.newPage();
     expect((await r2.goto(url))?.status()).toBe(200);
     await r2.getByLabel("Who are you").selectOption("casual worker");
-    await r2.getByLabel("Date it happened").fill("2026-10-13");
+    await r2.getByLabel("Date it happened").fill(addDays(today, -1));
     await r2
       .getByLabel("What happened", { exact: true })
       .selectOption("abuse-or-neglect");
@@ -325,7 +330,7 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
       "Notify the Commission by",
     );
     await shot(page, "rejected-still-reportable", project);
-    await page.getByLabel("Date you told the Commission").fill("2026-10-14");
+    await page.getByLabel("Date you told the Commission").fill(today);
     await page.getByTestId("rejected-notified-submit").click();
     await expect(page).toHaveURL(/\?saved=1$/);
     await expect(page.getByTestId("status-tag")).toContainText(
