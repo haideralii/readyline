@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/page-shell";
+import { TestSend } from "./test-send";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import {
@@ -102,6 +103,8 @@ export default async function LaunchPage() {
                 </li>
               ))}
             </ul>
+            {/* REQ-022 FR-6, SR-2: the one send this page makes, to the admin's own address. */}
+            {group === "email" ? <TestSend /> : null}
           </section>
         );
       })}

@@ -12,6 +12,7 @@
 import { isLiveKey } from "@/lib/payments/fake-session";
 import type { PriceFact } from "@/lib/payments/live-guards";
 import { FILL_PREFERRED_REGION } from "@/lib/registers/fill";
+import { judgeSenderDomain, type DnsFacts } from "./sender-domain";
 
 export type LaunchState = "set" | "unset" | "mismatched" | "unverified";
 
@@ -68,6 +69,8 @@ export type LaunchFacts = {
     /** REQ-022 Session B: what EMAIL_PROVIDER names, and the names it still needs (never values). */
     configured?: "log" | "smtp" | "unknown";
     missing?: string[];
+    /** REQ-022 FR-6 (D-2824): the sender's SPF and DMARC records as the server's lookup found them; null when not looked up. */
+    dns?: DnsFacts | null;
     domainVerified: boolean | null;
     lastTestSendAt: string | null;
   };
@@ -406,24 +409,9 @@ const RULES: Rule[] = [
   {
     id: "email-domain",
     group: "email",
-    name: "Sending domain verified",
-    judge: (f) =>
-      f.email.domainVerified === null
-        ? {
-            state: "unverified",
-            sentence:
-              "Not checked until the provider exists (Session B); then the provider reports the domain.",
-          }
-        : f.email.domainVerified
-          ? {
-              state: "set",
-              sentence: "The provider reports the sending domain verified.",
-            }
-          : {
-              state: "mismatched",
-              sentence:
-                "The provider reports the sending domain unverified; add the records in LAUNCH.md at the registrar.",
-            },
+    name: "Sending domain records",
+    // REQ-022 FR-6 as D-2824 reads it for plain SMTP: the sender's own DNS (SPF and DMARC), no vendor call.
+    judge: (f) => judgeSenderDomain(f.env.EMAIL_FROM, f.email.dns ?? null),
   },
   {
     id: "email-test-send",

@@ -55,6 +55,7 @@ const everythingSet = (): LaunchFacts =>
       },
       email: {
         provider: "smtp",
+        dns: { spf: true, dmarc: true },
         domainVerified: true,
         lastTestSendAt: "2026-10-15T01:00:00Z",
       },
@@ -75,6 +76,13 @@ const everythingSet = (): LaunchFacts =>
       PACK_PRICE_AUD_CENTS: "39900",
       SUBSCRIPTION_PRICE_AUD_CENTS: "3900",
       STRIPE_WEBHOOK_SECRET: "whsec_MARKER",
+      // REQ-022 Session B: the SMTP values, the password above all (SR-1, PO 23:10).
+      EMAIL_PROVIDER: "smtp",
+      EMAIL_FROM: "MARKER-from@marker.example",
+      SMTP_HOST: "MARKER-host",
+      SMTP_PORT: "465",
+      SMTP_USER: "MARKER-user",
+      SMTP_PASS: "MARKER-pass",
       GST_LINE: "MARKER-gst",
       GENERATION_ENABLED: "true",
       GENERATION_LIVE: "1",
@@ -242,10 +250,40 @@ describe("launchRows (REQ-022 FR-1)", () => {
       adminTotpEnrolled: false,
     });
     expect(byId(f)["email-provider"].state).toBe("set");
-    expect(byId(f)["email-domain"].state).toBe("mismatched");
+    // The domain row reads the sender's DNS (D-2824): no EMAIL_FROM in these facts, so not verified here.
+    expect(byId(f)["email-domain"].state).toBe("unverified");
     expect(byId(f)["email-test-send"].state).toBe("unset");
     expect(byId(f)["admin-totp"].state).toBe("unset");
     expect(byId(facts())["email-domain"].state).toBe("unverified");
+  });
+
+  it("the sending domain row reads the sender's DNS: unverified without a sender or an answer, mismatched naming the record, set with both (D-2824)", () => {
+    const base = {
+      provider: "smtp",
+      configured: "smtp" as const,
+      missing: [],
+      domainVerified: null,
+      lastTestSendAt: null,
+    };
+    const from = { EMAIL_FROM: "Readyline <no-reply@readyline.example>" };
+    expect(
+      byId(facts({ email: { ...base, dns: null } }))["email-domain"].state,
+    ).toBe("unverified");
+    const noDmarc = byId(
+      facts({ email: { ...base, dns: { spf: true, dmarc: false } } }, from),
+    )["email-domain"];
+    expect(noDmarc.state).toBe("mismatched");
+    expect(noDmarc.sentence).toContain("DMARC");
+    expect(
+      byId(
+        facts({ email: { ...base, dns: { spf: true, dmarc: true } } }, from),
+      )["email-domain"].state,
+    ).toBe("set");
+    expect(
+      byId(
+        facts({ email: { ...base, dns: { spf: null, dmarc: true } } }, from),
+      )["email-domain"].state,
+    ).toBe("unverified");
   });
 
   it("the provider row reads mismatched when smtp is named with a value missing (REQ-022 Session B)", () => {

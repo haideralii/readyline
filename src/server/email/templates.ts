@@ -168,3 +168,19 @@ export function accountPurgedEmail(input: {
     ].join("\n"),
   };
 }
+
+/** REQ-022 FR-6: the admin's own test send from /admin/launch; the footer line and nothing about any account. */
+export function testEmail(input: { to: string }): EmailMessage {
+  return {
+    to: input.to,
+    template: "test",
+    subject: `${BRAND}: a test email from the launch page`,
+    text: [
+      `This is the test email from ${BRAND}'s launch page. If you are reading it, the sender, the SMTP values and the domain's records work together.`,
+      "",
+      "Nothing else was sent and no account is involved.",
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}

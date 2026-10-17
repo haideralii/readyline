@@ -9,7 +9,14 @@ import "server-only";
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadLegalPage, loadLegalPages } from "@/lib/legal/pages";
+import { resolveTxt } from "node:dns/promises";
 import { log } from "@/lib/logging/logger";
+import {
+  hasDmarc,
+  hasSpf,
+  senderDomain,
+  type DnsFacts,
+} from "@/lib/ops/sender-domain";
 import type { LaunchFacts } from "@/lib/ops/launch";
 import { isFakeStripeMode } from "@/lib/payments/fake-session";
 import type { PriceFact } from "@/lib/payments/live-guards";
@@ -22,6 +29,43 @@ import { jobRunAction, type JobName } from "@/server/jobs/record-run";
 import { createStripeClient } from "@/server/payments/stripe";
 
 export const TEST_SEND_ACTION = "email.test-sent";
+
+const DNS_TIMEOUT_MS = 2_500;
+
+async function txt(name: string): Promise<string[][] | null> {
+  try {
+    return await Promise.race([
+      resolveTxt(name),
+      new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), DNS_TIMEOUT_MS),
+      ),
+    ]);
+  } catch {
+    // NXDOMAIN or no TXT records is an answer: none there.
+    return [];
+  }
+}
+
+/**
+ * REQ-022 FR-6 (D-2824): the sender's SPF and DMARC records from DNS, each
+ * null when the lookup did not answer in time, so the row reads "not
+ * verified here" and the page never throws. Nothing but the record kinds
+ * is kept.
+ */
+export async function readSenderDns(
+  from: string | undefined,
+): Promise<DnsFacts | null> {
+  const domain = senderDomain(from);
+  if (!domain) return null;
+  const [spf, dmarc] = await Promise.all([
+    txt(domain),
+    txt(`_dmarc.${domain}`),
+  ]);
+  return {
+    spf: spf === null ? null : hasSpf(spf),
+    dmarc: dmarc === null ? null : hasDmarc(dmarc),
+  };
+}
 
 type StripeLike = {
   prices: {
@@ -173,6 +217,7 @@ export async function gatherLaunchFacts(input: {
       provider: createEmailProvider().name,
       configured: configuredEmailProvider(),
       missing: configuredEmailProvider() === "smtp" ? smtpMissing() : [],
+      dns: await readSenderDns(process.env.EMAIL_FROM),
       domainVerified: null,
       lastTestSendAt: await lastAuditAt(input.admin, TEST_SEND_ACTION),
     },
