@@ -99,14 +99,17 @@ export function RegisterList({
             <li key={r.id}>
               <Link
                 href={r.href}
-                className="flex min-h-14 items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
+                className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
                 data-testid={`row-${r.id}`}
               >
-                <span className="min-w-0">
+                {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
+                    tag drops under it, so a long status at 14 px never squeezes a title
+                    word into breaking at 360 (the row inherits li's overflow-wrap). */}
+                <span className="min-w-0 flex-1 basis-48">
                   <span className="block text-base font-medium">{r.title}</span>
                   <span className="text-slate block text-sm">{r.detail}</span>
                 </span>
-                <span className="flex shrink-0 items-center gap-2">
+                <span className="ml-auto flex shrink-0 items-center gap-2">
                   <StatusTag status={r.status} />
                   <span aria-hidden="true" className="text-slate">
                     ›

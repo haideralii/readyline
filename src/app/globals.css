@@ -114,6 +114,10 @@ h3 {
   letter-spacing: -0.01em;
   font-optical-sizing: auto;
   line-height: 1.2;
+  /* REQ-028 AC-2 at 200% text: a long word in a heading wraps inside its
+     column rather than widening the page (#87 run 1: "Registration" at 64 px
+     in a 338 px column); min-content is untouched, as for dd, td and th. */
+  overflow-wrap: break-word;
 }
 h1 {
   font-size: 2rem;

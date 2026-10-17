@@ -1,11 +1,15 @@
 import { test, expect, type Page } from "@playwright/test";
+import { zoom200NoSidewaysScroll } from "./helpers/a11y";
 
 /**
  * REQ-028 AC-9 (FR-12, D-2811) over the rendered public pages at 360 on
  * `android-small` and 1280 on `desktop-chromium`: no body text in the serif
  * (the serif is h1 to h3 and the wordmark), no readable text under 14 px (a
  * table's `<th>` from `sm` excepted at 12), and every h1, h2 and h3 at the
- * scale's size for the width.
+ * scale's size for the width. Then, at the same width, 200 % text on every
+ * page must not scroll sideways (#87 run 1: a long heading word at 64 px
+ * widened the registration-groups guide by 2 px); the signed-in pages
+ * meet the same check in their own specs on the Supabase job.
  */
 const PAGES = [
   "/",
@@ -14,6 +18,7 @@ const PAGES = [
   "/sample",
   "/guides",
   "/guides/which-ndis-audit",
+  "/guides/registration-groups",
   "/sign-in",
   "/about",
   "/terms",
@@ -99,5 +104,16 @@ test.describe("REQ-028 AC-9: the type rules", () => {
     expect(findings.map((f) => `${f.page}: ${f.kind}: ${f.detail}`)).toEqual(
       [],
     );
+  });
+
+  test("200% text on every page: no sideways scroll", async ({ page }) => {
+    test.slow();
+    for (const path of PAGES) {
+      await page.goto(path);
+      await expect(
+        page.getByRole("heading", { level: 1 }).first(),
+      ).toBeVisible();
+      await zoom200NoSidewaysScroll(page, path);
+    }
   });
 });

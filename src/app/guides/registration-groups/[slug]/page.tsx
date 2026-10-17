@@ -32,7 +32,7 @@ export async function generateMetadata({
   };
 }
 
-const h2 = "mt-10 text-xl font-semibold tracking-tight";
+const h2 = "mt-10";
 const list = "mt-3 list-disc space-y-1 pl-5 leading-7 text-ink";
 
 /**

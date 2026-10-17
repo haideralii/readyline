@@ -12,6 +12,8 @@ export type WidthReport = {
   innerWidth: number;
   scrollWidth: number;
   offenders: string[];
+  /** Elements whose own content runs past their box sideways without a scrolling ancestor: the 2 px case the edge check cannot name (REQ-028, #87 run 1). */
+  overflowing: string[];
 };
 
 export async function widthReport(page: Page): Promise<WidthReport> {
@@ -39,6 +41,7 @@ export async function widthReport(page: Page): Promise<WidthReport> {
       return `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ""}${cls ? `.${cls}` : ""} left=${Math.round(r.left)} right=${Math.round(r.right)} "${text.slice(0, 50)}"`;
     };
     const offenders: string[] = [];
+    const overflowing: string[] = [];
     for (const el of Array.from(document.body.querySelectorAll("*"))) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
@@ -46,11 +49,24 @@ export async function widthReport(page: Page): Promise<WidthReport> {
       if (style.position === "fixed" && style.visibility === "hidden") continue;
       if ((r.right > w + 1 || r.left < -1) && !contained(el))
         offenders.push(describe(el, r));
+      // A box inside the viewport whose text or children run past its right
+      // edge (a long word in a heading at 200 % text) widens the page by the
+      // overhang alone; the edge check above never names it.
+      if (
+        el.clientWidth > 0 &&
+        el.scrollWidth > el.clientWidth + 1 &&
+        style.overflowX === "visible" &&
+        !contained(el)
+      )
+        overflowing.push(
+          `${describe(el, r)} content ${el.scrollWidth} in a box of ${el.clientWidth}`,
+        );
     }
     return {
       innerWidth: w,
       scrollWidth: document.documentElement.scrollWidth,
       offenders: offenders.slice(0, 15),
+      overflowing: overflowing.slice(0, 8),
     };
   });
 }
@@ -81,7 +97,7 @@ export async function expectNoSidewaysScroll(page: Page, label: string) {
   const r = await widthReport(page);
   expect(
     r.scrollWidth,
-    `${label}: page scrollWidth ${r.scrollWidth} exceeds viewport ${r.innerWidth}; offenders: ${r.offenders.join(" | ") || "none found"}`,
+    `${label}: page scrollWidth ${r.scrollWidth} exceeds viewport ${r.innerWidth}; offenders: ${r.offenders.join(" | ") || "none found"}; overflowing content: ${r.overflowing.join(" | ") || "none found"}`,
   ).toBeLessThanOrEqual(r.innerWidth);
   expect(r.offenders, `${label}: elements outside the viewport`).toEqual([]);
 }

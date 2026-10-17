@@ -65,7 +65,7 @@ async function documentsForVisitor(): Promise<{
   };
 }
 
-const h2 = "mt-10 text-xl font-semibold";
+const h2 = "mt-10";
 const body = "mt-3 leading-7 text-ink";
 const link = "underline underline-offset-2";
 const half = "scroll-mt-6 rounded-md border border-rule p-5";

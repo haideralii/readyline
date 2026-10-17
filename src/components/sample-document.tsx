@@ -167,7 +167,7 @@ export function SampleDocument({
         where="page"
         className="mt-2"
       />
-      <Title className="mt-2 text-2xl">{doc.title}</Title>
+      <Title className="mt-2">{doc.title}</Title>
       <p className="mt-3">
         <a
           href={SAMPLE_DOWNLOAD_PATH}
