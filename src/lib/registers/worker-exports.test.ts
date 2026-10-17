@@ -491,6 +491,21 @@ describe("the pack's worker files (AC-5, finding 114)", () => {
     const s = snapshot({
       rows: [staff("W-001"), staff("W-002", { ended_on: "2026-06-30" })],
       clearances: [clearance("W-001")],
+      // REQ-024 C (FR-11): an entry rides the worker file in the pinned columns, for the owner's pack and the link's alike.
+      entries: [
+        {
+          id: "e-1",
+          account_id: ACC,
+          worker_ref: "W-001",
+          kind: "supervision",
+          held_on: "2026-09-01",
+          by_ref: "KP-1",
+          note: "Covered the roster.",
+          outcome: null,
+          created_at: "2026-09-01T00:00:00Z",
+          updated_at: "2026-09-01T00:00:00Z",
+        },
+      ],
       roles: [
         {
           id: "r-1",
@@ -530,6 +545,10 @@ describe("the pack's worker files (AC-5, finding 114)", () => {
     }
     expect(files["screening-list-2026-10-17.csv"]).toContain("WWC1234567");
     expect(files["screening-list-2026-10-17.csv"]).not.toContain("[Full name]");
+    expect(files["workers/W-001.csv"]).toContain(
+      "supervision,supervision,,KP-1,,2026-09-01",
+    );
+    expect(files["workers/W-002.csv"]).not.toContain("supervision,");
   });
 });
 
