@@ -1,5 +1,5 @@
 # REQ-008: Legal and trust pages
-Status: ready
+Status: delivered and accepted (12 Oct 2026, branch `req-008-legal-pages`, PR #12 merged; footer dedupe batch 15; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 23)
 Phase: 4   Priority: must   Owner: Dev (pages and wiring); PO (copy)   Blocks: REQ-007 going live with real money.
 
 ## Why
@@ -10,7 +10,7 @@ In: `/terms`, `/privacy`, `/refunds`, `/ai` (how Readyline uses AI), `/about` (w
 
 ## Functional requirements
 - FR-1 Pages render markdown from `product/legal/*.md` with a "Last updated" date taken from the file's front matter; headings are numbered; reading grade target 9 or below for the refund and AI pages, 11 or below for terms and privacy (the readability lint from REQ-005 runs over these files in CI as a warning).
-- FR-2 Footer on every page: Readyline; "General information and document templates, not legal advice"; links Terms, Privacy, Refunds, How we use AI, About, Contact (mailto to a `CONTACT_EMAIL` config value); "Hosted in Australia"; "Independent of the NDIA and the NDIS Quality and Safeguards Commission"; ABN line shown only when `BUSINESS_ABN` is set.
+- FR-2 Footer on every page: Readyline; "General information and document templates, not legal advice"; links Terms, Privacy, Refunds, How we use AI, About, Guides (added by REQ-011 batch 31 item 3), Contact (mailto to a `CONTACT_EMAIL` config value); "Hosted in Australia"; "Independent of the NDIA and the NDIS Quality and Safeguards Commission"; ABN line shown only when `BUSINESS_ABN` is set, and the registered name likewise when `BUSINESS_NAME` is set (batch 45 item 1; retro review 15 Oct 2026, finding 26).
 - FR-3 Privacy page states: what we collect (business details, questionnaire answers, account email), what we never collect (participant personal, health or disability information; a request that users do not enter it), where data is stored (Supabase, Sydney; Vercel; Anthropic for document drafting with no training on our data), retention and deletion (REQ-004 periods), export, how to complain, and the Privacy Act small-business position in plain words with a note that we behave as if the Act applies.
 - FR-4 AI page states: which parts of a document are fixed text and which are drafted by a model from the user's answers; the model provider; that a person must review and adopt every document; that no participant data is sent to the model; and how to tell us about a wrong output.
 - FR-5 Refunds page: the REQ-007 promise verbatim, how to ask, how long it takes (Stripe's 5 to 10 business days).
@@ -18,7 +18,7 @@ In: `/terms`, `/privacy`, `/refunds`, `/ai` (how Readyline uses AI), `/about` (w
 - FR-7 About: who runs Readyline (sole trader, Sydney; name added when the ABN exists), why it exists, the independence statement, no auditor referral fees (D-021).
 
 ## Acceptance criteria
-- AC-1 Every page in the app has the footer (e2e walks every route). All five pages render, are linked, axe clean, Lighthouse accessibility 100, and readable at 360 px.
+- AC-1 Every page in the app has the footer (e2e walks every route). All five pages render, are linked, axe clean, Lighthouse accessibility 100 *(scored for `/about` and `/refunds` only by `scripts/ops/lighthouse.mjs`; retro review 15 Oct 2026, finding 24)*, and readable at 360 px.
 - AC-2 Prohibited-claims lint passes over `product/legal/*.md`.
 - AC-3 No third-party cookies and no third-party requests other than Supabase and (on purchase pages only) Stripe; a Playwright test records every request on the five pages and the home page.
 - AC-4 The copy files carry front matter `updated: YYYY-MM-DD` and `owner: po`.
@@ -33,7 +33,7 @@ Screenshots of the five pages and the footer at both viewports; the request log 
 ### How the markdown pages will be built
 
 - **Source of truth stays in `product/legal/*.md`.** A server-only module `src/lib/legal/pages.ts` reads the five files at build time with `node:fs`, parses the front matter with `gray-matter`, and exports a typed list (`slug`, `title`, `updated`, `owner`, `status`, body). Zod validates the front matter so a missing `updated` or an owner other than `po` fails the build, not the page.
-- **One route, five static pages:** `src/app/(legal)/[slug]/page.tsx` with `generateStaticParams` over the five slugs and `dynamicParams = false`, so `/terms`, `/privacy`, `/refunds`, `/ai` and `/about` are prerendered and anything else is a 404. `generateMetadata` sets the title from the front matter.
+- **One route, five static pages** *(delivered as five page files, `src/app/(legal)/<slug>/page.tsx`, each calling `loadLegalPage`; retro review 15 Oct 2026, finding 26)*: `src/app/(legal)/[slug]/page.tsx` with `generateStaticParams` over the five slugs and `dynamicParams = false`, so `/terms`, `/privacy`, `/refunds`, `/ai` and `/about` are prerendered and anything else is a 404. `generateMetadata` sets the title from the front matter.
 - **Rendering:** `react-markdown` with `remark-gfm` (tables in the privacy page), no `dangerouslySetInnerHTML`. Heading components are overridden to number `##` and `###` headings ("1", "1.1") and to give each an id, which also gives us an in-page contents list on phones. The PO's files already use numbered headings in the text ("## 1 Our promise"); the renderer will number from structure and the copy will drop the hand-typed numbers, so the two cannot drift.
 - **"Last updated"** is printed under the title from `updated`; while `status` begins with "draft", a one-line note above the body says the page is a plain-language draft pending legal review, taken from that front matter so it disappears when the PO removes the line.
 - **CI lints over the five files (`src/lib/legal/legal-copy.test.ts`, part of `npm run check`):** the prohibited-claims check from `src/lib/claims.ts` fails the test (AC-2); the readability grade from `src/lib/generator/readability.ts` is computed on the body text (headings and tables excluded, as for generated documents) and printed as a GitHub `::warning::` annotation when it is above 9 for refunds and ai, or above 11 for terms and privacy, without failing (FR-1). The same test checks that every file links nowhere outside the site and never uses "NDIS" in a page title.
