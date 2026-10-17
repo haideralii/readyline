@@ -14,6 +14,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 
 type Key = keyof QuestionnaireAnswers["existing"];
@@ -61,6 +62,10 @@ export function ExistingStepForm() {
     answers.existing ?? {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("existing", values, name, errors));
   const [pending, setPending] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -102,7 +107,11 @@ export function ExistingStepForm() {
           help={item.help}
           options={OPTIONS}
           value={values[item.key]}
-          onChange={(v) => setValues((prev) => ({ ...prev, [item.key]: v }))}
+          onChange={(v) => {
+            const next = { ...values, [item.key]: v };
+            setValues(next);
+            void clear(item.key, next);
+          }}
           errors={errorsFor(errors, item.key)}
         />
       ))}

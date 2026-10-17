@@ -178,7 +178,7 @@ export default async function RegistersPage() {
         {reportsToConfirmLine(toConfirm) ? (
           // REQ-020 FR-5: a report through the link or by a worker waits here until the owner confirms it.
           <p
-            className="border-signal mt-4 rounded-md border p-3 leading-7"
+            className="border-signal mt-4 rounded-md border p-4 leading-7"
             data-testid="reports-to-confirm"
           >
             <Link
@@ -236,7 +236,7 @@ export default async function RegistersPage() {
                 <li key={r.href}>
                   <Link
                     href={r.href}
-                    className="flex min-h-14 items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
+                    className="hover:bg-mist -mx-2 flex min-h-14 items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
                     data-testid={`register-${r.href.split("/").pop()}`}
                   >
                     <span>

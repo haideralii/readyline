@@ -143,7 +143,7 @@ export default async function AuditDayPage() {
       {reportsToConfirmLine(toConfirm) ? (
         // REQ-020 FR-5: the owner sees a waiting report here too, one tap from confirming it.
         <p
-          className="border-signal mt-3 rounded-md border p-3 leading-7 print:hidden"
+          className="border-signal mt-3 rounded-md border p-4 leading-7 print:hidden"
           data-testid="audit-day-reports"
         >
           <Link

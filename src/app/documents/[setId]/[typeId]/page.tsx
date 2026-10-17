@@ -99,7 +99,7 @@ export default async function ReviewDocumentPage({
       ) : null}
       {ruleChanges.length ? (
         <div
-          className="border-ochre mt-4 rounded-md border p-3 text-sm leading-6"
+          className="border-ochre mt-4 rounded-md border p-4 text-sm leading-6"
           data-testid="rule-changes"
         >
           <p className="font-medium">
@@ -166,7 +166,7 @@ export default async function ReviewDocumentPage({
               </div>
               {diff ? (
                 <div
-                  className="bg-mist mt-3 rounded-md p-3 text-sm"
+                  className="bg-mist mt-3 rounded-md p-4 text-sm"
                   data-testid="section-diff"
                 >
                   <p className="font-medium">

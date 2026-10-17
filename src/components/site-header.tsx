@@ -1,19 +1,28 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { isProductionDeployment } from "@/lib/env";
+import { NavLinks, type NavLinkItem } from "@/components/nav-links";
 import { Wordmark } from "@/components/wordmark";
 import { getSessionUser, getViewer } from "@/server/accounts/queries";
 
 /** Nav links: a 44 px target, a visible pressed state, never split across lines. */
-const navLink =
-  "inline-flex min-h-11 items-center px-1 underline-offset-4 hover:underline active:bg-mist active:underline";
-
 export async function SiteHeader() {
   const user = await getSessionUser();
   // REQ-020 FR-4: a worker's nav is their home alone; the owner's links would
   // only bounce them back there. One cached read per request (D-1012).
   const viewer = user ? await getViewer() : null;
   const worker = Boolean(viewer && !viewer.account && viewer.worker);
+  // REQ-028 FR-13 (D-2274): the links as data; NavLinks underlines the current section.
+  const links: NavLinkItem[] = worker
+    ? [{ href: "/worker", label: "Your entries", testId: "nav-worker" }]
+    : user
+      ? [
+          { href: "/checklist", label: "Checklist" },
+          { href: "/registers", label: "Registers" },
+          { href: "/documents", label: "Documents" },
+          { href: "/account", label: "Account" },
+        ]
+      : [{ href: "/sign-in", label: "Sign in" }];
   return (
     <header className="border-rule border-b">
       {/*
@@ -40,7 +49,7 @@ export async function SiteHeader() {
         {/* Previews and local runs only (batch 26 item 6): trial providers on production never see it. */}
         {isProductionDeployment() ? null : (
           <span
-            className="border-line text-slate order-3 rounded-full border px-2.5 py-0.5 text-sm whitespace-nowrap sm:order-none"
+            className="border-line text-slate order-3 hidden rounded-full border px-2.5 py-0.5 text-sm whitespace-nowrap sm:order-none lg:inline-flex"
             data-testid="dev-badge"
           >
             In development
@@ -51,30 +60,7 @@ export async function SiteHeader() {
           className="ml-auto flex flex-wrap items-center justify-end gap-x-3 text-sm whitespace-nowrap sm:gap-x-4"
           data-testid="site-nav"
         >
-          {worker ? (
-            <Link href="/worker" className={navLink} data-testid="nav-worker">
-              Your entries
-            </Link>
-          ) : user ? (
-            <>
-              <Link href="/checklist" className={navLink}>
-                Checklist
-              </Link>
-              <Link href="/registers" className={navLink}>
-                Registers
-              </Link>
-              <Link href="/documents" className={navLink}>
-                Documents
-              </Link>
-              <Link href="/account" className={navLink}>
-                Account
-              </Link>
-            </>
-          ) : (
-            <Link href="/sign-in" className={navLink}>
-              Sign in
-            </Link>
-          )}
+          <NavLinks links={links} />
         </nav>
       </div>
     </header>

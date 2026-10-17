@@ -195,6 +195,30 @@ function PurchaseSection({
           <p role="status" className="mt-2 leading-7">
             {C.delayed}
           </p>
+          {/* REQ-028 FR-15 (audit 60): the one action this state can offer, and the support address. */}
+          <p className="mt-3 text-sm leading-6">
+            <Link
+              href="/documents"
+              className="underline underline-offset-2"
+              data-testid="delayed-check-again"
+            >
+              Check again
+            </Link>
+            {email ? (
+              <>
+                {" "}
+                or{" "}
+                <a
+                  href={`mailto:${email}`}
+                  className="underline underline-offset-2"
+                  data-testid="delayed-email"
+                >
+                  email us
+                </a>
+              </>
+            ) : null}
+            .
+          </p>
           <PurchaseLinks purchase={state.purchase} email={email} />
         </section>
       );

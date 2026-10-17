@@ -12,6 +12,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { EXAMPLES, HELPER } from "./practices-copy";
 import { GlossaryTerms } from "@/components/glossary-terms";
@@ -70,6 +71,10 @@ export function PracticesStepForm() {
       : {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("practices", values, name, errors));
   const [pending, setPending] = useState(false);
 
   const helperComplete = HELPER.every((h) => helper[h.key] !== undefined);
@@ -125,7 +130,7 @@ export function PracticesStepForm() {
           <li key={example}>{example}</li>
         ))}
       </ul>
-      <details className="border-rule mb-6 rounded-md border p-3">
+      <details className="border-rule mb-6 rounded-md border p-4">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
           What counts? The Commission&apos;s definition
         </summary>
@@ -155,7 +160,10 @@ export function PracticesStepForm() {
         legend="Do you use, or plan to use, any of these with a participant?"
         options={OPTIONS}
         value={value}
-        onChange={setValue}
+        onChange={(v) => {
+          setValue(v);
+          void clear("restrictivePractices", { restrictivePractices: v });
+        }}
         errors={errorsFor(errors, "restrictivePractices")}
       />
 
@@ -175,7 +183,19 @@ export function PracticesStepForm() {
                 help={h.help}
                 options={YES_NO}
                 value={helper[h.key]}
-                onChange={(v) => setHelper((prev) => ({ ...prev, [h.key]: v }))}
+                onChange={(v) => {
+                  const next = { ...helper, [h.key]: v };
+                  setHelper(next);
+                  void clear(`notSureHelper.${h.key}`, {
+                    restrictivePractices: value,
+                    notSureHelper: {
+                      locksOrBarriers: next.locksOrBarriers === "yes",
+                      holdsOrRestraint: next.holdsOrRestraint === "yes",
+                      medicationForBehaviour:
+                        next.medicationForBehaviour === "yes",
+                    },
+                  });
+                }}
                 errors={errorsFor(errors, `notSureHelper.${h.key}`)}
               />
             ))}

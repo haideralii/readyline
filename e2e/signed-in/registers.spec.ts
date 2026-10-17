@@ -198,7 +198,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     await expect(page.getByTestId("incidents-list")).toContainText("INC-0001");
     await page.getByLabel(/^Open/).check();
     await expect(page.getByTestId("incidents-list-empty")).toContainText(
-      "Nothing with that status",
+      "No matches. Try another word, or clear the search to see every entry.",
     );
 
     // Export: a zip with two CSVs, through the session.

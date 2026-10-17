@@ -73,9 +73,9 @@ test.describe("REQ-025 Session B: one stepper", () => {
     // AC-4: one nav, six items, the current step marked, done steps links, future steps not focusable.
     const row = stepper.locator("ol").last();
     await expect(row.locator("> li")).toHaveCount(6);
-    await expect(row.locator("[aria-current='step']")).toHaveAttribute(
-      "aria-label",
-      /Step 6, Result/,
+    // REQ-028 FR-3 (QA F3): the current circle names itself with sr-only text, not aria-label on a span.
+    await expect(row.locator("[aria-current='step']")).toContainText(
+      /Step 6, Result: current/,
     );
     await expect(row.getByRole("link")).toHaveCount(5);
     await expect(
@@ -95,7 +95,10 @@ test.describe("REQ-025 Session B: one stepper", () => {
     // AC-5 and FR-7: 44 px targets; at a phone width no labels under the circles and no sideways scroll.
     const phone = (page.viewportSize()?.width ?? 1280) < 640;
     for (const li of await rowSupports.locator("> li").all()) {
-      const box = await li.locator("> a, > span[aria-label]").boundingBox();
+      // The circle alone: a done link, the current span or an inert span (not the connector or the label).
+      const box = await li
+        .locator("> a, > span[aria-current], > span[aria-disabled]")
+        .boundingBox();
       expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
       expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
     }

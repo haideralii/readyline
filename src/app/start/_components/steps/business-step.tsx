@@ -18,6 +18,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 
 const STRUCTURES: {
@@ -79,6 +80,11 @@ export function BusinessStepForm() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [pending, setPending] = useState(false);
 
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("business", values, name, errors));
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = await parseStep("business", {
@@ -123,7 +129,15 @@ export function BusinessStepForm() {
             id="tradingName"
             name="tradingName"
             value={tradingName}
-            onChange={setTradingName}
+            onChange={(v) => {
+              setTradingName(v);
+              void clear("tradingName", {
+                tradingName: v,
+                structure,
+                states,
+                abn,
+              });
+            }}
             describedBy={describedBy}
             invalid={invalid}
             autoComplete="organization"
@@ -139,7 +153,10 @@ export function BusinessStepForm() {
         help="Your structure changes a few audit questions; pick the one on your ABN record."
         options={STRUCTURES}
         value={structure}
-        onChange={setStructure}
+        onChange={(v) => {
+          setStructure(v);
+          void clear("structure", { tradingName, structure: v, states, abn });
+        }}
         errors={errorsFor(errors, "structure")}
       />
 
@@ -149,7 +166,10 @@ export function BusinessStepForm() {
         help="Where you deliver supports. Choose every state or territory that applies."
         options={STATES}
         values={states}
-        onChange={setStates}
+        onChange={(v) => {
+          setStates(v);
+          void clear("states", { tradingName, structure, states: v, abn });
+        }}
         errors={errorsFor(errors, "states")}
       />
 
@@ -164,7 +184,10 @@ export function BusinessStepForm() {
             id="abn"
             name="abn"
             value={abn}
-            onChange={setAbn}
+            onChange={(v) => {
+              setAbn(v);
+              void clear("abn", { tradingName, structure, states, abn: v });
+            }}
             describedBy={describedBy}
             invalid={invalid}
             inputMode="numeric"

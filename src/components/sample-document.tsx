@@ -12,7 +12,14 @@ import { GlossaryTerms } from "./glossary-terms";
  * provider's answers visibly marked, and the fixed legal text shown as what
  * it is. A real document from the recorded sole-trader set, not a mock-up.
  */
-export function Blocks({ blocks }: { blocks: readonly Block[] }) {
+export function Blocks({
+  blocks,
+  omitCallout,
+}: {
+  blocks: readonly Block[];
+  /** REQ-028 FR-15 (audit 56): the callout the document shows once above itself is not repeated in a section. */
+  omitCallout?: string;
+}) {
   return (
     <>
       {blocks.map((b, i) => {
@@ -24,10 +31,11 @@ export function Blocks({ blocks }: { blocks: readonly Block[] }) {
               </p>
             );
           case "callout":
+            if (b.text === omitCallout) return null;
             return (
               <p
                 key={i}
-                className="border-rule bg-mist mt-2 rounded-md border p-3 leading-7"
+                className="border-ochre bg-ochre-wash mt-2 rounded-md border p-4 leading-7"
               >
                 {b.text}
               </p>
@@ -118,10 +126,12 @@ type HeadingTag = "h2" | "h3" | "h4" | "h5";
 function Section({
   section: s,
   heading: H,
+  omitCallout,
 }: {
   section: DocumentModel["sections"][number];
   /** One level under the document's title (REQ-025 FR-12: the sample page's order is h1, h2, h3). */
   heading: HeadingTag;
+  omitCallout?: string;
 }) {
   return (
     <li
@@ -140,7 +150,7 @@ function Section({
       <p className="text-slate mt-1 text-sm font-medium tracking-wide uppercase">
         {s.mode === "tailored" ? MODE_LABEL.tailored : MODE_LABEL.fixed}
       </p>
-      <Blocks blocks={s.blocks} />
+      <Blocks blocks={s.blocks} omitCallout={omitCallout} />
     </li>
   );
 }
@@ -153,6 +163,12 @@ export function SampleDocument({
 } = {}) {
   const doc = SAMPLE_DOCUMENT;
   const tailored = doc.sections.filter((s) => s.mode === "tailored").length;
+  // REQ-028 FR-15 (audit 56): the document's callout, once above it in the note style; its words are the data's.
+  const callout = doc.sections
+    .flatMap((s) => s.blocks)
+    .find(
+      (b): b is Extract<Block, { type: "callout" }> => b.type === "callout",
+    );
   const Title: HeadingTag = level === 2 ? "h2" : "h3";
   const sectionHeading: HeadingTag = level === 2 ? "h3" : "h4";
   return (
@@ -168,6 +184,14 @@ export function SampleDocument({
         className="mt-2"
       />
       <Title className="mt-2">{doc.title}</Title>
+      {callout ? (
+        <p
+          className="border-ochre bg-ochre-wash mt-3 rounded-md border p-4 leading-7"
+          data-testid="sample-callout"
+        >
+          {callout.text}
+        </p>
+      ) : null}
       <p className="mt-3">
         <a
           href={SAMPLE_DOWNLOAD_PATH}
@@ -179,7 +203,12 @@ export function SampleDocument({
       </p>
       <ol className="mt-6 space-y-5">
         {doc.sections.slice(0, SHOWN_FIRST).map((s) => (
-          <Section key={s.id} section={s} heading={sectionHeading} />
+          <Section
+            key={s.id}
+            section={s}
+            heading={sectionHeading}
+            omitCallout={callout?.text}
+          />
         ))}
       </ol>
       {/* The rest folds away so the page stays short on a phone; a native
@@ -193,7 +222,12 @@ export function SampleDocument({
         </summary>
         <ol className="mt-5 space-y-5" start={SHOWN_FIRST + 1}>
           {doc.sections.slice(SHOWN_FIRST).map((s) => (
-            <Section key={s.id} section={s} heading={sectionHeading} />
+            <Section
+              key={s.id}
+              section={s}
+              heading={sectionHeading}
+              omitCallout={callout?.text}
+            />
           ))}
         </ol>
       </details>

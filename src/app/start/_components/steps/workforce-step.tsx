@@ -13,6 +13,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { GlossaryTerms } from "@/components/glossary-terms";
 
@@ -54,8 +55,31 @@ export function WorkforceStepForm() {
     saved?.allRiskAssessedScreened,
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("workforce", values, name, errors));
   const [pending, setPending] = useState(false);
   const large = Number(workerCount) > LARGE_PROVIDER_THRESHOLD;
+
+  // The values as onSubmit assembles them, for the re-validation on change.
+  const valuesNow = (o: {
+    workerCount?: string;
+    keyPersonnelCount?: string;
+    hasRisk?: string | undefined;
+    screened?: string | undefined;
+  }) => {
+    const wc = o.workerCount ?? workerCount;
+    const kp = o.keyPersonnelCount ?? keyPersonnelCount;
+    const hr = "hasRisk" in o ? o.hasRisk : hasRisk;
+    const sc = "screened" in o ? o.screened : screened;
+    return {
+      workerCount: wc === "" ? undefined : Number(wc),
+      keyPersonnelCount: kp === "" ? undefined : Number(kp),
+      hasRiskAssessedRoles: hr === undefined ? undefined : hr === "yes",
+      allRiskAssessedScreened: sc,
+    };
+  };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -102,7 +126,10 @@ export function WorkforceStepForm() {
             id="workerCount"
             name="workerCount"
             value={workerCount}
-            onChange={setWorkerCount}
+            onChange={(v) => {
+              setWorkerCount(v);
+              void clear("workerCount", valuesNow({ workerCount: v }));
+            }}
             describedBy={describedBy}
             invalid={invalid}
             min={1}
@@ -129,7 +156,13 @@ export function WorkforceStepForm() {
             id="keyPersonnelCount"
             name="keyPersonnelCount"
             value={keyPersonnelCount}
-            onChange={setKeyPersonnelCount}
+            onChange={(v) => {
+              setKeyPersonnelCount(v);
+              void clear(
+                "keyPersonnelCount",
+                valuesNow({ keyPersonnelCount: v }),
+              );
+            }}
             describedBy={describedBy}
             invalid={invalid}
             min={1}
@@ -147,7 +180,10 @@ export function WorkforceStepForm() {
           { value: "no", label: "No" },
         ]}
         value={hasRisk}
-        onChange={setHasRisk}
+        onChange={(v) => {
+          setHasRisk(v);
+          void clear("hasRiskAssessedRoles", valuesNow({ hasRisk: v }));
+        }}
         errors={errorsFor(errors, "hasRiskAssessedRoles")}
       />
 
@@ -164,7 +200,10 @@ export function WorkforceStepForm() {
           },
         ]}
         value={screened}
-        onChange={setScreened}
+        onChange={(v) => {
+          setScreened(v);
+          void clear("allRiskAssessedScreened", valuesNow({ screened: v }));
+        }}
         errors={errorsFor(errors, "allRiskAssessedScreened")}
       />
 

@@ -59,7 +59,7 @@ export function FillFormFields({
       {message ? (
         <p
           role="alert"
-          className="border-signal text-signal mt-4 rounded-md border p-3 text-sm leading-6"
+          className="border-signal text-signal mt-4 rounded-md border p-4 text-sm leading-6"
           data-testid="fill-message"
         >
           {message}
@@ -138,7 +138,7 @@ export function FillFormFields({
             return (
               <li
                 key={code}
-                className="border-rule rounded-md border p-3"
+                className="border-rule rounded-md border p-4"
                 data-testid={`fill-row-${code}`}
               >
                 <p className="font-medium">

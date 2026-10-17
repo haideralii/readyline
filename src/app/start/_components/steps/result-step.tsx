@@ -3,7 +3,9 @@ import { SUBSCRIPTION_OFF } from "@/lib/payments/copy";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
+import { Disclosure as SharedDisclosure } from "@/components/disclosure";
 import { ReadyLine } from "@/components/ready-line";
+import { Tag, type TagVariant } from "@/components/tag";
 import {
   readinessCounts,
   readyLineCounts,
@@ -193,57 +195,41 @@ function Disclosure({
   children: ReactNode;
   nested?: boolean;
 }) {
+  // REQ-028 FR-13 (D-2274): the shared Disclosure, with the page's remembered
+  // state passed through: the toggle sets it, the summary click records the
+  // state the click produces in the click's own task (#40, run 38637072132).
   return (
-    <details
+    <SharedDisclosure
       open={open}
-      onToggle={(e) => onToggle(id, e.currentTarget.open)}
-      // A details element flips `open` on the click itself and fires `toggle`
-      // in a later task; a reload issued between the two lost the remembered
-      // state once in ten runs (#40, run 38637072132, after 45b item 3 had
-      // moved the write out of the state updater). The click handler records
-      // the state the click produces, in the click's own task, without
-      // setting React state (a commit before the default action would make
-      // the browser toggle the element straight back); the toggle handler
-      // then sets the state and records the same value again.
-      onClick={(e) => {
-        // Only this element's own summary: a nested disclosure's click bubbles here too.
-        const summary = (e.target as HTMLElement).closest("summary");
-        if (!summary || summary.parentElement !== e.currentTarget) return;
-        onRemember(id, !e.currentTarget.open);
-      }}
-      className={
-        nested
-          ? "border-rule mt-2 rounded-md border"
-          : "border-rule mt-4 rounded-md border"
+      onToggle={(o) => onToggle(id, o)}
+      onSummaryClick={(o) => onRemember(id, o)}
+      className={nested ? "mt-2 rounded-md border" : "rounded-md border"}
+      summaryClassName={
+        nested ? "min-h-11 px-3 py-2 text-base font-medium" : undefined
       }
+      bodyClassName={nested ? "px-3 pb-3" : undefined}
+      summary={summary}
       data-testid={`result-section-${id}`}
     >
-      <summary
-        className={
-          nested
-            ? "min-h-11 cursor-pointer px-3 py-2 text-base font-medium"
-            : "min-h-12 cursor-pointer px-4 py-3 text-lg font-semibold"
-        }
-      >
-        {summary}
-      </summary>
-      <div className={nested ? "px-3 pb-3" : "px-4 pb-4"}>{children}</div>
-    </details>
+      {children}
+    </SharedDisclosure>
   );
 }
 
 /** REQ-027 D-2716, D-2718: a row step 5 did not ask about carries no tag, on both lists; a value the table lacks renders nothing too. */
+const HAVE_VARIANT: Record<string, TagVariant> = {
+  yes: "done",
+  no: "need",
+  "not-sure": "doing",
+};
+
 function HaveTag({ have }: { have: string }) {
   const t = HAVE_TAG[have as keyof typeof HAVE_TAG];
   if (!t) return null;
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.tone}`}
-      data-testid="have-tag"
-    >
-      <span aria-hidden="true">{t.icon}</span>
+    <Tag variant={HAVE_VARIANT[have] ?? "neutral"} testId="have-tag">
       {t.label}
-    </span>
+    </Tag>
   );
 }
 
@@ -443,14 +429,14 @@ function ResultView({
       >
         {r.flags.silExcluded ? (
           <p
-            className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6"
+            className="border-line bg-mist mt-2 rounded-md border p-4 text-sm leading-6"
             data-testid="sil-excluded"
           >
             {SIL_EXCLUDED_TEXT}
           </p>
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
-          <p className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6">
+          <p className="border-line bg-mist mt-2 rounded-md border p-4 text-sm leading-6">
             {RP_ASSUMED_TEXT}
           </p>
         ) : null}
@@ -494,7 +480,7 @@ function ResultView({
           {r.modules.map((m) => (
             <li
               key={m.id}
-              className="border-rule rounded-md border p-3"
+              className="border-rule rounded-md border p-4"
               data-testid={`module-${m.id}`}
             >
               <p className="text-base font-medium">

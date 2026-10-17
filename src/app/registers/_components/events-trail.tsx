@@ -9,7 +9,7 @@ import {
   addComplaintNoteAction,
   addIncidentNoteAction,
 } from "@/server/registers/actions";
-import { SafeTextArea } from "./inputs";
+import { RegisterParticipantLine, SafeTextArea } from "./inputs";
 
 /**
  * The append-only trail under an incident or complaint (REQ-009 FR-5):
@@ -112,6 +112,7 @@ export function EventsTrail({
       {canWrite ? (
         open ? (
           <form onSubmit={onSubmit} noValidate className="mt-3">
+            <RegisterParticipantLine />
             <SafeTextArea
               id="event-note"
               label="Note"
