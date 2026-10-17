@@ -9,6 +9,8 @@ import { signOut } from "@/server/auth/actions";
 import { listComplaints, listIncidents } from "@/server/registers/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { WorkerNotice } from "./worker-notice";
+import { WorkerStepsList } from "./worker-steps-list";
+import { loadWorkerSteps } from "@/server/registers/worker-steps";
 
 export const metadata: Metadata = {
   title: "Your entries",
@@ -35,9 +37,11 @@ export default async function WorkerHome() {
       </PageShell>
     );
   const supabase = await createSupabaseServerClient();
-  const [incidents, complaints] = await Promise.all([
+  const [incidents, complaints, steps] = await Promise.all([
     listIncidents(supabase, viewer.worker.id),
     listComplaints(supabase, viewer.worker.id),
+    // REQ-024 Session B (FR-7, FR-9): the worker's own steps are the first screen after the notice.
+    loadWorkerSteps(supabase, viewer.worker),
   ]);
   return (
     <PageShell kind="list">
@@ -64,6 +68,25 @@ export default async function WorkerHome() {
           Log a complaint
         </Link>
       </div>
+
+      {steps.row ? (
+        <WorkerStepsList
+          items={steps.items}
+          states={steps.states}
+          screening={steps.screening}
+          acknowledgements={steps.acknowledgements}
+          adopted={[...steps.adopted.entries()]}
+          today={steps.today}
+        />
+      ) : (
+        <p
+          className="text-slate mt-8 text-sm leading-7"
+          data-testid="worker-steps-none"
+        >
+          Your onboarding steps appear here once your manager has added you to
+          the staff list under your code.
+        </p>
+      )}
 
       <section
         aria-labelledby="mine-heading"

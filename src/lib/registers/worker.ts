@@ -45,10 +45,11 @@ export const REPORT_ACCOUNT_LIMIT = {
 } as const;
 
 export const EMERGENCY_LINE = "If someone is in danger now, call 000 first.";
+// REQ-024 FR-7: the role's sentence names the onboarding too, here and in the invitation.
 export const WORKER_HOME_LINE =
-  "You can log incidents and complaints and see what you logged. Your manager sees everything else.";
+  "You can log incidents and complaints and complete your onboarding here, and see what you logged. Your manager sees everything else.";
 export const INVITE_LINE =
-  "A worker can log incidents and complaints and see what they logged. They cannot see the other registers, the documents, the account or any export.";
+  "A worker can log incidents and complaints and complete their onboarding, and see what they logged. They cannot see the other registers, the documents, the account or any export.";
 export const REPORT_THANKS =
   "Thank you. The owner has been told and will confirm it. If someone is in danger now, call 000.";
 

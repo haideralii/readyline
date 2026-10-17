@@ -40,6 +40,7 @@ export function WorkerItems({
   items,
   states,
   ticks,
+  actorRoles,
   derived,
   canWrite,
   today,
@@ -48,6 +49,8 @@ export function WorkerItems({
   items: WorkerOnboardingItem[];
   states: OnboardingItemRow[];
   ticks: OnboardingTickRow[];
+  /** REQ-024 FR-8 (D-2444): the role of each tick's actor from memberships, keyed by user id. */
+  actorRoles?: Record<string, string>;
   derived: WorkerState;
   canWrite: boolean;
   today: string;
@@ -195,7 +198,7 @@ export function WorkerItems({
                       {s.done_on ? `Done ${s.done_on}` : "Not yet done"}
                       {s.recorded_by_owner ? " (recorded by your manager)" : ""}
                       {s.confirmed_on
-                        ? `; confirmed ${s.confirmed_on}${t ? ` by ${t.ticked_by_ref}` : ""}.`
+                        ? `; confirmed ${s.confirmed_on}${t ? ` by ${t.ticked_by_ref}${t.actor_user_id && actorRoles?.[t.actor_user_id] ? ` (${actorRoles[t.actor_user_id]})` : ""}` : ""}.`
                         : "; waiting for your confirmation."}
                     </p>
                   ) : null}
