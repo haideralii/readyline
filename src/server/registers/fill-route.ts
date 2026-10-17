@@ -11,20 +11,17 @@ import "server-only";
  * 123). Nothing is written anywhere.
  */
 import { NextResponse } from "next/server";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { BRAND } from "@/lib/brand";
 import { log } from "@/lib/logging/logger";
 import {
   EXPORT_SCREEN_PATH,
-  FILL_CLEAR_MS,
   FILL_COPY,
   FILL_LIMITS,
   parseFill,
   type FillKind,
 } from "@/lib/registers/fill";
+import { refusalFormHtml } from "@/lib/registers/fill-html";
 import type { WorkerFill } from "@/lib/registers/worker-exports";
-import { FillFormFields } from "@/app/registers/_components/fill-form";
 import { parseInput, type strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import { checkFillAllowed } from "@/server/auth/rate-limit";
@@ -67,10 +64,7 @@ export function rawFillValues(form: FormData): {
   return { fill, told, asAt, values };
 }
 
-const esc = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
-/** The refused submission's page: the form again, the message, a clean screen after ten minutes (no script, so no nonce). */
+/** The refused submission's page (finding 76): the pure builder, with the brand for its title. */
 export function refusalHtml(input: {
   message: string;
   codes: readonly string[];
@@ -78,34 +72,7 @@ export function refusalHtml(input: {
   supervisorRefs: readonly string[];
   state: ReturnType<typeof rawFillValues>;
 }): string {
-  const form = renderToStaticMarkup(
-    createElement(FillFormFields, {
-      codes: input.codes,
-      pastCodes: input.pastCodes,
-      supervisorRefs: input.supervisorRefs,
-      assessorDefault: "",
-      state: input.state,
-      message: input.message,
-    }),
-  );
-  const seconds = Math.round(FILL_CLEAR_MS / 1000);
-  return `<!doctype html>
-<html lang="en-AU">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<meta http-equiv="refresh" content="${seconds}; url=${EXPORT_SCREEN_PATH}">
-<title>${esc(BRAND)}: the file was not built</title>
-</head>
-<body>
-<main style="max-width:48rem;margin:0 auto;padding:1rem;font-family:system-ui,sans-serif;line-height:1.5">
-<p><a href="${EXPORT_SCREEN_PATH}">&lsaquo; Worker files and the two Rules lists</a></p>
-<h1>The file was not built</h1>
-<form method="post" enctype="multipart/form-data" autocomplete="off">${form}</form>
-</main>
-</body>
-</html>`;
+  return refusalFormHtml({ brand: BRAND, ...input });
 }
 
 async function codesFor(
