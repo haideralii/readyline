@@ -9,7 +9,11 @@
  */
 import { z } from "zod";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
-import { CommissionChangeForm, CorporateRiskForm } from "./audit-day-forms";
+import {
+  CommissionChangeForm,
+  CorporateRiskForm,
+  StaffMatrixForm,
+} from "./audit-day-forms";
 import { ComplaintForm, IncidentForm, WorkerCheckForm } from "./forms";
 
 export const IMPORT_REGISTERS = [
@@ -19,6 +23,8 @@ export const IMPORT_REGISTERS = [
   "corporate_risks",
   // REQ-023 FR-10 (Session D).
   "commission_changes",
+  // REQ-024 Session C (FR-13; D-2285): the staff matrix with its A1 columns; items are derived after the import, never imported.
+  "staff_matrix",
 ] as const;
 export type ImportRegister = (typeof IMPORT_REGISTERS)[number];
 
@@ -29,6 +35,7 @@ export const IMPORT_SLUGS: Record<ImportRegister, string> = {
   worker_clearances: "worker-checks",
   corporate_risks: "corporate-risks",
   commission_changes: "commission-changes",
+  staff_matrix: "staff-matrix",
 };
 
 export const IMPORT_LIMITS = {
@@ -42,6 +49,9 @@ export const IMPORT_LIMITS = {
 
 export const MOST_ROWS_FAILED =
   "Most rows did not pass; check the column names against the template";
+/** REQ-024 FR-13: a worker code once per file (the register keys on it). */
+export const DUPLICATE_CODE_IN_FILE =
+  "this worker code is on an earlier row of the file";
 
 /** The columns a file carries, by register: our export's names, minus what the system fills (references, computed dates, timestamps). */
 export const IMPORT_COLUMNS: Record<ImportRegister, readonly string[]> = {
@@ -91,6 +101,24 @@ export const IMPORT_COLUMNS: Record<ImportRegister, readonly string[]> = {
     "owner_role",
     "review_on",
   ],
+  // REQ-024 FR-13 (D-2830): the export's columns minus what the system fills (role_ref, risk_assessed_from); states as "NSW;VIC" or "NSW,VIC"; note and qualifications imported, capped and refused on a participant shape.
+  staff_matrix: [
+    "worker_ref",
+    "role",
+    "role_label",
+    "states",
+    "risk_assessed",
+    "risk_paragraph",
+    "works_with_children",
+    "may_use_restrictive_practice",
+    "started_on",
+    "ended_on",
+    "qualifications",
+    "last_supervision_on",
+    "last_appraisal_on",
+    "onboarding_signed_on",
+    "note",
+  ],
   // REQ-023 FR-10: the register's own columns, less the code and the timestamps the system fills.
   commission_changes: [
     "kind",
@@ -116,6 +144,17 @@ const FREE_TEXT: Record<ImportRegister, readonly string[]> = {
   corporate_risks: ["what_could_happen", "controls", "owner_role"],
   // REQ-023 SR-1: the refusal rule applies to both fields.
   commission_changes: ["commission_reference", "note"],
+  staff_matrix: ["role_label", "qualifications", "note"],
+};
+
+/**
+ * REQ-024 FR-13 (D-2285): a role title or a qualification reads like a name
+ * to the detector's capitalised-words rule ("Cert III Individual Support"),
+ * so those two columns are read for a date of birth, an NDIS number, an
+ * address and health words alone; the note is read for everything.
+ */
+const NAME_RULE_OFF: Partial<Record<ImportRegister, readonly string[]>> = {
+  staff_matrix: ["role_label", "qualifications"],
 };
 
 /** The empty template: the header row only. */
@@ -251,6 +290,26 @@ function toFormValues(
       return Object.fromEntries(
         IMPORT_COLUMNS.commission_changes.map((c) => [c, s(c)]),
       );
+    case "staff_matrix":
+      return {
+        worker_ref: s("worker_ref"),
+        role: s("role"),
+        role_label: s("role_label"),
+        qualifications: s("qualifications"),
+        risk_assessed: bool(s("risk_assessed")),
+        risk_paragraph: s("risk_paragraph"),
+        // The export writes the array as "NSW,VIC"; a spreadsheet may give "NSW;VIC" or "NSW VIC".
+        states: s("states").replace(/[;\s]+/g, ","),
+        works_with_children: bool(s("works_with_children")),
+        may_use_restrictive_practice: bool(s("may_use_restrictive_practice")),
+        is_me: false,
+        started_on: s("started_on"),
+        ended_on: s("ended_on"),
+        last_supervision_on: s("last_supervision_on"),
+        last_appraisal_on: s("last_appraisal_on"),
+        onboarding_signed_on: s("onboarding_signed_on"),
+        note: s("note"),
+      };
   }
 }
 
@@ -305,6 +364,14 @@ function toRow(
       return { ...v };
     case "commission_changes":
       return { ...v };
+    case "staff_matrix": {
+      // "This row is me" is the form's alone (FR-1); the import links nobody.
+      const { is_me: _isMe, ...row } = v as Record<string, unknown> & {
+        is_me?: boolean;
+      };
+      void _isMe;
+      return row;
+    }
   }
 }
 
@@ -314,6 +381,7 @@ const SCHEMAS: Record<ImportRegister, z.ZodType> = {
   worker_clearances: WorkerCheckForm,
   corporate_risks: CorporateRiskForm,
   commission_changes: CommissionChangeForm,
+  staff_matrix: StaffMatrixForm,
 };
 
 const LABEL_COLUMN: Record<ImportRegister, string> = {
@@ -322,6 +390,7 @@ const LABEL_COLUMN: Record<ImportRegister, string> = {
   worker_clearances: "worker_ref",
   corporate_risks: "area",
   commission_changes: "change_type",
+  staff_matrix: "worker_ref",
 };
 
 /** The form field a CSV column maps to, for the reasons list. */
@@ -366,6 +435,7 @@ export function previewImport(
       ok: false,
       message: `The file has ${data.length} rows; the limit is ${IMPORT_LIMITS.rows}. Split it and try again.`,
     };
+  const seenCodes = new Set<string>();
   const rows: ImportRowResult[] = data.map((cellsArray, i) => {
     const cells: Record<string, string> = {};
     header.forEach((h, j) => {
@@ -373,6 +443,16 @@ export function previewImport(
     });
     const values = toFormValues(register, cells);
     const reasons: string[] = [];
+    // FR-13: the staff matrix keys on the code, so a code twice in one file fails its second row here rather than the whole insert.
+    if (register === "staff_matrix") {
+      const code = (cells.worker_ref ?? "")
+        .trim()
+        .toUpperCase()
+        .replace(/^W-?/, "W-");
+      if (code && seenCodes.has(code))
+        reasons.push(`worker_ref: ${DUPLICATE_CODE_IN_FILE}`);
+      seenCodes.add(code);
+    }
     const result = SCHEMAS[register].safeParse(values);
     if (!result.success)
       for (const issue of result.error.issues)
@@ -381,7 +461,13 @@ export function previewImport(
         );
     for (const col of FREE_TEXT[register]) {
       const value = cells[col] ?? "";
-      if (value && detectParticipantData(value).length > 0)
+      const namesOff = NAME_RULE_OFF[register]?.includes(col) ?? false;
+      const hits = value
+        ? detectParticipantData(value).filter(
+            (w) => !(namesOff && w.kind === "name"),
+          )
+        : [];
+      if (hits.length > 0)
         reasons.push(
           `${col}: looks like a name, a date of birth, an NDIS number or an address; use a code`,
         );

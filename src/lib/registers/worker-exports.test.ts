@@ -6,6 +6,7 @@ import type {
   RiskAssessedRoleRow,
   ScreeningExceptionRow,
   StaffMatrixRow,
+  SupervisionEntryRow,
 } from "./audit-day-types";
 import { CSV_COLUMNS, toCsv } from "./csv";
 import type { WorkerOnboardingItem } from "./onboarding-items";
@@ -143,6 +144,7 @@ function snapshot(
     clearances: [],
     roles: [],
     exceptions: [],
+    entries: [],
     events: [],
     states: new Map(),
     itemsByRef: new Map(),
@@ -181,12 +183,48 @@ describe("the s 20 reconstruction (AC-13)", () => {
       (r) => r.worker_ref,
     );
 
-  it("lists the workers in a risk assessed role on each day the REQ names", () => {
+  it("lists the workers in a risk assessed role on each day the REQ names; an ended worker stays listed after the end with the date (D-2287)", () => {
     expect(listed("2025-01-15")).toEqual(["W-002", "W-003"]);
     expect(listed("2025-03-02")).toEqual(["W-002", "W-003", "W-005"]);
-    expect(listed("2025-07-01")).toEqual(["W-003", "W-005"]);
+    // AC-13 as written left W-002 off the day after the end; AC-10 keeps a past worker on the list with the end date (PO 06:35), so the later rule wins here.
+    expect(listed("2025-07-01")).toEqual(["W-002", "W-003", "W-005"]);
+    const ended = screeningListRows(
+      snapshot({ asAt: "2025-07-01", rows: [w2, w3, w5], events }),
+    ).find((r) => r.worker_ref === "W-002");
+    expect(ended?.ended_on).toBe("2025-06-30");
     expect(listed("2024-02-28")).toEqual([]);
     expect(listed("2025-02-01")).toEqual(["W-002", "W-003"]);
+  });
+
+  it("a worker reclassified out of a risk role and still current is off the list from that day; a worker who ended before ever holding one is never on it", () => {
+    const out = staff("W-011", {
+      risk_assessed: false,
+      risk_assessed_from: null,
+      started_on: "2024-01-01",
+    });
+    const change = [
+      event(
+        out.id,
+        "role-changed",
+        "from=support-worker to=admin on=2025-05-01",
+        "2025-05-01T00:00:00Z",
+      ),
+      event(
+        out.id,
+        "role-changed",
+        "from=admin to=support-worker on=2024-01-01",
+        "2024-01-01T00:00:00Z",
+      ),
+    ];
+    const on = (asAt: string) => onScreeningList(out, change, asAt);
+    expect(on("2025-04-30")).toBe(true);
+    expect(on("2025-05-02")).toBe(false);
+    const never = staff("W-012", {
+      risk_assessed: false,
+      risk_assessed_from: null,
+      ended_on: "2025-01-01",
+    });
+    expect(onScreeningList(never, [], "2025-06-01")).toBe(false);
   });
 
   it("reads the fixed note and nothing looser", () => {
@@ -489,6 +527,21 @@ describe("the pack's worker files (AC-5, finding 114)", () => {
     const s = snapshot({
       rows: [staff("W-001"), staff("W-002", { ended_on: "2026-06-30" })],
       clearances: [clearance("W-001")],
+      // REQ-024 C (FR-11): an entry rides the worker file in the pinned columns, for the owner's pack and the link's alike.
+      entries: [
+        {
+          id: "e-1",
+          account_id: ACC,
+          worker_ref: "W-001",
+          kind: "supervision",
+          held_on: "2026-09-01",
+          by_ref: "KP-1",
+          note: "Covered the roster.",
+          outcome: null,
+          created_at: "2026-09-01T00:00:00Z",
+          updated_at: "2026-09-01T00:00:00Z",
+        },
+      ],
       roles: [
         {
           id: "r-1",
@@ -528,5 +581,82 @@ describe("the pack's worker files (AC-5, finding 114)", () => {
     }
     expect(files["screening-list-2026-10-17.csv"]).toContain("WWC1234567");
     expect(files["screening-list-2026-10-17.csv"]).not.toContain("[Full name]");
+    expect(files["workers/W-001.csv"]).toContain(
+      "supervision,supervision,,KP-1,,2026-09-01",
+    );
+    expect(files["workers/W-002.csv"]).not.toContain("supervision,");
+  });
+});
+
+describe("the supervision entries in a worker's file (REQ-024 C, FR-11, AC-9)", () => {
+  const entry = (
+    id: string,
+    extra: Partial<SupervisionEntryRow>,
+  ): SupervisionEntryRow => ({
+    id,
+    account_id: ACC,
+    worker_ref: "W-003",
+    kind: "supervision",
+    held_on: "2026-09-01",
+    by_ref: "KP-1",
+    note: "Covered the roster.",
+    outcome: null,
+    created_at: "2026-09-01T00:00:00Z",
+    updated_at: "2026-09-01T00:00:00Z",
+    ...extra,
+  });
+  const w3 = staff("W-003", { last_supervision_on: "2026-10-05" });
+  const s = snapshot({
+    rows: [w3, staff("W-004")],
+    entries: [
+      entry("e1", {}),
+      entry("e2", {
+        kind: "probation-review",
+        held_on: "2026-10-05",
+        by_ref: "W-002",
+        note: "",
+        outcome: "continued",
+      }),
+      entry("e3", { worker_ref: "W-004", held_on: "2026-10-02" }),
+    ],
+    events: [
+      event(
+        "e2",
+        "created",
+        "probation-review on 2026-10-05 by W-002",
+        "2026-10-05T03:00:00Z",
+        "supervision_entries",
+      ),
+    ],
+  });
+
+  it("both entries appear with kind, date and supervisor code, oldest first, and the row's date is the later one", () => {
+    const rows = workerFileRows(s, "W-003").filter(
+      (r) => r.kind === "supervision",
+    );
+    expect(
+      rows.map((r) => [r.item_id, r.done_on, r.who, r.state, r.note]),
+    ).toEqual([
+      ["supervision", "2026-09-01", "KP-1", "", "Covered the roster."],
+      ["probation-review", "2026-10-05", "W-002", "continued", ""],
+    ]);
+    expect(w3.last_supervision_on).toBe("2026-10-05");
+    // The other worker's entry stays in the other worker's file.
+    expect(
+      workerFileRows(s, "W-004").filter((r) => r.kind === "supervision"),
+    ).toHaveLength(1);
+  });
+
+  it("the entries' trail lines join the worker's file and the columns stay the pinned list", () => {
+    const rows = workerFileRows(s, "W-003");
+    expect(rows.filter((r) => r.kind === "event").map((r) => r.event)).toEqual([
+      "supervision_entries: created",
+    ]);
+    for (const r of rows)
+      expect(Object.keys(r).sort()).toEqual(
+        [...CSV_COLUMNS.worker_file].sort(),
+      );
+    const files = packWorkerFiles(s, "2026-10-18");
+    expect(files["workers/W-003.csv"]).toContain("probation-review,");
   });
 });

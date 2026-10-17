@@ -203,7 +203,22 @@ export const CSV_COLUMNS = {
     "exception_supervisor_ref",
     "exception_part4",
   ],
-  // FR-6: one worker file, items, clearances, exceptions and the trail as rows of one table.
+  // REQ-024 B and C (FR-6c, FR-11): the acknowledgements and the supervision history, codes and dates.
+  policy_acknowledgements: [
+    "worker_ref",
+    "document_type_id",
+    "version",
+    "acknowledged_on",
+  ],
+  supervision_entries: [
+    "worker_ref",
+    "kind",
+    "held_on",
+    "by_ref",
+    "outcome",
+    "note",
+  ],
+  // FR-6: one worker file, items, clearances, exceptions, supervision entries and the trail as rows of one table.
   worker_file: [
     "kind",
     "item_id",

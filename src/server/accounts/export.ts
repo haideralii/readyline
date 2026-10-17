@@ -13,10 +13,9 @@ import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
  * REQ-024 FR-6c (D-2415; SR-8(m)): the worker tables the export carries as
  * CSV, every one the product holds about workers, read with the owner's
  * session under RLS and regardless of the subscription's state (the gate
- * applies to writes and the fill, never to reads or to this export). The
- * REQ's `supervision_entries` and `policy_acknowledgements` are not
- * tables: supervision is the staff row's dates and the W-8 item,
- * acknowledgements are items W-3 and W-6 (D-2273).
+ * applies to writes and the fill, never to reads or to this export).
+ * Session B added `policy_acknowledgements` and Session C
+ * `supervision_entries`, so both are here (FR-6c names the seven).
  */
 export const WORKER_EXPORT_TABLES = [
   "staff_matrix",
@@ -26,6 +25,8 @@ export const WORKER_EXPORT_TABLES = [
   "worker_clearances",
   "risk_assessed_roles",
   "screening_exceptions",
+  "policy_acknowledgements",
+  "supervision_entries",
 ] as const;
 export type WorkerExportTable = (typeof WORKER_EXPORT_TABLES)[number];
 

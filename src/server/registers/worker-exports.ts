@@ -13,11 +13,13 @@ import type {
   OnboardingItemRow,
   ScreeningExceptionRow,
   StaffMatrixRow,
+  SupervisionEntryRow,
 } from "@/lib/registers/audit-day-types";
 import {
   workerOnboardingItems,
   type WorkerOnboardingItem,
 } from "@/lib/registers/onboarding-items";
+import { inPeriod, type Period } from "@/lib/registers/period";
 import { STATE_FILE } from "@/lib/registers/state-facts";
 import type { WorkerClearanceRow } from "@/lib/registers/types";
 import type { WorkerExportSnapshot } from "@/lib/registers/worker-exports";
@@ -53,7 +55,12 @@ export function part4SectionFor(state: string): string | null {
 export async function loadWorkerExportSnapshot(
   supabase: SupabaseClient,
   accountId: string,
-  input: { today: string; asAt?: string },
+  input: {
+    today: string;
+    asAt?: string;
+    /** REQ-024 Session C (D-2832): the pack's period filters the supervision entries; items, ticks and states stay the whole register's. */
+    period?: Period;
+  },
 ): Promise<WorkerExportSnapshot> {
   const [
     rows,
@@ -62,6 +69,7 @@ export async function loadWorkerExportSnapshot(
     clearances,
     roles,
     exceptions,
+    entries,
     events,
     moduleIds,
     ownerRef,
@@ -84,6 +92,11 @@ export async function loadWorkerExportSnapshot(
       .select("*")
       .eq("account_id", accountId)
       .order("started_on", { ascending: true }),
+    supabase
+      .from("supervision_entries")
+      .select("*")
+      .eq("account_id", accountId)
+      .order("held_on", { ascending: true }),
     listAccountRegisterEvents(supabase, accountId),
     accountModuleIds(supabase, accountId),
     ownerRefForAccount(supabase, accountId),
@@ -108,6 +121,9 @@ export async function loadWorkerExportSnapshot(
     clearances: (clearances.data as WorkerClearanceRow[] | null) ?? [],
     roles,
     exceptions: (exceptions.data as ScreeningExceptionRow[] | null) ?? [],
+    entries: ((entries.data as SupervisionEntryRow[] | null) ?? []).filter(
+      (e) => !input.period || inPeriod(e.held_on, input.period),
+    ),
     events,
     states,
     itemsByRef,

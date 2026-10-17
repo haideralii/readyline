@@ -448,7 +448,18 @@ function ChecklistRow({
         data-testid={`checklist-row-${b}`}
       >
         {/* REQ-013 batch 36 item 2: the evidence-confidence flag is for the admin view, never the customer. */}
-        <span className="min-w-0 text-base font-medium">{item.title}</span>
+        <span className="min-w-0">
+          <span className="text-base font-medium">{item.title}</span>
+          {item.derived ? (
+            // REQ-024 Session C (FR-10; D-2831): where a derived status came from.
+            <span
+              className="text-slate block text-sm leading-6"
+              data-testid={`checklist-derived-${b}`}
+            >
+              {item.derived}
+            </span>
+          ) : null}
+        </span>
         <span className="flex shrink-0 items-center gap-2">
           <StatusTag status={status} />
           <span aria-hidden="true" className="text-slate">
