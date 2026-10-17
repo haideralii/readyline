@@ -27,6 +27,7 @@ export function accountDeletedEmail(input: {
 }): EmailMessage {
   return {
     to: input.to,
+    template: "account-deleted",
     subject: `${BRAND}: your account was deleted`,
     text: [
       `Your ${BRAND} account for ${input.tradingName} was deleted on ${formatDateAu(input.deletedAt)}.`,
@@ -46,6 +47,7 @@ export function documentsReadyEmail(input: {
 }): EmailMessage {
   return {
     to: input.to,
+    template: "documents-ready",
     subject: `${BRAND}: your documents are ready`,
     text: [
       `The document set for ${input.tradingName} is ready to download.`,
@@ -74,6 +76,7 @@ export function workerInvitationEmail(input: {
 }): EmailMessage {
   return {
     to: input.to,
+    template: "worker-invitation",
     subject: `${input.tradingName} has invited you to log incidents and complaints in ${BRAND}`,
     text: [
       `${input.tradingName} has invited you, as worker ${input.workerRef}, to log incidents and complaints in ${BRAND}.`,
@@ -97,6 +100,7 @@ export function reportToConfirmEmail(input: {
   const line = `${input.count} ${input.count === 1 ? "report is" : "reports are"} waiting for you to confirm`;
   return {
     to: input.to,
+    template: "report-to-confirm",
     subject: `${BRAND}: ${line}`,
     text: [
       `${line} for ${input.tradingName}.`,
@@ -117,9 +121,12 @@ export function remindersEmail(input: {
   lines: string[];
   /** REQ-023 FR-3: true when a timeline line is among them; the fixed sentence and the account-page pointer follow once (finding 56). */
   registration?: boolean;
+  /** REQ-022 FR-7, SR-6: the one-click unsubscribe link for this account (the reminders alone carry it). */
+  unsubscribeUrl?: string;
 }): EmailMessage {
   return {
     to: input.to,
+    template: "reminders",
     subject: `${BRAND}: ${input.lines.length === 1 ? "a register reminder" : `${input.lines.length} register reminders`}`,
     text: [
       `Reminders for ${input.tradingName}:`,
@@ -135,6 +142,9 @@ export function remindersEmail(input: {
         : []),
       "Sign in and open Registers to update them.",
       "",
+      ...(input.unsubscribeUrl
+        ? [`To stop these reminder emails: ${input.unsubscribeUrl}`, ""]
+        : []),
       SIGN_OFF,
     ].join("\n"),
   };
@@ -147,11 +157,28 @@ export function accountPurgedEmail(input: {
 }): EmailMessage {
   return {
     to: input.to,
+    template: "account-purged",
     subject: `${BRAND}: your data has been permanently removed`,
     text: [
       `The data held for ${input.tradingName} was permanently removed from ${BRAND} on ${formatDateAu(input.purgedAt)}.`,
       "",
       "This is the last message you will receive about this account.",
+      "",
+      SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
+/** REQ-022 FR-6: the admin's own test send from /admin/launch; the footer line and nothing about any account. */
+export function testEmail(input: { to: string }): EmailMessage {
+  return {
+    to: input.to,
+    template: "test",
+    subject: `${BRAND}: a test email from the launch page`,
+    text: [
+      `This is the test email from ${BRAND}'s launch page. If you are reading it, the sender, the SMTP values and the domain's records work together.`,
+      "",
+      "Nothing else was sent and no account is involved.",
       "",
       SIGN_OFF,
     ].join("\n"),

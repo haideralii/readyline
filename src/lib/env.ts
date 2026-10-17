@@ -106,6 +106,19 @@ export const OPTIONAL: ReadonlyArray<{
     from: "D-059 (the app starts the kicker workflow when work exists)",
     without: "the thirty-minute schedule picks jobs up instead",
   },
+  // REQ-022 Session B (D-2822): plain SMTP; every name or none.
+  ...[
+    "EMAIL_PROVIDER",
+    "EMAIL_FROM",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+  ].map((name) => ({
+    name,
+    from: "REQ-022 Session B (EMAIL_PROVIDER=smtp with the five SMTP values; D-2822)",
+    without: "email only logs, with the address hashed",
+  })),
 ];
 
 /**

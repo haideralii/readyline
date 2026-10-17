@@ -128,6 +128,45 @@ test.describe("the launch switchboard (REQ-022 FR-1)", () => {
     expect(audit.data?.length).toBeGreaterThanOrEqual(1);
   });
 
+  test("the test send goes to the admin alone through the log provider, turns its row green and refuses a second press within a minute (REQ-022 FR-6, SR-2)", async ({
+    page,
+    context,
+    baseURL,
+  }, testInfo) => {
+    // D-2825: the email.test-sent audit line is one per stack and the one-a-minute rule is real, so three
+    // projects pressing in turn cannot all succeed; this case runs on desktop-chromium alone, and the
+    // switchboard's rendering at the phone widths stays under the page's other cases.
+    test.skip(
+      testInfo.project.name !== "desktop-chromium",
+      "D-2825: the test send runs on desktop-chromium alone (one audit line per stack, one press a minute)",
+    );
+    await signInContext(context, admin, baseURL!);
+    await page.goto("/admin/launch");
+    await expect(
+      page.getByTestId("launch-row-email-test-send"),
+    ).toHaveAttribute("data-state", "unset");
+    await page.getByTestId("test-send-button").click();
+    await expect(page.getByTestId("test-send-result")).toContainText(
+      /Sent through the log-only provider/,
+    );
+    await page.getByTestId("test-send-button").click();
+    await expect(page.getByTestId("test-send-result")).toContainText(
+      /One test email a minute/,
+    );
+    await page.reload();
+    await expect(
+      page.getByTestId("launch-row-email-test-send"),
+    ).toHaveAttribute("data-state", "set");
+    expect((await page.content()).includes(admin.email)).toBe(false);
+    const audit = await admin.admin
+      .from("audit_log")
+      .select("action, target")
+      .eq("actor_user_id", admin.userId)
+      .eq("action", "email.test-sent");
+    expect(audit.data).toHaveLength(1);
+    expect(audit.data?.[0]?.target).toBe("log-only");
+  });
+
   test("a signed-in customer who is not a platform admin gets 404", async ({
     page,
     context,
