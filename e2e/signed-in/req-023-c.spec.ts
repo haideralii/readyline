@@ -356,6 +356,8 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
         account_id: tenant.accountId,
         token_hash: hashAuditorToken(plain),
         expires_at: new Date(Date.now() + 3_600_000).toISOString(),
+        // One bulk insert sends every key of every row, so the unticked row says false itself; left out, it would be sent as null (23502).
+        include_rehearsal: false,
       },
       {
         account_id: tenant.accountId,
