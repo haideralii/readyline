@@ -543,6 +543,54 @@ describe.skipIf(!enabled)(
       ).toEqual(rows);
     });
 
+    it("a recorded day is the Sydney day: reported_on by default and through the report link (D-2272 as amended)", async () => {
+      const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Australia/Sydney",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+      // The owner's form sends reported_on; a row without it takes the day the product keeps.
+      const row = incident(a.accountId) as Record<string, unknown>;
+      delete row.reported_on;
+      row.occurred_on = today;
+      const ins = await a.client
+        .from("incidents")
+        .insert(row)
+        .select("reported_on")
+        .single();
+      expect(ins.error).toBeNull();
+      expect(ins.data?.reported_on).toBe(today);
+      // The report link's function writes reported_on and aware_on itself.
+      const hash = randomUUID().replace(/-/g, "").padEnd(64, "0");
+      const link = await admin
+        .from("report_links")
+        .insert({ account_id: a.accountId, token_hash: hash })
+        .select("id")
+        .single();
+      expect(link.error).toBeNull();
+      const reported = await admin.rpc("submit_incident_report", {
+        p_token_hash: hash,
+        p_occurred_on: today,
+        p_category: "near-miss",
+        p_severity: "low",
+        p_participant_ref: "P-014",
+        p_worker_ref: "",
+        p_summary: "Near miss on the stairs; no harm.",
+        p_actions_taken: "",
+        p_reporter: "support worker",
+      });
+      expect(reported.error).toBeNull();
+      const id = (reported.data as { incident_id: string }[])[0].incident_id;
+      const read = await admin
+        .from("incidents")
+        .select("reported_on, aware_on")
+        .eq("id", id)
+        .single();
+      expect(read.error).toBeNull();
+      expect(read.data).toEqual({ reported_on: today, aware_on: today });
+    });
+
     it("accounts take a registration date and kind, and only the two kinds", async () => {
       const ok = await a.client
         .from("accounts")
