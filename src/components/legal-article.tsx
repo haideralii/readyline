@@ -4,6 +4,64 @@ import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { draftNote, formatUpdated, type LegalPage } from "@/lib/legal/pages";
 import { DataTable } from "./data-table";
+import { JumpTo, type JumpToItem } from "./jump-to";
+import { PageShell } from "./page-shell";
+
+/** A markdown syntax-tree node, as far as the plugin below reads it. */
+type MdNode = {
+  type: string;
+  value?: string;
+  children?: MdNode[];
+  data?: { hProperties?: Record<string, unknown> };
+};
+function mdText(n: MdNode): string {
+  return n.value ?? (n.children ?? []).map(mdText).join("");
+}
+
+/**
+ * REQ-028 QA F10: a remark plugin that tells each table the heading it sits
+ * under (and its number under that heading), so DataTable can name its
+ * region by the heading and two tables with the same columns stop sharing
+ * one name (axe `landmark-unique` on the registers guide). The values ride
+ * on `data.hProperties`, which react-markdown hands to the `table`
+ * renderer as `node.properties`.
+ */
+export function tableHeadings() {
+  return (tree: MdNode) => {
+    let heading = "";
+    let n = 0;
+    const walk = (node: MdNode) => {
+      if (node.type === "heading") {
+        heading = mdText(node);
+        n = 0;
+      }
+      if (node.type === "table") {
+        n += 1;
+        node.data = {
+          ...(node.data ?? {}),
+          hProperties: {
+            ...(node.data?.hProperties ?? {}),
+            dataHeading: heading,
+            dataTableIndex: String(n),
+          },
+        };
+      }
+      for (const c of node.children ?? []) walk(c);
+    };
+    walk(tree);
+  };
+}
+
+/** The remark plugins every markdown render site uses (the legal pages, the guides). */
+export const markdownPlugins = [remarkGfm, tableHeadings];
+
+/** REQ-028 FR-11: the "## " headings of a legal page's markdown, with the ids the renderer gives them, for the aside's "Jump to". */
+export function legalHeadings(markdown: string): JumpToItem[] {
+  return [...markdown.matchAll(/^## (.+?)\s*$/gm)].map((m) => ({
+    id: slugify(m[1]),
+    text: m[1],
+  }));
+}
 
 /** A markdown table's header and body cells as text, from the hast node react-markdown passes to `table`. */
 type Hast = {
@@ -60,12 +118,12 @@ const body = "leading-7 text-ink ";
 /** The markdown renderers; the guides (REQ-011) reuse them so every page reads the same. */
 export const markdownComponents: Components = {
   h2: ({ children }) => (
-    <h2 id={slugify(textOf(children))} className="mt-10">
+    <h2 id={slugify(textOf(children))} className="mt-10 scroll-mt-24">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 id={slugify(textOf(children))} className="mt-6">
+    <h3 id={slugify(textOf(children))} className="mt-6 scroll-mt-24">
       {children}
     </h3>
   ),
@@ -92,7 +150,18 @@ export const markdownComponents: Components = {
   // 1, D-1508) inside DataTable.
   table: ({ node }) => {
     const { columns, rows } = tableFromNode(node);
-    return columns.length ? <DataTable columns={columns} rows={rows} /> : null;
+    // REQ-028 QA F10: the region's name from the heading the table sits under (tableHeadings above).
+    const props = (node as { properties?: Record<string, unknown> } | undefined)
+      ?.properties;
+    const heading =
+      typeof props?.dataHeading === "string" ? props.dataHeading : "";
+    const index = Number(props?.dataTableIndex ?? 1);
+    const label = heading
+      ? `${heading}${index > 1 ? ` (table ${index})` : ""}: ${columns.join(", ")}`
+      : undefined;
+    return columns.length ? (
+      <DataTable columns={columns} rows={rows} label={label} />
+    ) : null;
   },
   strong: ({ children }) => (
     <strong className="font-semibold">{children}</strong>
@@ -101,23 +170,47 @@ export const markdownComponents: Components = {
 
 export function LegalArticle({ page }: { page: LegalPage }) {
   const note = draftNote(page.status);
-  return (
-    <article className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="">{page.title}</h1>
-      <p className="text-slate mt-2 text-sm" data-testid="legal-updated">
-        Last updated {formatUpdated(page.updated)}
+  const updated = `Last updated ${formatUpdated(page.updated)}`;
+  // REQ-028 FR-11: from lg the page is the shell's reading kind, eight columns of prose at 65ch with the
+  // sticky aside holding the "Jump to" nav and the updated line; under lg the article keeps its own order
+  // (the updated line under the h1) and the aside is out of the page (D-2276).
+  const aside = (
+    <div data-testid="legal-aside">
+      <p className="text-slate text-sm" data-testid="aside-updated">
+        {updated}
       </p>
-      {note ? (
+      <JumpTo
+        items={legalHeadings(page.markdown)}
+        testId="aside-jump-to"
+        className="mt-4"
+      />
+    </div>
+  );
+  return (
+    <PageShell kind="reading" aside={aside} asideFrom="lg">
+      <article>
+        <h1 className="">{page.title}</h1>
         <p
-          className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
-          data-testid="legal-draft-note"
+          className="text-slate mt-2 text-sm lg:hidden"
+          data-testid="legal-updated"
         >
-          <strong className="font-semibold">Draft.</strong> {note}
+          {updated}
         </p>
-      ) : null}
-      <Markdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-        {page.markdown}
-      </Markdown>
-    </article>
+        {note ? (
+          <p
+            className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+            data-testid="legal-draft-note"
+          >
+            <strong className="font-semibold">Draft.</strong> {note}
+          </p>
+        ) : null}
+        <Markdown
+          remarkPlugins={markdownPlugins}
+          components={markdownComponents}
+        >
+          {page.markdown}
+        </Markdown>
+      </article>
+    </PageShell>
   );
 }

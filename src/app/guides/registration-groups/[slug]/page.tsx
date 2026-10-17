@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/page-shell";
+import { JumpTo } from "@/components/jump-to";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -32,7 +33,7 @@ export async function generateMetadata({
   };
 }
 
-const h2 = "mt-10";
+const h2 = "mt-10 scroll-mt-24";
 const list = "mt-3 list-disc space-y-1 pl-5 leading-7 text-ink";
 
 /**
@@ -83,7 +84,27 @@ export default async function RegistrationGroupPage({
     ].join("\n"),
   );
   return (
-    <PageShell kind="reading">
+    <PageShell
+      kind="reading"
+      asideFrom="lg"
+      aside={
+        /* REQ-028 FR-11: the sticky "Jump to" over this page's sections from lg. */
+        <JumpTo
+          testId="aside-jump-to"
+          items={[
+            { id: "audit-heading", text: `Your audit: ${p.pathwayLabel}` },
+            { id: "modules-heading", text: "Practice Standards modules" },
+            {
+              id: "documents-heading",
+              text: "The documents the pack produces",
+            },
+            { id: "price-heading", text: "Price" },
+            { id: "faq-heading", text: "Questions people ask" },
+            { id: "sources-heading", text: "Sources" },
+          ]}
+        />
+      }
+    >
       <article>
         <JsonLd
           data={[
@@ -219,7 +240,7 @@ export default async function RegistrationGroupPage({
           className="border-ochre mt-10 rounded-md border p-4"
           data-testid="group-price"
         >
-          <h2 id="price-heading" className="">
+          <h2 id="price-heading" className="scroll-mt-24">
             {price
               ? `${price} once for the whole pack`
               : "One fixed price for the whole pack"}

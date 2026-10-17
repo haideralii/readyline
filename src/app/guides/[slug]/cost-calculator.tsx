@@ -58,7 +58,7 @@ export function CostCalculator({
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Household tasks, personal care, SIL…"
+        placeholder="Household tasks, personal care…"
         className="border-line bg-surface mt-1 block min-h-12 w-full rounded-md border px-3 py-2 text-base"
       />
       <ul
@@ -76,7 +76,8 @@ export function CostCalculator({
                 className="h-5 w-5 shrink-0"
               />
               <span className="min-w-0 text-sm">
-                {g.name}{" "}
+                {/* REQ-028 QA F11: a slash in a name ("Accommodation/tenancy assistance") breaks after the slash, not mid-word. */}
+                {g.name.replace(/\//g, "/\u200B")}{" "}
                 {/* QA pass F2: the muted pair the site uses, 4.5:1 in both schemes (dark zinc-500 on the dark paper was 3.01:1). */}
                 <span className="text-slate font-mono">{g.code}</span>
               </span>

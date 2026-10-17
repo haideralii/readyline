@@ -27,6 +27,7 @@ export function PageShell({
   kind,
   aside,
   padding = "default",
+  asideFrom = "always",
   children,
 }: {
   kind: PageKind;
@@ -34,6 +35,8 @@ export function PageShell({
   aside?: ReactNode;
   /** The questionnaire keeps its tighter phone top (REQ-015 FR-4: the result card's button inside a 681 px iPhone screen). */
   padding?: "default" | "compact";
+  /** REQ-028 FR-11: "lg" keeps the aside (and its landmark) out of the page under lg, for a page whose phone copy of the aside's blocks sits in its own order. */
+  asideFrom?: "always" | "lg";
   children: ReactNode;
 }) {
   const hasAside = Boolean(aside) && (kind === "reading" || kind === "form");
@@ -43,7 +46,12 @@ export function PageShell({
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
         <div className={`min-w-0 ${MAIN[kind]}`}>{children}</div>
         {hasAside ? (
-          <aside className="mt-8 lg:sticky lg:top-24 lg:col-span-4 lg:col-start-9 lg:mt-0 lg:self-start">
+          <aside
+            className={[
+              "lg:sticky lg:top-24 lg:col-span-4 lg:col-start-9 lg:mt-0 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto",
+              asideFrom === "lg" ? "hidden lg:block" : "mt-8",
+            ].join(" ")}
+          >
             {aside}
           </aside>
         ) : null}

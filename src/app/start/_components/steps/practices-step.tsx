@@ -117,19 +117,35 @@ export function PracticesStepForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first paragraph. */}
-      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
-      <p className="text-ink mb-4 text-base leading-7">
-        Some ways of keeping people safe count as restrictive practices and have
-        extra rules. In plain words, they include:
-      </p>
-      <ul className="text-ink mb-4 list-disc space-y-1 pl-5 text-base leading-7">
-        {EXAMPLES.map((example) => (
-          <li key={example}>{example}</li>
-        ))}
-      </ul>
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="step-side mb-4" />
+
+      <RadioGroup
+        name="restrictivePractices"
+        legend="Do you use, or plan to use, any of these with a participant?"
+        options={OPTIONS}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          void clear("restrictivePractices", { restrictivePractices: v });
+        }}
+        errors={errorsFor(errors, "restrictivePractices")}
+      />
+      {/* REQ-028 FR-5 (AC-5's second phone exception): the question's heading precedes the examples under lg;
+          from lg the examples sit in the aside column, rendered once (D-2276 (2)). */}
+      <div className="step-side mb-4" data-testid="practices-examples">
+        <p className="text-ink text-base leading-7">
+          Some ways of keeping people safe count as restrictive practices and
+          have extra rules. In plain words, they include:
+        </p>
+        <ul className="text-ink mt-2 list-disc space-y-1 pl-5 text-base leading-7">
+          {EXAMPLES.map((example) => (
+            <li key={example}>{example}</li>
+          ))}
+        </ul>
+      </div>
       <details className="border-rule mb-6 rounded-md border p-4">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
           What counts? The Commission&apos;s definition
@@ -154,18 +170,6 @@ export function PracticesStepForm() {
           .
         </p>
       </details>
-
-      <RadioGroup
-        name="restrictivePractices"
-        legend="Do you use, or plan to use, any of these with a participant?"
-        options={OPTIONS}
-        value={value}
-        onChange={(v) => {
-          setValue(v);
-          void clear("restrictivePractices", { restrictivePractices: v });
-        }}
-        errors={errorsFor(errors, "restrictivePractices")}
-      />
 
       {value === "not-sure" ? (
         <div

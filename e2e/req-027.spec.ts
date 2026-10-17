@@ -1,7 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import {
-  NEXT_LINE,
   HAVE_TAG,
   SOLE_TRADER_LINE,
   SOLE_TRADER_SOURCE,
@@ -90,18 +89,11 @@ test.describe("REQ-027 A2: the result page", () => {
 
     // AC-4, D-2707: the line's words, under the primary action, naming the heading auth/callback sends a new account to.
     const card = page.getByTestId("summary");
-    const nextLine = card.getByTestId("next-line");
-    await expect(nextLine).toHaveText(NEXT_LINE);
-    const setup = readFileSync("src/app/account/setup/page.tsx", "utf8");
-    const heading = setup.match(/<h1[^>]*>\s*([^<]+?)\s*<\/h1>/)?.[1];
-    expect(heading, "account/setup/page.tsx has an h1").toBeTruthy();
-    expect(NEXT_LINE).toContain(`'${heading}'`);
-    const button = await card
-      .getByRole("link", { name: "Start getting ready" })
-      .boundingBox();
-    const line = await nextLine.boundingBox();
-    expect(line!.y).toBeGreaterThanOrEqual(button!.y + button!.height);
-    // Finding 33: one sign-in clause on the card, the "Next:" line's.
+    // REQ-028 D-2805: the "Next:" line is gone; the button's label says where it goes.
+    await expect(
+      card.getByRole("link", { name: "Sign in to get ready" }),
+    ).toBeVisible();
+    // Finding 33: one sign-in clause on the card, the button's now (D-2805).
     expect(((await card.textContent()) ?? "").match(/sign in/gi)?.length).toBe(
       1,
     );

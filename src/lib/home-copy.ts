@@ -28,6 +28,10 @@ export const HOME_COPY = {
   subscriptionLine: (price: string) =>
     `${price} a month keeps you audit-ready: the registers, the reminders and the mid-term audit countdown, so your evidence sits in one place when renewal comes. Cancel at any time.`,
   startLine: "Where you start:",
+  /** REQ-028 FR-10 (D-2806): the strip's two cells, each the product's name and its price and nothing else, the subscription first; "one-off" is priceLine's own word. */
+  stripRegisters: (price: string) =>
+    `Registers subscription · ${price} a month`,
+  stripPack: (price: string) => `Document pack · ${price} one-off`,
   priceLine: (price: string) =>
     `${price} one-off for the document pack. No subscription needed, no instalments, no interest.`,
   refundLine:
@@ -114,6 +118,8 @@ export function homeStrings(): string[] {
     heroHeadline("AUD 399"),
     heroHeadline(null),
     HOME_COPY.priceLine("AUD 399"),
+    HOME_COPY.stripRegisters("AUD 39"),
+    HOME_COPY.stripPack("AUD 399"),
   ];
   const walk = (v: unknown) => {
     if (typeof v === "string") out.push(v);

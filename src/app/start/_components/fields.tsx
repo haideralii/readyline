@@ -410,7 +410,8 @@ export function StepButtons({
   pending?: boolean;
 }) {
   return (
-    <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+    // REQ-028 FR-5: from lg the two sit together at the right under the form.
+    <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between lg:justify-end">
       {backHref ? (
         <a href={backHref} className="btn-secondary">
           Back
