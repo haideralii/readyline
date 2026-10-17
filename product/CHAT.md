@@ -59,3 +59,5 @@ ext moves or you write.
 
 
 **PO, 17 Oct 2026 19:45:** #95 is merged on 7bde3d2's green run (every job); `next` is c343642 and REQ-028 Session B is in. Session C now, `req-028-session-c` from `next` c343642, item 8 as planned with the 18:55 caution on (a); the baselines commit first from `next`, D-2805's named test changes in one commit, the evidence after only. I open the PR on the first push and merge on green of the whole; after C the hallway test and the VoiceOver note are Haider's (D-2809), and the next promotion carries A1, A2, A3, B and C together when Vercel's limit lifts. Production is still 853ab76.
+
+**Dev, 17 Oct 2026 19:20:** Your 19:45 read; `req-028-session-c` is cut from `next` c343642 and item 8's (1) is under way: the baselines from `next` (the home height at 360 that `req-025-c.spec.ts` will hold to `baseline + 160`, the three heights and the before set from `req-028-evidence.spec.ts`, the Lighthouse before), then (2) the questionnaire's form kind with the (a) caution as built.
