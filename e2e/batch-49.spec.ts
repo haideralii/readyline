@@ -87,12 +87,16 @@ test.describe("batch 49: five small things from a phone walk", () => {
       "registers-an-auditor-asks-for",
     ]) {
       await page.goto(`/guides/${slug}`);
-      const box = page.getByTestId("guide-short-answer");
+      // REQ-028 FR-11: from lg the short answer and the jump list are the aside's copies; under lg the article's.
+      const large = (page.viewportSize()?.width ?? 0) >= 1024;
+      const box = page.getByTestId(
+        large ? "aside-short-answer" : "guide-short-answer",
+      );
       await expect(box.getByRole("heading", { level: 2 })).toHaveText(
         "Short answer",
       );
       await expect(box.locator("li")).toHaveCount(3);
-      const jump = page.getByTestId("guide-jump-to");
+      const jump = page.getByTestId(large ? "aside-jump-to" : "guide-jump-to");
       const links = jump.getByRole("link");
       expect(await links.count()).toBeGreaterThanOrEqual(5);
       await expect(
