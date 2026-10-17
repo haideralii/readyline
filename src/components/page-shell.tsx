@@ -37,7 +37,7 @@ export function PageShell({
   children: ReactNode;
 }) {
   const hasAside = Boolean(aside) && (kind === "reading" || kind === "form");
-  const py = padding === "compact" ? "py-6 sm:py-12" : "py-10 sm:py-14";
+  const py = padding === "compact" ? "py-6 sm:py-12" : "py-8 lg:py-12";
   return (
     <div className={`${SHELL} ${py}`} data-shell="page" data-kind={kind}>
       <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">

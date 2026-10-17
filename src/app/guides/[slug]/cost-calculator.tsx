@@ -90,7 +90,7 @@ export function CostCalculator({
         ))}
       </ul>
       <div
-        className="bg-mist mt-4 rounded-md p-3"
+        className="bg-mist mt-4 rounded-md p-4"
         role="status"
         aria-live="polite"
         data-testid="calculator-result"

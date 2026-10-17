@@ -252,7 +252,7 @@ export function ChecklistView({
       </p>
       {/* FR-11: the participant-data warning once, at the top. */}
       <p
-        className="border-rule bg-mist mt-3 rounded-md border p-3 text-sm leading-6"
+        className="border-rule bg-mist mt-3 rounded-md border p-4 text-sm leading-6"
         data-testid="checklist-privacy"
         id="checklist-note-warning"
       >

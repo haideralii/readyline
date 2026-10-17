@@ -178,7 +178,7 @@ export default async function RegistersPage() {
         {reportsToConfirmLine(toConfirm) ? (
           // REQ-020 FR-5: a report through the link or by a worker waits here until the owner confirms it.
           <p
-            className="border-signal mt-4 rounded-md border p-3 leading-7"
+            className="border-signal mt-4 rounded-md border p-4 leading-7"
             data-testid="reports-to-confirm"
           >
             <Link

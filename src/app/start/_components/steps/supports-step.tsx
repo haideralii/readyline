@@ -314,7 +314,7 @@ export function SupportsStepForm() {
         </p>
 
         <div
-          className="border-rule bg-mist mt-3 rounded-md border p-3 text-sm leading-6"
+          className="border-rule bg-mist mt-3 rounded-md border p-4 text-sm leading-6"
           data-testid="groups-hint"
         >
           <p data-testid="groups-hint-text">{hintText}</p>

@@ -429,14 +429,14 @@ function ResultView({
       >
         {r.flags.silExcluded ? (
           <p
-            className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6"
+            className="border-line bg-mist mt-2 rounded-md border p-4 text-sm leading-6"
             data-testid="sil-excluded"
           >
             {SIL_EXCLUDED_TEXT}
           </p>
         ) : null}
         {r.flags.restrictivePracticesAssumed ? (
-          <p className="border-line bg-mist mt-2 rounded-md border p-3 text-sm leading-6">
+          <p className="border-line bg-mist mt-2 rounded-md border p-4 text-sm leading-6">
             {RP_ASSUMED_TEXT}
           </p>
         ) : null}
@@ -480,7 +480,7 @@ function ResultView({
           {r.modules.map((m) => (
             <li
               key={m.id}
-              className="border-rule rounded-md border p-3"
+              className="border-rule rounded-md border p-4"
               data-testid={`module-${m.id}`}
             >
               <p className="text-base font-medium">

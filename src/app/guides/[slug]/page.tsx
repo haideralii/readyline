@@ -110,7 +110,7 @@ export default async function GuidePage({
         </p>
         {g.draft ? (
           <p
-            className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+            className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
             data-testid="guide-draft-note"
           >
             <strong className="font-semibold">Draft.</strong> This guide is

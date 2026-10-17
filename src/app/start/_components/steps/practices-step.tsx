@@ -130,7 +130,7 @@ export function PracticesStepForm() {
           <li key={example}>{example}</li>
         ))}
       </ul>
-      <details className="border-rule mb-6 rounded-md border p-3">
+      <details className="border-rule mb-6 rounded-md border p-4">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
           What counts? The Commission&apos;s definition
         </summary>

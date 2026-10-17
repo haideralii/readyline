@@ -49,6 +49,23 @@ describe("the class lint (REQ-028 FR-1, FR-2; D-2802)", () => {
     expect(findings(walkDir("src/app"), WIDTH)).toEqual([]);
   });
 
+  // REQ-028 FR-14 (D-2274): inside a card 16 px, one padding scale per page;
+  // a page that carries p-4 carries no bare p-3 or p-5 beside it (variants
+  // such as sm:p-3 are read as the same step and count too).
+  it("no file under src/app mixes p-4 with p-3 or p-5", () => {
+    const PAD = /(?<![\w-])(?:[a-z-]+:)?p-(3|4|5)(?![\w-])/g;
+    const mixed: string[] = [];
+    for (const file of walkDir("src/app")) {
+      const steps = new Set<string>();
+      for (const m of readFileSync(file, "utf8").matchAll(PAD)) steps.add(m[1]);
+      if (steps.has("4") && (steps.has("3") || steps.has("5")))
+        mixed.push(
+          `${file.replace(/\\/g, "/")}: p-${[...steps].sort().join(", p-")}`,
+        );
+    }
+    expect(mixed).toEqual([]);
+  });
+
   it("the pattern sees what it is for", () => {
     const sample = [
       'className="text-zinc-600 dark:text-zinc-400 bg-white hover:bg-zinc-50 border-zinc-300"',
