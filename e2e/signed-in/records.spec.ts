@@ -280,10 +280,10 @@ test.describe("hazards, import and the self-check (REQ-020 Session C)", () => {
     await expect(page).toHaveURL(/\/path\/audit-day\/check$/);
     await checkWidths(page, "self-check");
     await axeClean(page, "self-check");
-    await expect(page.getByTestId("check-progress")).toHaveText("1 of 13");
+    await expect(page.getByTestId("check-progress")).toHaveText("1 of 14");
     await shot(page, "self-check", project);
-    for (let i = 1; i <= 13; i += 1) {
-      await expect(page.getByTestId("check-progress")).toHaveText(`${i} of 13`);
+    for (let i = 1; i <= 14; i += 1) {
+      await expect(page.getByTestId("check-progress")).toHaveText(`${i} of 14`);
       await expect(page.getByTestId("check-state")).toHaveAttribute(
         "data-state",
         /filled|missing|overdue/,
