@@ -66,6 +66,12 @@ export const PRICING_COPY = {
   /** REQ-028 FR-10 (D-2816): the words beside the 30 px figure on each card; subscriptionPriceLine stays for the no-figure case. */
   subscriptionPriceNote: "a month for the registers, with email reminders.",
   packPriceNote: "one-off, for the document pack",
+  /** REQ-028 D-2819 (PO, 17 Oct 2026 22:35): the pack card's three bullets beside the subscription's four. */
+  packIncludes: [
+    "A draft of every document your registration groups call for",
+    "Written from your answers; you review and adopt each one",
+    "Download as one file (zip), yours to keep",
+  ],
   subscriptionIncludes: [
     "Incident register",
     "Complaints register",
