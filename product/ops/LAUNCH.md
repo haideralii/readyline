@@ -34,6 +34,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 14. Supabase, Authentication, URL Configuration: Site URL `https://<domain>` and the redirect URLs exactly as `DEPLOY.md` section 5 lists them, each with its trailing `*`. Row: **Supabase Site URL and redirects** (always Not verified here; the launch check below proves the sign-in path from outside).
 15. Stripe, Developers, Webhooks: move the endpoint to the domain (step 5 again). GitHub, repository variables: `PROD_URL` = `https://<domain>`. Row: **Stripe webhook endpoint**.
 16. HSTS, one deploy after the redirect is proven: Vercel `HSTS_MAX_AGE` = `604800`, redeploy; a week later `31536000`, redeploy (Session C).
+17. Nothing to set: the three one-time fill handlers (REQ-024 FR-6b, SR-8(e)) carry `preferredRegion = "syd1"` as a literal in each route file and a unit test reads it; the row reads Set from the same constant. Row: **One-time fill handlers pinned to Sydney (REQ-024 SR-8(e))**.
 
 ## 6. Scheduled jobs
 

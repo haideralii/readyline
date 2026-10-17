@@ -205,11 +205,20 @@ describe.skipIf(!enabled)(
         .select("id");
       expect(edit.error?.code).toBe("42501");
 
+      // D-2272 as amended: the days a row records are the Sydney day, the
+      // checklist's started_on and a tick's ticked_on by default.
+      const todaySydney = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Australia/Sydney",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
       const checklist = await a.client
         .from("onboarding_checklists")
-        .select("id")
+        .select("id, started_on")
         .eq("account_id", a.accountId)
         .single();
+      expect(checklist.data?.started_on).toBe(todaySydney);
       const tick = await a.client
         .from("onboarding_ticks")
         .insert({
@@ -218,10 +227,11 @@ describe.skipIf(!enabled)(
           item_id: "screening-clearance-seen",
           ticked_by_ref: "KP-1",
         })
-        .select("id, actor_user_id")
+        .select("id, actor_user_id, ticked_on")
         .single();
       expect(tick.error).toBeNull();
       expect(tick.data?.actor_user_id).toBe(a.userId);
+      expect(tick.data?.ticked_on).toBe(todaySydney);
       const retick = await a.client
         .from("onboarding_ticks")
         .update({ ticked_by_ref: "W-9" })

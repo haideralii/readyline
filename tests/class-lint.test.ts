@@ -66,6 +66,22 @@ describe("the class lint (REQ-028 FR-1, FR-2; D-2802)", () => {
     expect(mixed).toEqual([]);
   });
 
+  // REQ-024 A3 (PO 17 Oct 2026 14:50; #92 run 38997349648): Next's production
+  // build refuses `react-dom/server` anywhere in the app bundle, and the dev
+  // server does not, so `npm run check` passed where the build failed. The
+  // string may not appear under `src/` at all; allow-list zero.
+  it("no react-dom/server import under src/ (the production build refuses it)", () => {
+    const hits: string[] = [];
+    for (const file of walkDir("src")) {
+      const lines = readFileSync(file, "utf8").split("\n");
+      lines.forEach((line, i) => {
+        if (line.includes("react-dom/server"))
+          hits.push(`${file.replace(/\\/g, "/")}:${i + 1}`);
+      });
+    }
+    expect(hits).toEqual([]);
+  });
+
   it("the pattern sees what it is for", () => {
     const sample = [
       'className="text-zinc-600 dark:text-zinc-400 bg-white hover:bg-zinc-50 border-zinc-300"',

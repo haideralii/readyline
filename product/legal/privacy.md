@@ -18,7 +18,7 @@ We collect only what we need to run the service:
 - Your account email address, so you can sign in and we can send receipts and service emails.
 - Your questionnaire answers: trading name, ABN if you give it, business structure, states and territories, the supports you deliver, your number of workers and key personnel, whether you use restrictive practices, and which documents you already have.
 - The documents we draft for you and the notes you add to your checklist or registers.
-- Worker codes, the kind of check, its dates and, if you choose, the check number you enter in the worker checks register. We ask you to use codes for workers; we never ask for a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself.
+- Worker codes, each worker's role and the states they work in, the kind of check, its dates, the application number and, if you choose, the check number you enter in the worker checks register, the onboarding items with their dates and who recorded them, the supervision dates on the staff matrix, and the hashed email address of a worker you invite. We ask you to use codes for workers. We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself. If you choose to fill names, dates of birth and addresses into an export, we use them to build that one file in Sydney and do not keep them.
 - Purchase records: what you bought, when, the amount, and the payment reference. We never see or store your card number; our payment provider, Stripe, handles it.
 - Basic technical records such as the time of a sign-in and errors, kept to run and secure the service. We do not use advertising trackers or third-party analytics.
 
@@ -38,7 +38,7 @@ We do not sell your information. We do not share it with anyone except the servi
 ## Who helps us run the service
 
 - Supabase stores your account and data on servers in Sydney, Australia.
-- Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States.
+- Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States. Never the worker-detail fill, which runs in Sydney.
 - Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}. Anthropic processes our requests in the United States.
 - Stripe takes payments and keeps card details. Stripe may process data in the United States and elsewhere under its own privacy policy.
 - An email provider sends service emails.
@@ -49,10 +49,10 @@ Your data stays while your account is open. If you delete your account, we remov
 
 ## Your choices
 
-- Export: you can download everything we hold about you from your account page at any time.
+- Export: you can download everything we hold about you from your account page at any time: your account, your answers, your checklist, your registers (including the worker tables) and your audit log.
 - Delete: you can delete your account from your account page. We confirm by email.
 - Correct: you can change your answers and regenerate your documents.
-- If you are a worker whose provider uses Readyline: your worker home shows what we hold about you, except your provider's own notes. Ask us by email for anything else; we answer within a reasonable period, and if we refuse we say why in writing.
+- If you are a worker whose provider uses Readyline: your worker home shows what we hold about you, except your provider's own notes. Ask us by email for anything else; we answer within a reasonable period, and if we refuse we say why in writing. Your worker code and your check and application numbers go to your manager's auditor through a time-limited link, into your manager's own export of their account, and to the Commission if it asks. Your manager may type your name, date of birth and address, and the name of whoever supervises you, into a one-time file that Readyline builds and does not keep.
 
 ## Security
 

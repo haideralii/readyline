@@ -11,6 +11,7 @@
  */
 import { isLiveKey } from "@/lib/payments/fake-session";
 import type { PriceFact } from "@/lib/payments/live-guards";
+import { FILL_PREFERRED_REGION } from "@/lib/registers/fill";
 
 export type LaunchState = "set" | "unset" | "mismatched" | "unverified";
 
@@ -501,6 +502,22 @@ const RULES: Rule[] = [
           };
       }
     },
+  },
+  {
+    id: "fill-region",
+    group: "domain",
+    name: "One-time fill handlers pinned to Sydney (REQ-024 SR-8(e))",
+    judge: () =>
+      FILL_PREFERRED_REGION === "syd1"
+        ? {
+            state: "set",
+            sentence:
+              "The three fill handlers export preferredRegion syd1 in code; a unit test reads the literal from each route file.",
+          }
+        : {
+            state: "mismatched",
+            sentence: `The fill handlers name ${FILL_PREFERRED_REGION}, not syd1.`,
+          },
   },
   {
     id: "cron-secret",

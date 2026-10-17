@@ -14,6 +14,8 @@ export type WorkerMembership = {
   id: string;
   trading_name: string;
   worker_ref: string | null;
+  /** REQ-024 SR-1 (AC-11): null until the worker has seen the collection notice once. */
+  notice_seen_at: string | null;
 };
 
 export async function getWorkerMembership(
@@ -23,7 +25,7 @@ export async function getWorkerMembership(
 ): Promise<WorkerMembership | null> {
   const m = await supabase
     .from("memberships")
-    .select("account_id, worker_ref")
+    .select("account_id, worker_ref, notice_seen_at")
     .eq("user_id", userId)
     .eq("role", "worker")
     .limit(1)
@@ -53,5 +55,6 @@ export async function getWorkerMembership(
     id: row.id,
     trading_name: row.trading_name,
     worker_ref: (m.data.worker_ref as string | null) ?? null,
+    notice_seen_at: (m.data.notice_seen_at as string | null) ?? null,
   };
 }

@@ -6,6 +6,7 @@
  * ordinary users (AC-7 data side). Skips itself without the Supabase variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { unzipSync } from "fflate";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildAccountExport, buildExportZip } from "@/server/accounts/export";
@@ -128,9 +129,44 @@ describe.skipIf(!enabled)(
       expect(json).not.toContain(b.accountId);
       expect(json).not.toContain(b.userId);
 
-      const zip = buildExportZip(data!);
+      // REQ-024 FR-6c (D-2415): the worker tables are in the export as CSV,
+      // read under RLS with no subscription on this tenant.
+      const seeded = await admin.from("staff_matrix").insert({
+        account_id: a.accountId,
+        worker_ref: "W-77",
+        role_label: "Support worker",
+        role: "support-worker",
+        states: ["NSW"],
+        risk_assessed: true,
+        started_on: "2026-01-05",
+      });
+      expect(seeded.error).toBeNull();
+      const withWorker = await buildAccountExport(a.client, a.accountId);
+      expect(
+        withWorker!.workerTables.staff_matrix.map((r) => r.worker_ref),
+      ).toEqual(["W-77"]);
+      const zip = buildExportZip(withWorker!);
       expect(zip.length).toBeGreaterThan(100);
       expect(Buffer.from(zip.slice(0, 2)).toString("binary")).toBe("PK");
+      const files = unzipSync(zip);
+      expect(Object.keys(files)).toEqual(
+        expect.arrayContaining([
+          "account.json",
+          "README.txt",
+          "registers/staff_matrix.csv",
+          "registers/onboarding_items.csv",
+          "registers/worker_clearances.csv",
+          "registers/risk_assessed_roles.csv",
+          "registers/screening_exceptions.csv",
+        ]),
+      );
+      expect(
+        Buffer.from(files["registers/staff_matrix.csv"]).toString("utf8"),
+      ).toContain("W-77");
+      expect(
+        (await buildAccountExport(b.client, b.accountId))!.workerTables
+          .staff_matrix,
+      ).toEqual([]);
 
       const cross = await buildAccountExport(b.client, a.accountId);
       expect(cross).toBeNull();

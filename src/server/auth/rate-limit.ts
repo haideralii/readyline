@@ -75,6 +75,13 @@ export async function checkRegisterWriteAllowed(
   return hitRateLimit(`register-write:${userId}`, REGISTER_WRITE_LIMIT);
 }
 
+/** REQ-024 FR-6b (finding 76): ten one-time fills per account per rolling hour, a bucket of its own beside the register export limit the pack and the link spend. */
+export const FILL_LIMIT = { limit: 10, windowSeconds: 3600 } as const;
+
+export async function checkFillAllowed(accountId: string): Promise<boolean> {
+  return hitRateLimit(`fill:${accountId}`, FILL_LIMIT);
+}
+
 /** REQ-007 SR-4: five Checkout Sessions per account per rolling hour. */
 export const CHECKOUT_LIMIT = { limit: 5, windowSeconds: 3600 } as const;
 
