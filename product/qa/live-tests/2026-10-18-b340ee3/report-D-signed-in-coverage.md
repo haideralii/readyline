@@ -106,4 +106,46 @@ None of `test.fixme`, `test.only` or "quarantine" exists in `e2e/`. Every signed
 - REQ-023 FR-8's mid-term rehearsal variant; FR-9 (exempt provider sees no mid-term lines) is "by construction".
 - REQ-024 FR-4a "Update the procedure" (re-snapshot of the participant risk register) and FR-6c the account export's worker CSVs (unit/integration only).
 - REQ-022 FR-8 to FR-11 (domain, HSTS, legal bundle) and FR-13: not built, so no spec.
-- REQ-009 AC-3 (the P
+- REQ-009 AC-3 (the PO on the hosted site, Excel) is defined as manual and has no record on `main`.
+
+### Evidence screenshots
+Only REQ-004, 006, 007, 009 and 015 have committed jpgs. REQ-017 (the whole guided path), REQ-018, REQ-020, REQ-022, REQ-023 and REQ-024 have none on `main`; their screenshots exist only in the 14-day CI artifact `signed-in-screenshots`. The REQ-017 and REQ-020 texts themselves note this.
+
+## The five signed-in flows most worth a human walk-through on live
+
+Site: https://readyline-zeta.vercel.app, with your own test account. **Stripe is in test mode there: no real charge is made. Use Stripe's test card 4242 4242 4242 4242, any future expiry, any CVC, any postcode.** Use a phone (iPhone Safari if you have one) for scripts 1, 3 and 4; CI never runs those flows on Safari, or never runs them at all.
+
+### 1. Sign in by magic link on the phone and set up the account (rows 1–2; CI mints the link and never reads an inbox; iPhone not covered)
+1. On your laptop, open `/sign-in`, type your test address, press "Email me a sign-in link". Confirm the "link is on its way; expires in an hour; open it on any device" line.
+2. On your phone, open the email and tap the link. You should land signed in on `/account/setup` (first time) or `/account`, with no "Sign in" in the header.
+3. Fill "About your business" (trading name, sole trader, NSW, your name and role) and press "Create my account". You should land on the questionnaire (`/start`).
+4. Tap the same link again on the laptop. Expect the plain "The link has expired or was already used" message on `/sign-in`, nothing else in the URL but the flag.
+5. Pass: one account, both devices behave as stated, the email arrives within a minute from the Readyline sender.
+
+### 2. Buy the pack through real Stripe test mode, wait for the documents, download, refund (rows 5–7; CI uses a fake Checkout; the real hop was last done 13 Oct)
+1. Signed in with a completed questionnaire, open `/start/result` and press "Start getting ready", then "Get my documents" on Before you buy. You should be on checkout.stripe.com with the AUD 399 line and card only (no Afterpay/Klarna/Zip).
+2. Pay with 4242 4242 4242 4242. Land on `/documents?purchase=success` showing "You can close this page; come back in about 20 minutes" with a document count that climbs.
+3. Come back when it reads ready: download the zip and the summary PDF, open one `.docx`. Check `/account` lists the purchase with a Stripe receipt link that opens.
+4. In the Stripe test dashboard, refund the payment in full. Reload `/documents`: downloads closed, "Buy again" shown; the set page is locked.
+5. Pass: all of the above, and the Stripe test event log shows one `checkout.session.completed` and one `charge.refunded` for your session. Note the ids in the REQ-007 evidence.
+
+### 3. Invite a worker from a second mailbox; the worker completes their steps on a phone (rows 18, 34; CI never sends or opens the invitation and seeds the worker session)
+1. As the owner on `/account`, in the team panel enter a second address you control and code `W-003`, press invite. Note that the panel says the worker can "log incidents and complaints and complete their onboarding".
+2. On the phone, open the second mailbox: the invitation names your business and the worker's first three steps (Code of Conduct, orientation module, the policies). Tap the link, sign in by the magic link it leads to, press accept.
+3. Expect the collection notice once ("the provider you work for", never "your employer"), then the worker home with "Your steps" first and no Registers in the nav. Type a screening application number and tick the orientation date; the items read "waiting for your manager to confirm".
+4. Back as the owner, open `/registers/staff-matrix` → W-003 and confirm the orientation item; on the phone, reload `/worker` and see it confirmed. Have the worker log an incident; on `/registers/incidents` the row reads "Logged by W-003".
+5. Remove the worker on `/account`; the phone's next tap on `/worker` is sent away.
+
+### 4. Share an auditor link and open it on a phone; download the pack; revoke (row 17; REQ-020 asks for a PO phone check and a phone screenshot that are not on `main`)
+1. With a subscription active and at least one row in incidents, complaints and worker checks, on `/account` create an auditor link with the 72-hour expiry. Read the "check summaries and notes for names" warning.
+2. Paste the link into your phone's browser signed out (private window). Expect the banner "Read-only view shared by <trading name> for its audit; it expires on <date>", the contents table first, every participant as a code, the worker checks with the check number.
+3. Tap "Download my audit pack": the zip opens on the phone with the register CSVs, the document control CSV, the adopted `.docx` files, the summary PDF and the cover sheet. Confirm no name/fill column in `workers/`.
+4. On the laptop, revoke the link. Reload on the phone: a plain 404, not "expired". Check the account page shows the open count and last-opened time from step 2.
+5. Pass: all of the above; save one screenshot of step 2 to `product/evidence/req-020/`.
+
+### 5. Reminder emails and unsubscribe (rows 14, 24, 40; no e2e opens a mailbox; the unsubscribe click is integration-tested only)
+1. On `/registers/worker-checks/new`, add a check whose expiry is 7 days from today; on `/account`, type registration dates whose "Prepare for your mid-term audit from" date is today (period start 12 months ago, certification, three years long).
+2. Trigger the nightly reminders job (ask Dev to fire `/api/jobs/reminders` with the cron secret, or wait for the schedule). Expect one email to your address from the Readyline sender with the clearance line (`W-xxx`, never the summary text) and the mid-term prepare line, the fixed "the dates on your certificate rule" sentence once, the general-information footer, and an unsubscribe line.
+3. Click the unsubscribe link. Expect the plain confirmation page with no account id in the URL.
+4. Fire the job again: no email arrives; a second click on the same link is the same confirmation or a 404, never an error page.
+5. On `/admin/launch` (if you are the platform admin), press "Send me a test email": it arrives within a minute, the row turns green with the date, and a second press within a minute is refused.
