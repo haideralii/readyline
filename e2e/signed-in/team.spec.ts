@@ -108,6 +108,20 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
     );
     await w.getByTestId("invite-accept").click();
     await expect(w).toHaveURL(/\/worker$/);
+    // REQ-024 SR-1 (AC-11): the collection notice shows first and once, in
+    // the words D-2414 fixed ("the provider you work for", the recipients,
+    // the one-time file), and one button records that it was seen.
+    const notice = w.getByTestId("worker-collection-notice");
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText("the provider you work for");
+    await expect(notice).toContainText("one-time file");
+    await expect(notice).toContainText("your manager's auditor");
+    await expect(notice).not.toContainText("your employer");
+    await shot(w, "worker-notice", project);
+    await w.getByTestId("worker-notice-continue").click();
+    await expect(w.getByTestId("worker-home-line")).toBeVisible();
+    await w.goto("/worker");
+    await expect(w.getByTestId("worker-collection-notice")).toHaveCount(0);
     await expect(w.getByTestId("worker-home-line")).toContainText(
       "Your manager sees everything else. Your code is W-003.",
     );

@@ -8,7 +8,7 @@ import {
   AUDITOR_OPEN_LIMITED_LINE,
   auditorBanner,
 } from "@/lib/registers/auditor-link";
-import { packIntro } from "@/lib/registers/audit-pack";
+import { AUDITOR_RECIPIENTS_LINE, packIntro } from "@/lib/registers/audit-pack";
 import { checkAuditorOpenAllowed } from "@/server/auth/rate-limit";
 import {
   DOCUMENT_CONTROL_COLUMNS,
@@ -85,6 +85,13 @@ export default async function AuditorPage({
       </p>
       <h1 className="mt-6">Audit view: {link.tradingName}</h1>
       <p className="mt-3 leading-7">{packIntro(link.tradingName, date)}</p>
+      {/* REQ-024 SR-1 (findings 31, 37, 165): the recipients line, both numbers named, no name. */}
+      <p
+        className="text-slate mt-2 text-sm leading-6"
+        data-testid="auditor-recipients"
+      >
+        {AUDITOR_RECIPIENTS_LINE}
+      </p>
       <p className="mt-4">
         <a
           href={`/auditor/${token}/audit-pack.zip`}

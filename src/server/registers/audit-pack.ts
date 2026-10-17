@@ -28,6 +28,9 @@ import {
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
 import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import { packWorkerFiles } from "@/lib/registers/worker-exports";
+import { loadWorkerExportSnapshot, part4SectionFor } from "./worker-exports";
+import { todaySydney } from "./worker-onboarding";
 import { log } from "@/lib/logging/logger";
 import { downloadObject, objectPath } from "@/server/generation/storage";
 import {
@@ -237,6 +240,18 @@ export async function buildAuditPack(input: {
   files[`register-events-${stamp}.csv`] = strToU8(
     toCsv(CSV_COLUMNS.register_events, trailRows(events, labels, titles)),
   );
+
+  // REQ-024 A3 (FR-6, FR-6a; D-2407 as amended): the workers folder, one
+  // file per worker and the index, and the two Worker Screening Rules lists
+  // unfilled, the same files for the owner and for the auditor link, codes
+  // and numbers and never a name (SR-8(a)); the lists speak as at today.
+  const workers = await loadWorkerExportSnapshot(supabase, accountId, {
+    today: todaySydney(),
+  });
+  for (const [name, csv] of Object.entries(
+    packWorkerFiles(workers, stamp, part4SectionFor),
+  ))
+    files[name] = strToU8(csv);
 
   if (view.setId) {
     const setId = view.setId;

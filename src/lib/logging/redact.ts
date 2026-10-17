@@ -29,6 +29,10 @@ const SENSITIVE_KEY =
 const FREE_TEXT_KEY =
   /^(note|notes|description|details?|comments?|message|body|text|free_?text|narrative|summary|reason|answer|answers|content|html|markdown|prompt|completion)$/i;
 
+/** REQ-024 SR-7: the one-time fill's fields (FR-6b) never reach a line, whatever object carries them. */
+const FILL_KEY =
+  /^(full_name|date_of_birth|address|assessor_name|supervisor_name)$/i;
+
 export const REDACTED = "[redacted]";
 export const OMITTED = "[free-text omitted]";
 export const EMAIL_MASK = "[email]";
@@ -49,7 +53,7 @@ export function isSensitiveKey(key: string): boolean {
 }
 
 export function isFreeTextKey(key: string): boolean {
-  return FREE_TEXT_KEY.test(key);
+  return FREE_TEXT_KEY.test(key) || FILL_KEY.test(key);
 }
 
 /**

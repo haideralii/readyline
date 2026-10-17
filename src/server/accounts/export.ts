@@ -7,6 +7,39 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { strToU8, zipSync } from "fflate";
 import { BRAND } from "@/lib/brand";
+import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+
+/**
+ * REQ-024 FR-6c (D-2415; SR-8(m)): the worker tables the export carries as
+ * CSV, every one the product holds about workers, read with the owner's
+ * session under RLS and regardless of the subscription's state (the gate
+ * applies to writes and the fill, never to reads or to this export). The
+ * REQ's `supervision_entries` and `policy_acknowledgements` are not
+ * tables: supervision is the staff row's dates and the W-8 item,
+ * acknowledgements are items W-3 and W-6 (D-2273).
+ */
+export const WORKER_EXPORT_TABLES = [
+  "staff_matrix",
+  "onboarding_checklists",
+  "onboarding_items",
+  "onboarding_ticks",
+  "worker_clearances",
+  "risk_assessed_roles",
+  "screening_exceptions",
+] as const;
+export type WorkerExportTable = (typeof WORKER_EXPORT_TABLES)[number];
+
+/** The owner's own export keeps the note columns the pack leaves out. */
+const WITH_NOTE: readonly WorkerExportTable[] = [
+  "staff_matrix",
+  "onboarding_items",
+  "worker_clearances",
+];
+
+export function workerExportColumns(table: WorkerExportTable): string[] {
+  const base = [...CSV_COLUMNS[table]] as string[];
+  return WITH_NOTE.includes(table) ? [...base, "note"] : base;
+}
 
 export type AccountExport = {
   exportedAt: string;
@@ -19,6 +52,8 @@ export type AccountExport = {
   auditLog: Record<string, unknown>[];
   /** REQ-023 FR-2 (finding 66): the registration periods, dates as typed. */
   registrationPeriods: Record<string, unknown>[];
+  /** REQ-024 FR-6c: the worker tables, as stored, each a CSV in the zip. */
+  workerTables: Record<WorkerExportTable, Record<string, unknown>[]>;
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -36,35 +71,61 @@ export async function buildAccountExport(
     .maybeSingle();
   if (account.error || !account.data) return null;
 
-  const [memberships, draft, checklist, audit, periods] = await Promise.all([
-    supabase
-      .from("memberships")
-      .select("user_id, role, created_at")
-      .eq("account_id", accountId),
-    supabase
-      .from("questionnaire_drafts")
-      .select("answers, answers_version, current_step, updated_at")
-      .eq("account_id", accountId)
-      .maybeSingle(),
-    supabase
-      .from("checklist_items")
-      .select("item_id, status, note, updated_at")
-      .eq("account_id", accountId)
-      .order("item_id", { ascending: true }),
-    supabase
-      .from("audit_log")
-      .select("id, actor_user_id, action, target, at")
-      .eq("account_id", accountId)
-      .order("at", { ascending: true }),
-    // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
-    supabase
-      .from("registration_periods")
-      .select(
-        "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
-      )
-      .eq("account_id", accountId)
-      .order("period_starts_on", { ascending: true }),
-  ]);
+  const [memberships, draft, checklist, audit, periods, ...workers] =
+    await Promise.all([
+      supabase
+        .from("memberships")
+        .select("user_id, role, created_at")
+        .eq("account_id", accountId),
+      supabase
+        .from("questionnaire_drafts")
+        .select("answers, answers_version, current_step, updated_at")
+        .eq("account_id", accountId)
+        .maybeSingle(),
+      supabase
+        .from("checklist_items")
+        .select("item_id, status, note, updated_at")
+        .eq("account_id", accountId)
+        .order("item_id", { ascending: true }),
+      supabase
+        .from("audit_log")
+        .select("id, actor_user_id, action, target, at")
+        .eq("account_id", accountId)
+        .order("at", { ascending: true }),
+      // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
+      supabase
+        .from("registration_periods")
+        .select(
+          "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
+        )
+        .eq("account_id", accountId)
+        .order("period_starts_on", { ascending: true }),
+      ...WORKER_EXPORT_TABLES.map((table) =>
+        supabase
+          .from(table)
+          .select("*")
+          .eq("account_id", accountId)
+          .order("created_at", { ascending: true }),
+      ),
+    ]);
+  // The items and ticks are keyed by their checklist; the export names the worker.
+  const workerTables = Object.fromEntries(
+    WORKER_EXPORT_TABLES.map((table, i) => [
+      table,
+      (workers[i].data as Record<string, unknown>[] | null) ?? [],
+    ]),
+  ) as Record<WorkerExportTable, Record<string, unknown>[]>;
+  const refByChecklist = new Map(
+    workerTables.onboarding_checklists.map((c) => [
+      c.id as string,
+      c.subject_ref as string,
+    ]),
+  );
+  for (const table of ["onboarding_items", "onboarding_ticks"] as const)
+    workerTables[table] = workerTables[table].map((r) => ({
+      worker_ref: refByChecklist.get(r.checklist_id as string) ?? "",
+      ...r,
+    }));
 
   return {
     exportedAt: now.toISOString(),
@@ -75,6 +136,7 @@ export async function buildAccountExport(
     checklistItems: checklist.data ?? [],
     auditLog: audit.data ?? [],
     registrationPeriods: periods.data ?? [],
+    workerTables,
   };
 }
 
@@ -88,18 +150,21 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables and audit log as JSON.",
+    "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",
     "because the product does not collect any.",
     `${BRAND} provides general information and document templates for your own review; it is not legal advice.`,
     "",
   ].join("\n");
-  return zipSync(
-    {
-      "account.json": strToU8(JSON.stringify(data, null, 2)),
-      "README.txt": strToU8(readme),
-    },
-    { level: 6 },
-  );
+  const files: Record<string, Uint8Array> = {
+    "account.json": strToU8(JSON.stringify(data, null, 2)),
+    "README.txt": strToU8(readme),
+  };
+  for (const table of WORKER_EXPORT_TABLES)
+    files[`registers/${table}.csv`] = strToU8(
+      toCsv(workerExportColumns(table), data.workerTables?.[table] ?? []),
+    );
+  return zipSync(files, { level: 6 });
 }

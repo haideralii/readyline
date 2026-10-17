@@ -30,8 +30,10 @@ describe("register CSV (REQ-009 FR-6)", () => {
   it("every register has its reference or worker code first and never a participant name column", () => {
     for (const [name, cols] of Object.entries(CSV_COLUMNS)) {
       // The shared trail (retro finding 25) names the register first, then the row.
+      // REQ-024 A3: a checklist is keyed by its subject code, a role by its title,
+      // the worker file by the row kind and the workers index by its section.
       expect(cols[0], name).toMatch(
-        /^(reference|worker_ref|document_type_id|register)$/,
+        /^(reference|worker_ref|document_type_id|register|subject_ref|title|kind|section)$/,
       );
       expect(cols.join(" "), name).not.toMatch(/name|dob|address|ndis_number/);
     }

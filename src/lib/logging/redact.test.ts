@@ -83,6 +83,27 @@ describe("redact", () => {
     });
   });
 
+  // REQ-024 SR-7: the one-time fill fields never reach a line, whatever object carries them.
+  it("omits the one-time fill fields by key", () => {
+    expect(
+      redact({
+        full_name: "Marked Value",
+        date_of_birth: "1990-01-01",
+        address: "1 Example Street",
+        assessor_name: "Marked Value",
+        supervisor_name: "Marked Value",
+        worker_ref: "W-1",
+      }),
+    ).toEqual({
+      full_name: OMITTED,
+      date_of_birth: OMITTED,
+      address: OMITTED,
+      assessor_name: OMITTED,
+      supervisor_name: OMITTED,
+      worker_ref: "W-1",
+    });
+  });
+
   it("masks emails and tokens inside nested values and arrays", () => {
     expect(
       redact({

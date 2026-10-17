@@ -41,6 +41,7 @@ export function RegisterPage({
   addHref,
   addLabel,
   exportHref,
+  exportLabel,
   importHref,
   back,
   children,
@@ -51,6 +52,8 @@ export function RegisterPage({
   addHref?: string;
   addLabel?: string;
   exportHref?: string;
+  /** REQ-024 FR-6b: the staff matrix's export is a screen, not a CSV; the link says so. */
+  exportLabel?: string;
   /** REQ-020 FR-8: the spreadsheet import, shown only while writes are open. */
   importHref?: string;
   back?: { href: string; label: string };
@@ -99,7 +102,7 @@ export function RegisterPage({
               className="btn-secondary"
               data-testid="register-export"
             >
-              Export CSV
+              {exportLabel ?? "Export CSV"}
             </a>
           ) : null}
           {canWrite && importHref ? (
