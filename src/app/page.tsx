@@ -102,17 +102,18 @@ export default function Home() {
           </p>
           {/* REQ-028 FR-10 (D-2806): the two-cell price strip, 16 px with tabular figures, the same size and weight
             in both cells, the subscription first, each cell a link to its pricing card; a null price or the off
-            state omits its cell. Stacked under sm, a row from it. */}
+            state omits its cell. Stacked under sm, two equal grid cells from it whose words wrap inside
+            (CI's fonts run wider than this laptop's: two intrinsic cells wrapped under each other at 1280). */}
           {(subscriptionOffered && subscriptionPrice) || price ? (
             <nav
               aria-label="Prices"
-              className="mt-4 flex flex-col gap-2 text-base tabular-nums sm:flex-row sm:flex-wrap"
+              className="mt-4 grid grid-cols-1 gap-2 text-base tabular-nums sm:grid-cols-2"
               data-testid="home-price-strip"
             >
               {subscriptionOffered && subscriptionPrice ? (
                 <Link
                   href="/pricing#keeps"
-                  className="border-rule hover:bg-mist inline-flex min-h-11 items-center rounded-md border px-4 underline-offset-4 hover:underline"
+                  className="border-rule hover:bg-mist flex min-h-11 items-center rounded-md border px-4 py-2 underline-offset-4 hover:underline"
                   data-testid="home-strip-registers"
                 >
                   {C.stripRegisters(subscriptionPrice)}
@@ -121,7 +122,7 @@ export default function Home() {
               {price ? (
                 <Link
                   href="/pricing#start"
-                  className="border-rule hover:bg-mist inline-flex min-h-11 items-center rounded-md border px-4 underline-offset-4 hover:underline"
+                  className="border-rule hover:bg-mist flex min-h-11 items-center rounded-md border px-4 py-2 underline-offset-4 hover:underline"
                   data-testid="home-strip-pack"
                 >
                   {C.stripPack(price)}
