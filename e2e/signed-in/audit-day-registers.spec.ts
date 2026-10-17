@@ -132,7 +132,8 @@ test.describe("audit-day registers (REQ-018 Session B)", () => {
     await axeClean(page, "corporate risks list");
     await shot(page, "corporate-risks", project);
 
-    await list.locator("li a").first().click();
+    // REQ-028 FR-8: the table answers from sm and the cards under it; a role locator finds the visible link.
+    await list.getByRole("link").first().click();
     await expect(page.getByTestId("starter-note")).toBeVisible();
     // AC-1 on a row's facts too (the stacked definition list).
     await noLetterWrap(page, "row-facts", "corporate risk row");

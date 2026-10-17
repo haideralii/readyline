@@ -32,6 +32,8 @@ export function RegisterList({
   empty,
   testId,
   columns,
+  emptyAction,
+  importHref,
 }: {
   rows: ListRow[];
   /** The status keys offered as filters, in order, with their labels. */
@@ -40,10 +42,43 @@ export function RegisterList({
   testId: string;
   /** REQ-028 FR-8 (D-2814): with columns, the table renders from sm and these cards under it. */
   columns?: readonly TableColumn[];
+  /** REQ-028 FR-7, FR-8: the empty state's primary, the one way to add the first entry (given only while writes are open). */
+  emptyAction?: { href: string; label: string };
+  /** The spreadsheet import beside it, where the register has one. */
+  importHref?: string;
 }) {
   const [filter, setFilter] = useState<string>("all");
   const shown =
     filter === "all" ? rows : rows.filter((r) => r.status.key === filter);
+  if (rows.length === 0)
+    return (
+      <div data-testid={testId}>
+        {/* REQ-028 FR-8 (audit 5, 58): one sentence of what the auditor asks for and the primary to add the first entry. */}
+        <div className="mt-6" data-testid={`${testId}-empty`}>
+          <p className="text-slate leading-7">{empty}</p>
+          {emptyAction ? (
+            <p className="mt-4 flex flex-wrap items-center gap-4">
+              <Link
+                href={emptyAction.href}
+                className="btn-primary"
+                data-testid="register-add"
+              >
+                {emptyAction.label}
+              </Link>
+              {importHref ? (
+                <Link
+                  href={importHref}
+                  className="inline-flex min-h-11 items-center underline underline-offset-4"
+                  data-testid="register-import"
+                >
+                  Import from a spreadsheet
+                </Link>
+              ) : null}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    );
   return (
     <div data-testid={testId}>
       <fieldset className="mt-4">
@@ -76,22 +111,16 @@ export function RegisterList({
       </fieldset>
       {shown.length === 0 ? (
         <p className="text-slate mt-6" data-testid={`${testId}-empty`}>
-          {rows.length === 0 ? (
-            empty
-          ) : (
-            <>
-              No matches. Try another word, or{" "}
-              <button
-                type="button"
-                className="underline underline-offset-2"
-                onClick={() => setFilter("all")}
-                data-testid={`${testId}-clear`}
-              >
-                clear the search
-              </button>{" "}
-              to see every entry.
-            </>
-          )}
+          No matches. Try another word, or{" "}
+          <button
+            type="button"
+            className="underline underline-offset-2"
+            onClick={() => setFilter("all")}
+            data-testid={`${testId}-clear`}
+          >
+            clear the search
+          </button>{" "}
+          to see every entry.
         </p>
       ) : (
         <div className={columns?.length ? "sm:hidden" : undefined}>

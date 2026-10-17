@@ -6,6 +6,11 @@ import {
 } from "@/server/registers/queries";
 import { CATEGORY_LABELS } from "@/lib/registers/labels";
 import { reportsToConfirmLine } from "@/lib/registers/worker";
+import {
+  INCIDENT_COLUMNS,
+  cellsFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 
@@ -97,6 +102,8 @@ export default async function IncidentsPage() {
       addHref="/registers/incidents/new"
       addLabel="Add an incident"
       exportHref="/registers/incidents/export.zip"
+      exportLabel="Download the register and its events (zip of two CSV files)"
+      count={rows.length}
       importHref="/registers/incidents/import"
       back={{ href: "/registers", label: "Registers" }}
     >
@@ -140,8 +147,16 @@ export default async function IncidentsPage() {
           title: `${r.reference}: ${CATEGORY_LABELS[r.category]}`,
           detail: incidentDetail(r),
           status: incidentStatus(r),
+          cells: cellsFor(INCIDENT_COLUMNS, r),
         }))}
         filters={INCIDENT_FILTERS}
+        columns={tableColumns(INCIDENT_COLUMNS)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: "/registers/incidents/new", label: "Add an incident" }
+            : undefined
+        }
+        importHref={ctx.canWrite ? "/registers/incidents/import" : undefined}
         empty="No incidents recorded yet. Add one as soon as something happens; the date you record is part of the evidence."
       />
     </RegisterPage>
