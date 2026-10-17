@@ -340,8 +340,11 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     const ownerFiles = unzipSync(new Uint8Array(await ownerPack.body()));
     const sheet = `rehearsal-${today}.csv`;
     expect(Object.keys(ownerFiles)).toContain(sheet);
-    const csv = Buffer.from(ownerFiles[sheet]).toString("utf8");
-    expect(csv.split(/\r?\n/)[0]).toMatch(/^Our own working note, /);
+    // The pack's CSV convention (csv.ts): a byte-order mark for Excel and every cell quoted.
+    const csv = Buffer.from(ownerFiles[sheet])
+      .toString("utf8")
+      .replace(/^﻿/, "");
+    expect(csv.split(/\r?\n/)[0]).toMatch(/^"Our own working note, /);
     expect(csv).toContain("Ref P-07 not filed");
     expect(csv).not.toMatch(/this quarter/);
 
