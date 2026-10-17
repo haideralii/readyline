@@ -156,13 +156,15 @@ export default async function AuditorPage({
           <span className="text-slate block">{PERIOD_COUNTS_LINE}</span>
         )}
       </p>
+      {/* #99 run 2 (PO 02:20): one test id names one thing; the page's "Period shown" line keeps `auditor-period-line`,
+        the selector's own line is `auditor-period-selector-line`. */}
       <PeriodSelector
         basePath={basePath}
         period={period}
         ctx={ctx}
         unavailable={unavailable}
         fallback="period"
-        testId="auditor-period"
+        testId="auditor-period-selector"
       />
 
       <section
@@ -214,7 +216,10 @@ export default async function AuditorPage({
           </h2>
           {/* D-2318 A: how many rows of this register have no date in the period's column. */}
           {period.kind !== "all" && undatedLineFor(t.id, t.rows) ? (
-            <p className="text-slate mt-1 text-sm leading-6">
+            <p
+              className="text-slate mt-1 text-sm leading-6"
+              data-testid="auditor-period-count"
+            >
               {undatedLineFor(t.id, t.rows)}
             </p>
           ) : null}
