@@ -349,7 +349,25 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     // from the account; the approval date fills in on adoption (D-541), so the
     // "no blanks" check comes after step 5.
     await page.goto("/documents");
+    // REQ-028 FR-7 (AC-6): the zip is the primary on the documents page and on the set's page, with the count and
+    // size line beneath (the size is the stored object's; the count alone when the store cannot be asked).
+    await expect(page.getByTestId("download-zip")).toHaveText(
+      "Download all as one file (zip)",
+    );
+    await expect(page.getByTestId("zip-size-line")).toContainText(
+      /^\d+ Word files and the readiness summary/,
+    );
     await page.getByTestId("open-set").click();
+    await expect(page.getByTestId("download-zip")).toHaveText(
+      "Download all as one file (zip)",
+    );
+    await expect(page.getByTestId("zip-size-line")).toContainText(
+      /^\d+ Word files and the readiness summary/,
+    );
+    await expect(page.getByTestId("row-docx").first()).toHaveAttribute(
+      "aria-label",
+      /^Download .+ \(\.docx\)$/,
+    );
     await page.getByTestId("set-list").getByRole("link").first().click();
     // The control table renders twice (batch 36's data table: cards on a
     // phone, a table from sm up) and the hidden copy comes first in the DOM,
