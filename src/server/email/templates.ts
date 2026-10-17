@@ -7,6 +7,7 @@ import { BRAND } from "@/lib/brand";
 import { TIMELINE_FIXED_SENTENCE } from "@/lib/registers/timeline";
 import { REPORT_WINDOW_WORDS } from "@/lib/registers/worker";
 import type { EmailMessage } from "./provider";
+import { WORKER_FIRST_STEPS } from "@/lib/registers/worker-steps";
 
 const SIGN_OFF = `${BRAND} provides general information and document templates for your own review; it is not legal advice.`;
 
@@ -77,11 +78,15 @@ export function workerInvitationEmail(input: {
   return {
     to: input.to,
     template: "worker-invitation",
-    subject: `${input.tradingName} has invited you to log incidents and complaints in ${BRAND}`,
+    // REQ-024 FR-7, FR-9 (AC-8): the role's sentence and the worker's first three steps, no number but the code and the date.
+    subject: `${input.tradingName} has invited you to log incidents and complaints and complete your onboarding in ${BRAND}`,
     text: [
-      `${input.tradingName} has invited you, as worker ${input.workerRef}, to log incidents and complaints in ${BRAND}.`,
+      `${input.tradingName} has invited you, as worker ${input.workerRef}, to log incidents and complaints and complete your onboarding in ${BRAND}.`,
       "",
-      "You can log incidents and complaints and see what you logged. Your manager sees everything else.",
+      "Your first three steps, once you are in:",
+      ...WORKER_FIRST_STEPS.map((s) => `- ${s}`),
+      "",
+      "You can log incidents and complaints and complete your onboarding here, and see what you logged. Your manager sees everything else.",
       "",
       `Open this link and sign in with this email address: ${input.url}`,
       `The invitation works until ${input.expiresOn}.`,

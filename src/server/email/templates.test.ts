@@ -64,6 +64,30 @@ describe("documents-ready email (REQ-007 FR-5)", () => {
   });
 });
 
+describe("the invitation's first steps (REQ-024 FR-9, AC-8)", () => {
+  const m = workerInvitationEmail({
+    to: "worker@example.test",
+    tradingName: "Sunrise Supports",
+    workerRef: "W-3",
+    url: "https://readyline.example/invite/abc",
+    expiresOn: "1 November 2026",
+  });
+  it("carries the three steps in the worker's words, the link and the FR-7 subject, and no number but the code and the date", () => {
+    expect(m.subject).toContain(
+      "log incidents and complaints and complete your onboarding",
+    );
+    expect(m.text).toContain("Code of Conduct acknowledgement");
+    expect(m.text).toContain("NDIS Worker Orientation Module");
+    expect(m.text).toContain(
+      "incident, complaints, privacy and safeguarding policies",
+    );
+    expect(m.text).toContain("https://readyline.example/invite/abc");
+    // No phone, check or application number: nothing of five digits or more.
+    expect(m.text).not.toMatch(/\d{5,}/);
+    expect(findProhibitedClaims(m.text)).toEqual([]);
+  });
+});
+
 describe("every template as the provider sends it (REQ-022 FR-5, FR-7)", () => {
   const origin = "https://readyline.example";
   const all = [

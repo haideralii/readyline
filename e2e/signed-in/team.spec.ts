@@ -80,7 +80,7 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
     await page.goto("/account");
     await expect(page.getByTestId("account-team")).toBeVisible();
     await expect(page.getByTestId("team-panel")).toContainText(
-      "A worker can log incidents and complaints and see what they logged.",
+      "A worker can log incidents and complaints and complete their onboarding, and see what they logged.",
     );
     await page.getByLabel("Their email address").fill(worker.email);
     await page.getByLabel("Their worker code").fill("w-003");
