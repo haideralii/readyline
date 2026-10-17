@@ -117,6 +117,10 @@ test.describe("legal and trust pages (REQ-008)", () => {
       await expect(page.getByTestId("legal-draft-note"), path).toContainText(
         /^Draft\./,
       );
+      // REQ-028 FR-11: the aside (Jump to and the updated line) from lg, none under it.
+      await expect(page.getByRole("complementary"), path).toHaveCount(
+        (page.viewportSize()?.width ?? 0) >= 1024 ? 1 : 0,
+      );
       const h2s = await page
         .getByRole("heading", { level: 2 })
         .allTextContents();

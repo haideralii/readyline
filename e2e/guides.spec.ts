@@ -68,6 +68,10 @@ test.describe("guides (REQ-011)", () => {
     await expect(page.getByTestId("guide-reviewed")).toContainText(
       /Last reviewed/,
     );
+    // REQ-028 FR-11: the aside (Jump to, Last reviewed, the short answer) from lg, none under it.
+    await expect(page.getByRole("complementary")).toHaveCount(
+      (page.viewportSize()?.width ?? 0) >= 1024 ? 1 : 0,
+    );
     // The table comes from standards.json: 38 groups, household tasks is verification, personal care certification.
     // Batch 36: stacked rows on phones, a table on wider screens; the same cells either way.
     const table = page.getByTestId("data-table").first();

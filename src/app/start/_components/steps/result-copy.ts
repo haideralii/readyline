@@ -1,19 +1,10 @@
 /**
  * The result page's own copy and the two list rules it renders (REQ-027 A2:
- * FR-3a, FR-3b; D-2707, D-2716, D-2718, D-2722, D-2723, D-2725), in a `.ts`
+ * FR-3a, FR-3b; D-2707 as REQ-028 D-2805 amends it, D-2716, D-2718, D-2722, D-2723, D-2725), in a `.ts`
  * beside the page so the copy lint walks the strings (`COPY_MODULES`) and the
  * unit test reads them without React. Every sentence here is the PO's.
  */
 import type { HaveStatus } from "@/lib/questionnaire/document-set";
-
-/**
- * FR-3a, D-2707: the one "Next:" line, on the signed-out result page under
- * its primary action, for a new account: it names the screen a new account is
- * sent to by its heading (`account/setup/page.tsx`), nothing about time, and
- * never sits under a payment control. A reader who already has an account is
- * sent past that screen and the REQ-017 strip takes over once they are in.
- */
-export const NEXT_LINE = "Next: sign in, then 'About your business'.";
 
 /** REQ-025 FR-4a as D-2718 amends it: the reader's answers, in the reader's words; an unasked row carries no tag. */
 export const HAVE_TAG: Partial<

@@ -82,7 +82,7 @@ export function ExistingStepForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="step-form">
       {/* REQ-025 FR-1, D-2216: what these answers do and do not change, in two lines. */}
       <div
         className="text-ink mb-6 space-y-2 text-base leading-7"

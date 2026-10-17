@@ -15,10 +15,13 @@ export function SubscribeButton({
   label,
   cancelPath,
   testId = "subscribe-button",
+  variant = "primary",
 }: {
   label: string;
   cancelPath: "/pricing" | "/account" | "/registers";
   testId?: string;
+  /** REQ-028 D-2816: on the pricing page both buttons are secondary, so neither product is pushed. */
+  variant?: "primary" | "secondary";
 }) {
   const [state, action, pending] = useActionState(subscribeAction, null);
   return (
@@ -28,7 +31,7 @@ export function SubscribeButton({
         type="submit"
         disabled={pending}
         aria-busy={pending || undefined}
-        className="btn-primary"
+        className={variant === "secondary" ? "btn-secondary" : "btn-primary"}
         data-testid={testId}
       >
         {pending ? "Taking you to the payment page…" : label}

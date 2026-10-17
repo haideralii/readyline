@@ -29,28 +29,31 @@ export function Testimonials() {
   if (items.length === 0) return null;
   return (
     <section
-      className="mt-12 max-w-2xl"
+      className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-8"
       aria-labelledby="testimonials-heading"
       data-testid="testimonials"
     >
-      <h2 id="testimonials-heading" className="">
-        In providers&apos; own words
-      </h2>
-      <ul className="mt-4 space-y-4">
-        {items.map((t) => (
-          <li
-            key={`${t.business}-${t.given}`}
-            className="border-rule rounded-md border p-4"
-          >
-            <blockquote className="leading-7">
-              &ldquo;{t.quote}&rdquo;
-            </blockquote>
-            <p className="text-slate mt-2 text-sm">
-              {t.name}, {t.business}, {t.audit} audit
-            </p>
-          </li>
-        ))}
-      </ul>
+      {/* REQ-028 FR-10 (D-2276 default (d)): eight of the shell's columns, no width of its own. */}
+      <div className="lg:col-span-8">
+        <h2 id="testimonials-heading" className="">
+          In providers&apos; own words
+        </h2>
+        <ul className="mt-4 space-y-4">
+          {items.map((t) => (
+            <li
+              key={`${t.business}-${t.given}`}
+              className="border-rule rounded-md border p-4"
+            >
+              <blockquote className="leading-7">
+                &ldquo;{t.quote}&rdquo;
+              </blockquote>
+              <p className="text-slate mt-2 text-sm">
+                {t.name}, {t.business}, {t.audit} audit
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }
