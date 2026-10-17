@@ -54,7 +54,7 @@ const everythingSet = (): LaunchFacts =>
         webhookEndpoint: "matches",
       },
       email: {
-        provider: "ses",
+        provider: "smtp",
         domainVerified: true,
         lastTestSendAt: "2026-10-15T01:00:00Z",
       },
@@ -235,7 +235,7 @@ describe("launchRows (REQ-022 FR-1)", () => {
   it("the email and admin rows read the facts the server gathers", () => {
     const f = facts({
       email: {
-        provider: "ses",
+        provider: "smtp",
         domainVerified: false,
         lastTestSendAt: "2026-10-13T01:00:00Z",
       },
@@ -246,6 +246,35 @@ describe("launchRows (REQ-022 FR-1)", () => {
     expect(byId(f)["email-test-send"].state).toBe("unset");
     expect(byId(f)["admin-totp"].state).toBe("unset");
     expect(byId(facts())["email-domain"].state).toBe("unverified");
+  });
+
+  it("the provider row reads mismatched when smtp is named with a value missing (REQ-022 Session B)", () => {
+    const row = byId(
+      facts({
+        email: {
+          provider: "log-only",
+          configured: "smtp",
+          missing: ["SMTP_PASS", "HASH_PEPPER"],
+          domainVerified: null,
+          lastTestSendAt: null,
+        },
+      }),
+    )["email-provider"];
+    expect(row.state).toBe("mismatched");
+    expect(row.sentence).toContain("SMTP_PASS, HASH_PEPPER");
+    expect(
+      byId(
+        facts({
+          email: {
+            provider: "log-only",
+            configured: "log",
+            missing: [],
+            domainVerified: null,
+            lastTestSendAt: null,
+          },
+        }),
+      )["email-provider"].state,
+    ).toBe("unset");
   });
 
   it("the hash pepper row is unset until HASH_PEPPER exists (retro finding 34)", () => {

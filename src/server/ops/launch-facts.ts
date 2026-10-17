@@ -13,7 +13,11 @@ import { log } from "@/lib/logging/logger";
 import type { LaunchFacts } from "@/lib/ops/launch";
 import { isFakeStripeMode } from "@/lib/payments/fake-session";
 import type { PriceFact } from "@/lib/payments/live-guards";
-import { createEmailProvider } from "@/server/email/provider";
+import {
+  configuredEmailProvider,
+  createEmailProvider,
+  smtpMissing,
+} from "@/server/email/provider";
 import { jobRunAction, type JobName } from "@/server/jobs/record-run";
 import { createStripeClient } from "@/server/payments/stripe";
 
@@ -167,6 +171,8 @@ export async function gatherLaunchFacts(input: {
     stripe,
     email: {
       provider: createEmailProvider().name,
+      configured: configuredEmailProvider(),
+      missing: configuredEmailProvider() === "smtp" ? smtpMissing() : [],
       domainVerified: null,
       lastTestSendAt: await lastAuditAt(input.admin, TEST_SEND_ACTION),
     },

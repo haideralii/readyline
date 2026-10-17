@@ -65,6 +65,9 @@ export type LaunchFacts = {
   email: {
     /** The provider's name as `createEmailProvider()` reports it. */
     provider: string;
+    /** REQ-022 Session B: what EMAIL_PROVIDER names, and the names it still needs (never values). */
+    configured?: "log" | "smtp" | "unknown";
+    missing?: string[];
     domainVerified: boolean | null;
     lastTestSendAt: string | null;
   };
@@ -379,12 +382,26 @@ const RULES: Rule[] = [
     name: "Email provider",
     judge: (f) =>
       f.email.provider !== "log-only"
-        ? { state: "set", sentence: "A sending provider is configured." }
-        : {
-            state: "unset",
-            sentence:
-              "Email only logs; the provider arrives with REQ-022 Session B (D-2201).",
-          },
+        ? {
+            state: "set",
+            sentence: "Plain SMTP is configured (EMAIL_PROVIDER=smtp, D-2822).",
+          }
+        : f.email.configured === "smtp"
+          ? {
+              state: "mismatched",
+              sentence: `EMAIL_PROVIDER is smtp but ${(f.email.missing ?? []).join(", ") || "a value"} is not set; email only logs until it is.`,
+            }
+          : f.email.configured === "unknown"
+            ? {
+                state: "mismatched",
+                sentence:
+                  "EMAIL_PROVIDER names a provider this build does not have; set it to smtp or log.",
+              }
+            : {
+                state: "unset",
+                sentence:
+                  "Email only logs; set EMAIL_PROVIDER=smtp and the five SMTP values (D-2822).",
+              },
   },
   {
     id: "email-domain",
