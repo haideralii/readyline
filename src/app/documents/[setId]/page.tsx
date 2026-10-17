@@ -86,7 +86,7 @@ export default async function DocumentSetPage({
         </Link>
       </p>
       {/* REQ-028 FR-7: the list kind's header row; the zip is the page's primary, the summary PDF beside it. */}
-      <div className="lg:flex lg:items-start lg:justify-between lg:gap-8">
+      <div className="lg:flex lg:flex-wrap lg:items-start lg:justify-between lg:gap-8">
         <div className="min-w-0 lg:max-w-prose">
           <h1 className="mt-2">Document set</h1>
           <p className="text-ink mt-3 leading-7" data-testid="set-summary">
@@ -110,7 +110,7 @@ export default async function DocumentSetPage({
             )}
           </p>
         </div>
-        <div className="mt-5 lg:mt-1 lg:shrink-0">
+        <div className="mt-5 min-w-0 lg:mt-1 lg:max-w-[32rem]">
           <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
             <a
               href={`/documents/${set.id}/download?file=set.zip`}

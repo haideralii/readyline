@@ -79,7 +79,7 @@ export function RegisterPage({
         </p>
       ) : null}
       {/* REQ-028 FR-7: the list kind's header row, the title and its intro left and the actions right from lg. */}
-      <div className="lg:flex lg:items-start lg:justify-between lg:gap-8">
+      <div className="lg:flex lg:flex-wrap lg:items-start lg:justify-between lg:gap-8">
         <div className="min-w-0 lg:max-w-prose">
           {/* The register list and the events trail are labelled by this heading (backlog 1, D-1508). */}
           <h1 id="register-title" className="">
@@ -89,7 +89,7 @@ export function RegisterPage({
         </div>
         {showActions && (actions || (canWrite && addHref) || exportHref) ? (
           <div
-            className="mt-5 flex flex-wrap gap-3 lg:mt-1 lg:shrink-0 lg:justify-end"
+            className="mt-5 flex min-w-0 flex-wrap gap-3 lg:mt-1 lg:max-w-[32rem] lg:justify-end"
             data-testid="register-actions"
           >
             {actions}

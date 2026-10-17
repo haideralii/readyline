@@ -13,6 +13,7 @@ import {
   signInContext,
   type TestTenant,
 } from "../helpers/session";
+import { zoom200NoSidewaysScroll } from "../helpers/a11y";
 import { checkWidths } from "../helpers/width";
 import { formatShortDateAu } from "@/lib/registers/table-columns";
 
@@ -160,6 +161,8 @@ test.describe("REQ-028 Session B: the registers on a laptop", () => {
       await expect(list.locator("ul > li").first()).toBeVisible();
     }
     await checkWidths(page, "incidents table");
+    // PO 19:25: the header row with three controls and the table at doubled text, so the public job sees it.
+    await zoom200NoSidewaysScroll(page, "incidents list with rows");
     await shot(page, "incidents-table", project);
 
     // The planted name is on the entry's own page and in no table cell of the other two registers.
