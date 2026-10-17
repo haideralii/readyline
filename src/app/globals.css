@@ -314,14 +314,15 @@ th {
   summary.disclosure-summary::-webkit-details-marker {
     display: none;
   }
-  .disclosure-chevron {
+  summary.disclosure-summary::before {
+    content: "›";
     display: inline-block;
     width: 1rem;
     text-align: center;
     color: var(--slate);
     transition: transform 150ms ease-out;
   }
-  details[open] > summary.disclosure-summary > .disclosure-chevron {
+  details[open] > summary.disclosure-summary::before {
     transform: rotate(90deg);
   }
 

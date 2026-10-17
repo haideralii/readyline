@@ -135,11 +135,9 @@ export function Stepper({
                 <Link
                   href={stepHref(id)}
                   className={`${circle} bg-ochre text-paper relative`}
+                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: done, change it`}
                 >
                   <span aria-hidden="true">✓</span>
-                  <span className="sr-only">
-                    Step {n}, {STEP_SHORT[id]}: done, change it
-                  </span>
                 </Link>
               ) : state === "current" ? (
                 <span

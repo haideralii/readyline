@@ -34,7 +34,8 @@ describe("Disclosure", () => {
     );
     expect(details().open).toBe(false);
     expect(screen.getByTestId("s").textContent).toContain("Why this result");
-    expect(details().querySelector(".disclosure-chevron")).not.toBeNull();
+    expect(screen.getByTestId("s").className).toContain("disclosure-summary");
+    expect(screen.getByTestId("s").textContent).toBe("Why this result");
     expect(details().className).toContain("border-rule");
   });
 

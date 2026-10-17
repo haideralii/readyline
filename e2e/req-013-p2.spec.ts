@@ -78,9 +78,9 @@ test.describe("REQ-013 P2", () => {
     const stepper = page.getByRole("navigation", {
       name: "Questionnaire steps",
     });
-    await expect(stepper.locator("[aria-current='step']")).toHaveAttribute(
-      "aria-label",
-      /Step 1, Business/,
+    // REQ-028 FR-3 (QA F3): the current circle names itself with sr-only text, not aria-label on a span.
+    await expect(stepper.locator("[aria-current='step']")).toContainText(
+      /Step 1, Business: current/,
     );
     await expect(stepper.getByRole("link")).toHaveCount(0);
     await page.getByLabel("Trading name").fill("Sunrise Supports");

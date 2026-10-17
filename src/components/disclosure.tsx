@@ -2,15 +2,17 @@ import type { DetailsHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { OpenOnLarge } from "./open-on-large";
 
 /**
- * REQ-028 FR-13 (D-2813, D-2274): the one disclosure. A chevron, a 16 px
- * semibold summary, a `--rule` top border, and a `quiet` variant for the
- * glossary (a plain underlined line). With `openOnLarge` it renders through
- * `OpenOnLarge`, which opens it at `lg` on a first visit and follows the
- * crossing rule; otherwise it is a plain `<details>`. A caller that
- * remembers the state passes `open` and `onToggle`, and `onSummaryClick`
- * hears the click in its own task with the state the click produces (the
- * result page records it there, #40). It replaces the result page's local
- * disclosure and the glossary's own `<details>`.
+ * REQ-028 FR-13 (D-2813, D-2274): the one disclosure. A chevron drawn by the
+ * stylesheet (`summary.disclosure-summary::before`, so the summary's text
+ * stays the words alone), a 16 px semibold summary, a `--rule` top border,
+ * and a `quiet` variant for the glossary (a plain underlined line). With
+ * `openOnLarge` it renders through `OpenOnLarge`, which opens it at `lg` on
+ * a first visit and follows the crossing rule; otherwise it is a plain
+ * `<details>`. A caller that remembers the state passes `open` and
+ * `onToggle`, and `onSummaryClick` hears the click in its own task with the
+ * state the click produces (the result page records it there, #40). It
+ * replaces the result page's local disclosure and the glossary's own
+ * `<details>`.
  */
 export function Disclosure({
   summary,
@@ -70,9 +72,6 @@ export function Disclosure({
   const body = (
     <>
       <summary className={summaryClass} data-testid={summaryTestId}>
-        <span aria-hidden="true" className="disclosure-chevron">
-          ›
-        </span>
         {summary}
       </summary>
       <div className={bodyClassName ?? (quiet ? "" : "px-4 pb-4")}>
