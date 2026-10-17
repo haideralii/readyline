@@ -194,8 +194,8 @@ label:active {
 button:active:not(:disabled),
 [role="button"]:active {
   background-color: var(--mist);
-  transform: translateY(1px);
 }
+/* REQ-028 FR-13 (audit 48): the one-pixel drop belongs to the two button classes only. */
 .btn-primary:active:not(:disabled),
 .btn-primary[aria-busy="true"] {
   background-color: color-mix(in srgb, var(--ochre) 82%, var(--ink));
