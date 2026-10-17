@@ -475,7 +475,7 @@ function ResultView({
           {changes &&
           (changes.groupsChanged || changes.statesAdded.length > 0) ? (
             <div
-              className="border-rule mt-4 rounded-md border p-3 text-sm leading-6"
+              className="border-rule mt-4 rounded-md border p-4 text-sm leading-6"
               data-testid="result-changes"
             >
               {changes.groupsChanged ? (
