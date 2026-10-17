@@ -3,12 +3,19 @@ import "server-only";
  * The register exports (REQ-009 FR-6, SR-3): CSV with a byte-order mark,
  * dates as stored, and for incidents and complaints a zip holding the
  * register and its events as two files. Member-only through RLS, five an
- * hour per account, audit-logged with ids only.
+ * hour per account, audit-logged with ids only. REQ-023 FR-5: the four
+ * exports take the period; the rows filter on the register's date column
+ * and the file name carries the period after the date stamp.
  */
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { auditorVisibleIncidents } from "@/lib/registers/audit-pack";
 import { CSV_COLUMNS, CSV_HEADER_LABELS, toCsv } from "@/lib/registers/csv";
+import {
+  ALL_PERIOD,
+  periodFileSuffix,
+  type Period,
+} from "@/lib/registers/period";
 import {
   listComplaints,
   listIncidents,
@@ -33,22 +40,24 @@ export const EXPORT_PATHS: Record<string, ExportRegister> = {
  * exactly what the export does, except that the pack asks for the register
  * only (`registerOnly`): a draft or rejected report and its trail stay out
  * of what an auditor sees (FR-5; retro review finding 30), while the owner's
- * own export keeps them.
+ * own export keeps them. With a period (REQ-023 FR-5) the rows filter on the
+ * register's date column and the trail keeps the events of the rows shown.
  */
 export async function registerFiles(
   supabase: SupabaseClient,
   accountId: string,
   register: ExportRegister,
   stamp: string,
-  options: { registerOnly?: boolean } = {},
+  options: { registerOnly?: boolean; period?: Period } = {},
 ): Promise<Record<string, Uint8Array>> {
+  const period = options.period ?? ALL_PERIOD;
   if (register === "incidents" || register === "complaints") {
     const rows =
       register === "incidents"
-        ? await listIncidents(supabase, accountId).then((all) =>
+        ? await listIncidents(supabase, accountId, period).then((all) =>
             options.registerOnly ? auditorVisibleIncidents(all) : all,
           )
-        : await listComplaints(supabase, accountId);
+        : await listComplaints(supabase, accountId, period);
     const eventsTable =
       register === "incidents" ? "incident_events" : "complaint_events";
     const fk = register === "incidents" ? "incident_id" : "complaint_id";
@@ -59,8 +68,9 @@ export async function registerFiles(
       .order("at", { ascending: true })
       .limit(5000);
     const byId = new Map(rows.map((r) => [r.id, r.reference]));
+    const onlyShown = Boolean(options.registerOnly) || period.kind !== "all";
     const events = ((ev.data as Record<string, unknown>[] | null) ?? [])
-      .filter((e) => !options.registerOnly || byId.has(e[fk] as string))
+      .filter((e) => !onlyShown || byId.has(e[fk] as string))
       .map((e) => ({
         reference: byId.get(e[fk] as string) ?? "",
         at: e.at,
@@ -76,8 +86,8 @@ export async function registerFiles(
   }
   const rows =
     register === "worker_clearances"
-      ? await listWorkerChecks(supabase, accountId)
-      : await listPolicyReviews(supabase, accountId);
+      ? await listWorkerChecks(supabase, accountId, period)
+      : await listPolicyReviews(supabase, accountId, period);
   const name =
     register === "worker_clearances" ? "worker-checks" : "policy-reviews";
   return {
@@ -92,14 +102,19 @@ export async function buildRegisterExport(
   accountId: string,
   register: ExportRegister,
   now: Date,
+  period: Period = ALL_PERIOD,
 ): Promise<{ body: Uint8Array; contentType: string; fileName: string }> {
   const stamp = now.toISOString().slice(0, 10);
-  const files = await registerFiles(supabase, accountId, register, stamp);
+  const files = await registerFiles(supabase, accountId, register, stamp, {
+    period,
+  });
+  // FR-5: the file name carries the period after the date stamp.
+  const suffix = periodFileSuffix(period);
   if (register === "incidents" || register === "complaints") {
     return {
       body: zipSync(files, { level: 6 }),
       contentType: "application/zip",
-      fileName: `readyline-${register}-${stamp}.zip`,
+      fileName: `readyline-${register}-${stamp}${suffix}.zip`,
     };
   }
   const name =
@@ -107,6 +122,6 @@ export async function buildRegisterExport(
   return {
     body: Object.values(files)[0],
     contentType: "text/csv; charset=utf-8",
-    fileName: `readyline-${name}-${stamp}.csv`,
+    fileName: `readyline-${name}-${stamp}${suffix}.csv`,
   };
 }
