@@ -150,7 +150,13 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
       "the renewal window opened",
     );
     await expect(page.getByTestId("renewal-next")).toHaveText("Read it");
-    await expect(page.locator(".btn-primary")).toHaveCount(1);
+    // One primary on the screen; the "Your next step" strip above the shell carries its own (REQ-017 FR-1, D-1701), as guided-path.spec.ts counts it.
+    await expect(page.locator('[data-shell="page"] .btn-primary')).toHaveCount(
+      1,
+    );
+    await expect(page.getByTestId("next-step-button")).toHaveClass(
+      /btn-primary/,
+    );
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.getByTestId("renewal-step-booking")).not.toContainText(
       /recommend|approved auditor|fee/i,
