@@ -174,7 +174,8 @@ test.describe("REQ-024 C: supervision, the derived states, the import and ending
     await expect(line).toContainText(
       "From your staff list: 1 worker with items outstanding",
     );
-    await expect(page.locator("main")).not.toContainText(/\bready\b/i);
+    // D-2411 is a rule for the worker's words; the page's own summary says "N of M things ready" (REQ-017), so the check is on the line.
+    await expect(line).not.toContainText("ready");
     await shot(page, "audit-day-people", project);
     await page.goto("/checklist");
     await expect(
