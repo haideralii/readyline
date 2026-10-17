@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-16
+updated: 2026-10-17
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -49,7 +49,7 @@ Your data stays while your account is open. If you delete your account, we remov
 
 ## Your choices
 
-- Export: you can download everything we hold about you from your account page at any time.
+- Export: you can download everything we hold about you from your account page at any time: your account, your answers, your checklist, your registers (including the worker tables) and your audit log.
 - Delete: you can delete your account from your account page. We confirm by email.
 - Correct: you can change your answers and regenerate your documents.
 - If you are a worker whose provider uses Readyline: your worker home shows what we hold about you, except your provider's own notes. Ask us by email for anything else; we answer within a reasonable period, and if we refuse we say why in writing.
