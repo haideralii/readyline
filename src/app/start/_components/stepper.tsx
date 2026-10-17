@@ -69,7 +69,7 @@ export function Stepper({
           Step {index + 1} of {total}: {STEP_SHORT[step]}
         </p>
         <details className="sm:hidden" data-testid="stepper-steps">
-          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
+          <summary className="border-line bg-surface inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
             Show steps
           </summary>
           <ol
@@ -135,25 +135,31 @@ export function Stepper({
                 <Link
                   href={stepHref(id)}
                   className={`${circle} bg-ochre text-paper relative`}
-                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: done, change it`}
                 >
                   <span aria-hidden="true">✓</span>
+                  <span className="sr-only">
+                    Step {n}, {STEP_SHORT[id]}: done, change it
+                  </span>
                 </Link>
               ) : state === "current" ? (
                 <span
                   aria-current="step"
-                  className={`${circle} text-ink ring-ochre bg-surface relative ring-2`}
-                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: current`}
+                  className={`${circle} text-ink ring-ochre bg-paper relative ring-2`}
                 >
-                  {n}
+                  <span aria-hidden="true">{n}</span>
+                  <span className="sr-only">
+                    Step {n}, {STEP_SHORT[id]}: current
+                  </span>
                 </span>
               ) : (
                 <span
                   aria-disabled="true"
                   className={`${circle} text-slate bg-mist relative`}
-                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: not yet`}
                 >
-                  {n}
+                  <span aria-hidden="true">{n}</span>
+                  <span className="sr-only">
+                    Step {n}, {STEP_SHORT[id]}: not yet
+                  </span>
                 </span>
               )}
               {/* FR-6: labels under the circles from 640 px up; FR-8: on a phone the names are in the disclosure above. */}

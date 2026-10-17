@@ -26,6 +26,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { PRESELECT_KEY } from "../start-intro";
 import { GlossaryTerms } from "@/components/glossary-terms";
@@ -119,6 +120,10 @@ export function SupportsStepForm() {
   const [note, setNote] = useState(saved?.servicesNote ?? "");
   const [query, setQuery] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("supports", values, name, errors));
   const [pending, setPending] = useState(false);
   // FR-11: which headings are open. Phones start with the two common ones;
   // wider screens open everything, because there is room to scan. The
@@ -151,13 +156,33 @@ export function SupportsStepForm() {
   const nameOf = (code: string) =>
     groups.find((g) => g.code === code)?.name ?? code;
 
+  // The values as onSubmit assembles them, for the re-validation on change.
+  const valuesNow = (o: {
+    current?: string[];
+    note?: string;
+    fewHours?: string | undefined;
+    selfManaged?: string | undefined;
+  }) => {
+    const c = o.current ?? current;
+    const n = o.note ?? note;
+    const fh = "fewHours" in o ? o.fewHours : fewHours;
+    const sm = "selfManaged" in o ? o.selfManaged : selfManaged;
+    const values: Record<string, unknown> = { groups: c };
+    if (n.trim()) values.servicesNote = n;
+    if (fh && sm)
+      values.silEligibility = {
+        fewHoursOnly: fh === "yes",
+        participantManagesOwnWorkers: sm === "yes",
+      };
+    return values;
+  };
   const toggle = (code: string) => {
     setTouched(true);
-    setSelected(
-      current.includes(code)
-        ? current.filter((c) => c !== code)
-        : [...current, code].sort(),
-    );
+    const next = current.includes(code)
+      ? current.filter((c) => c !== code)
+      : [...current, code].sort();
+    setSelected(next);
+    void clear("groups", valuesNow({ current: next }));
   };
   const applyHint = () => {
     setTouched(true);
@@ -433,7 +458,13 @@ export function SupportsStepForm() {
               legend="Does the person only receive a few hours of support a day or week?"
               options={YES_NO}
               value={fewHours}
-              onChange={setFewHours}
+              onChange={(v) => {
+                setFewHours(v);
+                void clear(
+                  "silEligibility.fewHoursOnly",
+                  valuesNow({ fewHours: v }),
+                );
+              }}
               errors={errorsFor(errors, "silEligibility.fewHoursOnly")}
             />
             <RadioGroup
@@ -441,7 +472,13 @@ export function SupportsStepForm() {
               legend="Does the person choose and manage their own support workers (including directing, planning and rostering them)?"
               options={YES_NO}
               value={selfManaged}
-              onChange={setSelfManaged}
+              onChange={(v) => {
+                setSelfManaged(v);
+                void clear(
+                  "silEligibility.participantManagesOwnWorkers",
+                  valuesNow({ selfManaged: v }),
+                );
+              }}
               errors={errorsFor(
                 errors,
                 "silEligibility.participantManagesOwnWorkers",
@@ -462,7 +499,10 @@ export function SupportsStepForm() {
             id="servicesNote"
             name="servicesNote"
             value={note}
-            onChange={setNote}
+            onChange={(v) => {
+              setNote(v);
+              void clear("servicesNote", valuesNow({ note: v }));
+            }}
             describedBy={describedBy}
             invalid={invalid}
             maxLength={500}

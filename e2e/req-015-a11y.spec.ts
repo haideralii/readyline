@@ -60,6 +60,15 @@ async function axeClean(page: Page, label: string) {
     ),
     `${label}: axe violations`,
   ).toEqual([]);
+  // REQ-028 AC-2 (first pass 6): no aria-prohibited-attr incomplete either; the
+  // stepper named its circles with aria-label on spans until FR-3 gave them
+  // sr-only text, and this holds the line.
+  expect(
+    results.incomplete
+      .filter((i) => i.id === "aria-prohibited-attr")
+      .map((i) => `${i.id} (${i.nodes.length} nodes)`),
+    `${label}: aria-prohibited-attr incompletes`,
+  ).toEqual([]);
 }
 
 async function headingOrder(page: Page): Promise<string[]> {

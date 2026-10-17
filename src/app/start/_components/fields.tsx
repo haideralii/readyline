@@ -20,7 +20,7 @@ export function errorsFor(errors: FieldErrors, name: string): string[] {
 }
 
 const inputClass =
-  "block w-full min-h-12 rounded-md border border-line bg-surface px-3 py-2 text-base text-ink shadow-sm focus:border-ink focus:outline-2 focus:outline-offset-1 focus:outline-ink";
+  "block w-full min-h-12 rounded-md border border-line bg-surface px-3 py-2 text-base text-ink shadow-sm";
 const invalidClass = "border-red-700 dark:border-red-400";
 
 export function Field({
@@ -193,7 +193,7 @@ export function ChoiceRow({
   return (
     <label
       htmlFor={id}
-      className="border-line hover:bg-mist has-[:checked]:border-ink flex min-h-12 cursor-pointer items-start gap-3 rounded-md border px-3 py-3 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+      className="border-line hover:bg-mist has-[:checked]:border-ink has-[:checked]:bg-sky flex min-h-12 cursor-pointer items-start gap-3 rounded-md border px-3 py-3 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
     >
       <input
         type={type}
@@ -323,14 +323,14 @@ export function CheckboxGroup<V extends string>({
           {help}
         </p>
       ) : null}
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4" id={name}>
+      <div className="mt-2 flex flex-wrap gap-2" id={name}>
         {options.map((o) => {
           const id = `${name}-${o.value}`;
           return (
             <label
               key={o.value}
               htmlFor={id}
-              className="border-line hover:bg-mist has-[:checked]:border-ink flex min-h-12 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
+              className="border-line hover:bg-mist has-[:checked]:border-ink has-[:checked]:bg-sky inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md border px-3 py-2 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
             >
               <input
                 type="checkbox"

@@ -162,6 +162,13 @@ strong {
   outline: none;
 }
 
+/* REQ-028 FR-3: the one warm accent on every radio and checkbox; the per-input
+   ink focus classes are gone and the global ochre ring above applies. */
+input[type="radio"],
+input[type="checkbox"] {
+  accent-color: var(--ochre);
+}
+
 /* A date or time input focuses a segment inside its own shadow tree, so the
    host matches :focus but not :focus-visible in Chromium and WebKit alike, and
    a keyboard user saw no ring (#39, run 38623216096). The ring is shown on
