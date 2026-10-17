@@ -51,6 +51,12 @@ create trigger commission_changes_set_updated_at
   before update on public.commission_changes
   for each row execute function public.set_updated_at();
 
+-- The shared sequence admits the register (#103 run 1: the inline CHECK of 20261013000000 named the two
+-- REQ-009 registers alone, so the first insert failed with 23514).
+alter table public.register_sequences drop constraint register_sequences_register_check;
+alter table public.register_sequences add constraint register_sequences_register_check
+  check (register in ('incidents', 'complaints', 'commission_changes'));
+
 -- The row code: CHG-0001 (the function gains the prefix; the body is 20261015050000's with one line added).
 create or replace function public.next_register_reference(p_account uuid, p_register text)
 returns text
@@ -148,12 +154,13 @@ grant select on public.commission_changes_status to authenticated, service_role;
 grant all privileges on public.commission_changes to service_role;
 
 -- The shared trail takes the register (the list 20261017000000 leaves, plus this one).
+-- The list 20261017010000 leaves (REQ-024 A2's `screening_exceptions` included; #103 run 1), plus this register.
 alter table public.register_events drop constraint register_events_register_check;
 alter table public.register_events add constraint register_events_register_check check (register in (
   'corporate_risks', 'participant_risks', 'conflicts_of_interest', 'delegations',
   'insurance_items', 'improvements', 'staff_matrix', 'onboarding_checklists',
   'hazards', 'incidents', 'complaints', 'worker_clearances',
-  'onboarding_items', 'risk_assessed_roles', 'commission_changes'
+  'onboarding_items', 'risk_assessed_roles', 'screening_exceptions', 'commission_changes'
 ));
 
 notify pgrst, 'reload schema';
