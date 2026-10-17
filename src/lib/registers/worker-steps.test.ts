@@ -4,6 +4,8 @@ import {
   acknowledgementsComplete,
   acknowledgementsOutstanding,
   itemStepState,
+  w1StepState,
+  workerStepState,
   latestAdopted,
   STEP_WORDS,
 } from "./worker-steps";
@@ -45,6 +47,39 @@ describe("the worker's view of an item (REQ-024 FR-7, FR-8; D-2438, D-2444)", ()
     ).toBe("recorded-by-manager");
     expect(STEP_WORDS["recorded-by-manager"]).toBe("Recorded by your manager");
     expect(STEP_WORDS.waiting).toBe("Waiting for your manager to confirm");
+  });
+});
+
+describe("W-1 on the worker's home (D-2834)", () => {
+  const none = { done_on: null, confirmed_on: null, recorded_by_owner: false };
+  it("is to do with no row or no check number, waiting once the number is typed, confirmed once the owner confirms", () => {
+    expect(w1StepState(null, undefined)).toBe("to-do");
+    expect(w1StepState({ clearance_number: "" }, none)).toBe("to-do");
+    expect(w1StepState({ clearance_number: "WC 1" }, none)).toBe("waiting");
+    expect(
+      w1StepState(
+        { clearance_number: "WC 1" },
+        { ...none, confirmed_on: "2026-11-02" },
+      ),
+    ).toBe("confirmed");
+    expect(
+      w1StepState(
+        { clearance_number: "" },
+        { ...none, recorded_by_owner: true },
+      ),
+    ).toBe("recorded-by-manager");
+  });
+  it("workerStepState routes W-1 by its row and every other item by its columns", () => {
+    expect(
+      workerStepState({ id: "w1-clearance", who: "owner" }, undefined, null),
+    ).toBe("to-do");
+    expect(
+      workerStepState(
+        { id: "w10-other-checks", who: "owner" },
+        undefined,
+        null,
+      ),
+    ).toBe("manager-records");
   });
 });
 

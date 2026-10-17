@@ -46,7 +46,8 @@ const number40 = z
   .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only");
 
 const ClearanceForm = strictObject({
-  clearance_id: z.string().uuid(),
+  /** Empty when the owner has not recorded the application yet (D-2834): the function makes the pending row. */
+  clearance_id: z.union([z.literal(""), z.string().uuid()]),
   application_number: number40.default(""),
   clearance_number: number40.default(""),
   expires_on: optionalIsoDate.default(""),
@@ -97,12 +98,27 @@ export async function workerSaveClearanceAction(
   const d = parsed.data;
   if (!d.application_number && !d.clearance_number && !d.expires_on)
     return { ok: false, message: "Enter at least one of the three." };
-  const r = await ctx.supabase.rpc("worker_update_clearance", {
-    p_clearance: d.clearance_id,
-    p_application_number: d.application_number || null,
-    p_clearance_number: d.clearance_number || null,
-    p_expires_on: d.expires_on,
-  });
+  if (!d.clearance_id && !d.application_number)
+    return {
+      ok: false,
+      message:
+        "Enter the application number from the unit's notice first; the check number and the expiry can follow.",
+      fieldErrors: { application_number: ["Enter the application number"] },
+    };
+  const r = d.clearance_id
+    ? await ctx.supabase.rpc("worker_update_clearance", {
+        p_clearance: d.clearance_id,
+        p_application_number: d.application_number || null,
+        p_clearance_number: d.clearance_number || null,
+        p_expires_on: d.expires_on,
+      })
+    : // D-2834: no row yet; the function finds or makes the worker's own pending row.
+      await ctx.supabase.rpc("worker_record_clearance", {
+        p_account: ctx.worker.id,
+        p_application_number: d.application_number || null,
+        p_clearance_number: d.clearance_number || null,
+        p_expires_on: d.expires_on,
+      });
   if (r.error) return refused(r.error.code, "clearance");
   log.info("worker.step.clearance", { accountId: ctx.worker.id });
   return { ok: true };

@@ -54,6 +54,36 @@ export function itemStepState(
   return "to-do";
 }
 
+/** W-1's item id on the worker's home, where it is the worker's step (D-2834). */
+export const W1_ITEM_ID = "w1-clearance";
+
+/**
+ * D-2834 (#102's run at fbd82b6): W-1 is the worker's step, whatever the
+ * owner's list says about who confirms it. The worker reads "to do" until
+ * their screening row carries a check number, "waiting" once it does and
+ * the owner has not confirmed, "confirmed" once the owner has; a row the
+ * owner dated for them reads "recorded by your manager" as every item does.
+ */
+export function w1StepState(
+  screening: { clearance_number: string } | null,
+  state: ItemStepInput | undefined,
+): ItemStepState {
+  if (state?.recorded_by_owner) return "recorded-by-manager";
+  if (state?.confirmed_on) return "confirmed";
+  return screening?.clearance_number ? "waiting" : "to-do";
+}
+
+/** The state of any item on the worker's home: W-1 by its row, the rest by the three columns. */
+export function workerStepState(
+  item: Pick<WorkerOnboardingItem, "id" | "who">,
+  state: ItemStepInput | undefined,
+  screening: { clearance_number: string } | null,
+): ItemStepState {
+  return item.id === W1_ITEM_ID
+    ? w1StepState(screening, state)
+    : itemStepState(item.who, state);
+}
+
 /** FR-7: the document types each acknowledgement item names; W-6's five are `MANDATORY_POLICIES`' words as document ids. */
 export const ACKNOWLEDGEMENT_DOCUMENTS: Readonly<
   Record<"w3-code-of-conduct" | "w6-policies", readonly string[]>
