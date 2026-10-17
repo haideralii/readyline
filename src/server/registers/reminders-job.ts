@@ -16,7 +16,11 @@ import {
 } from "@/lib/registers/reminders";
 import { isRegistrationReminderKind } from "@/lib/registers/timeline";
 import type { ReminderKind } from "@/lib/registers/types";
+import { hashPepper } from "@/lib/peppered-hash";
+import { unsubscribeUrl } from "@/lib/email/unsubscribe-token";
+import { siteUrl } from "@/lib/site";
 import type { EmailProvider } from "@/server/email/provider";
+import { ensureReminderSettings } from "@/server/email/reminder-settings";
 import { remindersEmail } from "@/server/email/templates";
 import {
   currentPeriod,
@@ -29,6 +33,8 @@ export type RemindersReport = {
   computed: number;
   inserted: number;
   emailed: number;
+  /** REQ-022 FR-5 (D-2823): rows held back because the account asked for no reminder emails. */
+  suppressed: number;
   errors: string[];
 };
 
@@ -357,6 +363,7 @@ export async function runRemindersJob(input: {
     computed: 0,
     inserted: 0,
     emailed: 0,
+    suppressed: 0,
     errors: [],
   };
   const only = input.accountIds ? new Set(input.accountIds) : null;
@@ -410,9 +417,23 @@ export async function runRemindersJob(input: {
     list.push(r);
     byAccount.set(r.account_id, list);
   }
+  // REQ-022 FR-7, SR-6: the unsubscribe token hangs off the pepper; without one the email carries no link.
+  const pepper = hashPepper();
+  const origin = siteUrl();
   for (const [accountId, rows] of byAccount) {
     try {
       const account = accounts.find((a) => a.id === accountId);
+      // REQ-022 FR-5 (D-2823, both gates): an account that asked for no reminder emails gets none, of any kind;
+      // the five timeline kinds also stop on a cancelled subscription (D-2313, above). The rows stay unsent.
+      const settings = await ensureReminderSettings(
+        input.admin,
+        accountId,
+        pepper,
+      );
+      if (settings.doNotSend) {
+        report.suppressed += rows?.length ?? 0;
+        continue;
+      }
       const to = await input.ownerEmail(accountId);
       if (!to || !rows) continue;
       const lines: string[] = [];
@@ -431,14 +452,18 @@ export async function runRemindersJob(input: {
       const timeline = rows.filter((r) =>
         isRegistrationReminderKind(r.kind as string),
       );
-      await input.email.send(
-        remindersEmail({
+      await input.email.send({
+        ...remindersEmail({
           to,
           tradingName: account?.trading_name ?? "",
           lines,
           registration: timeline.length > 0,
+          unsubscribeUrl: settings.token
+            ? unsubscribeUrl(settings.token, origin)
+            : undefined,
         }),
-      );
+        accountId,
+      });
       const ids = rows.map((r) => r.id);
       const up = await input.admin
         .from("reminders")
