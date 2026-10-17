@@ -11,9 +11,11 @@ import {
   linkNameFor,
   tableColumns,
 } from "@/lib/registers/table-columns";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   OnboardingKind,
   StaffMatrixRow,
+  OnboardingTickRow,
 } from "@/lib/registers/audit-day-types";
 import { CLEARANCE_LABELS } from "@/lib/registers/labels";
 import { FROM_THE_DATES_LINE } from "@/lib/registers/worker-state";
@@ -334,6 +336,27 @@ export async function AuditDayDetailPage({
         });
       })()
     : null;
+  // REQ-024 FR-8 (D-2444): the trail's actor is actor_user_id and its role comes from memberships.
+  async function actorRolesFor(
+    supabase: SupabaseClient,
+    accountId: string,
+    rows: OnboardingTickRow[],
+  ): Promise<Record<string, string>> {
+    const ids = [
+      ...new Set(rows.map((r) => r.actor_user_id).filter(Boolean)),
+    ] as string[];
+    if (!ids.length) return {};
+    const r = await supabase
+      .from("memberships")
+      .select("user_id, role")
+      .eq("account_id", accountId)
+      .in("user_id", ids);
+    return Object.fromEntries(
+      ((r.data as { user_id: string; role: string }[] | null) ?? []).map(
+        (m) => [m.user_id, m.role],
+      ),
+    );
+  }
   const workerTicks =
     file?.checklist && slug === "staff-matrix"
       ? await listOnboardingTicks(
@@ -378,6 +401,11 @@ export async function AuditDayDetailPage({
             items={file.items}
             states={file.states}
             ticks={workerTicks}
+            actorRoles={await actorRolesFor(
+              ctx.supabase,
+              ctx.viewer.account.id,
+              workerTicks,
+            )}
             derived={file.derived}
             canWrite={ctx.canWrite}
             today={todaySydney()}

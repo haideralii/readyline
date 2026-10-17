@@ -6,6 +6,17 @@ import type { WorkerOnboardingItem } from "./onboarding-items";
  * documents an acknowledgement item names. Pure, so the words are tested
  * once and the home and the owner's page cannot drift.
  */
+/** REQ-020 FR-11's sentence as REQ-024 FR-7 changes it, in its three homes (the worker home, the invite screen, the invitation). */
+export const WORKER_ROLE_WORDS =
+  "log incidents and complaints and complete your onboarding";
+
+/** FR-9 (AC-8): the three steps every worker has, in the worker's own words, for the invitation and the home. */
+export const WORKER_FIRST_STEPS: readonly string[] = [
+  "Read the NDIS Code of Conduct acknowledgement from your manager's pack and acknowledge it.",
+  "Finish the NDIS Worker Orientation Module and keep your completion certificate.",
+  "Read the Code of Conduct, incident, complaints, privacy and safeguarding policies and acknowledge each one.",
+];
+
 export type ItemStepState =
   "to-do" | "waiting" | "confirmed" | "recorded-by-manager" | "manager-records";
 
