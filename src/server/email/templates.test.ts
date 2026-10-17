@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { renderHtml } from "./html";
+import {
+  remindersEmail,
+  reportToConfirmEmail,
+  workerInvitationEmail,
+} from "./templates";
 import {
   accountDeletedEmail,
   accountPurgedEmail,
@@ -55,5 +61,77 @@ describe("documents-ready email (REQ-007 FR-5)", () => {
     expect(ready.text).toMatch(/first draft for your review/);
     expect(ready.text).toMatch(/not legal advice/);
     expect(findProhibitedClaims(`${ready.subject}\n${ready.text}`)).toEqual([]);
+  });
+});
+
+describe("every template as the provider sends it (REQ-022 FR-5, FR-7)", () => {
+  const origin = "https://readyline.example";
+  const all = [
+    accountDeletedEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      deletedAt: new Date("2026-10-11T03:00:00Z"),
+      purgeAfter: new Date("2026-11-10T03:00:00Z"),
+    }),
+    accountPurgedEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      purgedAt: new Date("2026-11-11T03:00:00Z"),
+    }),
+    documentsReadyEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      documentsUrl: `${origin}/documents`,
+    }),
+    workerInvitationEmail({
+      to: "worker@example.test",
+      tradingName: "Sunrise Supports",
+      workerRef: "W-1",
+      url: `${origin}/invite/abc`,
+      expiresOn: "1 November 2026",
+    }),
+    reportToConfirmEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      count: 1,
+    }),
+    remindersEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      lines: ["Policy review PR-1 is due on 1 November 2026"],
+      unsubscribeUrl: `${origin}/email/unsubscribe/abc`,
+    }),
+  ];
+
+  it("names its template and carries the general-information line", () => {
+    for (const m of all) {
+      expect(m.template, m.subject).toMatch(/^[a-z-]+$/);
+      expect(m.text, m.subject).toMatch(/general information/);
+    }
+  });
+
+  it("renders an HTML alternative with no image, no style and no off-site link", () => {
+    for (const m of all) {
+      const html = renderHtml(m.text, origin);
+      expect(html, m.subject).not.toMatch(/<img|<style|<script|style=/);
+      for (const href of html.matchAll(/href="([^"]+)"/g))
+        expect(href[1], m.subject).toMatch(new RegExp(`^${origin}(/|$)`));
+      expect(findProhibitedClaims(html), m.subject).toEqual([]);
+    }
+  });
+
+  it("the reminders carry the unsubscribe line when given a link; nothing else does", () => {
+    const withLink = all[all.length - 1];
+    expect(withLink.text).toContain(
+      "To stop these reminder emails: https://readyline.example/email/unsubscribe/abc",
+    );
+    for (const m of all.slice(0, -1))
+      expect(m.text, m.subject).not.toMatch(/unsubscribe|stop these/i);
+    const without = remindersEmail({
+      to: "owner@example.test",
+      tradingName: "Sunrise Supports",
+      lines: ["one"],
+    });
+    expect(without.text).not.toMatch(/stop these/);
   });
 });
