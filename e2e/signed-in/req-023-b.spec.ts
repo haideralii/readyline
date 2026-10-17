@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { unzipSync } from "fflate";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { inflateSync } from "node:zlib";
 import { addMonths } from "@/lib/registers/status";
 import {
@@ -28,6 +28,12 @@ import { checkWidths } from "../helpers/width";
  */
 const EVIDENCE_DIR = "product/evidence/req-023";
 const enabled = hasSupabaseForE2e();
+const answers = JSON.parse(
+  readFileSync(
+    "fixtures/reference-cases/verification-sole-trader.json",
+    "utf8",
+  ),
+) as Record<string, unknown>;
 const today = todaySydney();
 const sydney = (days: number) => addDays(today, days);
 
@@ -91,10 +97,12 @@ test.describe("the period filter and what changed (REQ-023 Session B)", () => {
   let sheet: Record<string, string>[] = [];
 
   test.beforeAll(async ({}, testInfo) => {
+    // #99 run 1 (PO 01:10): the audit-day page sends an account with no
+    // questionnaire result to the questionnaire, so the tenant carries answers.
     tenant = await createTenant({
       label: `req-023-b-${testInfo.project.name}`,
       tradingName: "Sunrise Supports",
-      answers: {},
+      answers,
     });
     const admin = tenant.admin;
     const accountId = tenant.accountId;

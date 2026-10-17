@@ -97,7 +97,9 @@ export function PeriodSelector({
             </Link>
           </li>
         ))}
-        <li className="min-w-0">
+        {/* #99 run 1 (PO 01:10): the disclosure takes its own row so the form has the column's width; the two date fields
+          stack under sm, each full width, and sit in a row from sm. */}
+        <li className="w-full min-w-0">
           <details open={custom || undefined} data-testid="period-custom">
             <summary
               className={`${CHIP} cursor-pointer list-none ${custom ? CHIP_ON : CHIP_OFF}`}
@@ -109,31 +111,31 @@ export function PeriodSelector({
             <form
               method="get"
               action={basePath}
-              className="mt-2 flex flex-wrap items-end gap-3"
+              className="mt-2 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end"
               data-testid="period-custom-form"
             >
               <input type="hidden" name="period" value="custom" />
-              <label className="block text-sm">
+              <label className="block w-full min-w-0 text-sm sm:w-auto">
                 From
                 <input
                   type="date"
                   name="from"
                   required
                   defaultValue={custom ? (period.from ?? "") : ""}
-                  className={`${INPUT} mt-1`}
+                  className={`${INPUT} mt-1 w-full sm:w-auto`}
                 />
               </label>
-              <label className="block text-sm">
+              <label className="block w-full min-w-0 text-sm sm:w-auto">
                 To
                 <input
                   type="date"
                   name="to"
                   required
                   defaultValue={custom ? (period.to ?? "") : ""}
-                  className={`${INPUT} mt-1`}
+                  className={`${INPUT} mt-1 w-full sm:w-auto`}
                 />
               </label>
-              <button type="submit" className="btn-secondary">
+              <button type="submit" className="btn-secondary w-full sm:w-auto">
                 Show these dates
               </button>
             </form>

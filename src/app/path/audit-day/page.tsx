@@ -241,7 +241,16 @@ export default async function AuditDayPage({
           fallback="period"
           testId="audit-day-period"
         />
-      ) : null}
+      ) : (
+        // #99 run 1 (PO 01:10): a real owner lands here before the dates are in; the line says what the pack covers and why.
+        <p
+          className="mt-4 text-sm print:hidden"
+          data-testid="audit-day-period-line"
+        >
+          Showing: <span className="font-medium">All entries</span> (enter your
+          registration dates on the account page to filter by period).
+        </p>
+      )}
       {/* REQ-023 FR-6: the summary screen, the same sheet the pack carries. */}
       {period ? (
         <p className="mt-3 text-sm print:hidden">
