@@ -48,18 +48,20 @@ create policy policy_acknowledgements_insert_owner on public.policy_acknowledgem
   for insert to authenticated with check (
     public.is_owner(account_id) and public.has_active_subscription(account_id)
   );
--- The worker's own code alone (AC-6: another worker's code answers 42501).
+-- The worker's own code alone (AC-6: another worker's code answers 42501). A policy's subquery runs
+-- under the caller's own policies: a worker reads their own membership row (memberships_select_own) and
+-- no accounts row (accounts_select_member is is_member, which excludes the worker role), so the deleted-
+-- account test is is_worker's, a security definer, and the subquery joins nothing the worker cannot read
+-- (#102's run at 08249e0 read 42501 on this insert with the accounts join inside).
 create policy policy_acknowledgements_insert_worker on public.policy_acknowledgements
   for insert to authenticated with check (
     public.is_worker(account_id)
     and public.has_active_subscription(account_id)
     and exists (
       select 1 from public.memberships m
-      join public.accounts a on a.id = m.account_id
       where m.account_id = policy_acknowledgements.account_id
         and m.user_id = auth.uid() and m.role = 'worker'
         and m.worker_ref = policy_acknowledgements.worker_ref
-        and a.deleted_at is null
     )
   );
 -- No update and no delete policy: an acknowledgement is a record.
