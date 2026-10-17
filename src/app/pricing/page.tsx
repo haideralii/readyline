@@ -23,7 +23,12 @@ import { PricingCard } from "./pricing-card";
 export const metadata: Metadata = { title: "Pricing" };
 
 /** REQ-027 FR-3 (D-2701, D-2710): the glossary terms the pricing copy uses (`payments/copy.ts`), first appearance first. */
-const PRICING_TERMS = ["self-assessment", "adopt"] as const;
+// REQ-028 D-2819: the pack card's first bullet names the registration groups.
+const PRICING_TERMS = [
+  "self-assessment",
+  "adopt",
+  "registration-group",
+] as const;
 
 /**
  * The pricing page (REQ-007 FR-1): the two offers as halves of equal weight
@@ -190,6 +195,8 @@ export default async function PricingPage() {
             }
             priceTestId="pack-price"
             priceNote={C.packPriceNote}
+            bullets={C.packIncludes}
+            bulletsTestId="pack-includes"
             priceLine={
               <p className={body} data-testid="pack-price-unset">
                 {C.priceUnset}
