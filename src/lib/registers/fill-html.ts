@@ -1,7 +1,7 @@
 /**
  * REQ-024 Session A3 (FR-6b; findings 76 and 123): the refused fill
- * submission's page as plain HTML. Next.js forbids `react-dom/server` in
- * the app bundle, so the handler builds this form by hand: the message,
+ * submission's page as plain HTML. Next.js refuses the React server
+ * renderer inside the app bundle, so the handler builds this form by hand: the message,
  * the fields with the typed values still in them (escaped), the required
  * tick, the three buttons, and a meta refresh to the clean screen after
  * ten minutes. No script, so no nonce; `autocomplete="off"` on every
