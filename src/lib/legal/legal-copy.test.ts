@@ -128,10 +128,28 @@ describe("product/legal copy (REQ-008)", () => {
       for (const old of GONE[slug] ?? [])
         expect(page.body, old).not.toContain(old);
       expect(page.updated, "updated moved to the session's day").toBe(
-        "2026-10-16",
+        UPDATED[slug],
       );
     });
   }
+
+  // REQ-023 Session B (finding 38): the reminders sentence widens to the
+  // subscription's reminders, which the provider can turn off, and the
+  // privacy page's updated date moves with it; the other pages keep Session E's day.
+  const UPDATED: Record<LegalSlug, string> = {
+    terms: "2026-10-16",
+    refunds: "2026-10-16",
+    privacy: "2026-10-17",
+    ai: "2026-10-16",
+    about: "2026-10-16",
+  };
+  it("product/legal/privacy.md: the reminders sentence is the subscription's, which can be turned off (REQ-023 finding 38)", () => {
+    const page = loadLegalPage("privacy");
+    expect(page.body).toContain(
+      "reminders that come with your subscription, which you can turn off",
+    );
+    expect(page.body).not.toContain("reminders you have asked for");
+  });
 
   it("warns when CONTACT_EMAIL is not set (the footer then has no Contact link)", () => {
     if (!contactEmail()) {

@@ -51,6 +51,20 @@ jobs:
 
       - run: npm test
 
+      - name: Generator exam over the three reference cases, replayed and skeleton, as a report (backlog 9; PO 18 Oct 2026)
+        run: npx vitest run src/lib/generator/exam.test.ts
+        env:
+          EXAM_ARTEFACT: "1"
+
+      - name: Upload the generator exam report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generator-exam
+          path: out/generator-exam/
+          retention-days: 30
+          if-no-files-found: ignore
+
       - name: Document standard lint over the full 16-document sole-trader pack, replayed from the fixtures (REQ-016 FR-1; backlog 4)
         run: |
           mkdir -p out

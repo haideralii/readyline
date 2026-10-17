@@ -123,14 +123,19 @@ export function packLine(
 }
 
 /** The file name of the zip: the trading name as a slug and the date. */
-export function auditPackFileName(tradingName: string, stamp: string): string {
+export function auditPackFileName(
+  tradingName: string,
+  stamp: string,
+  suffix = "",
+): string {
   const slug =
     tradingName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "provider";
-  return `audit-pack-${slug}-${stamp}.zip`;
+  // REQ-023 FR-5: the period after the date stamp (`periodFileSuffix`), nothing for "all".
+  return `audit-pack-${slug}-${stamp}${suffix}.zip`;
 }
 
 /** The sentence the cover sheet and the auditor page open with. */

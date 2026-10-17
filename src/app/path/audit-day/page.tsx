@@ -6,6 +6,14 @@ import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
 import { legalRows, timelineRows } from "@/lib/registers/timeline";
+import {
+  parsePeriodParams,
+  periodContextFrom,
+  periodQuery,
+  resolvePeriod,
+  type RawPeriodParams,
+} from "@/lib/registers/period";
+import { PeriodSelector } from "@/components/period-selector";
 import { RegistrationTimeline } from "@/app/account/registration-timeline";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { auditKindsContent } from "@/lib/questionnaire/content";
@@ -57,7 +65,9 @@ function tick(item: ShownItem): { mark: string; word: string } {
   return { mark: "○", word: "Not yet." };
 }
 
-export default async function AuditDayPage() {
+export default async function AuditDayPage({
+  searchParams,
+}: PageProps<"/path/audit-day">) {
   const viewer = await getViewer();
   if (!viewer) redirect("/sign-in?next=%2Fpath%2Faudit-day");
   if (viewer.deleted) redirect("/account/deleted");
@@ -96,6 +106,18 @@ export default async function AuditDayPage() {
     // REQ-023 FR-2, FR-4 (Session D): the change-of-ownership row and item read the changes register.
     latestOwnershipChangeOn(supabase, viewer.account.id),
   ]);
+  // REQ-023 FR-5: the period the pack link carries, "This registration period"
+  // by default when a period exists (D-2305); the list's states stay live
+  // (D-2318 B). The proxy refused a malformed query already.
+  const parsedPeriod = parsePeriodParams(
+    (await searchParams) as RawPeriodParams,
+  );
+  const periodCtx = periodContextFrom(period);
+  const packPeriod = resolvePeriod(
+    parsedPeriod.ok ? parsedPeriod.selection : null,
+    periodCtx,
+    "period",
+  );
   // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
   const asks = auditDayAskList({
     registers,
@@ -205,7 +227,7 @@ export default async function AuditDayPage() {
       {/* REQ-020 FR-1: everything the auditor asks for, in one zip, built when you click. */}
       <p className="mt-3 text-sm print:hidden">
         <a
-          href="/registers/audit-pack.zip"
+          href={`/registers/audit-pack.zip${periodQuery(packPeriod.period, { explicitAll: true })}`}
           className="underline underline-offset-2"
           data-testid="audit-pack-download"
         >
@@ -213,6 +235,40 @@ export default async function AuditDayPage() {
           the summary and the adopted documents)
         </a>
       </p>
+      {/* REQ-023 FR-5: the period the pack's four registers cover; the states on this page stay the whole register's. */}
+      {period ? (
+        <PeriodSelector
+          basePath="/path/audit-day"
+          period={packPeriod.period}
+          ctx={periodCtx}
+          unavailable={packPeriod.unavailable}
+          fallback="period"
+          testId="audit-day-period"
+        />
+      ) : (
+        // #99 run 1 (PO 01:10): a real owner lands here before the dates are in; the line says what the pack covers and why.
+        <p
+          className="mt-4 text-sm print:hidden"
+          data-testid="audit-day-period-line"
+        >
+          Showing: <span className="font-medium">All entries</span> (enter your
+          registration dates on the account page to filter by period).
+        </p>
+      )}
+      {/* REQ-023 FR-6: the summary screen, the same sheet the pack carries. */}
+      {period ? (
+        <p className="mt-3 text-sm print:hidden">
+          <Link
+            href="/path/audit-day/what-changed"
+            className="underline underline-offset-2"
+            data-testid="audit-day-what-changed"
+          >
+            {period.last_audit_on
+              ? "What changed since the last audit"
+              : "What changed in this registration period"}
+          </Link>
+        </p>
+      ) : null}
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
       {[...shown.groups]

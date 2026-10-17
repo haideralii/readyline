@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-16
+updated: 2026-10-17
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -30,7 +30,7 @@ Readyline is for your business information only. Do not enter personal, health o
 
 - To draft your documents and run your checklist and registers.
 - To take payment and send receipts.
-- To send you service emails such as a sign-in link, a "your documents are ready" email, and reminders you have asked for. We do not send marketing email unless you opt in, and you can opt out at any time.
+- To send you service emails such as a sign-in link, a "your documents are ready" email, and reminders that come with your subscription, which you can turn off. We do not send marketing email unless you opt in, and you can opt out at any time.
 - To keep the service secure and fix problems.
 
 We do not sell your information. We do not share it with anyone except the service providers below, or where the law requires us to.
