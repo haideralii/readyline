@@ -1,6 +1,6 @@
 # Live QA pass, release b340ee3 (18 October 2026)
 
-Target: https://readyline-zeta.vercel.app, production, sha `b340ee3` (PR #106, `next` to `main`, merged 18 Oct 2026 12:40 Sydney; the hosted database migrated on the same push, `Migrate hosted database` green). Four QA passes run by the PO's QA agents from a cloud container with Playwright 1.64 and Chromium, signed out throughout, nothing submitted but the public questionnaire's steps, no account, no email, no card, about one request a second. The signed-in flows cannot be driven on production by the PO (the founder's standing rule: the PO never signs in anywhere), so pass D maps their CI coverage and gives the founder five scripts to walk on live himself.
+Target: https://readyline-zeta.vercel.app, production, sha `b340ee3` (PR #106, `next` to `main`, merged 18 Oct 2026 06:10 Sydney; the hosted database migrated on the same push, `Migrate hosted database` green). Four QA passes run by the PO's QA agents from a cloud container with Playwright 1.64 and Chromium, signed out throughout, nothing submitted but the public questionnaire's steps, no account, no email, no card, about one request a second. The signed-in flows cannot be driven on production by the PO (the founder's standing rule: the PO never signs in anywhere), so pass D maps their CI coverage and gives the founder five scripts to walk on live himself.
 
 | Pass | Scope | Checks | PASS | FAIL | NOTE | Report |
 |---|---|---|---|---|---|---|
