@@ -87,7 +87,10 @@ test.describe("REQ-028 AC-3: the form controls", () => {
     const name = page.getByLabel("Trading name");
     await expect(name).toBeVisible();
     await page.getByRole("button", { name: "Save and continue" }).click();
-    const summary = page.getByRole("alert");
+    // The page carries a second live region (the participant-data warning), so the summary is the alert with its heading.
+    const summary = page
+      .getByRole("alert")
+      .filter({ hasText: "Please fix the following" });
     await expect(summary).toContainText("Trading name");
     await expect(name).toHaveAttribute("aria-invalid", "true");
     await expect(page.locator("#tradingName-error")).toBeVisible();
