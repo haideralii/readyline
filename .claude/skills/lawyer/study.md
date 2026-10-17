@@ -50,7 +50,6 @@ s 267(2): a failure that "can be remedied and is not a major failure" lets the c
 
 ss 134 (information standards), 139 (manufacturer liability to non-injured persons) and 142 (defences to defective goods actions) were located in the text and do not bear on a services business; recorded so the next reader does not search again.
 
-
 ---
 
 # Study: Privacy Act 1988 (Cth) and the Australian Privacy Principles
@@ -125,7 +124,6 @@ APP 12.1: "If an APP entity holds personal information about an individual, the 
 
 APP 13.1: on request, or where the entity "is satisfied that ... the information is inaccurate, out-of-date, incomplete, irrelevant or misleading", take "such steps (if any) as are reasonable ... to correct that information". APP 13.2: notify another APP entity of a correction on request "unless it is impracticable or unlawful".
 
-
 ---
 
 # Study: National Disability Insurance Scheme Act 2013 (Cth)
@@ -180,7 +178,6 @@ s 73Y: an incident management system "appropriate for the size of the provider".
 
 Noted only: workers, contractors and participants who disclose a suspected contravention to the Commissioner or key personnel are protected.
 
-
 ---
 
 # Study: NDIS (Provider Registration and Practice Standards) Rules 2018
@@ -218,7 +215,6 @@ s 20(1): to be registered for a class, an applicant must "be assessed by an appr
 ## s 24
 
 "The quality indicators set out in the ... Guidelines 2018 (as existing from time to time) must be taken into account in assessing ... (a) whether an applicant ... meets the NDIS Practice Standards; (b) whether a registered NDIS provider is complying with those standards."
-
 
 ---
 
@@ -272,7 +268,6 @@ s 22(1): Part 4 is "made for the purposes of subsection 73T(1) of the Act and se
 
 Gist for the Victorian pair: s 25(5)(d)(iii) has no date of its own, but it sits inside (5), which also needs (5)(b), compliance "before the end of the transition period" with a Victorian departmental policy "as in force from time to time", and (5)(c), a screening that "is current in accordance with the requirements". Whether that policy still exists in force, and whether any screening under it can still be "current" five years on, are facts outside the Rules' text. And s 14(1)(b)(i) only ever applied Part 4 "in the participating jurisdiction in which supports or services are provided"; it did not say that Part 4 displaces the law of that jurisdiction. The Rules read as a whole defer to state law (s 14(1)(a)(iv), s 14A(1)(b)); the Act makes state law a condition of registration (s 73F(2)(a)).
 
-
 ---
 
 # Study: NDIS (Incident Management and Reportable Incidents) Rules 2018
@@ -303,7 +298,6 @@ s 21(1): applies where the incident "is not of a kind covered by paragraph 20(1)
 
 s 25(1): a provider that becomes aware of a reportable incident "must keep a record of the incident"; s 25(2): "The record must be kept for 7 years from the day that notification of the reportable incident is given under subsection 20(2), paragraph 21(2)(b) or subsection 23(2)". VERIFIED.
 
-
 ---
 
 # Study: NDIS (Code of Conduct) Rules 2018
@@ -317,7 +311,6 @@ s 5(1): "This Part is made for the purposes of section 73V of the Act." s 5(2): 
 ## s 6, the Code
 
 s 6(1): "In providing supports or services to people with disability, a Code-covered person must: (a) act with respect for individual rights to freedom of expression, self-determination and decision-making ...; (b) respect the privacy of people with disability; (c) provide supports and services in a safe and competent manner, with care and skill; (d) act with integrity, honesty and transparency; (e) promptly take steps to raise and act on concerns about matters that may impact the quality and safety of supports and services ...; (f) take all reasonable steps to prevent and respond to all forms of violence against, and exploitation, neglect and abuse of, people with disability; and (g) take all reasonable steps to prevent and respond to sexual misconduct." s 6(2): a Code-covered person "must not, without a reasonable justification: (a) represent a price for the supply of goods for a participant that is higher than the price represented ... for a person who is not a participant; or (b) charge a price ... higher". Gist: (b) is the provision CLAUDE.md 3a's "privacy provision of the NDIS Code of Conduct" refers to when it speaks of participant information in public AI tools; the Code says "respect the privacy", not "de-identify", so the product's de-identification rule is Readyline's own standard and the Commission's expectation, not the Code's words.
-
 
 ---
 
@@ -378,7 +371,6 @@ Not reached. The Commonwealth Rules s 29(3)(b) name "the Care and Protection of 
 On secrecy (SR-5, D-2446): in Victoria (s 130), Queensland (ss 138ZLB, 228), Western Australia (s 71), Tasmania (s 54) and the ACT (s 65) the secrecy provision binds the Regulator, the department and persons performing functions under the Act, and in each the information protected is information acquired in performing those functions. None of the five, on its face, binds a registered provider in respect of a clearance number or an outcome it learned from the worker or the Commonwealth database, and each excepts disclosure with the person's consent. The Commonwealth Rules s 18(3)(d) require the provider to record the check number and outcome and s 20 requires the list to be kept in a form "which would allow an auditor to determine" who was engaged on any day, so the Rules contemplate the auditor reading it. What remains for the practising lawyer: NSW and the NT, unread; whether a unit's outcome notice to an employer carries a use condition under Chapter 7 (Vic) or the equivalent; and the Privacy Act question for the provider (an exclusion or interim-bar code as information about a "criminal record", s 6 "sensitive information", if the provider is an APP entity under s 6D(4)(b) and s 6FB(3)(b)).
 
 On Victoria's s 25(5)(d)(iii) (SR-5 second question): the Victorian Act's s 118 prohibits the work and s 119 allows it only for a renewal applicant under s 35; the Act s 73F(2)(a) makes compliance with "a law of the State or Territory in which the person or entity operates" a condition of registration; the Rules' own s 14(1)(a)(iv) and s 14A(1)(b) defer to the state's law. The role's read is that a Commonwealth Part 4 arrangement cannot be relied on where the state Act prohibits the work, and that the first Victorian question (whether (5)(b) and (c) can still be met) is moot for a first-time applicant and depends on facts outside the Rules (whether the DHHS "safety screening policy ... as in force from time to time" still exists) for anyone else. A practising lawyer is still needed because the construction of "allows" in s 14(1)(a)(iv) and of "complying with the transitional arrangements" in s 14(1)(b)(i) against a state offence is a question of inconsistency the role cannot settle from the words, and because the Victorian policy's current status is a fact not in any text read.
-
 
 ---
 
