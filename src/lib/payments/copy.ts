@@ -21,7 +21,8 @@ export const SUBSCRIPTION_OFF =
   "The registers subscription is not switched on in this environment.";
 
 export const PRICING_COPY = {
-  title: "Your document pack",
+  /** REQ-028 FR-10: the page is "Pricing"; each card carries its product's name. */
+  title: "Pricing",
   intro: `One fixed price for the policies, procedures, registers and self-assessment your answers call for, as editable Word files. ${BRAND} drafts them; you review and adopt them.`,
   priceHeading: "Price",
   priceUnset:
@@ -62,6 +63,9 @@ export const PRICING_COPY = {
     price
       ? `${price} a month for the registers, with email reminders.`
       : "A monthly subscription for the registers, with email reminders.",
+  /** REQ-028 FR-10 (D-2816): the words beside the 30 px figure on each card; subscriptionPriceLine stays for the no-figure case. */
+  subscriptionPriceNote: "a month for the registers, with email reminders.",
+  packPriceNote: "one-off, for the document pack",
   subscriptionIncludes: [
     "Incident register",
     "Complaints register",
@@ -79,7 +83,8 @@ export const PRICING_COPY = {
       : "Registers: monthly, cancel any time",
   separateLine:
     "The two are separate: the pack is paid once and the subscription is monthly; neither includes the other, and there is no discount for taking both.",
-  subscriptionHeading: "Audit-ready subscription",
+  /** REQ-028 FR-10 (QA N7): one name for the subscription everywhere, the registers subscription. */
+  subscriptionHeading: "Registers subscription",
   /** Batch 47 item 1: the one sentence every page uses while STRIPE_PRICE_REGISTERS is unset; never "coming" or "soon". */
   subscriptionOff: SUBSCRIPTION_OFF,
   /** CLAUDE.md 5: said under the subscription in both states, since it holds whether or not it can be bought today. */

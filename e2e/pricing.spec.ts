@@ -17,7 +17,7 @@ test.describe("pricing page (REQ-007 FR-1, AC-4)", () => {
   }, testInfo) => {
     await page.goto("/pricing");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Your document pack" }),
+      page.getByRole("heading", { level: 1, name: "Pricing" }),
     ).toBeVisible();
     // The e2e server runs with PACK_PRICE_AUD_CENTS=39900 and a GST line (playwright.config).
     // REQ-027 AC-3: the words on the page with their meanings (axe runs below).

@@ -226,3 +226,135 @@ test.describe("REQ-028 Session C: the questionnaire on a laptop (FR-5, AC-5)", (
     }
   });
 });
+
+/**
+ * REQ-028 Session C, FR-10 (AC-8): home and pricing. The strip's two cells
+ * name and price both products in one size and weight, the subscription
+ * first, each a link to its pricing card, with D-2265's sentences under the
+ * strip unmoved; at 1280 the example result card sits beside the hero in
+ * five columns and the trust cards are 2 x 2; at 360 the cells stack at
+ * 16 px. The pricing page is "Pricing", its two cards share one skeleton
+ * with equal heights at 1280, both buttons secondary (D-2816), and the one
+ * no-interest sentence sits under both. The height at 360 is
+ * req-025-c.spec.ts's (baseline + 160).
+ */
+test.describe("REQ-028 Session C: home and pricing (FR-10, AC-8)", () => {
+  test("home: the strip's cells, the sentences under it, the example card beside the hero and the trust cards 2 x 2 at 1280, the cells stacked at 360", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const strip = page.getByTestId("home-price-strip");
+    const registers = page.getByTestId("home-strip-registers");
+    const pack = page.getByTestId("home-strip-pack");
+    await expect(registers).toHaveText(
+      "Registers subscription · AUD 39 a month",
+    );
+    await expect(pack).toHaveText("Document pack · AUD 399 one-off");
+    await expect(registers).toHaveAttribute("href", "/pricing#keeps");
+    await expect(pack).toHaveAttribute("href", "/pricing#start");
+    // D-2806 (the lawyer's read): one size and weight in both cells, 16 px, tabular figures.
+    const styles = await Promise.all(
+      [registers, pack].map((cell) =>
+        cell.evaluate((el) => {
+          const s = getComputedStyle(el);
+          return {
+            size: s.fontSize,
+            weight: s.fontWeight,
+            nums: s.fontVariantNumeric,
+          };
+        }),
+      ),
+    );
+    for (const s of styles) {
+      expect(s.size).toBe("16px");
+      expect(s.nums).toContain("tabular-nums");
+    }
+    expect(styles[0].weight).toBe(styles[1].weight);
+    // D-2265's sentences stay as prose directly under the strip.
+    const sb = (await strip.boundingBox())!;
+    const line = (await page
+      .getByTestId("home-subscription-line")
+      .boundingBox())!;
+    expect(line.y).toBeGreaterThanOrEqual(sb.y + sb.height - 1);
+    await expect(page.getByTestId("home-price-line")).toContainText(
+      /one-off for the document pack/,
+    );
+    const rb = (await registers.boundingBox())!;
+    const pb = (await pack.boundingBox())!;
+    if (large(page)) {
+      expect(Math.abs(rb.y - pb.y)).toBeLessThanOrEqual(2);
+      expect(rb.x).toBeLessThan(pb.x);
+      const shell = (await page.locator('[data-shell="page"]').boundingBox())!;
+      const content = shell.width - 64;
+      const col = (content - 11 * 32) / 12;
+      const h1 = (await page
+        .getByTestId("home-hero")
+        .getByRole("heading", { level: 1 })
+        .boundingBox())!;
+      const example = (await page.getByTestId("home-example").boundingBox())!;
+      expect(Math.abs(example.width - (5 * col + 4 * 32))).toBeLessThanOrEqual(
+        4,
+      );
+      expect(example.x).toBeGreaterThan(h1.x + h1.width);
+      expect(example.y).toBeLessThan(h1.y + h1.height);
+      const cards = page.getByTestId("home-trust").locator("ul > li");
+      await expect(cards).toHaveCount(4);
+      const b = await Promise.all(
+        [0, 1, 2, 3].map(async (i) => (await cards.nth(i).boundingBox())!),
+      );
+      expect(Math.abs(b[0].y - b[1].y)).toBeLessThanOrEqual(2);
+      expect(b[1].x).toBeGreaterThan(b[0].x + b[0].width / 2);
+      expect(b[2].y).toBeGreaterThanOrEqual(b[0].y + b[0].height - 1);
+      expect(Math.abs(b[2].y - b[3].y)).toBeLessThanOrEqual(2);
+    } else {
+      // The two cells stack; the example card follows the hero's words.
+      expect(pb.y).toBeGreaterThanOrEqual(rb.y + rb.height - 1);
+      const example = (await page.getByTestId("home-example").boundingBox())!;
+      expect(example.y).toBeGreaterThan(sb.y + sb.height);
+    }
+  });
+
+  test("pricing: the page is Pricing, one skeleton with secondary buttons and equal heights at 1280, one no-interest sentence under both cards", async ({
+    page,
+  }) => {
+    await page.goto("/pricing");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Pricing" }),
+    ).toBeVisible();
+    const halves = page.getByTestId("pricing-halves");
+    const sub = page.getByTestId("pricing-subscription");
+    const pack = page.getByTestId("pricing-pack");
+    await expect(sub.getByRole("heading", { level: 2 })).toHaveText(
+      "Registers subscription",
+    );
+    await expect(page.getByTestId("subscription-price")).toHaveText("AUD 39");
+    await expect(page.getByTestId("pack-price")).toHaveText("AUD 399");
+    for (const id of ["subscription-price", "pack-price"])
+      expect(
+        await page
+          .getByTestId(id)
+          .evaluate((el) => getComputedStyle(el).fontSize),
+      ).toBe("30px");
+    // D-2816: nothing primary inside the cards; signed out, the pack's sign-in link is the secondary style.
+    await expect(halves.locator(".btn-primary")).toHaveCount(0);
+    await expect(page.getByTestId("sign-in-to-buy")).toHaveClass(
+      /btn-secondary/,
+    );
+    const noCredit = page.getByTestId("pricing-no-credit");
+    await expect(noCredit).toHaveCount(1);
+    const hb = (await halves.boundingBox())!;
+    const nb = (await noCredit.boundingBox())!;
+    expect(nb.y).toBeGreaterThanOrEqual(hb.y + hb.height - 1);
+    if (large(page)) {
+      const shell = (await page.locator('[data-shell="page"]').boundingBox())!;
+      const content = shell.width - 64;
+      const col = (content - 11 * 32) / 12;
+      expect(Math.abs(hb.width - (10 * col + 9 * 32))).toBeLessThanOrEqual(4);
+      expect(Math.abs(hb.x - (shell.x + 32 + col + 32))).toBeLessThanOrEqual(4);
+      const s = (await sub.boundingBox())!;
+      const k = (await pack.boundingBox())!;
+      expect(Math.abs(s.height - k.height)).toBeLessThanOrEqual(1);
+      expect(Math.abs(s.y - k.y)).toBeLessThanOrEqual(1);
+    }
+  });
+});

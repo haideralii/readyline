@@ -27,7 +27,7 @@ You must be at least 18 and buying for a business.
 
 The document pack is a one-off purchase. The price is shown before you pay, in Australian dollars, with GST shown where it applies. There are no hidden fees. We do not offer instalments, buy-now-pay-later, or credit, and we never charge interest or late fees.
 
-{{subscription-off}} The audit-ready subscription is charged in advance for each period. You can cancel at any time and keep access until the end of the paid period. If a payment fails, access pauses until it is paid; nothing extra is charged. When the payment goes through, access resumes and the paused period is covered by it. While access is paused, your account export, including your worker records, stays available.
+{{subscription-off}} The registers subscription is charged in advance for each period. You can cancel at any time and keep access until the end of the paid period. If a payment fails, access pauses until it is paid; nothing extra is charged. When the payment goes through, access resumes and the paused period is covered by it. While access is paused, your account export, including your worker records, stays available.
 
 Refunds are described on the Refunds page, which forms part of these terms.
 
