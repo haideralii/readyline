@@ -1,0 +1,121 @@
+import type { WorkerOnboardingItem } from "./onboarding-items";
+
+/**
+ * REQ-024 Session B (FR-7, FR-8; D-2438, D-2444): the worker's own view of
+ * an item, in words, from the three columns the item row carries, and the
+ * documents an acknowledgement item names. Pure, so the words are tested
+ * once and the home and the owner's page cannot drift.
+ */
+export type ItemStepState =
+  "to-do" | "waiting" | "confirmed" | "recorded-by-manager" | "manager-records";
+
+export const STEP_WORDS: Record<ItemStepState, string> = {
+  "to-do": "To do",
+  waiting: "Waiting for your manager to confirm",
+  confirmed: "Confirmed",
+  "recorded-by-manager": "Recorded by your manager",
+  "manager-records": "Your manager records this",
+};
+
+export type ItemStepInput = {
+  done_on: string | null;
+  confirmed_on: string | null;
+  recorded_by_owner: boolean;
+};
+
+/**
+ * The worker's state of one item. An owner's item is the manager's to
+ * record and reads confirmed once it is; a shared or worker item the owner
+ * dated for the worker reads "recorded by your manager" whatever else is
+ * set, so the worker is never told they ticked what they did not (finding
+ * 224); the worker's own date waits for the owner's confirmation.
+ */
+export function itemStepState(
+  who: WorkerOnboardingItem["who"],
+  state: ItemStepInput | undefined,
+): ItemStepState {
+  if (who === "owner")
+    return state?.confirmed_on ? "confirmed" : "manager-records";
+  if (!state) return "to-do";
+  if (state.recorded_by_owner) return "recorded-by-manager";
+  if (state.confirmed_on) return "confirmed";
+  if (state.done_on) return "waiting";
+  return "to-do";
+}
+
+/** FR-7: the document types each acknowledgement item names; W-6's five are `MANDATORY_POLICIES`' words as document ids. */
+export const ACKNOWLEDGEMENT_DOCUMENTS: Readonly<
+  Record<"w3-code-of-conduct" | "w6-policies", readonly string[]>
+> = {
+  "w3-code-of-conduct": ["code-of-conduct-acknowledgement"],
+  "w6-policies": [
+    "code-of-conduct-acknowledgement",
+    "incident-management-policy-and-register",
+    "complaints-management-policy-and-register",
+    "privacy-and-information-management-policy",
+    "safeguarding-policy",
+  ],
+};
+
+export type AdoptedDocument = {
+  id: string;
+  document_type_id: string;
+  version: number;
+  adopted_on: string | null;
+};
+
+/** The adopted version of each type: the highest version among the adopted rows. */
+export function latestAdopted(
+  rows: readonly AdoptedDocument[],
+): Map<string, AdoptedDocument> {
+  const out = new Map<string, AdoptedDocument>();
+  for (const r of rows) {
+    const cur = out.get(r.document_type_id);
+    if (!cur || r.version > cur.version) out.set(r.document_type_id, r);
+  }
+  return out;
+}
+
+export type AcknowledgementRow = {
+  document_type_id: string;
+  version: number;
+  acknowledged_on: string;
+};
+
+/** True when every document the item names has an adopted version and that version is acknowledged. */
+export function acknowledgementsComplete(
+  itemId: keyof typeof ACKNOWLEDGEMENT_DOCUMENTS,
+  adopted: Map<string, AdoptedDocument>,
+  acks: readonly AcknowledgementRow[],
+): boolean {
+  return ACKNOWLEDGEMENT_DOCUMENTS[itemId].every((typeId) => {
+    const doc = adopted.get(typeId);
+    return (
+      doc !== undefined &&
+      acks.some(
+        (a) => a.document_type_id === typeId && a.version === doc.version,
+      )
+    );
+  });
+}
+
+/** The documents the worker still has to acknowledge for an item, with the ones the account has not adopted named apart. */
+export function acknowledgementsOutstanding(
+  itemId: keyof typeof ACKNOWLEDGEMENT_DOCUMENTS,
+  adopted: Map<string, AdoptedDocument>,
+  acks: readonly AcknowledgementRow[],
+): { toAcknowledge: AdoptedDocument[]; notAdopted: string[] } {
+  const toAcknowledge: AdoptedDocument[] = [];
+  const notAdopted: string[] = [];
+  for (const typeId of ACKNOWLEDGEMENT_DOCUMENTS[itemId]) {
+    const doc = adopted.get(typeId);
+    if (!doc) notAdopted.push(typeId);
+    else if (
+      !acks.some(
+        (a) => a.document_type_id === typeId && a.version === doc.version,
+      )
+    )
+      toAcknowledge.push(doc);
+  }
+  return { toAcknowledge, notAdopted };
+}
