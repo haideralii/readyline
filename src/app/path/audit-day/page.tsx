@@ -22,6 +22,7 @@ import { loadPathContext } from "@/server/path/state";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   lastSelfCheck,
@@ -77,6 +78,7 @@ export default async function AuditDayPage() {
     toConfirm,
     drill,
     period,
+    ownershipChangeOn,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -91,6 +93,8 @@ export default async function AuditDayPage() {
       .maybeSingle(),
     // REQ-023 FR-2, FR-4: the registration period's legal rows and dated items.
     currentPeriod(supabase, viewer.account.id),
+    // REQ-023 FR-2, FR-4 (Session D): the change-of-ownership row and item read the changes register.
+    latestOwnershipChangeOn(supabase, viewer.account.id),
   ]);
   // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
   const asks = auditDayAskList({
@@ -122,7 +126,7 @@ export default async function AuditDayPage() {
       ctx.result,
       ctx.answers,
       dataset,
-      checklistPeriod(period),
+      checklistPeriod(period, ownershipChangeOn),
     ),
     stored,
     draftedDocumentTypeIds: drafted,
@@ -192,7 +196,7 @@ export default async function AuditDayPage() {
             Your registration dates
           </h2>
           <RegistrationTimeline
-            rows={legalRows(timelineRows(period))}
+            rows={legalRows(timelineRows(period, { ownershipChangeOn }))}
             caption="Your registration dates, from your certificate, the Rules and the Act"
             testId="audit-day-timeline"
           />

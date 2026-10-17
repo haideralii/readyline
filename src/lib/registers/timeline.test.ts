@@ -12,6 +12,7 @@ import {
   legalRows,
   midtermFor,
   mustStartBy,
+  ownershipAuditStartBy,
   positionSentence,
   registrationReminderLine,
   registrationReminders,
@@ -170,6 +171,57 @@ describe("the timeline (AC-1)", () => {
     expect(monthsBetween("2026-03-15", "2026-10-14")).toBe(6);
     expect(monthsBetween("2026-10-15", "2026-10-14")).toBe(0);
     expect(formatLongDate("2029-03-01")).toBe("1 March 2029");
+  });
+
+  // REQ-023 Session D (FR-2, AC-6; findings 47 and 86).
+  it("adds the change-of-ownership audit row for a certification provider, three months after the change, with the Rules' source word", () => {
+    const rows = timelineRows(period(), { ownershipChangeOn: "2027-06-01" });
+    expect(rows.map((r) => r.id)).toEqual([
+      "midterm-prepare",
+      "midterm-start-by",
+      "ownership-audit-start-by",
+      "renewal-window",
+      "renewal-apply-by",
+      "period-end",
+    ]);
+    const row = byId(rows)["ownership-audit-start-by"];
+    expect(row.date).toBe("2027-09-01");
+    expect(row.source).toBe("Rules s 13BA");
+    expect(row.label).toBe("Change-of-ownership audit must start by");
+    expect(row.legal).toBe(true);
+    expect(legalRows(rows).map((r) => r.id)).toContain(
+      "ownership-audit-start-by",
+    );
+    expect(ownershipAuditStartBy(period(), "2027-06-01")).toBe("2027-09-01");
+  });
+
+  it("holds the row back for a verification provider, with no change recorded, when the registration ends inside the three months, or when a mid-term audit is under way", () => {
+    expect(ownershipAuditStartBy(period(), null)).toBeNull();
+    expect(
+      ownershipAuditStartBy(
+        period({ audit_type: "verification", midterm_applies: false }),
+        "2027-06-01",
+      ),
+    ).toBeNull();
+    // The period ends 1 March 2029; a change on 1 January 2029 would need an audit by 1 April 2029.
+    expect(ownershipAuditStartBy(period(), "2029-01-01")).toBeNull();
+    expect(ownershipAuditStartBy(period(), "2028-12-01")).toBe("2029-03-01");
+    // A mid-term audit that started inside the three months after the change is under way.
+    expect(
+      ownershipAuditStartBy(
+        period({ midterm_audit_on: "2027-07-15" }),
+        "2027-06-01",
+      ),
+    ).toBeNull();
+    expect(
+      ownershipAuditStartBy(
+        period({ midterm_audit_on: "2027-04-15" }),
+        "2027-06-01",
+      ),
+    ).toBe("2027-09-01");
+    expect(
+      timelineRows(period(), { ownershipChangeOn: null }).map((r) => r.id),
+    ).not.toContain("ownership-audit-start-by");
   });
 });
 

@@ -190,6 +190,25 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
     completed_on: null,
     status: "in-progress",
   },
+  // Dev-2 (REQ-023 Session D, D-2317): the note and the Commission's reference carry the planted name; no cell reads them.
+  "commission-changes": {
+    id: "cc1",
+    reference: "CHG-0001",
+    kind: "notification",
+    change_type: "key-personnel-change",
+    happened_on: DAY,
+    aware_on: null,
+    notified_on: null,
+    channel: null,
+    approved_form: null,
+    applied_on: null,
+    decided_on: null,
+    effective_on: null,
+    commission_reference: NAME,
+    note: NAME,
+    notify_by: DAY,
+    state: "to notify",
+  },
 };
 
 describe("the register columns (REQ-028 FR-8, D-2814)", () => {
