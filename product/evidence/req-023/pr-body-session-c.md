@@ -1,6 +1,6 @@
 # REQ-023 Session C: the renewal path and the rehearsal (FR-7, FR-8, FR-9; AC-5)
 
-Stacked on Session D (`req-023-session-d`, #103); PR to `next`. Dev-2's worktree build (CHAT-2 rules); the one shared file touched is none: every edit is in Session C's own files, the self-check's files, the pack, the auditor-link files and the three pages that gain a link.
+Stacked on Session D (`req-023-session-d` d0051cd, #103); PR to `next`. Dev-2's worktree build (CHAT-2 rules); the one shared file touched is none: every edit is in Session C's own files, the self-check's files, the pack, the auditor-link files and the three pages that gain a link.
 
 ## What this adds
 
@@ -18,7 +18,7 @@ Stacked on Session D (`req-023-session-d`, #103); PR to `next`. Dev-2's worktree
 - Unit: `src/lib/path/renewal.test.ts` (AC-5's ten states, the dated steps, the s 73K line, the practice lines verbatim), `self-check.test.ts` (the rehearsal's questions, order, sheet and closing line), `timeline.test.ts` (`applicationInsideWindow` and the position sentence).
 - Integration: `tests/integration/renewal-path.test.ts` (the five columns and both CHECKs, the rehearsal's mode and period CHECK, the tick's default and the lookup).
 - E2E (desktop and Android, D-2207): `e2e/signed-in/req-023-c.spec.ts` (AC-5's states in order with one primary action; the application and booking saved, the SR-1 refusal; the rehearsal with no improvement row, the sheet in the owner's pack, absent from a plain auditor link's pack and present in a ticked one).
-- `npm run check`: __UNIT__. The D-2319 public run in CI mode on the three projects from a production build: __CIMODE__.
+- `npm run check`: green, 173 files (1 skipped), 1,263 tests, 6 skipped. The D-2319 public run in CI mode on the three projects from a production build: 307 passed, 29 skipped, 2 failed in 17.2 minutes; the two reds are one case of `e2e/req-022-b.spec.ts` ("a malformed or unknown token is a plain 404", desktop and Android), answering 500 because the hosted project the Dev-2 tree reads has no `public.reminder_settings` table (migration `20261017050000_reminder_settings.sql`, REQ-022 Session B, not applied there); not a Session C change, and the PR's job runs every migration.
 
 ## Decisions and records
 
