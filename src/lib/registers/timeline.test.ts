@@ -189,6 +189,10 @@ describe("the timeline (AC-1)", () => {
     expect(row.source).toBe("Rules s 13BA");
     expect(row.label).toBe("Change-of-ownership audit must start by");
     expect(row.legal).toBe(true);
+    // D-2320: the row says how "under way" is read and what clears it.
+    expect(row.plain).toContain(
+      "record its date on the account page and this row goes",
+    );
     expect(legalRows(rows).map((r) => r.id)).toContain(
       "ownership-audit-start-by",
     );

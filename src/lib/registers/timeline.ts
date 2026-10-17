@@ -221,8 +221,9 @@ export function timelineRows(
       date: ownershipBy,
       source: "Rules s 13BA",
       legal: true,
+      // D-2320: the one line that says how the product reads "under way".
       plain:
-        "The registration must still be in force for those three months (Rules s 13BA(1)(c)).",
+        "The registration must still be in force for those three months (Rules s 13BA(1)(c)). If your mid-term audit started in these three months, record its date on the account page and this row goes.",
     });
   rows.push({
     id: "renewal-window",
