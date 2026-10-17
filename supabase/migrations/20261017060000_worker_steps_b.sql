@@ -150,4 +150,47 @@ $$;
 revoke all on function public.worker_record_clearance(uuid, text, text, date) from public, anon;
 grant execute on function public.worker_record_clearance(uuid, text, text, date) to authenticated;
 
+-- 5. The worker's checklist and item rows exist before the owner has opened the
+--    worker's page (#102's run at f190a70: the W-4 control renders on an item
+--    row, and a worker invited first had none). The worker's loader passes the
+--    derived items (id and owner role) and this function makes the checklist
+--    under the worker's own code and the missing item rows with no dates, the
+--    rows the owner's page would make; the three A1 functions stay the only
+--    path to a date. Every refusal is 42501 "not allowed".
+create or replace function public.worker_ensure_items(p_account uuid, p_items jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_ref text;
+  v_list uuid;
+  v_item jsonb;
+begin
+  v_ref := public.worker_context(p_account);
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) > 60 then
+    raise exception 'not allowed' using errcode = '42501';
+  end if;
+  select o.id into v_list from public.onboarding_checklists o
+   where o.account_id = p_account and o.kind = 'worker' and o.subject_ref = v_ref;
+  if v_list is null then
+    insert into public.onboarding_checklists (account_id, kind, subject_ref, started_on)
+      values (p_account, 'worker', v_ref, public.sydney_today())
+      returning id into v_list;
+  end if;
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    if (v_item->>'id') !~ '^[a-z0-9-]{1,60}$' or (v_item->>'owner_role') not in ('owner', 'worker', 'both') then
+      raise exception 'not allowed' using errcode = '42501';
+    end if;
+    insert into public.onboarding_items (account_id, checklist_id, item_id, owner_role)
+      values (p_account, v_list, v_item->>'id', v_item->>'owner_role')
+      on conflict (checklist_id, item_id) do nothing;
+  end loop;
+  return v_list;
+end;
+$$;
+revoke all on function public.worker_ensure_items(uuid, jsonb) from public, anon;
+grant execute on function public.worker_ensure_items(uuid, jsonb) to authenticated;
+
 notify pgrst, 'reload schema';
