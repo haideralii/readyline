@@ -23,6 +23,22 @@ import { ReplayClient } from "./model-client";
 
 const questions = loadExamQuestions();
 const REPORT_DIR = "product/qa/generator-exam";
+/** PO 18 Oct 2026 00:40 (backlog 9, (2)): the report as a CI artefact, written under out/ with EXAM_ARTEFACT=1. */
+const OUT_DIR = "out/generator-exam";
+const HOMES = [
+  ...(process.env.EXAM_REPORT === "1" ? [REPORT_DIR] : []),
+  ...(process.env.EXAM_REPORT === "1" || process.env.EXAM_ARTEFACT === "1"
+    ? [OUT_DIR]
+    : []),
+];
+const summaries: ExamSummary[] = [];
+function writeReport(name: string, report: string, summary: ExamSummary) {
+  summaries.push(summary);
+  for (const dir of HOMES) {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(`${dir}/${name}.md`, report);
+  }
+}
 const TODAY = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Australia/Sydney",
   year: "numeric",
@@ -59,9 +75,8 @@ describe("the generator exam (backlog 9)", () => {
     const results = runExam(pack, questions);
     const summary = summarise(pack, results, TODAY);
     const report = renderExamReport(summary, questions);
+    writeReport(TODAY, report, summary);
     if (process.env.EXAM_REPORT === "1") {
-      mkdirSync(REPORT_DIR, { recursive: true });
-      writeFileSync(`${REPORT_DIR}/${TODAY}.md`, report);
       writeFileSync(
         `${REPORT_DIR}/latest.json`,
         JSON.stringify(
@@ -92,23 +107,51 @@ describe("the generator exam (backlog 9)", () => {
     expect(summary.passed).toBeGreaterThanOrEqual(45);
   }, 120_000);
 
-  it("the fixed-text questions hold on the other two reference sets' skeletons", async () => {
+  // PO 18 Oct 2026 00:40 (backlog 9, (1)): the whole exam over the other two reference sets, on their
+  // skeletons (no recording exists for their tailored sections; a recording is a model call and the PO's
+  // call), each with its own report, so the three cases are examined and read in one place. A question is
+  // answered on the fixed sections alone there; one over the tailored sections alone is "not applicable".
+  it("the other two reference sets pass every must-pass question on their skeletons, each with its own report", async () => {
     for (const caseId of [
       "certification-personal-care",
       "behaviour-support-company",
     ]) {
       const pack = await buildExamPack({ caseId, client: null, model: "none" });
-      const fixedOnly = questions.filter(
-        (q) => q.scope.sections === "fixed" && q.check.kind !== "lint",
+      const results = runExam(pack, questions);
+      const summary = summarise(pack, results, TODAY);
+      writeReport(
+        `${TODAY}-${caseId}`,
+        renderExamReport(summary, questions),
+        summary,
       );
-      const results = runExam(pack, fixedOnly);
       expect(
         results
           .filter((r) => r.mustPass && r.outcome === "fail")
           .map((r) => `${caseId} ${r.id}: ${r.evidence}`),
       ).toEqual([]);
+      // The fixed text alone answers a good part of the exam on any pack.
+      expect(summary.passed, caseId).toBeGreaterThanOrEqual(25);
     }
   }, 120_000);
+
+  it("one summary lists the three cases for the report's reader", () => {
+    if (!HOMES.length) return;
+    expect(summaries.length).toBe(3);
+    const lines = [
+      `# Generator exam, ${TODAY}: the three reference cases`,
+      "",
+      "| Case | Mode | Passed | Failed | Not applicable | Must-pass failures |",
+      "| --- | --- | ---: | ---: | ---: | --- |",
+      ...summaries.map(
+        (s) =>
+          `| ${s.caseId} | ${s.mode} | ${s.passed} | ${s.failed} | ${s.notApplicable} | ${s.mustPassFailed.join(", ") || "none"} |`,
+      ),
+      "",
+      "The sole-trader pack replays its recorded tailored sections; the other two run on their skeletons until their sections are recorded (a model call, the PO's call). Each case's full report sits beside this file.",
+      "",
+    ].join("\n");
+    for (const dir of HOMES) writeFileSync(`${dir}/${TODAY}-summary.md`, lines);
+  });
 
   it("the current prompt version has a passing exam on record (a bump without one is blocked)", () => {
     const path = `${REPORT_DIR}/latest.json`;

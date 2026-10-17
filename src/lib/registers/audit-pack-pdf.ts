@@ -7,6 +7,7 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { BRAND, GENERAL_INFORMATION_NOTICE } from "@/lib/brand";
 import { packIntro, type PackLine } from "./audit-pack";
+import { PERIOD_COUNTS_LINE } from "./period";
 
 const PAGE = { width: 595.28, height: 841.89 };
 const MARGIN = 50;
@@ -16,6 +17,8 @@ export async function renderCoverSheet(input: {
   date: string;
   lines: PackLine[];
   files: string[];
+  /** REQ-023 FR-5: "Period shown: <label>." when the register files are filtered; null for the whole register. */
+  periodLine?: string | null;
 }): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -51,6 +54,13 @@ export async function renderCoverSheet(input: {
 
   text("Audit pack", 20, bold);
   wrap(packIntro(input.tradingName, input.date), 11);
+  // REQ-023 FR-5: the cover sheet states the period the register files cover
+  // (D-2340 B: the row counts below are the files'; the states are the whole register's).
+  if (input.periodLine) {
+    y -= 2;
+    wrap(input.periodLine, 11);
+    wrap(PERIOD_COUNTS_LINE, 9);
+  }
   y -= 8;
   wrap(GENERAL_INFORMATION_NOTICE, 9);
   y -= 10;

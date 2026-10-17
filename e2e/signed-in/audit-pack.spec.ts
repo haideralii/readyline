@@ -308,7 +308,8 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
       .limit(1)
       .single();
     if (opened.error) throw opened.error;
-    const viewer = /viewer:([0-9a-f]{16}|unknown)$/.exec(
+    // REQ-023 SR-3: the line ends with the period shown (` from:- to:-` here), so no end anchor.
+    const viewer = /viewer:([0-9a-f]{16}|unknown)\b/.exec(
       opened.data.target as string,
     )?.[1];
     expect(viewer).toBeTruthy();

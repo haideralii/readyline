@@ -266,6 +266,10 @@ export async function buildExamPack(input: {
 }
 
 function inScope(pack: ExamPack, q: ExamQuestion) {
+  // D-2281: a skeleton pack has no tailored text, so a question is answered on its fixed sections alone and a
+  // question over the tailored sections alone reads not applicable, never a pass.
+  const readable = (s: ExamSection) =>
+    pack.mode !== "skeleton" || s.mode === "fixed";
   const docs =
     q.scope.documents === "all"
       ? pack.documents
@@ -279,7 +283,7 @@ function inScope(pack: ExamPack, q: ExamQuestion) {
           ? d.sections.filter((s) => s.mode === "tailored")
           : d.sections.filter((s) => q.scope.sections.includes(s.id));
   return docs
-    .map((d) => ({ doc: d, sections: sectionsOf(d) }))
+    .map((d) => ({ doc: d, sections: sectionsOf(d).filter(readable) }))
     .filter((x) => x.sections.length > 0);
 }
 

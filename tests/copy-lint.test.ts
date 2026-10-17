@@ -605,6 +605,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/components/jump-to.tsx": null,
   // REQ-028 FR-10 (D-2816): the pricing card renders the pricing page's words only.
   "src/app/pricing/pricing-card.tsx": "src/app/pricing/page.tsx",
+  // REQ-023 FR-5: the period selector's words (the choices, the dates line) carry no glossary term.
+  "src/components/period-selector.tsx": null,
   "src/lib/home-copy.ts": "src/app/page.tsx",
   "src/lib/brand.ts": null,
   "src/lib/checklist/derive.ts": "src/app/checklist/checklist-view.tsx",
