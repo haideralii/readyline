@@ -48,6 +48,13 @@ export type WhatChangedReview = {
   next_review_on: string | null;
 };
 
+/** REQ-023 FR-10 (Session D): a row of the changes register, as the summary reads it. */
+export type WhatChangedChange = {
+  kind: "notification" | "variation";
+  notified_on: string | null;
+  applied_on: string | null;
+};
+
 export type WhatChangedInput = {
   /** The summary's period: since the last audit, or the registration period when no last-audit date exists. */
   period: Period;
@@ -60,8 +67,17 @@ export type WhatChangedInput = {
   complaints: readonly WhatChangedComplaint[];
   checks: readonly WhatChangedCheck[];
   reviews: readonly WhatChangedReview[];
+  /** FR-6's last line (Session D): the changes register's rows, unfiltered; absent before the register existed. */
+  changes?: readonly WhatChangedChange[];
   /** The document's title for the register's row (the catalogue's, or the row's own for "other"). */
   titleOf: (typeId: string, title: string) => string;
+};
+
+/** FR-6's last line: the changes notified to the Commission and the variations applied for in the period, with the register's link. */
+export type ChangesLine = {
+  notified: number;
+  applied: number;
+  href: string;
 };
 
 export type RegisterCount = {
@@ -110,6 +126,8 @@ export type WhatChanged = {
   due: DueLine[];
   workers: WorkerLine[];
   workerCounts: Record<WorkerEvent, number>;
+  /** FR-6's last line (Session D). */
+  changes: ChangesLine;
 };
 
 const dated = (d: string | null | undefined, p: Period): d is string =>
@@ -239,6 +257,18 @@ export function whatChanged(input: WhatChangedInput): WhatChanged {
     expired: workers.filter((w) => w.event === "expired").length,
   };
 
+  // FR-6's last line (Session D, FR-10): a notification counts on the day it was notified, a variation on the day applied for.
+  const changeRows = input.changes ?? [];
+  const changes: ChangesLine = {
+    notified: changeRows.filter(
+      (c) => c.kind === "notification" && dated(c.notified_on, p),
+    ).length,
+    applied: changeRows.filter(
+      (c) => c.kind === "variation" && dated(c.applied_on, p),
+    ).length,
+    href: "/registers/commission-changes",
+  };
+
   return {
     title: input.lastAuditOn ? WHAT_CHANGED_TITLE : THIS_PERIOD_TITLE,
     why: input.lastAuditOn ? null : whatChangedWhy(input.periodStartsOn),
@@ -248,7 +278,17 @@ export function whatChanged(input: WhatChangedInput): WhatChanged {
     due,
     workers,
     workerCounts,
+    changes,
   };
+}
+
+/** The changes line on the screen (FR-6, FR-10): counts in words, the register's own words. */
+export function changesSummaryLine(w: WhatChanged): string {
+  const n = w.changes.notified;
+  const a = w.changes.applied;
+  const told = `${n} ${n === 1 ? "change" : "changes"} notified to the Commission`;
+  const applied = `${a} ${a === 1 ? "variation" : "variations"} applied for`;
+  return `${told}; ${applied}.`;
 }
 
 /** The pack's CSV (FR-6, AC-4): one flat sheet the screen's four sections share. */
@@ -287,6 +327,13 @@ export function whatChangedRows(w: WhatChanged): Record<string, unknown>[] {
       detail: `${x.kind} ${x.event}`,
       date: x.date,
     })),
+    // FR-6's last line (Session D): one row for the changes register's two counts.
+    {
+      section: "commission-changes",
+      item: "Changes we told the Commission",
+      detail: `notified ${w.changes.notified}; variations applied for ${w.changes.applied}`,
+      date: "",
+    },
   ];
 }
 

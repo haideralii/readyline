@@ -413,6 +413,12 @@ export async function AuditDayDetailPage({
       <p className="mt-3">
         <StatusTag status={meta.statusOf(row as never)} />
       </p>
+      {/* REQ-023 FR-10: the Rule's words for the row's type, where the meta gives them. */}
+      {meta.noteOf?.(row as never) ? (
+        <p className="text-ink mt-3 text-sm leading-6" data-testid="row-note">
+          {meta.noteOf(row as never)}
+        </p>
+      ) : null}
       {slug === "corporate-risks" && row.starter ? (
         <p
           className="border-ochre mt-3 rounded-md border p-3 text-sm leading-6"

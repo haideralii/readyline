@@ -20,6 +20,7 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { latestReadySet, listChecklistItems } from "@/server/checklist/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   accountWorkerStates,
@@ -67,25 +68,28 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, latest, period, workers] = await Promise.all([
-    listChecklistItems(supabase, viewer.account.id),
-    latestReadySet(supabase, viewer.account.id),
-    currentPeriod(supabase, viewer.account.id),
-    // REQ-024 Session C (FR-10; D-2831): the two people items read the staff list while it has rows.
-    accountWorkerStates(
-      supabase,
-      viewer.account.id,
-      viewer.user.id,
-      built.result,
-      todaySydney(),
-    ),
-  ]);
+  const [stored, latest, period, workers, ownershipChangeOn] =
+    await Promise.all([
+      listChecklistItems(supabase, viewer.account.id),
+      latestReadySet(supabase, viewer.account.id),
+      currentPeriod(supabase, viewer.account.id),
+      // REQ-024 Session C (FR-10; D-2831): the two people items read the staff list while it has rows.
+      accountWorkerStates(
+        supabase,
+        viewer.account.id,
+        viewer.user.id,
+        built.result,
+        todaySydney(),
+      ),
+      // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+      latestOwnershipChangeOn(supabase, viewer.account.id),
+    ]);
   // REQ-023 FR-4: the dated audit items once a registration period exists.
   const checklist = deriveChecklist(
     built.result,
     answers.data,
     dataset,
-    checklistPeriod(period),
+    checklistPeriod(period, ownershipChangeOn),
   );
   const shown = applyWorkerStates(
     mergeChecklist({

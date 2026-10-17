@@ -45,11 +45,31 @@ import {
 } from "./onboarding-items";
 import { AU_STATES, NDIS_NUMBER_SHAPE } from "./types";
 import { dateField } from "./forms";
+import {
+  APPLIED_ON_HELP,
+  APPROVED_FORM_ANSWERS,
+  APPROVED_FORM_HELP,
+  APPROVED_FORM_LABELS,
+  CHANGE_KINDS,
+  CHANGE_STATES,
+  CHANGE_TYPES,
+  CHANGE_TYPE_IDS,
+  CHANGE_TYPE_LABELS,
+  CHANNELS,
+  CHANNEL_LABELS,
+  DECIDED_LINE,
+  EFFECTIVE_ON_HELP,
+  TO_APPLY_LINE,
+  changeType,
+  type ChangeKind,
+  type CommissionChangeRow,
+} from "./commission-changes";
 // #74's run 38858109250: a raw ISO date in a list's detail line breaks at its
 // hyphen at 360 px (`2027-02-13` read "2027-02-" and "13."), so every date a
 // `detailOf` prints is the long form, "13 February 2027".
 import { formatLongDate } from "./status";
 import {
+  COMMISSION_CHANGE_COLUMNS,
   CONFLICT_COLUMNS,
   CORPORATE_RISK_COLUMNS,
   DECISION_COLUMNS,
@@ -703,6 +723,232 @@ export const OnboardingTickForm = strictObject({
   ticked_by_ref: refField(AUDIT_DAY_REF_PATTERNS.staff, "KP-1 or W-003"),
 });
 
+/* ---------- REQ-023 FR-10 (Session D): the changes register ---------- */
+
+const changeTypeOptions = (kind: ChangeKind) =>
+  CHANGE_TYPES.filter((t) => t.kind === kind).map((t) => ({
+    value: t.id,
+    label: t.label,
+  }));
+
+/**
+ * One form for both kinds (the generic form shows every field; the helpers
+ * say which kind each date belongs to, and the schema refuses a date of the
+ * other kind). The Rules' words per type are the constant's helpers, shown
+ * under the type on the entry's page.
+ */
+export const COMMISSION_CHANGE_FIELDS: FieldSpec[] = [
+  {
+    name: "kind",
+    label: "What this row records",
+    kind: "select",
+    options: [
+      {
+        value: "notification",
+        label: "A change or event we told the Commission about",
+      },
+      {
+        value: "variation",
+        label: "A variation of our registration we applied for",
+      },
+    ],
+  },
+  {
+    name: "change_type",
+    label: "The change",
+    kind: "select",
+    help: "The fixed list from the Rules (s 13, s 13A) and the Act (s 73M); a varied condition or a varied period is not a row here, change the dates on your registration form instead.",
+    options: [
+      ...changeTypeOptions("notification"),
+      ...changeTypeOptions("variation"),
+    ],
+  },
+  {
+    name: "happened_on",
+    label: "The day it happened",
+    kind: "date",
+    help: "For a change of ownership, the first step that is a necessary precondition to it (Rules s 13A(3)); for a variation, the day you want the change from.",
+  },
+  {
+    name: "aware_on",
+    label: "The day you knew it would happen",
+    kind: "date",
+    optional: true,
+    help: "Rules s 13A: the notice is due by the earlier of this day and the day it happened.",
+  },
+  {
+    name: "notified_on",
+    label: "Notified on (a notification)",
+    kind: "date",
+    optional: true,
+    help: "The day you told the Commission.",
+  },
+  {
+    name: "channel",
+    label: "How you told them (a notification)",
+    kind: "select",
+    optional: true,
+    options: CHANNELS.map((c) => ({ value: c, label: CHANNEL_LABELS[c] })),
+  },
+  {
+    name: "approved_form",
+    label: "In the Commission's approved form? (a notification)",
+    kind: "select",
+    optional: true,
+    help: APPROVED_FORM_HELP,
+    options: APPROVED_FORM_ANSWERS.map((a) => ({
+      value: a,
+      label: APPROVED_FORM_LABELS[a],
+    })),
+  },
+  {
+    name: "applied_on",
+    label: "Applied on (a variation)",
+    kind: "date",
+    optional: true,
+    help: APPLIED_ON_HELP,
+  },
+  {
+    name: "decided_on",
+    label: "Decided on (a variation)",
+    kind: "date",
+    optional: true,
+    help: "The date of the Commissioner's notice of decision.",
+  },
+  {
+    name: "effective_on",
+    label: "Takes effect on (a variation)",
+    kind: "date",
+    optional: true,
+    help: EFFECTIVE_ON_HELP,
+  },
+  {
+    name: "commission_reference",
+    label: "The Commission's reference",
+    kind: "text",
+    optional: true,
+    help: "If the Commission gave one. Letters, digits, spaces, / and - only; never an NDIS participant number.",
+    maxLength: 40,
+  },
+  {
+    name: "note",
+    label: "Note",
+    kind: "textarea",
+    optional: true,
+    help: 'No names. For a change in participant or worker numbers, the Rules give no figure for "significant": record why you judged the change significant.',
+    maxLength: AUDIT_DAY_TEXT_CAPS.note,
+    rows: 3,
+  },
+];
+
+const optionalEnum = <V extends string>(values: readonly V[]) =>
+  z
+    .union([z.literal(""), z.enum(values)])
+    .transform((v) => (v === "" ? null : v));
+
+export const CommissionChangeForm = strictObject({
+  kind: z.enum(CHANGE_KINDS, { error: "Choose what this row records" }),
+  change_type: z.enum(CHANGE_TYPE_IDS as [string, ...string[]], {
+    error: "Choose the change from the list",
+  }),
+  happened_on: dateField("day it happened"),
+  aware_on: optionalDate("day you knew"),
+  notified_on: optionalDate("day notified"),
+  channel: optionalEnum(CHANNELS),
+  approved_form: optionalEnum(APPROVED_FORM_ANSWERS),
+  applied_on: optionalDate("day applied"),
+  decided_on: optionalDate("day decided"),
+  effective_on: optionalDate("day it takes effect"),
+  commission_reference: z
+    .string()
+    .trim()
+    .max(40, "Use 40 characters or fewer")
+    .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only")
+    .refine(
+      (v) => !NDIS_NUMBER_SHAPE.test(v),
+      "This looks like an NDIS participant number. Use the Commission's reference.",
+    ),
+  note: safeText(AUDIT_DAY_TEXT_CAPS.note),
+})
+  .refine(
+    (v) =>
+      (v.kind === "variation") === (v.change_type === "supports-registered"),
+    {
+      message:
+        "A variation is the supports or services registered; every other change is a notification",
+      path: ["change_type"],
+    },
+  )
+  .refine(
+    (v) =>
+      v.kind !== "notification" ||
+      (!v.applied_on && !v.decided_on && !v.effective_on),
+    {
+      message: "A notification has no application dates",
+      path: ["applied_on"],
+    },
+  )
+  .refine(
+    (v) =>
+      v.kind !== "variation" ||
+      (!v.notified_on && !v.channel && !v.approved_form),
+    { message: "A variation has no notice fields", path: ["notified_on"] },
+  )
+  .refine((v) => !v.notified_on || v.approved_form, {
+    message: "Say whether the notice was in the Commission's approved form",
+    path: ["approved_form"],
+  })
+  .refine((v) => !v.decided_on || v.applied_on, {
+    message: "Type the day you applied first",
+    path: ["decided_on"],
+  })
+  .refine((v) => !v.effective_on || v.decided_on, {
+    message: "Type the day it was decided first",
+    path: ["effective_on"],
+  });
+
+export const COMMISSION_CHANGE_FILTERS = CHANGE_STATES.map((s) => ({
+  key: s,
+  label: s[0].toUpperCase() + s.slice(1),
+}));
+
+/** The tag for a row's state (FR-10, D-2311): overdue is the signal, the two pending states ochre, the rest moss or slate. */
+export function changeStateTag(
+  state: string,
+  notifyBy: string | null,
+): ListStatus {
+  switch (state) {
+    case "overdue":
+      return {
+        key: state,
+        label: `Overdue to notify${notifyBy ? ` since ${formatLongDate(notifyBy)}` : ""}`,
+        tone: "signal",
+      };
+    case "to notify":
+      return {
+        key: state,
+        label: notifyBy
+          ? `To notify by ${formatLongDate(notifyBy)}`
+          : "To notify, as soon as practicable",
+        tone: "ochre",
+      };
+    case "to apply":
+      return { key: state, label: "To apply", tone: "ochre" };
+    case "notified":
+      return { key: state, label: "Notified", tone: "moss" };
+    case "decided":
+      return { key: state, label: "Decided", tone: "moss" };
+    case "applied":
+      return {
+        key: state,
+        label: "Applied, awaiting the decision",
+        tone: "slate",
+      };
+    default:
+      return { key: state, label: state, tone: "slate" };
+  }
+}
+
 /* ---------- the register table ---------- */
 
 export const AUDIT_DAY_SLUGS = [
@@ -717,6 +963,8 @@ export const AUDIT_DAY_SLUGS = [
   "onboarding",
   // REQ-020 FR-7.
   "hazards",
+  // REQ-023 FR-10 (Session D).
+  "commission-changes",
 ] as const;
 export type AuditDaySlug = (typeof AUDIT_DAY_SLUGS)[number];
 
@@ -765,6 +1013,8 @@ export type RegisterMeta<Row> = {
   titleOf: (row: Row) => string;
   detailOf: (row: Row) => string;
   statusOf: (row: Row) => ListStatus;
+  /** REQ-023 FR-10: one plain line under the status on the entry's page (the Rule's words for the row's type), or none. */
+  noteOf?: (row: Row) => string | null;
   orderBy: { column: string; ascending: boolean };
   /** REQ-028 FR-8 (D-2814): the table's columns as data; empty keeps the list form at every width. */
   columns: readonly ColumnSpec<Row>[];
@@ -1056,6 +1306,43 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
     columns: ONBOARDING_COLUMNS,
   } satisfies RegisterMeta<
     Statused<OnboardingChecklistRow> & { ticked: number }
+  >,
+  "commission-changes": {
+    slug: "commission-changes",
+    table: "commission_changes",
+    view: "commission_changes_status",
+    title: "Changes we told the Commission",
+    singular: "change",
+    intro:
+      "One row for each change or event you told the Commission about (Rules s 13 and s 13A) and each variation of your registration you applied for (NDIS Act s 73M), with the dates. The Rules set the timing; this register keeps the record nobody else keeps.",
+    addLabel: "Record a change",
+    empty:
+      "Nothing recorded yet. When you tell the Commission about a change, or apply to vary your registration, record it here with the date.",
+    fields: COMMISSION_CHANGE_FIELDS,
+    schema: CommissionChangeForm,
+    filters: COMMISSION_CHANGE_FILTERS,
+    titleOf: (r) =>
+      `${r.reference}: ${CHANGE_TYPE_LABELS[r.change_type] ?? r.change_type}`,
+    detailOf: (r) =>
+      r.kind === "variation"
+        ? `Variation wanted from ${formatLongDate(r.happened_on)}.${r.applied_on ? ` Applied ${formatLongDate(r.applied_on)}.` : ""}${r.decided_on ? ` Decided ${formatLongDate(r.decided_on)}.` : ""}${r.effective_on ? ` Takes effect ${formatLongDate(r.effective_on)}.` : ""}`
+        : `Happened ${formatLongDate(r.happened_on)}.${r.aware_on ? ` Known ${formatLongDate(r.aware_on)}.` : ""}${r.notified_on ? ` Notified ${formatLongDate(r.notified_on)}.` : ""}`,
+    statusOf: (r) => changeStateTag(r.state, r.notify_by),
+    // FR-10: the Rule's words for the type (R-4), and for a variation the line that says what to do next (D-2341).
+    noteOf: (r) => {
+      const words = changeType(r.change_type)?.helper ?? null;
+      if (r.kind !== "variation") return words;
+      const next = r.decided_on
+        ? DECIDED_LINE
+        : r.applied_on
+          ? null
+          : TO_APPLY_LINE;
+      return [words, next].filter(Boolean).join(" ") || null;
+    },
+    orderBy: { column: "happened_on", ascending: false },
+    columns: COMMISSION_CHANGE_COLUMNS,
+  } satisfies RegisterMeta<
+    CommissionChangeRow & { state: string; notify_by: string | null }
   >,
 };
 

@@ -38,6 +38,8 @@ const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
   "improvements",
   "decisions",
   "onboarding",
+  // REQ-023 FR-10 (Session D): a row on the day you tell the Commission or apply.
+  "commission-changes",
 ];
 /** The REQ-018 registers you keep current: a date changes, the row changes. */
 const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [

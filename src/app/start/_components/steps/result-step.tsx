@@ -24,7 +24,11 @@ import { askedDocumentCount } from "@/lib/questionnaire/document-set";
 import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
-import { deriveResult, type DeriveResultResponse } from "../../actions";
+import {
+  deriveResult,
+  type DeriveResultResponse,
+  type ResultChanges,
+} from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
 import {
   HAVE_TAG,
@@ -128,6 +132,7 @@ export function ResultStep({
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
       contactEmail={contactEmail}
+      changes={response.changes}
     />
   );
 }
@@ -328,12 +333,15 @@ function ResultView({
   signedIn,
   contactEmail,
   subscriptionOffered,
+  changes,
 }: {
   subscriptionOffered: boolean;
   result: QuestionnaireResult;
   checklistTotal: number;
   signedIn: boolean;
   contactEmail: string | null;
+  /** REQ-023 FR-11: how the result differs from the latest completed assessment, for a signed-in owner with a ready set. */
+  changes?: ResultChanges;
 }) {
   const r = result;
   const { open, known, toggle, remember } = useRememberedOpen();
@@ -466,6 +474,52 @@ function ResultView({
               testId="clear-draft"
             />
           </div>
+          {/* REQ-023 FR-11 (D-2310, D-2341): prompts, not nags, after the card's controls. The groups changed is a
+            variation to apply for and then record; a state added is conditional on where supports are delivered, with
+            that state's own checks, and never says the duty has arisen. No row is written. */}
+          {changes &&
+          (changes.groupsChanged || changes.statesAdded.length > 0) ? (
+            <div
+              className="border-rule mt-4 rounded-md border p-4 text-sm leading-6"
+              data-testid="result-changes"
+            >
+              {changes.groupsChanged ? (
+                <p className="text-sm" data-testid="result-changes-groups">
+                  Your registration groups changed since your last pack. This
+                  changes your registration; you apply to vary it (NDIS Act s
+                  73M), then{" "}
+                  <Link
+                    href="/registers/commission-changes/new?kind=variation&change_type=supports-registered"
+                    className="underline underline-offset-4"
+                    data-testid="result-changes-variation-link"
+                  >
+                    record it in your changes register
+                  </Link>
+                  .
+                </p>
+              ) : null}
+              {changes.statesAdded.map((s) => (
+                <div
+                  key={s.state}
+                  className="mt-2 first:mt-0"
+                  data-testid={`result-changes-state-${s.state}`}
+                >
+                  <p className="text-sm">
+                    If you now deliver supports in {s.name}, tell the Commission
+                    (Rules s 13), and check {s.name}&apos;s own checks below.
+                  </p>
+                  <ul className="mt-1 list-disc pl-5">
+                    {s.childrenCheck ? (
+                      <li>Children&apos;s check: {s.childrenCheck}</li>
+                    ) : null}
+                    {s.restrictivePractice ? (
+                      <li>Restrictive practices: {s.restrictivePractice}</li>
+                    ) : null}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
 
         {/* REQ-027 D-2701, D-2711: the one disclosure for the words on this page, under the card and inside no other

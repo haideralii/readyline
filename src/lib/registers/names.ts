@@ -147,6 +147,17 @@ export const RECORD_NAMES: readonly RecordName[] = [
     href: "/registers/hazards",
   },
   {
+    // REQ-023 FR-10 (Session D): what was notified to the Commission and what was applied for as a variation.
+    id: "commission-changes",
+    name: "Changes we told the Commission",
+    aliases: [
+      "changes register",
+      "notifications to the Commission",
+      "register of changes notified to the Commission",
+    ],
+    href: "/registers/commission-changes",
+  },
+  {
     id: "training",
     name: "Training register",
     aliases: ["training records", "training log"],
@@ -298,6 +309,14 @@ export const AUDIT_DAY_RECORDS: readonly {
     name: "Hazard register",
     ask: "Your hazard register: what could hurt someone, what you did, and when you check it again",
     href: "/registers/hazards",
+    tier: "practice",
+  },
+  {
+    // REQ-023 FR-10 (Session D): the fourteenth record, after the hazards; the register nobody keeps.
+    id: "commission-changes",
+    name: "Changes we told the Commission",
+    ask: "Your record of the changes you told the Commission about, and the variations you applied for, with the dates",
+    href: "/registers/commission-changes",
     tier: "practice",
   },
   {

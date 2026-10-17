@@ -33,6 +33,7 @@ import {
 } from "@/lib/registers/timeline";
 import type { RegistrationKind } from "@/lib/registers/types";
 import { loadQuestionnaire } from "@/server/path/state";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
@@ -77,6 +78,7 @@ export default async function AccountPage() {
     period,
     questionnaire,
     kindRow,
+    ownershipChangeOn,
   ] = await Promise.all([
     listPurchases(supabase, a.id),
     registerOverview(supabase, a.id),
@@ -93,6 +95,8 @@ export default async function AccountPage() {
       .select("registration_kind")
       .eq("id", a.id)
       .maybeSingle(),
+    // REQ-023 FR-2 (Session D): the change-of-ownership row reads the changes register.
+    latestOwnershipChangeOn(supabase, a.id),
   ]);
   const mirroredKind =
     (kindRow.data as { registration_kind: RegistrationKind | null } | null)
@@ -252,7 +256,7 @@ export default async function AccountPage() {
               <>
                 <h3 className="mt-6">Your registration timeline</h3>
                 <RegistrationTimeline
-                  rows={timelineRows(period)}
+                  rows={timelineRows(period, { ownershipChangeOn })}
                   caption="Your registration timeline"
                   testId="registration-timeline"
                 />

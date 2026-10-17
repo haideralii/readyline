@@ -13,6 +13,7 @@ import {
   INCIDENT_COLUMNS,
   INCIDENT_EXAMPLE_ROW,
 } from "@/lib/registers/names";
+import { tellingTheCommissionRows } from "@/lib/registers/commission-changes";
 import { reviewCyclesFor } from "./catalogue";
 import type { Block } from "./section-schema";
 import type { FixedContext } from "./fixed-text";
@@ -410,28 +411,10 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
     {
       type: "table",
       columns: ["What", "By when"],
-      rows: [
-        [
-          "A change to our contact details (Rules s 13)",
-          "As soon as practicable after we know it will happen, or after it happens, whichever is earlier",
-        ],
-        [
-          "A change in our scale: the area or the locations we work from, or a significant rise or fall in the number of participants or workers (Rules s 13)",
-          "As soon as practicable after we know it will happen, or after it happens, whichever is earlier",
-        ],
-        [
-          "An event that significantly affects our ability to meet a condition of registration, or a change that adversely affects a participant's access to our supports (Rules s 13A)",
-          "When we become aware it will occur, or when it occurs, whichever is earlier",
-        ],
-        [
-          "An adverse change in our financial capacity, or a significant change in our organisation or governance, including a change of ownership (Rules s 13A)",
-          "For a change of ownership: when we become aware it will occur, or when a necessary step toward it occurs, whichever is earlier; otherwise as the row above",
-        ],
-        [
-          "An event about the suitability of the business or of our key personnel of the kind the Commission would weigh for an applicant (Rules s 13A)",
-          "When we become aware it will occur, or when it occurs, whichever is earlier",
-        ],
-      ],
+      // REQ-023 FR-10 (Session D): the rows come from the changes register's
+      // one constant, so the register's list and this table cannot drift; the
+      // words are the 15 October 2026 fixed text, byte for byte, held by a test.
+      rows: tellingTheCommissionRows(),
     },
     {
       type: "paragraph",

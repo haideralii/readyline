@@ -25,6 +25,7 @@ import {
   rerenderSetWithFacts,
 } from "@/server/generation/rerender";
 import { countEvent } from "@/server/metrics/counters";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
@@ -267,7 +268,11 @@ export async function adoptGroupAction(
           result,
           answers,
           getStandardsDataset(),
-          checklistPeriod(await currentPeriod(supabase, accountId)),
+          checklistPeriod(
+            await currentPeriod(supabase, accountId),
+            // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+            await latestOwnershipChangeOn(supabase, accountId),
+          ),
         ).items
       : [];
   for (const d of group.documents) {

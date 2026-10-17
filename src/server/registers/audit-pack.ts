@@ -34,6 +34,7 @@ import {
   whatChanged,
   whatChangedFileName,
   whatChangedRows,
+  type WhatChangedChange,
 } from "@/lib/registers/what-changed";
 import { currentPeriod } from "./registration-queries";
 import {
@@ -204,13 +205,16 @@ export async function whatChangedFiles(
 ): Promise<Record<string, Uint8Array>> {
   const period = await currentPeriod(supabase, accountId);
   if (!period) return {};
-  const [incidents, complaints, checks, reviews] = await Promise.all([
+  const [incidents, complaints, checks, reviews, changes] = await Promise.all([
     listIncidents(supabase, accountId),
     listComplaints(supabase, accountId),
     listWorkerChecks(supabase, accountId),
     listPolicyReviews(supabase, accountId),
+    // FR-6's last line (Session D, FR-10): the changes register.
+    listAuditDayRows(supabase, accountId, "commission-changes"),
   ]);
   const summary = whatChanged({
+    changes: changes as unknown as WhatChangedChange[],
     period: period.last_audit_on
       ? { kind: "since-last-audit", from: period.last_audit_on, to: null }
       : { kind: "period", from: period.period_starts_on, to: null },

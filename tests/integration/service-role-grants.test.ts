@@ -193,6 +193,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   invitations: ["INSERT", "SELECT", "UPDATE"],
   report_links: ["INSERT", "SELECT", "UPDATE"],
   registration_periods: ["INSERT", "SELECT", "UPDATE"],
+  // REQ-023 Session D (D-2341): the changes register; members read, subscribed members insert and update, nobody deletes.
+  commission_changes: ["INSERT", "SELECT", "UPDATE"],
   // The status views.
   incidents_status: ["SELECT"],
   worker_clearances_status: ["SELECT"],
@@ -205,6 +207,7 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   staff_matrix_status: ["SELECT"],
   onboarding_checklists_status: ["SELECT"],
   hazards_status: ["SELECT"],
+  commission_changes_status: ["SELECT"],
   // REQ-024 A1 (D-2429): the worker's two views without `note`.
   staff_matrix_worker: ["SELECT"],
   worker_clearances_worker: ["SELECT"],
