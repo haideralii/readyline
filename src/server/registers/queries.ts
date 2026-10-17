@@ -268,3 +268,24 @@ export async function isDocumentAdopted(
     .maybeSingle();
   return Boolean(r.data?.adopted_on);
 }
+
+/**
+ * REQ-028 FR-7 (D-2275 (3)): when the account last downloaded its audit pack,
+ * from the newest `audit_pack.downloaded` line of the audit log, or null
+ * when it never has. The owner's select policy on `audit_log` allows the read.
+ */
+export async function lastAuditPackDownload(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<string | null> {
+  const r = await supabase
+    .from("audit_log")
+    .select("at")
+    .eq("account_id", accountId)
+    .eq("action", "audit_pack.downloaded")
+    .order("at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (r.error) throw r.error;
+  return (r.data as { at: string } | null)?.at ?? null;
+}

@@ -45,6 +45,7 @@ export function RegisterPage({
   importHref,
   back,
   count,
+  actions,
   children,
 }: {
   title: string;
@@ -60,6 +61,8 @@ export function RegisterPage({
   back?: { href: string; label: string };
   /** REQ-028 FR-7, FR-8: the register's row count; at 0 the list's empty state carries the primary and the header's actions step aside. */
   count?: number;
+  /** REQ-028 FR-7: a page whose primary is not "Add" (the index's pack button) renders it here, first in the row. */
+  actions?: ReactNode;
   children: ReactNode;
 }) {
   const showActions = count !== 0;
@@ -84,11 +87,12 @@ export function RegisterPage({
           </h1>
           {intro ? <p className="text-ink mt-3 leading-7">{intro}</p> : null}
         </div>
-        {showActions && ((canWrite && addHref) || exportHref) ? (
+        {showActions && (actions || (canWrite && addHref) || exportHref) ? (
           <div
             className="mt-5 flex flex-wrap gap-3 lg:mt-1 lg:shrink-0 lg:justify-end"
             data-testid="register-actions"
           >
+            {actions}
             {canWrite && addHref ? (
               <Link
                 href={addHref}
