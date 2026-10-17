@@ -96,6 +96,7 @@ const snapshot: WorkerExportSnapshot = {
   clearances: [],
   roles: [],
   exceptions: [],
+  entries: [],
   events: [],
   states: new Map(),
   itemsByRef: new Map(),

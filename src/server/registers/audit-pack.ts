@@ -316,9 +316,19 @@ export async function buildAuditPack(input: {
   // REQ-024 A3 (FR-6, FR-6a; D-2407 as amended): the workers folder, one
   // file per worker and the index, and the two Worker Screening Rules lists
   // unfilled, the same files for the owner and for the auditor link, codes
-  // and numbers and never a name (SR-8(a)); the lists speak as at today.
+  // and numbers and never a name (SR-8(a)). REQ-024 Session C (D-2832): the
+  // pack's period filters the supervision entries, and the lists speak as at
+  // the period's end day when it has one, today otherwise; items, ticks and
+  // states stay the whole register's (D-2318 B).
+  const today = todaySydney();
+  const asAt =
+    period.kind !== "all" && period.to !== null && period.to < today
+      ? period.to
+      : undefined;
   const workers = await loadWorkerExportSnapshot(supabase, accountId, {
-    today: todaySydney(),
+    today,
+    period,
+    asAt,
   });
   for (const [name, csv] of Object.entries(
     packWorkerFiles(workers, stamp, part4SectionFor),

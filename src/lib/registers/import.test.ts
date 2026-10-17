@@ -10,6 +10,7 @@
 import { describe, expect, it } from "vitest";
 import { lintText } from "@/lib/copy-lint/rules";
 import {
+  DUPLICATE_CODE_IN_FILE,
   IMPORT_COLUMNS,
   IMPORT_LIMITS,
   IMPORT_REGISTERS,
@@ -212,6 +213,100 @@ describe("the preview (FR-8)", () => {
       review_on: "2027-03-01",
     });
     expect(r.ok && r.rows[0].label).toBe("finance");
+  });
+});
+
+describe("the staff matrix (REQ-024 FR-13; D-2830)", () => {
+  const header = IMPORT_COLUMNS.staff_matrix.join(",");
+  const row = (over: Partial<Record<string, string>> = {}) => {
+    const cells: Record<string, string> = {
+      worker_ref: "w-7",
+      role: "support-worker",
+      role_label: "Support worker",
+      states: "NSW;VIC",
+      risk_assessed: "yes",
+      risk_paragraph: "b",
+      works_with_children: "false",
+      may_use_restrictive_practice: "no",
+      started_on: "2026-02-01",
+      ended_on: "",
+      qualifications: "Cert III Individual Support",
+      last_supervision_on: "2026-09-30",
+      last_appraisal_on: "",
+      onboarding_signed_on: "",
+      note: "Prefers morning shifts.",
+      ...over,
+    };
+    return IMPORT_COLUMNS.staff_matrix.map((c) => cells[c] ?? "").join(",");
+  };
+
+  it("round-trips a row through the A1 form: the code upper-cased, the states an array, the booleans read, no is_me and no system column", () => {
+    const p = previewImport("staff_matrix", `${header}\n${row()}\n`);
+    expect(p.ok && p.rows[0].ok).toBe(true);
+    const r = p.ok ? p.rows[0].row! : {};
+    expect(r).toMatchObject({
+      worker_ref: "W-7",
+      role: "support-worker",
+      role_label: "Support worker",
+      states: ["NSW", "VIC"],
+      risk_assessed: true,
+      risk_paragraph: "b",
+      works_with_children: false,
+      may_use_restrictive_practice: false,
+      started_on: "2026-02-01",
+      ended_on: null,
+      qualifications: "Cert III Individual Support",
+      last_supervision_on: "2026-09-30",
+      note: "Prefers morning shifts.",
+    });
+    expect(Object.keys(r)).not.toContain("is_me");
+    expect(Object.keys(r)).not.toContain("role_ref");
+    expect(Object.keys(r)).not.toContain("risk_assessed_from");
+    expect(p.ok && p.rows[0].label).toBe("w-7");
+  });
+
+  it("a name in the note or the qualifications fails the row; a wrong state or role names the column; a code twice in one file fails the second row", () => {
+    const text = `${header}\n${row()}\n${row({
+      worker_ref: "W-8",
+      note: "Jane Smith lives at 12 High Street",
+    })}\n${row({ worker_ref: "W-9", states: "NSW;XX" })}\n${row({
+      worker_ref: "W-10",
+      role: "manager",
+    })}\n${row({ worker_ref: "W-7" })}\n${row({ worker_ref: "W-11" })}\n${row({
+      worker_ref: "W-12",
+    })}\n${row({ worker_ref: "W-13" })}\n`;
+    const p = previewImport("staff_matrix", text);
+    expect(p.ok).toBe(true);
+    if (!p.ok) return;
+    expect(p.rows.map((r) => r.ok)).toEqual([
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+    ]);
+    expect(p.rows[1].reasons[0]).toMatch(/^note: looks like a name/);
+    expect(p.rows[2].reasons[0]).toMatch(/^states: /);
+    expect(p.rows[3].reasons[0]).toMatch(/^role: /);
+    expect(p.rows[4].reasons).toEqual([
+      `worker_ref: ${DUPLICATE_CODE_IN_FILE}`,
+    ]);
+    for (const r of p.rows)
+      for (const reason of r.reasons) expect(lintText(reason)).toEqual([]);
+  });
+
+  it("the template is the export's columns minus what the system fills, and every free-text column is read by the detector", () => {
+    expect(
+      importTemplate("staff_matrix")
+        .replace(/^\uFEFF/, "")
+        .trim(),
+    ).toBe(header);
+    expect(IMPORT_COLUMNS.staff_matrix).not.toContain("role_ref");
+    expect(IMPORT_COLUMNS.staff_matrix).not.toContain("risk_assessed_from");
+    expect(IMPORT_SLUGS.staff_matrix).toBe("staff-matrix");
   });
 });
 

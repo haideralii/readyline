@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
+import { applyWorkerStates } from "@/lib/checklist/worker-states";
+import { workerStatesLine } from "@/lib/registers/worker-states-line";
 import { legalRows, timelineRows } from "@/lib/registers/timeline";
 import {
   parsePeriodParams,
@@ -39,6 +41,10 @@ import {
 import { selfCheckOffer } from "@/lib/registers/self-check";
 import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import {
+  accountWorkerStates,
+  todaySydney,
+} from "@/server/registers/worker-onboarding";
 import { DrillForm } from "./drill-form";
 
 export const metadata: Metadata = { title: "Audit day" };
@@ -88,6 +94,7 @@ export default async function AuditDayPage({
     toConfirm,
     drill,
     period,
+    workers,
     ownershipChangeOn,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
@@ -103,9 +110,18 @@ export default async function AuditDayPage({
       .maybeSingle(),
     // REQ-023 FR-2, FR-4: the registration period's legal rows and dated items.
     currentPeriod(supabase, viewer.account.id),
+    // REQ-024 Session C (FR-10; D-2411, D-2831): every worker's derived state, for the people group and the two people items.
+    accountWorkerStates(
+      supabase,
+      viewer.account.id,
+      viewer.user.id,
+      ctx.result,
+      todaySydney(),
+    ),
     // REQ-023 FR-2, FR-4 (Session D): the change-of-ownership row and item read the changes register.
     latestOwnershipChangeOn(supabase, viewer.account.id),
   ]);
+  const peopleLine = workerStatesLine(workers, todaySydney());
   // REQ-023 FR-5: the period the pack link carries, "This registration period"
   // by default when a period exists (D-2305); the list's states stay live
   // (D-2318 B). The proxy refused a malformed query already.
@@ -143,16 +159,20 @@ export default async function AuditDayPage({
       day: "2-digit",
     }).format(new Date()),
   });
-  const shown = mergeChecklist({
-    checklist: deriveChecklist(
-      ctx.result,
-      ctx.answers,
-      dataset,
-      checklistPeriod(period, ownershipChangeOn),
-    ),
-    stored,
-    draftedDocumentTypeIds: drafted,
-  });
+  const shown = applyWorkerStates(
+    mergeChecklist({
+      checklist: deriveChecklist(
+        ctx.result,
+        ctx.answers,
+        dataset,
+        checklistPeriod(period, ownershipChangeOn),
+      ),
+      stored,
+      draftedDocumentTypeIds: drafted,
+    }),
+    workers,
+    todaySydney(),
+  );
   const setId = ctx.state.readySetId;
   const groups = setId ? orderDocuments(ctx.documents) : [];
   const have = shown.items.filter((i) => i.status === "have").length;
@@ -286,6 +306,22 @@ export default async function AuditDayPage({
             <h2 id={`ask-${g.id}`} className="">
               {ASK[g.id] ?? g.title}
             </h2>
+            {g.id === "people" && peopleLine ? (
+              // REQ-024 Session C (FR-10; D-2411): the staff list's derived states in one line, with the way to them.
+              <p
+                className="mt-2 text-sm leading-6"
+                data-testid="audit-day-people-line"
+              >
+                From your staff list: {peopleLine}.{" "}
+                <Link
+                  href="/registers/staff-matrix"
+                  className="underline underline-offset-2"
+                >
+                  Open the staff list
+                </Link>
+                .
+              </p>
+            ) : null}
             <ul className="divide-rule mt-3 divide-y">
               {g.items.map((i) => {
                 const t = tick(i);

@@ -27,6 +27,8 @@ export type ShownItem = ChecklistItem & {
   stored: boolean;
   /** REQ-023 FR-4: the recorded date of a dated item, or null. */
   doneOn: string | null;
+  /** REQ-024 Session C (FR-10; D-2831): the line under the title when the status came from the staff list. */
+  derived?: string;
 };
 
 export type ShownGroup = {

@@ -29,6 +29,8 @@ export const PERIOD_COLUMNS = {
   complaints: "received_on",
   worker_clearances: "issued_on",
   policy_reviews: "last_reviewed_on",
+  // REQ-024 Session C (FR-11; D-2832): the supervision history in the pack's workers folder.
+  supervision_entries: "held_on",
 } as const;
 export type PeriodRegister = keyof typeof PERIOD_COLUMNS;
 

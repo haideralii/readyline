@@ -176,6 +176,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   // REQ-024 Session B (Data, finding 175): the acknowledgements, append-only for clients; the worker's documents view.
   policy_acknowledgements: ["INSERT", "SELECT"],
   document_versions_worker: ["SELECT"],
+  // REQ-024 Session C (Data, finding 175): the supervision history, a register like the others.
+  supervision_entries: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   // REQ-022 Session B (D-2823): the reminder settings; members read, the owner writes, nobody deletes through the API.
   reminder_settings: ["INSERT", "SELECT", "UPDATE"],
   // REQ-024 A2 (D-2434): the s 14 exception, ended and never removed, so no delete.
