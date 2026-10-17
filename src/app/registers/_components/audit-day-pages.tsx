@@ -163,10 +163,10 @@ export async function AuditDayListPage({
         slug === "staff-matrix" ? "/registers/staff-matrix/export" : undefined
       }
       exportLabel="Worker files and the two Rules lists"
-      // REQ-020 FR-8: the corporate risk register takes a spreadsheet.
+      // REQ-020 FR-8: the corporate risk register takes a spreadsheet; REQ-024 FR-13: so does the staff matrix.
       importHref={
-        slug === "corporate-risks"
-          ? "/registers/corporate-risks/import"
+        slug === "corporate-risks" || slug === "staff-matrix"
+          ? `/registers/${slug}/import`
           : undefined
       }
       back={{ href: "/registers", label: "Registers" }}
@@ -223,8 +223,9 @@ export async function AuditDayListPage({
             : undefined
         }
         importHref={
-          ctx.canWrite && slug === "corporate-risks"
-            ? "/registers/corporate-risks/import"
+          ctx.canWrite &&
+          (slug === "corporate-risks" || slug === "staff-matrix")
+            ? `/registers/${slug}/import`
             : undefined
         }
       />
