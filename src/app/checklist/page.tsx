@@ -19,6 +19,7 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { latestReadySet, listChecklistItems } from "@/server/checklist/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { ChecklistView } from "./checklist-view";
@@ -62,17 +63,19 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, latest, period] = await Promise.all([
+  const [stored, latest, period, ownershipChangeOn] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     latestReadySet(supabase, viewer.account.id),
     currentPeriod(supabase, viewer.account.id),
+    // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+    latestOwnershipChangeOn(supabase, viewer.account.id),
   ]);
   // REQ-023 FR-4: the dated audit items once a registration period exists.
   const checklist = deriveChecklist(
     built.result,
     answers.data,
     dataset,
-    checklistPeriod(period),
+    checklistPeriod(period, ownershipChangeOn),
   );
   const shown = mergeChecklist({
     checklist,

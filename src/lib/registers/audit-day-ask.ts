@@ -124,6 +124,15 @@ export function auditDayAskList(input: {
       ...fromOverview(a.hazards, "/registers/hazards", "Add a hazard"),
     },
     {
+      // REQ-023 FR-10 (Session D): the changes register, with its live state.
+      id: "commission-changes",
+      ...fromOverview(
+        a["commission-changes"],
+        "/registers/commission-changes",
+        "Record a change",
+      ),
+    },
+    {
       id: "insurances",
       ...fromOverview(a.insurances, "/registers/insurances", "Add an item"),
     },

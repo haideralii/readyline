@@ -154,7 +154,7 @@ describe("audit-day ask list (REQ-018 FR-11)", () => {
 });
 
 describe("the two tiers and the paper marks (batch 45, REQ-018-gated item)", () => {
-  it("every line carries its tier from the one list, six and six, and only the two paper records are marked", () => {
+  it("every line carries its tier from the one list, six and eight, and only the two paper records are marked", () => {
     const lines = auditDayAskList({
       registers: registersEmpty,
       auditDay: empty,
@@ -176,6 +176,8 @@ describe("the two tiers and the paper marks (batch 45, REQ-018-gated item)", () 
         "conflicts-of-interest",
         "delegations",
         "hazards",
+        // REQ-023 FR-10 (Session D): the changes register joins after the hazards.
+        "commission-changes",
         "improvements",
         "onboarding",
       ],

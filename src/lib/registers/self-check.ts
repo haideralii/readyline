@@ -27,6 +27,9 @@ export const SELF_CHECK_QUESTIONS: Record<string, string> = {
     "Does the delegations register say who acts for you when you are away, and is it still right?",
   hazards:
     "Is every hazard you know of in the hazard register, with what you did and a review date?",
+  // REQ-023 FR-10 (Session D): a Dev-2 draft for the PO, as D-2236's questions were.
+  "commission-changes":
+    "Is every change you told the Commission about this quarter in the changes register, with the date you told them?",
   insurances:
     "Is every insurance certificate current, and is each expiry date in the register?",
   improvements:

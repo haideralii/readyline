@@ -69,12 +69,14 @@ export type TimelineSource =
   | "your certificate's conditions"
   | "the Commissioner's letter"
   | "NDIS Act s 73K"
+  | "Rules s 13BA"
   | "your certificate";
 
 export type TimelineRowId =
   | "midterm-prepare"
   | "midterm-start-by"
   | "midterm-done"
+  | "ownership-audit-start-by"
   | "renewal-window"
   | "renewal-apply-by"
   | "period-end";
@@ -146,8 +148,44 @@ export function applyBy(p: RegistrationPeriod): string {
   return addMonths(p.period_ends_on, -APPLY_BY_MONTHS);
 }
 
+/** Rules s 13BA(1)(a): the change-of-ownership audit must start within 3 months of the change. */
+export const OWNERSHIP_AUDIT_START_MONTHS = 3;
+
+/**
+ * REQ-023 FR-2 (Session D, findings 47 and 86; D-2341): the day the
+ * change-of-ownership audit must start by, or null when the Rules ask for
+ * none: the provider is not a certification provider (s 13BA attaches to a
+ * s 13B provider), no change of ownership is recorded, a mid-term audit is
+ * under way (s 13BA(1)(c)(i); read as a recorded mid-term audit date inside
+ * the three months after the change, the two audits overlapping), or the
+ * registration ends within those three months (s 13BA(1)(c)(ii)).
+ */
+export function ownershipAuditStartBy(
+  p: RegistrationPeriod,
+  ownershipChangeOn: string | null | undefined,
+): string | null {
+  if (!ownershipChangeOn || p.audit_type !== "certification") return null;
+  const by = addMonths(ownershipChangeOn, OWNERSHIP_AUDIT_START_MONTHS);
+  if (by > p.period_ends_on) return null;
+  const midtermUnderWay =
+    p.midterm_applies &&
+    p.midterm_audit_on !== null &&
+    p.midterm_audit_on >= ownershipChangeOn &&
+    p.midterm_audit_on <= by;
+  if (midtermUnderWay) return null;
+  return by;
+}
+
+export type TimelineOptions = {
+  /** REQ-023 FR-2 (Session D): the latest change of ownership in the changes register, or none. */
+  ownershipChangeOn?: string | null;
+};
+
 /** Every row of "Your registration timeline", in order (FR-2). */
-export function timelineRows(p: RegistrationPeriod): TimelineRow[] {
+export function timelineRows(
+  p: RegistrationPeriod,
+  opts: TimelineOptions = {},
+): TimelineRow[] {
   const rows: TimelineRow[] = [];
   if (p.midterm_applies) {
     if (p.midterm_audit_on) {
@@ -175,6 +213,18 @@ export function timelineRows(p: RegistrationPeriod): TimelineRow[] {
       });
     }
   }
+  const ownershipBy = ownershipAuditStartBy(p, opts.ownershipChangeOn);
+  if (ownershipBy)
+    rows.push({
+      id: "ownership-audit-start-by",
+      label: "Change-of-ownership audit must start by",
+      date: ownershipBy,
+      source: "Rules s 13BA",
+      legal: true,
+      // D-2320: the one line that says how the product reads "under way".
+      plain:
+        "The registration must still be in force for those three months (Rules s 13BA(1)(c)). If your mid-term audit started in these three months, record its date on the account page and this row goes.",
+    });
   rows.push({
     id: "renewal-window",
     label: "Your renewal window opens",

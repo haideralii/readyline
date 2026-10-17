@@ -8,7 +8,11 @@
  * `standards.json` ties first aid to a class.
  */
 import { glossaryMeaning } from "@/lib/questionnaire/content";
-import { mustStartBy, type RegistrationPeriod } from "@/lib/registers/timeline";
+import {
+  mustStartBy,
+  ownershipAuditStartBy,
+  type RegistrationPeriod,
+} from "@/lib/registers/timeline";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -88,6 +92,8 @@ export type ChecklistPeriod = {
   /** The must-start-by date (Rules s 13B, or the override), when the mid-term audit applies. */
   mustStartBy: string;
   periodEndsOn: string;
+  /** REQ-023 FR-4 (Session D, finding 47): the change-of-ownership audit's must-start-by date (Rules s 13BA), when the changes register holds one that counts. */
+  ownershipAuditStartBy?: string | null;
 };
 
 export type ChecklistGroup = {
@@ -230,12 +236,15 @@ function haveNote(answer: "yes" | "no" | "not-sure" | "unknown") {
 /** REQ-023 FR-4: what the checklist reads from the current period, or nothing without one. */
 export function checklistPeriod(
   period: RegistrationPeriod | null | undefined,
+  /** REQ-023 FR-4 (Session D): the latest change of ownership in the changes register, or none. */
+  ownershipChangeOn: string | null = null,
 ): ChecklistPeriod | undefined {
   if (!period) return undefined;
   return {
     midtermApplies: period.midterm_applies,
     mustStartBy: mustStartBy(period),
     periodEndsOn: period.period_ends_on,
+    ownershipAuditStartBy: ownershipAuditStartBy(period, ownershipChangeOn),
   };
 }
 
@@ -503,6 +512,23 @@ export function deriveChecklist(
         initialStatus: "need",
         dated: true,
         dueDate: period.mustStartBy,
+      });
+    // REQ-023 FR-4 (Session D, findings 47 and 86): the fourth dated item, only
+    // while the changes register holds a change of ownership whose audit the
+    // Rules require (certification, no mid-term audit under way, the period
+    // still in force for the three months).
+    if (period.ownershipAuditStartBy)
+      items.push({
+        id: "audit:change-of-ownership-audit-started",
+        group: "audit",
+        title: `Type the date your change-of-ownership audit started; it must start by ${period.ownershipAuditStartBy}`,
+        ask: "Which auditing company did the audit after your change of ownership, and on what date did it start?",
+        why: "After a change of ownership a certification provider has a certification audit that must start within 3 months of the change, or by the date the Commissioner allows (Rules s 13BA). It is not required while a mid-term audit is under way or when the registration ends within those months.",
+        sourceRef: midTermRef,
+        unverified: false,
+        initialStatus: "need",
+        dated: true,
+        dueDate: period.ownershipAuditStartBy,
       });
     items.push({
       id: "audit:renewal-application-submitted",
