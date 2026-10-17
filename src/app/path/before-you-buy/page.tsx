@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BuyButton } from "@/app/documents/buy-button";
+import { HOME_COPY } from "@/lib/home-copy";
 import { formatAud, readPricing } from "@/lib/payments/pricing";
-import { refundPromise } from "@/lib/payments/refund-promise";
 import { getViewer } from "@/server/accounts/queries";
 import { loadPathContext } from "@/server/path/state";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -29,7 +29,6 @@ export default async function BeforeYouBuyPage() {
   if (!ctx.result) redirect("/start");
   if (ctx.state.paid) redirect("/documents");
   const pricing = readPricing();
-  const promise = refundPromise();
   const documents = ctx.result.documents.length + 1;
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
@@ -45,8 +44,11 @@ export default async function BeforeYouBuyPage() {
           ? `${formatAud(pricing.packPriceCents)} once. No subscription, no instalments.`
           : "One fixed price, paid once. No subscription, no instalments."}
       </p>
+      {/* Retro finding 113: at the point of sale the refund line carries its
+          conditions (the pack paragraph the home page shows), not the open
+          promise alone, which read as unconditional (ACL s 18). */}
       <p className="mt-2 text-lg leading-8" data-testid="buy-line-refund">
-        {promise[0] ?? "Our refund promise is on the Refunds page."}
+        {HOME_COPY.refundLine}
       </p>
       <BuyButton
         label="Get my documents"

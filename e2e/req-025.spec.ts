@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { axeSerious } from "./helpers/a11y";
+import { glossaryOnPage } from "./helpers/glossary";
 import { checkWidths } from "./helpers/width";
 
 /**
@@ -16,22 +17,41 @@ const LINE_ONE =
 const LINE_TWO =
   "They do not change which standards apply or what your pack contains: the pack drafts the full set so every document matches. Not sure counts as no.";
 
+// REQ-027 AC-3 (D-2721): the render check once per step after it renders, no new load; axe is
+// the accessibility pass's on every step (req-015-a11y), so it is not run again here (D-2267).
 async function reachStepFive(page: Page) {
   await page.goto("/start/business");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "About your business" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 1", axe: false });
   await page.getByLabel("Trading name").fill("Sunrise Supports");
   await page.getByRole("radio", { name: "Sole trader" }).check();
   await page.getByRole("checkbox", { name: "NSW" }).check();
   await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "The supports you deliver" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 2", axe: false });
   await page.locator("#group-0107").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Restrictive practices" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 3", axe: false });
   await page.locator("#restrictivePractices-no").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Your workforce" }),
+  ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 4", axe: false });
   await page.getByLabel("Number of workers").fill("3");
   await page.locator("#allRiskAssessedScreened-yes").check();
   await page.getByRole("button", { name: "Save and continue" }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: "What you already have" }),
   ).toBeVisible();
+  await glossaryOnPage(page, { label: "step 5", axe: false });
 }
 
 const count = (s: string | null, re: RegExp) => Number(s?.match(re)?.[1]);
@@ -63,7 +83,7 @@ test.describe("REQ-025 Session A", () => {
     const card = page.getByTestId("summary");
     await expect(card).toContainText("Your audit: certification");
     await expect(card.getByTestId("audit-kind")).toHaveText(
-      "An auditor reads your documents and visits you.",
+      "An approved auditor reads your documents, visits where you work and talks to people.",
     );
 
     // AC-2, FR-3: the list's numbers equal what the page shows elsewhere.
@@ -101,13 +121,14 @@ test.describe("REQ-025 Session A", () => {
         const s = g.locator("> summary");
         if ((await s.count()) > 0) await s.click();
       }
+    // REQ-027 FR-3b (D-2718, finding 143): the legend's first sentence and the tag words are the reader's.
     await expect(docs.getByTestId("have-legend")).toContainText(
-      "Your pack includes a draft of every document below.",
+      "Your pack drafts every document below.",
     );
     expect(
       await docs
         .getByTestId("have-tag")
-        .filter({ hasText: "You have this" })
+        .filter({ hasText: "You have one" })
         .count(),
     ).toBe(docHave);
     const regs = page.getByTestId("result-section-registers");
@@ -119,14 +140,19 @@ test.describe("REQ-025 Session A", () => {
     expect(
       await regs
         .getByTestId("have-tag")
-        .filter({ hasText: "You have this" })
+        .filter({ hasText: "You have one" })
         .count(),
     ).toBe(regHave ? Number(regHave) : 0);
-    // FR-4a: one vocabulary, nothing else.
+    // FR-4a as REQ-027 D-2718 amends it: one vocabulary, nothing else; an unasked row carries no tag
+    // (req-027.spec counts the tags against the asked rows).
     for (const tag of await page.getByTestId("have-tag").allTextContents())
-      expect(tag.trim()).toMatch(/^.(You have this|To prepare|Not asked)$/);
+      expect(tag.trim()).toMatch(
+        /^.(You have one|You need one|You said not sure)$/,
+      );
     await expect(
-      page.getByText(/drafts this|You said you don't|You said: not sure/),
+      page.getByText(
+        /drafts this|You said you don't|You said: not sure|Not asked|To prepare|You have this/,
+      ),
     ).toHaveCount(0);
 
     // FR-5: each reason links to its source by title; "new tab" is said once.
@@ -143,18 +169,25 @@ test.describe("REQ-025 Session A", () => {
       await expect(links).not.toContainText(/Source:|opens in a new tab/);
       await expect(links).toHaveAttribute("target", "_blank");
     }
-    // FR-13: the words on this page, each with its meaning.
-    const glossary = why.getByTestId("glossary-terms");
+    // FR-13: the words on this page, each with its meaning. REQ-027 D-2701 moved the disclosure
+    // under the card, and its count is the render-time count req-027.spec proves (finding 81).
+    const glossary = page.getByTestId("glossary-terms");
     await expect(glossary.locator("> summary")).toHaveText(
-      "What these words mean (6)",
+      /^What these words mean \(\d+\)$/,
     );
     await glossary.locator("> summary").click();
-    await expect(glossary.getByTestId("glossary-mid-term-audit")).toHaveText(
-      "mid-term audit: a check about halfway through your three years.",
+    // REQ-027 A1 (D-2709, D-2713): the shared component renders the meaning as a sentence, then `more`.
+    const midTerm = glossary.getByTestId("glossary-mid-term-audit");
+    await expect(midTerm).toContainText("mid-term audit");
+    await expect(midTerm).toContainText(
+      "A second audit that most certification providers must have.",
+    );
+    await expect(midTerm).toContainText(
+      "The Rules say it must begin within 18 months of your registration starting",
     );
     await expect(
       glossary.getByTestId("glossary-practice-standards"),
-    ).toContainText("the rules every registered provider is audited against");
+    ).toContainText("The quality rules in the law for registered providers.");
     await checkWidths(page, "result (open)");
     expect(await axeSerious(page, "result (open)")).toEqual([]);
   });

@@ -5,9 +5,13 @@
 # a test: 0 means "nothing to build, skip", 1 means "build".
 #
 # Skip unless the commit is on main and changes something other than the
-# product folder and markdown files. Previews stop (CI's Playwright run
-# against a production build covers what they did), and a status or chat
-# commit on main costs no deployment against Vercel Hobby's 100 a day.
+# product folder and markdown files, so a status or chat commit on main
+# builds nothing. This is the second layer only: a build this script cancels
+# is still a created deployment and counts against Vercel Hobby's 100 a day
+# (Vercel docs, project settings, read 16 Oct 2026), so previews are turned
+# off before any deployment exists, in vercel.json's git.deploymentEnabled
+# (D-2239). The ref check below stays as a guard for a branch that slips
+# through that setting.
 set -u
 
 ref="${VERCEL_GIT_COMMIT_REF:-}"

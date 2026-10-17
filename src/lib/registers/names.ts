@@ -439,6 +439,9 @@ export const CLEARANCE_COLUMNS = {
   role_label: "Role",
   clearance_kind: "Kind of check",
   clearance_number: "Check number",
+  // REQ-024 A1 (D-2419): the two numbers s 18(3)(d) asks for, and the day the owner checked the database (s 15(4)).
+  application_number: "Application number",
+  verified_in_database_on: "Checked in the NDIS Worker Screening Database on",
   issued_on: "Date issued",
   expires_on: "Expiry date",
   next_check: "Next check",

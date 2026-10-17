@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { formatDateAu } from "@/lib/generator/fixed-text";
 import { fromPolicyReviewRow } from "@/lib/registers/labels";
+import { sydneyDay } from "@/lib/metrics/counters";
+import { listAdoptedDates } from "@/server/path/state";
 import { getPolicyReview } from "@/server/registers/queries";
 import { documentOptions } from "../catalogue";
 import { PolicyReviewFormView } from "../../_components/policy-review-form";
@@ -17,6 +20,13 @@ export default async function PolicyReviewPage({
   const ctx = await registerContext(`/registers/policy-reviews/${id}`);
   const row = await getPolicyReview(ctx.supabase, ctx.viewer.account.id, id);
   if (!row) notFound();
+  // REQ-024 A0 (D-2435): a catalogue type's adopted date is shown from the
+  // pack's version column, never typed here.
+  const adoptedDates = ctx.canWrite
+    ? Object.fromEntries(
+        await listAdoptedDates(ctx.supabase, ctx.viewer.account.id),
+      )
+    : {};
   return (
     <RegisterPage
       title={reviewTitle(row)}
@@ -31,12 +41,17 @@ export default async function PolicyReviewPage({
           id={id}
           initial={fromPolicyReviewRow(row)}
           documentOptions={documentOptions()}
+          adoptedDates={adoptedDates}
+          today={sydneyDay()}
         />
       ) : (
         <dl className="mt-5 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           {(
             [
-              ["Adopted", row.adopted_on ?? "Not yet"],
+              [
+                "Adopted",
+                row.adopted_on ? formatDateAu(row.adopted_on) : "Not yet",
+              ],
               ["Months between reviews", String(row.review_cycle_months)],
               ["Last reviewed", row.last_reviewed_on ?? "Not yet"],
               ["Next review", row.next_review_on ?? "After adoption"],

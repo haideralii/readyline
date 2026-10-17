@@ -288,3 +288,55 @@ describe("deriveChecklist (REQ-006 AC-1)", () => {
     expect(progressLine(0, 1)).toBe("0 of 1 item ready");
   });
 });
+
+describe("the dated audit items once a registration period exists (REQ-023 FR-4; findings 62 and 80)", () => {
+  const period = {
+    midtermApplies: true,
+    mustStartBy: "2027-09-01",
+    periodEndsOn: "2029-03-01",
+  };
+  const withPeriod = deriveChecklist(
+    personalCare.result,
+    personalCare.answers,
+    dataset,
+    period,
+  );
+  it("replaces the first-audit booking and the mid-term calendar items with three dated items", () => {
+    expect(ids(withPeriod, "audit")).not.toContain("audit:book-audit");
+    expect(ids(withPeriod, "audit")).not.toContain("audit:mid-term-audit-date");
+    const dated = withPeriod.items.filter((i) => i.dated);
+    expect(dated.map((i) => i.id)).toEqual([
+      "audit:mid-term-audit-started",
+      "audit:renewal-application-submitted",
+      "audit:renewal-audit-done",
+    ]);
+    expect(dated[0].dueDate).toBe("2027-09-01");
+    expect(dated[0].title).toContain("must start by 2027-09-01");
+    for (const item of dated) {
+      expect(item.title).toMatch(/^Type\b/);
+      expect(item.initialStatus).toBe("need");
+      expect(
+        findProhibitedClaims(`${item.title} ${item.why} ${item.ask}`),
+      ).toEqual([]);
+      expect(lintText(item.why).map((f) => f.rule)).toEqual([]);
+    }
+  });
+  it("without a period both items stay, and a verification period has no mid-term item", () => {
+    expect(ids(personalCare.checklist, "audit")).toContain("audit:book-audit");
+    expect(ids(personalCare.checklist, "audit")).toContain(
+      "audit:mid-term-audit-date",
+    );
+    const verification = deriveChecklist(
+      soleTrader.result,
+      soleTrader.answers,
+      dataset,
+      { ...period, midtermApplies: false },
+    );
+    expect(ids(verification, "audit")).not.toContain(
+      "audit:mid-term-audit-started",
+    );
+    expect(ids(verification, "audit")).toContain(
+      "audit:renewal-application-submitted",
+    );
+  });
+});

@@ -1,6 +1,6 @@
 ---
 title: Refunds
-updated: 2026-10-15
+updated: 2026-10-16
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -9,7 +9,7 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 ## Our promise
 
-We want you to be happy with what you buy. If you are not, tell us and we will put it right or refund you.
+We want you to be happy with what you buy. If you are not, tell us and we will put it right or refund you as set out below.
 
 ## The document pack
 
@@ -25,7 +25,7 @@ You can cancel at any time. You keep access until the end of the period you have
 
 ## How to ask
 
-Email us at the contact address in the footer with the email address on your account and either the receipt number from Stripe's email or the purchase reference on your documents page. You do not need to give a reason.
+Email us at the contact address in the footer with the email address on your account and the receipt number. You do not need to give a reason.
 
 ## How long it takes
 

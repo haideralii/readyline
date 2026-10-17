@@ -1,0 +1,46 @@
+{
+  "kind": "role-assessment-due",
+  "today": "2026-10-27",
+  "note": "A role first given to a current worker on Tuesday 13 October 2026 and not yet assessed: s 17(2)(b) gives 20 business days, so the assessment is due by 10 November 2026 and the first reminder goes out at 10 business days, today; a seeded role nobody holds sends nothing.",
+  "input": {
+    "account": {
+      "id": "acc",
+      "registration_date": null,
+      "registration_kind": null
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": [],
+    "riskAssessedRoles": [
+      {
+        "id": "role-1",
+        "first_held_on": "2026-10-13",
+        "assessed_on": null,
+        "held": true
+      },
+      {
+        "id": "role-2",
+        "first_held_on": null,
+        "assessed_on": null,
+        "held": false
+      },
+      {
+        "id": "role-3",
+        "first_held_on": "2026-10-13",
+        "assessed_on": "2026-10-20",
+        "held": true
+      }
+    ]
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "role-assessment-due",
+      "subject_table": "risk_assessed_roles",
+      "subject_id": "role-1",
+      "due_on": "2026-11-10",
+      "send_on": "2026-10-27"
+    }
+  ]
+}

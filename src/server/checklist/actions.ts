@@ -7,7 +7,11 @@
  * no-participant-data warning on the field.
  */
 import { z } from "zod";
-import { CHECKLIST_STATUSES, deriveChecklist } from "@/lib/checklist/derive";
+import {
+  CHECKLIST_STATUSES,
+  checklistPeriod,
+  deriveChecklist,
+} from "@/lib/checklist/derive";
 import { log } from "@/lib/logging/logger";
 import { ANSWERS_VERSION, answersSchemaFor } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
@@ -15,14 +19,19 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { parseInput, strictObject } from "@/lib/validation";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
-import { markAdopted } from "@/server/registers/seed";
-import { createSupabaseAdminClient } from "@/server/supabase/admin";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 const Input = strictObject({
   itemId: z.string().regex(/^[a-z]+:[a-z0-9-]+$/),
   status: z.enum(CHECKLIST_STATUSES),
   note: z.string().max(500).default(""),
+  // REQ-023 FR-4: a dated item's date; "" clears it. A date sets `have`, a clear sets `need` (finding 80).
+  doneOn: z
+    .string()
+    .max(10)
+    .refine((v) => v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v))
+    .optional(),
 });
 
 export type SaveChecklistResult = { ok: true } | { ok: false; message: string };
@@ -48,17 +57,34 @@ export async function saveChecklistItemAction(
     return { ok: false, message: "Finish the questionnaire first." };
   const built = buildResult(dataset, answers.data);
   if (!built.ok) return { ok: false, message: built.message };
-  const checklist = deriveChecklist(built.result, answers.data, dataset);
-  if (!checklist.items.some((i) => i.id === parsed.data.itemId))
-    return { ok: false, message: "That item is not on your checklist." };
-
   const supabase = await createSupabaseServerClient();
+  // REQ-023 FR-4: the dated audit items exist once a period does (finding 62).
+  const period = checklistPeriod(
+    await currentPeriod(supabase, viewer.account.id),
+  );
+  const checklist = deriveChecklist(
+    built.result,
+    answers.data,
+    dataset,
+    period,
+  );
+  const item = checklist.items.find((i) => i.id === parsed.data.itemId);
+  if (!item)
+    return { ok: false, message: "That item is not on your checklist." };
+  const doneOn =
+    item.dated && parsed.data.doneOn !== undefined
+      ? parsed.data.doneOn || null
+      : undefined;
+  const status =
+    doneOn === undefined ? parsed.data.status : doneOn ? "have" : "need";
+
   const up = await supabase.from("checklist_items").upsert(
     {
       account_id: viewer.account.id,
       item_id: parsed.data.itemId,
-      status: parsed.data.status,
+      status,
       note: parsed.data.note,
+      ...(doneOn === undefined ? {} : { done_on: doneOn }),
     },
     { onConflict: "account_id,item_id" },
   );
@@ -69,19 +95,10 @@ export async function saveChecklistItemAction(
     });
     return { ok: false, message: "We could not save that just now." };
   }
-  // REQ-009 FR-7: "Done" on a document sets the policy review's adopted date
-  // when it is still empty. With the admin client (D-1706): the policy
-  // reviews' update policy needs an active subscription, which a pack buyer
-  // ticking Done need not have; the account id is the viewer's own.
-  if (parsed.data.status === "have") {
-    const item = checklist.items.find((i) => i.id === parsed.data.itemId);
-    if (item?.documentTypeId)
-      await markAdopted(
-        createSupabaseAdminClient(),
-        viewer.account.id,
-        item.documentTypeId,
-        new Date().toISOString().slice(0, 10),
-      );
-  }
+  // D-2450 (REQ-024, PO, 17 Oct 2026; QA pass F4): "Done" records `have`
+  // alone. Adoption is approval with the adopt step's gates (no open blanks,
+  // D-2211; a named approver, D-2244), so the adopt step and the document
+  // page's own action are the only writers of a version's adopted date; the
+  // REQ-009 FR-7 rule that a tick adopted the document is withdrawn.
   return { ok: true };
 }

@@ -11,6 +11,8 @@ test.describe("the 404 page", () => {
   }) => {
     const response = await page.goto("/no-such-page");
     expect(response?.status()).toBe(404);
+    // QA pass F9 (WCAG 2.4.2): its own title, through the layout's template.
+    await expect(page).toHaveTitle(/^Page not found \| /);
     await expect(
       page.getByRole("heading", { level: 1, name: "That page is not here." }),
     ).toBeVisible();

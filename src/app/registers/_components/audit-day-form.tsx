@@ -14,6 +14,7 @@ import {
   type AuditDaySlug,
   type FieldSpec,
 } from "@/lib/registers/audit-day-forms";
+import { AU_STATES } from "@/lib/registers/types";
 import { parseInput } from "@/lib/validation";
 import { saveAuditDayRowAction } from "@/server/registers/audit-day-actions";
 import {
@@ -139,6 +140,61 @@ export function AuditDayForm({
             onChange={(x) => set(f.name, x)}
           />
         );
+      case "states": {
+        // REQ-024 A1 (FR-1): one checkbox per state, kept as "NSW,VIC" in the form's values.
+        const chosen = String(value ?? "")
+          .split(",")
+          .filter(Boolean);
+        const toggle = (code: string, on: boolean) =>
+          set(
+            f.name,
+            (on ? [...chosen, code] : chosen.filter((c) => c !== code)).join(
+              ",",
+            ),
+          );
+        return (
+          <fieldset
+            key={f.name}
+            className="mt-4"
+            aria-describedby={f.help ? `${f.name}-help` : undefined}
+            data-testid={`field-${f.name}`}
+          >
+            <legend className="text-sm font-medium">{f.label}</legend>
+            {f.help ? (
+              <p
+                id={`${f.name}-help`}
+                className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
+              >
+                {f.help}
+              </p>
+            ) : null}
+            <div className="mt-2 grid grid-cols-2 gap-x-4 sm:grid-cols-4">
+              {AU_STATES.map((code) => (
+                <label
+                  key={code}
+                  className="inline-flex min-h-11 items-center gap-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    id={`${f.name}-${code}`}
+                    name={f.name}
+                    value={code}
+                    checked={chosen.includes(code)}
+                    onChange={(e) => toggle(code, e.target.checked)}
+                    className="h-5 w-5"
+                  />
+                  {code}
+                </label>
+              ))}
+            </div>
+            {errs.length ? (
+              <p className="mt-1 text-sm text-red-700 dark:text-red-400">
+                {errs[0]}
+              </p>
+            ) : null}
+          </fieldset>
+        );
+      }
       case "textarea":
         return (
           <SafeTextArea

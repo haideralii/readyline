@@ -21,6 +21,10 @@ export type DocumentControlInput = {
     title: string;
     version: number;
     created_at: string;
+    /** REQ-024 A0 (D-2427): the Sydney day this latest version was adopted, from `document_versions.adopted_on`; null when it is not. */
+    adopted_on: string | null;
+    /** D-2436: the date of an older adopted version of the type, in any set, when this one is not adopted; the row then reads "new version to adopt". */
+    older_adopted_on?: string | null;
     /** The stored version's id, so the page can re-generate a section (backlog 8). */
     version_id?: string;
     /** Section texts from the stored model, for the living-policies match (backlog 8). */
@@ -44,7 +48,20 @@ export type DocumentControlInput = {
   }[];
   /** The owner's role from the account facts (D-1704), or a plain default. */
   adoptedByRole: string | null;
+  /** The owner's name from the account facts; adoption needs it (retro finding 114, D-2244), so "by whom" names a person. */
+  adoptedByName?: string | null;
 };
+
+/** "Jane Citizen, Director"; the name alone; the role alone; "Owner" when the facts hold neither (packs adopted before D-2244). */
+export function adoptedBy(input: {
+  adoptedByRole: string | null;
+  adoptedByName?: string | null;
+}): string {
+  const name = input.adoptedByName?.trim() ?? "";
+  const role = input.adoptedByRole?.trim() ?? "";
+  if (name && role) return `${name}, ${role}`;
+  return name || role || "Owner";
+}
 
 export type DocumentControlRow = {
   document_type_id: string;
@@ -55,8 +72,14 @@ export type DocumentControlRow = {
   next_review_on: string | null;
   /** The latest circulation at or after the document's current version, if any. */
   circulated: { on: string; workers: number } | null;
-  /** The row's one-word state for the list and the audit-day page; "review-needed" when a rule change applies (backlog 8). */
-  state: "adopted" | "not-adopted" | "review-due" | "overdue" | "review-needed";
+  /** The row's one-word state for the list and the audit-day page; "review-needed" when a rule change applies (backlog 8); "new-version" when the newest version is unadopted and an older one was (REQ-024 A0, D-2436). */
+  state:
+    | "adopted"
+    | "not-adopted"
+    | "review-due"
+    | "overdue"
+    | "review-needed"
+    | "new-version";
   /** The stored version's id when known. */
   version_id: string | null;
   /** Rule changes this adopted document still needs checked for (backlog 8). */
@@ -81,7 +104,11 @@ export function documentControlRows(
   }
   return input.documents.map((d) => {
     const review = reviewByType.get(d.document_type_id);
-    const adopted = review?.adopted_on ?? null;
+    // REQ-024 A0 (D-2427, D-2436): the version column is the truth. A latest
+    // version without a date whose type has an older adopted version reads
+    // "new version to adopt", with the older date in its cells.
+    const newVersion = !d.adopted_on && !!d.older_adopted_on;
+    const adopted = d.adopted_on ?? (newVersion ? d.older_adopted_on! : null);
     // Backlog 8: an adopted document drafted before a rule change it does not carry needs a look.
     const reviewNeeded =
       adopted && d.sections
@@ -114,19 +141,21 @@ export function documentControlRows(
       .sort((a, b) => (a.circulated_on < b.circulated_on ? 1 : -1))[0];
     const state: DocumentControlRow["state"] = !adopted
       ? "not-adopted"
-      : nextReview && nextReview < today
-        ? "overdue"
-        : reviewNeeded.length > 0
-          ? "review-needed"
-          : nextReview && nextReview <= addMonths(today, 1)
-            ? "review-due"
-            : "adopted";
+      : newVersion
+        ? "new-version"
+        : nextReview && nextReview < today
+          ? "overdue"
+          : reviewNeeded.length > 0
+            ? "review-needed"
+            : nextReview && nextReview <= addMonths(today, 1)
+              ? "review-due"
+              : "adopted";
     return {
       document_type_id: d.document_type_id,
       title: d.title,
       version: String(d.version),
       adopted_on: adopted,
-      adopted_by: adopted ? (input.adoptedByRole ?? "Owner") : "",
+      adopted_by: adopted ? adoptedBy(input) : "",
       next_review_on: nextReview,
       circulated: circulation
         ? {
@@ -146,6 +175,8 @@ export function documentControlGaps(rows: DocumentControlRow[]): string[] {
   const out: string[] = [];
   for (const r of rows) {
     if (!r.adopted_on) out.push(`${r.title}: not adopted`);
+    else if (r.state === "new-version")
+      out.push(`${r.title}: new version to adopt`);
     else if (!r.next_review_on) out.push(`${r.title}: no review date`);
     else if (!r.circulated) out.push(`${r.title}: not circulated to workers`);
     else if (r.reviewNeeded.length > 0)
@@ -161,6 +192,7 @@ export function documentControlSentence(rows: DocumentControlRow[]): string {
   const circulated = rows.filter((r) => r.circulated).length;
   const overdue = rows.filter((r) => r.state === "overdue").length;
   const needReview = rows.filter((r) => r.reviewNeeded.length > 0).length;
+  const newVersions = rows.filter((r) => r.state === "new-version").length;
   const parts = [
     `${adopted} of ${rows.length} adopted`,
     `${circulated} circulated to workers`,
@@ -168,5 +200,14 @@ export function documentControlSentence(rows: DocumentControlRow[]): string {
   if (overdue)
     parts.push(`${overdue} review${overdue === 1 ? "" : "s"} overdue`);
   if (needReview) parts.push(`${needReview} to check after a rule change`);
+  // REQ-024 A0 (D-2436): the clause is appended, so "N of T adopted" stands.
+  if (newVersions) parts.push(`${newVersions} with a new version to adopt`);
   return `${parts.join(", ")}.`;
+}
+
+/** D-2436: the audit-day ask's words for a set whose rows carry new versions and nothing is missing. */
+export function newVersionsAsk(rows: DocumentControlRow[]): string | null {
+  const n = rows.filter((r) => r.state === "new-version").length;
+  if (!n) return null;
+  return `${n} document${n === 1 ? " has" : "s have"} a new version to adopt`;
 }

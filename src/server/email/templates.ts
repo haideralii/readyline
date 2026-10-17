@@ -4,6 +4,8 @@
  * contains anything about participants.
  */
 import { BRAND } from "@/lib/brand";
+import { TIMELINE_FIXED_SENTENCE } from "@/lib/registers/timeline";
+import { REPORT_WINDOW_WORDS } from "@/lib/registers/worker";
 import type { EmailMessage } from "./provider";
 
 const SIGN_OFF = `${BRAND} provides general information and document templates for your own review; it is not legal advice.`;
@@ -99,7 +101,8 @@ export function reportToConfirmEmail(input: {
     text: [
       `${line} for ${input.tradingName}.`,
       "",
-      "If a report is a reportable incident, the Commission must be told within 24 hours of the report, so please confirm it today.",
+      // Retro finding 68: the window depends on the kind (Incident Rules ss 20 and 21), and this email has no category.
+      `If a report is a reportable incident, the Commission must be told ${REPORT_WINDOW_WORDS}, so please confirm it today.`,
       "",
       "Sign in, open Registers, then Incidents, and confirm or reject each report.",
       "",
@@ -112,6 +115,8 @@ export function remindersEmail(input: {
   to: string;
   tradingName: string;
   lines: string[];
+  /** REQ-023 FR-3: true when a timeline line is among them; the fixed sentence and the account-page pointer follow once (finding 56). */
+  registration?: boolean;
 }): EmailMessage {
   return {
     to: input.to,
@@ -121,6 +126,13 @@ export function remindersEmail(input: {
       "",
       ...input.lines.map((l) => `- ${l}`),
       "",
+      ...(input.registration
+        ? [
+            TIMELINE_FIXED_SENTENCE,
+            "Your registration timeline is on your account page.",
+            "",
+          ]
+        : []),
       "Sign in and open Registers to update them.",
       "",
       SIGN_OFF,

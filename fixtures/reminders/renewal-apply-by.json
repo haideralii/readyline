@@ -1,0 +1,36 @@
+{
+  "kind": "renewal-apply-by",
+  "today": "2026-10-13",
+  "note": "A verification period that ends on 10 February 2027: the apply-by date is three months before (our suggestion), 10 November 2026, and the reminder fires 28 days before that, today. The window reminder's day (10 August 2026) is outside the catch-up window.",
+  "input": {
+    "account": { "id": "acc" },
+    "period": {
+      "period": {
+        "id": "per-1",
+        "period_starts_on": "2024-02-10",
+        "period_ends_on": "2027-02-10",
+        "audit_type": "verification",
+        "midterm_applies": false,
+        "midterm_exempt_reason": "a verification audit has no mid-term audit (Rules s 13B(1))",
+        "midterm_start_by_override": null,
+        "midterm_override_source": null,
+        "last_audit_on": null,
+        "midterm_audit_on": null
+      }
+    },
+    "incidents": [],
+    "complaints": [],
+    "workerChecks": [],
+    "policyReviews": []
+  },
+  "expected": [
+    {
+      "account_id": "acc",
+      "kind": "renewal-apply-by",
+      "subject_table": "registration_periods",
+      "subject_id": "per-1",
+      "due_on": "2026-11-10",
+      "send_on": "2026-10-13"
+    }
+  ]
+}

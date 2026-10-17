@@ -14,6 +14,10 @@ import {
   type FieldErrors,
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
+import { GlossaryTerms } from "@/components/glossary-terms";
+
+/** REQ-027 FR-3 (D-2710, D-2705): the glossary terms this step's words use, first appearance first; the key-personnel meaning reaches the page here. */
+const STEP_TERMS = ["key-personnel", "worker-screening-check"] as const;
 
 const LABELS = {
   workerCount: "Number of workers",
@@ -76,6 +80,8 @@ export function WorkforceStepForm() {
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
+      {/* REQ-027 FR-3, D-2701: the words on this step (both with their `more`), above its first question. */}
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
       {soleTrader ? (
         <p
           className="mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"

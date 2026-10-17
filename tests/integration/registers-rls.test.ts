@@ -460,7 +460,17 @@ describe.skipIf(!enabled)(
           .limit(1);
         expect(all.error, viewName).toBeNull();
       }
-      const review = await a.client
+      // REQ-024 A0 (D-2442; #77's run 38880262268): a client may not plant a
+      // catalogue type's adopted date, so the owner's insert is refused by
+      // `policy_reviews_adopted_on_guard` and the fixture row goes in through
+      // the service role, which passes the gate.
+      const planted = await a.client.from("policy_reviews").insert({
+        account_id: a.accountId,
+        document_type_id: "complaints-management-policy-and-register",
+        adopted_on: "2025-01-15",
+      });
+      expect(planted.error?.code).toBe("42501");
+      const review = await admin
         .from("policy_reviews")
         .insert({
           account_id: a.accountId,
@@ -481,6 +491,56 @@ describe.skipIf(!enabled)(
         .select("worker_ref")
         .eq("account_id", a.accountId);
       expect(hidden.data ?? []).toEqual([]);
+    });
+
+    it("the status views judge today on the Sydney day (D-2272)", async () => {
+      // The product's calendar (D-2242). On a UTC runner between 00:00 and
+      // 10 or 11 am Sydney the two days differ; the old `current_date` views
+      // then read a notification due yesterday as still due. Outside that
+      // window both definitions agree, which is the most a test without a
+      // clock can pin.
+      const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Australia/Sydney",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+      const day = (iso: string, delta: number) =>
+        new Date(Date.parse(iso) + delta * 86_400_000)
+          .toISOString()
+          .slice(0, 10);
+      // A 24-hour kind: notify_by is the day after it happened.
+      const rows: Record<string, string> = {};
+      for (const [label, ago] of [
+        ["overdue-notification", 2],
+        ["notification-due", 1],
+      ] as const) {
+        const ins = await a.client
+          .from("incidents")
+          .insert(
+            incident(a.accountId, {
+              category: "serious-injury",
+              severity: "high",
+              reportable: true,
+              occurred_on: day(today, -ago),
+              reported_on: day(today, -ago),
+            }),
+          )
+          .select("id")
+          .single();
+        expect(ins.error).toBeNull();
+        rows[ins.data!.id as string] = label;
+      }
+      const view = await a.client
+        .from("incidents_status")
+        .select("id, notification_status")
+        .in("id", Object.keys(rows));
+      expect(view.error).toBeNull();
+      expect(
+        Object.fromEntries(
+          (view.data ?? []).map((r) => [r.id, r.notification_status]),
+        ),
+      ).toEqual(rows);
     });
 
     it("accounts take a registration date and kind, and only the two kinds", async () => {

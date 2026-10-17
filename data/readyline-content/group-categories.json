@@ -7,7 +7,8 @@
   "question": "What do you do for participants?",
   "hint": {
     "text": "Not sure? Most sole-trader support workers choose Assistance with daily personal activities and Household tasks.",
-    "selects": ["0107", "0120"]
+    "selects": ["0107", "0120"],
+    "textGeneral": "Not sure? Many small providers start with Assistance with daily personal activities and Household tasks."
   },
   "categories": [
     {

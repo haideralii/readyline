@@ -22,7 +22,9 @@ import {
  * One screen, one button (REQ-020 FR-6, REQ-017 FR-5): the owner says
  * whether the report is reportable, when the Commission was told if it
  * has been, and confirms. Reject sits folded under it with its reason;
- * the rejected report is kept and counts nowhere.
+ * the rejected report is kept. One in a reportable category keeps its
+ * Commission clock (retro finding 62, Incident Rules s 17); any other
+ * counts nowhere.
  */
 export function ConfirmReportForm({
   id,
@@ -158,6 +160,22 @@ export function ConfirmReportForm({
           Not an incident? Reject it
         </summary>
         <form onSubmit={reject} noValidate className="mt-3">
+          {suggested ? (
+            // Retro finding 62: Incident Rules s 17 reads "reportable
+            // incident" as including one alleged to have occurred, so the
+            // allegation keeps its clock; the rejected report stays in the
+            // register as received, not recorded.
+            <p
+              className="border-signal mb-3 rounded-md border p-3 text-sm leading-6"
+              data-testid="reject-still-reportable"
+            >
+              An allegation of this kind is still reportable; rejecting the
+              report does not stop the Commission&apos;s clock. The report stays
+              in your register as received, not recorded, with its notify-by
+              date, until you record the date you told the Commission or that it
+              is not reportable after all.
+            </p>
+          ) : null}
           <SafeTextArea
             id="reason"
             label="Why you are rejecting it"

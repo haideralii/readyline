@@ -11,12 +11,18 @@
  * CATCH_UP_DAYS rather than silently skipping them or flooding an account
  * that enters an old date.
  */
-import { addBusinessDays, addDays, daysBetween } from "./status";
-import type {
-  RegistrationKind,
-  ReminderKind,
-  ReminderSubjectTable,
-} from "./types";
+import { addBusinessDays, addDays, addMonths, daysBetween } from "./status";
+import {
+  registrationReminderLine,
+  registrationReminders,
+  isRegistrationReminderKind,
+  type RegistrationReminderInput,
+} from "./timeline";
+import type { ReminderKind, ReminderSubjectTable } from "./types";
+import { REPORT_WINDOW_WORDS } from "./worker";
+
+// REQ-023 Session A: the month arithmetic moved to status.ts; kept here for its importers.
+export { addMonths } from "./status";
 
 export const CATCH_UP_DAYS = 7;
 // REQ-018 Session C (FR-5, FR-8, FR-10; D-1905).
@@ -30,21 +36,22 @@ export const CLEARANCE_OFFSETS = [90, 30, 7, 0] as const;
 export const REVIEW_OFFSETS = [60, 14, 0] as const;
 export const INCIDENT_OPEN_DAYS = 30;
 export const COMPLAINT_ACK_BUSINESS_DAYS = 2;
-export const MID_TERM_MONTHS = [12, 15, 17] as const;
-export const MID_TERM_DUE_MONTHS = 18;
-export const RENEWAL_MONTHS_BEFORE = [6, 3] as const;
-export const REGISTRATION_TERM_MONTHS = 36;
+// REQ-023 Session A (finding 59): the registration dates and their reminders
+// come from the registration period (`./timeline`), never from a three-year
+// assumption; `MID_TERM_MONTHS`, `RENEWAL_MONTHS_BEFORE` and
+// `REGISTRATION_TERM_MONTHS` went with the two old kinds.
 
 export type ReminderInput = {
   today: string;
   account: {
     id: string;
-    registration_date: string | null;
-    registration_kind: RegistrationKind | null;
   };
+  /** REQ-023 FR-3: the current registration period and what the job knows about it; none means no timeline reminders. */
+  period?: RegistrationReminderInput;
   incidents: {
     id: string;
-    status: "open" | "under-review" | "closed";
+    /** `rejected` only for a rejected report still marked reportable (retro finding 62): its clock runs, nothing else does. */
+    status: "open" | "under-review" | "closed" | "rejected";
     reportable: boolean;
     notify_by: string | null;
     reportable_notified_on: string | null;
@@ -83,12 +90,23 @@ export type ReminderInput = {
   lastEmergencyDrillOn?: string | null;
   /** REQ-020 FR-5: draft reports waiting for the owner, by when the provider became aware. */
   reports?: { id: string; aware_at: string }[];
+  /** REQ-024 FR-6a (D-2416): the s 17 roles; only a role a current worker holds and nobody has assessed reminds, from the day it was first held. */
+  riskAssessedRoles?: {
+    id: string;
+    first_held_on: string | null;
+    assessed_on: string | null;
+    held: boolean;
+  }[];
   /** The moment the rules run (ISO), for the hour-based rules; defaults to the end of `today`. */
   now?: string;
 };
 
 /** A draft report nudges the owner again once this many hours have passed since it came in (PO edit to FR-5). */
 export const REPORT_NUDGE_HOURS = 12;
+
+/** Worker Screening Rules s 17(2)(b): the list is updated within 20 business days of a new or reclassified role; the warning goes at 10 (REQ-024 FR-6a). */
+export const ROLE_ASSESSMENT_BUSINESS_DAYS = 20;
+export const ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS = 10;
 
 export type ReminderDue = {
   account_id: string;
@@ -98,19 +116,6 @@ export type ReminderDue = {
   due_on: string;
   send_on: string;
 };
-
-/** Calendar months added to an ISO date; a day past the month's end clamps (31 Jan + 1 month = 28 Feb). */
-export function addMonths(date: string, months: number): string {
-  const [y, m, d] = date.split("-").map(Number);
-  const first = new Date(Date.UTC(y, m - 1 + months, 1));
-  const lastDay = new Date(
-    Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0),
-  ).getUTCDate();
-  const dt = new Date(
-    Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), Math.min(d, lastDay)),
-  );
-  return dt.toISOString().slice(0, 10);
-}
 
 /** True when a reminder dated `sendOn` should go out on `today`: today or within the catch-up window. */
 export function inWindow(sendOn: string, today: string): boolean {
@@ -178,8 +183,8 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   }
 
   for (const i of input.incidents) {
-    // Open for 30 days with no event.
-    if (i.status !== "closed") {
+    // Open for 30 days with no event (a rejected report is not open).
+    if (i.status !== "closed" && i.status !== "rejected") {
       const quiet = addDays(i.last_activity_on, INCIDENT_OPEN_DAYS);
       push("incident-open", "incidents", i.id, quiet, quiet);
     }
@@ -202,32 +207,16 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
     push("complaint-unacknowledged", "complaints", c.id, by, by);
   }
 
-  // Registration: the mid-term audit (certification only) and the renewal (both kinds).
-  const reg = input.account.registration_date;
-  if (reg) {
-    if (input.account.registration_kind === "certification") {
-      const due = addMonths(reg, MID_TERM_DUE_MONTHS);
-      for (const m of MID_TERM_MONTHS)
-        push(
-          "mid-term-audit",
-          "accounts",
-          input.account.id,
-          due,
-          addMonths(reg, m),
-        );
-    }
-    if (input.account.registration_kind) {
-      const expiry = addMonths(reg, REGISTRATION_TERM_MONTHS);
-      for (const m of RENEWAL_MONTHS_BEFORE)
-        push(
-          "renewal",
-          "accounts",
-          input.account.id,
-          expiry,
-          addMonths(expiry, -m),
-        );
-    }
-  }
+  // REQ-023 FR-3: the five timeline kinds from the current period, the period row as the subject (finding 58).
+  if (input.period)
+    for (const r of registrationReminders(input.period))
+      push(
+        r.kind,
+        "registration_periods",
+        input.period.period.id,
+        r.due_on,
+        r.send_on,
+      );
 
   // REQ-018 FR-5: insurances and vehicles, 30 and 7 days before expiry and on the day.
   for (const i of input.insuranceItems ?? [])
@@ -251,6 +240,22 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
       push("appraisal-due", "staff_matrix", s.id, due, addDays(due, -30));
       push("appraisal-due", "staff_matrix", s.id, due, due);
     }
+  }
+
+  // REQ-024 FR-6a (D-2416; findings 44, 66, 80 and 83): a new or reclassified role's assessment is due within
+  // 20 business days of the day the first current worker was given it (s 17(2)(b)); the reminder at 10 business
+  // days is the warning and the one at 20 is the deadline (D-902); an unheld or assessed role sends nothing.
+  for (const r of input.riskAssessedRoles ?? []) {
+    if (!r.held || r.assessed_on || !r.first_held_on) continue;
+    const due = addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_BUSINESS_DAYS);
+    push(
+      "role-assessment-due",
+      "risk_assessed_roles",
+      r.id,
+      due,
+      addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS),
+    );
+    push("role-assessment-due", "risk_assessed_roles", r.id, due, due);
   }
 
   // REQ-018 FR-10: the support plan review per participant, 30 and 7 days before and on the day.
@@ -299,6 +304,8 @@ export function reminderLine(
   reference: string,
   dueOn: string,
 ): string {
+  if (isRegistrationReminderKind(kind))
+    return registrationReminderLine(kind, dueOn);
   switch (kind) {
     case "clearance-expiry":
       return `Worker check ${reference} expires on ${dueOn}.`;
@@ -310,10 +317,6 @@ export function reminderLine(
       return `Complaint ${reference} has not been acknowledged.`;
     case "reportable-not-notified":
       return `Incident ${reference} was due to the Commission by ${dueOn} and is not marked as notified.`;
-    case "mid-term-audit":
-      return `Your mid-term audit is due around ${dueOn}. Start preparing.`;
-    case "renewal":
-      return `Your registration ends on ${dueOn}. Plan the renewal audit.`;
     case "insurance-expiry":
       return `${reference} expires on ${dueOn}. Renew it and type the new expiry into the insurances register.`;
     case "supervision-due":
@@ -326,7 +329,10 @@ export function reminderLine(
       return `Your emergency drill is due by ${dueOn}. Run it and record the date on the audit-day page.`;
     case "register-review":
       return `Register row ${reference} is due for review on ${dueOn}. Open it and tap Reviewed today.`;
+    case "role-assessment-due":
+      return `Role assessment due by ${dueOn}: the role ${reference} is a risk assessed role a worker holds and its assessment is not recorded. Record who assessed it and when on the roles list.`;
     case "report-to-confirm":
-      return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told within 24 hours of the report.`;
+      // Retro finding 68: the line has no category, so it names both windows.
+      return `Report ${reference} is waiting for you to confirm. If it is reportable, the Commission must be told ${REPORT_WINDOW_WORDS}.`;
   }
 }

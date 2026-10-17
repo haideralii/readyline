@@ -7,7 +7,8 @@ import "server-only";
  */
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import { auditorVisibleIncidents } from "@/lib/registers/audit-pack";
+import { CSV_COLUMNS, CSV_HEADER_LABELS, toCsv } from "@/lib/registers/csv";
 import {
   listComplaints,
   listIncidents,
@@ -29,18 +30,24 @@ export const EXPORT_PATHS: Record<string, ExportRegister> = {
  * A register's export as files by name (one CSV, or the register and its
  * event trail for incidents and complaints). The single export and the
  * audit pack (REQ-020 FR-1) both build from this, so the pack carries
- * exactly what the export does.
+ * exactly what the export does, except that the pack asks for the register
+ * only (`registerOnly`): a draft or rejected report and its trail stay out
+ * of what an auditor sees (FR-5; retro review finding 30), while the owner's
+ * own export keeps them.
  */
 export async function registerFiles(
   supabase: SupabaseClient,
   accountId: string,
   register: ExportRegister,
   stamp: string,
+  options: { registerOnly?: boolean } = {},
 ): Promise<Record<string, Uint8Array>> {
   if (register === "incidents" || register === "complaints") {
     const rows =
       register === "incidents"
-        ? await listIncidents(supabase, accountId)
+        ? await listIncidents(supabase, accountId).then((all) =>
+            options.registerOnly ? auditorVisibleIncidents(all) : all,
+          )
         : await listComplaints(supabase, accountId);
     const eventsTable =
       register === "incidents" ? "incident_events" : "complaint_events";
@@ -52,14 +59,14 @@ export async function registerFiles(
       .order("at", { ascending: true })
       .limit(5000);
     const byId = new Map(rows.map((r) => [r.id, r.reference]));
-    const events = ((ev.data as Record<string, unknown>[] | null) ?? []).map(
-      (e) => ({
+    const events = ((ev.data as Record<string, unknown>[] | null) ?? [])
+      .filter((e) => !options.registerOnly || byId.has(e[fk] as string))
+      .map((e) => ({
         reference: byId.get(e[fk] as string) ?? "",
         at: e.at,
         kind: e.kind,
         note: e.note,
-      }),
-    );
+      }));
     return {
       [`${register}-${stamp}.csv`]: strToU8(toCsv(CSV_COLUMNS[register], rows)),
       [`${register}-events-${stamp}.csv`]: strToU8(
@@ -74,7 +81,9 @@ export async function registerFiles(
   const name =
     register === "worker_clearances" ? "worker-checks" : "policy-reviews";
   return {
-    [`${name}-${stamp}.csv`]: strToU8(toCsv(CSV_COLUMNS[register], rows)),
+    [`${name}-${stamp}.csv`]: strToU8(
+      toCsv(CSV_COLUMNS[register], rows, CSV_HEADER_LABELS[register]),
+    ),
   };
 }
 

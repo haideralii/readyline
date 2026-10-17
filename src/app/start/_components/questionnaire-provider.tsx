@@ -57,6 +57,8 @@ type QuestionnaireContext = {
   ) => Promise<void>;
   touchStep: (step: StepId) => void;
   clearDraft: () => Promise<void>;
+  /** QA pass F7 (D-2269): true from "Start again" until a step opens again, so the step guard does not race the push to the intro. */
+  clearing: boolean;
 };
 
 const Ctx = createContext<QuestionnaireContext | null>(null);
@@ -147,8 +149,10 @@ export function QuestionnaireProvider({
     [answers, persist],
   );
 
+  const [clearing, setClearing] = useState(false);
   const touchStep = useCallback(
     (step: StepId) => {
+      setClearing(false);
       setCurrentStep(step);
       if (ready && Object.keys(answers).length > 0) void persist(answers, step);
     },
@@ -156,6 +160,10 @@ export function QuestionnaireProvider({
   );
 
   const clearDraft = useCallback(async () => {
+    // QA pass F7 (D-2269): the flag goes up before the answers empty, so the
+    // result step's guard sees it in the same render and leaves the
+    // navigation to the caller's push; the next step that opens lowers it.
+    setClearing(true);
     setAnswers({});
     setCurrentStep("business");
     try {
@@ -179,6 +187,7 @@ export function QuestionnaireProvider({
       saveStep,
       touchStep,
       clearDraft,
+      clearing,
     }),
     [
       ready,
@@ -192,6 +201,7 @@ export function QuestionnaireProvider({
       saveStep,
       touchStep,
       clearDraft,
+      clearing,
     ],
   );
 

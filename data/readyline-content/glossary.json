@@ -1,27 +1,31 @@
 {
-  "note": "The audit words a provider meets, each with one plain meaning (REQ-025 FR-13; D-2219). The one source: audit-kinds.json, the checklist's audit items, the home example and the result page read their meanings from here, so the site never carries two texts for one term. Written by the product owner on 15 October 2026 (REQ-025, with the review's decisions 16 and 17); NOT NDIS Quality and Safeguards Commission text. The restrictive-practice meaning is marked VERIFY against the NDIS Act 2013 s 9 and must be checked before it ships.",
+  "note": "The audit words a provider meets, each with one plain meaning and, where it helps, one or two more sentences shown only in the 'What these words mean' disclosure (REQ-025 FR-13; REQ-027 D-2709, D-2713). The one source: audit-kinds.json, the checklist's audit items, the home example and the result page read their meanings from here, so the site never carries two texts for one term. Written by the product owner on 15 October 2026 (REQ-025, with the review's decisions 16 and 17); NOT NDIS Quality and Safeguards Commission text. Meanings read against the NDIS Act 2013, the Practice Standards Rules and the Worker Screening Rules on 16 Oct 2026 (product/qa/req-reviews/2026-10-16-glossary-read.md); every entry status reviewed.",
   "author": "readyline",
-  "status": "draft",
+  "status": "reviewed",
   "items": [
     {
       "id": "verification-audit",
       "term": "verification audit",
-      "meaning": "an auditor checks your documents at a desk; nobody visits"
+      "meaning": "an approved auditor checks your documents without coming to see you",
+      "more": "The Rules call it a desk audit. The Commission calls these lower-risk supports."
     },
     {
       "id": "certification-audit",
       "term": "certification audit",
-      "meaning": "an auditor reads your documents and visits you"
+      "meaning": "an approved auditor reads your documents, visits where you work and talks to people",
+      "more": "That includes you, your workers and the people you support. The Commission calls these higher-risk supports."
     },
     {
       "id": "practice-standards",
       "term": "Practice Standards",
-      "meaning": "the rules every registered provider is audited against"
+      "meaning": "the quality rules in the law for registered providers",
+      "more": "Which rules apply to you depends on the supports you provide or apply for. Your audit checks those."
     },
     {
       "id": "module",
       "term": "module",
-      "meaning": "a group of those rules that applies to the supports you deliver"
+      "meaning": "a group of the Practice Standards rules on one topic",
+      "more": "Which modules apply to you depends on the supports you deliver or apply for."
     },
     {
       "id": "quality-indicator",
@@ -30,44 +34,51 @@
     },
     {
       "id": "registration-group",
-      "term": "registration group",
-      "meaning": "the Commission's name for a type of support"
+      "term": "registration group or class",
+      "meaning": "a type of support you are registered, or apply, to provide",
+      "more": "The law says 'class of supports'. The Commission's lists say 'registration group', with a four-digit code."
     },
     {
       "id": "mid-term-audit",
       "term": "mid-term audit",
-      "meaning": "a check about halfway through your three years"
+      "meaning": "a second audit that most certification providers must have",
+      "more": "The Rules say it must begin within 18 months of your registration starting, or later if the Commissioner allows. It covers your governance and management rules, anything under a corrective action plan, and anything the Commissioner names."
     },
     {
       "id": "restrictive-practice",
       "term": "restrictive practice",
-      "meaning": "a practice that restricts a person's rights or movement; the law controls it",
-      "verify": "NDIS Act 2013 s 9: check the meaning against the definition before it ships (review finding 17)"
+      "meaning": "anything done that restricts the rights or freedom of movement of a person with disability",
+      "more": "The law limits when and how it may be used."
     },
     {
       "id": "key-personnel",
       "term": "key personnel",
-      "meaning": "the people who run the business"
+      "meaning": "the people who run the business or have a real say in how it is run, such as directors",
+      "more": "Partners and board members count too (NDIS Act s 11A)."
     },
     {
       "id": "self-assessment",
       "term": "self-assessment",
-      "meaning": "the form where you say how you meet each rule"
+      "meaning": "the part of the Commission's application where you show, with evidence, how you meet each rule",
+      "more": "It is part of the online application and covers each rule that applies to you. Renewals have one too."
     },
     {
       "id": "worker-screening-check",
       "term": "NDIS Worker Screening Check",
-      "meaning": "the national police-and-history check a worker in a risk-assessed role must hold"
+      "meaning": "a check by your state or territory of whether a person is a risk to people with disability",
+      "more": "Workers in risk-assessed roles need the clearance it gives, and so do key personnel and sole-trader providers, with few exceptions. Clearances last up to five years."
     },
     {
       "id": "reportable-incident",
       "term": "reportable incident",
-      "meaning": "a serious incident the Commission must be told about"
+      "meaning": "an incident the law and the Rules list, which a registered provider must report to the Commission",
+      "more": "The list covers death, serious injury, abuse or neglect, unlawful contact or assault, sexual misconduct, and a restrictive practice used without authorisation or outside a behaviour support plan."
     },
     {
       "id": "adopt",
       "term": "adopt",
-      "meaning": "sign and date a document so it is yours"
+      "meaning": "take a document as your own and date it",
+      "more": "An auditor also looks for proof you follow it."
     }
   ]
 }

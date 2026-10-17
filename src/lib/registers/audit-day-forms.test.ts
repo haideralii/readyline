@@ -23,8 +23,20 @@ import {
 } from "./audit-day-forms";
 import {
   PARTICIPANT_ONBOARDING_ITEMS,
-  WORKER_ONBOARDING_ITEMS,
+  workerOnboardingItems,
 } from "./onboarding-items";
+
+// REQ-024 A1: the worker list is derived; the lint reads it for a worker with every item (children, restrictive practice, every training module) in one state.
+const WORKER_ONBOARDING_ITEMS = workerOnboardingItems({
+  role: "support-worker",
+  states: ["NSW"],
+  worksWithChildren: true,
+  mayUseRestrictivePractice: true,
+  ownerRow: false,
+  riskAssessed: true,
+  moduleIds: ["core", "hidpa", "sbs"],
+  today: "2026-11-02",
+});
 
 function schemaKeys(schema: unknown): string[] {
   const s = schema as {
@@ -165,5 +177,16 @@ describe("audit-day register meta (REQ-018 Session B)", () => {
     expect(reviewTag("due-soon", "2026-11-01").tone).toBe("ochre");
     expect(reviewTag("current", "2027-04-01").label).toContain("2027-04-01");
     expect(reviewTag("no-date", null).key).toBe("no-date");
+  });
+
+  it("the staff matrix cadences read as Readyline's suggestion, never as a rule (retro review of REQ-018, finding 10)", () => {
+    const fields = AUDIT_DAY_META["staff-matrix"].fields;
+    const help = (name: string) => fields.find((f) => f.name === name)?.help;
+    expect(help("last_supervision_on")).toBe(
+      "We suggest monthly; we remind you when a month has passed.",
+    );
+    expect(help("last_appraisal_on")).toBe("We suggest yearly.");
+    for (const f of fields)
+      expect(f.help ?? "", f.name).not.toMatch(/^At least/);
   });
 });

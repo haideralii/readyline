@@ -77,6 +77,23 @@ export default async function DocumentControlPage() {
           {rows.map((r) => (
             <li key={r.document_type_id} className="py-3" data-state={r.state}>
               <p className="font-medium">{r.title}</p>
+              {r.state === "new-version" ? (
+                // REQ-024 A0 (D-2436, D-2440): a newer version waits for the owner's adoption.
+                <p
+                  className="text-ochre mt-1 text-sm"
+                  data-testid={`new-version-${r.document_type_id}`}
+                >
+                  New version to adopt: version {r.version} is not yet adopted;
+                  the date shown is the older version&apos;s.{" "}
+                  <Link
+                    href={`/documents/${setId}/${r.document_type_id}`}
+                    className="underline underline-offset-2"
+                  >
+                    Read and adopt it
+                  </Link>
+                  .
+                </p>
+              ) : null}
               <dl className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm sm:grid-cols-5">
                 {(
                   [

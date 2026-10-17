@@ -17,11 +17,21 @@ import {
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
 import { applyFacts } from "@/lib/generator/facts-fill";
+import {
+  insertDivision3Plan,
+  WORKER_SCREENING_PROCEDURE_ID,
+  type ParticipantRiskSnapshot,
+} from "@/lib/generator/division3";
 import type { SectionFailure } from "@/lib/generator/generate-section";
 import type { ModelClient } from "@/lib/generator/model-client";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { log } from "@/lib/logging/logger";
+import {
+  QUIET_FAILURE_CODES,
+  generationFailureCode,
+  reasonForCi,
+} from "./failure-code";
 import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
@@ -265,7 +275,11 @@ export async function runGenerationTick(input: {
     fields: Omit<JobPatch, "last_progress_at">,
   ): JobPatch => ({ ...fields, last_progress_at: now().toISOString() });
 
-  const failPermanently = async (reason: string, alert: boolean) => {
+  const failPermanently = async (
+    reason: string,
+    alert: boolean,
+    kind: "context" | "build" | "attempts" = "context",
+  ) => {
     await backend.update(job.id, {
       status: "failed",
       phase: "failed",
@@ -281,14 +295,30 @@ export async function runGenerationTick(input: {
           status: "failed",
         })
         .catch(() => undefined);
+    // After-window item 9: the closed code beside the omitted free text, so the
+    // log reads without it; in CI alone the raw reason follows at warn (runs
+    // 38750817767 and 38826340580 left three failures unreadable).
+    const code = generationFailureCode(reason, kind);
     const fields = {
       jobId: job.id,
       purchaseId: job.purchase_id,
       accountId: job.account_id,
+      code,
       reason,
     };
-    if (alert) log.error("payments.generation.failed", fields);
-    else log.info("payments.generation.cancelled", fields);
+    // PO 16 Oct 19:44: an account deleted or left without an owner before its
+    // job ran is the account's end, not a failure anyone can act on, so those
+    // two codes log at warn; every other permanent failure stays an alert.
+    if (!alert) log.info("payments.generation.cancelled", fields);
+    else if (QUIET_FAILURE_CODES.includes(code))
+      log.warn("payments.generation.failed", fields);
+    else log.error("payments.generation.failed", fields);
+    if (alert && reasonForCi())
+      log.warn("payments.generation.failed-reason", {
+        jobId: job.id,
+        accountId: job.account_id,
+        reasonText: reason.slice(0, 500),
+      });
     return {
       claimed: true as const,
       jobId: job.id,
@@ -313,7 +343,7 @@ export async function runGenerationTick(input: {
         accountId: job.account_id,
       });
     const built = buildResult(dataset, ctx.answers);
-    if (!built.ok) return await failPermanently(built.message, true);
+    if (!built.ok) return await failPermanently(built.message, true, "build");
     const result = built.result;
     const facts = buildProviderFacts(ctx.answers, result);
     const generatedAt = job.created_at.slice(0, 10);
@@ -348,6 +378,7 @@ export async function runGenerationTick(input: {
     const stored = new Set(
       (await backend.listDocuments(setId)).map((d) => d.document_type_id),
     );
+    let participantRisks: ParticipantRiskSnapshot | undefined;
     const handBack = async (): Promise<TickReport> => {
       await backend.update(job.id, {
         status: "queued",
@@ -453,6 +484,19 @@ export async function runGenerationTick(input: {
           },
           ctx.facts,
         );
+        // REQ-024 A2 (FR-4a; D-2424, D-2428): the worker screening procedure
+        // gains the Division 3 plan with the participant risk register as it
+        // stands when the pack is drafted, taken once per run by the store
+        // under the job's own account id, inserted into the finished model
+        // after the prompts have run so no recorded prompt hash moves, and
+        // read by that section alone, never by a prompt.
+        if (typeId === WORKER_SCREENING_PROCEDURE_ID) {
+          participantRisks ??= await store.participantRisks(
+            job.account_id,
+            generatedAt,
+          );
+          model = insertDivision3Plan(model, participantRisks);
+        }
       } catch (e) {
         // REQ-021 S4: a document that throws twice is recorded as needing
         // another go and the rest continue; the first time the tick retries
@@ -743,7 +787,7 @@ export async function runGenerationTick(input: {
     const message = (e instanceof Error ? e.message : String(e)).slice(0, 500);
     if (attempts >= MAX_ATTEMPTS) {
       await backend.update(job.id, { attempts });
-      return await failPermanently(message, true);
+      return await failPermanently(message, true, "attempts");
     }
     await backend.update(job.id, {
       status: "queued",

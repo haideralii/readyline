@@ -18,11 +18,25 @@ function cell(value: unknown): string {
 export function toCsv(
   columns: readonly string[],
   rows: readonly Record<string, unknown>[],
+  /** A header shown under another name than its column (`CSV_HEADER_LABELS`). */
+  labels: Readonly<Record<string, string>> = {},
 ): string {
-  const lines = [columns.map(cell).join(",")];
+  const lines = [columns.map((c) => cell(labels[c] ?? c)).join(",")];
   for (const r of rows) lines.push(columns.map((c) => cell(r[c])).join(","));
   return `${CSV_BOM}${lines.join("\r\n")}\r\n`;
 }
+
+/**
+ * REQ-024 A0 (D-2432, findings 234 and 244): the policy review row's
+ * `adopted_on` is the type's first adoption (the function's upsert keeps
+ * it), while the version column and the document control file carry the
+ * latest adopted version's day, so the two dates in one zip are each named.
+ */
+export const CSV_HEADER_LABELS: Readonly<
+  Record<string, Readonly<Record<string, string>>>
+> = {
+  policy_reviews: { adopted_on: "first adopted on" },
+};
 
 /** The column order per register; the same names as the database columns, references first. */
 export const CSV_COLUMNS = {
@@ -63,11 +77,21 @@ export const CSV_COLUMNS = {
     "updated_at",
   ],
   complaint_events: ["reference", "at", "kind", "note"],
+  /** The audit-day registers' shared trail in the pack (REQ-020 FR-1; retro finding 25): the register, the row as its list names it, then the line. */
+  register_events: ["register", "row", "at", "kind", "note"],
   worker_clearances: [
     "worker_ref",
     "role_label",
     "clearance_kind",
+    // Retro review of REQ-018 to 021, finding 35 (PO decision 35; D-2407 as
+    // amended): the check number travels in the owner's export, the audit
+    // pack and the auditor's view, because the Worker Screening Rules
+    // s 18(3)(d) list it and it is not a name. Names never do; the worker is
+    // its code.
     "clearance_number",
+    // REQ-024 A1 (D-2419; finding 109): the application number, s 18(3)(d)(i), and the day the database was checked.
+    "application_number",
+    "verified_in_database_on",
     "issued_on",
     "expires_on",
     "state",

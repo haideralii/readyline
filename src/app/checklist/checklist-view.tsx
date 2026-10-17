@@ -14,6 +14,8 @@ import {
   type ShownStatus,
 } from "@/lib/checklist/state";
 import { saveChecklistItemAction } from "@/server/checklist/actions";
+import { GlossaryTerms } from "@/components/glossary-terms";
+import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 
 /**
  * The checklist as a task list (REQ-015 Section C): the counts line and the
@@ -23,7 +25,10 @@ import { saveChecklistItemAction } from "@/server/checklist/actions";
  * retry when the save fails (FR-8 to FR-12, FR-15). The stored values stay
  * `need`, `in-progress` and `have`; only the labels changed.
  */
-type Local = Record<string, { status: ShownStatus; note: string }>;
+type Local = Record<
+  string,
+  { status: ShownStatus; note: string; doneOn: string | null }
+>;
 
 type Feedback =
   | { kind: "saving"; itemId: string }
@@ -74,7 +79,10 @@ export function ChecklistView({
 }) {
   const [local, setLocal] = useState<Local>(() =>
     Object.fromEntries(
-      shown.items.map((i) => [i.id, { status: i.status, note: i.note }]),
+      shown.items.map((i) => [
+        i.id,
+        { status: i.status, note: i.note, doneOn: i.doneOn },
+      ]),
     ),
   );
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -96,10 +104,13 @@ export function ChecklistView({
     previous: Local[string] | null,
   ) {
     setFeedback({ kind: "saving", itemId });
+    // REQ-023 FR-4: a dated item sends its date; the server sets the status from it (finding 80).
+    const dated = shown.items.find((i) => i.id === itemId)?.dated;
     const r = await saveChecklistItemAction({
       itemId,
       status: stored(next.status),
       note: next.note,
+      ...(dated ? { doneOn: next.doneOn ?? "" } : {}),
     });
     if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     if (r.ok) {
@@ -125,15 +136,39 @@ export function ChecklistView({
   }
 
   function onStatus(item: ShownItem, status: ChecklistStatus) {
-    const previous = local[item.id] ?? { status: item.status, note: "" };
+    const previous = local[item.id] ?? {
+      status: item.status,
+      note: "",
+      doneOn: item.doneOn,
+    };
     if (previous.status === status) return;
-    const next = { status, note: previous.note };
+    const next = { ...previous, status };
+    setLocal((l) => ({ ...l, [item.id]: next }));
+    void save(item.id, next, previous);
+  }
+
+  // REQ-023 FR-4: a date sets Done, a cleared date sets Need (finding 80).
+  function onDate(item: ShownItem, doneOn: string) {
+    const previous = local[item.id] ?? {
+      status: item.status,
+      note: "",
+      doneOn: item.doneOn,
+    };
+    const next = {
+      status: (doneOn ? "have" : "need") as ShownStatus,
+      note: previous.note,
+      doneOn: doneOn || null,
+    };
     setLocal((l) => ({ ...l, [item.id]: next }));
     void save(item.id, next, previous);
   }
 
   function onNote(item: ShownItem, note: string) {
-    const current = local[item.id] ?? { status: item.status, note: "" };
+    const current = local[item.id] ?? {
+      status: item.status,
+      note: "",
+      doneOn: item.doneOn,
+    };
     const next = { ...current, note };
     setLocal((l) => ({ ...l, [item.id]: next }));
     clearTimeout(timers.current[item.id]);
@@ -187,6 +222,17 @@ export function ChecklistView({
     return feedback.message;
   })();
 
+  // REQ-027 FR-3, D-2711: the glossary terms this checklist is about to show,
+  // from the page's own words and every item's title and detail, in the
+  // order they first appear.
+  const present = findGlossaryTerms(
+    [
+      `For ${tradingName}, a ${pathway} audit. Tap an item to set its status. Done means reviewed and adopted.`,
+      ...shown.groups.map((g) => g.title),
+      ...shown.items.flatMap((i) => [i.title, i.ask, i.why, i.haveNote ?? ""]),
+    ].join("\n"),
+  );
+
   return (
     <div className="print:hidden">
       <h1 className="text-3xl font-semibold tracking-tight">
@@ -196,6 +242,8 @@ export function ChecklistView({
         For <strong>{tradingName}</strong>, a {pathway} audit. Tap an item to
         set its status. <strong>Done</strong> means reviewed and adopted.
       </p>
+      {/* REQ-027 FR-3, D-2701, D-2711: the words on this page, counted at render from the items it shows, above the first body section. */}
+      <GlossaryTerms ids={present} where="page" className="mt-3" />
       <p
         className="mt-4 text-lg font-medium"
         role="status"
@@ -314,9 +362,11 @@ export function ChecklistView({
                   setId={setId}
                   status={local[item.id]?.status ?? item.status}
                   note={local[item.id]?.note ?? ""}
+                  doneOn={local[item.id]?.doneOn ?? item.doneOn}
                   open={openItems.has(item.id)}
                   onToggle={() => toggleItem(item.id)}
                   onStatus={(s) => onStatus(item, s)}
+                  onDate={(d) => onDate(item, d)}
                   onNote={(n) => onNote(item, n)}
                   feedback={feedback?.itemId === item.id ? feedback : null}
                 />
@@ -341,9 +391,11 @@ function ChecklistRow({
   setId,
   status,
   note,
+  doneOn,
   open,
   onToggle,
   onStatus,
+  onDate,
   onNote,
   feedback,
 }: {
@@ -351,9 +403,11 @@ function ChecklistRow({
   setId: string | null;
   status: ShownStatus;
   note: string;
+  doneOn: string | null;
   open: boolean;
   onToggle: () => void;
   onStatus: (s: ChecklistStatus) => void;
+  onDate: (d: string) => void;
   onNote: (n: string) => void;
   feedback: Feedback | null;
 }) {
@@ -455,8 +509,42 @@ function ChecklistRow({
             </Link>
           </p>
         ) : null}
+        {item.dated ? (
+          // REQ-023 FR-4: a dated item is done by its date, not by a tap; the date is what the auditor reads.
+          <div className="mt-3" data-testid={`checklist-date-${b}`}>
+            <label htmlFor={`${b}-date`} className="block text-sm font-medium">
+              Date it happened
+            </label>
+            {item.dueDate ? (
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                Measured against {item.dueDate}.
+              </p>
+            ) : null}
+            <input
+              id={`${b}-date`}
+              type="date"
+              value={doneOn ?? ""}
+              onChange={(e) => onDate(e.target.value)}
+              aria-describedby={whyId}
+              className="mt-1 rounded-md border border-zinc-300 px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950"
+            />
+            <span
+              className="ml-3 inline-flex min-h-11 items-center text-sm text-zinc-600 dark:text-zinc-400"
+              aria-live="polite"
+              data-testid={`item-feedback-${b}`}
+            >
+              {feedback?.kind === "saving"
+                ? "Saving…"
+                : feedback?.kind === "saved"
+                  ? "✓ Saved"
+                  : feedback?.kind === "failed"
+                    ? "Not saved, try again"
+                    : ""}
+            </span>
+          </div>
+        ) : null}
         {/* FR-10: a segmented control that never wraps at 375 px. */}
-        <fieldset className="mt-3" aria-describedby={whyId}>
+        <fieldset className="mt-3" aria-describedby={whyId} hidden={item.dated}>
           <legend className="text-sm font-medium">Status</legend>
           <div
             className="mt-1 inline-flex max-w-full overflow-hidden rounded-md border border-zinc-400 dark:border-zinc-600"
@@ -493,19 +581,21 @@ function ChecklistRow({
               );
             })}
           </div>
-          <span
-            className="ml-3 inline-flex min-h-11 items-center text-sm text-zinc-600 dark:text-zinc-400"
-            aria-live="polite"
-            data-testid={`item-feedback-${b}`}
-          >
-            {feedback?.kind === "saving"
-              ? "Saving…"
-              : feedback?.kind === "saved"
-                ? "✓ Saved"
-                : feedback?.kind === "failed"
-                  ? "Not saved, try again"
-                  : ""}
-          </span>
+          {item.dated ? null : (
+            <span
+              className="ml-3 inline-flex min-h-11 items-center text-sm text-zinc-600 dark:text-zinc-400"
+              aria-live="polite"
+              data-testid={`item-feedback-${b}`}
+            >
+              {feedback?.kind === "saving"
+                ? "Saving…"
+                : feedback?.kind === "saved"
+                  ? "✓ Saved"
+                  : feedback?.kind === "failed"
+                    ? "Not saved, try again"
+                    : ""}
+            </span>
+          )}
         </fieldset>
         {noteOpen ? (
           <>

@@ -3,8 +3,12 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { DataTable } from "@/components/data-table";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
-import { auditorBanner } from "@/lib/registers/auditor-link";
+import {
+  AUDITOR_OPEN_LIMITED_LINE,
+  auditorBanner,
+} from "@/lib/registers/auditor-link";
 import { packIntro } from "@/lib/registers/audit-pack";
+import { checkAuditorOpenAllowed } from "@/server/auth/rate-limit";
 import {
   DOCUMENT_CONTROL_COLUMNS,
   collectAuditView,
@@ -53,12 +57,22 @@ export default async function AuditorPage({
   const link = await resolveAuditorToken(admin, token);
   if (!link) notFound();
   const h = await headers();
-  await recordAuditorOpen(
-    admin,
-    link,
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
-    "opened",
-  );
+  const address = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  // Retro review of REQ-020, finding 21: every open writes a row, so one
+  // address gets sixty opens of this link an hour. A page cannot answer 429;
+  // the plain message stands in, and nothing is written or shown.
+  if (!(await checkAuditorOpenAllowed(link.linkId, address)))
+    return (
+      <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Too many opens
+        </h1>
+        <p className="mt-3 leading-7" data-testid="auditor-limited">
+          {AUDITOR_OPEN_LIMITED_LINE}
+        </p>
+      </div>
+    );
+  await recordAuditorOpen(admin, link, address, "opened");
   const view = await collectAuditView(admin, link.accountId);
   const date = new Date().toISOString().slice(0, 10);
   return (

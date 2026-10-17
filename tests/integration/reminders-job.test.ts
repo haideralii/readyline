@@ -58,14 +58,16 @@ describe.skipIf(!enabled)(
       });
       if (rpc.error) throw rpc.error;
       accountId = rpc.data as string;
-      // Certification registered 12 months ago: a mid-term reminder today.
-      const reg = await admin
-        .from("accounts")
-        .update({
-          registration_date: addMonths(TODAY, -12),
-          registration_kind: "certification",
-        })
-        .eq("id", accountId);
+      // REQ-023 FR-3: a certification period that began 12 months ago, so the
+      // prepare-from reminder (start plus 12 months) fires today, about the
+      // must-start-by date (start plus 18 months).
+      const reg = await admin.from("registration_periods").insert({
+        account_id: accountId,
+        period_starts_on: addMonths(TODAY, -12),
+        period_ends_on: addMonths(TODAY, 24),
+        audit_type: "certification",
+        midterm_applies: true,
+      });
       if (reg.error) throw reg.error;
       const sub = await admin
         .from("entitlements")
@@ -130,6 +132,24 @@ describe.skipIf(!enabled)(
         });
         if (draft.error) throw draft.error;
       }
+      // Retro finding 62 (D-2244): a rejected report in a reportable category
+      // keeps its Commission clock, so the job raises the notification
+      // reminder for it; the view lets the notification state through.
+      const rejected = await admin.from("incidents").insert({
+        account_id: accountId,
+        occurred_on: addDays(TODAY, -2),
+        reported_on: addDays(TODAY, -2),
+        category: "abuse-or-neglect",
+        severity: "medium",
+        summary: "Alleged, rejected by the owner.",
+        reportable: true,
+        status: "rejected",
+        rejected_reason:
+          "Not one of ours; the person named is not a participant.",
+        reported_via: "link",
+        logged_by_ref: "support worker",
+      });
+      if (rejected.error) throw rejected.error;
       // REQ-018 Session C (AC-3): one row per new reminder kind with a fixed date that fires today.
       const drill = await admin
         .from("accounts")
@@ -215,8 +235,10 @@ describe.skipIf(!enabled)(
           `clearance-expiry@${TODAY}`,
           `policy-review@${TODAY}`,
           `reportable-not-notified@${TODAY}`,
+          // Retro finding 62: the rejected report in a reportable category, its clock still running.
+          `reportable-not-notified@${TODAY}`,
           "complaint-unacknowledged@2026-10-12",
-          `mid-term-audit@${TODAY}`,
+          `midterm-prepare@${TODAY}`,
           // REQ-018 Session C (AC-3): the six new kinds, each from the fixed date seeded above.
           `insurance-expiry@${TODAY}`,
           `supervision-due@${TODAY}`,
@@ -233,9 +255,9 @@ describe.skipIf(!enabled)(
       expect(
         (rows.data ?? []).filter((r) => r.subject_table === "hazards"),
       ).toHaveLength(1);
-      expect(rows.data?.length).toBe(13);
-      expect(first.inserted).toBe(13);
-      expect(first.emailed).toBe(13);
+      expect(rows.data?.length).toBe(14);
+      expect(first.inserted).toBe(14);
+      expect(first.emailed).toBe(14);
       expect((rows.data ?? []).every((r) => r.sent_at)).toBe(true);
       // SR-4: the message names registers and references, never the summary text.
       const sent = provider.sent.find((m) => m.to === email);
@@ -243,6 +265,24 @@ describe.skipIf(!enabled)(
       expect(sent?.text).toContain("INC-0001");
       expect(sent?.text).toContain("CMP-0001");
       expect(sent?.text).not.toMatch(/kitchen|Late twice/);
+      // REQ-023 AC-2: the timeline line, the fixed sentence once, and the audit line with the period id.
+      expect(sent?.text).toContain("Start preparing for your mid-term audit");
+      expect(
+        sent?.text.split("The dates on your certificate rule").length,
+      ).toBe(2);
+      const periodRow = await admin
+        .from("registration_periods")
+        .select("id")
+        .eq("account_id", accountId)
+        .single();
+      const sentLine = await admin
+        .from("audit_log")
+        .select("action, target")
+        .eq("account_id", accountId)
+        .eq("action", "reminder.midterm-prepare.sent");
+      expect(sentLine.data).toEqual([
+        { action: "reminder.midterm-prepare.sent", target: periodRow.data?.id },
+      ]);
 
       const sentBefore = provider.sent.filter((m) => m.to === email).length;
       const second = await runRemindersJob({
@@ -260,7 +300,7 @@ describe.skipIf(!enabled)(
         .from("reminders")
         .select("id", { count: "exact", head: true })
         .eq("account_id", accountId);
-      expect(again.count).toBe(13);
+      expect(again.count).toBe(14);
       expect(provider.sent.filter((m) => m.to === email).length).toBe(
         sentBefore,
       );

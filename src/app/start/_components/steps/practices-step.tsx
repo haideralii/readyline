@@ -14,6 +14,14 @@ import {
 } from "../fields";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { EXAMPLES, HELPER } from "./practices-copy";
+import { GlossaryTerms } from "@/components/glossary-terms";
+
+/** REQ-027 FR-3 (D-2710, D-2705): the glossary terms this step's words use, first appearance first; the restrictive-practice meaning reaches the page here. */
+const STEP_TERMS = [
+  "restrictive-practice",
+  "module",
+  "registration-group",
+] as const;
 
 const LABELS = {
   restrictivePractices: "Restrictive practices",
@@ -106,6 +114,8 @@ export function PracticesStepForm() {
   return (
     <form onSubmit={onSubmit} noValidate>
       <ErrorSummary errors={errors} labels={LABELS} />
+      {/* REQ-027 FR-3, D-2701: the words on this step, above its first paragraph. */}
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
       <p className="mb-4 text-base leading-7 text-zinc-700 dark:text-zinc-300">
         Some ways of keeping people safe count as restrictive practices and have
         extra rules. In plain words, they include:

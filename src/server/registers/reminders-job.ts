@@ -14,9 +14,15 @@ import {
   reminderLine,
   type ReminderDue,
 } from "@/lib/registers/reminders";
+import { isRegistrationReminderKind } from "@/lib/registers/timeline";
 import type { ReminderKind } from "@/lib/registers/types";
 import type { EmailProvider } from "@/server/email/provider";
 import { remindersEmail } from "@/server/email/templates";
+import {
+  currentPeriod,
+  periodEndChangedInsideWindow,
+  sentRegistrationKinds,
+} from "./registration-queries";
 
 export type RemindersReport = {
   accounts: number;
@@ -29,8 +35,6 @@ export type RemindersReport = {
 type AccountRow = {
   id: string;
   trading_name: string;
-  registration_date: string | null;
-  registration_kind: "certification" | "verification" | null;
   /** REQ-018 FR-10: the last emergency drill, recorded on the audit-day page. */
   last_emergency_drill_on: string | null;
 };
@@ -52,6 +56,8 @@ async function accountsWithRegisters(
     "conflicts_of_interest",
     // REQ-020 FR-7.
     "hazards",
+    // REQ-023 FR-3: the registration period's five kinds.
+    "registration_periods",
   ]) {
     const r = await admin.from(table).select("account_id").limit(10_000);
     for (const row of (r.data as { account_id: string }[] | null) ?? [])
@@ -60,7 +66,7 @@ async function accountsWithRegisters(
   const dated = await admin
     .from("accounts")
     .select("id")
-    .or("registration_date.not.is.null,last_emergency_drill_on.not.is.null")
+    .not("last_emergency_drill_on", "is", null)
     .is("deleted_at", null)
     .limit(10_000);
   for (const row of (dated.data as { id: string }[] | null) ?? [])
@@ -68,12 +74,32 @@ async function accountsWithRegisters(
   if (ids.size === 0) return [];
   const r = await admin
     .from("accounts")
-    .select(
-      "id, trading_name, registration_date, registration_kind, last_emergency_drill_on",
-    )
+    .select("id, trading_name, last_emergency_drill_on")
     .in("id", [...ids])
     .is("deleted_at", null);
   return (r.data as AccountRow[] | null) ?? [];
+}
+
+/**
+ * REQ-023 FR-3 (D-2313): the five timeline kinds stop when the subscription
+ * was cancelled (Stripe's `canceled`, or `unpaid`, which revokes the same
+ * way, D-056) and stay on through a pause (`past_due`); a newer subscription
+ * row is a new subscription, so they resume with it. REQ-022 Session B's
+ * `do_not_send` replaces this test when it lands.
+ */
+async function subscriptionCancelled(
+  admin: SupabaseClient,
+  accountId: string,
+): Promise<boolean> {
+  const r = await admin
+    .from("subscriptions")
+    .select("status")
+    .eq("account_id", accountId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const status = (r.data as { status: string } | null)?.status;
+  return status === "canceled" || status === "unpaid";
 }
 
 /** What is due for one account on `today`, from the live rows. */
@@ -83,7 +109,7 @@ export async function computeAccountReminders(
   today: string,
 ): Promise<ReminderDue[]> {
   // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
-  const [insurance, staff, participants, corporate, conflicts, hazards] =
+  const [insurance, staff, participants, corporate, conflicts, hazards, roles] =
     await Promise.all([
       admin
         .from("insurance_items")
@@ -109,6 +135,13 @@ export async function computeAccountReminders(
       admin
         .from("hazards")
         .select("id, review_on")
+        .eq("account_id", account.id),
+      // REQ-024 FR-6a (D-2416): the s 17 roles with whether a current worker holds each.
+      admin
+        .from("risk_assessed_roles")
+        .select(
+          "id, first_held_on, assessed_on, staff_matrix!role_ref(ended_on)",
+        )
         .eq("account_id", account.id),
     ]);
   const rows = <T>(r: { data: unknown }) => (r.data as T[] | null) ?? [];
@@ -147,7 +180,36 @@ export async function computeAccountReminders(
       })),
     ],
     lastEmergencyDrillOn: account.last_emergency_drill_on,
+    riskAssessedRoles: rows<{
+      id: string;
+      first_held_on: string | null;
+      assessed_on: string | null;
+      staff_matrix: { ended_on: string | null }[] | null;
+    }>(roles).map((r) => ({
+      id: r.id,
+      first_held_on: r.first_held_on,
+      assessed_on: r.assessed_on,
+      // Held: at least one matrix row references the role and has not ended by today.
+      held: (r.staff_matrix ?? []).some(
+        (s) => s.ended_on === null || s.ended_on > today,
+      ),
+    })),
   };
+  // REQ-023 FR-3: the current period, the kinds already sent for it (the once
+  // rule), the last-call exception and the subscription's state (D-2313).
+  const period = await currentPeriod(admin, account.id);
+  const registration = period
+    ? {
+        period,
+        sentKinds: await sentRegistrationKinds(admin, period.id),
+        subscriptionCancelled: await subscriptionCancelled(admin, account.id),
+        endChangedInsideWindow: await periodEndChangedInsideWindow(
+          admin,
+          account.id,
+          period,
+        ),
+      }
+    : undefined;
   const [inc, ev, comp, checks, reviews] = await Promise.all([
     admin
       .from("incidents")
@@ -180,7 +242,9 @@ export async function computeAccountReminders(
     if (!lastEvent.has(e.incident_id))
       lastEvent.set(e.incident_id, e.at.slice(0, 10));
   // REQ-020 FR-5: a draft report raises only the nudge to confirm it; it joins
-  // the incident rules once confirmed. A rejected report raises nothing.
+  // the incident rules once confirmed. A rejected report raises nothing,
+  // unless it is still marked reportable (retro finding 62, D-2244): then its
+  // Commission clock runs as for any reportable incident.
   const incidentRows =
     (inc.data as
       | {
@@ -196,18 +260,18 @@ export async function computeAccountReminders(
   return dueReminders({
     today,
     now: new Date().toISOString(),
-    account: {
-      id: account.id,
-      registration_date: account.registration_date,
-      registration_kind: account.registration_kind,
-    },
+    account: { id: account.id },
+    period: registration,
     reports: incidentRows
       .filter((i) => i.status === "draft")
       .map((i) => ({ id: i.id, aware_at: i.aware_at })),
     incidents: incidentRows
       .filter(
-        (i): i is typeof i & { status: "open" | "under-review" | "closed" } =>
-          i.status !== "draft" && i.status !== "rejected",
+        (
+          i,
+        ): i is typeof i & {
+          status: "open" | "under-review" | "closed" | "rejected";
+        } => i.status !== "draft" && (i.status !== "rejected" || i.reportable),
       )
       .map((i) => ({
         ...i,
@@ -237,7 +301,12 @@ async function referenceFor(
   r: { subject_table: string; subject_id: string },
   tradingName: string,
 ): Promise<string> {
-  if (r.subject_table === "accounts") return tradingName;
+  // REQ-023 FR-3: a timeline line names no reference; the business stands in.
+  if (
+    r.subject_table === "accounts" ||
+    r.subject_table === "registration_periods"
+  )
+    return tradingName;
   // REQ-018 Session C: the audit-day registers' references (a code, a label or an area), never content (SR-4).
   const column =
     r.subject_table === "worker_clearances" ||
@@ -255,7 +324,9 @@ async function referenceFor(
                 ? "who_ref"
                 : r.subject_table === "hazards"
                   ? "site_ref"
-                  : "reference";
+                  : r.subject_table === "risk_assessed_roles"
+                    ? "title"
+                    : "reference";
   const row = await admin
     .from(r.subject_table)
     .select(column)
@@ -357,8 +428,16 @@ export async function runRemindersJob(input: {
             r.due_on,
           ),
         );
+      const timeline = rows.filter((r) =>
+        isRegistrationReminderKind(r.kind as string),
+      );
       await input.email.send(
-        remindersEmail({ to, tradingName: account?.trading_name ?? "", lines }),
+        remindersEmail({
+          to,
+          tradingName: account?.trading_name ?? "",
+          lines,
+          registration: timeline.length > 0,
+        }),
       );
       const ids = rows.map((r) => r.id);
       const up = await input.admin
@@ -366,6 +445,19 @@ export async function runRemindersJob(input: {
         .update({ sent_at: new Date().toISOString() })
         .in("id", ids);
       if (up.error) throw new Error(up.error.message);
+      // REQ-023 FR-3 (finding 74): one audit line per timeline reminder sent, the period id as the target, never the address.
+      if (timeline.length > 0) {
+        const audit = await input.admin.from("audit_log").insert(
+          timeline.map((r) => ({
+            account_id: accountId,
+            actor_user_id: null,
+            action: `reminder.${r.kind}.sent`,
+            target: r.subject_id,
+          })),
+        );
+        if (audit.error)
+          log.warn("audit.write.failed", { accountId, code: audit.error.code });
+      }
       report.emailed += ids.length;
     } catch (e) {
       report.errors.push(

@@ -127,6 +127,11 @@ export const AUDIT_DAY_REGISTERS = [
   "onboarding_checklists",
   // REQ-020 FR-7.
   "hazards",
+  // REQ-024 A1 (finding 66): the derived items' state and the s 17 roles.
+  "onboarding_items",
+  "risk_assessed_roles",
+  // REQ-024 A2 (D-2434): the s 14 exception's rows.
+  "screening_exceptions",
 ] as const;
 export type AuditDayRegister = (typeof AUDIT_DAY_REGISTERS)[number];
 
@@ -138,6 +143,13 @@ export const REGISTER_EVENT_KINDS = [
   "closed",
   // REQ-020 FR-8: one line per row an import wrote.
   "imported",
+  // REQ-024 A1: the owner's confirmation of an item, a role change with its fixed note, a worker ended.
+  "confirmed",
+  "role-changed",
+  "ended",
+  // REQ-024 A2 (D-2434): the s 14 exception's start and end, their notes in words, never a uuid.
+  "exception-started",
+  "exception-ended",
 ] as const;
 export type RegisterEventKind = (typeof REGISTER_EVENT_KINDS)[number];
 
@@ -288,6 +300,45 @@ export type StaffMatrixRow = {
   last_appraisal_on: string | null;
   onboarding_signed_on: string | null;
   note: string;
+  // REQ-024 A1 (FR-1): the closed role, the states served, the two flags, the end, the s 17 role and the s 20 dates.
+  role: string | null;
+  states: string[];
+  works_with_children: boolean;
+  may_use_restrictive_practice: boolean;
+  ended_on: string | null;
+  role_ref: string | null;
+  risk_assessed_from: string | null;
+  risk_paragraph: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** REQ-024 A1 (Data): the mutable state of one derived item; numbers and expiries live on the clearance row (D-2419). */
+export type OnboardingItemRow = {
+  id: string;
+  account_id: string;
+  checklist_id: string;
+  item_id: string;
+  owner_role: "owner" | "worker" | "both";
+  done_on: string | null;
+  confirmed_on: string | null;
+  recorded_by_owner: boolean;
+  note: string;
+  created_at: string;
+  updated_at: string;
+};
+
+/** REQ-024 A1 (Data, D-2416): one s 17 role; the assessor is a code, the name a fill field. */
+export type RiskAssessedRoleRow = {
+  id: string;
+  account_id: string;
+  title: string;
+  paragraphs: string[];
+  description: string;
+  assessed_on: string | null;
+  assessor_ref: string | null;
+  first_held_on: string | null;
+  seed_code: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -323,4 +374,34 @@ export type RegisterEventRow = {
   actor_user_id: string | null;
   kind: RegisterEventKind;
   note: string;
+};
+
+/** REQ-024 A2 (D-2434): one s 14 exception as the table holds it; the pinned version is an id, the notes carry words. */
+export type ScreeningExceptionRow = {
+  id: string;
+  account_id: string;
+  worker_ref: string;
+  clearance_id: string | null;
+  code: "s14-1a" | "s14-1b" | "s14-1c" | "s14-2a" | "s14-2b";
+  part4_state: string | null;
+  started_on: string;
+  verified_on: string | null;
+  notice_seen_on: string | null;
+  supervisor_ref: string | null;
+  declaration_on: string | null;
+  plan_version_id: string | null;
+  plan_register_date: string | null;
+  ended_on: string | null;
+  end_code:
+    | "clearance-issued"
+    | "excluded"
+    | "interim-bar"
+    | "supervision-stopped"
+    | "plan-stopped"
+    | "withdrawn"
+    | "closed"
+    | "supervisor-clearance-expired"
+    | null;
+  created_at: string;
+  updated_at: string;
 };

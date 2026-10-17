@@ -48,12 +48,20 @@ export async function GET(request: Request) {
   const data = await buildAccountExport(supabase, viewer.account.id, now);
   if (!data) return new NextResponse("Not found", { status: 404 });
 
-  await supabase.from("audit_log").insert({
+  // The write is checked (PO 16 Oct 19:47): on the hosted project it had
+  // answered 42501 unseen since it was written, the insert grant missing.
+  const audit = await supabase.from("audit_log").insert({
     account_id: viewer.account.id,
     actor_user_id: viewer.user.id,
     action: "account.exported",
     target: viewer.account.id,
   });
+  if (audit.error)
+    log.warn("audit.write.failed", {
+      accountId: viewer.account.id,
+      action: "account.exported",
+      code: audit.error.code,
+    });
   log.info("account.exported", {
     accountId: viewer.account.id,
     userId: viewer.user.id,

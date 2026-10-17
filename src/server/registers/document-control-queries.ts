@@ -30,8 +30,8 @@ export async function documentControlForSet(
   accountId: string,
   setId: string,
 ): Promise<DocumentControlRow[]> {
-  const [docs, reviews, circulations, facts, changeReviews] = await Promise.all(
-    [
+  const [docs, reviews, circulations, facts, changeReviews, olderAdopted] =
+    await Promise.all([
       listLatestDocuments(supabase, setId),
       supabase
         .from("policy_reviews")
@@ -39,6 +39,9 @@ export async function documentControlForSet(
           "document_type_id, adopted_on, review_cycle_months, last_reviewed_on, next_review_on",
         )
         .eq("account_id", accountId)
+        // REQ-024 A0 (finding 232): the seeded row alone, so a titled second
+        // row for the same type can never supply the next review date.
+        .eq("title", "")
         .limit(500),
       supabase
         .from("policy_circulations")
@@ -52,8 +55,21 @@ export async function documentControlForSet(
         .select("document_type_id, change_id")
         .eq("account_id", accountId)
         .limit(2000),
-    ],
-  );
+      // REQ-024 A0 (D-2436): any adopted version of each type, in any set,
+      // over the partial index, for the "new version to adopt" state.
+      supabase
+        .from("document_versions")
+        .select("document_type_id, adopted_on")
+        .eq("account_id", accountId)
+        .not("adopted_on", "is", null)
+        .order("adopted_on", { ascending: false })
+        .limit(2000),
+    ]);
+  const olderByType = new Map<string, string>();
+  for (const row of (olderAdopted.data as
+    { document_type_id: string; adopted_on: string }[] | null) ?? [])
+    if (!olderByType.has(row.document_type_id))
+      olderByType.set(row.document_type_id, row.adopted_on);
   return documentControlRows(
     {
       documents: docs.map((d) => ({
@@ -61,6 +77,8 @@ export async function documentControlForSet(
         title: d.model.title,
         version: d.version,
         created_at: d.created_at,
+        adopted_on: d.adopted_on ?? null,
+        older_adopted_on: olderByType.get(d.document_type_id) ?? null,
         version_id: d.id,
         sections: d.model.sections.map((s) => ({
           id: s.id,
@@ -89,6 +107,7 @@ export async function documentControlForSet(
             }[]
           | null) ?? [],
       adoptedByRole: facts.role ?? null,
+      adoptedByName: facts.name ?? null,
     },
     todaySydney(),
   );

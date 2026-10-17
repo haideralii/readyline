@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { glossaryOnPage } from "./helpers/glossary";
 
 test.describe("home page", () => {
   test("renders a heading and the general-information notice", async ({
@@ -6,6 +7,8 @@ test.describe("home page", () => {
   }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    // REQ-027 AC-3: every glossary word on the page has its meaning on the page.
+    await glossaryOnPage(page, { label: "home" });
     const notice = page.getByTestId("site-disclaimer");
     await expect(notice).toBeVisible();
     await expect(notice).toContainText(/general information/i);

@@ -199,6 +199,8 @@ export async function saveIncidentAction(
       reference: up.data.reference as string,
     };
   }
+  // The aware date comes from the form (Session B, D-2237: it defaults to the
+  // day it happened), so a back-filled row's clock never starts on the typing day.
   const ins = await ctx.supabase
     .from("incidents")
     .insert(row)
@@ -447,7 +449,10 @@ export async function saveWorkerCheckAction(
     role_label: v.roleLabel,
     clearance_kind: v.clearanceKind,
     clearance_number: v.clearanceNumber,
-    issued_on: v.issuedOn,
+    // REQ-024 A1 (D-2419, finding 157): the application number and the database check; a pending row has no issue date.
+    application_number: v.applicationNumber,
+    verified_in_database_on: v.verifiedInDatabaseOn || null,
+    issued_on: v.issuedOn || null,
     expires_on: v.expiresOn,
     state: v.state,
     note: v.note,
@@ -500,11 +505,16 @@ export async function savePolicyReviewAction(
       message: "Too many changes in a minute. Wait a moment and try again.",
     };
   const v = parsed.data.values;
+  // REQ-024 A0 (D-2435, D-2442): a catalogue type's `adopted_on` is the
+  // pack's, written by `adopt_document_version` alone, so the register never
+  // sends it (the table's guard would refuse the change anyway); the review
+  // date stays the owner's, since a review is not an adoption. An "other"
+  // document of the owner's own keeps both dates typed.
   const row = {
     account_id: ctx.account.id,
     document_type_id: v.documentTypeId,
     title: v.title,
-    adopted_on: v.adoptedOn,
+    ...(v.documentTypeId === "other" ? { adopted_on: v.adoptedOn } : {}),
     review_cycle_months: v.reviewCycleMonths,
     last_reviewed_on: v.lastReviewedOn,
     reviewer_ref: v.reviewerRef,

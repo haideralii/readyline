@@ -9,8 +9,8 @@
  * admin client the way the job does, after the set is proven to be theirs.
  */
 import { z } from "zod";
-import { openBlanks } from "./state";
-import { deriveChecklist } from "@/lib/checklist/derive";
+import { listAdoptedDates, openBlanks } from "./state";
+import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
@@ -19,18 +19,30 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
-import { rerenderSetWithFacts } from "@/server/generation/rerender";
+import { reasonForCi } from "@/server/generation/failure-code";
+import {
+  refreshSetSummary,
+  rerenderSetWithFacts,
+} from "@/server/generation/rerender";
 import { countEvent } from "@/server/metrics/counters";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { getStandardsDataset } from "@/lib/standards/dataset";
+import {
+  ADOPT_NEEDS_NAME,
+  ADOPT_NEEDS_NAME_HREF,
+  ADOPT_NEEDS_NAME_LINK,
+  NOT_CURRENT_PACK,
+} from "@/lib/path/adopt-copy";
+import { latestReadySet } from "@/server/checklist/queries";
 import { loadFacts, saveFact } from "./facts";
 import { loadQuestionnaire } from "./state";
 
 export type PathActionResult =
   | { ok: true; blanksLeft?: number; changed?: number }
-  | { ok: false; message: string };
+  | { ok: false; message: string; href?: string; hrefLabel?: string };
 
 const FactInput = strictObject({
   key: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
@@ -85,11 +97,26 @@ export async function finishPackAction(
   if (!set || set.account_id !== viewer.account.id || set.status !== "ready")
     return { ok: false, message: "That set was not found." };
   const facts = await loadFacts(supabase, viewer.account.id);
-  const out = await rerenderSetWithFacts({
-    admin: createSupabaseAdminClient(),
-    set,
-    facts,
-  });
+  let out: Awaited<ReturnType<typeof rerenderSetWithFacts>>;
+  try {
+    out = await rerenderSetWithFacts({
+      admin: createSupabaseAdminClient(),
+      set,
+      facts,
+    });
+  } catch (e) {
+    // D-2266 (#78's run 38881965824: the android-small finish went quiet,
+    // not loud): in CI the throw's name and text reach the job log at warn
+    // before it goes on; production logs nothing more than it did.
+    if (reasonForCi())
+      log.warn("path.finish.failed", {
+        accountId: viewer.account.id,
+        versionSetId: set.id,
+        errorName: e instanceof Error ? e.name : typeof e,
+        reasonText: (e instanceof Error ? e.message : String(e)).slice(0, 300),
+      });
+    throw e;
+  }
   // Batch 45 item 12 (D-2002): a pack finished, counted per day, nothing per user.
   if (out.blanksLeft === 0) countEvent("finish-completed");
   return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
@@ -149,13 +176,20 @@ export async function adoptGroupAction(
       ok: false,
       message: `Finish your pack first: ${open} ${open === 1 ? "blank is" : "blanks are"} still open.`,
     };
+  // Retro finding 114 (D-2244): adoption is approval by a named person on a
+  // date, so it waits for the account's name fact; the register's "by whom"
+  // then carries it.
+  const facts = await loadFacts(supabase, accountId);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: ADOPT_NEEDS_NAME_HREF,
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
 
-  const today = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Sydney",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
+  // REQ-024 A0 (D-2437): the adoption day itself is written in Sydney by
+  // `adopt_document_version`; only the words for the date fact are made here.
   const todayWords = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
     day: "numeric",
@@ -171,17 +205,70 @@ export async function adoptGroupAction(
   // proven to be the account's above, and the writes carry its id.
   const admin = createSupabaseAdminClient();
   await seedPolicyReviews(admin, accountId);
-  const facts = await loadFacts(supabase, accountId);
   if (!facts.date) {
     const r = await saveFact(supabase, accountId, "date", todayWords);
     if (r.ok) facts.date = todayWords;
   }
 
+  // QA pass F1 (17 Oct 2026, D-2269): the set must be the account's newest
+  // ready set, the rule `adopt_document_version` holds, said here in plain
+  // words before anything is written; the adopt step's page may be open while
+  // a regeneration finishes.
+  const newest = await latestReadySet(supabase, accountId);
+  if (newest.setId !== set.id) return { ok: false, message: NOT_CURRENT_PACK };
+
+  // REQ-024 A0 (D-2433, D-2441): re-render first, so the version adopted is
+  // the one that carries the approval date; then adopt the newest version of
+  // each document in the group through the function; then refresh the zip's
+  // summary and Start here sheet, which read adoption per version.
+  // D-2448 and D-2449 (#77's signed-in run): this re-render also writes the
+  // adoption dates into the control tables of groups adopted earlier, a new
+  // version of each with the same words, so their adoption is carried onto
+  // that version here, with the earlier version's own day, rather than left
+  // as a "new version to adopt" the owner never asked for; a facts edit on
+  // the Finish page still leaves the nudge.
+  // QA pass F1 and N6 (D-2269): the adoption comes first and its result is
+  // read, as `adoptDocumentVersionAction` reads it; the checklist and the
+  // circulation rows are written only once every document of the group is
+  // adopted, so a refusal or a throw in the re-render leaves nothing ticked.
+  const adoptedBefore = await listAdoptedDates(admin, accountId);
+  const out = await rerenderSetWithFacts({ admin, set, facts });
+  const own = new Set(group.documents.map((d) => d.document_type_id));
+  const notAdopted: string[] = [];
+  for (const d of await listLatestDocuments(admin, set.id)) {
+    const earlier = adoptedBefore.get(d.document_type_id);
+    if (own.has(d.document_type_id)) {
+      const day = await markAdopted(
+        admin,
+        accountId,
+        d.document_type_id,
+        set.id,
+      );
+      if (!day) notAdopted.push(d.document_type_id);
+    } else if (earlier && !d.adopted_on)
+      await markAdopted(admin, accountId, d.document_type_id, set.id, earlier);
+  }
+  if (notAdopted.length > 0) {
+    log.warn("path.adopt.group.not-adopted", {
+      accountId,
+      versionSetId: set.id,
+      group: parsed.data.group,
+      documents: notAdopted.length,
+    });
+    return { ok: false, message: NOT_CURRENT_PACK };
+  }
+  await refreshSetSummary(admin, set.id);
+
   // Checklist Done for each document in the group (REQ-006 items keyed by document type).
   const { answers, result } = await loadQuestionnaire();
   const items =
     answers && result
-      ? deriveChecklist(result, answers, getStandardsDataset()).items
+      ? deriveChecklist(
+          result,
+          answers,
+          getStandardsDataset(),
+          checklistPeriod(await currentPeriod(supabase, accountId)),
+        ).items
       : [];
   for (const d of group.documents) {
     const item = items.find((i) => i.documentTypeId === d.document_type_id);
@@ -198,7 +285,6 @@ export async function adoptGroupAction(
           code: up.error.code,
         });
     }
-    await markAdopted(admin, accountId, d.document_type_id, today);
   }
   // REQ-018 FR-14: the circulation record, one row per document in the group (append only; codes only).
   const circulation = parsed.data.circulation;
@@ -217,7 +303,6 @@ export async function adoptGroupAction(
         code: ins.error.code,
       });
   }
-  const out = await rerenderSetWithFacts({ admin, set, facts });
   log.info("path.adopt.group", {
     accountId,
     versionSetId: set.id,
@@ -225,4 +310,58 @@ export async function adoptGroupAction(
     documents: group.documents.length,
   });
   return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
+}
+
+const ReadoptInput = strictObject({
+  setId: z.string().uuid(),
+  typeId: z.string().regex(/^[a-z0-9-]{1,80}$/),
+});
+
+/**
+ * REQ-024 A0 (D-2427, D-2436): the document page's "Adopt this version"
+ * for a type whose newest version is unadopted while an older one was
+ * adopted (a facts edit or a regeneration wrote it). The function refuses a
+ * version that is not the latest of its type in the account's newest ready
+ * set, so the page offers the action on that set alone.
+ */
+export async function adoptDocumentVersionAction(
+  input: unknown,
+): Promise<PathActionResult> {
+  const parsed = parseInput(ReadoptInput, input);
+  if (!parsed.ok) return { ok: false, message: "That document was not found." };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to adopt your documents." };
+  const supabase = await createSupabaseServerClient();
+  const set = await getVersionSet(supabase, parsed.data.setId);
+  if (!set || set.account_id !== viewer.account.id || set.status !== "ready")
+    return { ok: false, message: "That document was not found." };
+  const facts = await loadFacts(supabase, viewer.account.id);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: ADOPT_NEEDS_NAME_HREF,
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
+  const admin = createSupabaseAdminClient();
+  const adopted = await markAdopted(
+    admin,
+    viewer.account.id,
+    parsed.data.typeId,
+    set.id,
+  );
+  if (!adopted)
+    return {
+      ok: false,
+      message:
+        "This version could not be adopted. It must be the newest version in your current pack.",
+    };
+  await refreshSetSummary(admin, set.id);
+  log.info("path.adopt.version", {
+    accountId: viewer.account.id,
+    versionSetId: set.id,
+    documentTypeId: parsed.data.typeId,
+  });
+  return { ok: true };
 }

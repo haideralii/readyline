@@ -6,6 +6,17 @@ updated: 2026-10-14
 reviewed: 2026-10-14
 owner: po
 shortAnswer: "Auditors ask for twelve records; two are required by the Rules, the rest by the Practice Standards or by practice. | Each register proves what happened, what you did and what changed. | Keep them as things happen, with codes instead of names."
+glossary:
+  [
+    practice-standards,
+    quality-indicator,
+    reportable-incident,
+    mid-term-audit,
+    key-personnel,
+    worker-screening-check,
+    adopt,
+    module,
+  ]
 status: published (PO decision D-2003, batch 45, 15 Oct 2026; Dev first draft 14 Oct 2026; the twelve records come from sector webinars and are labelled practice; the Rules and standards they evidence are the Commission's)
 ---
 
@@ -30,13 +41,13 @@ The list of twelve comes from auditors' and consultants' own accounts (sector we
 
 These are named or implied by the quality indicators for the standards that apply to most small providers. The auditor samples them.
 
-| Record                      | What it proves                                                                                                                                                     | Where to keep it                                                                                                                                                                         |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Worker screening and checks | Human resource management: workers in risk-assessed roles hold a current NDIS worker screening clearance; identity, right to work and qualifications were checked. | Readyline's worker checks register: the kind of check, issued and expiry dates, reminders before expiry. Clearance numbers stay in your own file.                                        |
-| Training records            | Human resource management: the NDIS Worker Orientation Module, infection control, role training, refreshers.                                                       | Readyline's staff matrix register: each worker's checks, training and refreshers with their dates, beside the training register template in your pack.                                   |
-| Policy review register      | Governance: every policy has a version, an adoption date, who approved it and a next review date.                                                                  | Readyline's policy review register, filled from the documents you adopt, with reminders before a review is due.                                                                          |
-| Risk register               | Risk management: risks to participants, workers and the business are identified, rated, treated and reviewed on a date.                                            | Readyline's corporate risks register, started with the nine areas auditors look for, each rated and reviewed on a date; the risk register template in your pack stays as the paper copy. |
-| Insurance certificates      | Risk management: current professional indemnity, public liability and, where you employ, workers compensation.                                                     | Readyline's insurances and vehicles register holds each policy's insurer, number and expiry with a reminder before it lapses; the certificates stay in your own folder.                  |
+| Record                      | What it proves                                                                                                                                                     | Where to keep it                                                                                                                                                                                                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Worker screening and checks | Human resource management: workers in risk-assessed roles hold a current NDIS worker screening clearance; identity, right to work and qualifications were checked. | Readyline's worker checks register: the kind of check, the check number, the issued and expiry dates, and reminders before expiry. It is the companion to your own worker list, which the Worker Screening Rules s 18 say must hold each worker's full name, date of birth and address; that list stays in your own file. |
+| Training records            | Human resource management: the NDIS Worker Orientation Module, infection control, role training, refreshers.                                                       | Readyline's staff matrix register: each worker's checks, training and refreshers with their dates, beside the training register template in your pack.                                                                                                                                                                    |
+| Policy review register      | Governance: every policy has a version, an adoption date, who approved it and a next review date.                                                                  | Readyline's policy review register, filled from the documents you adopt, with reminders before a review is due.                                                                                                                                                                                                           |
+| Risk register               | Risk management: risks to participants, workers and the business are identified, rated, treated and reviewed on a date.                                            | Readyline's corporate risks register, started with the nine areas auditors look for, each rated and reviewed on a date; the risk register template in your pack stays as the paper copy.                                                                                                                                  |
+| Insurance certificates      | Risk management: current professional indemnity, public liability and, where you employ, workers compensation.                                                     | Readyline's insurances and vehicles register holds each policy's insurer, number and expiry with a reminder before it lapses; the certificates stay in your own folder.                                                                                                                                                   |
 
 ## The records auditors ask for in practice
 

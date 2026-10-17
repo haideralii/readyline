@@ -24,6 +24,15 @@ export const START_HERE_TITLE = "Start here";
 
 /** The printed box in front of a line the provider ticks on paper. */
 export const BOX = "☐ ";
+/** The ticked box in front of a line the app already knows is done (REQ-024 A0, D-2441: the adopt line after adoption). */
+export const TICK = "☑ ";
+
+/** The document's adopt line: ticked and dated in words once its newest version is adopted, a box to tick until then. */
+export function adoptLine(adopted: boolean): string {
+  return adopted
+    ? `${TICK}Adopt: adopted; the document control table carries the date.`
+    : `${BOX}Adopt: sign and date the document control table, then mark it adopted on your documents page.`;
+}
 
 export type SheetDocumentInput = {
   typeId: string;
@@ -334,9 +343,7 @@ export function sheetLines(sheet: StartHereSheet): string[] {
       push(`${BOX}Make it yours: ${l.text} (generic text: add your details)`),
     );
     if (d.readOnce) push(d.readOnce);
-    push(
-      `${BOX}Adopt: sign and date the document control table, then mark it adopted on your documents page.`,
-    );
+    push(adoptLine(d.adopted));
   }
   sheet.registers.forEach((r) => {
     push(`${r.title}: ${r.purpose}`);
@@ -390,7 +397,7 @@ export function startHereModel(
                 `${BOX}Make it yours: ${l.text} (generic text: add your details)`,
             ),
             ...(d.readOnce ? [d.readOnce] : []),
-            `${BOX}Adopt: sign and date the document control table, then mark it adopted on your documents page.`,
+            adoptLine(d.adopted),
           ],
         },
       ]),

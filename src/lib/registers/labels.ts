@@ -98,6 +98,10 @@ export const CLEARANCE_LABELS: Record<
   "first-aid": "First aid certificate",
   "ndis-worker-orientation-module":
     "NDIS Worker Orientation Module (no expiry)",
+  "manual-handling": "Manual handling training",
+  medication: "Medication training",
+  cpr: "CPR certificate",
+  "driver-licence": "Driver licence",
   other: "Other",
 };
 
@@ -142,8 +146,11 @@ export function fromWorkerCheckRow(
     workerRef: row.worker_ref,
     roleLabel: row.role_label,
     clearanceKind: row.clearance_kind,
-    issuedOn: row.issued_on,
+    clearanceNumber: row.clearance_number ?? "",
+    applicationNumber: row.application_number ?? "",
+    issuedOn: row.issued_on ?? "",
     expiresOn: row.expires_on ?? "",
+    verifiedInDatabaseOn: row.verified_in_database_on ?? "",
     state: row.state ?? "",
     note: row.note,
   };

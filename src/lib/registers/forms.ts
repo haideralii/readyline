@@ -42,7 +42,7 @@ const safeText = (max: number, min = 0, required?: string) =>
     "This looks like an NDIS participant number. Use a reference code instead.",
   );
 
-const refField = (pattern: RegExp, hint: string) =>
+export const refField = (pattern: RegExp, hint: string) =>
   z
     .string()
     .trim()
@@ -199,18 +199,36 @@ export const WorkerCheckForm = strictObject({
     .max(40, "The check number is 40 characters at most")
     .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only")
     .default(""),
-  issuedOn: dateField("date it was issued"),
+  // REQ-024 A1 (D-2419, finding 157): the application number from the unit's notice; a pending application is a row with this and no issue date.
+  applicationNumber: z
+    .string()
+    .trim()
+    .max(40, "The application number is 40 characters at most")
+    .regex(/^[A-Za-z0-9 /-]*$/, "Letters, digits, spaces, / and - only")
+    .default(""),
+  issuedOn: optionalDate("date it was issued"),
   expiresOn: optionalDate("expiry date"),
+  // REQ-024 A1 (s 15(4)): the day the owner checked the application or clearance in the database; a form or a CSV row without the field reads as not yet checked.
+  verifiedInDatabaseOn: optionalDate("date you checked the database").default(
+    null,
+  ),
   state: z
     .union([z.literal(""), z.enum(AU_STATES)])
     .transform((v) => (v === "" ? null : v)),
   note: safeText(TEXT_CAPS.note),
 }).superRefine((v, ctx) => {
-  if (v.expiresOn && v.expiresOn < v.issuedOn)
+  if (v.expiresOn && v.issuedOn && v.expiresOn < v.issuedOn)
     ctx.addIssue({
       code: "custom",
       path: ["expiresOn"],
       message: "The expiry cannot be before the issue date",
+    });
+  if (!v.issuedOn && !v.applicationNumber)
+    ctx.addIssue({
+      code: "custom",
+      path: ["issuedOn"],
+      message:
+        "Enter the date it was issued, or the application number while it is pending",
     });
 });
 export type WorkerCheckFormValues = z.input<typeof WorkerCheckForm>;
@@ -242,6 +260,15 @@ export const PolicyReviewForm = strictObject({
       code: "custom",
       path: ["lastReviewedOn"],
       message: "Cannot be before the date it was adopted",
+    });
+  // REQ-024 A0 (D-2435, finding 203): a document of the owner's own is
+  // adopted on a day that has come; a catalogue type's date is the pack's and
+  // the action never writes it, so only "other" is checked here.
+  if (v.documentTypeId === "other" && v.adoptedOn && v.adoptedOn > sydneyDay())
+    ctx.addIssue({
+      code: "custom",
+      path: ["adoptedOn"],
+      message: "Cannot be after today",
     });
 });
 export type PolicyReviewFormValues = z.input<typeof PolicyReviewForm>;

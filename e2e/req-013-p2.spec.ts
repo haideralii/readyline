@@ -177,7 +177,11 @@ test.describe("REQ-013 P2", () => {
     await expect(page.getByTestId("workforce-defaults-note")).toBeVisible();
     const workers = page.getByLabel("Number of workers");
     await expect(workers).toHaveValue("1");
-    await expect(workers).toHaveAttribute("inputmode", "numeric");
+    await expect(workers).toHaveAttribute(
+      "inputmode",
+      // QA N8 (17 Oct 2026): the decimal keyboard, so a typed decimal reaches the schema and is refused in words.
+      "decimal",
+    );
     await expect(page.getByLabel("Number of key personnel")).toHaveValue("1");
     await expect(page.locator("#hasRiskAssessedRoles-yes")).toBeChecked();
     await expect(

@@ -13,6 +13,16 @@ import { setTextZoom, widthReport } from "./helpers/width";
  * step, target sizes, and axe clean on every public page and the result.
  */
 const dir = "product/evidence/req-015";
+// QA pass F2 (17 Oct 2026): the five guide pages join the pass, in both colour
+// schemes, after a dark-mode contrast failure on the cost guide's calculator
+// codes went unseen because the pass listed no guide and ran light only.
+const GUIDES = [
+  "/guides",
+  "/guides/which-ndis-audit",
+  "/guides/ndis-registration-cost",
+  "/guides/what-happens-at-an-ndis-audit",
+  "/guides/registers-an-auditor-asks-for",
+];
 const PAGES = [
   "/",
   "/start",
@@ -24,6 +34,7 @@ const PAGES = [
   "/terms",
   "/refunds",
   "/ai",
+  ...GUIDES,
 ];
 
 async function shot(page: Page, name: string, project: string) {
@@ -104,6 +115,9 @@ test.describe("REQ-015 Section E", () => {
   test("every public page: one h1 in order, a unique title, axe clean (FR-17, FR-19)", async ({
     page,
   }, testInfo) => {
+    // QA pass F2: twenty axe passes (fifteen pages, the five guides again in
+    // the dark scheme) run past 30 s beside other workers; slow, as N2 did.
+    test.slow();
     const titles = new Set<string>();
     for (const path of PAGES) {
       await page.goto(path);
@@ -121,6 +135,13 @@ test.describe("REQ-015 Section E", () => {
         `${path}: targets under size`,
       ).toEqual([]);
     }
+    // QA pass F2: the guides again in the dark scheme, where the contrast pairs differ.
+    await page.emulateMedia({ colorScheme: "dark" });
+    for (const path of GUIDES) {
+      await page.goto(path);
+      await axeClean(page, `${path} (dark)`);
+    }
+    await page.emulateMedia({ colorScheme: "light" });
     await shot(page, "pages-pass", testInfo.project.name);
   });
 
@@ -247,7 +268,7 @@ test.describe("REQ-015 Section E", () => {
     await expect(card).toContainText(/Your audit: certification/);
     // REQ-025 FR-13: the audit kind's meaning under the heading comes from the glossary.
     await expect(card.getByTestId("audit-kind")).toContainText(
-      /An auditor reads your documents and visits you/,
+      /An approved auditor reads your documents, visits where you work and talks to people/,
     );
     // REQ-017 step 1: the one button is "Start getting ready"; the checklist and the price are plain links under it.
     const button = card.getByRole("link", { name: "Start getting ready" });
@@ -268,11 +289,11 @@ test.describe("REQ-015 Section E", () => {
       .locator("> summary")
       .click();
     await expect(page.getByTestId("have-legend")).toBeVisible();
-    // REQ-025 FR-4a: one vocabulary, the provider's status only.
+    // REQ-025 FR-4a as REQ-027 D-2718 amends it: one vocabulary, the reader's answers only.
     const tags = page
       .getByTestId("result-section-documents")
       .getByTestId("have-tag")
-      .filter({ hasText: /^.(You have this|To prepare|Not asked)$/ });
+      .filter({ hasText: /^.(You have one|You need one|You said not sure)$/ });
     expect(await tags.count()).toBeGreaterThan(0);
     await page.reload();
     await expect(page.getByTestId("result")).toBeVisible();
