@@ -478,3 +478,44 @@ export const ALL_COLUMN_LISTS: Record<string, readonly ColumnSpec<never>[]> = {
   "staff-matrix": STAFF_MATRIX_COLUMNS as readonly ColumnSpec<never>[],
   onboarding: ONBOARDING_COLUMNS as readonly ColumnSpec<never>[],
 };
+
+/**
+ * D-2804 for the grid's accessible layer (PO 18:55): on the six registers whose
+ * card title carries a narrative field, the table link's accessible name is
+ * the row's code, with the kind where the card has one, never the narrative;
+ * every other register's link is named by the card's title (the code and the
+ * fixed word together, "New worker W-1"). Null means "use the title".
+ */
+export const NARRATIVE_TITLE_SLUGS = [
+  "complaints",
+  "corporate-risks",
+  "hazards",
+  "participant-risks",
+  "conflicts-of-interest",
+  "improvements",
+] as const;
+
+const LINK_NAMES: Record<
+  (typeof NARRATIVE_TITLE_SLUGS)[number],
+  (row: never) => string
+> = {
+  complaints: ((r: ComplaintRow) => r.reference) as (row: never) => string,
+  "corporate-risks": ((r: CorporateRiskRow) =>
+    `Risk: ${RISK_AREA_LABELS[r.area]}`) as (row: never) => string,
+  hazards: ((r: HazardRow) => `Hazard ${r.site_ref}`) as (row: never) => string,
+  "participant-risks": ((r: ParticipantRiskRow) =>
+    `Participant ${r.participant_ref}`) as (row: never) => string,
+  "conflicts-of-interest": ((r: ConflictOfInterestRow) =>
+    `Conflict ${r.who_ref}`) as (row: never) => string,
+  improvements: ((r: ImprovementRow) =>
+    `${IMPROVEMENT_SOURCE_LABELS[r.source_kind]}${r.source_ref ? ` ${r.source_ref}` : ""}`) as (
+    row: never,
+  ) => string,
+};
+
+export function linkNameFor(slug: string, row: unknown): string | null {
+  const f = (
+    LINK_NAMES as Record<string, ((row: never) => string) | undefined>
+  )[slug];
+  return f ? f(row as never) : null;
+}

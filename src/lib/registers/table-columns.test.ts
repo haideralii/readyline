@@ -5,7 +5,9 @@ import {
   COMPLAINT_COLUMNS,
   INCIDENT_COLUMNS,
   NARRATIVE_KEYS,
+  NARRATIVE_TITLE_SLUGS,
   cellsFor,
+  linkNameFor,
   formatShortDateAu,
   tableColumns,
   type ColumnSpec,
@@ -256,6 +258,29 @@ describe("the register columns (REQ-028 FR-8, D-2814)", () => {
       "Status",
       "Notify by",
     ]);
+  });
+
+  it("names the table link by the code on the six narrative-title registers and by the title elsewhere (PO 18:55)", () => {
+    for (const slug of NARRATIVE_TITLE_SLUGS) {
+      const name = linkNameFor(slug, SAMPLE[slug]);
+      expect(name, slug).toBeTruthy();
+      expect(name).not.toContain(NAME);
+    }
+    expect(linkNameFor("complaints", SAMPLE.complaints)).toBe("CMP-0001");
+    expect(linkNameFor("improvements", SAMPLE.improvements)).toBe(
+      "An incident INC-0001",
+    );
+    for (const slug of [
+      "incidents",
+      "worker-checks",
+      "policy-reviews",
+      "onboarding",
+      "staff-matrix",
+      "delegations",
+      "insurances",
+      "decisions",
+    ])
+      expect(linkNameFor(slug, SAMPLE[slug]), slug).toBeNull();
   });
 
   it("every audit-day register's meta carries its list", () => {

@@ -23,6 +23,8 @@ export type RegisterTableRow = {
   href: string;
   /** The card's title; the table's first cell falls back to it when the first column is empty. */
   title: string;
+  /** The link's accessible name when it is not the title: the code with its kind on the narrative-title registers (PO 18:55). */
+  name?: string;
   status: RegisterStatus;
   cells: (string | null)[];
 };
@@ -76,7 +78,11 @@ export function RegisterTable({
       tabIndex={0}
       data-testid={testId}
     >
-      <table className="w-full border-collapse text-sm">
+      {/* The table is named by the same heading as its region, so a screen reader hears "table, <register>". */}
+      <table
+        className="w-full border-collapse text-sm"
+        aria-labelledby={labelledBy}
+      >
         <thead className="sticky top-0">
           <tr>
             {columns.map((c, i) => (
@@ -120,7 +126,11 @@ export function RegisterTable({
                       <Link
                         href={r.href}
                         className="font-medium underline-offset-4 hover:underline"
-                        aria-label={shown === r.title ? undefined : r.title}
+                        aria-label={
+                          shown === (r.name ?? r.title)
+                            ? undefined
+                            : (r.name ?? r.title)
+                        }
                       >
                         {shown}
                       </Link>

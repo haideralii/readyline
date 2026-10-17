@@ -19,6 +19,8 @@ export type ListRow = {
   detail: string;
   /** REQ-028 FR-8: the table's cells in column order (`cellsFor`), when the register has columns. */
   cells?: (string | null)[];
+  /** The table link's accessible name when it is not the title (the narrative-title registers, PO 18:55). */
+  name?: string;
   status: {
     key: string;
     label: string;
@@ -164,6 +166,7 @@ export function RegisterList({
               id: r.id,
               href: r.href,
               title: r.title,
+              name: r.name,
               status: r.status,
               cells: r.cells ?? [],
             }))}

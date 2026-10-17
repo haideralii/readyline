@@ -35,6 +35,7 @@ AC-1 to AC-4 and AC-9 were A1's and A2's; AC-5, AC-8 and AC-10 are Session C's.
 - The whole public set in CI mode on the three projects from a production build of the head: 291 passed, 25 skipped, none failed (5.9 min).
 - PR #95's CI: the runs at bfc37a4, e731e3c and d2945bc were cancelled by the next push each time; the run at the head (the evidence commit) is the one to read, the new spec and the four changed signed-in specs on its Supabase job.
 - The run at 87b41a0 (39010415976): the new spec green; three older signed-in specs red on the session's own changes (the pack-contents list without an accessible name, the onboarding table's link no longer named "New worker W-1", the documents row's two links making `purchase-flow.spec.ts`'s one-link locator ambiguous), fixed in 7a: the table link's accessible name is the row's title as the card gives it, the list carries `aria-label`, the spec takes the title by name.
+- The run at 1cca4a4 (run 39012268206): one line left, the incidents table with a row had no caption or label; 7b names the table by the register's h1 and, on the PO's 18:55 line, names the six narrative-title registers' links by the code with its kind.
 
 ## Screenshots (the after set, D-2271 (12))
 

@@ -6,7 +6,11 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { onboardingItemsFor } from "@/lib/registers/onboarding-items";
-import { cellsFor, tableColumns } from "@/lib/registers/table-columns";
+import {
+  cellsFor,
+  linkNameFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import type {
   OnboardingKind,
   StaffMatrixRow,
@@ -135,6 +139,7 @@ export async function AuditDayListPage({
           }
         : meta.statusOf(r as never),
       cells: cellsFor(meta.columns, r as never),
+      name: linkNameFor(slug, r) ?? undefined,
     };
   });
   return (

@@ -5,6 +5,7 @@ import { COMPLAINT_STATUS_LABELS } from "@/lib/registers/labels";
 import {
   COMPLAINT_COLUMNS,
   cellsFor,
+  linkNameFor,
   tableColumns,
 } from "@/lib/registers/table-columns";
 import { RegisterList, type ListRow } from "../_components/register-list";
@@ -57,6 +58,7 @@ export default async function ComplaintsPage() {
           detail: `Received ${r.received_on}${r.from_ref ? ` from ${r.from_ref}` : ""}.`,
           status: complaintStatus(r),
           cells: cellsFor(COMPLAINT_COLUMNS, r),
+          name: linkNameFor("complaints", r) ?? undefined,
         }))}
         filters={COMPLAINT_FILTERS}
         columns={tableColumns(COMPLAINT_COLUMNS)}

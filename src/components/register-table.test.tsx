@@ -22,8 +22,20 @@ const ROWS = [
     id: "a",
     href: "/registers/complaints/a",
     title: "CMP-0001: a title",
+    name: "CMP-0001",
     status: { key: "open", label: "Open", tone: "ochre" as const },
     cells: ["CMP-0001", "17 Oct 2026", null, null],
+  },
+  {
+    id: "c",
+    href: "/registers/onboarding/c",
+    title: "New worker W-1",
+    status: {
+      key: "in-progress",
+      label: "In progress",
+      tone: "ochre" as const,
+    },
+    cells: ["New worker", "17 Oct 2026", null, null],
   },
   {
     id: "b",
@@ -44,8 +56,9 @@ describe("RegisterTable", () => {
     const link = first.querySelector("a")!;
     expect(link.getAttribute("href")).toBe("/registers/complaints/a");
     expect(link.textContent).toBe("CMP-0001");
-    // The accessible name is the row's title, the visible cell inside it (PO 18:10).
-    expect(link.getAttribute("aria-label")).toBe("CMP-0001: a title");
+    // The accessible name is the row's own name when it has one (the code on a narrative-title register, PO 18:55),
+    // and it is not repeated when the cell already shows it.
+    expect(link.getAttribute("aria-label")).toBeNull();
     const tag = first.querySelector('[data-testid="status-tag"]')!;
     expect(tag.getAttribute("data-status")).toBe("open");
     expect(tag.textContent).toContain("Open");
@@ -65,6 +78,10 @@ describe("RegisterTable", () => {
     expect(cellsB[0].querySelector("a")!.getAttribute("aria-label")).toBeNull();
     expect(cellsB[1].className.split(" ")).toContain("tabular-nums");
     expect(cellsB[1].className.split(" ")).not.toContain("text-slate");
+    // Without a name of its own, the link is named by the title (PO 18:10): "New worker W-1", not "New worker".
+    const linkC = screen.getByTestId("trow-c").querySelector("a")!;
+    expect(linkC.textContent).toBe("New worker");
+    expect(linkC.getAttribute("aria-label")).toBe("New worker W-1");
   });
 
   it("is named by the register's heading and hidden under sm", () => {
@@ -72,6 +89,9 @@ describe("RegisterTable", () => {
     const region = screen.getByTestId("t");
     expect(region.getAttribute("role")).toBe("region");
     expect(region.getAttribute("aria-labelledby")).toBe("register-title");
+    expect(region.querySelector("table")!.getAttribute("aria-labelledby")).toBe(
+      "register-title",
+    );
     expect(region.className).toContain("hidden");
     expect(region.className).toContain("sm:block");
   });
