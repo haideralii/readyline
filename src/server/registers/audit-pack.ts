@@ -28,6 +28,12 @@ import {
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
 import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import {
+  ALL_PERIOD,
+  periodFileSuffix,
+  periodShownLine,
+  type Period,
+} from "@/lib/registers/period";
 import { packWorkerFiles } from "@/lib/registers/worker-exports";
 import { loadWorkerExportSnapshot, part4SectionFor } from "./worker-exports";
 import { todaySydney } from "./worker-onboarding";
@@ -60,6 +66,8 @@ export type AuditView = {
   documentControl: Record<string, unknown>[];
   tables: AuditTable[];
   setId: string | null;
+  /** REQ-023 FR-5: the period the four registers' rows were filtered by. */
+  period: Period;
 };
 
 export const DOCUMENT_CONTROL_COLUMNS = [
@@ -74,9 +82,16 @@ export const DOCUMENT_CONTROL_COLUMNS = [
   "state",
 ] as const;
 
+/**
+ * REQ-023 FR-5: with a period, the four REQ-009 registers' rows filter on
+ * their date columns (the audit-day registers have no period column yet and
+ * show every row); the states come from the whole register (D-2340 B), the
+ * row counts and last entries from the rows shown.
+ */
 export async function collectAuditView(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<AuditView> {
   const [
     registers,
@@ -90,10 +105,10 @@ export async function collectAuditView(
     registerOverview(supabase, accountId),
     auditDayOverview(supabase, accountId),
     documentControlForAccount(supabase, accountId),
-    listIncidents(supabase, accountId),
-    listComplaints(supabase, accountId),
-    listWorkerChecks(supabase, accountId),
-    listPolicyReviews(supabase, accountId),
+    listIncidents(supabase, accountId, period),
+    listComplaints(supabase, accountId, period),
+    listWorkerChecks(supabase, accountId, period),
+    listPolicyReviews(supabase, accountId, period),
   ]);
   const tables: AuditTable[] = [
     {
@@ -163,6 +178,7 @@ export async function collectAuditView(
     documentControl: dcRows,
     tables,
     setId: documentControl.setId,
+    period,
   };
 }
 
@@ -179,10 +195,13 @@ export async function buildAuditPack(input: {
   accountId: string;
   tradingName: string;
   now: Date;
+  /** REQ-023 FR-5: the period the four registers' files cover; the whole register by default. */
+  period?: Period;
 }): Promise<AuditPack> {
   const { supabase, admin, accountId, now } = input;
+  const period = input.period ?? ALL_PERIOD;
   const stamp = now.toISOString().slice(0, 10);
-  const view = await collectAuditView(supabase, accountId);
+  const view = await collectAuditView(supabase, accountId, period);
   const files: Record<string, Uint8Array> = {};
 
   for (const register of [
@@ -197,6 +216,7 @@ export async function buildAuditPack(input: {
       // (no draft or rejected report), as the auditor's view does.
       await registerFiles(supabase, accountId, register, stamp, {
         registerOnly: true,
+        period,
       }),
     );
   for (const t of view.tables)
@@ -304,10 +324,15 @@ export async function buildAuditPack(input: {
     date: stamp,
     lines: view.lines,
     files: names,
+    periodLine: period.kind === "all" ? null : periodShownLine(period),
   });
   return {
     body: zipSync(files, { level: 6 }),
-    fileName: auditPackFileName(input.tradingName, stamp),
+    fileName: auditPackFileName(
+      input.tradingName,
+      stamp,
+      periodFileSuffix(period),
+    ),
     lines: view.lines,
     files: ["cover-sheet.pdf", ...names],
   };

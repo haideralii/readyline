@@ -14,7 +14,9 @@ import {
   periodLabel,
   periodQuery,
   periodShownLine,
+  periodUndatedLine,
   resolvePeriod,
+  undatedCount,
   type Period,
 } from "./period";
 
@@ -255,6 +257,23 @@ describe("inPeriod and periodFilter: inclusive bounds, a dateless row stays (D-2
     expect(inPeriod(null, range)).toBe(true);
     expect(inPeriod(undefined, since)).toBe(true);
     expect(inPeriod("1999-01-01", ALL_PERIOD)).toBe(true);
+  });
+
+  it("counts the undated rows and says so in the PO's words, nothing at zero (D-2318 A)", () => {
+    const rows = [
+      { issued_on: "2027-01-01" },
+      { issued_on: null },
+      { issued_on: null },
+    ];
+    expect(undatedCount(rows, "issued_on")).toBe(2);
+    expect(undatedCount(rows, "expires_on")).toBe(3);
+    expect(periodUndatedLine(0)).toBeNull();
+    expect(periodUndatedLine(1)).toBe(
+      "1 entry has no date in this column and is always shown.",
+    );
+    expect(periodUndatedLine(2)).toBe(
+      "2 entries have no date in this column and are always shown.",
+    );
   });
 
   it("writes the PostgREST filter for the register's date column, or none for all", () => {

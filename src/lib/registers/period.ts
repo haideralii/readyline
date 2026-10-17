@@ -189,7 +189,7 @@ export function periodContextFrom(
  * Whether a row's date falls in the period (the pure twin of the query's
  * filter, for the "what changed" summary and the tests). D-2340 A: a row with
  * no date in the column stays in every view, since it has no date to fall
- * outside; the selector says so (`PERIOD_NULL_DATE_LINE`).
+ * outside; the selector says how many (`periodUndatedLine`).
  */
 export function inPeriod(date: string | null | undefined, p: Period): boolean {
   if (p.kind === "all" || !date) return true;
@@ -267,9 +267,30 @@ export function periodQuery(
   return `?period=${p.kind}`;
 }
 
-/** The one small line under the selector (D-2340 A). */
-export const PERIOD_NULL_DATE_LINE =
-  "An entry with no date in the column the period reads, such as a pending worker application or a policy not yet adopted, stays in every view.";
+/**
+ * The one small line under the selector and under a filtered table (D-2318
+ * A, the PO's words): the count of rows with no date in the period's column,
+ * which stay in every view; no line at zero.
+ */
+export function periodUndatedLine(count: number): string | null {
+  if (count <= 0) return null;
+  return count === 1
+    ? "1 entry has no date in this column and is always shown."
+    : `${count} entries have no date in this column and are always shown.`;
+}
+
+/** The rows of a register with no date in the period's column, for that line. */
+export function undatedCount(
+  rows: readonly Record<string, unknown>[],
+  column: string,
+): number {
+  return rows.filter((r) => r[column] === null || r[column] === undefined)
+    .length;
+}
+
+/** D-2318 B: the cover sheet's line under "Period shown". */
+export const PERIOD_COUNTS_LINE =
+  "The row counts and last entries in the table below are the rows in this period; each record's state is the whole register's.";
 
 /** The line when the URL asked for a date the account has not entered (the period then shows all entries). */
 export function periodUnavailableLine(
