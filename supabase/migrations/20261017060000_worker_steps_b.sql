@@ -110,7 +110,7 @@ returns uuid
 language plpgsql
 security definer
 set search_path = public
-as $
+as $$
 declare
   v_ref text;
   v_id uuid;
@@ -146,7 +146,7 @@ begin
             'application recorded by the worker; waiting for the manager to confirm');
   return v_id;
 end;
-$;
+$$;
 revoke all on function public.worker_record_clearance(uuid, text, text, date) from public, anon;
 grant execute on function public.worker_record_clearance(uuid, text, text, date) to authenticated;
 
