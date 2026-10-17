@@ -599,6 +599,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/components/open-on-large.tsx": null,
   // REQ-028 FR-8: the register table renders the columns its callers name.
   "src/components/register-table.tsx": null,
+  // REQ-022 Session B: the unsubscribe page is outside D-2710's list (no term of the glossary on it).
+  "src/app/email/unsubscribe/[token]/page.tsx": null,
   // REQ-028 FR-11: the "Jump to" nav renders its callers' headings only.
   "src/components/jump-to.tsx": null,
   // REQ-028 FR-10 (D-2816): the pricing card renders the pricing page's words only.

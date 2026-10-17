@@ -81,6 +81,7 @@ export async function GET(request: Request) {
       accounts: report.accounts,
       inserted: report.inserted,
       emailed: report.emailed,
+      suppressed: report.suppressed,
       errors: report.errors.length,
     });
     // REQ-022 FR-1 (D-2208): the launch page reads the last run from audit_log.
@@ -88,6 +89,7 @@ export async function GET(request: Request) {
       accounts: report.accounts,
       inserted: report.inserted,
       emailed: report.emailed,
+      suppressed: report.suppressed,
       errors: report.errors.length,
     });
     return NextResponse.json(report, {
