@@ -45,23 +45,44 @@ export function Stepper({
   step,
   answers,
   ready,
+  className,
+  lineClassName,
+  circlesClassName,
+  collapseUnderSm = false,
 }: {
   step: StepId;
   answers: QuestionnaireDraft["answers"];
   ready: boolean;
+  /** REQ-028 FR-5: the shell's header grid places the nav, line one and the circles from lg. */
+  className?: string;
+  lineClassName?: string;
+  circlesClassName?: string;
+  /** REQ-028 FR-6: the result's stepper is line one alone under sm; the circles return from sm. */
+  collapseUnderSm?: boolean;
 }) {
   const index = stepIndex(step);
   const states = stepStates(step, answers, ready);
   const total = STEP_IDS.length;
   return (
-    <nav aria-label="Questionnaire steps" data-testid="stepper">
+    <nav
+      aria-label="Questionnaire steps"
+      data-testid="stepper"
+      className={className}
+    >
       {/* FR-6: line one is the indicator everyone reads; FR-8: the names on a phone sit behind one control beside it. */}
       {/* The row is the list's containing block: the open list spans the row's
           width, so it never hangs off the screen when the control wraps onto
           its own line at a large text size (the iphone project at 130 %, run
           38766171500; anchored to the control's right edge it sat 173 px off
           the left edge). */}
-      <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+      <div
+        className={[
+          "relative flex flex-wrap items-center justify-between gap-x-4 gap-y-1",
+          lineClassName ?? null,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <p
           className="text-slate text-sm font-medium"
           data-testid="progress-line-label"
@@ -69,7 +90,7 @@ export function Stepper({
           Step {index + 1} of {total}: {STEP_SHORT[step]}
         </p>
         <details className="sm:hidden" data-testid="stepper-steps">
-          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
+          <summary className="border-line bg-surface inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden">
             Show steps
           </summary>
           <ol
@@ -108,7 +129,16 @@ export function Stepper({
           </ol>
         </details>
       </div>
-      <ol className="mt-2 flex items-start">
+      <ol
+        className={[
+          collapseUnderSm
+            ? "mt-2 hidden items-start sm:flex"
+            : "mt-2 flex items-start",
+          circlesClassName ?? null,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {STEP_IDS.map((id, i) => {
           const state = states[i];
           const n = i + 1;
@@ -142,18 +172,22 @@ export function Stepper({
               ) : state === "current" ? (
                 <span
                   aria-current="step"
-                  className={`${circle} text-ink ring-ochre bg-surface relative ring-2`}
-                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: current`}
+                  className={`${circle} text-ink ring-ochre bg-paper relative ring-2`}
                 >
-                  {n}
+                  <span aria-hidden="true">{n}</span>
+                  <span className="sr-only">
+                    Step {n}, {STEP_SHORT[id]}: current
+                  </span>
                 </span>
               ) : (
                 <span
                   aria-disabled="true"
                   className={`${circle} text-slate bg-mist relative`}
-                  aria-label={`Step ${n}, ${STEP_SHORT[id]}: not yet`}
                 >
-                  {n}
+                  <span aria-hidden="true">{n}</span>
+                  <span className="sr-only">
+                    Step {n}, {STEP_SHORT[id]}: not yet
+                  </span>
                 </span>
               )}
               {/* FR-6: labels under the circles from 640 px up; FR-8: on a phone the names are in the disclosure above. */}

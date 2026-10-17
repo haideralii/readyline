@@ -22,6 +22,7 @@ import {
   DateField,
   FormButtons,
   RefField,
+  RegisterParticipantLine,
   SafeTextArea,
   SelectField,
 } from "./inputs";
@@ -99,6 +100,7 @@ export function ComplaintFormView({
   return (
     <form onSubmit={onSubmit} noValidate className="mt-6">
       <ErrorSummary errors={errors} labels={LABELS} />
+      <RegisterParticipantLine />
       <DateField
         id="receivedOn"
         label={LABELS.receivedOn}

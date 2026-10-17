@@ -15,6 +15,21 @@ function cell(value: unknown): string {
   return s;
 }
 
+/**
+ * REQ-024 FR-6a: a file whose first line is a sentence (the draft notice the
+ * Rules lists carry), then the header and the rows. The sentence is one
+ * quoted cell so a spreadsheet shows it whole on its own row.
+ */
+export function toCsvWithFirstLine(
+  firstLine: string,
+  columns: readonly string[],
+  rows: readonly Record<string, unknown>[],
+  labels: Readonly<Record<string, string>> = {},
+): string {
+  const body = toCsv(columns, rows, labels).slice(CSV_BOM.length);
+  return `${CSV_BOM}${cell(firstLine)}\r\n${body}`;
+}
+
 export function toCsv(
   columns: readonly string[],
   rows: readonly Record<string, unknown>[],
@@ -112,5 +127,130 @@ export const CSV_COLUMNS = {
     "note",
     "created_at",
     "updated_at",
+  ],
+  // REQ-024 A3 (FR-6, FR-6a, FR-6c; finding 114): the worker tables and the
+  // two Rules lists. No column is a name, a date of birth or an address: the
+  // fill (FR-6b) adds its columns to a direct download only, never here.
+  staff_matrix: [
+    "worker_ref",
+    "role",
+    "role_label",
+    "states",
+    "risk_assessed",
+    "risk_assessed_from",
+    "risk_paragraph",
+    "works_with_children",
+    "may_use_restrictive_practice",
+    "started_on",
+    "ended_on",
+    "qualifications",
+    "last_supervision_on",
+    "last_appraisal_on",
+    "onboarding_signed_on",
+    "role_ref",
+  ],
+  onboarding_checklists: ["subject_ref", "kind", "started_on", "completed_on"],
+  onboarding_items: [
+    "worker_ref",
+    "item_id",
+    "owner_role",
+    "done_on",
+    "confirmed_on",
+    "recorded_by_owner",
+  ],
+  onboarding_ticks: ["worker_ref", "item_id", "ticked_on", "ticked_by_ref"],
+  risk_assessed_roles: [
+    "title",
+    "paragraphs",
+    "description",
+    "assessed_on",
+    "assessor_ref",
+    "first_held_on",
+    "seed_code",
+  ],
+  screening_exceptions: [
+    "worker_ref",
+    "code",
+    "part4_state",
+    "started_on",
+    "verified_on",
+    "notice_seen_on",
+    "supervisor_ref",
+    "declaration_on",
+    "plan_register_date",
+    "ended_on",
+    "end_code",
+  ],
+  // FR-6a, s 18: one row per risk assessed worker as at the date, numbers and codes only.
+  screening_list: [
+    "worker_ref",
+    "role",
+    "role_label",
+    "risk_assessed_from",
+    "ended_on",
+    "application_number",
+    "clearance_number",
+    "outcome",
+    "issued_on",
+    "expires_on",
+    "verified_in_database_on",
+    "decision_code",
+    "decision_on",
+    "exception_code",
+    "exception_started_on",
+    "exception_ended_on",
+    "exception_end_code",
+    "exception_supervisor_ref",
+    "exception_part4",
+  ],
+  // REQ-024 B and C (FR-6c, FR-11): the acknowledgements and the supervision history, codes and dates.
+  policy_acknowledgements: [
+    "worker_ref",
+    "document_type_id",
+    "version",
+    "acknowledged_on",
+  ],
+  supervision_entries: [
+    "worker_ref",
+    "kind",
+    "held_on",
+    "by_ref",
+    "outcome",
+    "note",
+  ],
+  // FR-6: one worker file, items, clearances, exceptions, supervision entries and the trail as rows of one table.
+  worker_file: [
+    "kind",
+    "item_id",
+    "text",
+    "who",
+    "state",
+    "done_on",
+    "confirmed_on",
+    "recorded_by_owner",
+    "clearance_kind",
+    "application_number",
+    "clearance_number",
+    "issued_on",
+    "expires_on",
+    "verified_in_database_on",
+    "decision_code",
+    "decision_on",
+    "at",
+    "event",
+    "note",
+  ],
+  workers_index: [
+    "section",
+    "worker_ref",
+    "role",
+    "role_label",
+    "states",
+    "risk_assessed",
+    "started_on",
+    "ended_on",
+    "state",
+    "outstanding",
+    "file",
   ],
 } as const;

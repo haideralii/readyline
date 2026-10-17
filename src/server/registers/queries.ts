@@ -5,6 +5,13 @@ import "server-only";
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { auditorVisibleIncidents } from "@/lib/registers/audit-pack";
+import {
+  ALL_PERIOD,
+  PERIOD_COLUMNS,
+  periodFilter,
+  type Period,
+  type PeriodRegister,
+} from "@/lib/registers/period";
 import type {
   ComplaintEventRow,
   ComplaintRow,
@@ -29,6 +36,22 @@ export type PolicyReviewListRow = PolicyReviewRow & { status: ReviewStatus };
 
 const LIMIT = 500;
 
+/**
+ * REQ-023 FR-5 (D-2340 A): the period's inclusive bounds on the register's
+ * date column, as one PostgREST `or` filter; a row with no date in that
+ * column stays, since it has no date to fall outside. The dates were
+ * validated as ISO by `parsePeriodParams` or read from the period row, and
+ * `periodFilter` checks them again before they reach the filter string.
+ */
+function withPeriod<Q extends { or(filters: string): Q }>(
+  query: Q,
+  register: PeriodRegister,
+  period: Period,
+): Q {
+  const filter = periodFilter(PERIOD_COLUMNS[register], period);
+  return filter ? query.or(filter) : query;
+}
+
 export async function hasActiveSubscription(
   supabase: SupabaseClient,
   accountId: string,
@@ -42,11 +65,13 @@ export async function hasActiveSubscription(
 export async function listIncidents(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<IncidentListRow[]> {
-  const r = await supabase
-    .from("incidents_status")
-    .select("*")
-    .eq("account_id", accountId)
+  const r = await withPeriod(
+    supabase.from("incidents_status").select("*").eq("account_id", accountId),
+    "incidents",
+    period,
+  )
     .order("occurred_on", { ascending: false })
     .order("reference", { ascending: false })
     .limit(LIMIT);
@@ -80,11 +105,13 @@ export async function getIncident(
 export async function listComplaints(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<ComplaintRow[]> {
-  const r = await supabase
-    .from("complaints")
-    .select("*")
-    .eq("account_id", accountId)
+  const r = await withPeriod(
+    supabase.from("complaints").select("*").eq("account_id", accountId),
+    "complaints",
+    period,
+  )
     .order("received_on", { ascending: false })
     .order("reference", { ascending: false })
     .limit(LIMIT);
@@ -118,11 +145,16 @@ export async function getComplaint(
 export async function listWorkerChecks(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<WorkerCheckListRow[]> {
-  const r = await supabase
-    .from("worker_clearances_status")
-    .select("*")
-    .eq("account_id", accountId)
+  const r = await withPeriod(
+    supabase
+      .from("worker_clearances_status")
+      .select("*")
+      .eq("account_id", accountId),
+    "worker_clearances",
+    period,
+  )
     .order("expires_on", { ascending: true, nullsFirst: false })
     .order("worker_ref", { ascending: true })
     .limit(LIMIT);
@@ -146,11 +178,16 @@ export async function getWorkerCheck(
 export async function listPolicyReviews(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<PolicyReviewListRow[]> {
-  const r = await supabase
-    .from("policy_reviews_status")
-    .select("*")
-    .eq("account_id", accountId)
+  const r = await withPeriod(
+    supabase
+      .from("policy_reviews_status")
+      .select("*")
+      .eq("account_id", accountId),
+    "policy_reviews",
+    period,
+  )
     .order("next_review_on", { ascending: true, nullsFirst: false })
     .order("title", { ascending: true })
     .limit(LIMIT);
@@ -267,4 +304,25 @@ export async function isDocumentAdopted(
     .limit(1)
     .maybeSingle();
   return Boolean(r.data?.adopted_on);
+}
+
+/**
+ * REQ-028 FR-7 (D-2275 (3)): when the account last downloaded its audit pack,
+ * from the newest `audit_pack.downloaded` line of the audit log, or null
+ * when it never has. The owner's select policy on `audit_log` allows the read.
+ */
+export async function lastAuditPackDownload(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<string | null> {
+  const r = await supabase
+    .from("audit_log")
+    .select("at")
+    .eq("account_id", accountId)
+    .eq("action", "audit_pack.downloaded")
+    .order("at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (r.error) throw r.error;
+  return (r.data as { at: string } | null)?.at ?? null;
 }

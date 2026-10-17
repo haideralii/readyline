@@ -27,7 +27,33 @@ import {
   type PackLine,
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
-import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import { CSV_COLUMNS, toCsv, toCsvWithFirstLine } from "@/lib/registers/csv";
+import { documentTitle } from "@/lib/questionnaire/content";
+import {
+  CORRECTIVE_ACTION_ID,
+  REHEARSAL_SHEET_COLUMNS,
+  rehearsalFileName,
+  rehearsalHeading,
+  rehearsalSheetRows,
+} from "@/lib/registers/self-check";
+import { lastRehearsal } from "./self-check-queries";
+import {
+  WHAT_CHANGED_COLUMNS,
+  whatChanged,
+  whatChangedFileName,
+  whatChangedRows,
+  type WhatChangedChange,
+} from "@/lib/registers/what-changed";
+import { currentPeriod } from "./registration-queries";
+import {
+  ALL_PERIOD,
+  periodFileSuffix,
+  periodShownLine,
+  type Period,
+} from "@/lib/registers/period";
+import { packWorkerFiles } from "@/lib/registers/worker-exports";
+import { loadWorkerExportSnapshot, part4SectionFor } from "./worker-exports";
+import { todaySydney } from "./worker-onboarding";
 import { log } from "@/lib/logging/logger";
 import { downloadObject, objectPath } from "@/server/generation/storage";
 import {
@@ -57,6 +83,8 @@ export type AuditView = {
   documentControl: Record<string, unknown>[];
   tables: AuditTable[];
   setId: string | null;
+  /** REQ-023 FR-5: the period the four registers' rows were filtered by. */
+  period: Period;
 };
 
 export const DOCUMENT_CONTROL_COLUMNS = [
@@ -71,9 +99,16 @@ export const DOCUMENT_CONTROL_COLUMNS = [
   "state",
 ] as const;
 
+/**
+ * REQ-023 FR-5: with a period, the four REQ-009 registers' rows filter on
+ * their date columns (the audit-day registers have no period column yet and
+ * show every row); the states come from the whole register (D-2340 B), the
+ * row counts and last entries from the rows shown.
+ */
 export async function collectAuditView(
   supabase: SupabaseClient,
   accountId: string,
+  period: Period = ALL_PERIOD,
 ): Promise<AuditView> {
   const [
     registers,
@@ -87,10 +122,10 @@ export async function collectAuditView(
     registerOverview(supabase, accountId),
     auditDayOverview(supabase, accountId),
     documentControlForAccount(supabase, accountId),
-    listIncidents(supabase, accountId),
-    listComplaints(supabase, accountId),
-    listWorkerChecks(supabase, accountId),
-    listPolicyReviews(supabase, accountId),
+    listIncidents(supabase, accountId, period),
+    listComplaints(supabase, accountId, period),
+    listWorkerChecks(supabase, accountId, period),
+    listPolicyReviews(supabase, accountId, period),
   ]);
   const tables: AuditTable[] = [
     {
@@ -160,6 +195,7 @@ export async function collectAuditView(
     documentControl: dcRows,
     tables,
     setId: documentControl.setId,
+    period,
   };
 }
 
@@ -170,16 +206,59 @@ export type AuditPack = {
   files: string[];
 };
 
+/** REQ-023 FR-6: the summary sheet for the pack, or no file when the account has no registration period. */
+export async function whatChangedFiles(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<Record<string, Uint8Array>> {
+  const period = await currentPeriod(supabase, accountId);
+  if (!period) return {};
+  const [incidents, complaints, checks, reviews, changes] = await Promise.all([
+    listIncidents(supabase, accountId),
+    listComplaints(supabase, accountId),
+    listWorkerChecks(supabase, accountId),
+    listPolicyReviews(supabase, accountId),
+    // FR-6's last line (Session D, FR-10): the changes register.
+    listAuditDayRows(supabase, accountId, "commission-changes"),
+  ]);
+  const summary = whatChanged({
+    changes: changes as unknown as WhatChangedChange[],
+    period: period.last_audit_on
+      ? { kind: "since-last-audit", from: period.last_audit_on, to: null }
+      : { kind: "period", from: period.period_starts_on, to: null },
+    periodStartsOn: period.period_starts_on,
+    periodEndsOn: period.period_ends_on,
+    lastAuditOn: period.last_audit_on,
+    today: todaySydney(),
+    incidents: auditorVisibleIncidents(incidents),
+    complaints,
+    checks,
+    reviews,
+    titleOf: (typeId, title) =>
+      typeId === "other" ? title : documentTitle(typeId) || title || typeId,
+  });
+  return {
+    [whatChangedFileName(Boolean(period.last_audit_on))]: strToU8(
+      toCsv(WHAT_CHANGED_COLUMNS, whatChangedRows(summary)),
+    ),
+  };
+}
+
 export async function buildAuditPack(input: {
   supabase: SupabaseClient;
   admin: SupabaseClient;
   accountId: string;
   tradingName: string;
   now: Date;
+  /** REQ-023 FR-5: the period the four registers' files cover; the whole register by default. */
+  period?: Period;
+  /** REQ-023 FR-8 (D-2309): the owner's rehearsal sheet rides the owner's pack, and the auditor link's only when ticked. */
+  includeRehearsal?: boolean;
 }): Promise<AuditPack> {
   const { supabase, admin, accountId, now } = input;
+  const period = input.period ?? ALL_PERIOD;
   const stamp = now.toISOString().slice(0, 10);
-  const view = await collectAuditView(supabase, accountId);
+  const view = await collectAuditView(supabase, accountId, period);
   const files: Record<string, Uint8Array> = {};
 
   for (const register of [
@@ -194,6 +273,7 @@ export async function buildAuditPack(input: {
       // (no draft or rejected report), as the auditor's view does.
       await registerFiles(supabase, accountId, register, stamp, {
         registerOnly: true,
+        period,
       }),
     );
   for (const t of view.tables)
@@ -202,6 +282,28 @@ export async function buildAuditPack(input: {
   files[`document-control-${stamp}.csv`] = strToU8(
     toCsv(DOCUMENT_CONTROL_COLUMNS, view.documentControl),
   );
+  // REQ-023 FR-6: "what changed since the last audit" as one sheet, the same
+  // object the screen renders (AC-4), over the whole registers regardless of
+  // the pack's own period; by the last-audit date when one exists, else the
+  // registration period; nothing without a period.
+  Object.assign(files, await whatChangedFiles(supabase, accountId));
+  // REQ-023 FR-8 (D-2309, D-2207): the newest rehearsal as one CSV headed
+  // "Our own working note, <date>", in the owner's pack and in the auditor
+  // link's pack only when the owner ticked it; never a PDF.
+  if (input.includeRehearsal) {
+    const rehearsal = await lastRehearsal(supabase, accountId);
+    if (rehearsal)
+      files[rehearsalFileName(rehearsal.walked_on)] = strToU8(
+        toCsvWithFirstLine(
+          rehearsalHeading(rehearsal.walked_on),
+          REHEARSAL_SHEET_COLUMNS,
+          rehearsalSheetRows(
+            rehearsal.answers,
+            CORRECTIVE_ACTION_ID in rehearsal.answers ? "mid-term" : "renewal",
+          ),
+        ),
+      );
+  }
   // FR-1 "including the events trails" (retro finding 25): the audit-day
   // registers share one trail, so it is one file, each line naming its
   // register and its row as the register's own list names it (the row's id
@@ -237,6 +339,28 @@ export async function buildAuditPack(input: {
   files[`register-events-${stamp}.csv`] = strToU8(
     toCsv(CSV_COLUMNS.register_events, trailRows(events, labels, titles)),
   );
+
+  // REQ-024 A3 (FR-6, FR-6a; D-2407 as amended): the workers folder, one
+  // file per worker and the index, and the two Worker Screening Rules lists
+  // unfilled, the same files for the owner and for the auditor link, codes
+  // and numbers and never a name (SR-8(a)). REQ-024 Session C (D-2832): the
+  // pack's period filters the supervision entries, and the lists speak as at
+  // the period's end day when it has one, today otherwise; items, ticks and
+  // states stay the whole register's (D-2318 B).
+  const today = todaySydney();
+  const asAt =
+    period.kind !== "all" && period.to !== null && period.to < today
+      ? period.to
+      : undefined;
+  const workers = await loadWorkerExportSnapshot(supabase, accountId, {
+    today,
+    period,
+    asAt,
+  });
+  for (const [name, csv] of Object.entries(
+    packWorkerFiles(workers, stamp, part4SectionFor),
+  ))
+    files[name] = strToU8(csv);
 
   if (view.setId) {
     const setId = view.setId;
@@ -289,10 +413,15 @@ export async function buildAuditPack(input: {
     date: stamp,
     lines: view.lines,
     files: names,
+    periodLine: period.kind === "all" ? null : periodShownLine(period),
   });
   return {
     body: zipSync(files, { level: 6 }),
-    fileName: auditPackFileName(input.tradingName, stamp),
+    fileName: auditPackFileName(
+      input.tradingName,
+      stamp,
+      periodFileSuffix(period),
+    ),
     lines: view.lines,
     files: ["cover-sheet.pdf", ...names],
   };

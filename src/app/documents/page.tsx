@@ -27,6 +27,9 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import { WritingIndicator } from "@/components/writing-indicator";
 import type { WritingStatus } from "@/lib/generation/writing-state";
 import { writingStatusFor } from "@/server/generation/writing-status";
+import { listLatestDocuments } from "@/server/generation/queries";
+import { setZipSize } from "@/server/generation/zip-size";
+import { zipSizeLine } from "@/lib/generator/zip-line";
 import { AutoRefresh } from "./auto-refresh";
 import { BuyButton } from "./buy-button";
 import { GenerateButton } from "./generate-button";
@@ -106,12 +109,15 @@ function PurchaseSection({
   thanks,
   email,
   writing,
+  zipLine,
 }: {
   state: DocumentsState;
   thanks: boolean;
   email: string | null;
   /** REQ-021: the writing indicator's status for the active job, when there is one. */
   writing: WritingStatus | null;
+  /** REQ-028 FR-7: the count and size line under the zip button of a ready set. */
+  zipLine: string | null;
 }) {
   const pricing = readPricing();
   switch (state.kind) {
@@ -195,6 +201,30 @@ function PurchaseSection({
           <p role="status" className="mt-2 leading-7">
             {C.delayed}
           </p>
+          {/* REQ-028 FR-15 (audit 60): the one action this state can offer, and the support address. */}
+          <p className="mt-3 text-sm leading-6">
+            <Link
+              href="/documents"
+              className="underline underline-offset-2"
+              data-testid="delayed-check-again"
+            >
+              Check again
+            </Link>
+            {email ? (
+              <>
+                {" "}
+                or{" "}
+                <a
+                  href={`mailto:${email}`}
+                  className="underline underline-offset-2"
+                  data-testid="delayed-email"
+                >
+                  email us
+                </a>
+              </>
+            ) : null}
+            .
+          </p>
           <PurchaseLinks purchase={state.purchase} email={email} />
         </section>
       );
@@ -217,10 +247,10 @@ function PurchaseSection({
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <a
               href={`/documents/${state.versionSetId}/download?file=set.zip`}
-              className={button}
+              className="btn-primary"
               data-testid="download-zip"
             >
-              Download all (zip)
+              Download all as one file (zip)
             </a>
             <a
               href={`/documents/${state.versionSetId}/download?file=readiness-summary.pdf`}
@@ -237,6 +267,11 @@ function PurchaseSection({
               {C.openSet}
             </Link>
           </div>
+          {zipLine ? (
+            <p className="text-slate mt-2 text-sm" data-testid="zip-size-line">
+              {zipLine}
+            </p>
+          ) : null}
           <PurchaseLinks purchase={state.purchase} email={email} />
         </section>
       );
@@ -294,6 +329,14 @@ export default async function DocumentsPage({
         )
       : null;
   const email = contactEmail();
+  // REQ-028 FR-7: the count and size line under a ready set's zip button (D-2275 (4)).
+  const zipLine =
+    state.kind === "ready"
+      ? zipSizeLine(
+          (await listLatestDocuments(supabase, state.versionSetId)).length,
+          await setZipSize(accountId, state.versionSetId),
+        )
+      : null;
   // The paid set is shown above; the list below is for regenerated or dev sets.
   const otherSets = sets.filter(
     (s) => !(state.kind === "ready" && s.id === state.versionSetId),
@@ -309,6 +352,7 @@ export default async function DocumentsPage({
         <PurchaseSection
           state={state}
           thanks={thanks}
+          zipLine={zipLine}
           email={email}
           writing={writing}
         />

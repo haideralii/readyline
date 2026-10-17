@@ -12,6 +12,8 @@ const TITLES: Record<ImportRegister, string> = {
   complaints: "Complaints",
   worker_clearances: "Worker checks",
   corporate_risks: "Corporate risks",
+  commission_changes: "Changes we told the Commission",
+  staff_matrix: "Staff matrix",
 };
 
 /** The one import page every importable register's route renders (REQ-020 FR-8). */

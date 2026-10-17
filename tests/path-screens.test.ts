@@ -19,8 +19,8 @@ const PATH_FILES = [
   ...walk(join(ROOT, "src/app/path")),
   join(ROOT, "src/app/documents/[setId]/finish/page.tsx"),
   join(ROOT, "src/app/documents/[setId]/finish/finish-form.tsx"),
-  // REQ-027 FR-3a (findings 6 and 50): the result page's card is the path's first screen; its
-  // "Next:" line sits under the control and is counted after it, never among the three above.
+  // REQ-027 FR-3a (findings 6 and 50): the result page's card is the path's first screen (its
+  // "Next:" line went with REQ-028 D-2805).
   join(ROOT, "src/app/start/_components/steps/result-step.tsx"),
 ];
 const RESULT_STEP = "src/app/start/_components/steps/result-step.tsx";
@@ -120,12 +120,8 @@ describe("the guided path's screens (REQ-017 FR-5)", () => {
         c.textAboveControl,
         "paragraphs above the control",
       ).toBeLessThanOrEqual(3);
-      // REQ-027 FR-3a, AC-4: the result card's "Next:" line follows its control.
-      if (rel === RESULT_STEP)
-        expect(
-          c.textAfterControl,
-          "paragraphs after the control",
-        ).toBeGreaterThanOrEqual(1);
+      // REQ-028 D-2805: the result card's "Next:" line is gone; nothing is asserted after the control.
+      void RESULT_STEP;
     });
   }
 });

@@ -20,6 +20,7 @@ import {
   DateField,
   FormButtons,
   RefField,
+  RegisterParticipantLine,
   SafeTextArea,
   SelectField,
 } from "./inputs";
@@ -100,6 +101,7 @@ export function PolicyReviewFormView({
   return (
     <form onSubmit={onSubmit} noValidate className="mt-6">
       <ErrorSummary errors={errors} labels={LABELS} />
+      <RegisterParticipantLine />
       <SelectField
         id="documentTypeId"
         label={LABELS.documentTypeId}

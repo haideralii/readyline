@@ -1,6 +1,10 @@
 "use client";
+import { RegisterTable, StatusTag } from "@/components/register-table";
+import type { TableColumn } from "@/lib/registers/table-columns";
 import Link from "next/link";
 import { useState } from "react";
+
+export { StatusTag };
 
 /**
  * One list for all four registers (REQ-009 FR-5; REQ-015 Section C): each
@@ -13,6 +17,10 @@ export type ListRow = {
   href: string;
   title: string;
   detail: string;
+  /** REQ-028 FR-8: the table's cells in column order (`cellsFor`), when the register has columns. */
+  cells?: (string | null)[];
+  /** The table link's accessible name when it is not the title (the narrative-title registers, PO 18:55). */
+  name?: string;
   status: {
     key: string;
     label: string;
@@ -20,42 +28,59 @@ export type ListRow = {
   };
 };
 
-const TONE: Record<ListRow["status"]["tone"], { icon: string; cls: string }> = {
-  moss: { icon: "✓", cls: "border-moss text-moss" },
-  ochre: { icon: "◐", cls: "border-ochre text-ochre" },
-  signal: { icon: "!", cls: "border-signal text-signal" },
-  slate: { icon: "○", cls: "border-slate text-slate" },
-};
-
-export function StatusTag({ status }: { status: ListRow["status"] }) {
-  const t = TONE[status.tone];
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.cls}`}
-      data-testid="status-tag"
-      data-status={status.key}
-    >
-      <span aria-hidden="true">{t.icon}</span>
-      {status.label}
-    </span>
-  );
-}
-
 export function RegisterList({
   rows,
   filters,
   empty,
   testId,
+  columns,
+  emptyAction,
+  importHref,
 }: {
   rows: ListRow[];
   /** The status keys offered as filters, in order, with their labels. */
   filters: { key: string; label: string }[];
   empty: string;
   testId: string;
+  /** REQ-028 FR-8 (D-2814): with columns, the table renders from sm and these cards under it. */
+  columns?: readonly TableColumn[];
+  /** REQ-028 FR-7, FR-8: the empty state's primary, the one way to add the first entry (given only while writes are open). */
+  emptyAction?: { href: string; label: string };
+  /** The spreadsheet import beside it, where the register has one. */
+  importHref?: string;
 }) {
   const [filter, setFilter] = useState<string>("all");
   const shown =
     filter === "all" ? rows : rows.filter((r) => r.status.key === filter);
+  if (rows.length === 0)
+    return (
+      <div data-testid={testId}>
+        {/* REQ-028 FR-8 (audit 5, 58): one sentence of what the auditor asks for and the primary to add the first entry. */}
+        <div className="mt-6" data-testid={`${testId}-empty`}>
+          <p className="text-slate leading-7">{empty}</p>
+          {emptyAction ? (
+            <p className="mt-4 flex flex-wrap items-center gap-4">
+              <Link
+                href={emptyAction.href}
+                className="btn-primary"
+                data-testid="register-add"
+              >
+                {emptyAction.label}
+              </Link>
+              {importHref ? (
+                <Link
+                  href={importHref}
+                  className="inline-flex min-h-11 items-center underline underline-offset-4"
+                  data-testid="register-import"
+                >
+                  Import from a spreadsheet
+                </Link>
+              ) : null}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    );
   return (
     <div data-testid={testId}>
       <fieldset className="mt-4">
@@ -88,38 +113,67 @@ export function RegisterList({
       </fieldset>
       {shown.length === 0 ? (
         <p className="text-slate mt-6" data-testid={`${testId}-empty`}>
-          {rows.length === 0 ? empty : "Nothing with that status."}
+          No matches. Try another word, or{" "}
+          <button
+            type="button"
+            className="underline underline-offset-2"
+            onClick={() => setFilter("all")}
+            data-testid={`${testId}-clear`}
+          >
+            clear the search
+          </button>{" "}
+          to see every entry.
         </p>
       ) : (
-        <ul
-          className="divide-rule mt-4 divide-y"
-          aria-labelledby="register-title"
-        >
-          {shown.map((r) => (
-            <li key={r.id}>
-              <Link
-                href={r.href}
-                className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
-                data-testid={`row-${r.id}`}
-              >
-                {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
+        <div className={columns?.length ? "sm:hidden" : undefined}>
+          <ul
+            className="divide-rule mt-4 divide-y"
+            aria-labelledby="register-title"
+          >
+            {shown.map((r) => (
+              <li key={r.id}>
+                <Link
+                  href={r.href}
+                  className="hover:bg-mist -mx-2 flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
+                  data-testid={`row-${r.id}`}
+                >
+                  {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
                     tag drops under it, so a long status at 14 px never squeezes a title
                     word into breaking at 360 (the row inherits li's overflow-wrap). */}
-                <span className="min-w-0 flex-1 basis-48">
-                  <span className="block text-base font-medium">{r.title}</span>
-                  <span className="text-slate block text-sm">{r.detail}</span>
-                </span>
-                <span className="ml-auto flex shrink-0 items-center gap-2">
-                  <StatusTag status={r.status} />
-                  <span aria-hidden="true" className="text-slate">
-                    ›
+                  <span className="min-w-0 flex-1 basis-48">
+                    <span className="block text-base font-medium">
+                      {r.title}
+                    </span>
+                    <span className="text-slate block text-sm">{r.detail}</span>
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <span className="ml-auto flex shrink-0 items-center gap-2">
+                    <StatusTag status={r.status} />
+                    <span aria-hidden="true" className="text-slate">
+                      ›
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+      {columns?.length && shown.length > 0 ? (
+        <div className="mt-4">
+          <RegisterTable
+            columns={columns}
+            rows={shown.map((r) => ({
+              id: r.id,
+              href: r.href,
+              title: r.title,
+              name: r.name,
+              status: r.status,
+              cells: r.cells ?? [],
+            }))}
+            testId={`${testId}-table`}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

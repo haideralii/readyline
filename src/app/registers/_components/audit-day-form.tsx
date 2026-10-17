@@ -22,6 +22,7 @@ import {
   DateField,
   FormButtons,
   RefField,
+  RegisterParticipantLine,
   SafeTextArea,
   SelectField,
 } from "./inputs";
@@ -240,6 +241,7 @@ export function AuditDayForm({
       data-testid={`audit-day-form-${slug}`}
     >
       <ErrorSummary errors={errors} labels={labels} />
+      <RegisterParticipantLine />
       {meta.fields.map(control)}
       <FormButtons
         pending={pending}

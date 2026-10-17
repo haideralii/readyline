@@ -18,11 +18,17 @@ import { BuyButton } from "@/app/documents/buy-button";
 import { SubscribeButton } from "@/app/account/subscribe-button";
 import { subscriptionAvailable } from "@/server/payments/stripe";
 import { GlossaryTerms } from "@/components/glossary-terms";
+import { PricingCard } from "./pricing-card";
 
 export const metadata: Metadata = { title: "Pricing" };
 
 /** REQ-027 FR-3 (D-2701, D-2710): the glossary terms the pricing copy uses (`payments/copy.ts`), first appearance first. */
-const PRICING_TERMS = ["self-assessment", "adopt"] as const;
+// REQ-028 D-2819: the pack card's first bullet names the registration groups.
+const PRICING_TERMS = [
+  "self-assessment",
+  "adopt",
+  "registration-group",
+] as const;
 
 /**
  * The pricing page (REQ-007 FR-1): the two offers as halves of equal weight
@@ -68,8 +74,6 @@ async function documentsForVisitor(): Promise<{
 const h2 = "mt-10";
 const body = "mt-3 leading-7 text-ink";
 const link = "underline underline-offset-2";
-const half = "scroll-mt-6 rounded-md border border-rule p-5";
-const eyebrow = "text-sm font-medium text-slate";
 
 export default async function PricingPage() {
   const pricing = readPricing();
@@ -123,134 +127,133 @@ export default async function PricingPage() {
           ) : null}
         </ul>
       </nav>
-      <div
-        className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2"
-        data-testid="pricing-halves"
-      >
-        <section
-          id="keeps"
-          aria-labelledby="sub-heading"
-          className={half}
-          data-testid="pricing-subscription"
+      {/* REQ-028 FR-10 (D-2816): the two cards side by side across columns 2 to 11 from lg through one
+          skeleton, both buttons secondary; D-2001's order, the subscription first, is the only emphasis. */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
+        <div
+          className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 lg:col-span-10 lg:col-start-2"
+          data-testid="pricing-halves"
         >
-          <p className={eyebrow}>{C.keepsEyebrow}</p>
-          <h2 id="sub-heading" className="mt-1">
-            {C.subscriptionHeading}
-          </h2>
-          {offered ? (
-            <>
-              {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee.
- Batch 49 item 2: a price line, a four-item list and the cancel line, nothing else
- on the first phone screen; the linking sentence is on the registers page. */}
-              <div data-testid="subscription-offer">
-                <p className={body}>
-                  {C.subscriptionPriceLine(
-                    pricing.subscriptionPriceCents
-                      ? formatAud(pricing.subscriptionPriceCents)
-                      : null,
-                  )}
+          <PricingCard
+            id="keeps"
+            testId="pricing-subscription"
+            eyebrow={C.keepsEyebrow}
+            heading={C.subscriptionHeading}
+            headingId="sub-heading"
+            price={
+              offered && pricing.subscriptionPriceCents
+                ? formatAud(pricing.subscriptionPriceCents)
+                : null
+            }
+            priceTestId="subscription-price"
+            priceNote={C.subscriptionPriceNote}
+            priceLine={
+              offered ? (
+                <p className={body}>{C.subscriptionPriceLine(null)}</p>
+              ) : (
+                /* Batch 47 item 1 (after D-051 and batch 45 item 2): the one off-state sentence every page uses, no price, no "soon". */
+                <p className={body} data-testid="subscription-off">
+                  {C.subscriptionOff}
                 </p>
-                <ul
-                  className="text-ink mt-2 list-disc pl-5 leading-7"
-                  data-testid="subscription-includes"
-                >
-                  {C.subscriptionIncludes.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-                <p className={body}>{C.subscriptionCancel}</p>
-              </div>
-              {docs.signedIn ? (
-                <SubscribeButton
-                  label={
-                    pricing.subscriptionPriceCents
-                      ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
-                      : "Subscribe to the registers"
-                  }
+              )
+            }
+            /* REQ-009 Session C, batch 49 item 2: the offer is the price, the four-item list and the cancel line. */
+            bodyTestId={offered ? "subscription-offer" : undefined}
+            bullets={offered ? C.subscriptionIncludes : undefined}
+            bulletsTestId="subscription-includes"
+            action={
+              offered ? (
+                docs.signedIn ? (
+                  <SubscribeButton
+                    label={
+                      pricing.subscriptionPriceCents
+                        ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
+                        : "Subscribe to the registers"
+                    }
+                    cancelPath="/pricing"
+                    variant="secondary"
+                  />
+                ) : (
+                  <p className="text-slate mt-3 text-sm leading-6">
+                    Sign in to subscribe; the registers belong to your account.
+                  </p>
+                )
+              ) : null
+            }
+          >
+            {offered ? <p className={body}>{C.subscriptionCancel}</p> : null}
+          </PricingCard>
+
+          <PricingCard
+            id="start"
+            testId="pricing-pack"
+            eyebrow={C.startEyebrow}
+            heading={C.priceHeading}
+            headingId="price-heading"
+            price={
+              pricing.packPriceCents ? formatAud(pricing.packPriceCents) : null
+            }
+            priceTestId="pack-price"
+            priceNote={C.packPriceNote}
+            bullets={C.packIncludes}
+            bulletsTestId="pack-includes"
+            priceLine={
+              <p className={body} data-testid="pack-price-unset">
+                {C.priceUnset}
+              </p>
+            }
+            action={
+              docs.signedIn ? (
+                <BuyButton
+                  label={C.buy}
                   cancelPath="/pricing"
+                  variant="secondary"
                 />
               ) : (
-                <p className="text-slate mt-3 text-sm leading-6">
-                  Sign in to subscribe; the registers belong to your account.
-                </p>
-              )}
-            </>
-          ) : (
-            /* Batch 47 item 1 (after D-051 and batch 45 item 2): the one off-state sentence every page uses, no price, no "soon". */
-            <p className={body} data-testid="subscription-off">
-              {C.subscriptionOff}
-            </p>
-          )}
-          <p className={body} data-testid="pricing-no-credit">
-            {C.noCredit}
-          </p>
-        </section>
-
-        <section
-          id="start"
-          aria-labelledby="price-heading"
-          className={half}
-          data-testid="pricing-pack"
-        >
-          <p className={eyebrow}>{C.startEyebrow}</p>
-          <h2 id="price-heading" className="mt-1">
-            {C.priceHeading}
-          </h2>
-          {pricing.packPriceCents ? (
-            <p className="mt-2">
-              <span
-                className="text-3xl font-semibold tabular-nums"
-                data-testid="pack-price"
-              >
-                {formatAud(pricing.packPriceCents)}
-              </span>{" "}
-              <span className="text-slate">one-off, for the document pack</span>
-            </p>
-          ) : (
-            <p className={body} data-testid="pack-price-unset">
-              {C.priceUnset}
-            </p>
-          )}
-          {pricing.gstLine ? (
-            <p className="text-slate mt-2 text-sm" data-testid="gst-line">
-              {pricing.gstLine}
-            </p>
-          ) : null}
-          {docs.signedIn ? (
-            <BuyButton label={C.buy} cancelPath="/pricing" />
-          ) : (
-            <>
-              <p className="mt-4">
-                <Link
-                  href="/sign-in?next=%2Fpricing"
-                  className="btn-primary"
-                  data-testid="sign-in-to-buy"
-                >
-                  {C.signInToBuy}
-                </Link>
+                <>
+                  <p className="mt-4">
+                    <Link
+                      href="/sign-in?next=%2Fpricing"
+                      className="btn-secondary"
+                      data-testid="sign-in-to-buy"
+                    >
+                      {C.signInToBuy}
+                    </Link>
+                  </p>
+                  <p className="text-slate mt-3 text-sm leading-6">
+                    {C.signInNote}
+                  </p>
+                </>
+              )
+            }
+          >
+            {pricing.gstLine ? (
+              <p className="text-slate mt-2 text-sm" data-testid="gst-line">
+                {pricing.gstLine}
               </p>
-              <p className="text-slate mt-3 text-sm leading-6">
-                {C.signInNote}
-              </p>
-            </>
-          )}
-          <p className="text-slate mt-3 text-sm leading-6">
-            {C.termsLead}{" "}
-            <Link href="/terms" className={link}>
-              {C.terms}
-            </Link>
-            ,{" "}
-            <Link href="/privacy" className={link}>
-              {C.privacy}
-            </Link>{" "}
-            and{" "}
-            <Link href="/refunds" className={link}>
-              {C.refundsPage}
-            </Link>
-            .
-          </p>
-        </section>
+            ) : null}
+            <p className="text-slate mt-3 text-sm leading-6">
+              {C.termsLead}{" "}
+              <Link href="/terms" className={link}>
+                {C.terms}
+              </Link>
+              ,{" "}
+              <Link href="/privacy" className={link}>
+                {C.privacy}
+              </Link>{" "}
+              and{" "}
+              <Link href="/refunds" className={link}>
+                {C.refundsPage}
+              </Link>
+              .
+            </p>
+          </PricingCard>
+        </div>
       </div>
+      {/* CLAUDE.md 5; REQ-028 FR-10: the one no-interest sentence, under both cards. */}
+      <p className={body} data-testid="pricing-no-credit">
+        {C.noCredit}
+      </p>
       <p
         className="text-slate mt-3 text-sm leading-6"
         data-testid="pricing-separate"

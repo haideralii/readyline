@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { unzipSync } from "fflate";
+import { CSV_COLUMNS } from "@/lib/registers/csv";
 import { mkdirSync } from "node:fs";
 import { hasSupabaseForE2e } from "../helpers/env";
 import {
@@ -173,6 +174,31 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
         expect.stringMatching(/^register-events-\d{4}-\d{2}-\d{2}\.csv$/),
       ]),
     );
+    // REQ-024 A3 (FR-6, FR-6a, AC-5; D-2407 as amended): the workers folder
+    // and the two Rules lists are in the link's pack as in the owner's, with
+    // codes and numbers and no column that is a name, a date of birth or an
+    // address, and no column outside csv.ts's lists (finding 114).
+    expect(names).toContain("workers/index.csv");
+    const listNames = names.filter((n) =>
+      /^(screening-list|risk-assessed-roles)-\d{4}-\d{2}-\d{2}\.csv$/.test(n),
+    );
+    expect(listNames).toHaveLength(2);
+    const allowed = new Set(Object.values(CSV_COLUMNS).flat() as string[]);
+    for (const n of ["workers/index.csv", ...listNames]) {
+      const lines = Buffer.from(unzipped[n])
+        .toString("utf8")
+        .replace(/^\uFEFF/, "")
+        .split("\r\n");
+      const header = (n === "workers/index.csv" ? lines[0] : lines[1]).split(
+        ",",
+      );
+      for (const h of header) {
+        expect(allowed, `${n}: ${h}`).toContain(h);
+        expect(h, n).not.toMatch(/name|birth|address/);
+      }
+      if (n !== "workers/index.csv")
+        expect(lines[0]).toContain("This is a draft of the information");
+    }
     // Finding 30 again, on the file: the register's CSV holds the confirmed row only.
     const incidentsCsv = Buffer.from(
       unzipped[names.find((n) => /^incidents-\d/.test(n))!],
@@ -282,7 +308,8 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
       .limit(1)
       .single();
     if (opened.error) throw opened.error;
-    const viewer = /viewer:([0-9a-f]{16}|unknown)$/.exec(
+    // REQ-023 SR-3: the line ends with the period shown (` from:- to:-` here), so no end anchor.
+    const viewer = /viewer:([0-9a-f]{16}|unknown)\b/.exec(
       opened.data.target as string,
     )?.[1];
     expect(viewer).toBeTruthy();

@@ -2,12 +2,20 @@
  * GET /auditor/<token>/audit-pack.zip (REQ-020 FR-2): the same pack as the
  * owner's, behind a live auditor link, under the account's export limit;
  * the open is recorded as `auditor_link.pack-downloaded` with the link id
- * and the viewer's hashed address. A dead token is a plain 404.
+ * and the viewer's hashed address. A dead token is a plain 404. The only
+ * query parameters are the period's (REQ-023 FR-5, SR-3), defaulting to the
+ * registration period (D-2305); a malformed or unavailable one answers 400.
  */
 import { NextResponse } from "next/server";
 import { log } from "@/lib/logging/logger";
 import { AUDITOR_OPEN_LIMITED_LINE } from "@/lib/registers/auditor-link";
+import {
+  parsePeriodParams,
+  periodContextFrom,
+  resolvePeriod,
+} from "@/lib/registers/period";
 import { parseInput, strictObject } from "@/lib/validation";
+import { PERIOD_QUERY_FIELDS } from "@/lib/validation/schemas/period";
 import {
   checkAuditorOpenAllowed,
   checkRegisterExportAllowed,
@@ -17,6 +25,7 @@ import {
   recordAuditorOpen,
   resolveAuditorToken,
 } from "@/server/registers/auditor-links";
+import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -24,7 +33,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const Query = strictObject({});
+const Query = strictObject(PERIOD_QUERY_FIELDS);
 
 export async function GET(
   request: Request,
@@ -35,6 +44,8 @@ export async function GET(
     Object.fromEntries(new URL(request.url).searchParams.entries()),
   );
   if (!query.ok) return new NextResponse("Bad request", { status: 400 });
+  const selection = parsePeriodParams(query.data);
+  if (!selection.ok) return new NextResponse("Bad request", { status: 400 });
   const { token } = await ctx.params;
   let admin: SupabaseClient;
   try {
@@ -65,13 +76,29 @@ export async function GET(
       { status: 429, headers: { "Retry-After": "3600" } },
     );
   }
-  await recordAuditorOpen(admin, link, address, "pack-downloaded");
+  const resolved = resolvePeriod(
+    selection.selection,
+    periodContextFrom(await currentPeriod(admin, link.accountId)),
+    "period",
+  );
+  if (resolved.unavailable)
+    return new NextResponse("Bad request", { status: 400 });
+  await recordAuditorOpen(
+    admin,
+    link,
+    address,
+    "pack-downloaded",
+    resolved.period,
+  );
   const pack = await buildAuditPack({
     supabase: admin,
     admin,
     accountId: link.accountId,
     tradingName: link.tradingName,
     now: new Date(),
+    period: resolved.period,
+    // REQ-023 FR-8 (D-2309): the rehearsal sheet only when the owner ticked it on this link.
+    includeRehearsal: link.includeRehearsal,
   });
   return new NextResponse(new Uint8Array(pack.body), {
     status: 200,

@@ -69,10 +69,21 @@ test.describe("home page v2 (batch 24)", () => {
     // Batch 26 item 6: the badge shows off production (every e2e run); the
     // smoke test asserts its absence on the deployed site. Batch 47 item 9:
     // against a deployment (an https base) the badge is absent by design.
-    if (/^https:/.test(process.env.PLAYWRIGHT_BASE_URL ?? ""))
+    // REQ-028 FR-15 (audit 57): one badge is visible at a time, the header's
+    // from lg and the footer's under it.
+    if (/^https:/.test(process.env.PLAYWRIGHT_BASE_URL ?? "")) {
       await expect(page.getByTestId("dev-badge")).toHaveCount(0);
-    else
+      await expect(page.getByTestId("dev-badge-footer")).toHaveCount(0);
+    } else {
+      const large = (page.viewportSize()?.width ?? 0) >= 1024;
       await expect(page.getByTestId("dev-badge")).toHaveText("In development");
+      await expect(page.getByTestId("dev-badge")).toBeVisible({
+        visible: large,
+      });
+      await expect(page.getByTestId("dev-badge-footer")).toBeVisible({
+        visible: !large,
+      });
+    }
     await shot(page, "home-v2", testInfo.project.name);
   });
 

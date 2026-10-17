@@ -78,9 +78,9 @@ test.describe("REQ-013 P2", () => {
     const stepper = page.getByRole("navigation", {
       name: "Questionnaire steps",
     });
-    await expect(stepper.locator("[aria-current='step']")).toHaveAttribute(
-      "aria-label",
-      /Step 1, Business/,
+    // REQ-028 FR-3 (QA F3): the current circle names itself with sr-only text, not aria-label on a span.
+    await expect(stepper.locator("[aria-current='step']")).toContainText(
+      /Step 1, Business: current/,
     );
     await expect(stepper.getByRole("link")).toHaveCount(0);
     await page.getByLabel("Trading name").fill("Sunrise Supports");
@@ -152,6 +152,9 @@ test.describe("REQ-013 P2", () => {
     await page.getByLabel(/Search by what you do/).fill("");
 
     // The hint ticks 0107 and 0120 and leaves their headings open.
+    // REQ-028 FR-5 (AC-5's phone exception): under lg the hint is one line until tapped, so the phone opens it first.
+    const hintSummary = page.getByTestId("groups-hint-summary");
+    if (await hintSummary.isVisible()) await hintSummary.click();
     await page.getByRole("button", { name: "Choose those two for me" }).click();
     await expect(page.locator("#group-0107")).toBeChecked();
     await expect(page.locator("#group-0120")).toBeChecked();

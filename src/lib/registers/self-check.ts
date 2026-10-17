@@ -7,6 +7,7 @@
  * The questions are a Dev draft for the PO (D-2236).
  */
 import { AUDIT_DAY_RECORDS } from "./names";
+import { formatLongDate } from "./status";
 
 export const SELF_CHECK_MONTHS = 3;
 export const SELF_CHECK_FINDING_DAYS = 30;
@@ -27,6 +28,9 @@ export const SELF_CHECK_QUESTIONS: Record<string, string> = {
     "Does the delegations register say who acts for you when you are away, and is it still right?",
   hazards:
     "Is every hazard you know of in the hazard register, with what you did and a review date?",
+  // REQ-023 FR-10 (Session D): a Dev-2 draft for the PO, as D-2236's questions were.
+  "commission-changes":
+    "Is every change you told the Commission about this quarter in the changes register, with the date you told them?",
   insurances:
     "Is every insurance certificate current, and is each expiry date in the register?",
   improvements:
@@ -47,6 +51,110 @@ export type SelfCheckAnswers = Record<string, SelfCheckAnswer>;
 /** The record ids the walk asks about: the audit-day list, in its order. */
 export function selfCheckRecordIds(): string[] {
   return AUDIT_DAY_RECORDS.map((r) => r.id);
+}
+
+/* ---------- REQ-023 Session C (FR-8; D-2309, D-2342): the rehearsal ---------- */
+
+export const SELF_CHECK_MODES = ["walk", "rehearsal"] as const;
+export type SelfCheckMode = (typeof SELF_CHECK_MODES)[number];
+
+/** The mid-term variant's opening question (s 13B(5); finding 46), a pseudo-record ahead of the list. */
+export const CORRECTIVE_ACTION_ID = "corrective-action-plan";
+export const CORRECTIVE_ACTION_QUESTION =
+  "Do you have the corrective action plan from your last audit and the Commissioner's notice, if any?";
+export const CORRECTIVE_ACTION_NAME =
+  "Your last audit's corrective action plan and the Commissioner's notice";
+
+/**
+ * The mid-term variant leads with the governance and operational management
+ * records (the mid-term audit assesses the Part 3 standards, s 13B(5)): the
+ * records the standards name first, in the list's order, then the rest.
+ */
+export const GOVERNANCE_FIRST_IDS: readonly string[] = [
+  "document-control",
+  "decisions",
+  "corporate-risks",
+  "conflicts-of-interest",
+  "delegations",
+  "insurances",
+  "staff-matrix",
+];
+
+export type RehearsalVariant = "renewal" | "mid-term";
+
+/** The records a rehearsal walks, in the variant's order; the mid-term variant opens with the corrective-action question. */
+export function rehearsalRecordIds(variant: RehearsalVariant): string[] {
+  const ids = selfCheckRecordIds();
+  if (variant === "renewal") return ids;
+  const first = GOVERNANCE_FIRST_IDS.filter((id) => ids.includes(id));
+  return [
+    CORRECTIVE_ACTION_ID,
+    ...first,
+    ...ids.filter((id) => !first.includes(id)),
+  ];
+}
+
+/** A rehearsal asks the walk's question with "this quarter" read as "in this period" (FR-8). */
+export function rehearsalQuestion(id: string): string {
+  if (id === CORRECTIVE_ACTION_ID) return CORRECTIVE_ACTION_QUESTION;
+  return (SELF_CHECK_QUESTIONS[id] ?? "").replace(
+    /this quarter/g,
+    "in this period",
+  );
+}
+
+/** The question for a record in either mode. */
+export function questionFor(id: string, mode: SelfCheckMode): string {
+  return mode === "rehearsal"
+    ? rehearsalQuestion(id)
+    : (SELF_CHECK_QUESTIONS[id] ?? "");
+}
+
+/** The sheet's heading, the owner's own words (D-2309): "Our own working note, 20 September 2028". */
+export function rehearsalHeading(walkedOn: string): string {
+  return `Our own working note, ${formatLongDate(walkedOn)}`;
+}
+
+/** The pack's file name for the rehearsal sheet (FR-8; D-2207: CSV, no PDF path). */
+export function rehearsalFileName(walkedOn: string): string {
+  return `rehearsal-${walkedOn}.csv`;
+}
+
+export const REHEARSAL_SHEET_COLUMNS = [
+  "record",
+  "question",
+  "answer",
+  "note",
+] as const;
+
+/** The sheet: one row per question, what is missing first ("no" rows), then the rest; codes, never names. */
+export function rehearsalSheetRows(
+  answers: SelfCheckAnswers,
+  variant: RehearsalVariant,
+): Record<string, string>[] {
+  const names = new Map(AUDIT_DAY_RECORDS.map((r) => [r.id, r.name]));
+  names.set(CORRECTIVE_ACTION_ID, CORRECTIVE_ACTION_NAME);
+  const rows = rehearsalRecordIds(variant)
+    .filter((id) => answers[id])
+    .map((id) => ({
+      record: names.get(id) ?? id,
+      question: rehearsalQuestion(id),
+      answer: answers[id].answer,
+      note: answers[id].note,
+    }));
+  return [
+    ...rows.filter((r) => r.answer === "no"),
+    ...rows.filter((r) => r.answer !== "no"),
+  ];
+}
+
+/** The rehearsal's closing line: what is missing, where the sheet is, and where it is not (D-2309). */
+export function rehearsalSummary(missing: number, walkedOn: string): string {
+  const gaps =
+    missing === 0
+      ? "Nothing missing."
+      : `${missing} ${missing === 1 ? "thing is" : "things are"} missing.`;
+  return `${gaps} Your working note is saved as ${rehearsalFileName(walkedOn)} in your own audit pack; it is not in an auditor link's pack unless you tick that when you create the link on the account page. Nothing was written to your improvement register.`;
 }
 
 export function addMonthsIso(iso: string, months: number): string {

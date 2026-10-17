@@ -3,14 +3,11 @@
  * REQ-027 A2 (FR-3a, FR-3b; D-2707, D-2716, D-2718, D-2722, D-2723, D-2725):
  * the result page's copy and its two list rules, read without React.
  */
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
 import { lintText } from "@/lib/copy-lint/rules";
 import {
   HAVE_TAG,
-  NEXT_LINE,
   SOLE_TRADER_LINE,
   SOLE_TRADER_SOURCE,
   countHave,
@@ -63,7 +60,6 @@ describe("the legend, the Next line and the sole-trader pair (D-2707, D-2718, D-
 
   it("every customer sentence here is claim-free and lint-clean (D-2706, finding 107)", () => {
     for (const text of [
-      NEXT_LINE,
       haveLegend(3),
       SOLE_TRADER_LINE,
       SOLE_TRADER_SOURCE.text,
@@ -72,25 +68,6 @@ describe("the legend, the Next line and the sole-trader pair (D-2707, D-2718, D-
       expect(findProhibitedClaims(text), text).toEqual([]);
       expect(lintText(text, { block: true }), text).toEqual([]);
     }
-  });
-
-  it("the Next line names the screen a new account is sent to, read from that page's heading, and its comment names D-2707 and the reader (AC-4, findings 85 and 134)", () => {
-    const setup = readFileSync(
-      resolve(process.cwd(), "src/app/account/setup/page.tsx"),
-      "utf8",
-    );
-    const heading = /<h1[^>]*>\s*([^<]+?)\s*<\/h1>/.exec(setup)?.[1];
-    expect(heading).toBeTruthy();
-    expect(NEXT_LINE).toContain(`'${heading}'`);
-    expect(NEXT_LINE).toMatch(/^Next: sign in, then/);
-    expect(NEXT_LINE).not.toMatch(/\d+\s*minute/i);
-    const source = readFileSync(
-      resolve(process.cwd(), "src/app/start/_components/steps/result-copy.ts"),
-      "utf8",
-    );
-    const comment = source.slice(0, source.indexOf("export const NEXT_LINE"));
-    expect(comment).toContain("D-2707");
-    expect(comment).toContain("a new account");
   });
 
   it("the sole-trader pair states the rule and its source in the reasons' shape, the link to the Commission's page (D-2723)", () => {

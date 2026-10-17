@@ -6,9 +6,16 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { onboardingItemsFor } from "@/lib/registers/onboarding-items";
+import {
+  cellsFor,
+  linkNameFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   OnboardingKind,
   StaffMatrixRow,
+  OnboardingTickRow,
 } from "@/lib/registers/audit-day-types";
 import { CLEARANCE_LABELS } from "@/lib/registers/labels";
 import { FROM_THE_DATES_LINE } from "@/lib/registers/worker-state";
@@ -18,6 +25,7 @@ import {
   loadWorkerFile,
   ownerWorkerRef,
 } from "@/server/registers/worker-onboarding";
+import { SupervisionPanel } from "./supervision-panel";
 import { WorkerItems } from "./worker-items";
 import { ExceptionPanel } from "./exception-panel";
 import { part4EndFor } from "@/lib/registers/state-facts";
@@ -110,6 +118,12 @@ export async function AuditDayListPage({
           );
         })()
       : null;
+  // REQ-024 Session C (FR-12): an ended worker sits under "Past workers", off the current list and its filters.
+  const pastIds = new Set(
+    slug === "staff-matrix"
+      ? rows.filter((r) => r.ended_on).map((r) => r.id as string)
+      : [],
+  );
   const list: ListRow[] = rows.map((r) => {
     const derived = workerStates?.get(String(r.worker_ref));
     return {
@@ -133,6 +147,8 @@ export async function AuditDayListPage({
                   : "ochre",
           }
         : meta.statusOf(r as never),
+      cells: cellsFor(meta.columns, r as never),
+      name: linkNameFor(slug, r) ?? undefined,
     };
   });
   return (
@@ -142,13 +158,19 @@ export async function AuditDayListPage({
       canWrite={ctx.canWrite}
       addHref={`/registers/${slug}/new`}
       addLabel={meta.addLabel}
-      // REQ-020 FR-8: the corporate risk register takes a spreadsheet.
+      // REQ-024 FR-6b: the worker files and the two Rules lists, with the one-time fill.
+      exportHref={
+        slug === "staff-matrix" ? "/registers/staff-matrix/export" : undefined
+      }
+      exportLabel="Worker files and the two Rules lists"
+      // REQ-020 FR-8: the corporate risk register takes a spreadsheet; REQ-024 FR-13: so does the staff matrix.
       importHref={
-        slug === "corporate-risks"
-          ? "/registers/corporate-risks/import"
+        slug === "corporate-risks" || slug === "staff-matrix"
+          ? `/registers/${slug}/import`
           : undefined
       }
       back={{ href: "/registers", label: "Registers" }}
+      count={rows.length}
     >
       {saved ? (
         <p
@@ -183,10 +205,53 @@ export async function AuditDayListPage({
       ) : null}
       <RegisterList
         testId={`${slug}-list`}
-        rows={list}
-        filters={meta.filters}
+        rows={
+          slug === "staff-matrix"
+            ? list.filter((r) => !pastIds.has(r.id))
+            : list
+        }
+        filters={
+          slug === "staff-matrix"
+            ? meta.filters.filter((f) => f.key !== "ended")
+            : meta.filters
+        }
         empty={meta.empty}
+        columns={tableColumns(meta.columns)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: `/registers/${slug}/new`, label: meta.addLabel }
+            : undefined
+        }
+        importHref={
+          ctx.canWrite &&
+          (slug === "corporate-risks" || slug === "staff-matrix")
+            ? `/registers/${slug}/import`
+            : undefined
+        }
       />
+      {pastIds.size > 0 ? (
+        <section
+          className="mt-10"
+          aria-labelledby="past-workers-heading"
+          data-testid="staff-matrix-past"
+        >
+          <h2 id="past-workers-heading" className="text-lg font-semibold">
+            Past workers
+          </h2>
+          <p className="text-slate mt-1 text-sm leading-6">
+            Workers who have ended. Their rows, files and dates stay for seven
+            years and they remain on the screening list export with their end
+            date; their sign-in, if they had one, ended with them.
+          </p>
+          <RegisterList
+            testId="staff-matrix-past-list"
+            rows={list.filter((r) => pastIds.has(r.id))}
+            filters={[]}
+            empty=""
+            columns={tableColumns(meta.columns)}
+          />
+        </section>
+      ) : null}
     </RegisterPage>
   );
 }
@@ -310,6 +375,27 @@ export async function AuditDayDetailPage({
         });
       })()
     : null;
+  // REQ-024 FR-8 (D-2444): the trail's actor is actor_user_id and its role comes from memberships.
+  async function actorRolesFor(
+    supabase: SupabaseClient,
+    accountId: string,
+    rows: OnboardingTickRow[],
+  ): Promise<Record<string, string>> {
+    const ids = [
+      ...new Set(rows.map((r) => r.actor_user_id).filter(Boolean)),
+    ] as string[];
+    if (!ids.length) return {};
+    const r = await supabase
+      .from("memberships")
+      .select("user_id, role")
+      .eq("account_id", accountId)
+      .in("user_id", ids);
+    return Object.fromEntries(
+      ((r.data as { user_id: string; role: string }[] | null) ?? []).map(
+        (m) => [m.user_id, m.role],
+      ),
+    );
+  }
   const workerTicks =
     file?.checklist && slug === "staff-matrix"
       ? await listOnboardingTicks(
@@ -327,6 +413,12 @@ export async function AuditDayDetailPage({
       <p className="mt-3">
         <StatusTag status={meta.statusOf(row as never)} />
       </p>
+      {/* REQ-023 FR-10: the Rule's words for the row's type, where the meta gives them. */}
+      {meta.noteOf?.(row as never) ? (
+        <p className="text-ink mt-3 text-sm leading-6" data-testid="row-note">
+          {meta.noteOf(row as never)}
+        </p>
+      ) : null}
       {slug === "corporate-risks" && row.starter ? (
         <p
           className="border-ochre mt-3 rounded-md border p-3 text-sm leading-6"
@@ -354,10 +446,34 @@ export async function AuditDayDetailPage({
             items={file.items}
             states={file.states}
             ticks={workerTicks}
+            actorRoles={await actorRolesFor(
+              ctx.supabase,
+              ctx.viewer.account.id,
+              workerTicks,
+            )}
             derived={file.derived}
             canWrite={ctx.canWrite}
             today={todaySydney()}
           />
+          {slug === "staff-matrix" ? (
+            // REQ-024 Session C (FR-11): the supervision history and its one form, on the staff row alone.
+            <SupervisionPanel
+              workerRef={file.row.worker_ref}
+              entries={file.supervision}
+              lastSupervisionOn={file.row.last_supervision_on}
+              canWrite={ctx.canWrite}
+              today={todaySydney()}
+              ownerRef={
+                (
+                  await ownerWorkerRef(
+                    ctx.supabase,
+                    ctx.viewer.account.id,
+                    ctx.viewer.user.id,
+                  )
+                )?.workerRef ?? null
+              }
+            />
+          ) : null}
           {file.exception && slug === "staff-matrix" ? (
             <ExceptionPanel
               workerRef={file.row.worker_ref}

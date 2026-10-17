@@ -106,16 +106,17 @@ test.describe("REQ-025 Session A", () => {
     await expect(page.getByTestId("result-ready-line-text")).toHaveText(
       `The pack drafts all ${docTotal} so they match; your checklist shows which to compare with what you have.`,
     );
-    await expect(
-      card.getByRole("link", { name: `Open your checklist (${c[1]} things)` }),
-    ).toBeVisible();
-
     // The disclosures' counts and tags agree with the list.
     const docs = page.getByTestId("result-section-documents");
     await expect(docs.locator("> summary")).toContainText(
       `Documents you will need (${docTotal})`,
     );
-    await docs.locator("> summary").click();
+    if ((await docs.getAttribute("open")) === null)
+      await docs.locator("> summary").click();
+    // REQ-028 FR-6, D-2805: the checklist link heads the documents section.
+    await expect(
+      docs.getByRole("link", { name: "Open these in your checklist" }),
+    ).toBeVisible();
     for (const g of await page.locator('[data-testid^="doc-group-"]').all())
       if ((await g.getAttribute("open")) === null) {
         const s = g.locator("> summary");
@@ -157,7 +158,10 @@ test.describe("REQ-025 Session A", () => {
 
     // FR-5: each reason links to its source by title; "new tab" is said once.
     const why = page.getByTestId("result-section-why");
-    await why.locator("> summary").click();
+    // REQ-028 D-2813: open at lg on a first visit, closed under it.
+    if ((page.viewportSize()?.width ?? 0) >= 1024)
+      await expect(why).toHaveAttribute("open", "");
+    else await why.locator("> summary").click();
     await expect(why.getByTestId("reasons-intro")).toContainText(
       "open in a new tab",
     );

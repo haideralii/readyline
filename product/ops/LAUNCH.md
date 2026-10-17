@@ -23,10 +23,10 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 9. Anthropic console: a key with a monthly spend cap. Vercel: `ANTHROPIC_API_KEY`; `ANTHROPIC_MODEL` to pin the model (otherwise the code default, D-048). Rows: **Anthropic API key**, **Model id**.
 10. `GENERATION_LIVE` stays unset until section 9. Row: **Live model calls** (red until then, by design).
 
-## 4. Email (REQ-022 Session B; the rows read Not set until it ships)
+## 4. Email (REQ-022 Session B, D-2822: plain SMTP, no vendor code)
 
-11. Amazon SES, ap-southeast-2 (D-2201): verify the sending domain (add the DKIM CNAME records, and the SPF and DMARC TXT records SES shows, at the registrar), request production access (new accounts start in the sandbox), create a send-only IAM user and its SMTP credentials. Vercel: the provider variables Session B names in `.env.example`. Row: **Email provider**, **Sending domain verified**.
-12. Supabase, Authentication, SMTP Settings: host `email-smtp.ap-southeast-2.amazonaws.com`, port 465, the SMTP username and password SES generated, sender `Readyline <no-reply@<domain>>`; raise the rate limit from the default. Then on `/admin/launch` press "Send me a test email" and confirm it arrived. Row: **Test email in the last 24 hours**.
+11. Pick a sender on the day (any provider with SMTP and a free or pay-per-use tier, a personal account, no company resources). At the registrar for `<domain>`: the SPF TXT record on the domain (`v=spf1 include:<the sender's include> ~all`), the DKIM CNAME records the sender shows (`<selector>._domainkey.<domain>`), and a DMARC TXT record at `_dmarc.<domain>` (`v=DMARC1; p=none; rua=mailto:<CONTACT_EMAIL>` to start; tighten to `p=quarantine` once a week of mail has passed). Vercel, server only: `EMAIL_PROVIDER=smtp`, `EMAIL_FROM` (`Readyline <no-reply@<domain>>`), `SMTP_HOST`, `SMTP_PORT` (465 for TLS, 587 for STARTTLS), `SMTP_USER`, `SMTP_PASS`; `HASH_PEPPER` must already be set (section 7). Rows: **Email provider** (set when the six names are present; mismatched names the missing ones), **Sending domain records** (reads the domain's SPF and DMARC from DNS; DKIM is checked at the sender, not here).
+12. Supabase, Authentication, SMTP Settings: the same host, port, username and password, and the same sender, so sign-in mail and product mail come from one name; raise the custom-SMTP rate limit from its default (it starts low). Then on `/admin/launch` press "Send me a test email" (to your own address, one a minute) and confirm it arrived with the general-information footer. Row: **Test email in the last 24 hours**.
 
 ## 5. Domain (REQ-022 Session C)
 
@@ -34,6 +34,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 14. Supabase, Authentication, URL Configuration: Site URL `https://<domain>` and the redirect URLs exactly as `DEPLOY.md` section 5 lists them, each with its trailing `*`. Row: **Supabase Site URL and redirects** (always Not verified here; the launch check below proves the sign-in path from outside).
 15. Stripe, Developers, Webhooks: move the endpoint to the domain (step 5 again). GitHub, repository variables: `PROD_URL` = `https://<domain>`. Row: **Stripe webhook endpoint**.
 16. HSTS, one deploy after the redirect is proven: Vercel `HSTS_MAX_AGE` = `604800`, redeploy; a week later `31536000`, redeploy (Session C).
+17. Nothing to set: the three one-time fill handlers (REQ-024 FR-6b, SR-8(e)) carry `preferredRegion = "syd1"` as a literal in each route file and a unit test reads it; the row reads Set from the same constant. Row: **One-time fill handlers pinned to Sydney (REQ-024 SR-8(e))**.
 
 ## 6. Scheduled jobs
 

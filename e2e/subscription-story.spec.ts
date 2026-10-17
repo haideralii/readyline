@@ -30,7 +30,7 @@ test.describe("one subscription story, on (batch 47 item 1)", () => {
 
     await page.goto("/refunds");
     const article = page.getByRole("main");
-    await expect(article).toContainText("The audit-ready subscription");
+    await expect(article).toContainText("The registers subscription");
     await expect(article).not.toContainText(/when available/i);
     await expect(article).not.toContainText(OFF);
 

@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { GlossaryTerms } from "@/components/glossary-terms";
-import { markdownComponents } from "@/components/legal-article";
+import {
+  markdownComponents,
+  markdownPlugins,
+} from "@/components/legal-article";
+import { JumpTo } from "@/components/jump-to";
 import { BRAND } from "@/lib/brand";
 import { registrationGroupsTable } from "@/lib/guides/groups-table";
 import { listGuideSlugs, loadGuide } from "@/lib/guides/pages";
@@ -67,8 +70,41 @@ export default async function GuidePage({
     auditType: x.auditType,
   }));
   const url = `${siteUrl()}/guides/${g.slug}`;
+  const reviewed = `Last reviewed ${formatUpdated(g.reviewed)}. Updated ${formatUpdated(g.updated)}.`;
+  const jumpItems = [
+    ...g.headings,
+    ...(g.faq.length
+      ? [{ id: "faq-heading", text: "Questions people ask" }]
+      : []),
+    ...(g.sources.length ? [{ id: "sources-heading", text: "Sources" }] : []),
+  ];
+  // REQ-028 FR-11: from lg the sticky aside holds the "Jump to" nav, the reviewed line and the short answer;
+  // under lg the article keeps batch 49 item 5's order (the answer first, then where each section is) with
+  // its own copies of the three, one set visible at each width (D-2276, the FR-5 hint pattern).
+  const aside = (
+    <div data-testid="guide-aside">
+      <JumpTo items={jumpItems} testId="aside-jump-to" />
+      <p className="text-slate mt-4 text-sm" data-testid="aside-reviewed">
+        {reviewed}
+      </p>
+      <section
+        aria-labelledby="aside-short-answer-heading"
+        className="border-ochre mt-4 rounded-md border p-4"
+        data-testid="aside-short-answer"
+      >
+        <h2 id="aside-short-answer-heading" className="">
+          Short answer
+        </h2>
+        <ul className="mt-2 list-disc space-y-1 pl-5 leading-7">
+          {g.shortAnswer.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  );
   return (
-    <PageShell kind="reading">
+    <PageShell kind="reading" aside={aside} asideFrom="lg">
       <article>
         <JsonLd
           data={[
@@ -104,13 +140,15 @@ export default async function GuidePage({
           </Link>
         </p>
         <h1 className="">{g.title}</h1>
-        <p className="text-slate mt-2 text-sm" data-testid="guide-reviewed">
-          Last reviewed {formatUpdated(g.reviewed)}. Updated{" "}
-          {formatUpdated(g.updated)}.
+        <p
+          className="text-slate mt-2 text-sm lg:hidden"
+          data-testid="guide-reviewed"
+        >
+          {reviewed}
         </p>
         {g.draft ? (
           <p
-            className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+            className="border-ochre bg-ochre-wash text-ink mt-4 rounded-md border p-4 text-sm"
             data-testid="guide-draft-note"
           >
             <strong className="font-semibold">Draft.</strong> This guide is
@@ -121,7 +159,7 @@ export default async function GuidePage({
         {/* Batch 49 item 5 (REQ-025 D-2218): the answer in three lines first, then where each section is. */}
         <section
           aria-labelledby="short-answer-heading"
-          className="border-ochre mt-6 rounded-md border p-4"
+          className="border-ochre mt-6 rounded-md border p-4 lg:hidden"
           data-testid="guide-short-answer"
         >
           <h2 id="short-answer-heading" className="">
@@ -137,20 +175,12 @@ export default async function GuidePage({
         <GlossaryTerms ids={g.glossary} where="guide" className="mt-3" />
         <nav
           aria-label="Jump to"
-          className="mt-4 text-sm"
+          className="mt-4 text-sm lg:hidden"
           data-testid="guide-jump-to"
         >
           <span className="font-medium">Jump to: </span>
           <ul className="inline">
-            {[
-              ...g.headings,
-              ...(g.faq.length
-                ? [{ id: "faq-heading", text: "Questions people ask" }]
-                : []),
-              ...(g.sources.length
-                ? [{ id: "sources-heading", text: "Sources" }]
-                : []),
-            ].map((h, i) => (
+            {jumpItems.map((h, i) => (
               <li key={h.id} className="inline">
                 {i > 0 ? <span aria-hidden="true">, </span> : null}
                 <a
@@ -163,14 +193,17 @@ export default async function GuidePage({
             ))}
           </ul>
         </nav>
-        <Markdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+        <Markdown
+          remarkPlugins={markdownPlugins}
+          components={markdownComponents}
+        >
           {before}
         </Markdown>
         {after !== undefined ? (
           <>
             <CostCalculator groups={groups} packPrice={price} />
             <Markdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={markdownPlugins}
               components={markdownComponents}
             >
               {after}
@@ -183,7 +216,7 @@ export default async function GuidePage({
             className="mt-10"
             data-testid="guide-faq"
           >
-            <h2 id="faq-heading" className="">
+            <h2 id="faq-heading" className="scroll-mt-24">
               Questions people ask
             </h2>
             {g.faq.map((f) => (
@@ -196,7 +229,7 @@ export default async function GuidePage({
                 </summary>
                 <div className="px-4 pb-4">
                   <Markdown
-                    remarkPlugins={[remarkGfm]}
+                    remarkPlugins={markdownPlugins}
                     components={markdownComponents}
                   >
                     {f.answer}
@@ -211,7 +244,7 @@ export default async function GuidePage({
           className="border-ochre mt-10 rounded-md border p-4"
           data-testid="guide-cta"
         >
-          <h2 id="cta-heading" className="">
+          <h2 id="cta-heading" className="scroll-mt-24">
             See which audit you need, free
           </h2>
           <p className="mt-2 leading-7">
@@ -231,7 +264,7 @@ export default async function GuidePage({
             className="mt-10"
             data-testid="guide-sources"
           >
-            <h2 id="sources-heading" className="">
+            <h2 id="sources-heading" className="scroll-mt-24">
               Sources
             </h2>
             <ul className="text-ink mt-3 list-disc space-y-2 pl-5 leading-7">

@@ -17,7 +17,7 @@ You can have a full refund within 14 days of buying the pack if you have not dow
 
 If you have downloaded the documents, we still refund you if they do not match the answers you gave in the questionnaire, or if they are missing something you were told they would include. When we are not sure, we decide in your favour.
 
-## The audit-ready subscription
+## The registers subscription
 
 {{subscription-off}}
 

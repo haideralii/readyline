@@ -5,7 +5,17 @@ import { redirect } from "next/navigation";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist, type ShownItem } from "@/lib/checklist/state";
+import { applyWorkerStates } from "@/lib/checklist/worker-states";
+import { workerStatesLine } from "@/lib/registers/worker-states-line";
 import { legalRows, timelineRows } from "@/lib/registers/timeline";
+import {
+  parsePeriodParams,
+  periodContextFrom,
+  periodQuery,
+  resolvePeriod,
+  type RawPeriodParams,
+} from "@/lib/registers/period";
+import { PeriodSelector } from "@/components/period-selector";
 import { RegistrationTimeline } from "@/app/account/registration-timeline";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { auditKindsContent } from "@/lib/questionnaire/content";
@@ -22,6 +32,7 @@ import { loadPathContext } from "@/server/path/state";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   lastSelfCheck,
@@ -30,6 +41,10 @@ import {
 import { selfCheckOffer } from "@/lib/registers/self-check";
 import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import {
+  accountWorkerStates,
+  todaySydney,
+} from "@/server/registers/worker-onboarding";
 import { DrillForm } from "./drill-form";
 
 export const metadata: Metadata = { title: "Audit day" };
@@ -56,7 +71,9 @@ function tick(item: ShownItem): { mark: string; word: string } {
   return { mark: "○", word: "Not yet." };
 }
 
-export default async function AuditDayPage() {
+export default async function AuditDayPage({
+  searchParams,
+}: PageProps<"/path/audit-day">) {
   const viewer = await getViewer();
   if (!viewer) redirect("/sign-in?next=%2Fpath%2Faudit-day");
   if (viewer.deleted) redirect("/account/deleted");
@@ -77,6 +94,8 @@ export default async function AuditDayPage() {
     toConfirm,
     drill,
     period,
+    workers,
+    ownershipChangeOn,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -91,7 +110,30 @@ export default async function AuditDayPage() {
       .maybeSingle(),
     // REQ-023 FR-2, FR-4: the registration period's legal rows and dated items.
     currentPeriod(supabase, viewer.account.id),
+    // REQ-024 Session C (FR-10; D-2411, D-2831): every worker's derived state, for the people group and the two people items.
+    accountWorkerStates(
+      supabase,
+      viewer.account.id,
+      viewer.user.id,
+      ctx.result,
+      todaySydney(),
+    ),
+    // REQ-023 FR-2, FR-4 (Session D): the change-of-ownership row and item read the changes register.
+    latestOwnershipChangeOn(supabase, viewer.account.id),
   ]);
+  const peopleLine = workerStatesLine(workers, todaySydney());
+  // REQ-023 FR-5: the period the pack link carries, "This registration period"
+  // by default when a period exists (D-2305); the list's states stay live
+  // (D-2318 B). The proxy refused a malformed query already.
+  const parsedPeriod = parsePeriodParams(
+    (await searchParams) as RawPeriodParams,
+  );
+  const periodCtx = periodContextFrom(period);
+  const packPeriod = resolvePeriod(
+    parsedPeriod.ok ? parsedPeriod.selection : null,
+    periodCtx,
+    "period",
+  );
   // REQ-018 FR-11: the twelve records with the live state of each register (D-1907).
   const asks = auditDayAskList({
     registers,
@@ -117,16 +159,20 @@ export default async function AuditDayPage() {
       day: "2-digit",
     }).format(new Date()),
   });
-  const shown = mergeChecklist({
-    checklist: deriveChecklist(
-      ctx.result,
-      ctx.answers,
-      dataset,
-      checklistPeriod(period),
-    ),
-    stored,
-    draftedDocumentTypeIds: drafted,
-  });
+  const shown = applyWorkerStates(
+    mergeChecklist({
+      checklist: deriveChecklist(
+        ctx.result,
+        ctx.answers,
+        dataset,
+        checklistPeriod(period, ownershipChangeOn),
+      ),
+      stored,
+      draftedDocumentTypeIds: drafted,
+    }),
+    workers,
+    todaySydney(),
+  );
   const setId = ctx.state.readySetId;
   const groups = setId ? orderDocuments(ctx.documents) : [];
   const have = shown.items.filter((i) => i.status === "have").length;
@@ -143,7 +189,7 @@ export default async function AuditDayPage() {
       {reportsToConfirmLine(toConfirm) ? (
         // REQ-020 FR-5: the owner sees a waiting report here too, one tap from confirming it.
         <p
-          className="border-signal mt-3 rounded-md border p-3 leading-7 print:hidden"
+          className="border-signal mt-3 rounded-md border p-4 leading-7 print:hidden"
           data-testid="audit-day-reports"
         >
           <Link
@@ -192,7 +238,7 @@ export default async function AuditDayPage() {
             Your registration dates
           </h2>
           <RegistrationTimeline
-            rows={legalRows(timelineRows(period))}
+            rows={legalRows(timelineRows(period, { ownershipChangeOn }))}
             caption="Your registration dates, from your certificate, the Rules and the Act"
             testId="audit-day-timeline"
           />
@@ -201,13 +247,57 @@ export default async function AuditDayPage() {
       {/* REQ-020 FR-1: everything the auditor asks for, in one zip, built when you click. */}
       <p className="mt-3 text-sm print:hidden">
         <a
-          href="/registers/audit-pack.zip"
+          href={`/registers/audit-pack.zip${periodQuery(packPeriod.period, { explicitAll: true })}`}
           className="underline underline-offset-2"
           data-testid="audit-pack-download"
         >
           Download my audit pack (every register, the document control register,
           the summary and the adopted documents)
         </a>
+      </p>
+      {/* REQ-023 FR-5: the period the pack's four registers cover; the states on this page stay the whole register's. */}
+      {period ? (
+        <PeriodSelector
+          basePath="/path/audit-day"
+          period={packPeriod.period}
+          ctx={periodCtx}
+          unavailable={packPeriod.unavailable}
+          fallback="period"
+          testId="audit-day-period"
+        />
+      ) : (
+        // #99 run 1 (PO 01:10): a real owner lands here before the dates are in; the line says what the pack covers and why.
+        <p
+          className="mt-4 text-sm print:hidden"
+          data-testid="audit-day-period-line"
+        >
+          Showing: <span className="font-medium">All entries</span> (enter your
+          registration dates on the account page to filter by period).
+        </p>
+      )}
+      {/* REQ-023 FR-6: the summary screen, the same sheet the pack carries. */}
+      {period ? (
+        <p className="mt-3 text-sm print:hidden">
+          <Link
+            href="/path/audit-day/what-changed"
+            className="underline underline-offset-2"
+            data-testid="audit-day-what-changed"
+          >
+            {period.last_audit_on
+              ? "What changed since the last audit"
+              : "What changed in this registration period"}
+          </Link>
+        </p>
+      ) : null}
+      {/* REQ-023 FR-7 (Session C): the renewal path, the ten steps in the Commission's order. */}
+      <p className="mt-2 text-sm print:hidden">
+        <Link
+          href="/path/renewal"
+          className="underline underline-offset-2"
+          data-testid="audit-day-renewal"
+        >
+          Your renewal path
+        </Link>
       </p>
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
@@ -226,6 +316,22 @@ export default async function AuditDayPage() {
             <h2 id={`ask-${g.id}`} className="">
               {ASK[g.id] ?? g.title}
             </h2>
+            {g.id === "people" && peopleLine ? (
+              // REQ-024 Session C (FR-10; D-2411): the staff list's derived states in one line, with the way to them.
+              <p
+                className="mt-2 text-sm leading-6"
+                data-testid="audit-day-people-line"
+              >
+                From your staff list: {peopleLine}.{" "}
+                <Link
+                  href="/registers/staff-matrix"
+                  className="underline underline-offset-2"
+                >
+                  Open the staff list
+                </Link>
+                .
+              </p>
+            ) : null}
             <ul className="divide-rule mt-3 divide-y">
               {g.items.map((i) => {
                 const t = tick(i);

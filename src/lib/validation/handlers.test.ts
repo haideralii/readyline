@@ -87,6 +87,8 @@ const GATES: readonly RegExp[] = [
   /if \(!env\.fake\)/,
   // The register export routes delegate to one handler that reads the viewer and hits the export limiter.
   /\bmakeExportHandler\(/,
+  // REQ-024 FR-6b: the three fill routes delegate to one handler that reads the viewer and hits the fill limiter.
+  /\bmakeFillHandler\(/,
 ];
 
 describe("boundaries are gated (ASVS L1, backlog 5)", () => {

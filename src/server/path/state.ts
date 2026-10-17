@@ -35,6 +35,7 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import {
   listEntitlements,
@@ -190,18 +191,20 @@ export async function loadPathContext(
   state.groupsToAdopt = groupsLeftToAdopt(documents, adopted);
 
   const dataset = getStandardsDataset();
-  const [stored, drafted, period] = await Promise.all([
+  const [stored, drafted, period, ownershipChangeOn] = await Promise.all([
     listChecklistItems(supabase, accountId),
     listDraftedDocumentTypeIds(supabase, accountId),
     // REQ-023 FR-4: the dated audit items once a registration period exists.
     currentPeriod(supabase, accountId),
+    // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+    latestOwnershipChangeOn(supabase, accountId),
   ]);
   const shown = mergeChecklist({
     checklist: deriveChecklist(
       result,
       answers,
       dataset,
-      checklistPeriod(period),
+      checklistPeriod(period, ownershipChangeOn),
     ),
     stored,
     draftedDocumentTypeIds: drafted,

@@ -1,4 +1,5 @@
 import { PageShell } from "@/components/page-shell";
+import { JumpTo } from "@/components/jump-to";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -26,12 +27,15 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import {
   PAUSED_EXPORT_SENTENCE,
   TIMELINE_FIXED_SENTENCE,
+  applicationInsideWindow,
   midtermFor,
   positionSentence,
+  renewalWindowOpens,
   timelineRows,
 } from "@/lib/registers/timeline";
 import type { RegistrationKind } from "@/lib/registers/types";
 import { loadQuestionnaire } from "@/server/path/state";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { AccountForm } from "./account-form";
 import { DeleteAccountForm } from "./delete-account-form";
@@ -76,6 +80,7 @@ export default async function AccountPage() {
     period,
     questionnaire,
     kindRow,
+    ownershipChangeOn,
   ] = await Promise.all([
     listPurchases(supabase, a.id),
     registerOverview(supabase, a.id),
@@ -92,6 +97,8 @@ export default async function AccountPage() {
       .select("registration_kind")
       .eq("id", a.id)
       .maybeSingle(),
+    // REQ-023 FR-2 (Session D): the change-of-ownership row reads the changes register.
+    latestOwnershipChangeOn(supabase, a.id),
   ]);
   const mirroredKind =
     (kindRow.data as { registration_kind: RegistrationKind | null } | null)
@@ -147,353 +154,406 @@ export default async function AccountPage() {
         .
       </p>
 
-      {/* REQ-009 batch 28 item 4: the registers' state on the ready line, with the overdue counts in words. */}
-      <section
-        aria-labelledby="registers-heading"
-        className="mt-8"
-        data-testid="account-registers"
-      >
-        <h2 id="registers-heading" className="">
-          Registers
-        </h2>
-        <div className="mt-3">
-          <ReadyLine
-            counts={{
-              done: registers.current,
-              todo: registers.dueSoon + registers.overdue,
-            }}
-            noun="register entries"
-            testId="account-registers-line"
+      {/* REQ-028 FR-11: from lg a sticky in-page nav over the section headings in columns 1 to 3 and the
+          sections in 4 to 12; under lg the sections alone in their order. */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-x-8">
+        <div
+          className="hidden lg:sticky lg:top-24 lg:col-span-3 lg:block lg:self-start"
+          data-testid="account-nav"
+        >
+          <JumpTo
+            label="On this page"
+            testId="account-jump-to"
+            className="mt-8"
+            items={[
+              { id: "registers-heading", text: "Registers" },
+              { id: "registration-heading", text: "Your registration" },
+              {
+                id: "auditor-heading",
+                text: "Share a read-only view with your auditor",
+              },
+              { id: "team-heading", text: "Your team" },
+              { id: "subscription-heading", text: "Registers subscription" },
+              { id: "details-heading", text: "Business details" },
+              { id: "session-heading", text: "Sessions" },
+              { id: "data-heading", text: "Your data" },
+              { id: "purchases-heading", text: "Purchases" },
+              { id: "delete-heading", text: "Delete this account" },
+            ]}
           />
         </div>
-        <p className="text-ink mt-2 text-sm leading-6">
-          {registers.sentence}{" "}
-          <Link href="/registers" className="underline underline-offset-2">
-            Open the registers
-          </Link>
-          .
-        </p>
-        {/* REQ-009 FR-3: the same rows the reminder emails are sent from. */}
-        <h3 className="mt-4">Due soon</h3>
-        {dueSoon.length === 0 ? (
-          <p className="text-slate mt-1 text-sm" data-testid="due-soon-empty">
-            Nothing due in the next 30 days.
-          </p>
-        ) : (
-          <ul
-            className="mt-1 list-disc space-y-1 pl-5 text-sm leading-6"
-            data-testid="due-soon"
+        <div className="min-w-0 lg:col-span-9">
+          {/* REQ-009 batch 28 item 4: the registers' state on the ready line, with the overdue counts in words. */}
+          <section
+            aria-labelledby="registers-heading"
+            className="mt-8"
+            data-testid="account-registers"
           >
-            {dueSoon.map((d) => (
-              <li key={d.id}>
-                {d.line}
-                {d.sent ? <span className="text-slate"> (emailed)</span> : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* REQ-023 FR-1, FR-2: the dates from the certificate, the timeline the product derives, the one sentence that says which rules. */}
-      <section
-        aria-labelledby="registration-heading"
-        className="mt-8"
-        data-testid="account-registration"
-      >
-        <h2 id="registration-heading" className="">
-          Your registration
-        </h2>
-        <p className="text-ink mt-2 text-sm leading-6">
-          Type the dates from your certificate of registration. We work out the
-          mid-term audit and renewal dates from them and remind you by email.
-        </p>
-        <RegistrationForm
-          initial={registrationInitial}
-          midterm={midterm}
-          questionnaireDone={Boolean(questionnaire.result)}
-        />
-        {period ? (
-          <>
-            <h3 className="mt-6">Your registration timeline</h3>
-            <RegistrationTimeline
-              rows={timelineRows(period)}
-              caption="Your registration timeline"
-              testId="registration-timeline"
-            />
-            <p
-              className="mt-3 text-sm leading-6"
-              data-testid="registration-position"
-            >
-              {positionSentence(period, today)}
+            <h2 id="registers-heading" className="scroll-mt-24">
+              Registers
+            </h2>
+            <div className="mt-3">
+              <ReadyLine
+                counts={{
+                  done: registers.current,
+                  todo: registers.dueSoon + registers.overdue,
+                }}
+                noun="register entries"
+                testId="account-registers-line"
+              />
+            </div>
+            <p className="text-ink mt-2 text-sm leading-6">
+              {registers.sentence}{" "}
+              <Link href="/registers" className="underline underline-offset-2">
+                Open the registers
+              </Link>
+              .
             </p>
-            <p
-              className="text-slate mt-2 text-sm leading-6"
-              data-testid="registration-fixed-sentence"
-            >
-              {TIMELINE_FIXED_SENTENCE}
-            </p>
-            <p className="mt-2 text-sm leading-6">
-              <a
-                href="/registers/audit-pack.zip"
-                className="underline underline-offset-2"
-                data-testid="registration-pack-link"
-              >
-                Download your audit pack (every register)
-              </a>
-              : a provider who ceases to be registered must keep its records for
-              three years from that day (NDIS Act s 73R).
-            </p>
-          </>
-        ) : null}
-      </section>
-
-      {/* REQ-020 FR-2, FR-3: one read-only auditor link at a time; the owner sends it, Readyline never does. */}
-      <section
-        aria-labelledby="auditor-heading"
-        className="mt-8"
-        data-testid="account-auditor-link"
-      >
-        <h2 id="auditor-heading" className="">
-          Share a read-only view with your auditor
-        </h2>
-        {/* Retro finding 59: the link is the provider's own disclosure, so the copy says what the view holds, not less. */}
-        <p className="text-ink mt-2 text-sm leading-6">
-          A link that opens your registers, your document control register and
-          your audit pack, read-only. It expires when you say and you can revoke
-          it at any time. You copy it and send it yourself; we send nothing and
-          we do not list or recommend auditors.
-        </p>
-        <p
-          className="text-ink mt-2 text-sm leading-6"
-          data-testid="auditor-link-disclosure"
-        >
-          Participants appear as the codes you typed. Everything you typed into
-          a register is in the view exactly as you typed it, so check your
-          summaries and notes for names, and for any worker named in a note,
-          before you share.
-        </p>
-        <AuditorLinkPanel
-          current={
-            auditorLink
-              ? {
-                  id: auditorLink.id,
-                  expiresAt: auditorLink.expires_at,
-                  lastOpenedAt: auditorLink.last_opened_at,
-                  openedCount: auditorLink.opened_count,
-                }
-              : null
-          }
-        />
-      </section>
-
-      {/* REQ-020 FR-4, FR-5, FR-11: the workers who log for you and the report link. */}
-      <section
-        aria-labelledby="team-heading"
-        className="mt-8"
-        data-testid="account-team"
-      >
-        <h2 id="team-heading" className="">
-          Your team
-        </h2>
-        <TeamPanel
-          invitations={pendingInvitations(invitations).map((i) => ({
-            id: i.id,
-            workerRef: i.worker_ref,
-            expiresAt: i.expires_at,
-          }))}
-          workers={workers.map((w) => ({
-            userId: w.user_id,
-            workerRef: w.worker_ref,
-            since: w.created_at,
-          }))}
-          reportLink={
-            reportLink
-              ? { id: reportLink.id, createdAt: reportLink.created_at }
-              : null
-          }
-        />
-      </section>
-
-      {/* REQ-009 Session C: the registers subscription, its state and the billing portal. */}
-      <section
-        aria-labelledby="subscription-heading"
-        className="mt-8"
-        data-testid="account-subscription"
-      >
-        <h2 id="subscription-heading" className="">
-          Registers subscription
-        </h2>
-        {subscribed ? (
-          <>
-            <p
-              className="text-ink mt-2 text-sm leading-6"
-              data-testid="subscription-status"
-            >
-              {subscription?.status === "past_due"
-                ? "Active. Your last payment did not go through; Stripe is retrying. Update your card below if it keeps failing. Your records stay open meanwhile."
-                : `Active. ${pricing.subscriptionPriceCents ? `${formatAud(pricing.subscriptionPriceCents)} a month, ` : ""}cancel at any time; no fee, no notice period.`}
-            </p>
-            <BillingPortalButton />
-          </>
-        ) : (
-          <>
-            <p
-              className="text-ink mt-2 text-sm leading-6"
-              data-testid="subscription-status"
-            >
-              {subscription
-                ? "Your subscription has lapsed; your records are safe and read-only. Renew to add to them."
-                : "Not subscribed. The registers are read-only without a subscription."}
-            </p>
-            {subscription ? (
-              // REQ-023 FR-2 (findings 40, 66, 85): the s 73Q records outlive the payment; the pack holds every register.
+            {/* REQ-009 FR-3: the same rows the reminder emails are sent from. */}
+            <h3 className="mt-4">Due soon</h3>
+            {dueSoon.length === 0 ? (
               <p
-                className="text-ink mt-2 text-sm leading-6"
-                data-testid="paused-export"
+                className="text-slate mt-1 text-sm"
+                data-testid="due-soon-empty"
               >
-                {PAUSED_EXPORT_SENTENCE}{" "}
-                <a
-                  href="/registers/audit-pack.zip"
-                  className="underline underline-offset-2"
+                Nothing due in the next 30 days.
+              </p>
+            ) : (
+              <ul
+                className="mt-1 list-disc space-y-1 pl-5 text-sm leading-6"
+                data-testid="due-soon"
+              >
+                {dueSoon.map((d) => (
+                  <li key={d.id}>
+                    {d.line}
+                    {d.sent ? (
+                      <span className="text-slate"> (emailed)</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          {/* REQ-023 FR-1, FR-2: the dates from the certificate, the timeline the product derives, the one sentence that says which rules. */}
+          <section
+            aria-labelledby="registration-heading"
+            className="mt-8"
+            data-testid="account-registration"
+          >
+            <h2 id="registration-heading" className="scroll-mt-24">
+              Your registration
+            </h2>
+            <p className="text-ink mt-2 text-sm leading-6">
+              Type the dates from your certificate of registration. We work out
+              the mid-term audit and renewal dates from them and remind you by
+              email.
+            </p>
+            <RegistrationForm
+              initial={registrationInitial}
+              midterm={midterm}
+              questionnaireDone={Boolean(questionnaire.result)}
+            />
+            {period ? (
+              <>
+                <h3 className="mt-6">Your registration timeline</h3>
+                <RegistrationTimeline
+                  rows={timelineRows(period, { ownershipChangeOn })}
+                  caption="Your registration timeline"
+                  testId="registration-timeline"
+                />
+                <p
+                  className="mt-3 text-sm leading-6"
+                  data-testid="registration-position"
                 >
-                  Download your audit pack
-                </a>
+                  {positionSentence(period, today, {
+                    applicationInsideWindow: applicationInsideWindow(period),
+                  })}
+                </p>
+                <p
+                  className="text-slate mt-2 text-sm leading-6"
+                  data-testid="registration-fixed-sentence"
+                >
+                  {TIMELINE_FIXED_SENTENCE}
+                </p>
+                {/* REQ-023 FR-7 (Session C, finding 65): the renewal path, from the window on. */}
+                {today >= renewalWindowOpens(period) ? (
+                  <p className="mt-2 text-sm leading-6">
+                    <Link
+                      href="/path/renewal"
+                      className="underline underline-offset-2"
+                      data-testid="registration-renewal-link"
+                    >
+                      Your renewal path: the ten steps, in the
+                      Commission&rsquo;s order
+                    </Link>
+                  </p>
+                ) : null}
+                <p className="mt-2 text-sm leading-6">
+                  <a
+                    href="/registers/audit-pack.zip"
+                    className="underline underline-offset-2"
+                    data-testid="registration-pack-link"
+                  >
+                    Download your audit pack (every register)
+                  </a>
+                  : a provider who ceases to be registered must keep its records
+                  for three years from that day (NDIS Act s 73R).
+                </p>
+              </>
+            ) : null}
+          </section>
+
+          {/* REQ-020 FR-2, FR-3: one read-only auditor link at a time; the owner sends it, Readyline never does. */}
+          <section
+            aria-labelledby="auditor-heading"
+            className="mt-8"
+            data-testid="account-auditor-link"
+          >
+            <h2 id="auditor-heading" className="scroll-mt-24">
+              Share a read-only view with your auditor
+            </h2>
+            {/* Retro finding 59: the link is the provider's own disclosure, so the copy says what the view holds, not less. */}
+            <p className="text-ink mt-2 text-sm leading-6">
+              A link that opens your registers, your document control register
+              and your audit pack, read-only. It expires when you say and you
+              can revoke it at any time. You copy it and send it yourself; we
+              send nothing and we do not list or recommend auditors.
+            </p>
+            <p
+              className="text-ink mt-2 text-sm leading-6"
+              data-testid="auditor-link-disclosure"
+            >
+              Participants appear as the codes you typed. Everything you typed
+              into a register is in the view exactly as you typed it, so check
+              your summaries and notes for names, and for any worker named in a
+              note, before you share.
+            </p>
+            <AuditorLinkPanel
+              current={
+                auditorLink
+                  ? {
+                      id: auditorLink.id,
+                      expiresAt: auditorLink.expires_at,
+                      lastOpenedAt: auditorLink.last_opened_at,
+                      openedCount: auditorLink.opened_count,
+                    }
+                  : null
+              }
+            />
+          </section>
+
+          {/* REQ-020 FR-4, FR-5, FR-11: the workers who log for you and the report link. */}
+          <section
+            aria-labelledby="team-heading"
+            className="mt-8"
+            data-testid="account-team"
+          >
+            <h2 id="team-heading" className="scroll-mt-24">
+              Your team
+            </h2>
+            <TeamPanel
+              invitations={pendingInvitations(invitations).map((i) => ({
+                id: i.id,
+                workerRef: i.worker_ref,
+                expiresAt: i.expires_at,
+              }))}
+              workers={workers.map((w) => ({
+                userId: w.user_id,
+                workerRef: w.worker_ref,
+                since: w.created_at,
+              }))}
+              reportLink={
+                reportLink
+                  ? { id: reportLink.id, createdAt: reportLink.created_at }
+                  : null
+              }
+            />
+          </section>
+
+          {/* REQ-009 Session C: the registers subscription, its state and the billing portal. */}
+          <section
+            aria-labelledby="subscription-heading"
+            className="mt-8"
+            data-testid="account-subscription"
+          >
+            <h2 id="subscription-heading" className="scroll-mt-24">
+              Registers subscription
+            </h2>
+            {subscribed ? (
+              <>
+                <p
+                  className="text-ink mt-2 text-sm leading-6"
+                  data-testid="subscription-status"
+                >
+                  {subscription?.status === "past_due"
+                    ? "Active. Your last payment did not go through; Stripe is retrying. Update your card below if it keeps failing. Your records stay open meanwhile."
+                    : `Active. ${pricing.subscriptionPriceCents ? `${formatAud(pricing.subscriptionPriceCents)} a month, ` : ""}cancel at any time; no fee, no notice period.`}
+                </p>
+                <BillingPortalButton />
+              </>
+            ) : (
+              <>
+                <p
+                  className="text-ink mt-2 text-sm leading-6"
+                  data-testid="subscription-status"
+                >
+                  {subscription
+                    ? "Your subscription has lapsed; your records are safe and read-only. Renew to add to them."
+                    : "Not subscribed. The registers are read-only without a subscription."}
+                </p>
+                {subscription ? (
+                  // REQ-023 FR-2 (findings 40, 66, 85): the s 73Q records outlive the payment; the pack holds every register.
+                  <p
+                    className="text-ink mt-2 text-sm leading-6"
+                    data-testid="paused-export"
+                  >
+                    {PAUSED_EXPORT_SENTENCE}{" "}
+                    <a
+                      href="/registers/audit-pack.zip"
+                      className="underline underline-offset-2"
+                    >
+                      Download your audit pack
+                    </a>
+                    .
+                  </p>
+                ) : null}
+                {subscriptionOffered ? (
+                  <SubscribeButton
+                    label={
+                      pricing.subscriptionPriceCents
+                        ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
+                        : "Subscribe to the registers"
+                    }
+                    cancelPath="/account"
+                  />
+                ) : (
+                  <p
+                    className="text-slate mt-2 text-sm"
+                    data-testid="subscription-off"
+                  >
+                    {SUBSCRIPTION_OFF}
+                  </p>
+                )}
+              </>
+            )}
+          </section>
+
+          <section aria-labelledby="details-heading" className="mt-8">
+            <h2 id="details-heading" className="scroll-mt-24">
+              Business details
+            </h2>
+            <AccountForm
+              mode="settings"
+              initial={{
+                tradingName: a.trading_name,
+                structure: a.business_structure as BusinessStructureAnswer,
+                states: a.states as State[],
+                abn: a.abn ?? "",
+                ownerName: facts.name ?? "",
+                ownerRole: facts.role ?? "",
+              }}
+            />
+          </section>
+
+          <section aria-labelledby="session-heading" className="mt-10">
+            <h2 id="session-heading" className="scroll-mt-24">
+              Sessions
+            </h2>
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <form action={signOut}>
+                <button type="submit" className={secondaryButton}>
+                  Sign out
+                </button>
+              </form>
+              <form action={signOutEverywhere}>
+                {/* REQ-015 FR-15: a destructive action asks first. */}
+                <ConfirmButton
+                  label="Sign out of all devices"
+                  question="Sign out of every device, including this one?"
+                  confirmLabel="Yes, sign out everywhere"
+                  submit
+                  testId="sign-out-everywhere"
+                />
+              </form>
+            </div>
+          </section>
+
+          <section aria-labelledby="data-heading" className="mt-10">
+            <h2 id="data-heading" className="scroll-mt-24">
+              Your data
+            </h2>
+            <p className="text-ink mt-2 text-sm leading-6">
+              Download everything stored for this account as a zip of JSON
+              files. Nothing about participants is stored here; the export holds
+              your business details, questionnaire draft and account history
+              only.
+            </p>
+            <a
+              href="/account/export"
+              className={`${secondaryButton} mt-3`}
+              data-testid="export-link"
+            >
+              Export my data (zip)
+            </a>
+          </section>
+
+          <section aria-labelledby="purchases-heading" className="mt-10">
+            <h2 id="purchases-heading" className="scroll-mt-24">
+              Purchases
+            </h2>
+            {purchases.length === 0 ? (
+              <p className="text-ink mt-2 text-sm leading-6">
+                No purchases yet.{" "}
+                <Link href="/pricing" className="underline underline-offset-2">
+                  See the document pack
+                </Link>
                 .
               </p>
-            ) : null}
-            {subscriptionOffered ? (
-              <SubscribeButton
-                label={
-                  pricing.subscriptionPriceCents
-                    ? `Subscribe for ${formatAud(pricing.subscriptionPriceCents)} a month`
-                    : "Subscribe to the registers"
-                }
-                cancelPath="/account"
-              />
             ) : (
-              <p
-                className="text-slate mt-2 text-sm"
-                data-testid="subscription-off"
-              >
-                {SUBSCRIPTION_OFF}
-              </p>
-            )}
-          </>
-        )}
-      </section>
-
-      <section aria-labelledby="details-heading" className="mt-8">
-        <h2 id="details-heading" className="">
-          Business details
-        </h2>
-        <AccountForm
-          mode="settings"
-          initial={{
-            tradingName: a.trading_name,
-            structure: a.business_structure as BusinessStructureAnswer,
-            states: a.states as State[],
-            abn: a.abn ?? "",
-            ownerName: facts.name ?? "",
-            ownerRole: facts.role ?? "",
-          }}
-        />
-      </section>
-
-      <section aria-labelledby="session-heading" className="mt-10">
-        <h2 id="session-heading" className="">
-          Sessions
-        </h2>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-          <form action={signOut}>
-            <button type="submit" className={secondaryButton}>
-              Sign out
-            </button>
-          </form>
-          <form action={signOutEverywhere}>
-            {/* REQ-015 FR-15: a destructive action asks first. */}
-            <ConfirmButton
-              label="Sign out of all devices"
-              question="Sign out of every device, including this one?"
-              confirmLabel="Yes, sign out everywhere"
-              submit
-              testId="sign-out-everywhere"
-            />
-          </form>
-        </div>
-      </section>
-
-      <section aria-labelledby="data-heading" className="mt-10">
-        <h2 id="data-heading" className="">
-          Your data
-        </h2>
-        <p className="text-ink mt-2 text-sm leading-6">
-          Download everything stored for this account as a zip of JSON files.
-          Nothing about participants is stored here; the export holds your
-          business details, questionnaire draft and account history only.
-        </p>
-        <a
-          href="/account/export"
-          className={`${secondaryButton} mt-3`}
-          data-testid="export-link"
-        >
-          Export my data (zip)
-        </a>
-      </section>
-
-      <section aria-labelledby="purchases-heading" className="mt-10">
-        <h2 id="purchases-heading" className="">
-          Purchases
-        </h2>
-        {purchases.length === 0 ? (
-          <p className="text-ink mt-2 text-sm leading-6">
-            No purchases yet.{" "}
-            <Link href="/pricing" className="underline underline-offset-2">
-              See the document pack
-            </Link>
-            .
-          </p>
-        ) : (
-          <ul className="divide-rule mt-3 divide-y" data-testid="purchases">
-            {purchases.map((p) => (
-              <li
-                key={p.id}
-                className="flex flex-col gap-1 py-3 text-sm leading-6 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <span>
-                  Document pack, {formatAud(p.amountCents)},{" "}
-                  {new Date(p.createdAt).toLocaleDateString("en-AU", {
-                    timeZone: "Australia/Sydney",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                  {p.status === "refunded" ? " (refunded)" : ""}
-                </span>
-                {p.receiptUrl ? (
-                  <a
-                    href={p.receiptUrl}
-                    className="underline underline-offset-2"
-                    rel="noopener noreferrer"
+              <ul className="divide-rule mt-3 divide-y" data-testid="purchases">
+                {purchases.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex flex-col gap-1 py-3 text-sm leading-6 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    View receipt
-                  </a>
-                ) : (
-                  <span className="text-slate">
-                    Receipt by email from Stripe
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+                    <span>
+                      Document pack, {formatAud(p.amountCents)},{" "}
+                      {new Date(p.createdAt).toLocaleDateString("en-AU", {
+                        timeZone: "Australia/Sydney",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                      {p.status === "refunded" ? " (refunded)" : ""}
+                    </span>
+                    {p.receiptUrl ? (
+                      <a
+                        href={p.receiptUrl}
+                        className="underline underline-offset-2"
+                        rel="noopener noreferrer"
+                      >
+                        View receipt
+                      </a>
+                    ) : (
+                      <span className="text-slate">
+                        Receipt by email from Stripe
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <section aria-labelledby="delete-heading" className="mt-10">
-        <h2 id="delete-heading" className="">
-          Delete this account
-        </h2>
-        <DeleteAccountForm tradingName={a.trading_name} />
-      </section>
+          <section aria-labelledby="delete-heading" className="mt-10">
+            <h2 id="delete-heading" className="scroll-mt-24">
+              Delete this account
+            </h2>
+            <DeleteAccountForm tradingName={a.trading_name} />
+          </section>
+        </div>
+      </div>
     </PageShell>
   );
 }

@@ -11,11 +11,14 @@ export function BuyButton({
   label,
   cancelPath,
   testId = "buy-button",
+  variant = "primary",
 }: {
   label: string;
   cancelPath:
     "/pricing" | "/documents" | "/start/result" | "/path/before-you-buy";
   testId?: string;
+  /** REQ-028 D-2816: on the pricing page both buttons are secondary, so neither product is pushed. */
+  variant?: "primary" | "secondary";
 }) {
   const [state, action, pending] = useActionState(buyAction, null);
   return (
@@ -27,7 +30,11 @@ export function BuyButton({
         disabled={pending}
         aria-busy={pending || undefined}
         data-testid={testId}
-        className="btn-primary disabled:opacity-60"
+        className={
+          variant === "secondary"
+            ? "btn-secondary disabled:opacity-60"
+            : "btn-primary disabled:opacity-60"
+        }
       >
         {pending ? "Taking you to the payment page…" : label}
       </button>

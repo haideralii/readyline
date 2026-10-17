@@ -12,6 +12,7 @@ import {
   errorsFor,
   type FieldErrors,
 } from "../fields";
+import { revalidateField } from "../field-errors";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { EXAMPLES, HELPER } from "./practices-copy";
 import { GlossaryTerms } from "@/components/glossary-terms";
@@ -70,6 +71,10 @@ export function PracticesStepForm() {
       : {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
+  // change and its message, summary entry and aria-invalid go when it passes.
+  const clear = async (name: string, values: unknown) =>
+    setErrors(await revalidateField("practices", values, name, errors));
   const [pending, setPending] = useState(false);
 
   const helperComplete = HELPER.every((h) => helper[h.key] !== undefined);
@@ -112,20 +117,36 @@ export function PracticesStepForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first paragraph. */}
-      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
-      <p className="text-ink mb-4 text-base leading-7">
-        Some ways of keeping people safe count as restrictive practices and have
-        extra rules. In plain words, they include:
-      </p>
-      <ul className="text-ink mb-4 list-disc space-y-1 pl-5 text-base leading-7">
-        {EXAMPLES.map((example) => (
-          <li key={example}>{example}</li>
-        ))}
-      </ul>
-      <details className="border-rule mb-6 rounded-md border p-3">
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="step-side mb-4" />
+
+      <RadioGroup
+        name="restrictivePractices"
+        legend="Do you use, or plan to use, any of these with a participant?"
+        options={OPTIONS}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          void clear("restrictivePractices", { restrictivePractices: v });
+        }}
+        errors={errorsFor(errors, "restrictivePractices")}
+      />
+      {/* REQ-028 FR-5 (AC-5's second phone exception): the question's heading precedes the examples under lg;
+          from lg the examples sit in the aside column, rendered once (D-2276 (2)). */}
+      <div className="step-side mb-4" data-testid="practices-examples">
+        <p className="text-ink text-base leading-7">
+          Some ways of keeping people safe count as restrictive practices and
+          have extra rules. In plain words, they include:
+        </p>
+        <ul className="text-ink mt-2 list-disc space-y-1 pl-5 text-base leading-7">
+          {EXAMPLES.map((example) => (
+            <li key={example}>{example}</li>
+          ))}
+        </ul>
+      </div>
+      <details className="border-rule mb-6 rounded-md border p-4">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
           What counts? The Commission&apos;s definition
         </summary>
@@ -150,15 +171,6 @@ export function PracticesStepForm() {
         </p>
       </details>
 
-      <RadioGroup
-        name="restrictivePractices"
-        legend="Do you use, or plan to use, any of these with a participant?"
-        options={OPTIONS}
-        value={value}
-        onChange={setValue}
-        errors={errorsFor(errors, "restrictivePractices")}
-      />
-
       {value === "not-sure" ? (
         <div
           className="border-rule mb-6 rounded-md border p-4"
@@ -175,7 +187,19 @@ export function PracticesStepForm() {
                 help={h.help}
                 options={YES_NO}
                 value={helper[h.key]}
-                onChange={(v) => setHelper((prev) => ({ ...prev, [h.key]: v }))}
+                onChange={(v) => {
+                  const next = { ...helper, [h.key]: v };
+                  setHelper(next);
+                  void clear(`notSureHelper.${h.key}`, {
+                    restrictivePractices: value,
+                    notSureHelper: {
+                      locksOrBarriers: next.locksOrBarriers === "yes",
+                      holdsOrRestraint: next.holdsOrRestraint === "yes",
+                      medicationForBehaviour:
+                        next.medicationForBehaviour === "yes",
+                    },
+                  });
+                }}
                 errors={errorsFor(errors, `notSureHelper.${h.key}`)}
               />
             ))}

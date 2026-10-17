@@ -9,9 +9,11 @@ import type { MidTermAudit } from "@/lib/standards/derive";
 import { addMonths, formatLongDate, monthsBetween } from "./status";
 import {
   REGISTRATION_REMINDER_KINDS,
+  applicationInsideWindow,
   legalRows,
   midtermFor,
   mustStartBy,
+  ownershipAuditStartBy,
   positionSentence,
   registrationReminderLine,
   registrationReminders,
@@ -171,6 +173,61 @@ describe("the timeline (AC-1)", () => {
     expect(monthsBetween("2026-10-15", "2026-10-14")).toBe(0);
     expect(formatLongDate("2029-03-01")).toBe("1 March 2029");
   });
+
+  // REQ-023 Session D (FR-2, AC-6; findings 47 and 86).
+  it("adds the change-of-ownership audit row for a certification provider, three months after the change, with the Rules' source word", () => {
+    const rows = timelineRows(period(), { ownershipChangeOn: "2027-06-01" });
+    expect(rows.map((r) => r.id)).toEqual([
+      "midterm-prepare",
+      "midterm-start-by",
+      "ownership-audit-start-by",
+      "renewal-window",
+      "renewal-apply-by",
+      "period-end",
+    ]);
+    const row = byId(rows)["ownership-audit-start-by"];
+    expect(row.date).toBe("2027-09-01");
+    expect(row.source).toBe("Rules s 13BA");
+    expect(row.label).toBe("Change-of-ownership audit must start by");
+    expect(row.legal).toBe(true);
+    // D-2320: the row says how "under way" is read and what clears it.
+    expect(row.plain).toContain(
+      "record its date on the account page and this row goes",
+    );
+    expect(legalRows(rows).map((r) => r.id)).toContain(
+      "ownership-audit-start-by",
+    );
+    expect(ownershipAuditStartBy(period(), "2027-06-01")).toBe("2027-09-01");
+  });
+
+  it("holds the row back for a verification provider, with no change recorded, when the registration ends inside the three months, or when a mid-term audit is under way", () => {
+    expect(ownershipAuditStartBy(period(), null)).toBeNull();
+    expect(
+      ownershipAuditStartBy(
+        period({ audit_type: "verification", midterm_applies: false }),
+        "2027-06-01",
+      ),
+    ).toBeNull();
+    // The period ends 1 March 2029; a change on 1 January 2029 would need an audit by 1 April 2029.
+    expect(ownershipAuditStartBy(period(), "2029-01-01")).toBeNull();
+    expect(ownershipAuditStartBy(period(), "2028-12-01")).toBe("2029-03-01");
+    // A mid-term audit that started inside the three months after the change is under way.
+    expect(
+      ownershipAuditStartBy(
+        period({ midterm_audit_on: "2027-07-15" }),
+        "2027-06-01",
+      ),
+    ).toBeNull();
+    expect(
+      ownershipAuditStartBy(
+        period({ midterm_audit_on: "2027-04-15" }),
+        "2027-06-01",
+      ),
+    ).toBe("2027-09-01");
+    expect(
+      timelineRows(period(), { ownershipChangeOn: null }).map((r) => r.id),
+    ).not.toContain("ownership-audit-start-by");
+  });
 });
 
 describe("midtermFor (findings 45, 71, 78)", () => {
@@ -278,5 +335,55 @@ describe("the five reminders (FR-3, AC-2)", () => {
       expect(line).toMatch(/Rules s 13B|NDIS Act s 73K|our suggestion/);
       expect(line).not.toMatch(/incident|complaint|participant/i);
     }
+  });
+});
+
+/**
+ * REQ-023 FR-7 (Session C, finding 83): a recorded application counts under
+ * NDIS Act s 73K only inside the six months before the period ends; the
+ * position sentence reads that answer, so an application on the day the
+ * window opened keeps the renewal-window sentence past the suggested
+ * apply-by day, and an earlier one does not.
+ */
+describe("applicationInsideWindow (s 73K)", () => {
+  it("is true from the day the window opens to the last day, false before, after or when no date is recorded", () => {
+    expect(applicationInsideWindow(period())).toBe(false);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2028-09-01" }),
+      ),
+    ).toBe(true);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2029-03-01" }),
+      ),
+    ).toBe(true);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2028-08-31" }),
+      ),
+    ).toBe(false);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2029-03-02" }),
+      ),
+    ).toBe(false);
+  });
+
+  it("keeps the position sentence on the window once an application inside it is recorded", () => {
+    const p = period({ application_submitted_on: "2028-09-15" });
+    const late = "2029-01-15";
+    expect(positionSentence(p, late)).toMatch(/^If you have not applied/);
+    expect(
+      positionSentence(p, late, {
+        applicationInsideWindow: applicationInsideWindow(p),
+      }),
+    ).toMatch(/^Your renewal window is open/);
+    const early = period({ application_submitted_on: "2028-06-01" });
+    expect(
+      positionSentence(early, late, {
+        applicationInsideWindow: applicationInsideWindow(early),
+      }),
+    ).toMatch(/^If you have not applied/);
   });
 });

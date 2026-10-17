@@ -224,7 +224,11 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
       await page.goBack();
     }
     // One document on this viewport (REQ-016 AC-1 evidence: laptop and phone).
-    await items.first().getByRole("link").click();
+    // REQ-028 FR-7: the row holds the title link and the .docx link now; the title by name.
+    await items
+      .first()
+      .getByRole("link", { name: "Governance policy", exact: true })
+      .click();
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Governance policy",
     );

@@ -2,6 +2,18 @@ import type { Metadata } from "next";
 import type { ComplaintRow } from "@/lib/registers/types";
 import { listComplaints } from "@/server/registers/queries";
 import { COMPLAINT_STATUS_LABELS } from "@/lib/registers/labels";
+import {
+  COMPLAINT_COLUMNS,
+  cellsFor,
+  linkNameFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
+import { periodQuery } from "@/lib/registers/period";
+import {
+  PeriodEmpty,
+  RegisterPeriodBar,
+  pagePeriod,
+} from "../_components/period-filter";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 
@@ -27,9 +39,22 @@ export const COMPLAINT_FILTERS = [
   { key: "withdrawn", label: "Withdrawn" },
 ];
 
-export default async function ComplaintsPage() {
+export default async function ComplaintsPage({
+  searchParams,
+}: PageProps<"/registers/complaints">) {
   const ctx = await registerContext("/registers/complaints");
-  const rows = await listComplaints(ctx.supabase, ctx.viewer.account.id);
+  // REQ-023 FR-5: the period from the URL, "All" by default on a register page.
+  const filter = await pagePeriod(
+    ctx.supabase,
+    ctx.viewer.account.id,
+    searchParams,
+  );
+  const rows = await listComplaints(
+    ctx.supabase,
+    ctx.viewer.account.id,
+    filter.period,
+  );
+  const filtered = filter.period.kind !== "all";
   return (
     <RegisterPage
       title="Complaints"
@@ -37,22 +62,46 @@ export default async function ComplaintsPage() {
       canWrite={ctx.canWrite}
       addHref="/registers/complaints/new"
       addLabel="Add a complaint"
-      exportHref="/registers/complaints/export.zip"
+      exportHref={`/registers/complaints/export.zip${periodQuery(filter.period)}`}
+      exportLabel="Download the register and its events (zip of two CSV files)"
+      count={filtered ? undefined : rows.length}
       importHref="/registers/complaints/import"
       back={{ href: "/registers", label: "Registers" }}
     >
-      <RegisterList
-        testId="complaints-list"
-        rows={rows.map((r) => ({
-          id: r.id,
-          href: `/registers/complaints/${r.id}`,
-          title: `${r.reference}: ${r.summary.slice(0, 60)}${r.summary.length > 60 ? "…" : ""}`,
-          detail: `Received ${r.received_on}${r.from_ref ? ` from ${r.from_ref}` : ""}.`,
-          status: complaintStatus(r),
-        }))}
-        filters={COMPLAINT_FILTERS}
-        empty="No complaints recorded yet. A complaint is any expression of dissatisfaction; record it even when it is resolved on the spot."
+      <RegisterPeriodBar
+        basePath="/registers/complaints"
+        register="complaints"
+        rows={rows}
+        state={filter}
       />
+      {filtered && rows.length === 0 ? (
+        <PeriodEmpty
+          basePath="/registers/complaints"
+          testId="complaints-list"
+        />
+      ) : (
+        <RegisterList
+          testId="complaints-list"
+          rows={rows.map((r) => ({
+            id: r.id,
+            href: `/registers/complaints/${r.id}`,
+            title: `${r.reference}: ${r.summary.slice(0, 60)}${r.summary.length > 60 ? "…" : ""}`,
+            detail: `Received ${r.received_on}${r.from_ref ? ` from ${r.from_ref}` : ""}.`,
+            status: complaintStatus(r),
+            cells: cellsFor(COMPLAINT_COLUMNS, r),
+            name: linkNameFor("complaints", r) ?? undefined,
+          }))}
+          filters={COMPLAINT_FILTERS}
+          columns={tableColumns(COMPLAINT_COLUMNS)}
+          emptyAction={
+            ctx.canWrite
+              ? { href: "/registers/complaints/new", label: "Add a complaint" }
+              : undefined
+          }
+          importHref={ctx.canWrite ? "/registers/complaints/import" : undefined}
+          empty="No complaints recorded yet. A complaint is any expression of dissatisfaction; record it even when it is resolved on the spot."
+        />
+      )}
     </RegisterPage>
   );
 }

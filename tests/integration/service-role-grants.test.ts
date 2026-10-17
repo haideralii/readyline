@@ -107,6 +107,7 @@ const SECRET_KEY_TABLES = [
   "entitlements",
   "generation_jobs",
   "stripe_events",
+  "reminder_settings",
 ] as const;
 
 describe.skipIf(!enabled)("service_role table grants (D-711)", () => {
@@ -172,6 +173,13 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   // REQ-024 A1 (D-2416, Data): the s 17 roles, owner-only through RLS; the items, derived and never removed.
   risk_assessed_roles: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   onboarding_items: ["INSERT", "SELECT", "UPDATE"],
+  // REQ-024 Session B (Data, finding 175): the acknowledgements, append-only for clients; the worker's documents view.
+  policy_acknowledgements: ["INSERT", "SELECT"],
+  document_versions_worker: ["SELECT"],
+  // REQ-024 Session C (Data, finding 175): the supervision history, a register like the others.
+  supervision_entries: ["DELETE", "INSERT", "SELECT", "UPDATE"],
+  // REQ-022 Session B (D-2823): the reminder settings; members read, the owner writes, nobody deletes through the API.
+  reminder_settings: ["INSERT", "SELECT", "UPDATE"],
   // REQ-024 A2 (D-2434): the s 14 exception, ended and never removed, so no delete.
   screening_exceptions: ["INSERT", "SELECT", "UPDATE"],
   decisions: ["DELETE", "INSERT", "SELECT"],
@@ -185,6 +193,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   invitations: ["INSERT", "SELECT", "UPDATE"],
   report_links: ["INSERT", "SELECT", "UPDATE"],
   registration_periods: ["INSERT", "SELECT", "UPDATE"],
+  // REQ-023 Session D (D-2341): the changes register; members read, subscribed members insert and update, nobody deletes.
+  commission_changes: ["INSERT", "SELECT", "UPDATE"],
   // The status views.
   incidents_status: ["SELECT"],
   worker_clearances_status: ["SELECT"],
@@ -197,6 +207,7 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   staff_matrix_status: ["SELECT"],
   onboarding_checklists_status: ["SELECT"],
   hazards_status: ["SELECT"],
+  commission_changes_status: ["SELECT"],
   // REQ-024 A1 (D-2429): the worker's two views without `note`.
   staff_matrix_worker: ["SELECT"],
   worker_clearances_worker: ["SELECT"],

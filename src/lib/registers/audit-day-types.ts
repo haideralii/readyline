@@ -132,6 +132,9 @@ export const AUDIT_DAY_REGISTERS = [
   "risk_assessed_roles",
   // REQ-024 A2 (D-2434): the s 14 exception's rows.
   "screening_exceptions",
+  // REQ-024 B and C (Data, finding 66): the acknowledgements and the supervision history.
+  "policy_acknowledgements",
+  "supervision_entries",
 ] as const;
 export type AuditDayRegister = (typeof AUDIT_DAY_REGISTERS)[number];
 
@@ -374,6 +377,20 @@ export type RegisterEventRow = {
   actor_user_id: string | null;
   kind: RegisterEventKind;
   note: string;
+};
+
+/** REQ-024 Session C (FR-11; D-2829): one supervision entry as the table holds it; the supervisor is a code. */
+export type SupervisionEntryRow = {
+  id: string;
+  account_id: string;
+  worker_ref: string;
+  kind: "supervision" | "probation-review" | "conversation";
+  held_on: string;
+  by_ref: string;
+  note: string;
+  outcome: "continued" | "extended" | "ended" | null;
+  created_at: string;
+  updated_at: string;
 };
 
 /** REQ-024 A2 (D-2434): one s 14 exception as the table holds it; the pinned version is an id, the notes carry words. */

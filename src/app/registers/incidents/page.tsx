@@ -6,6 +6,17 @@ import {
 } from "@/server/registers/queries";
 import { CATEGORY_LABELS } from "@/lib/registers/labels";
 import { reportsToConfirmLine } from "@/lib/registers/worker";
+import {
+  INCIDENT_COLUMNS,
+  cellsFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
+import { periodQuery } from "@/lib/registers/period";
+import {
+  PeriodEmpty,
+  RegisterPeriodBar,
+  pagePeriod,
+} from "../_components/period-filter";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 
@@ -84,9 +95,22 @@ export function incidentDetail(r: IncidentListRow): string {
   return `${r.occurred_on}${r.participant_ref ? `, ${r.participant_ref}` : ""}.${who} ${r.summary.slice(0, 80)}${r.summary.length > 80 ? "…" : ""}`;
 }
 
-export default async function IncidentsPage() {
+export default async function IncidentsPage({
+  searchParams,
+}: PageProps<"/registers/incidents">) {
   const ctx = await registerContext("/registers/incidents");
-  const rows = await listIncidents(ctx.supabase, ctx.viewer.account.id);
+  // REQ-023 FR-5: the period from the URL, "All" by default on a register page.
+  const filter = await pagePeriod(
+    ctx.supabase,
+    ctx.viewer.account.id,
+    searchParams,
+  );
+  const rows = await listIncidents(
+    ctx.supabase,
+    ctx.viewer.account.id,
+    filter.period,
+  );
+  const filtered = filter.period.kind !== "all";
   const drafts = rows.filter((r) => r.status === "draft");
   const toConfirm = reportsToConfirmLine(drafts.length);
   return (
@@ -96,10 +120,18 @@ export default async function IncidentsPage() {
       canWrite={ctx.canWrite}
       addHref="/registers/incidents/new"
       addLabel="Add an incident"
-      exportHref="/registers/incidents/export.zip"
+      exportHref={`/registers/incidents/export.zip${periodQuery(filter.period)}`}
+      exportLabel="Download the register and its events (zip of two CSV files)"
+      count={filtered ? undefined : rows.length}
       importHref="/registers/incidents/import"
       back={{ href: "/registers", label: "Registers" }}
     >
+      <RegisterPeriodBar
+        basePath="/registers/incidents"
+        register="incidents"
+        rows={rows}
+        state={filter}
+      />
       {toConfirm ? (
         // REQ-020 FR-5, FR-6: the drafts first, each one tap from its confirmation screen.
         <section
@@ -129,21 +161,33 @@ export default async function IncidentsPage() {
           </ul>
         </section>
       ) : null}
-      <RegisterList
-        testId="incidents-list"
-        rows={rows.map((r) => ({
-          id: r.id,
-          href:
-            r.status === "draft"
-              ? `/registers/incidents/${r.id}/confirm`
-              : `/registers/incidents/${r.id}`,
-          title: `${r.reference}: ${CATEGORY_LABELS[r.category]}`,
-          detail: incidentDetail(r),
-          status: incidentStatus(r),
-        }))}
-        filters={INCIDENT_FILTERS}
-        empty="No incidents recorded yet. Add one as soon as something happens; the date you record is part of the evidence."
-      />
+      {filtered && rows.length === 0 ? (
+        <PeriodEmpty basePath="/registers/incidents" testId="incidents-list" />
+      ) : (
+        <RegisterList
+          testId="incidents-list"
+          rows={rows.map((r) => ({
+            id: r.id,
+            href:
+              r.status === "draft"
+                ? `/registers/incidents/${r.id}/confirm`
+                : `/registers/incidents/${r.id}`,
+            title: `${r.reference}: ${CATEGORY_LABELS[r.category]}`,
+            detail: incidentDetail(r),
+            status: incidentStatus(r),
+            cells: cellsFor(INCIDENT_COLUMNS, r),
+          }))}
+          filters={INCIDENT_FILTERS}
+          columns={tableColumns(INCIDENT_COLUMNS)}
+          emptyAction={
+            ctx.canWrite
+              ? { href: "/registers/incidents/new", label: "Add an incident" }
+              : undefined
+          }
+          importHref={ctx.canWrite ? "/registers/incidents/import" : undefined}
+          empty="No incidents recorded yet. Add one as soon as something happens; the date you record is part of the evidence."
+        />
+      )}
     </RegisterPage>
   );
 }

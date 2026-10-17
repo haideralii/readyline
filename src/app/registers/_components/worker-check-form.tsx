@@ -22,6 +22,7 @@ import {
   DateField,
   FormButtons,
   RefField,
+  RegisterParticipantLine,
   SafeTextArea,
   SelectField,
 } from "./inputs";
@@ -117,6 +118,7 @@ export function WorkerCheckFormView({
   return (
     <form onSubmit={onSubmit} noValidate className="mt-6">
       <ErrorSummary errors={errors} labels={LABELS} />
+      <RegisterParticipantLine />
       <RefField
         id="workerRef"
         label={LABELS.workerRef}

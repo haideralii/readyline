@@ -321,6 +321,28 @@ describe("the dated audit items once a registration period exists (REQ-023 FR-4;
       expect(lintText(item.why).map((f) => f.rule)).toEqual([]);
     }
   });
+  it("adds the change-of-ownership audit item only while the period carries its must-start-by date (REQ-023 FR-4, Session D)", () => {
+    const withOwnership = deriveChecklist(
+      personalCare.result,
+      personalCare.answers,
+      dataset,
+      { ...period, ownershipAuditStartBy: "2027-09-01" },
+    );
+    const item = withOwnership.items.find(
+      (i) => i.id === "audit:change-of-ownership-audit-started",
+    );
+    expect(item).toBeDefined();
+    expect(item!.dated).toBe(true);
+    expect(item!.dueDate).toBe("2027-09-01");
+    expect(item!.title).toContain("must start by 2027-09-01");
+    expect(item!.why).toContain("Rules s 13BA");
+    expect(
+      findProhibitedClaims(`${item!.title} ${item!.why} ${item!.ask}`),
+    ).toEqual([]);
+    expect(ids(withPeriod, "audit")).not.toContain(
+      "audit:change-of-ownership-audit-started",
+    );
+  });
   it("without a period both items stay, and a verification period has no mid-term item", () => {
     expect(ids(personalCare.checklist, "audit")).toContain("audit:book-audit");
     expect(ids(personalCare.checklist, "audit")).toContain(

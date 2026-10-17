@@ -59,8 +59,70 @@ export default async function ReviewDocumentPage({
     loadWatchChanges(),
   );
 
+  // REQ-028 FR-7: the aside holds the file, the adoption and the section list, the drafted sections marked in ochre.
+  const aside = (
+    <div
+      className="border-rule rounded-md border p-4 text-sm"
+      data-testid="reader-aside"
+    >
+      <a
+        href={`/documents/${set.id}/download?file=${typeId}.docx`}
+        className="btn-secondary w-full"
+        data-testid="reader-download"
+      >
+        Download .docx
+      </a>
+      {current.adopted_on ? (
+        <p className="text-slate mt-3" data-testid="version-adopted-on">
+          Adopted {current.adopted_on}.
+        </p>
+      ) : olderAdopted ? (
+        <AdoptVersionButton
+          setId={set.id}
+          typeId={typeId}
+          version={current.version}
+          olderAdoptedOn={olderAdopted}
+        />
+      ) : (
+        <p className="text-slate mt-3">
+          Not yet adopted. Adopt it on the adopt step once it says what you do.
+        </p>
+      )}
+      <nav aria-labelledby="sections-heading" className="mt-4">
+        <h2 id="sections-heading" className="text-sm font-medium">
+          Sections
+        </h2>
+        <ol className="mt-1" data-testid="reader-toc">
+          {current.model.sections.map((s) => {
+            const drafted = s.mode === "tailored" && s.status === "generated";
+            return (
+              <li key={s.id}>
+                <a
+                  href={`#section-${s.id}`}
+                  className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`h-2 w-2 shrink-0 rounded-full ${drafted ? "bg-ochre" : "bg-line"}`}
+                  />
+                  <span>
+                    {s.number ? `${s.number} ` : ""}
+                    {s.heading}
+                  </span>
+                  {drafted ? (
+                    <span className="sr-only">, drafted from your answers</span>
+                  ) : null}
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    </div>
+  );
+
   return (
-    <PageShell kind="reading">
+    <PageShell kind="reading" aside={aside}>
       <p className="text-sm">
         <Link
           href={`/documents/${set.id}`}
@@ -72,34 +134,15 @@ export default async function ReviewDocumentPage({
       <h1 className="mt-2">{current.model.title}</h1>
       <p className="text-slate mt-2 text-sm">
         Version {current.version} ·{" "}
-        {current.status === "ready" ? "drafted" : "review needed"} ·{" "}
-        {current.adopted_on ? (
-          <span data-testid="version-adopted-on">
-            adopted {current.adopted_on} ·{" "}
-          </span>
-        ) : null}
-        <a
-          href={`/documents/${set.id}/download?file=${typeId}.docx`}
-          className="underline underline-offset-2"
-        >
-          Download .docx
-        </a>
+        {current.status === "ready" ? "drafted" : "review needed"}
       </p>
       <p className="text-ink mt-3 text-sm leading-6">
         Each tailored section shows which of your answers it used. Regenerating
         a section records a new version of this document and shows what changed.
       </p>
-      {!current.adopted_on && olderAdopted ? (
-        <AdoptVersionButton
-          setId={set.id}
-          typeId={typeId}
-          version={current.version}
-          olderAdoptedOn={olderAdopted}
-        />
-      ) : null}
       {ruleChanges.length ? (
         <div
-          className="border-ochre mt-4 rounded-md border p-3 text-sm leading-6"
+          className="border-ochre mt-4 rounded-md border p-4 text-sm leading-6"
           data-testid="rule-changes"
         >
           <p className="font-medium">
@@ -138,7 +181,8 @@ export default async function ReviewDocumentPage({
           return (
             <li
               key={s.id}
-              className="border-rule rounded-md border p-4"
+              id={`section-${s.id}`}
+              className="border-rule scroll-mt-24 rounded-md border p-4"
               data-testid={`section-${s.id}`}
             >
               <h2 className="">
@@ -166,7 +210,7 @@ export default async function ReviewDocumentPage({
               </div>
               {diff ? (
                 <div
-                  className="bg-mist mt-3 rounded-md p-3 text-sm"
+                  className="bg-mist mt-3 rounded-md p-4 text-sm"
                   data-testid="section-diff"
                 >
                   <p className="font-medium">

@@ -13,13 +13,19 @@ import {
   mergeChecklist,
   statusLabel,
 } from "@/lib/checklist/state";
+import { applyWorkerStates } from "@/lib/checklist/worker-states";
 import { ANSWERS_VERSION, answersSchemaFor } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { latestReadySet, listChecklistItems } from "@/server/checklist/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
+import {
+  accountWorkerStates,
+  todaySydney,
+} from "@/server/registers/worker-onboarding";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { ChecklistView } from "./checklist-view";
 
@@ -62,23 +68,38 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, latest, period] = await Promise.all([
-    listChecklistItems(supabase, viewer.account.id),
-    latestReadySet(supabase, viewer.account.id),
-    currentPeriod(supabase, viewer.account.id),
-  ]);
+  const [stored, latest, period, workers, ownershipChangeOn] =
+    await Promise.all([
+      listChecklistItems(supabase, viewer.account.id),
+      latestReadySet(supabase, viewer.account.id),
+      currentPeriod(supabase, viewer.account.id),
+      // REQ-024 Session C (FR-10; D-2831): the two people items read the staff list while it has rows.
+      accountWorkerStates(
+        supabase,
+        viewer.account.id,
+        viewer.user.id,
+        built.result,
+        todaySydney(),
+      ),
+      // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+      latestOwnershipChangeOn(supabase, viewer.account.id),
+    ]);
   // REQ-023 FR-4: the dated audit items once a registration period exists.
   const checklist = deriveChecklist(
     built.result,
     answers.data,
     dataset,
-    checklistPeriod(period),
+    checklistPeriod(period, ownershipChangeOn),
   );
-  const shown = mergeChecklist({
-    checklist,
-    stored,
-    draftedDocumentTypeIds: latest.documentTypeIds,
-  });
+  const shown = applyWorkerStates(
+    mergeChecklist({
+      checklist,
+      stored,
+      draftedDocumentTypeIds: latest.documentTypeIds,
+    }),
+    workers,
+    todaySydney(),
+  );
   const today = new Intl.DateTimeFormat("en-AU", {
     day: "numeric",
     month: "long",

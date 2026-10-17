@@ -20,6 +20,12 @@ import { plainDatabaseMessage } from "@/lib/registers/messages";
 import { parseInput, strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import { hitRateLimit } from "@/server/auth/rate-limit";
+import { loadQuestionnaire } from "@/server/path/state";
+import {
+  accountModuleIds,
+  afterStaffMatrixSave,
+  todaySydney,
+} from "@/server/registers/worker-onboarding";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
 const Register = z.enum(IMPORT_REGISTERS);
@@ -28,7 +34,14 @@ const Text = z.string().max(IMPORT_LIMITS.bytes + 16);
 const PreviewInput = strictObject({ register: Register, text: Text });
 
 export type ImportCommitResult =
-  | { ok: true; imported: number; failed: number; importId: string }
+  | {
+      ok: true;
+      imported: number;
+      failed: number;
+      importId: string;
+      /** REQ-024 FR-13: staff rows left out because their code is already on the list (the register keys on it). */
+      alreadyListed?: number;
+    }
   | { ok: false; message: string };
 
 async function owner() {
@@ -73,14 +86,38 @@ export async function commitImportAction(
   const register: ImportRegister = parsed.data.register;
   const preview = previewImport(register, parsed.data.text);
   if (!preview.ok) return preview;
-  const rows = preview.rows
+  let rows = preview.rows
     .filter((r) => r.ok && r.row)
     .map((r) => ({
       account_id: o.accountId,
       ...(r.row as Record<string, unknown>),
     }));
+  // FR-13: a code already on the staff list is left out rather than failing the whole insert on the key; the count comes back.
+  let alreadyListed = 0;
+  if (register === "staff_matrix") {
+    const existing = await o.supabase
+      .from("staff_matrix")
+      .select("worker_ref")
+      .eq("account_id", o.accountId);
+    const codes = new Set(
+      ((existing.data as { worker_ref: string }[] | null) ?? []).map(
+        (r) => r.worker_ref,
+      ),
+    );
+    const kept = rows.filter(
+      (r) => !codes.has(String((r as Record<string, unknown>).worker_ref)),
+    );
+    alreadyListed = rows.length - kept.length;
+    rows = kept;
+  }
   if (rows.length === 0)
-    return { ok: false, message: "No row passed; nothing was imported." };
+    return {
+      ok: false,
+      message:
+        alreadyListed > 0
+          ? "Every passing row's worker code is already on your staff list; nothing was imported. Edit those workers on their own rows."
+          : "No row passed; nothing was imported.",
+    };
   const ins = await o.supabase.from(register).insert(rows).select("id");
   if (ins.error) {
     log.warn("registers.import.failed", {
@@ -141,13 +178,44 @@ export async function commitImportAction(
         code: own.error.code,
       });
   }
+  // REQ-024 FR-13 (D-2402, finding 110): the roles, the forced flag, the s 20 dates and each worker's derived checklist, as a saved row gets them; items are never imported.
+  if (register === "staff_matrix") {
+    const { result } = await loadQuestionnaire();
+    const moduleIds = await accountModuleIds(o.supabase, o.accountId, result);
+    const today = todaySydney();
+    for (const [i, id] of ids.entries()) {
+      // PostgREST returns the inserted rows in the order sent, so the row's own start day is the s 20 date.
+      const started = rows[i] as { started_on?: string | null } | undefined;
+      const after = await afterStaffMatrixSave(o.supabase, {
+        accountId: o.accountId,
+        userId: o.viewer.user.id,
+        rowId: id,
+        before: null,
+        isMe: false,
+        effectiveOn: started?.started_on || today,
+        moduleIds,
+        today,
+      });
+      if (!after.ok)
+        log.warn("registers.import.after-save", {
+          accountId: o.accountId,
+          register,
+        });
+    }
+  }
   await o.supabase.from("audit_log").insert({
     account_id: o.accountId,
     actor_user_id: o.viewer.user.id,
     action: `register.${register}.imported`,
     target: `${importId} ${ids.length}/${preview.rows.length}`,
   });
-  return { ok: true, imported: ids.length, failed: preview.failed, importId };
+  return {
+    ok: true,
+    imported: ids.length,
+    failed: preview.failed,
+    importId,
+    ...(alreadyListed ? { alreadyListed } : {}),
+  };
 }
 
 const UndoInput = strictObject({ id: z.string().uuid() });
@@ -185,6 +253,19 @@ export async function undoImportAction(input: unknown): Promise<UndoResult> {
       message:
         "More than an hour has passed; the rows are now ordinary entries you edit or delete one by one.",
     };
+  // REQ-024 FR-13: an undone staff import takes its derived checklists with it where nothing was ticked on them.
+  const codes =
+    row.register === "staff_matrix"
+      ? ((
+          (
+            await o.supabase
+              .from("staff_matrix")
+              .select("worker_ref")
+              .eq("account_id", o.accountId)
+              .in("id", row.row_ids)
+          ).data as { worker_ref: string }[] | null
+        )?.map((r) => r.worker_ref) ?? [])
+      : [];
   const del = await o.supabase
     .from(row.register)
     .delete()
@@ -193,6 +274,35 @@ export async function undoImportAction(input: unknown): Promise<UndoResult> {
     .select("id");
   if (del.error) return { ok: false, message: plainDatabaseMessage(del.error) };
   const removed = del.data?.length ?? 0;
+  if (codes.length > 0) {
+    const lists = await o.supabase
+      .from("onboarding_checklists")
+      .select("id, subject_ref")
+      .eq("account_id", o.accountId)
+      .eq("kind", "worker")
+      .in("subject_ref", codes);
+    const listIds = ((lists.data as { id: string }[] | null) ?? []).map(
+      (l) => l.id,
+    );
+    if (listIds.length > 0) {
+      const ticked = await o.supabase
+        .from("onboarding_ticks")
+        .select("checklist_id")
+        .in("checklist_id", listIds);
+      const keep = new Set(
+        ((ticked.data as { checklist_id: string }[] | null) ?? []).map(
+          (t) => t.checklist_id,
+        ),
+      );
+      const gone = listIds.filter((id) => !keep.has(id));
+      if (gone.length > 0)
+        await o.supabase
+          .from("onboarding_checklists")
+          .delete()
+          .eq("account_id", o.accountId)
+          .in("id", gone);
+    }
+  }
   const mark = await o.supabase
     .from("imports")
     .update({ undone_at: new Date().toISOString() })

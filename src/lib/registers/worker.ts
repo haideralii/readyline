@@ -45,10 +45,11 @@ export const REPORT_ACCOUNT_LIMIT = {
 } as const;
 
 export const EMERGENCY_LINE = "If someone is in danger now, call 000 first.";
+// REQ-024 FR-7: the role's sentence names the onboarding too, here and in the invitation.
 export const WORKER_HOME_LINE =
-  "You can log incidents and complaints and see what you logged. Your manager sees everything else.";
+  "You can log incidents and complaints and complete your onboarding here, and see what you logged. Your manager sees everything else.";
 export const INVITE_LINE =
-  "A worker can log incidents and complaints and see what they logged. They cannot see the other registers, the documents, the account or any export.";
+  "A worker can log incidents and complaints and complete their onboarding, and see what they logged. They cannot see the other registers, the documents, the account or any export.";
 export const REPORT_THANKS =
   "Thank you. The owner has been told and will confirm it. If someone is in danger now, call 000.";
 
@@ -199,3 +200,20 @@ export function reportsToConfirmLine(count: number): string | null {
   if (count <= 0) return null;
   return `${count} ${count === 1 ? "report" : "reports"} to confirm`;
 }
+
+/**
+ * REQ-024 SR-1 (AC-11; D-2414; findings 31, 37, 161, 164): the collection
+ * notice on the worker's first sign-in. It names the provider as "the
+ * provider you work for", the recipients of the code and the numbers, and
+ * the one-time file the manager may build, which Readyline does not keep.
+ */
+export const WORKER_NOTICE = {
+  heading: "Before you start: what Readyline holds about you",
+  paragraphs: (tradingName: string): string[] => [
+    `${tradingName}, the provider you work for, uses Readyline to keep its registers. About you it keeps a worker code, your role, the states you work in, the kind of check you hold with its dates, your application number and check number, the onboarding items with their dates, and the dates of your supervision. It never keeps your name, date of birth or address.`,
+    "Your worker code and your check and application numbers go to your manager's auditor through a time-limited link, into your manager's own export of their account, and to the Commission if it asks.",
+    "Your manager may type your name, date of birth and address, and the name of whoever supervises you, into a one-time file that Readyline builds and does not keep; the provider you work for keeps those details in its own records.",
+    "Your home here shows what we hold about you, except your manager's own notes. Readyline's privacy policy, linked in the footer, says the rest.",
+  ],
+  button: "I have read this",
+} as const;
