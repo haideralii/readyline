@@ -15,6 +15,7 @@ import {
 } from "@/lib/checklist/state";
 import { saveChecklistItemAction } from "@/server/checklist/actions";
 import { GlossaryTerms } from "@/components/glossary-terms";
+import { ReadyLine } from "@/components/ready-line";
 import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 
 /**
@@ -242,137 +243,148 @@ export function ChecklistView({
       </p>
       {/* REQ-027 FR-3, D-2701, D-2711: the words on this page, counted at render from the items it shows, above the first body section. */}
       <GlossaryTerms ids={present} where="page" className="mt-3" />
-      <p
-        className="mt-4 text-lg font-medium"
-        role="status"
-        aria-live="polite"
-        data-testid="checklist-progress"
-      >
-        {progressLine(ready, shown.total)}
-      </p>
-      {/* FR-11: the participant-data warning once, at the top. */}
-      <p
-        className="border-rule bg-mist mt-3 rounded-md border p-4 text-sm leading-6"
-        data-testid="checklist-privacy"
-        id="checklist-note-warning"
-      >
-        Notes are for your own reminders. <ParticipantDataWarning />
-      </p>
-
-      {nextThree.length > 0 ? (
-        <section
-          aria-labelledby="next-three-heading"
-          className="border-ochre mt-5 rounded-md border p-4"
-          data-testid="checklist-next"
+      {/* REQ-028 FR-9: columns 1 to 4 sticky with the counts, the next three and the print control; 5 to 12 the groups. */}
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+        <div
+          className="lg:sticky lg:top-24 lg:col-span-4 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-y-auto"
+          data-testid="checklist-aside"
         >
-          <h2 id="next-three-heading" className="">
-            Next three things to do
-          </h2>
-          <ol className="mt-2 list-decimal space-y-1 pl-5">
-            {nextThree.map((i) => (
-              <li key={i.id}>
+          <div className="mt-4">
+            <ReadyLine
+              counts={{ done: ready, todo: Math.max(0, shown.total - ready) }}
+              sentence={progressLine(ready, shown.total)}
+              sentenceTestId="checklist-progress"
+              live
+              testId="checklist-ready-line"
+            />
+          </div>
+
+          {nextThree.length > 0 ? (
+            <section
+              aria-labelledby="next-three-heading"
+              className="border-ochre mt-5 rounded-md border p-4"
+              data-testid="checklist-next"
+            >
+              <h2 id="next-three-heading" className="">
+                Next three things to do
+              </h2>
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                {nextThree.map((i) => (
+                  <li key={i.id}>
+                    <button
+                      type="button"
+                      onClick={() => goTo(i)}
+                      className="inline-flex min-h-11 items-center text-left underline underline-offset-4"
+                      data-testid={`next-${base(i.id)}`}
+                    >
+                      {i.title}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="btn-secondary text-sm"
+              data-testid="checklist-print-button"
+            >
+              Print this checklist
+            </button>
+            <span
+              role="status"
+              aria-live="polite"
+              className="text-slate inline-flex min-h-11 items-center gap-2"
+              data-testid="checklist-save-status"
+            >
+              {feedback?.kind === "saved" ? (
+                <span aria-hidden="true" className="text-moss">
+                  ✓
+                </span>
+              ) : null}
+              {status}
+              {feedback?.kind === "saved" && feedback.undo ? (
                 <button
                   type="button"
-                  onClick={() => goTo(i)}
-                  className="inline-flex min-h-11 items-center text-left underline underline-offset-4"
-                  data-testid={`next-${base(i.id)}`}
+                  className="min-h-11 underline underline-offset-4"
+                  onClick={() => undo(feedback.itemId, feedback.undo!)}
+                  data-testid="checklist-undo"
                 >
-                  {i.title}
+                  Undo
                 </button>
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
-
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="btn-secondary text-sm"
-          data-testid="checklist-print-button"
-        >
-          Print this checklist
-        </button>
-        <span
-          role="status"
-          aria-live="polite"
-          className="text-slate inline-flex min-h-11 items-center gap-2"
-          data-testid="checklist-save-status"
-        >
-          {feedback?.kind === "saved" ? (
-            <span aria-hidden="true" className="text-moss">
-              ✓
+              ) : null}
+              {feedback?.kind === "failed" ? (
+                <button
+                  type="button"
+                  className="min-h-11 underline underline-offset-4"
+                  onClick={feedback.retry}
+                  data-testid="checklist-retry"
+                >
+                  Try again
+                </button>
+              ) : null}
             </span>
-          ) : null}
-          {status}
-          {feedback?.kind === "saved" && feedback.undo ? (
-            <button
-              type="button"
-              className="min-h-11 underline underline-offset-4"
-              onClick={() => undo(feedback.itemId, feedback.undo!)}
-              data-testid="checklist-undo"
-            >
-              Undo
-            </button>
-          ) : null}
-          {feedback?.kind === "failed" ? (
-            <button
-              type="button"
-              className="min-h-11 underline underline-offset-4"
-              onClick={feedback.retry}
-              data-testid="checklist-retry"
-            >
-              Try again
-            </button>
-          ) : null}
-        </span>
-      </div>
-
-      {shown.groups.map((g) => {
-        const groupReady = g.items.filter(
-          (i) => local[i.id]?.status === "have",
-        ).length;
-        return (
-          <details
-            key={g.id}
-            open={openGroups[g.id] ?? g.open}
-            onToggle={(e) => {
-              const isOpen = e.currentTarget.open;
-              setOpenGroups((s) =>
-                s[g.id] === isOpen ? s : { ...s, [g.id]: isOpen },
-              );
-            }}
-            className="border-rule mt-6 rounded-md border"
-            data-testid={`checklist-group-${g.id}`}
+          </div>
+        </div>
+        <div className="lg:col-span-8">
+          {/* FR-11: the participant-data warning once, at the top of the list. */}
+          <p
+            className="border-rule bg-mist mt-4 rounded-md border p-4 text-sm leading-6 lg:mt-0"
+            data-testid="checklist-privacy"
+            id="checklist-note-warning"
           >
-            <summary className="min-h-12 cursor-pointer px-4 py-3 text-lg font-semibold">
-              {g.title}{" "}
-              <span className="text-slate text-base font-normal">
-                ({groupReady} of {g.items.length} ready)
-              </span>
-            </summary>
-            <ul className="divide-rule divide-y px-4">
-              {g.items.map((item) => (
-                <ChecklistRow
-                  key={item.id}
-                  item={item}
-                  setId={setId}
-                  status={local[item.id]?.status ?? item.status}
-                  note={local[item.id]?.note ?? ""}
-                  doneOn={local[item.id]?.doneOn ?? item.doneOn}
-                  open={openItems.has(item.id)}
-                  onToggle={() => toggleItem(item.id)}
-                  onStatus={(s) => onStatus(item, s)}
-                  onDate={(d) => onDate(item, d)}
-                  onNote={(n) => onNote(item, n)}
-                  feedback={feedback?.itemId === item.id ? feedback : null}
-                />
-              ))}
-            </ul>
-          </details>
-        );
-      })}
+            Notes are for your own reminders. <ParticipantDataWarning />
+          </p>
+
+          {shown.groups.map((g) => {
+            const groupReady = g.items.filter(
+              (i) => local[i.id]?.status === "have",
+            ).length;
+            return (
+              <details
+                key={g.id}
+                open={openGroups[g.id] ?? g.open}
+                onToggle={(e) => {
+                  const isOpen = e.currentTarget.open;
+                  setOpenGroups((s) =>
+                    s[g.id] === isOpen ? s : { ...s, [g.id]: isOpen },
+                  );
+                }}
+                className="border-rule mt-6 rounded-md border"
+                data-testid={`checklist-group-${g.id}`}
+              >
+                <summary className="min-h-12 cursor-pointer px-4 py-3 text-lg font-semibold">
+                  {g.title}{" "}
+                  <span className="text-slate text-base font-normal">
+                    ({groupReady} of {g.items.length} ready)
+                  </span>
+                </summary>
+                <ul className="divide-rule divide-y px-4">
+                  {g.items.map((item) => (
+                    <ChecklistRow
+                      key={item.id}
+                      item={item}
+                      setId={setId}
+                      status={local[item.id]?.status ?? item.status}
+                      note={local[item.id]?.note ?? ""}
+                      doneOn={local[item.id]?.doneOn ?? item.doneOn}
+                      open={openItems.has(item.id)}
+                      onToggle={() => toggleItem(item.id)}
+                      onStatus={(s) => onStatus(item, s)}
+                      onDate={(d) => onDate(item, d)}
+                      onNote={(n) => onNote(item, n)}
+                      feedback={feedback?.itemId === item.id ? feedback : null}
+                    />
+                  ))}
+                </ul>
+              </details>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
