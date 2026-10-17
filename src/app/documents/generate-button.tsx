@@ -33,10 +33,7 @@ export function GenerateButton() {
           : "Generate my documents"}
       </button>
       {message ? (
-        <p
-          role="alert"
-          className="mt-3 text-sm leading-6 text-zinc-800 dark:text-zinc-200"
-        >
+        <p role="alert" className="text-ink mt-3 text-sm leading-6">
           {message}
         </p>
       ) : null}

@@ -63,12 +63,10 @@ export function TeamPanel({
 
   return (
     <div data-testid="team-panel">
-      <h3 className="mt-4 text-lg font-semibold">Workers</h3>
-      <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-        {INVITE_LINE}
-      </p>
+      <h3 className="mt-4">Workers</h3>
+      <p className="text-ink mt-1 text-sm leading-6">{INVITE_LINE}</p>
       {workers.length > 0 ? (
-        <ul className="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul className="divide-rule mt-2 divide-y">
           {workers.map((w) => (
             <li
               key={w.userId}
@@ -94,16 +92,14 @@ export function TeamPanel({
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          No workers yet.
-        </p>
+        <p className="text-slate mt-2 text-sm">No workers yet.</p>
       )}
       {alert(removed)}
 
       {invitations.length > 0 ? (
         <>
-          <h3 className="mt-5 text-base font-semibold">Invitations waiting</h3>
-          <ul className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <h3 className="mt-5">Invitations waiting</h3>
+          <ul className="divide-rule mt-1 divide-y">
             {invitations.map((i) => (
               <li
                 key={i.id}
@@ -134,7 +130,7 @@ export function TeamPanel({
 
       {invited && invited.ok && invited.url ? (
         <div
-          className="mt-4 rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+          className="border-rule mt-4 rounded-md border p-3"
           data-testid="team-invite-sent"
         >
           <p className="text-sm leading-6">
@@ -145,14 +141,14 @@ export function TeamPanel({
             readOnly
             value={invited.url}
             aria-label="Invitation link"
-            className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+            className="border-line mt-2 block w-full rounded-md border px-3 py-2 text-sm"
             data-testid="team-invite-url"
             onFocus={(e) => e.currentTarget.select()}
           />
         </div>
       ) : null}
       <form action={invite} className="mt-4" data-testid="team-invite-form">
-        <h3 className="text-base font-semibold">Invite a worker</h3>
+        <h3 className="">Invite a worker</h3>
         <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="invite-email" className="block text-sm font-medium">
@@ -164,7 +160,7 @@ export function TeamPanel({
               type="email"
               autoComplete="off"
               required
-              className="mt-1 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+              className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
             />
           </div>
           <div>
@@ -182,12 +178,9 @@ export function TeamPanel({
               placeholder="W-003"
               required
               aria-describedby="invite-worker-ref-help"
-              className="mt-1 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+              className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
             />
-            <p
-              id="invite-worker-ref-help"
-              className="mt-1 text-xs text-zinc-600 dark:text-zinc-400"
-            >
+            <p id="invite-worker-ref-help" className="text-slate mt-1 text-sm">
               The same code as in your worker checks register, never a name.
             </p>
           </div>
@@ -204,15 +197,15 @@ export function TeamPanel({
         {alert(invited)}
       </form>
 
-      <h3 className="mt-8 text-lg font-semibold">Report link</h3>
-      <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+      <h3 className="mt-8">Report link</h3>
+      <p className="text-ink mt-1 text-sm leading-6">
         One link anyone on your team can open, signed out, to report an incident
         to you. Each report waits for you to confirm it. Turn it off at any
         time; regenerate it if it has been shared too widely.
       </p>
       {linked && linked.ok && linked.url ? (
         <div
-          className="mt-3 rounded-md border border-zinc-300 p-3 dark:border-zinc-700"
+          className="border-rule mt-3 rounded-md border p-3"
           data-testid="team-report-link-created"
         >
           <p className="text-sm leading-6">
@@ -223,7 +216,7 @@ export function TeamPanel({
             readOnly
             value={linked.url}
             aria-label="Report link"
-            className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+            className="border-line mt-2 block w-full rounded-md border px-3 py-2 text-sm"
             data-testid="team-report-link-url"
             onFocus={(e) => e.currentTarget.select()}
           />

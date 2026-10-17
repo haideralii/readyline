@@ -33,7 +33,7 @@ export function GlossaryTerms({
         What these words mean ({ids.length})
       </summary>
       <p
-        className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-1 text-sm leading-6"
         data-testid="glossary-attribution"
       >
         {GLOSSARY_ATTRIBUTION[where]}

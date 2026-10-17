@@ -76,7 +76,7 @@ function subscribeWide(onChange: () => void) {
 
 function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
   return (
-    <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+    <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
       {auditType === "verification" ? "desk audit" : "site audit"}
     </span>
   );
@@ -225,7 +225,7 @@ export function SupportsStepForm() {
           <>
             <AuditTag auditType={g.auditType} />
             {g.mandatoryFrom ? (
-              <span className="rounded-full border border-zinc-300 px-2 py-0.5 text-xs whitespace-nowrap text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm">
                 registration mandatory from 1 July 2026
               </span>
             ) : null}
@@ -283,22 +283,19 @@ export function SupportsStepForm() {
         }
       >
         <legend className="text-xl font-semibold">{GROUP_QUESTION}</legend>
-        <p
-          id="groups-help"
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id="groups-help" className="text-slate mt-1 text-sm leading-6">
           {GROUPS_HELP}
         </p>
 
         <div
-          className="mt-3 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+          className="border-rule bg-mist mt-3 rounded-md border p-3 text-sm leading-6"
           data-testid="groups-hint"
         >
           <p data-testid="groups-hint-text">{hintText}</p>
           <button
             type="button"
             onClick={applyHint}
-            className="mt-2 inline-flex min-h-11 items-center rounded-md border border-zinc-400 px-3 text-sm font-medium hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-600 dark:hover:bg-zinc-800"
+            className="border-line hover:bg-surface mt-2 inline-flex min-h-11 items-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             Choose those two for me
           </button>
@@ -321,7 +318,7 @@ export function SupportsStepForm() {
           </div>
         </div>
         <p
-          className="mt-3 text-sm text-zinc-700 dark:text-zinc-300"
+          className="text-ink mt-3 text-sm"
           aria-live="polite"
           data-testid="groups-chosen"
         >
@@ -341,7 +338,7 @@ export function SupportsStepForm() {
             return (
               <div
                 key={c.id}
-                className="rounded-md border border-zinc-200 dark:border-zinc-800"
+                className="border-rule rounded-md border"
                 data-testid={`category-${c.id}`}
                 data-open={open ? "true" : "false"}
                 data-codes={all.map((g) => g.code).join(" ")}
@@ -360,22 +357,22 @@ export function SupportsStepForm() {
                   >
                     <span
                       aria-hidden="true"
-                      className="mt-1 inline-block w-4 shrink-0 text-sm text-zinc-500"
+                      className="text-slate mt-1 inline-block w-4 shrink-0 text-sm"
                     >
                       {open ? "▾" : "▸"}
                     </span>
                     <span className="min-w-0">
                       <span className="text-base font-semibold">{c.title}</span>{" "}
-                      <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                      <span className="text-slate text-sm">
                         ({all.length} {all.length === 1 ? "class" : "classes"}
                         {ticked.length ? `, ${ticked.length} ticked` : ""})
-                      </span>
-                      <span className="block text-sm font-normal text-zinc-600 dark:text-zinc-400">
-                        {c.description}
                       </span>
                     </span>
                   </button>
                 </h2>
+                <p className="text-slate -mt-1 px-3 pb-2 pl-9 text-sm leading-6">
+                  {c.description}
+                </p>
                 {open ? (
                   <ul
                     id={`category-${c.id}-list`}
@@ -397,7 +394,7 @@ export function SupportsStepForm() {
             );
           })}
           {filtered.length === 0 ? (
-            <p className="text-sm text-zinc-500" role="status">
+            <p className="text-slate text-sm" role="status">
               No matches. Try another word, or clear the search to see every
               group.
             </p>
@@ -414,20 +411,18 @@ export function SupportsStepForm() {
       </fieldset>
 
       {sdaOnly ? (
-        <div className="mb-6 rounded-md border border-zinc-300 bg-zinc-50 p-4 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="border-rule bg-mist mb-6 rounded-md border p-4 text-sm leading-6">
           <strong>{SDA_ONLY_LEAD}</strong> {SDA_ONLY_TEXT}
         </div>
       ) : null}
 
       {silChosen ? (
         <div
-          className="mb-6 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+          className="border-rule mb-6 rounded-md border p-4"
           id="silEligibility"
         >
-          <h2 className="text-base font-semibold">
-            Two questions about supported independent living
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <h2 className="">Two questions about supported independent living</h2>
+          <p className="text-slate mt-1 text-sm leading-6">
             The Commission says it is not supported independent living if either
             of these is true. If so, class 0138 is left out of your result and
             you can still choose other groups.

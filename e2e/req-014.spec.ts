@@ -104,7 +104,8 @@ test.describe("REQ-014 visual identity", () => {
     const bodyBg = await page.evaluate(
       () => getComputedStyle(document.body).backgroundColor,
     );
-    expect(bodyBg).toBe("rgb(20, 28, 27)");
+    // REQ-028 FR-2 (D-2802): the dark paper lifted to #1B2422.
+    expect(bodyBg).toBe("rgb(27, 36, 34)");
     await axeClean(page, "home dark");
   });
 

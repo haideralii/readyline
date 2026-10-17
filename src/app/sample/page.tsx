@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SampleDocument } from "@/components/sample-document";
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function SamplePage() {
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm">
         <Link
           href="/"
@@ -26,12 +27,8 @@ export default function SamplePage() {
           ‹ Home
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        {C.sampleHeading}
-      </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-        {C.samplePageLead}
-      </p>
+      <h1 className="mt-2">{C.sampleHeading}</h1>
+      <p className="text-ink mt-3 leading-7">{C.samplePageLead}</p>
       <div className="mt-6">
         <SampleDocument level={2} />
       </div>
@@ -40,6 +37,6 @@ export default function SamplePage() {
           See which audit I need
         </Link>
       </p>
-    </div>
+    </PageShell>
   );
 }

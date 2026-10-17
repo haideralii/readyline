@@ -85,18 +85,16 @@ export function EventsTrail({
       className="mt-8"
       data-testid="events-trail"
     >
-      <h2 id="trail-heading" className="text-lg font-semibold">
+      <h2 id="trail-heading" className="">
         What has happened since ({events.length})
       </h2>
       <ol
-        className="mt-2 divide-y divide-zinc-200 text-sm dark:divide-zinc-800"
+        className="divide-rule mt-2 divide-y text-sm"
         aria-labelledby="trail-heading"
       >
         {events.map((ev) => (
           <li key={ev.id} className="py-2">
-            <span className="text-zinc-600 dark:text-zinc-400">
-              {when(ev.at)}
-            </span>{" "}
+            <span className="text-slate">{when(ev.at)}</span>{" "}
             <span className="font-medium">
               {KIND_LABEL[ev.kind] ?? ev.kind}
             </span>

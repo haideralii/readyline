@@ -42,11 +42,16 @@ paper and `text-zinc-900` is ink; new code should prefer the named tokens
 
 ## Typography
 
-- Headings: Fraunces (variable, optical size axis), weight 500, tracking
-  −0.01em, self-hosted through `next/font/google` so the CSP stays strict.
-  Sizes follow Tailwind's scale (a 1.25 modular ramp).
-- Body and UI: Geist at 16 px minimum, 1.6 line height; never below 16 px on
-  phones.
+- Headings: Fraunces (variable, optical size axis following the rendered size),
+  weight 500, tracking −0.01em, self-hosted through `next/font/google` so the
+  CSP stays strict; h1 to h3 only, never body text. The scale, phone / laptop
+  (`lg`): h1 32 / 44, h2 24 / 28, h3 19 / 20 (REQ-028 FR-12, D-2811).
+- Body and UI: Geist at 16 px at every width and 17 px from `lg`, at a 28 px
+  line (`leading-7`); prose at 65ch. The floors (REQ-028 D-2811, amending the
+  earlier "never below 16 px on phones" as REQ-025 finding 9 did for the
+  width): 14 px for tags, legends, table cells, the stepper's labels and the
+  card mode's labels; 12 px uppercase, tracked, for a table's `<th>` from `sm`
+  only; no text a person reads under 14 px anywhere.
 - Numbers: `tabular-nums` on `strong`, `dd` and `.tabular`.
 
 ## Motif: the ready line

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -31,10 +32,8 @@ export default async function WorkerHome() {
     listComplaints(supabase, viewer.worker.id),
   ]);
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Your entries for {viewer.worker.trading_name}
-      </h1>
+    <PageShell kind="list">
+      <h1 className="">Your entries for {viewer.worker.trading_name}</h1>
       <p className="mt-3 leading-7" data-testid="worker-home-line">
         {WORKER_HOME_LINE}
         {viewer.worker.worker_ref
@@ -63,15 +62,13 @@ export default async function WorkerHome() {
         className="mt-10"
         data-testid="worker-entries"
       >
-        <h2 id="mine-heading" className="text-xl font-semibold">
+        <h2 id="mine-heading" className="">
           What you logged
         </h2>
         {incidents.length === 0 && complaints.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Nothing yet.
-          </p>
+          <p className="text-slate mt-2 text-sm">Nothing yet.</p>
         ) : (
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-rule mt-3 divide-y">
             {incidents.map((r) => (
               <li
                 key={r.id}
@@ -81,7 +78,7 @@ export default async function WorkerHome() {
                 <span className="font-medium">
                   {r.reference}: {CATEGORY_LABELS[r.category]}
                 </span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-ink">
                   {r.occurred_on}
                   {r.participant_ref ? `, ${r.participant_ref}` : ""}.{" "}
                   {r.summary.slice(0, 80)}
@@ -98,7 +95,7 @@ export default async function WorkerHome() {
                 <span className="font-medium">
                   {r.reference}: complaint by {CHANNEL_LABELS[r.channel]}
                 </span>{" "}
-                <span className="text-zinc-700 dark:text-zinc-300">
+                <span className="text-ink">
                   {r.received_on}. {r.summary.slice(0, 80)}
                   {r.summary.length > 80 ? "…" : ""}
                 </span>
@@ -117,6 +114,6 @@ export default async function WorkerHome() {
           Sign out
         </button>
       </form>
-    </div>
+    </PageShell>
   );
 }

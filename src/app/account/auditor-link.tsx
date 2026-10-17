@@ -46,7 +46,7 @@ export function AuditorLinkPanel({
   return (
     <div data-testid="auditor-link-panel">
       {created && created.ok && "url" in created ? (
-        <div className="mt-3 rounded-md border border-zinc-300 p-3 dark:border-zinc-700">
+        <div className="border-rule mt-3 rounded-md border p-3">
           <p className="text-sm leading-6">
             Your link, shown once. Copy it and send it to your auditor yourself;
             it expires on {when(created.expiresAt)}.
@@ -55,7 +55,7 @@ export function AuditorLinkPanel({
             readOnly
             value={created.url}
             aria-label="Auditor link"
-            className="mt-2 block w-full rounded-md border border-zinc-400 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+            className="border-line mt-2 block w-full rounded-md border px-3 py-2 text-sm"
             data-testid="auditor-link-url"
             onFocus={(e) => e.currentTarget.select()}
           />
@@ -89,7 +89,7 @@ export function AuditorLinkPanel({
           id="auditor-hours"
           name="hours"
           defaultValue="72"
-          className="mt-1 rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+          className="border-line mt-1 rounded-md border px-3 py-2 text-base"
         >
           <option value="24">24 hours</option>
           <option value="48">48 hours</option>

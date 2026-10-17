@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { ReadyLine } from "@/components/ready-line";
 import { readyLineCounts } from "@/lib/questionnaire/readiness";
@@ -52,7 +53,7 @@ export default function Home() {
     (s) => s.mode === "tailored",
   ).length;
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <PageShell kind="grid">
       {/* REQ-011: Organization structured data; the ABN joins once BUSINESS_ABN is set. */}
       <JsonLd
         data={{
@@ -74,16 +75,10 @@ export default function Home() {
             : {}),
         }}
       />
-      <section className="max-w-2xl" data-testid="home-hero">
-        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-          {C.eyebrow}
-        </p>
-        <h1 className="mt-2 text-3xl tracking-tight sm:text-4xl">
-          {heroHeadline(price)}
-        </h1>
-        <p className="mt-4 text-lg leading-8 text-zinc-700 dark:text-zinc-300">
-          {C.lead}
-        </p>
+      <section data-testid="home-hero">
+        <p className="text-slate text-sm font-medium">{C.eyebrow}</p>
+        <h1 className="mt-2">{heroHeadline(price)}</h1>
+        <p className="text-ink mt-4 text-lg leading-8">{C.lead}</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link href="/start" className="btn-primary" data-testid="home-cta">
             {C.cta}
@@ -96,17 +91,14 @@ export default function Home() {
             {C.ctaSecondary}
           </Link>
         </div>
-        <p
-          className="mt-3 text-sm text-zinc-600 dark:text-zinc-400"
-          data-testid="home-free-line"
-        >
+        <p className="text-slate mt-3 text-sm" data-testid="home-free-line">
           {C.ctaNote}
         </p>
         {/* Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second. */}
         {/* Batch 47 item 1: the subscription is named only while it can be bought; otherwise the one off-state sentence. */}
         {subscriptionOffered && subscriptionPrice ? (
           <p
-            className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-4 text-sm leading-6"
             data-testid="home-subscription-line"
           >
             <strong className="font-semibold">{C.keepsEyebrow}:</strong>{" "}
@@ -114,7 +106,7 @@ export default function Home() {
           </p>
         ) : (
           <p
-            className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-4 text-sm leading-6"
             data-testid="home-subscription-off"
           >
             <strong className="font-semibold">{C.keepsEyebrow}:</strong>{" "}
@@ -123,7 +115,7 @@ export default function Home() {
         )}
         {price ? (
           <p
-            className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+            className="text-ink mt-2 text-sm leading-6"
             data-testid="home-price-line"
           >
             <strong className="font-semibold">{C.startLine}</strong>{" "}
@@ -142,28 +134,28 @@ export default function Home() {
       {/* REQ-025 FR-12: the sample left this page (13,400 px at 360 px with it); a card and two links point at /sample. */}
       <section
         id="sample"
-        className="mt-12 max-w-2xl scroll-mt-6"
+        className="mt-12 scroll-mt-6"
         aria-labelledby="sample-heading"
         data-testid="home-sample"
       >
-        <h2 id="sample-heading" className="text-xl font-semibold">
+        <h2 id="sample-heading" className="">
           {C.sampleHeading}
         </h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+        <ul className="text-ink mt-2 list-disc space-y-1 pl-5 leading-7">
           {C.sampleIntro.map((line) => (
             <li key={line}>{line}</li>
           ))}
         </ul>
         <div
-          className="mt-4 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+          className="border-rule mt-4 rounded-md border p-4"
           data-testid="home-sample-card"
         >
           <p className="text-lg font-semibold">{SAMPLE_DOCUMENT.title}</p>
-          <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          <p className="text-ink mt-1 text-sm leading-6">
             {C.sampleCardDescription}
           </p>
           <p
-            className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
+            className="text-slate mt-1 text-sm"
             data-testid="home-sample-sections"
           >
             {sampleTailored} of {SAMPLE_DOCUMENT.sections.length} sections
@@ -189,22 +181,17 @@ export default function Home() {
       </section>
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="trust-heading"
         data-testid="home-trust"
       >
-        <h2 id="trust-heading" className="text-xl font-semibold">
+        <h2 id="trust-heading" className="">
           {C.trustHeading}
         </h2>
-        <ul className="mt-4 space-y-3 leading-7 text-zinc-700 dark:text-zinc-300">
+        <ul className="text-ink mt-4 space-y-3 leading-7">
           {C.trust.map((t) => (
-            <li
-              key={t.title}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
-            >
-              <strong className="font-semibold text-zinc-900 dark:text-zinc-50">
-                {t.title}.
-              </strong>{" "}
+            <li key={t.title} className="border-rule rounded-md border p-4">
+              <strong className="text-ink font-semibold">{t.title}.</strong>{" "}
               {t.text}
             </li>
           ))}
@@ -212,17 +199,15 @@ export default function Home() {
       </section>
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="example-heading"
         data-testid="home-example"
       >
-        <h2 id="example-heading" className="text-xl font-semibold">
+        <h2 id="example-heading" className="">
           {C.exampleHeading}
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          {C.exampleLead}
-        </p>
-        <div className="mt-4 rounded-md border border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
+        <p className="text-slate mt-2 text-sm leading-6">{C.exampleLead}</p>
+        <div className="border-rule bg-mist mt-4 rounded-md border p-4">
           <p className="text-lg leading-8">
             <strong>{C.example.audit}</strong> {C.example.summary}
           </p>
@@ -236,25 +221,23 @@ export default function Home() {
           <dl className="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
             {C.example.facts.map((f) => (
               <div key={f.label}>
-                <dt className="text-zinc-600 dark:text-zinc-400">{f.label}</dt>
+                <dt className="text-slate">{f.label}</dt>
                 <dd className="font-medium">{f.value}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            {C.example.note}
-          </p>
+          <p className="text-slate mt-3 text-sm leading-6">{C.example.note}</p>
         </div>
       </section>
 
       <Testimonials />
 
       <section
-        className="mt-12 max-w-2xl"
+        className="mt-12"
         aria-labelledby="mission-heading"
         data-testid="home-mission"
       >
-        <h2 id="mission-heading" className="text-xl font-semibold">
+        <h2 id="mission-heading" className="">
           {C.missionHeading}
         </h2>
         {[
@@ -263,10 +246,7 @@ export default function Home() {
             .join(" "),
           ...C.mission,
         ].map((p) => (
-          <p
-            key={p.slice(0, 24)}
-            className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
-          >
+          <p key={p.slice(0, 24)} className="text-ink mt-3 leading-7">
             {p}
           </p>
         ))}
@@ -291,8 +271,8 @@ export default function Home() {
           five bullets restated the hero and the sample card, and with the
           glossary disclosure and the subscription sentence the page sat on
           REQ-025 FR-12's 5,000 px cap at 360 px. The pricing line stays. */}
-      <section className="mt-12 max-w-2xl">
-        <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+      <section className="mt-12">
+        <p className="text-slate text-sm leading-6">
           {C.pricingLead}{" "}
           <Link href="/pricing" className="underline underline-offset-2">
             {C.pricingLink}
@@ -300,6 +280,6 @@ export default function Home() {
           . {BRAND} {C.closing}
         </p>
       </section>
-    </div>
+    </PageShell>
   );
 }

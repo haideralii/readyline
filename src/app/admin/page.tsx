@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { unverifiedChecklistItems } from "@/lib/checklist/confidence";
 import { requireAdmin, writeAdminAudit } from "@/server/admin/access";
@@ -59,26 +60,21 @@ export default async function AdminPage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">Admin</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+    <PageShell kind="list">
+      <h1 className="">Admin</h1>
+      <p className="text-slate mt-2 text-sm">
         Signed in with a verified authenticator. Every visit and action here is
         written to the audit log.
       </p>
 
       <section aria-labelledby="counts-heading" className="mt-8">
-        <h2 id="counts-heading" className="text-xl font-semibold">
+        <h2 id="counts-heading" className="">
           Counts
         </h2>
         <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {rows.map((r) => (
-            <div
-              key={r.label}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
-            >
-              <dt className="text-sm text-zinc-600 dark:text-zinc-400">
-                {r.label}
-              </dt>
+            <div key={r.label} className="border-rule rounded-md border p-4">
+              <dt className="text-slate text-sm">{r.label}</dt>
               <dd className="mt-1 text-2xl font-semibold">{r.value ?? "–"}</dd>
             </div>
           ))}
@@ -90,22 +86,17 @@ export default async function AdminPage() {
         className="mt-10"
         data-testid="admin-counters"
       >
-        <h2 id="counters-heading" className="text-xl font-semibold">
+        <h2 id="counters-heading" className="">
           Last 30 days
         </h2>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-slate mt-1 text-sm">
           First-party counts by day: no cookies, no third party, nothing per
           person.
         </p>
         <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {COUNTER_EVENTS.map((e) => (
-            <div
-              key={e}
-              className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
-            >
-              <dt className="text-sm text-zinc-600 dark:text-zinc-400">
-                {COUNTER_LABELS[e]}
-              </dt>
+            <div key={e} className="border-rule rounded-md border p-4">
+              <dt className="text-slate text-sm">{COUNTER_LABELS[e]}</dt>
               <dd
                 className="mt-1 text-2xl font-semibold"
                 data-testid={`counter-${e}`}
@@ -119,11 +110,11 @@ export default async function AdminPage() {
 
       {/* REQ-013 batch 36 item 2: the evidence-confidence flag lives here and in the evidence files, never on a customer page. */}
       <section aria-labelledby="confidence-heading" className="mt-10">
-        <h2 id="confidence-heading" className="text-xl font-semibold">
+        <h2 id="confidence-heading" className="">
           Evidence confidence: checklist items the Commission&apos;s text does
           not state
         </h2>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="text-slate mt-2 text-sm">
           Readyline&apos;s own evidence items across the three reference cases.
           The customer sees a plain &quot;check this&quot; sentence with the
           source link instead of this flag.
@@ -136,14 +127,14 @@ export default async function AdminPage() {
       </section>
 
       <section aria-labelledby="audit-heading" className="mt-10">
-        <h2 id="audit-heading" className="text-xl font-semibold">
+        <h2 id="audit-heading" className="">
           Recent audit log
         </h2>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">Recent audit log</caption>
             <thead>
-              <tr className="border-b border-zinc-200 dark:border-zinc-800">
+              <tr className="border-rule border-b">
                 <th scope="col" className="py-2 pr-3">
                   When (UTC)
                 </th>
@@ -160,10 +151,7 @@ export default async function AdminPage() {
             </thead>
             <tbody>
               {(recent.data ?? []).map((e) => (
-                <tr
-                  key={e.id}
-                  className="border-b border-zinc-100 dark:border-zinc-900"
-                >
+                <tr key={e.id} className="border-rule border-b">
                   <td className="py-2 pr-3 whitespace-nowrap">
                     {new Date(e.at)
                       .toISOString()
@@ -171,10 +159,10 @@ export default async function AdminPage() {
                       .slice(0, 19)}
                   </td>
                   <td className="py-2 pr-3">{e.action}</td>
-                  <td className="py-2 pr-3 font-mono text-xs">
+                  <td className="py-2 pr-3 font-mono text-sm">
                     {e.account_id ?? "–"}
                   </td>
-                  <td className="py-2 font-mono text-xs">
+                  <td className="py-2 font-mono text-sm">
                     {e.actor_user_id ?? "system"}
                   </td>
                 </tr>
@@ -184,11 +172,11 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <p className="mt-10 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-sm">
         The purge job runs daily from Vercel Cron; to run it by hand call the
         purge route with the cron secret and{" "}
         <code className="mx-1">?dryRun=1</code> first.
       </p>
-    </div>
+    </PageShell>
   );
 }

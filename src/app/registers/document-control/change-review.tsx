@@ -79,19 +79,17 @@ export function ChangeReview(props: {
       <p className="mt-1">{describeChange(change)}</p>
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>
-          <dt className="text-zinc-600 dark:text-zinc-400">Before</dt>
+          <dt className="text-slate">Before</dt>
           <dd className="[overflow-wrap:anywhere]">
             {change.oldSentence ?? "No sentence about this."}
           </dd>
         </div>
         <div>
-          <dt className="text-zinc-600 dark:text-zinc-400">Now</dt>
+          <dt className="text-slate">Now</dt>
           <dd className="[overflow-wrap:anywhere]">{change.newSentence}</dd>
         </div>
       </dl>
-      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
-        Source: {change.source}
-      </p>
+      <p className="text-slate mt-1 text-sm">Source: {change.source}</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {canRegenerate ? (
           <button

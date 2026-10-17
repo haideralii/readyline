@@ -46,20 +46,17 @@ export function MfaForm({ mode }: { mode: Mode }) {
         <div className="mb-6">
           {/* The SVG comes from Supabase's enrol response for this session only. */}
           <div
-            className="inline-block rounded-md border border-zinc-300 bg-white p-2"
+            className="border-rule bg-surface inline-block rounded-md border p-2"
             dangerouslySetInnerHTML={{ __html: qr.svg }}
           />
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-slate mt-2 text-sm">
             Cannot scan? Enter this key by hand:{" "}
             <code className="font-mono">{qr.secret}</code>
           </p>
         </div>
       ) : null}
       {mode.kind === "enrol" && !qr && !error ? (
-        <p
-          role="status"
-          className="mb-4 text-sm text-zinc-600 dark:text-zinc-400"
-        >
+        <p role="status" className="text-slate mb-4 text-sm">
           Preparing your authenticator code…
         </p>
       ) : null}
@@ -76,7 +73,7 @@ export function MfaForm({ mode }: { mode: Mode }) {
         onChange={(e) => setCode(e.target.value.replace(/[^\d]/g, ""))}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? "code-error" : undefined}
-        className="mt-2 block w-full max-w-40 rounded-md border border-zinc-300 bg-white px-3 py-2 text-base tracking-widest dark:border-zinc-700 dark:bg-zinc-950"
+        className="border-line bg-surface mt-2 block w-full max-w-40 rounded-md border px-3 py-2 text-base tracking-widest"
       />
       {error ? (
         <p

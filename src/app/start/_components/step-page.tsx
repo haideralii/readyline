@@ -78,7 +78,7 @@ export function StepPage({
           </fieldset>
         ) : (
           <div className="min-h-[70vh]">
-            <p className="text-zinc-600 dark:text-zinc-400" role="status">
+            <p className="text-slate" role="status">
               Loading your draft…
             </p>
           </div>

@@ -179,7 +179,7 @@ export async function zoom200NoSidewaysScroll(page: Page, label: string) {
   await setTextZoom(page, null);
   expect(
     r.scrollWidth,
-    `${label} at 200% text: page scrollWidth ${r.scrollWidth} exceeds viewport ${r.innerWidth}; offenders: ${r.offenders.join(" | ") || "none found"}`,
+    `${label} at 200% text: page scrollWidth ${r.scrollWidth} exceeds viewport ${r.innerWidth}; offenders: ${r.offenders.join(" | ") || "none found"}; overflowing content: ${r.overflowing.join(" | ") || "none found"}`,
   ).toBeLessThanOrEqual(r.innerWidth);
   expect(
     r.offenders,

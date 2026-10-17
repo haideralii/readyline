@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -33,9 +34,9 @@ import { GenerateButton } from "./generate-button";
 export const metadata: Metadata = { title: "Your documents" };
 
 const button =
-  "inline-flex min-h-12 items-center justify-center rounded-md border border-zinc-300 px-5 text-base font-medium hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 dark:border-zinc-700 dark:hover:bg-zinc-900";
+  "inline-flex min-h-12 items-center justify-center rounded-md border border-line px-5 text-base font-medium hover:bg-mist focus-visible:outline-2 focus-visible:outline-offset-2";
 const link = "underline underline-offset-2";
-const box = "mt-6 rounded-md border border-zinc-300 p-5 dark:border-zinc-700";
+const box = "mt-6 rounded-md border border-rule p-5";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-AU", {
@@ -56,7 +57,7 @@ function PurchaseLinks({
 }) {
   if (!purchase) return null;
   return (
-    <div className="mt-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+    <div className="text-ink mt-4 text-sm leading-6">
       <p>
         Paid {formatAud(purchase.amountCents)} on{" "}
         {formatDate(purchase.createdAt)}.{" "}
@@ -121,27 +122,25 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-none"
         >
-          <h2 id="buy-heading" className="text-xl font-semibold">
+          <h2 id="buy-heading" className="">
             {C.buyHeading}
           </h2>
-          <p className="mt-2 leading-7 text-zinc-700 dark:text-zinc-300">
-            {C.buyLead}
-          </p>
+          <p className="text-ink mt-2 leading-7">{C.buyLead}</p>
           {pricing.packPriceCents ? (
             <p className="mt-3">
               <span className="text-3xl font-semibold" data-testid="pack-price">
                 {formatAud(pricing.packPriceCents)}
               </span>{" "}
-              <span className="text-zinc-600 dark:text-zinc-400">one-off</span>
+              <span className="text-slate">one-off</span>
               {pricing.gstLine ? (
-                <span className="block text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="text-slate block text-sm">
                   {pricing.gstLine}
                 </span>
               ) : null}
             </p>
           ) : null}
           <BuyButton label={C.buyButton} cancelPath="/documents" />
-          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <p className="text-slate mt-3 text-sm leading-6">
             {C.buyTerms}{" "}
             <Link href="/pricing" className={link}>
               pricing page
@@ -175,12 +174,9 @@ function PurchaseSection({
             // REQ-021: the five honest phases from the job row; the words below stay for the status role.
             <WritingIndicator initial={writing} />
           ) : (
-            <h2 className="text-xl font-semibold">{C.preparingHeading}</h2>
+            <h2 className="">{C.preparingHeading}</h2>
           )}
-          <p
-            role="status"
-            className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-          >
+          <p role="status" className="text-slate mt-3 text-sm leading-6">
             {C.preparing} {C.preparingProgress(state.documentsDone)}
           </p>
           <PurchaseLinks purchase={state.purchase} email={email} />
@@ -193,7 +189,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-delayed"
         >
-          <h2 id="delayed-heading" className="text-xl font-semibold">
+          <h2 id="delayed-heading" className="">
             {C.preparingHeading}
           </h2>
           <p role="status" className="mt-2 leading-7">
@@ -213,7 +209,7 @@ function PurchaseSection({
             // REQ-021 S6, AC-3: the Ready state at once, leading with the next step of the guided path.
             <WritingIndicator initial={writing} />
           ) : (
-            <h2 id="ready-heading" className="text-xl font-semibold">
+            <h2 id="ready-heading" className="">
               {C.readyHeading}
             </h2>
           )}
@@ -251,7 +247,7 @@ function PurchaseSection({
           className={box}
           data-testid="purchase-refunded"
         >
-          <h2 id="refunded-heading" className="text-xl font-semibold">
+          <h2 id="refunded-heading" className="">
             {C.refundedHeading}
           </h2>
           <p className="mt-2 leading-7">
@@ -304,11 +300,9 @@ export default async function DocumentsPage({
   );
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">Your documents</h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-        {C.intro}
-      </p>
+    <PageShell kind="grid">
+      <h1 className="">Your documents</h1>
+      <p className="text-ink mt-3 leading-7">{C.intro}</p>
 
       {/* Batch 45 item 2: with generation off and nothing bought, no Buy box; the one line below says why. */}
       {enabled || state.kind !== "none" ? (
@@ -325,10 +319,10 @@ export default async function DocumentsPage({
 
       {enabled ? (
         <section aria-labelledby="generate-heading" className="mt-10">
-          <h2 id="generate-heading" className="text-xl font-semibold">
+          <h2 id="generate-heading" className="">
             Generate a new set
           </h2>
-          <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          <p className="text-ink mt-2 text-sm leading-6">
             Uses your current questionnaire answers. Each account can generate a
             few sets a day; the limit resets at midnight Sydney time.
           </p>
@@ -338,7 +332,7 @@ export default async function DocumentsPage({
         <p
           role="status"
           data-testid="generation-disabled"
-          className="mt-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mt-6 text-sm leading-6"
         >
           {DISABLED_MESSAGE}{" "}
           <Link href="/start/result" className={link}>
@@ -350,10 +344,10 @@ export default async function DocumentsPage({
 
       {otherSets.length > 0 ? (
         <section aria-labelledby="sets-heading" className="mt-10">
-          <h2 id="sets-heading" className="text-xl font-semibold">
+          <h2 id="sets-heading" className="">
             {state.kind === "ready" ? "Other document sets" : "Document sets"}
           </h2>
-          <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <ul className="divide-rule mt-3 divide-y">
             {otherSets.map((s) => (
               <li key={s.id} className="py-3">
                 <Link
@@ -365,7 +359,7 @@ export default async function DocumentsPage({
                     timeZone: "Australia/Sydney",
                   })}
                 </Link>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="text-slate text-sm">
                   {s.status === "ready"
                     ? `${s.document_count} documents; ${s.fallback_section_count} section${s.fallback_section_count === 1 ? "" : "s"} to review`
                     : s.status === "generating"
@@ -377,6 +371,6 @@ export default async function DocumentsPage({
           </ul>
         </section>
       ) : null}
-    </div>
+    </PageShell>
   );
 }

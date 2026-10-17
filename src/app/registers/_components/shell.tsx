@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -56,7 +57,7 @@ export function RegisterPage({
   children: ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       {back ? (
         <p className="text-sm">
           <Link
@@ -68,18 +69,14 @@ export function RegisterPage({
         </p>
       ) : null}
       {/* The register list and the events trail are labelled by this heading (backlog 1, D-1508). */}
-      <h1 id="register-title" className="text-3xl font-semibold tracking-tight">
+      <h1 id="register-title" className="">
         {title}
       </h1>
-      {intro ? (
-        <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
-          {intro}
-        </p>
-      ) : null}
+      {intro ? <p className="text-ink mt-3 leading-7">{intro}</p> : null}
       {!canWrite ? (
         <p
           role="status"
-          className="mt-4 rounded-md border border-zinc-300 bg-zinc-50 p-3 text-sm leading-6 dark:border-zinc-700 dark:bg-zinc-900"
+          className="border-rule bg-mist mt-4 rounded-md border p-3 text-sm leading-6"
           data-testid="register-lapsed"
         >
           {LAPSE_MESSAGE}
@@ -117,6 +114,6 @@ export function RegisterPage({
         </div>
       ) : null}
       {children}
-    </div>
+    </PageShell>
   );
 }

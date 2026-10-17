@@ -27,7 +27,7 @@ export function DeleteAccountForm({ tradingName }: { tradingName: string }) {
       className="mt-3"
       data-testid="delete-account-form"
     >
-      <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink text-sm leading-6">
         Deleting hides everything in the account at once, signs you out
         everywhere, and permanently removes the data after 30 days. Export your
         data first if you want a copy.

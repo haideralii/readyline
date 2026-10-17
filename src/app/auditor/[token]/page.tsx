@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
@@ -63,30 +64,26 @@ export default async function AuditorPage({
   // the plain message stands in, and nothing is written or shown.
   if (!(await checkAuditorOpenAllowed(link.linkId, address)))
     return (
-      <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Too many opens
-        </h1>
+      <PageShell kind="reading">
+        <h1 className="">Too many opens</h1>
         <p className="mt-3 leading-7" data-testid="auditor-limited">
           {AUDITOR_OPEN_LIMITED_LINE}
         </p>
-      </div>
+      </PageShell>
     );
   await recordAuditorOpen(admin, link, address, "opened");
   const view = await collectAuditView(admin, link.accountId);
   const date = new Date().toISOString().slice(0, 10);
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p
         role="status"
-        className="rounded-md border border-zinc-300 p-3 text-sm leading-6 dark:border-zinc-700"
+        className="border-rule rounded-md border p-3 text-sm leading-6"
         data-testid="auditor-banner"
       >
         {auditorBanner(link.tradingName, link.expiresAt)}
       </p>
-      <h1 className="mt-6 text-3xl font-semibold tracking-tight">
-        Audit view: {link.tradingName}
-      </h1>
+      <h1 className="mt-6">Audit view: {link.tradingName}</h1>
       <p className="mt-3 leading-7">{packIntro(link.tradingName, date)}</p>
       <p className="mt-4">
         <a
@@ -103,7 +100,7 @@ export default async function AuditorPage({
         className="mt-10"
         data-testid="auditor-records"
       >
-        <h2 id="records-heading" className="text-xl font-semibold">
+        <h2 id="records-heading" className="">
           The records, and the state of each
         </h2>
         <DataTable
@@ -123,7 +120,7 @@ export default async function AuditorPage({
         className="mt-10"
         data-testid="auditor-document-control"
       >
-        <h2 id="dc-heading" className="text-xl font-semibold">
+        <h2 id="dc-heading" className="">
           Document control register
         </h2>
         <DataTable
@@ -142,7 +139,7 @@ export default async function AuditorPage({
           className="mt-10"
           data-testid={`auditor-register-${t.id}`}
         >
-          <h2 id={`reg-${t.id}`} className="text-xl font-semibold">
+          <h2 id={`reg-${t.id}`} className="">
             {t.title}
           </h2>
           {t.rows.length ? (
@@ -152,16 +149,14 @@ export default async function AuditorPage({
               rows={t.rows.map((r) => t.columns.map((c) => cell(r[c])))}
             />
           ) : (
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Nothing recorded yet.
-            </p>
+            <p className="text-slate mt-2 text-sm">Nothing recorded yet.</p>
           )}
         </section>
       ))}
 
-      <p className="mt-10 text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-sm">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
-    </div>
+    </PageShell>
   );
 }

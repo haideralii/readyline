@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -44,10 +45,8 @@ export default async function InvitePage({
   const viewer = await getViewer();
   if (viewer?.account) redirect("/account");
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        {preview.trading_name} has invited you
-      </h1>
+    <PageShell kind="reading">
+      <h1 className="">{preview.trading_name} has invited you</h1>
       <p className="mt-3 leading-7" data-testid="invite-line">
         You would log as worker {preview.worker_ref}. {INVITE_LINE}
       </p>
@@ -64,6 +63,6 @@ export default async function InvitePage({
           </Link>
         </p>
       )}
-    </div>
+    </PageShell>
   );
 }

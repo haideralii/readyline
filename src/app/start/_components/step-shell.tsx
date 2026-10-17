@@ -1,4 +1,5 @@
 "use client";
+import { PageShell } from "@/components/page-shell";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
@@ -42,7 +43,7 @@ export function StepShell({
   // has to end inside a 681 px iPhone screen (REQ-015 FR-4), and the stepper's
   // second row had pushed it 13 px past it (run 38772962718).
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:px-6 sm:py-12">
+    <PageShell kind="form" padding="compact">
       {/* Batch 48 item 2: one stepper on every step; a done step is the way back to it. */}
       <Stepper step={step} answers={answers} ready={ready} />
       {step === "result" ? (
@@ -69,7 +70,7 @@ export function StepShell({
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="focus-quiet mt-4 text-2xl font-semibold tracking-tight outline-none sm:text-3xl"
+        className="focus-quiet mt-4 outline-none"
       >
         {STEP_TITLES[step]}
       </h1>
@@ -77,7 +78,7 @@ export function StepShell({
       <div className="mt-6">{children}</div>
 
       <p
-        className="mt-8 text-xs text-zinc-500 dark:text-zinc-400"
+        className="text-slate mt-8 text-sm"
         role="status"
         data-testid="draft-status"
       >
@@ -93,6 +94,6 @@ export function StepShell({
               ? "Could not save a draft on this device; your answers stay in this tab."
               : "Your draft will be saved locally on this device after each step."}
       </p>
-    </div>
+    </PageShell>
   );
 }

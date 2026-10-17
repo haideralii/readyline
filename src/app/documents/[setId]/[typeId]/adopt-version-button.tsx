@@ -60,16 +60,13 @@ export function AdoptVersionButton(props: {
         type="button"
         onClick={onClick}
         disabled={busy}
-        className="bg-ink mt-3 inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium text-white hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+        className="bg-ink text-paper mt-3 inline-flex min-h-11 items-center justify-center rounded-md px-4 text-sm font-medium hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
         data-testid="adopt-version-button"
       >
         {busy ? "Adopting…" : "Adopt this version"}
       </button>
       {message ? (
-        <p
-          role="alert"
-          className="mt-2 text-sm text-zinc-800 dark:text-zinc-200"
-        >
+        <p role="alert" className="text-ink mt-2 text-sm">
           {message}
           {href ? (
             <>

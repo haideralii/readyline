@@ -22,7 +22,10 @@ export async function NextStepStrip() {
       data-testid="next-step"
       data-step={step.id}
     >
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm sm:px-6">
+      <div
+        data-shell="strip"
+        className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-sm sm:px-6 lg:px-8"
+      >
         <p className="min-w-0 flex-1 leading-6">
           <strong className="font-semibold">Your next step.</strong>{" "}
           {step.sentence}

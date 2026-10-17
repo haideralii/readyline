@@ -46,7 +46,7 @@ export default async function WorkerCheckPage({
             ] as [string, string][]
           ).map(([k, v]) => (
             <div key={k}>
-              <dt className="text-zinc-600 dark:text-zinc-400">{k}</dt>
+              <dt className="text-slate">{k}</dt>
               <dd className="font-medium">{v}</dd>
             </div>
           ))}

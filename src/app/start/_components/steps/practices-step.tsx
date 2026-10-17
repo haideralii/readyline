@@ -116,26 +116,26 @@ export function PracticesStepForm() {
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first paragraph. */}
       <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
-      <p className="mb-4 text-base leading-7 text-zinc-700 dark:text-zinc-300">
+      <p className="text-ink mb-4 text-base leading-7">
         Some ways of keeping people safe count as restrictive practices and have
         extra rules. In plain words, they include:
       </p>
-      <ul className="mb-4 list-disc space-y-1 pl-5 text-base leading-7 text-zinc-700 dark:text-zinc-300">
+      <ul className="text-ink mb-4 list-disc space-y-1 pl-5 text-base leading-7">
         {EXAMPLES.map((example) => (
           <li key={example}>{example}</li>
         ))}
       </ul>
-      <details className="mb-6 rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+      <details className="border-rule mb-6 rounded-md border p-3">
         <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
           What counts? The Commission&apos;s definition
         </summary>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           The NDIS (Restrictive Practices and Behaviour Support) Rules 2018 name
           five: seclusion, and chemical, mechanical, physical and environmental
           restraint. They may only be used under a behaviour support plan, with
           any state or territory authorisation.
         </p>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           If you use them, the implementing behaviour support plans module
           applies to you, whatever your registration groups.{" "}
           <a
@@ -161,13 +161,11 @@ export function PracticesStepForm() {
 
       {value === "not-sure" ? (
         <div
-          className="mb-6 rounded-md border border-zinc-300 p-4 dark:border-zinc-700"
+          className="border-rule mb-6 rounded-md border p-4"
           id="notSureHelper"
           data-testid="not-sure-helper"
         >
-          <h2 className="text-base font-semibold">
-            Three quick questions to work it out
-          </h2>
+          <h2 className="">Three quick questions to work it out</h2>
           <div className="mt-4">
             {HELPER.map((h) => (
               <RadioGroup
@@ -185,7 +183,7 @@ export function PracticesStepForm() {
           {preview ? (
             <p
               role="status"
-              className="text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              className="text-ink text-sm leading-6"
               data-testid="not-sure-resolution"
             >
               {preview.uses

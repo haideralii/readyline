@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { GlossaryTerms } from "@/components/glossary-terms";
@@ -29,9 +30,9 @@ export default function GuidesPage() {
     ].join("\n"),
   );
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">Guides</h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">{LEAD}</p>
+    <PageShell kind="reading">
+      <h1 className="">Guides</h1>
+      <p className="text-ink mt-3 leading-7">{LEAD}</p>
       {/* REQ-011 batch 31: the 38 registration-group pages have their own index. */}
       <p className="mt-4 leading-7" data-testid="guides-groups-link">
         <Link
@@ -44,10 +45,7 @@ export default function GuidesPage() {
       </p>
       {/* REQ-027 FR-3, D-2701: the words on this page (the guides' descriptions carry several), above the list. */}
       <GlossaryTerms ids={present} where="page" className="mt-4" />
-      <ul
-        className="mt-6 divide-y divide-zinc-200 dark:divide-zinc-800"
-        data-testid="guides-list"
-      >
+      <ul className="divide-rule mt-6 divide-y" data-testid="guides-list">
         {guides.map((g) => (
           <li key={g.slug} className="py-4">
             <Link
@@ -56,15 +54,13 @@ export default function GuidesPage() {
             >
               {g.title}
             </Link>
-            <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
-              {g.description}
-            </p>
-            <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            <p className="text-ink mt-1 text-sm leading-6">{g.description}</p>
+            <p className="text-slate mt-1 text-sm">
               Last reviewed {formatUpdated(g.reviewed)}
             </p>
           </li>
         ))}
       </ul>
-    </div>
+    </PageShell>
   );
 }

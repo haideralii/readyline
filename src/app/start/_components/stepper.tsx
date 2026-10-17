@@ -73,7 +73,7 @@ export function Stepper({
             Show steps
           </summary>
           <ol
-            className="absolute inset-x-0 z-10 mt-1 rounded-md border border-zinc-300 bg-white p-2 text-sm shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className="border-rule bg-surface absolute inset-x-0 z-10 mt-1 rounded-md border p-2 text-sm shadow-sm"
             data-testid="stepper-steps-list"
           >
             {STEP_IDS.map((id, i) => {
@@ -134,7 +134,7 @@ export function Stepper({
               {state === "done" ? (
                 <Link
                   href={stepHref(id)}
-                  className={`${circle} bg-ochre relative text-white`}
+                  className={`${circle} bg-ochre text-paper relative`}
                   aria-label={`Step ${n}, ${STEP_SHORT[id]}: done, change it`}
                 >
                   <span aria-hidden="true">✓</span>
@@ -142,7 +142,7 @@ export function Stepper({
               ) : state === "current" ? (
                 <span
                   aria-current="step"
-                  className={`${circle} text-ink ring-ochre relative bg-white ring-2 dark:bg-zinc-900 dark:text-white`}
+                  className={`${circle} text-ink ring-ochre bg-surface relative ring-2`}
                   aria-label={`Step ${n}, ${STEP_SHORT[id]}: current`}
                 >
                   {n}
@@ -159,7 +159,7 @@ export function Stepper({
               {/* FR-6: labels under the circles from 640 px up; FR-8: on a phone the names are in the disclosure above. */}
               <span
                 aria-hidden="true"
-                className={`mt-1 hidden text-xs sm:block ${state === "current" ? "font-semibold" : state === "todo" ? "text-slate" : ""}`}
+                className={`mt-1 hidden text-sm sm:block ${state === "current" ? "font-semibold" : state === "todo" ? "text-slate" : ""}`}
               >
                 {STEP_SHORT[id]}
               </span>

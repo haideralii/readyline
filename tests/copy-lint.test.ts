@@ -589,6 +589,10 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/app/guides/registration-groups/groups-search.tsx":
     "src/app/guides/registration-groups/page.tsx",
   "src/components/glossary-terms.tsx": null,
+  // REQ-028 FR-1: the shell carries no words of its own, only the container every page shares.
+  "src/components/page-shell.tsx": null,
+  // REQ-028 D-2813: the open-on-lg disclosure renders its caller's words only.
+  "src/components/open-on-large.tsx": null,
   "src/lib/home-copy.ts": "src/app/page.tsx",
   "src/lib/brand.ts": null,
   "src/lib/checklist/derive.ts": "src/app/checklist/checklist-view.tsx",

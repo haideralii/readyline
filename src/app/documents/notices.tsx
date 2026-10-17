@@ -10,10 +10,10 @@ export function DocumentsNotices() {
   return (
     <section
       aria-labelledby="notices-heading"
-      className="mt-10 rounded-md border border-zinc-200 p-4 text-sm leading-6 text-zinc-700 dark:border-zinc-800 dark:text-zinc-300"
+      className="border-rule text-ink mt-10 rounded-md border p-4 text-sm leading-6"
       data-testid="documents-notices"
     >
-      <h2 id="notices-heading" className="text-base font-semibold">
+      <h2 id="notices-heading" className="">
         About these documents
       </h2>
       <p className="mt-2">{GENERAL_INFORMATION_NOTICE}</p>
