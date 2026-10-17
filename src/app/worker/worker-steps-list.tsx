@@ -7,7 +7,8 @@ import type { WorkerClearanceRow } from "@/lib/registers/types";
 import {
   ACKNOWLEDGEMENT_DOCUMENTS,
   acknowledgementsOutstanding,
-  itemStepState,
+  W1_ITEM_ID,
+  workerStepState,
   STEP_WORDS,
   type AcknowledgementRow,
   type AdoptedDocument,
@@ -81,7 +82,7 @@ export function WorkerStepsList({
   }
 
   const done = items.filter(
-    (i) => itemStepState(i.who, byId.get(i.id)) === "confirmed",
+    (i) => workerStepState(i, byId.get(i.id), screening) === "confirmed",
   ).length;
 
   return (
@@ -108,8 +109,9 @@ export function WorkerStepsList({
       <ol className="divide-rule mt-3 divide-y">
         {items.map((item) => {
           const s = byId.get(item.id);
-          const state = itemStepState(item.who, s);
-          const theirs = item.who !== "owner";
+          // D-2834: W-1 is the worker's step whatever the owner's list says about who confirms it.
+          const state = workerStepState(item, s, screening);
+          const theirs = item.who !== "owner" || item.id === W1_ITEM_ID;
           return (
             <li
               key={item.id}
@@ -143,104 +145,98 @@ export function WorkerStepsList({
                   {theirs &&
                   state !== "confirmed" &&
                   state !== "recorded-by-manager" ? (
-                    item.id === "w1-clearance" ||
-                    item.id === "w1-application-recorded" ? (
-                      screening ? (
-                        <div
-                          className="border-rule mt-2 rounded-md border p-3"
-                          data-testid="worker-clearance-form"
-                        >
-                          <p className="text-slate text-sm">
-                            Your NDIS Worker Screening Check: the numbers from
-                            the unit&apos;s notice and the expiry on the
-                            clearance. No names here; your manager checks the
-                            database and confirms.
-                          </p>
-                          <label
-                            className="mt-2 block text-sm"
-                            htmlFor="ws-application"
-                          >
-                            Application number (optional)
-                          </label>
-                          <input
-                            id="ws-application"
-                            className={inputClass}
-                            value={application}
-                            onChange={(e) => setApplication(e.target.value)}
-                            autoComplete="off"
-                          />
-                          {fieldErrors.application_number?.map((m) => (
-                            <p key={m} className="mt-1 text-sm text-red-700">
-                              {m}
-                            </p>
-                          ))}
-                          <label
-                            className="mt-2 block text-sm"
-                            htmlFor="ws-number"
-                          >
-                            Check number (optional)
-                          </label>
-                          <input
-                            id="ws-number"
-                            className={inputClass}
-                            value={number}
-                            onChange={(e) => setNumber(e.target.value)}
-                            autoComplete="off"
-                          />
-                          {fieldErrors.clearance_number?.map((m) => (
-                            <p key={m} className="mt-1 text-sm text-red-700">
-                              {m}
-                            </p>
-                          ))}
-                          <label
-                            className="mt-2 block text-sm"
-                            htmlFor="ws-expiry"
-                          >
-                            Expiry (optional)
-                          </label>
-                          <input
-                            id="ws-expiry"
-                            type="date"
-                            className={`${inputClass} max-w-60`}
-                            value={expiry}
-                            onChange={(e) => setExpiry(e.target.value)}
-                          />
-                          {fieldErrors.expires_on?.map((m) => (
-                            <p key={m} className="mt-1 text-sm text-red-700">
-                              {m}
-                            </p>
-                          ))}
-                          <button
-                            type="button"
-                            className="btn-secondary mt-3 text-sm"
-                            disabled={pending !== null}
-                            aria-busy={pending === "clearance" || undefined}
-                            data-testid="worker-clearance-save"
-                            onClick={() =>
-                              run("clearance", () =>
-                                workerSaveClearanceAction({
-                                  clearance_id: screening.id,
-                                  application_number: application,
-                                  clearance_number: number,
-                                  expires_on: expiry,
-                                }),
-                              )
-                            }
-                          >
-                            {pending === "clearance"
-                              ? "Saving…"
-                              : "Save my check details"}
-                          </button>
-                        </div>
-                      ) : (
-                        <p
-                          className="text-slate mt-1 text-sm"
-                          data-testid="worker-clearance-none"
-                        >
-                          Your manager records the application first; then the
-                          numbers and the expiry are yours to type here.
+                    item.id === W1_ITEM_ID ? (
+                      <div
+                        className="border-rule mt-2 rounded-md border p-3"
+                        data-testid="worker-clearance-form"
+                      >
+                        <p className="text-slate text-sm">
+                          Your NDIS Worker Screening Check: the numbers from the
+                          unit&apos;s notice and the expiry on the clearance. No
+                          names here; your manager checks the database and
+                          confirms.
+                          {screening
+                            ? ""
+                            : " Your manager has not recorded the application yet: type its number from the unit's notice and they confirm it."}
                         </p>
-                      )
+                        <label
+                          className="mt-2 block text-sm"
+                          htmlFor="ws-application"
+                        >
+                          {screening
+                            ? "Application number (optional)"
+                            : "Application number"}
+                        </label>
+                        <input
+                          id="ws-application"
+                          className={inputClass}
+                          value={application}
+                          onChange={(e) => setApplication(e.target.value)}
+                          autoComplete="off"
+                        />
+                        {fieldErrors.application_number?.map((m) => (
+                          <p key={m} className="mt-1 text-sm text-red-700">
+                            {m}
+                          </p>
+                        ))}
+                        <label
+                          className="mt-2 block text-sm"
+                          htmlFor="ws-number"
+                        >
+                          Check number (optional)
+                        </label>
+                        <input
+                          id="ws-number"
+                          className={inputClass}
+                          value={number}
+                          onChange={(e) => setNumber(e.target.value)}
+                          autoComplete="off"
+                        />
+                        {fieldErrors.clearance_number?.map((m) => (
+                          <p key={m} className="mt-1 text-sm text-red-700">
+                            {m}
+                          </p>
+                        ))}
+                        <label
+                          className="mt-2 block text-sm"
+                          htmlFor="ws-expiry"
+                        >
+                          Expiry (optional)
+                        </label>
+                        <input
+                          id="ws-expiry"
+                          type="date"
+                          className={`${inputClass} max-w-60`}
+                          value={expiry}
+                          onChange={(e) => setExpiry(e.target.value)}
+                        />
+                        {fieldErrors.expires_on?.map((m) => (
+                          <p key={m} className="mt-1 text-sm text-red-700">
+                            {m}
+                          </p>
+                        ))}
+                        <button
+                          type="button"
+                          className="btn-secondary mt-3 text-sm"
+                          disabled={pending !== null}
+                          aria-busy={pending === "clearance" || undefined}
+                          data-testid="worker-clearance-save"
+                          onClick={() =>
+                            run("clearance", () =>
+                              workerSaveClearanceAction({
+                                clearance_id: screening?.id ?? "",
+                                application_number: application,
+                                clearance_number: number,
+                                expires_on: expiry,
+                              }),
+                            )
+                          }
+                        >
+                          {pending === "clearance"
+                            ? "Saving…"
+                            : "Save my check details"}
+                        </button>
+                      </div>
                     ) : isAckItem(item.id) ? (
                       (() => {
                         const out = acknowledgementsOutstanding(

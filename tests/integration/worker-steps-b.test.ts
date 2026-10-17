@@ -314,6 +314,57 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
     });
   });
 
+  it("D-2834: a worker with no screening row records the application and the pending row is theirs; a second call updates it; no number is refused", async () => {
+    const refused = await stranger.client.rpc("worker_record_clearance", {
+      p_account: owner.accountId,
+      p_application_number: null,
+      p_clearance_number: "WC 2026 0022",
+      p_expires_on: null,
+    });
+    expect(refused.error?.code).toBe("42501");
+    const made = await stranger.client.rpc("worker_record_clearance", {
+      p_account: owner.accountId,
+      p_application_number: "APP 2026 0022",
+      p_clearance_number: null,
+      p_expires_on: null,
+    });
+    expect(made.error).toBeNull();
+    const again = await stranger.client.rpc("worker_record_clearance", {
+      p_account: owner.accountId,
+      p_application_number: null,
+      p_clearance_number: "WC 2026 0022",
+      p_expires_on: "2031-01-01",
+    });
+    expect(again.error).toBeNull();
+    expect(again.data).toBe(made.data);
+    const rows = await stranger.client
+      .from("worker_clearances_worker")
+      .select(
+        "worker_ref, clearance_kind, application_number, clearance_number, expires_on, issued_on, role_label",
+      )
+      .eq("account_id", owner.accountId);
+    expect(rows.data).toEqual([
+      {
+        worker_ref: "W-22",
+        clearance_kind: "ndis-worker-screening",
+        application_number: "APP 2026 0022",
+        clearance_number: "WC 2026 0022",
+        expires_on: "2031-01-01",
+        issued_on: null,
+        role_label: "worker",
+      },
+    ]);
+    // The worker still cannot insert a row directly.
+    const direct = await stranger.client.from("worker_clearances").insert({
+      account_id: owner.accountId,
+      worker_ref: "W-22",
+      role_label: "worker",
+      clearance_kind: "wwcc",
+      application_number: "X",
+    });
+    expect(direct.error?.code).toBe("42501");
+  });
+
   it("D-2243: one role_table_grants line for the table and the view", async () => {
     const admin2 = admin;
     const grants = await admin2.rpc("has_active_subscription", {
