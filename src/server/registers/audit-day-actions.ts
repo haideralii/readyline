@@ -149,13 +149,19 @@ export async function saveAuditDayRowAction(
       ? ((
           await ctx.supabase
             .from("staff_matrix")
-            .select("risk_assessed, role, risk_assessed_from, role_ref")
+            .select(
+              "risk_assessed, role, risk_assessed_from, role_ref, ended_on",
+            )
             .eq("id", outer.data.id)
             .eq("account_id", ctx.account.id)
             .maybeSingle()
         ).data as Pick<
           StaffMatrixRow,
-          "risk_assessed" | "role" | "risk_assessed_from" | "role_ref"
+          | "risk_assessed"
+          | "role"
+          | "risk_assessed_from"
+          | "role_ref"
+          | "ended_on"
         > | null)
       : null;
   const row = {

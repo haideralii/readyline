@@ -11,6 +11,8 @@ import { documentControlForAccount } from "@/server/registers/document-control-q
 import { registerOverview } from "@/server/registers/queries";
 import { hasActiveSubscription } from "@/server/registers/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { workerStatesLine } from "@/lib/registers/worker-states-line";
+import { accountWorkerStates } from "@/server/registers/worker-onboarding";
 import { CheckWalk, type WalkRecord } from "./check-walk";
 
 export const metadata: Metadata = { title: "Check my systems" };
@@ -44,12 +46,26 @@ export default async function CheckPage() {
     documentControl: documentControl.rows,
   });
   const names = new Map(AUDIT_DAY_RECORDS.map((r) => [r.id, r.name]));
+  // REQ-024 Session C (FR-10): the staff-matrix question is asked from the derived states, the same line the audit-day page shows.
+  const peopleLine = workerStatesLine(
+    await accountWorkerStates(
+      supabase,
+      viewer.account.id,
+      viewer.user.id,
+      null,
+      todaySydney(),
+    ),
+    todaySydney(),
+  );
   const records: WalkRecord[] = selfCheckRecordIds().map((id) => {
     const ask = asks.find((a) => a.id === id);
     return {
       id,
       name: names.get(id) ?? id,
-      word: ask?.word ?? "",
+      word:
+        id === "staff-matrix" && peopleLine
+          ? `From your staff list: ${peopleLine}.`
+          : (ask?.word ?? ""),
       state: ask?.state ?? "missing",
       href: ask?.href ?? "/registers",
     };

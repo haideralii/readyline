@@ -118,6 +118,12 @@ export async function AuditDayListPage({
           );
         })()
       : null;
+  // REQ-024 Session C (FR-12): an ended worker sits under "Past workers", off the current list and its filters.
+  const pastIds = new Set(
+    slug === "staff-matrix"
+      ? rows.filter((r) => r.ended_on).map((r) => r.id as string)
+      : [],
+  );
   const list: ListRow[] = rows.map((r) => {
     const derived = workerStates?.get(String(r.worker_ref));
     return {
@@ -199,8 +205,16 @@ export async function AuditDayListPage({
       ) : null}
       <RegisterList
         testId={`${slug}-list`}
-        rows={list}
-        filters={meta.filters}
+        rows={
+          slug === "staff-matrix"
+            ? list.filter((r) => !pastIds.has(r.id))
+            : list
+        }
+        filters={
+          slug === "staff-matrix"
+            ? meta.filters.filter((f) => f.key !== "ended")
+            : meta.filters
+        }
         empty={meta.empty}
         columns={tableColumns(meta.columns)}
         emptyAction={
@@ -214,6 +228,29 @@ export async function AuditDayListPage({
             : undefined
         }
       />
+      {pastIds.size > 0 ? (
+        <section
+          className="mt-10"
+          aria-labelledby="past-workers-heading"
+          data-testid="staff-matrix-past"
+        >
+          <h2 id="past-workers-heading" className="text-lg font-semibold">
+            Past workers
+          </h2>
+          <p className="text-slate mt-1 text-sm leading-6">
+            Workers who have ended. Their rows, files and dates stay for seven
+            years and they remain on the screening list export with their end
+            date; their sign-in, if they had one, ended with them.
+          </p>
+          <RegisterList
+            testId="staff-matrix-past-list"
+            rows={list.filter((r) => pastIds.has(r.id))}
+            filters={[]}
+            empty=""
+            columns={tableColumns(meta.columns)}
+          />
+        </section>
+      ) : null}
     </RegisterPage>
   );
 }

@@ -465,7 +465,7 @@ export async function afterStaffMatrixSave(
     rowId: string;
     before: Pick<
       StaffMatrixRow,
-      "risk_assessed" | "role" | "risk_assessed_from" | "role_ref"
+      "risk_assessed" | "role" | "risk_assessed_from" | "role_ref" | "ended_on"
     > | null;
     isMe: boolean;
     effectiveOn: string;
@@ -548,8 +548,12 @@ export async function afterStaffMatrixSave(
       .eq("id", role.id)
       .eq("account_id", input.accountId)
       .is("first_held_on", null);
-  // A worker who has ended: the event (FR-12; the membership's revocation is Session C's).
-  if (row.ended_on && !input.before)
+  // REQ-024 Session C (FR-12, AC-10): a worker who has ended, on the save that
+  // set the date: the event, and the worker's membership revoked the way
+  // removeWorkerAction does it (the owner's own delete policy), so their next
+  // request is REQ-020's redirect; the rows stay, and the file and the s 18
+  // list keep the worker under past workers.
+  if (row.ended_on && !input.before?.ended_on) {
     await supabase.from("register_events").insert({
       account_id: input.accountId,
       register: "staff_matrix",
@@ -557,6 +561,21 @@ export async function afterStaffMatrixSave(
       kind: "ended",
       note: `ended on ${row.ended_on}`,
     });
+    const revoked = await supabase
+      .from("memberships")
+      .delete()
+      .eq("account_id", input.accountId)
+      .eq("worker_ref", row.worker_ref)
+      .eq("role", "worker")
+      .select("user_id");
+    for (const m of (revoked.data as { user_id: string }[] | null) ?? [])
+      await supabase.from("audit_log").insert({
+        account_id: input.accountId,
+        actor_user_id: input.userId,
+        action: "worker.removed",
+        target: m.user_id,
+      });
+  }
   // The worker's checklist and its derived items (FR-2).
   const ctx = contextFor(
     { ...row, risk_assessed: riskAssessed },
@@ -572,4 +591,45 @@ export async function afterStaffMatrixSave(
     input.today,
   );
   return { ok: true };
+}
+
+/** REQ-024 Session C (FR-10): a worker's derived state with the row's risk flag, for the lines the checklist and the audit-day page read. */
+export type WorkerStateWithRow = WorkerState & {
+  worker_ref: string;
+  riskAssessed: boolean;
+};
+
+/**
+ * FR-10 (D-2831): every worker's derived state for an account, read once
+ * for the audit-day page, the checklist and the self-check; an empty list
+ * when the account has no matrix rows, and the pages then stay as they are.
+ */
+export async function accountWorkerStates(
+  supabase: SupabaseClient,
+  accountId: string,
+  userId: string,
+  draftResult: QuestionnaireResult | null,
+  today: string,
+): Promise<WorkerStateWithRow[]> {
+  const rows = await supabase
+    .from("staff_matrix")
+    .select("*")
+    .eq("account_id", accountId)
+    .order("worker_ref", { ascending: true });
+  const staff = (rows.data as StaffMatrixRow[] | null) ?? [];
+  if (staff.length === 0) return [];
+  const [moduleIds, owner] = await Promise.all([
+    accountModuleIds(supabase, accountId, draftResult),
+    ownerWorkerRef(supabase, accountId, userId),
+  ]);
+  const states = await listWorkerStates(supabase, accountId, staff, {
+    moduleIds,
+    ownerRef: owner?.workerRef ?? null,
+    today,
+  });
+  return staff.map((r) => ({
+    ...states.get(r.worker_ref)!,
+    worker_ref: r.worker_ref,
+    riskAssessed: r.risk_assessed,
+  }));
 }
