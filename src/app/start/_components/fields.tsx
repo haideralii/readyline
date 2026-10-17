@@ -380,7 +380,7 @@ export function ErrorSummary({
       ref={ref}
       tabIndex={-1}
       role="alert"
-      className="mb-6 rounded-md border border-red-700 bg-red-50 p-4 outline-none dark:border-red-400 dark:bg-red-950"
+      className="border-signal bg-signal-wash mb-6 rounded-md border p-4 outline-none"
     >
       <h2 className="">Please fix the following before continuing</h2>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">

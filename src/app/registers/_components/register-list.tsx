@@ -1,4 +1,5 @@
 "use client";
+import { Tag, type TagVariant } from "@/components/tag";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -20,24 +21,23 @@ export type ListRow = {
   };
 };
 
-const TONE: Record<ListRow["status"]["tone"], { icon: string; cls: string }> = {
-  moss: { icon: "✓", cls: "border-moss text-moss" },
-  ochre: { icon: "◐", cls: "border-ochre text-ochre" },
-  signal: { icon: "!", cls: "border-signal text-signal" },
-  slate: { icon: "○", cls: "border-slate text-slate" },
+/** REQ-028 FR-13 (D-2274): the register tones as the one Tag's variants. */
+const TONE_VARIANT: Record<ListRow["status"]["tone"], TagVariant> = {
+  moss: "done",
+  ochre: "doing",
+  signal: "error",
+  slate: "neutral",
 };
 
 export function StatusTag({ status }: { status: ListRow["status"] }) {
-  const t = TONE[status.tone];
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.cls}`}
-      data-testid="status-tag"
+    <Tag
+      variant={TONE_VARIANT[status.tone]}
+      testId="status-tag"
       data-status={status.key}
     >
-      <span aria-hidden="true">{t.icon}</span>
       {status.label}
-    </span>
+    </Tag>
   );
 }
 
@@ -99,7 +99,7 @@ export function RegisterList({
             <li key={r.id}>
               <Link
                 href={r.href}
-                className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
+                className="hover:bg-mist -mx-2 flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
                 data-testid={`row-${r.id}`}
               >
                 {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the

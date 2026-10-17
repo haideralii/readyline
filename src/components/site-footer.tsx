@@ -20,7 +20,7 @@ export function SiteFooter() {
   const link =
     "inline-flex min-h-11 items-center underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2";
   return (
-    <footer className="border-rule bg-mist mt-auto border-t">
+    <footer className="border-rule bg-mist/50 mt-auto border-t">
       <div
         data-shell="footer"
         className="text-slate mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:px-6 lg:px-8"

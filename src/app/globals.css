@@ -264,11 +264,15 @@ th {
     color: var(--paper);
     text-decoration: none;
   }
-  .btn-primary:hover {
-    filter: brightness(0.92);
+  /* REQ-028 FR-13: the hover is the accent leaning to ink; disabled is mist, slate and line. */
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--ochre) 88%, var(--ink));
   }
   .btn-primary:disabled {
-    opacity: 0.6;
+    background: var(--mist);
+    color: var(--slate);
+    border: 1px solid var(--line);
+    cursor: not-allowed;
   }
   .btn-secondary {
     display: inline-flex;
@@ -288,7 +292,37 @@ th {
     background: var(--mist);
   }
   .btn-secondary:disabled {
-    opacity: 0.6;
+    background: var(--mist);
+    color: var(--slate);
+    border-color: var(--line);
+    cursor: not-allowed;
+  }
+  /* REQ-028 FR-13: the small secondary for a row's action. */
+  .btn-secondary-sm {
+    min-height: 2.5rem;
+    padding-inline: 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  /* REQ-028 FR-13: the one disclosure's chevron turns when it opens; the marker is ours. */
+  summary.disclosure-summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  summary.disclosure-summary::-webkit-details-marker {
+    display: none;
+  }
+  .disclosure-chevron {
+    display: inline-block;
+    width: 1rem;
+    text-align: center;
+    color: var(--slate);
+    transition: transform 150ms ease-out;
+  }
+  details[open] > summary.disclosure-summary > .disclosure-chevron {
+    transform: rotate(90deg);
   }
 
   /* The wordmark: the serif with a thin ochre line under "Ready" that runs on to the right. */

@@ -1,4 +1,5 @@
 import { glossaryTerm } from "@/lib/questionnaire/content";
+import { Disclosure } from "./disclosure";
 import {
   GLOSSARY_ATTRIBUTION,
   GLOSSARY_BRACKET_TITLE,
@@ -28,10 +29,12 @@ export function GlossaryTerms({
 }) {
   if (ids.length === 0) return null;
   return (
-    <details className={className ?? "mt-4"} data-testid="glossary-terms">
-      <summary className="min-h-11 cursor-pointer py-2 text-sm font-medium underline-offset-4 hover:underline">
-        What these words mean ({ids.length})
-      </summary>
+    <Disclosure
+      variant="quiet"
+      className={className ?? "mt-4"}
+      data-testid="glossary-terms"
+      summary={`What these words mean (${ids.length})`}
+    >
       <p
         className="text-slate mt-1 text-sm leading-6"
         data-testid="glossary-attribution"
@@ -62,7 +65,7 @@ export function GlossaryTerms({
           );
         })}
       </dl>
-    </details>
+    </Disclosure>
   );
 }
 

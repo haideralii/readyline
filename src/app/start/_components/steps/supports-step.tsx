@@ -1,4 +1,5 @@
 "use client";
+import { Tag } from "@/components/tag";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
@@ -77,9 +78,9 @@ function subscribeWide(onChange: () => void) {
 
 function AuditTag({ auditType }: { auditType: GroupOption["auditType"] }) {
   return (
-    <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm whitespace-nowrap">
+    <Tag variant="neutral" icon={false}>
       {auditType === "verification" ? "desk audit" : "site audit"}
-    </span>
+    </Tag>
   );
 }
 
@@ -250,9 +251,9 @@ export function SupportsStepForm() {
           <>
             <AuditTag auditType={g.auditType} />
             {g.mandatoryFrom ? (
-              <span className="border-line text-slate rounded-full border px-2 py-0.5 text-sm">
+              <Tag variant="neutral" icon={false} wrap>
                 registration mandatory from 1 July 2026
-              </span>
+              </Tag>
             ) : null}
           </>
         }

@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="bg-paper text-ink flex min-h-full flex-col">
         <a
           href="#main-content"
-          className="focus:bg-paper focus:text-ink sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:px-3 focus:py-2 focus:outline-2"
+          className="focus:bg-ink focus:text-paper sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:px-3 focus:py-2 focus:outline-2"
         >
           Skip to main content
         </a>
