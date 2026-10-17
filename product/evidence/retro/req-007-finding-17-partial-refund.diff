@@ -1,0 +1,286 @@
+﻿diff --git a/src/lib/payments/entitlement.test.ts b/src/lib/payments/entitlement.test.ts
+index c68bfcd..99c4884 100644
+--- a/src/lib/payments/entitlement.test.ts
++++ b/src/lib/payments/entitlement.test.ts
+@@ -107,6 +107,50 @@ describe("entitlement reducer (REQ-007 FR-3, FR-4, SR-2)", () => {
+     expect(hasActivePack(ledger, "acct_a")).toBe(false);
+   });
+ 
++  it("a partial refund is recorded by id and leaves the purchase paid and the entitlement live; the full refund that follows revokes", () => {
++    const partial: PaymentEvent = {
++      ...refunded,
++      id: "evt_partial",
++      amountCents: 10000,
++      chargeAmountCents: 39900,
++    };
++    const { ledger, outcomes } = run([
++      completed,
++      partial,
++      { ...partial, id: "evt_partial_again" },
++      { ...refunded, id: "evt_full", chargeAmountCents: 39900 },
++    ]);
++    expect(outcomes).toEqual([
++      "granted",
++      "partial_refund_ignored",
++      "partial_refund_ignored",
++      "revoked",
++    ]);
++    const afterPartial = run([completed, partial]).ledger;
++    expect(afterPartial.purchases[0].status).toBe("paid");
++    expect(afterPartial.entitlements[0].revokedAt).toBeNull();
++    expect(hasActivePack(afterPartial, "acct_a")).toBe(true);
++    expect(afterPartial.seenEventIds).toEqual(["evt_1", "evt_partial"]);
++    expect(ledger.purchases[0].status).toBe("refunded");
++    expect(hasActivePack(ledger, "acct_a")).toBe(false);
++  });
++
++  it("a refund without the charge amount, or for the full amount, revokes (the safe side)", () => {
++    expect(
++      run([completed, { ...refunded, chargeAmountCents: null }]).outcomes,
++    ).toEqual(["granted", "revoked"]);
++    expect(
++      run([completed, { ...refunded, chargeAmountCents: 39900 }]).outcomes,
++    ).toEqual(["granted", "revoked"]);
++    // A partial refund for an unknown payment intent records nothing: the later completion still grants.
++    expect(
++      run([
++        { ...refunded, amountCents: 100, chargeAmountCents: 39900 },
++        completed,
++      ]).outcomes,
++    ).toEqual(["partial_refund_ignored", "granted"]);
++  });
++
+   it("a refund that arrives before the completion leaves the purchase refunded and never grants", () => {
+     const { ledger, outcomes } = run([refunded, completed]);
+     expect(outcomes).toEqual(["refund_recorded", "refunded_before_completion"]);
+diff --git a/src/lib/payments/entitlement.ts b/src/lib/payments/entitlement.ts
+index 8597a3d..80bf326 100644
+--- a/src/lib/payments/entitlement.ts
++++ b/src/lib/payments/entitlement.ts
+@@ -11,9 +11,13 @@
+  *   grants one pack entitlement, unless a refund for the same payment intent
+  *   arrived first, in which case the purchase is recorded as refunded and no
+  *   entitlement is granted;
+- * - a refund marks the purchase refunded and revokes its entitlement; a refund
+- *   for an unknown payment intent records a refunded shell so a later
+- *   completion cannot grant;
++ * - a refund in full marks the purchase refunded and revokes its entitlement;
++ *   a refund for an unknown payment intent records a refunded shell so a
++ *   later completion cannot grant;
++ * - a partial refund (Stripe sends `charge.refunded` for those too, with
++ *   `amount_refunded` below the charge) is recorded by id and changes
++ *   nothing else: the operator rule is full refunds only
++ *   (supabase/ops/refund.md), and a slip must not close the downloads;
+  * - every other event type is ignored (its id is still recorded).
+  */
+ 
+@@ -31,6 +35,8 @@ export type PaymentEvent = {
+   accountId?: string | null;
+   assessmentId?: string | null;
+   amountCents?: number | null;
++  /** On a refund: the charge's full amount, so a partial refund is told from a full one. Unknown means full. */
++  chargeAmountCents?: number | null;
+   currency?: string | null;
+   receiptUrl?: string | null;
+   occurredAt: string;
+@@ -122,6 +128,7 @@ export type ApplyOutcome =
+   | "revoked"
+   | "refunded_before_completion"
+   | "refund_recorded"
++  | "partial_refund_ignored"
+   | "already_paid"
+   | "invalid"
+   | "subscription_granted"
+@@ -231,6 +238,15 @@ const COMPLETION_TYPES = new Set<string>([
+   "checkout.session.async_payment_succeeded",
+ ]);
+ 
++/** True when the refund is for less than the charge; an event without the charge amount counts as a full refund. */
++function isPartialRefund(event: PaymentEvent): boolean {
++  return (
++    event.chargeAmountCents != null &&
++    event.amountCents != null &&
++    event.amountCents < event.chargeAmountCents
++  );
++}
++
+ /** Applies one event; returns the new ledger and what happened. `newId` supplies row ids (uuid in production). */
+ export function applyStripeEvent(
+   ledger: Ledger,
+@@ -310,6 +326,8 @@ export function applyStripeEvent(
+ 
+   if (event.type === "charge.refunded") {
+     if (!event.paymentIntentId) return { ledger: seen, outcome: "invalid" };
++    if (isPartialRefund(event))
++      return { ledger: seen, outcome: "partial_refund_ignored" };
+     const purchase = seen.purchases.find(
+       (p) => p.paymentIntentId === event.paymentIntentId,
+     );
+diff --git a/src/lib/payments/fake-session.ts b/src/lib/payments/fake-session.ts
+index 9146010..ca217f6 100644
+--- a/src/lib/payments/fake-session.ts
++++ b/src/lib/payments/fake-session.ts
+@@ -274,6 +274,7 @@ export function fakeRefundedEvent(
+         object: "charge",
+         payment_intent: fakePaymentIntentId(sessionId),
+         metadata: { account_id: data.accountId },
++        amount: data.amountCents,
+         amount_refunded: data.amountCents,
+         currency: data.currency,
+         receipt_url: fakeReceiptUrl(origin, sessionId),
+diff --git a/src/lib/payments/webhook.test.ts b/src/lib/payments/webhook.test.ts
+index 41b0cf9..4c82c12 100644
+--- a/src/lib/payments/webhook.test.ts
++++ b/src/lib/payments/webhook.test.ts
+@@ -32,7 +32,10 @@ function completedEvent(id = "evt_completed_1"): Record<string, unknown> {
+   };
+ }
+ 
+-function refundedEvent(id = "evt_refund_1"): Record<string, unknown> {
++function refundedEvent(
++  id = "evt_refund_1",
++  amountRefunded = 39900,
++): Record<string, unknown> {
+   return {
+     id,
+     object: "event",
+@@ -44,7 +47,8 @@ function refundedEvent(id = "evt_refund_1"): Record<string, unknown> {
+         object: "charge",
+         payment_intent: "pi_test_1",
+         metadata: { account_id: "acct-a" },
+-        amount_refunded: 39900,
++        amount: 39900,
++        amount_refunded: amountRefunded,
+         currency: "aud",
+         receipt_url: "https://pay.stripe.com/receipts/r1",
+       },
+@@ -130,6 +134,25 @@ describe("Stripe webhook (REQ-007 AC-2, SR-1, SR-2)", () => {
+     expect(store.ledger.entitlements[0].revokedAt).not.toBeNull();
+   });
+ 
++  it("a partial refund (amount_refunded below the charge) is acknowledged and leaves the entitlement standing", async () => {
++    const store = new MemoryPaymentStore();
++    await post(store, completedEvent());
++    const r = await post(store, refundedEvent("evt_refund_part", 10000));
++    expect(r.status).toBe(200);
++    expect(r.body).toEqual({ ok: true, outcome: "partial_refund_ignored" });
++    expect(store.ledger.purchases[0].status).toBe("paid");
++    expect(store.ledger.entitlements[0].revokedAt).toBeNull();
++    expect(
++      toPaymentEvent(
++        refundedEvent("evt_map_part", 10000) as unknown as Stripe.Event,
++      ),
++    ).toMatchObject({ amountCents: 10000, chargeAmountCents: 39900 });
++    // The full refund after it still closes the downloads.
++    const full = await post(store, refundedEvent("evt_refund_full"));
++    expect(full.body.outcome).toBe("revoked");
++    expect(store.ledger.entitlements[0].revokedAt).not.toBeNull();
++  });
++
+   it("events out of order (refund before completed) end revoked with no entitlement", async () => {
+     const store = new MemoryPaymentStore();
+     const r = await post(store, refundedEvent());
+diff --git a/src/lib/payments/webhook.ts b/src/lib/payments/webhook.ts
+index fa0ab33..11bc194 100644
+--- a/src/lib/payments/webhook.ts
++++ b/src/lib/payments/webhook.ts
+@@ -107,6 +107,8 @@ export function toPaymentEvent(event: Stripe.Event): PaymentEvent {
+       paymentIntentId: idOf(c.payment_intent),
+       accountId: c.metadata?.account_id ?? null,
+       amountCents: c.amount_refunded ?? null,
++      // The charge amount tells a partial refund from a full one (retro review of REQ-007, finding 17).
++      chargeAmountCents: c.amount ?? null,
+       currency: c.currency ?? null,
+       receiptUrl: c.receipt_url ?? null,
+       occurredAt,
+diff --git a/src/server/payments/store.ts b/src/server/payments/store.ts
+index 5664396..3b8a628 100644
+--- a/src/server/payments/store.ts
++++ b/src/server/payments/store.ts
+@@ -16,6 +16,7 @@ const OUTCOMES = new Set<ApplyOutcome>([
+   "revoked",
+   "refunded_before_completion",
+   "refund_recorded",
++  "partial_refund_ignored",
+   "already_paid",
+   "invalid",
+   "subscription_granted",
+@@ -59,6 +60,7 @@ export class SupabasePaymentStore implements PaymentStore {
+       p_currency: event.currency ? event.currency.toLowerCase() : null,
+       p_receipt_url: event.receiptUrl ?? null,
+       p_occurred_at: event.occurredAt,
++      p_charge_amount_cents: event.chargeAmountCents ?? null,
+     });
+     if (r.error) throw new Error(`apply_stripe_event: ${r.error.message}`);
+     const outcome = r.data as string;
+diff --git a/supabase/ops/refund.md b/supabase/ops/refund.md
+index f4d1cb8..d73da8c 100644
+--- a/supabase/ops/refund.md
++++ b/supabase/ops/refund.md
+@@ -17,7 +17,9 @@ to an audit; a refund is money back to the card the customer paid with.
+    logged per file).
+ 3. In the Stripe dashboard, open the payment (search by the customer's email
+    or by the `purchases.stripe_payment_intent_id` value in Supabase) and
+-   refund it in full. No partial refunds for the pack.
++   refund it in full. No partial refunds for the pack. (If one is made by
++   mistake, the ledger records it as `partial_refund_ignored` and the
++   downloads stay open; refund the rest to close them.)
+ 4. Stripe sends `charge.refunded` to `/api/stripe/webhook`. The function
+    `apply_stripe_event` marks the purchase `refunded`, sets `revoked_at` on
+    the entitlement, and from then on `/documents` shows "This purchase was
+diff --git a/tests/integration/stripe-apply-event.test.ts b/tests/integration/stripe-apply-event.test.ts
+index 1de71b5..5cba0a6 100644
+--- a/tests/integration/stripe-apply-event.test.ts
++++ b/tests/integration/stripe-apply-event.test.ts
+@@ -32,6 +32,7 @@ describe.skipIf(!enabled)("apply_stripe_event (REQ-007 AC-2, SR-2)", () => {
+       p_currency: "aud",
+       p_receipt_url: null,
+       p_occurred_at: new Date().toISOString(),
++      p_charge_amount_cents: null,
+       ...overrides,
+     };
+   }
+@@ -128,6 +129,43 @@ describe.skipIf(!enabled)("apply_stripe_event (REQ-007 AC-2, SR-2)", () => {
+     expect(ent.data?.revoked_at).not.toBeNull();
+   });
+ 
++  it("a partial refund leaves the purchase paid and the entitlement standing; the full refund then revokes (retro finding 17)", async () => {
++    const session = `cs_${randomUUID()}`;
++    const pi = `pi_${randomUUID()}`;
++    expect(
++      await apply({ p_session_id: session, p_payment_intent_id: pi }),
++    ).toBe("granted");
++    expect(
++      await apply({
++        p_type: "charge.refunded",
++        p_payment_intent_id: pi,
++        p_amount_cents: 10000,
++        p_charge_amount_cents: 39900,
++      }),
++    ).toBe("partial_refund_ignored");
++    const purchase = await admin
++      .from("purchases")
++      .select("status, refunded_at, id")
++      .eq("stripe_checkout_session_id", session)
++      .single();
++    expect(purchase.data?.status).toBe("paid");
++    expect(purchase.data?.refunded_at).toBeNull();
++    const ent = await admin
++      .from("entitlements")
++      .select("revoked_at")
++      .eq("source_purchase_id", purchase.data!.id)
++      .single();
++    expect(ent.data?.revoked_at).toBeNull();
++    expect(
++      await apply({
++        p_type: "charge.refunded",
++        p_payment_intent_id: pi,
++        p_amount_cents: 39900,
++        p_charge_amount_cents: 39900,
++      }),
++    ).toBe("revoked");
++  });
++
+   it("a refund that arrives first leaves the purchase refunded and the later completion grants nothing", async () => {
+     const session = `cs_${randomUUID()}`;
+     const pi = `pi_${randomUUID()}`;

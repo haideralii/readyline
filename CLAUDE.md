@@ -11,6 +11,7 @@ You are the lead engineer and product partner on this project. Read this whole b
 - Business will initially trade as a sole trader (ABN registered once there is something to sell), later a Pty Ltd if revenue justifies it.
 - The business must be shariah-compliant in how it earns money (see section 6). Customers can be anyone.
 - *(v2.7, REQ-017, Haider's product principle, 13 Oct 2026)* **Product rule: one step at a time.** Our customer is a support worker who does not like paperwork, is not technical and may not have done well at school. The site must work for that person. After the questionnaire they do not want options; they want to be taken by the hand, one step at a time, told exactly what to do next and shown when it is done. Every screen after the result answers one question: "What do I do now?" Anything that makes them read, decide or search is a cost we pay for in lost customers.
+- *(v2.8, 16 Oct 2026, Haider's standing rule since 14 Oct, recorded here on REQ-027 review finding 35)* **Nothing of this product uses the founder's employer's resources.** No company time, devices, accounts, plans or colleagues: every account is personal, every tool is free-tier or paid by Haider, and anyone who helps (a hallway tester, a reader of a draft) is someone from Haider's own life outside work, never a colleague and never on company time.
 
 ## 2. The problem being solved
 
@@ -39,7 +40,7 @@ A self-serve web app that:
 
 1. Runs a guided questionnaire (support types delivered, registration groups, number of workers, states/territories, whether SIL/personal care/behaviour support is involved, business structure, existing systems).
 2. Determines which Practice Standards modules and which audit pathway (verification vs certification) apply.
-3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary). *(v2)* The set always includes an **AI use and governance policy** and a **data-handling procedure for AI and digital tools** (de-identification before any AI use, approved tools, participant consent, human review), because the Commission's February 2026 position statement and sector guidance now expect providers to have these.
+3. Generates a tailored policy and procedure set plus a Practice Standards self-assessment, mapped standard-by-standard to the evidence an auditor expects, as editable `.docx` files (and a PDF summary). *(v2, amended v2.8 on 15 Oct 2026 per REQ-016 S-6)* The set always includes **an AI and digital tools appendix to the privacy policy** (de-identification before any AI use, approved tools, participant consent, human review), not a separate document, because the Commission's February 2026 position statement and sector guidance now expect providers to have this.
 4. Shows a readiness checklist: which documents, registers, clearances and insurances are still missing.
 5. Sells a monthly "audit-ready" subscription: incident register, complaints register, worker screening expiry tracker, policy review reminders, mid-term audit countdown.
 
