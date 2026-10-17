@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-17
+updated: 2026-10-16
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---

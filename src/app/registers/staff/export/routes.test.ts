@@ -19,7 +19,7 @@ describe("the fill handlers' route config", () => {
       expect(FILL_PREFERRED_REGION).toBe("syd1");
       expect(source).toContain(`export const dynamic = "force-dynamic";`);
       expect(source).toContain(`export const runtime = "nodejs";`);
-      expect(source).toContain(`makeFillHandler("${kind}")`);
+      expect(source).toContain(`makeFillHandler("${kind}", strictObject({}))`);
     });
   }
 });

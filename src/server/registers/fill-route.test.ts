@@ -110,7 +110,11 @@ vi.mock("./worker-exports", () => ({
 }));
 vi.mock("./worker-onboarding", () => ({ todaySydney: () => "2026-10-17" }));
 
-const { makeFillHandler } = await import("./fill-route");
+const { makeFillHandler: make } = await import("./fill-route");
+const { strictObject } = await import("@/lib/validation");
+const makeFillHandler = (
+  kind: "screening-list" | "risk-assessed-roles" | "workers",
+) => make(kind, strictObject({}));
 
 const MARK = "Zq Marked Value Xy";
 const ORIGIN = "https://readyline.example";

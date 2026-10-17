@@ -3,10 +3,12 @@
  * workers folder as one zip from one submission (finding 77), filled or
  * unfilled, built once and sent. The region is pinned in code (SR-8(e)).
  */
+import { strictObject } from "@/lib/validation";
 import { makeFillHandler } from "@/server/registers/fill-route";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const preferredRegion = "syd1";
 
-export const POST = makeFillHandler("workers");
+// No query parameters are accepted (REQ-002 FR-3).
+export const POST = makeFillHandler("workers", strictObject({}));

@@ -25,6 +25,7 @@ import {
 } from "@/lib/registers/fill";
 import type { WorkerFill } from "@/lib/registers/worker-exports";
 import { FillFormFields } from "@/app/registers/_components/fill-form";
+import { parseInput, type strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import { checkFillAllowed } from "@/server/auth/rate-limit";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -139,8 +140,21 @@ async function codesFor(
   };
 }
 
-export function makeFillHandler(kind: FillKind) {
+/** Each route passes its own empty strict schema so the boundary guard sees the validation import where the route lives; a query string is refused. */
+export function makeFillHandler(
+  kind: FillKind,
+  Query: ReturnType<typeof strictObject>,
+) {
   return async function POST(request: Request) {
+    const query = parseInput(
+      Query,
+      Object.fromEntries(new URL(request.url).searchParams.entries()),
+    );
+    if (!query.ok)
+      return new NextResponse("Bad request", {
+        status: 400,
+        headers: NO_STORE,
+      });
     if (!postedFromExportScreen(request))
       return new NextResponse("Forbidden", { status: 403, headers: NO_STORE });
     const viewer = await getViewer();
