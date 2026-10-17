@@ -13,7 +13,12 @@ import { reportsToConfirmLine } from "@/lib/registers/worker";
 import { formatLongDate } from "@/lib/registers/status";
 import { auditDayOverview } from "@/server/registers/audit-day-queries";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
-import { registerOverview } from "@/server/registers/queries";
+import {
+  lastAuditPackDownload,
+  registerOverview,
+} from "@/server/registers/queries";
+import { Disclosure } from "@/components/disclosure";
+import { ReadyLine } from "@/components/ready-line";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { countReportsToConfirm } from "@/server/registers/team-queries";
 import { RegisterPage, registerContext } from "./_components/shell";
@@ -57,7 +62,7 @@ const AUDIT_DAY_KEEP_CURRENT: AuditDaySlug[] = [
  */
 export default async function RegistersPage() {
   const ctx = await registerContext("/registers");
-  const [o, a, dc, toConfirm, period] = await Promise.all([
+  const [o, a, dc, toConfirm, period, lastPack] = await Promise.all([
     registerOverview(ctx.supabase, ctx.viewer.account.id),
     auditDayOverview(ctx.supabase, ctx.viewer.account.id),
     documentControlForAccount(ctx.supabase, ctx.viewer.account.id),
@@ -65,6 +70,8 @@ export default async function RegistersPage() {
     // REQ-023 FR-1: batch 45 item 8's "due around" line is now one link to the
     // timeline, so the two never disagree.
     currentPeriod(ctx.supabase, ctx.viewer.account.id),
+    // REQ-028 FR-7: the newest audit-pack download, for the line under the button.
+    lastAuditPackDownload(ctx.supabase, ctx.viewer.account.id),
   ]);
   const auditDayRow = (slug: AuditDaySlug): Row => ({
     href: `/registers/${slug}`,
@@ -137,6 +144,18 @@ export default async function RegistersPage() {
     },
     ...AUDIT_DAY_KEEP_CURRENT.map(auditDayRow),
   ];
+  // REQ-028 FR-7 (first pass 17): "N of 15 registers started", the fifteen being the five named registers and
+  // the ten audit-day registers; document control counts once the set is ready, since it is built, never added to.
+  const allRows = [...fromYourPack, ...asThingsHappen, ...keepCurrent];
+  const started = allRows.filter((r) => r.total > 0).length;
+  const lastDownloaded = lastPack
+    ? new Intl.DateTimeFormat("en-AU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Australia/Sydney",
+      }).format(new Date(lastPack))
+    : null;
   const groups = [
     {
       id: "from-your-pack",
@@ -173,8 +192,61 @@ export default async function RegistersPage() {
         </>
       }
       canWrite={ctx.canWrite}
+      actions={
+        // REQ-020 FR-1; REQ-028 FR-7: one zip of every register, the document control register, the summary and the
+        // adopted documents, the page's primary, with the day it was last taken beneath.
+        <div>
+          <a
+            href="/registers/audit-pack.zip"
+            className="btn-primary"
+            data-testid="audit-pack-download"
+          >
+            Download my audit pack as one file (zip)
+          </a>
+          <p
+            className="text-slate mt-2 text-sm"
+            data-testid="audit-pack-last-downloaded"
+          >
+            {lastDownloaded
+              ? `Last downloaded ${lastDownloaded}`
+              : "Not downloaded yet"}
+          </p>
+        </div>
+      }
     >
       <div data-testid="registers-index">
+        <Disclosure
+          variant="quiet"
+          summary="What is in the pack"
+          summaryTestId="pack-contents-summary"
+          data-testid="pack-contents"
+        >
+          <ul
+            className="list-disc pl-5 leading-7"
+            aria-label="What is in the pack"
+            data-testid="pack-contents-list"
+          >
+            <li>
+              Every register as a spreadsheet file (CSV), one per register.
+            </li>
+            <li>The document control register.</li>
+            <li>The register events: every change, with its day.</li>
+            <li>The readiness summary (PDF).</li>
+            <li>The documents you have adopted, as Word files.</li>
+            <li>
+              The workers folder: one file per worker and the two lists the
+              Worker Screening Rules ask for, codes and numbers only.
+            </li>
+            <li>A cover sheet that lists every file in the zip.</li>
+          </ul>
+        </Disclosure>
+        <div className="mt-6">
+          <ReadyLine
+            counts={{ done: started, todo: allRows.length - started }}
+            sentence={`${started} of ${allRows.length} registers started`}
+            testId="registers-ready-line"
+          />
+        </div>
         {reportsToConfirmLine(toConfirm) ? (
           // REQ-020 FR-5: a report through the link or by a worker waits here until the owner confirms it.
           <p
@@ -191,16 +263,6 @@ export default async function RegistersPage() {
             from when you read it.
           </p>
         ) : null}
-        {/* REQ-020 FR-1: one zip of every register, the document control register, the summary and the adopted documents. */}
-        <p className="mt-2 text-sm">
-          <a
-            href="/registers/audit-pack.zip"
-            className="underline underline-offset-2"
-            data-testid="audit-pack-download"
-          >
-            Download my audit pack
-          </a>
-        </p>
         {period ? (
           <p
             className="text-ink mt-2 text-sm"
@@ -228,15 +290,16 @@ export default async function RegistersPage() {
               {g.heading}
             </h2>
             <p className="text-slate mt-1 text-sm">{g.intro}</p>
+            {/* REQ-028 FR-7: the registers as cards, two columns from lg. */}
             <ul
-              className="divide-rule mt-2 divide-y"
+              className="mt-3 grid gap-3 lg:grid-cols-2"
               aria-labelledby={`${g.id}-heading`}
             >
               {g.rows.map((r) => (
                 <li key={r.href}>
                   <Link
                     href={r.href}
-                    className="hover:bg-mist -mx-2 flex min-h-14 items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
+                    className="border-rule hover:bg-mist flex min-h-14 items-center justify-between gap-3 rounded-md border p-4 underline-offset-4"
                     data-testid={`register-${r.href.split("/").pop()}`}
                   >
                     <span>

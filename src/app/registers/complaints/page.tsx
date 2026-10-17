@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import type { ComplaintRow } from "@/lib/registers/types";
 import { listComplaints } from "@/server/registers/queries";
 import { COMPLAINT_STATUS_LABELS } from "@/lib/registers/labels";
+import {
+  COMPLAINT_COLUMNS,
+  cellsFor,
+  linkNameFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 
@@ -38,6 +44,8 @@ export default async function ComplaintsPage() {
       addHref="/registers/complaints/new"
       addLabel="Add a complaint"
       exportHref="/registers/complaints/export.zip"
+      exportLabel="Download the register and its events (zip of two CSV files)"
+      count={rows.length}
       importHref="/registers/complaints/import"
       back={{ href: "/registers", label: "Registers" }}
     >
@@ -49,8 +57,17 @@ export default async function ComplaintsPage() {
           title: `${r.reference}: ${r.summary.slice(0, 60)}${r.summary.length > 60 ? "…" : ""}`,
           detail: `Received ${r.received_on}${r.from_ref ? ` from ${r.from_ref}` : ""}.`,
           status: complaintStatus(r),
+          cells: cellsFor(COMPLAINT_COLUMNS, r),
+          name: linkNameFor("complaints", r) ?? undefined,
         }))}
         filters={COMPLAINT_FILTERS}
+        columns={tableColumns(COMPLAINT_COLUMNS)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: "/registers/complaints/new", label: "Add a complaint" }
+            : undefined
+        }
+        importHref={ctx.canWrite ? "/registers/complaints/import" : undefined}
         empty="No complaints recorded yet. A complaint is any expression of dissatisfaction; record it even when it is resolved on the spot."
       />
     </RegisterPage>

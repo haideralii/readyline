@@ -49,6 +49,19 @@ import { dateField } from "./forms";
 // hyphen at 360 px (`2027-02-13` read "2027-02-" and "13."), so every date a
 // `detailOf` prints is the long form, "13 February 2027".
 import { formatLongDate } from "./status";
+import {
+  CONFLICT_COLUMNS,
+  CORPORATE_RISK_COLUMNS,
+  DECISION_COLUMNS,
+  DELEGATION_COLUMNS,
+  HAZARD_COLUMNS,
+  IMPROVEMENT_COLUMNS,
+  INSURANCE_COLUMNS,
+  ONBOARDING_COLUMNS,
+  PARTICIPANT_RISK_COLUMNS,
+  STAFF_MATRIX_COLUMNS,
+  type ColumnSpec,
+} from "./table-columns";
 
 const optionalDate = (label: string) =>
   z
@@ -753,6 +766,8 @@ export type RegisterMeta<Row> = {
   detailOf: (row: Row) => string;
   statusOf: (row: Row) => ListStatus;
   orderBy: { column: string; ascending: boolean };
+  /** REQ-028 FR-8 (D-2814): the table's columns as data; empty keeps the list form at every width. */
+  columns: readonly ColumnSpec<Row>[];
 };
 
 type Statused<R> = R & { status: string };
@@ -778,6 +793,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
       `${r.likelihood[0].toUpperCase()}${r.likelihood.slice(1)} likelihood. Owner: ${r.owner_role}.${r.starter ? " Starter row: check this and change it." : ""}`,
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
+    columns: CORPORATE_RISK_COLUMNS,
   } satisfies RegisterMeta<Statused<CorporateRiskRow>>,
   hazards: {
     slug: "hazards",
@@ -798,6 +814,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
       `Could harm ${HARM_TO_LABELS[r.harm_to].toLowerCase()}. ${r.likelihood[0].toUpperCase()}${r.likelihood.slice(1)} likelihood, ${r.severity} severity. ${r.done_on ? `Done ${formatLongDate(r.done_on)}.` : `Due ${formatLongDate(r.due_on)}.`}`,
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
+    columns: HAZARD_COLUMNS,
   } satisfies RegisterMeta<Statused<HazardRow>>,
   "participant-risks": {
     slug: "participant-risks",
@@ -820,6 +837,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
         : "No support plan review date yet.",
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
+    columns: PARTICIPANT_RISK_COLUMNS,
   } satisfies RegisterMeta<Statused<ParticipantRiskRow>>,
   "conflicts-of-interest": {
     slug: "conflicts-of-interest",
@@ -840,6 +858,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
       `Declared ${formatLongDate(r.declared_on)}. ${r.managed_by}`,
     statusOf: (r) => reviewTag(r.status, r.review_on),
     orderBy: { column: "review_on", ascending: true },
+    columns: CONFLICT_COLUMNS,
   } satisfies RegisterMeta<Statused<ConflictOfInterestRow>>,
   delegations: {
     slug: "delegations",
@@ -867,6 +886,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
         ? { key: "backed-up", label: "Backup named", tone: "moss" }
         : { key: "no-backup", label: "No backup", tone: "ochre" },
     orderBy: { column: "role", ascending: true },
+    columns: DELEGATION_COLUMNS,
   } satisfies RegisterMeta<DelegationRow & { status?: string }>,
   insurances: {
     slug: "insurances",
@@ -900,6 +920,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
               tone: "moss",
             },
     orderBy: { column: "expires_on", ascending: true },
+    columns: INSURANCE_COLUMNS,
   } satisfies RegisterMeta<Statused<InsuranceItemRow>>,
   improvements: {
     slug: "improvements",
@@ -933,6 +954,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
             }
           : { key: "open", label: `Due ${r.due_on}`, tone: "ochre" },
     orderBy: { column: "due_on", ascending: true },
+    columns: IMPROVEMENT_COLUMNS,
   } satisfies RegisterMeta<Statused<ImprovementRow>>,
   decisions: {
     slug: "decisions",
@@ -958,6 +980,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
       tone: "slate",
     }),
     orderBy: { column: "decided_on", ascending: false },
+    columns: DECISION_COLUMNS,
   } satisfies RegisterMeta<DecisionRow & { status?: string }>,
   "staff-matrix": {
     slug: "staff-matrix",
@@ -997,6 +1020,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
             }
           : { key: "current", label: "Current", tone: "moss" },
     orderBy: { column: "worker_ref", ascending: true },
+    columns: STAFF_MATRIX_COLUMNS,
   } satisfies RegisterMeta<
     Statused<StaffMatrixRow> & {
       expired_checks: number;
@@ -1029,6 +1053,7 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
         ? { key: "complete", label: `Complete ${r.completed_on}`, tone: "moss" }
         : { key: "in-progress", label: "In progress", tone: "ochre" },
     orderBy: { column: "started_on", ascending: false },
+    columns: ONBOARDING_COLUMNS,
   } satisfies RegisterMeta<
     Statused<OnboardingChecklistRow> & { ticked: number }
   >,

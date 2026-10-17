@@ -6,6 +6,11 @@ import {
   type PolicyReviewListRow,
 } from "@/server/registers/queries";
 import { seedPolicyReviews } from "@/server/registers/seed";
+import {
+  POLICY_REVIEW_COLUMNS,
+  cellsFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 
@@ -52,6 +57,8 @@ export default async function PolicyReviewsPage() {
       addHref="/registers/policy-reviews/new"
       addLabel="Add a policy"
       exportHref="/registers/policy-reviews/export.csv"
+      exportLabel="Download as a spreadsheet (CSV)"
+      count={rows.length}
       back={{ href: "/registers", label: "Registers" }}
     >
       <RegisterList
@@ -65,8 +72,15 @@ export default async function PolicyReviewsPage() {
             ? `Adopted ${formatDateAu(r.adopted_on)}; every ${r.review_cycle_months} months.`
             : `Not adopted yet; every ${r.review_cycle_months} months once adopted.`,
           status: reviewStatusTag(r),
+          cells: cellsFor(POLICY_REVIEW_COLUMNS, r),
         }))}
         filters={REVIEW_FILTERS}
+        columns={tableColumns(POLICY_REVIEW_COLUMNS)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: "/registers/policy-reviews/new", label: "Add a policy" }
+            : undefined
+        }
         empty="No policies listed yet. Buy the document pack and they appear here, or add one by hand."
       />
     </RegisterPage>

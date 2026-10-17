@@ -6,6 +6,11 @@ import {
   type AuditDaySlug,
 } from "@/lib/registers/audit-day-forms";
 import { onboardingItemsFor } from "@/lib/registers/onboarding-items";
+import {
+  cellsFor,
+  linkNameFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import type {
   OnboardingKind,
   StaffMatrixRow,
@@ -133,6 +138,8 @@ export async function AuditDayListPage({
                   : "ochre",
           }
         : meta.statusOf(r as never),
+      cells: cellsFor(meta.columns, r as never),
+      name: linkNameFor(slug, r) ?? undefined,
     };
   });
   return (
@@ -154,6 +161,7 @@ export async function AuditDayListPage({
           : undefined
       }
       back={{ href: "/registers", label: "Registers" }}
+      count={rows.length}
     >
       {saved ? (
         <p
@@ -191,6 +199,17 @@ export async function AuditDayListPage({
         rows={list}
         filters={meta.filters}
         empty={meta.empty}
+        columns={tableColumns(meta.columns)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: `/registers/${slug}/new`, label: meta.addLabel }
+            : undefined
+        }
+        importHref={
+          ctx.canWrite && slug === "corporate-risks"
+            ? "/registers/corporate-risks/import"
+            : undefined
+        }
       />
     </RegisterPage>
   );

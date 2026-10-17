@@ -3,6 +3,11 @@ import {
   listWorkerChecks,
   type WorkerCheckListRow,
 } from "@/server/registers/queries";
+import {
+  WORKER_CHECK_COLUMNS,
+  cellsFor,
+  tableColumns,
+} from "@/lib/registers/table-columns";
 import { RegisterList, type ListRow } from "../_components/register-list";
 import { RegisterPage, registerContext } from "../_components/shell";
 import { CLEARANCE_LABELS } from "@/lib/registers/labels";
@@ -38,6 +43,8 @@ export default async function WorkerChecksPage() {
       addHref="/registers/worker-checks/new"
       addLabel="Add a check"
       exportHref="/registers/worker-checks/export.csv"
+      exportLabel="Download as a spreadsheet (CSV)"
+      count={rows.length}
       importHref="/registers/worker-checks/import"
       back={{ href: "/registers", label: "Registers" }}
     >
@@ -50,8 +57,18 @@ export default async function WorkerChecksPage() {
           // REQ-024 A1 (finding 157): a pending application has no issue date; it reads pending with its application number.
           detail: `${r.role_label}. ${r.issued_on ? `Issued ${r.issued_on}` : `Pending${r.application_number ? `, application ${r.application_number}` : ""}`}${r.state ? `, ${r.state}` : ""}.`,
           status: checkStatus(r),
+          cells: cellsFor(WORKER_CHECK_COLUMNS, r),
         }))}
         filters={CHECK_FILTERS}
+        columns={tableColumns(WORKER_CHECK_COLUMNS)}
+        emptyAction={
+          ctx.canWrite
+            ? { href: "/registers/worker-checks/new", label: "Add a check" }
+            : undefined
+        }
+        importHref={
+          ctx.canWrite ? "/registers/worker-checks/import" : undefined
+        }
         empty="No checks recorded yet. Add one row per worker per check: NDIS Worker Screening, Working with Children, first aid and the orientation module."
       />
     </RegisterPage>

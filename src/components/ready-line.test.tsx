@@ -66,4 +66,20 @@ describe("ReadyLine", () => {
       readyLineSentence({ done: 0, todo: 0 }, "registers"),
     );
   });
+  it("lets a page name the sentence as its live status line (REQ-028 FR-9)", () => {
+    render(
+      <ReadyLine
+        counts={{ done: 2, todo: 5 }}
+        sentence="2 of 7 done"
+        sentenceTestId="checklist-progress"
+        live
+        testId="r"
+      />,
+    );
+    const p = screen.getByTestId("checklist-progress");
+    expect(p.textContent).toBe("2 of 7 done");
+    expect(p.getAttribute("role")).toBe("status");
+    expect(p.getAttribute("aria-live")).toBe("polite");
+    expect(screen.queryByTestId("r-text")).toBeNull();
+  });
 });

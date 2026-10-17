@@ -44,6 +44,8 @@ export function RegisterPage({
   exportLabel,
   importHref,
   back,
+  count,
+  actions,
   children,
 }: {
   title: string;
@@ -57,8 +59,13 @@ export function RegisterPage({
   /** REQ-020 FR-8: the spreadsheet import, shown only while writes are open. */
   importHref?: string;
   back?: { href: string; label: string };
+  /** REQ-028 FR-7, FR-8: the register's row count; at 0 the list's empty state carries the primary and the header's actions step aside. */
+  count?: number;
+  /** REQ-028 FR-7: a page whose primary is not "Add" (the index's pack button) renders it here, first in the row. */
+  actions?: ReactNode;
   children: ReactNode;
 }) {
+  const showActions = count !== 0;
   return (
     <PageShell kind="list">
       {back ? (
@@ -71,50 +78,59 @@ export function RegisterPage({
           </Link>
         </p>
       ) : null}
-      {/* The register list and the events trail are labelled by this heading (backlog 1, D-1508). */}
-      <h1 id="register-title" className="">
-        {title}
-      </h1>
-      {intro ? <p className="text-ink mt-3 leading-7">{intro}</p> : null}
+      {/* REQ-028 FR-7: the list kind's header row, the title and its intro left and the actions right from lg. */}
+      <div className="lg:flex lg:flex-wrap lg:items-start lg:justify-between lg:gap-8">
+        <div className="min-w-0 lg:max-w-prose">
+          {/* The register list and the events trail are labelled by this heading (backlog 1, D-1508). */}
+          <h1 id="register-title" className="">
+            {title}
+          </h1>
+          {intro ? <p className="text-ink mt-3 leading-7">{intro}</p> : null}
+        </div>
+        {showActions && (actions || (canWrite && addHref) || exportHref) ? (
+          <div
+            className="mt-5 flex min-w-0 flex-wrap gap-3 lg:mt-1 lg:max-w-[32rem] lg:justify-end"
+            data-testid="register-actions"
+          >
+            {actions}
+            {canWrite && addHref ? (
+              <Link
+                href={addHref}
+                className="btn-primary"
+                data-testid="register-add"
+              >
+                {addLabel ?? "Add"}
+              </Link>
+            ) : null}
+            {exportHref ? (
+              <a
+                href={exportHref}
+                className="btn-secondary"
+                data-testid="register-export"
+              >
+                {exportLabel ?? "Export CSV"}
+              </a>
+            ) : null}
+            {canWrite && importHref ? (
+              <Link
+                href={importHref}
+                className="inline-flex min-h-11 items-center underline underline-offset-4"
+                data-testid="register-import"
+              >
+                Import from a spreadsheet
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
       {!canWrite ? (
         <p
           role="status"
-          className="border-rule bg-mist mt-4 rounded-md border p-3 text-sm leading-6"
+          className="border-rule bg-mist mt-4 rounded-md border p-4 text-sm leading-6"
           data-testid="register-lapsed"
         >
           {LAPSE_MESSAGE}
         </p>
-      ) : null}
-      {(canWrite && addHref) || exportHref ? (
-        <div className="mt-5 flex flex-wrap gap-3">
-          {canWrite && addHref ? (
-            <Link
-              href={addHref}
-              className="btn-primary"
-              data-testid="register-add"
-            >
-              {addLabel ?? "Add"}
-            </Link>
-          ) : null}
-          {exportHref ? (
-            <a
-              href={exportHref}
-              className="btn-secondary"
-              data-testid="register-export"
-            >
-              {exportLabel ?? "Export CSV"}
-            </a>
-          ) : null}
-          {canWrite && importHref ? (
-            <Link
-              href={importHref}
-              className="inline-flex min-h-11 items-center underline underline-offset-4"
-              data-testid="register-import"
-            >
-              Import from a spreadsheet
-            </Link>
-          ) : null}
-        </div>
       ) : null}
       {children}
     </PageShell>

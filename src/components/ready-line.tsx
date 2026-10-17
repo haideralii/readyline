@@ -43,6 +43,8 @@ export function ReadyLine({
   noun,
   sentence,
   testId = "ready-line",
+  sentenceTestId,
+  live = false,
 }: {
   counts: ReadyLineCounts;
   /** "register entries", "documents and registers"; used by the default sentence. */
@@ -50,6 +52,10 @@ export function ReadyLine({
   /** The sentence under the line; the default counts the noun. */
   sentence?: string;
   testId?: string;
+  /** REQ-028 FR-9: a page whose status line is this sentence names it (the checklist's progress line). */
+  sentenceTestId?: string;
+  /** With `live`, the sentence is a polite live region, so a save that changes the count is announced. */
+  live?: boolean;
 }) {
   const g = readyLineGeometry(counts);
   return (
@@ -86,7 +92,12 @@ export function ReadyLine({
           ) : null}
         </svg>
       </div>
-      <p className="text-slate mt-2 text-sm" data-testid={`${testId}-text`}>
+      <p
+        className="text-slate mt-2 text-sm"
+        data-testid={sentenceTestId ?? `${testId}-text`}
+        role={live ? "status" : undefined}
+        aria-live={live ? "polite" : undefined}
+      >
         {sentence ?? readyLineSentence(counts, noun ?? "things")}
       </p>
     </div>
