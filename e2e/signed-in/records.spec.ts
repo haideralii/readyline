@@ -151,7 +151,7 @@ test.describe("hazards, import and the self-check (REQ-020 Session C)", () => {
     await page.goto("/path/audit-day");
     await expect(
       page.getByTestId("audit-day-ask").getByRole("listitem"),
-    ).toHaveCount(13);
+    ).toHaveCount(14);
     await expect(page.getByTestId("ask-hazards")).toHaveAttribute(
       "data-state",
       "filled",
