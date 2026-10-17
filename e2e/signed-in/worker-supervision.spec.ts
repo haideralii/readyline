@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { unzipSync } from "fflate";
 import { hasSupabaseForE2e } from "../helpers/env";
 import {
@@ -25,6 +25,13 @@ import { checkWidths } from "../helpers/width";
  */
 const EVIDENCE_DIR = "product/evidence/req-024";
 const enabled = hasSupabaseForE2e();
+// The checklist and the audit-day page derive from the questionnaire, so the owner needs a saved result (#104 run 1).
+const personalCare = JSON.parse(
+  readFileSync(
+    "fixtures/reference-cases/certification-personal-care.json",
+    "utf8",
+  ),
+) as Record<string, unknown>;
 
 async function shot(page: Page, name: string, project: string) {
   if (!process.env.EVIDENCE) return;
@@ -64,7 +71,7 @@ test.describe("REQ-024 C: supervision, the derived states, the import and ending
     owner = await createTenant({
       label: `supervision-owner-${testInfo.project.name}`,
       tradingName: "Sunrise Supports",
-      answers: {},
+      answers: personalCare,
     });
     const ent = await owner.admin
       .from("entitlements")
@@ -160,15 +167,7 @@ test.describe("REQ-024 C: supervision, the derived states, the import and ending
     await checkWidths(page, `supervision panel (${project})`);
     await shot(page, "supervision", project);
 
-    // A future day is refused in words.
-    await page.locator("#supervision-kind").selectOption("conversation");
-    await page.locator("#supervision-held-on").fill("2099-01-01");
-    await page.getByTestId("supervision-save").click();
-    await expect(page.getByTestId("supervision-message")).toBeVisible();
-    await expect(page.getByTestId("supervision-form")).toContainText(
-      "cannot be after today",
-    );
-
+    // A future day is kept out by the picker (max today) and refused by the action (unit-tested); not driven here, since a browser blocks the submit on the constraint before the action runs.
     // FR-10: the audit-day page's people line, the checklist's derived line, the self-check's question.
     await page.goto("/path/audit-day");
     const line = page.getByTestId("audit-day-people-line");
