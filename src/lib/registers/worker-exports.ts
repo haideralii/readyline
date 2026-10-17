@@ -155,15 +155,28 @@ export function riskSegments(
   return out;
 }
 
-/** Whether the worker is on the s 18 list as at the day. */
+/**
+ * Whether the worker is on the s 18 list as at the day: in a risk assessed
+ * role on that day, or ended by then after such a role (AC-10, D-2287: a
+ * past worker stays on the list with the end date; s 18(2) keeps the
+ * record, s 21 for seven years). A current worker reclassified out of a
+ * risk role is off the list from that day, as A3 built it.
+ */
 export function onScreeningList(
   row: RiskRow,
   events: readonly TrailEvent[],
   asAt: string,
   riskCodes: readonly string[] = DEFAULT_RISK_ROLE_CODES,
 ): boolean {
-  return riskSegments(row, events, riskCodes).some(
-    (s) => s.start <= asAt && (s.end === null || asAt <= s.end),
+  const segments = riskSegments(row, events, riskCodes);
+  if (
+    segments.some((s) => s.start <= asAt && (s.end === null || asAt <= s.end))
+  )
+    return true;
+  return (
+    row.ended_on !== null &&
+    row.ended_on <= asAt &&
+    segments.some((s) => s.start <= asAt)
   );
 }
 

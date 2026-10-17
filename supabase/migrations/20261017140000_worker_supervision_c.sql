@@ -1,5 +1,8 @@
 -- REQ-024 Session C: supervision rows, the staff-matrix import and the trail
--- (FR-11, FR-12, FR-13; Data; D-2283; findings 66, 78, 110 and 175).
+-- (FR-11, FR-12, FR-13; Data; D-2283, D-2287; findings 66, 78, 110 and 175).
+-- Hour 14 (D-2835): after every migration on `next` at the push (Dev-2's hour
+-- 12 rewrote the trail's CHECK after this file's first hour, 07, and took
+-- its entry away in #104's run).
 -- Workers and supervisors stay codes: no name, no date of birth, no address.
 --
 -- 1. `supervision_entries`: the history behind `staff_matrix.last_supervision_on`.
@@ -90,20 +93,26 @@ create trigger supervision_entries_set_last
   for each row execute function public.supervision_entries_set_last();
 
 -- ---------------------------------------------------------------------------
--- 3. The trail and the imports (FR-12, FR-13; finding 66)
+-- 3. The trail and the imports (FR-12, FR-13; finding 66; D-2835)
 -- ---------------------------------------------------------------------------
+-- The trail's list starts from 20261017120000_commission_changes.sql's (the
+-- last to rewrite it on `next`) and adds B's `policy_acknowledgements`, which
+-- hour 12 had not seen, and `supervision_entries`.
 alter table public.register_events drop constraint register_events_register_check;
 alter table public.register_events add constraint register_events_register_check check (register in (
   'corporate_risks', 'participant_risks', 'conflicts_of_interest', 'delegations',
   'insurance_items', 'improvements', 'staff_matrix', 'onboarding_checklists',
   'hazards', 'incidents', 'complaints', 'worker_clearances',
-  'onboarding_items', 'risk_assessed_roles', 'screening_exceptions',
+  'onboarding_items', 'risk_assessed_roles', 'screening_exceptions', 'commission_changes',
   'policy_acknowledgements', 'supervision_entries'
 ));
 
+-- The imports' list starts from 20261015060000_hazards_imports_self_checks.sql's
+-- (no migration since has rewritten it) and adds REQ-023 D's `commission_changes`,
+-- whose import page is on `next` without it, and `staff_matrix`.
 alter table public.imports drop constraint imports_register_check;
 alter table public.imports add constraint imports_register_check check (register in (
-  'incidents', 'complaints', 'worker_clearances', 'corporate_risks', 'staff_matrix'
+  'incidents', 'complaints', 'worker_clearances', 'corporate_risks', 'commission_changes', 'staff_matrix'
 ));
 
 notify pgrst, 'reload schema';

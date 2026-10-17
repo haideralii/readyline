@@ -189,9 +189,9 @@ describe("buildFillFile (FR-6a, FR-6b; AC-12)", () => {
     );
     expect(text).toContain("[Full name]");
     expect(text).toContain("WWC1234567");
-    // W-002 ended in March, so as at today the s 18 list holds W-001 alone.
-    expect(f.count).toBe(1);
-    expect(text).not.toContain("W-002");
+    // W-002 ended in March and stays on the s 18 list with the end date (AC-10, D-2287), so the list holds both.
+    expect(f.count).toBe(2);
+    expect(text).toContain("W-002");
   });
 
   it("ticked, the values are in the file and an empty cell keeps its bracket", () => {

@@ -183,12 +183,48 @@ describe("the s 20 reconstruction (AC-13)", () => {
       (r) => r.worker_ref,
     );
 
-  it("lists the workers in a risk assessed role on each day the REQ names", () => {
+  it("lists the workers in a risk assessed role on each day the REQ names; an ended worker stays listed after the end with the date (D-2287)", () => {
     expect(listed("2025-01-15")).toEqual(["W-002", "W-003"]);
     expect(listed("2025-03-02")).toEqual(["W-002", "W-003", "W-005"]);
-    expect(listed("2025-07-01")).toEqual(["W-003", "W-005"]);
+    // AC-13 as written left W-002 off the day after the end; AC-10 keeps a past worker on the list with the end date (PO 06:35), so the later rule wins here.
+    expect(listed("2025-07-01")).toEqual(["W-002", "W-003", "W-005"]);
+    const ended = screeningListRows(
+      snapshot({ asAt: "2025-07-01", rows: [w2, w3, w5], events }),
+    ).find((r) => r.worker_ref === "W-002");
+    expect(ended?.ended_on).toBe("2025-06-30");
     expect(listed("2024-02-28")).toEqual([]);
     expect(listed("2025-02-01")).toEqual(["W-002", "W-003"]);
+  });
+
+  it("a worker reclassified out of a risk role and still current is off the list from that day; a worker who ended before ever holding one is never on it", () => {
+    const out = staff("W-011", {
+      risk_assessed: false,
+      risk_assessed_from: null,
+      started_on: "2024-01-01",
+    });
+    const change = [
+      event(
+        out.id,
+        "role-changed",
+        "from=support-worker to=admin on=2025-05-01",
+        "2025-05-01T00:00:00Z",
+      ),
+      event(
+        out.id,
+        "role-changed",
+        "from=admin to=support-worker on=2024-01-01",
+        "2024-01-01T00:00:00Z",
+      ),
+    ];
+    const on = (asAt: string) => onScreeningList(out, change, asAt);
+    expect(on("2025-04-30")).toBe(true);
+    expect(on("2025-05-02")).toBe(false);
+    const never = staff("W-012", {
+      risk_assessed: false,
+      risk_assessed_from: null,
+      ended_on: "2025-01-01",
+    });
+    expect(onScreeningList(never, [], "2025-06-01")).toBe(false);
   });
 
   it("reads the fixed note and nothing looser", () => {
