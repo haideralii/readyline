@@ -9,6 +9,11 @@ import {
   type TestTenant,
 } from "../helpers/session";
 import { checkTables, checkWidths } from "../helpers/width";
+import {
+  addBusinessDays,
+  minusBusinessDays,
+  todaySydney,
+} from "../helpers/dates";
 
 /**
  * REQ-009 Session B (batch 28) on all three projects: a subscribed owner
@@ -21,6 +26,8 @@ import { checkTables, checkWidths } from "../helpers/width";
  */
 const EVIDENCE_DIR = "product/evidence/req-009";
 const enabled = hasSupabaseForE2e();
+// D-2272: every date the spec types follows the runner's Sydney day.
+const today = todaySydney();
 const answers = JSON.parse(
   readFileSync(
     "fixtures/reference-cases/verification-sole-trader.json",
@@ -86,6 +93,11 @@ test.describe("registers (REQ-009 Session B)", () => {
     baseURL,
   }, testInfo) => {
     const project = testInfo.project.name;
+    // D-2272: the dates follow the runner's Sydney day. Two business days ago
+    // for the incident, so a low-severity unauthorised restrictive practice's
+    // five business days land ahead of today and the row reads "Notify by".
+    const occurred = minusBusinessDays(today, 2);
+    const notifyBy = addBusinessDays(occurred, 5);
     await signInContext(context, tenant, baseURL!);
     await page.goto("/registers");
     await expect(page.getByTestId("registers-index")).toContainText(
@@ -102,14 +114,14 @@ test.describe("registers (REQ-009 Session B)", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: "Add an incident" }),
     ).toBeVisible();
-    await page.getByLabel("Date it happened").fill("2026-10-09");
+    await page.getByLabel("Date it happened").fill(occurred);
     // Retro finding 23: the aware date follows the date it happened until it
     // is touched, so the clock never runs from the typing day.
     await expect(page.getByLabel("Date you became aware")).toHaveValue(
-      "2026-10-09",
+      occurred,
     );
-    await page.getByLabel("Date you became aware").fill("2026-10-09");
-    await page.getByLabel("Date it was reported").fill("2026-10-09");
+    await page.getByLabel("Date you became aware").fill(occurred);
+    await page.getByLabel("Date it was reported").fill(occurred);
     await page
       .getByLabel("What happened", { exact: true })
       .selectOption("restrictive-practice-unauthorised");
@@ -124,7 +136,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     );
     await summary.fill("Door locked for ten minutes without a plan in place.");
     await page.getByLabel("Reportable to the Commission").check();
-    await expect(page.getByTestId("notify-by")).toContainText("2026-10-16");
+    await expect(page.getByTestId("notify-by")).toContainText(notifyBy);
     await checkWidths(page, "incident form");
     await shot(page, "incident-form", project);
     await axeClean(page, "incident form");
@@ -137,7 +149,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     );
     await expect(page.getByTestId("register-saved")).toBeVisible();
     await expect(page.getByTestId("status-tag")).toContainText(
-      "Notify by 2026-10-16",
+      `Notify by ${notifyBy}`,
     );
     await expect(page.getByTestId("events-trail")).toContainText("Recorded");
 
@@ -151,7 +163,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     await expect(
       page.getByTestId("due-soon").getByRole("listitem").first(),
     ).toContainText(
-      "Notify the Commission about incident INC-0001 by 2026-10-16.",
+      `Notify the Commission about incident INC-0001 by ${notifyBy}.`,
     );
     await page.goto(incidentUrl);
 
@@ -173,7 +185,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     // Edit: close it; the status change is an event.
     await page.getByTestId("register-edit").click();
     await page.getByLabel("Status").selectOption("closed");
-    await page.getByLabel("Date closed").fill("2026-10-12");
+    await page.getByLabel("Date closed").fill(today);
     await page.getByTestId("register-submit").click();
     await expect(page.getByTestId("events-trail")).toContainText(
       "Status changed",
@@ -206,7 +218,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     const project = testInfo.project.name;
     await signInContext(context, tenant, baseURL!);
     await page.goto("/registers/complaints/new");
-    await page.getByLabel("Date received").fill("2026-10-12");
+    await page.getByLabel("Date received").fill(today);
     await page.getByLabel("How it arrived").selectOption("phone");
     await page.getByLabel(/Who raised it/).fill("fam-2");
     await page
