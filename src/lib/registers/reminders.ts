@@ -13,6 +13,7 @@
  */
 import { addBusinessDays, addDays, addMonths, daysBetween } from "./status";
 import {
+  applicationInsideWindow,
   registrationReminderLine,
   registrationReminders,
   isRegistrationReminderKind,
@@ -208,8 +209,13 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   }
 
   // REQ-023 FR-3: the five timeline kinds from the current period, the period row as the subject (finding 58).
+  // REQ-023 FR-7 (Session C, finding 83): an application recorded inside the s 73K window
+  // stops the last call; read here from the period row, so the job passes nothing new.
   if (input.period)
-    for (const r of registrationReminders(input.period))
+    for (const r of registrationReminders({
+      applicationInsideWindow: applicationInsideWindow(input.period.period),
+      ...input.period,
+    }))
       push(
         r.kind,
         "registration_periods",

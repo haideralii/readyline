@@ -27,8 +27,10 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import {
   PAUSED_EXPORT_SENTENCE,
   TIMELINE_FIXED_SENTENCE,
+  applicationInsideWindow,
   midtermFor,
   positionSentence,
+  renewalWindowOpens,
   timelineRows,
 } from "@/lib/registers/timeline";
 import type { RegistrationKind } from "@/lib/registers/types";
@@ -264,7 +266,9 @@ export default async function AccountPage() {
                   className="mt-3 text-sm leading-6"
                   data-testid="registration-position"
                 >
-                  {positionSentence(period, today)}
+                  {positionSentence(period, today, {
+                    applicationInsideWindow: applicationInsideWindow(period),
+                  })}
                 </p>
                 <p
                   className="text-slate mt-2 text-sm leading-6"
@@ -272,6 +276,19 @@ export default async function AccountPage() {
                 >
                   {TIMELINE_FIXED_SENTENCE}
                 </p>
+                {/* REQ-023 FR-7 (Session C, finding 65): the renewal path, from the window on. */}
+                {today >= renewalWindowOpens(period) ? (
+                  <p className="mt-2 text-sm leading-6">
+                    <Link
+                      href="/path/renewal"
+                      className="underline underline-offset-2"
+                      data-testid="registration-renewal-link"
+                    >
+                      Your renewal path: the ten steps, in the
+                      Commission&rsquo;s order
+                    </Link>
+                  </p>
+                ) : null}
                 <p className="mt-2 text-sm leading-6">
                   <a
                     href="/registers/audit-pack.zip"

@@ -9,6 +9,7 @@ import type { MidTermAudit } from "@/lib/standards/derive";
 import { addMonths, formatLongDate, monthsBetween } from "./status";
 import {
   REGISTRATION_REMINDER_KINDS,
+  applicationInsideWindow,
   legalRows,
   midtermFor,
   mustStartBy,
@@ -334,5 +335,55 @@ describe("the five reminders (FR-3, AC-2)", () => {
       expect(line).toMatch(/Rules s 13B|NDIS Act s 73K|our suggestion/);
       expect(line).not.toMatch(/incident|complaint|participant/i);
     }
+  });
+});
+
+/**
+ * REQ-023 FR-7 (Session C, finding 83): a recorded application counts under
+ * NDIS Act s 73K only inside the six months before the period ends; the
+ * position sentence reads that answer, so an application on the day the
+ * window opened keeps the renewal-window sentence past the suggested
+ * apply-by day, and an earlier one does not.
+ */
+describe("applicationInsideWindow (s 73K)", () => {
+  it("is true from the day the window opens to the last day, false before, after or when no date is recorded", () => {
+    expect(applicationInsideWindow(period())).toBe(false);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2028-09-01" }),
+      ),
+    ).toBe(true);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2029-03-01" }),
+      ),
+    ).toBe(true);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2028-08-31" }),
+      ),
+    ).toBe(false);
+    expect(
+      applicationInsideWindow(
+        period({ application_submitted_on: "2029-03-02" }),
+      ),
+    ).toBe(false);
+  });
+
+  it("keeps the position sentence on the window once an application inside it is recorded", () => {
+    const p = period({ application_submitted_on: "2028-09-15" });
+    const late = "2029-01-15";
+    expect(positionSentence(p, late)).toMatch(/^If you have not applied/);
+    expect(
+      positionSentence(p, late, {
+        applicationInsideWindow: applicationInsideWindow(p),
+      }),
+    ).toMatch(/^Your renewal window is open/);
+    const early = period({ application_submitted_on: "2028-06-01" });
+    expect(
+      positionSentence(early, late, {
+        applicationInsideWindow: applicationInsideWindow(early),
+      }),
+    ).toMatch(/^If you have not applied/);
   });
 });

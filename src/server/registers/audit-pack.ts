@@ -27,8 +27,16 @@ import {
   type PackLine,
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
-import { CSV_COLUMNS, toCsv } from "@/lib/registers/csv";
+import { CSV_COLUMNS, toCsv, toCsvWithFirstLine } from "@/lib/registers/csv";
 import { documentTitle } from "@/lib/questionnaire/content";
+import {
+  CORRECTIVE_ACTION_ID,
+  REHEARSAL_SHEET_COLUMNS,
+  rehearsalFileName,
+  rehearsalHeading,
+  rehearsalSheetRows,
+} from "@/lib/registers/self-check";
+import { lastRehearsal } from "./self-check-queries";
 import {
   WHAT_CHANGED_COLUMNS,
   whatChanged,
@@ -244,6 +252,8 @@ export async function buildAuditPack(input: {
   now: Date;
   /** REQ-023 FR-5: the period the four registers' files cover; the whole register by default. */
   period?: Period;
+  /** REQ-023 FR-8 (D-2309): the owner's rehearsal sheet rides the owner's pack, and the auditor link's only when ticked. */
+  includeRehearsal?: boolean;
 }): Promise<AuditPack> {
   const { supabase, admin, accountId, now } = input;
   const period = input.period ?? ALL_PERIOD;
@@ -277,6 +287,23 @@ export async function buildAuditPack(input: {
   // the pack's own period; by the last-audit date when one exists, else the
   // registration period; nothing without a period.
   Object.assign(files, await whatChangedFiles(supabase, accountId));
+  // REQ-023 FR-8 (D-2309, D-2207): the newest rehearsal as one CSV headed
+  // "Our own working note, <date>", in the owner's pack and in the auditor
+  // link's pack only when the owner ticked it; never a PDF.
+  if (input.includeRehearsal) {
+    const rehearsal = await lastRehearsal(supabase, accountId);
+    if (rehearsal)
+      files[rehearsalFileName(rehearsal.walked_on)] = strToU8(
+        toCsvWithFirstLine(
+          rehearsalHeading(rehearsal.walked_on),
+          REHEARSAL_SHEET_COLUMNS,
+          rehearsalSheetRows(
+            rehearsal.answers,
+            CORRECTIVE_ACTION_ID in rehearsal.answers ? "mid-term" : "renewal",
+          ),
+        ),
+      );
+  }
   // FR-1 "including the events trails" (retro finding 25): the audit-day
   // registers share one trail, so it is one file, each line naming its
   // register and its row as the register's own list names it (the row's id

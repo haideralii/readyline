@@ -272,10 +272,7 @@ export default async function RegistersPage() {
           >
             Your registration period ends on{" "}
             {formatLongDate(period.period_ends_on)}.{" "}
-            <Link
-              href="/account#registration-heading"
-              className="underline underline-offset-2"
-            >
+            <Link href="/path/renewal" className="underline underline-offset-2">
               See your registration timeline
             </Link>
             .

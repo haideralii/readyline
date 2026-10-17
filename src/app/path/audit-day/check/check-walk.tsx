@@ -2,9 +2,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  SELF_CHECK_QUESTIONS,
+  questionFor,
+  rehearsalSummary,
   walkSummary,
+  type RehearsalVariant,
   type SelfCheckAnswers,
+  type SelfCheckMode,
 } from "@/lib/registers/self-check";
 import { finishSelfCheckAction } from "@/server/registers/self-check-actions";
 
@@ -21,14 +24,24 @@ export type WalkRecord = {
  * One screen per record (REQ-020 FR-9; REQ-017's one-step rule): the
  * record's live state, one plain question, Yes or No, an optional note,
  * then the next; the last screen is the count of findings and the next
- * date. Nothing is saved until the walk ends.
+ * date. Nothing is saved until the walk ends. REQ-023 FR-8 (Session C): in
+ * `rehearsal` mode the same questions read "in this period", nothing goes to
+ * the improvement register, the quarter is not reset, and the last screen is
+ * the dated working note's whereabouts (D-2309).
  */
 export function CheckWalk({
   records,
   today,
+  mode = "walk",
+  period,
+  variant = "renewal",
 }: {
   records: WalkRecord[];
   today: string;
+  mode?: SelfCheckMode;
+  /** The period a rehearsal reads (FR-8). */
+  period?: { from: string; to: string };
+  variant?: RehearsalVariant;
 }) {
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<SelfCheckAnswers>({});
@@ -57,6 +70,11 @@ export function CheckWalk({
         walkedOn: today,
         walkedByRef: "owner",
         answers: next,
+        mode,
+        variant,
+        ...(mode === "rehearsal" && period
+          ? { periodFrom: period.from, periodTo: period.to }
+          : {}),
       });
       if (!r.ok) {
         setError(r.message);
@@ -74,20 +92,24 @@ export function CheckWalk({
 
   if (done)
     return (
-      <div className="mt-6" data-testid="check-done">
+      <div className="mt-6" data-testid="check-done" data-mode={mode}>
         <p className="text-lg leading-8" data-testid="check-summary">
-          {walkSummary(done.findings, today)}
+          {mode === "rehearsal"
+            ? rehearsalSummary(done.findings, today)
+            : walkSummary(done.findings, today)}
         </p>
         <p className="mt-4">
           <Link
-            href="/path/audit-day"
+            href={mode === "rehearsal" ? "/path/renewal" : "/path/audit-day"}
             className="btn-primary"
             data-testid="check-back"
           >
-            Back to the audit day
+            {mode === "rehearsal"
+              ? "Back to your renewal path"
+              : "Back to the audit day"}
           </Link>
         </p>
-        {done.findings > 0 ? (
+        {done.findings > 0 && mode === "walk" ? (
           <p className="mt-3 text-sm">
             <Link
               href="/registers/improvements"
@@ -101,7 +123,7 @@ export function CheckWalk({
     );
 
   return (
-    <div className="mt-6" data-testid="check-walk">
+    <div className="mt-6" data-testid="check-walk" data-mode={mode}>
       <p
         className="text-slate text-sm font-medium"
         data-testid="check-progress"
@@ -127,7 +149,7 @@ export function CheckWalk({
         </Link>
       </p>
       <p className="mt-4 text-lg leading-8" data-testid="check-question">
-        {SELF_CHECK_QUESTIONS[current.id]}
+        {questionFor(current.id, mode)}
       </p>
       <label htmlFor="check-note" className="mt-4 block text-sm font-medium">
         A note (optional; codes, never names)
@@ -141,7 +163,11 @@ export function CheckWalk({
         className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
       />
       {error ? (
-        <p role="alert" className="mt-3 text-sm leading-6">
+        <p
+          role="alert"
+          className="mt-3 text-sm leading-6"
+          data-testid="check-error"
+        >
           {error}
         </p>
       ) : null}

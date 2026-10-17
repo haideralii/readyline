@@ -65,6 +65,8 @@ export async function GET(request: Request) {
     tradingName: viewer.account.trading_name,
     now: new Date(),
     period: resolved.period,
+    // REQ-023 FR-8 (D-2309): the owner's own pack carries the rehearsal sheet.
+    includeRehearsal: true,
   });
   // The write is checked (PO 16 Oct 19:47): on the hosted project it had
   // answered 42501 unseen since it was written, the insert grant missing.
