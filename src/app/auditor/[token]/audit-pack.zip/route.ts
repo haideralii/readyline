@@ -97,6 +97,8 @@ export async function GET(
     tradingName: link.tradingName,
     now: new Date(),
     period: resolved.period,
+    // REQ-023 FR-8 (D-2309): the rehearsal sheet only when the owner ticked it on this link.
+    includeRehearsal: link.includeRehearsal,
   });
   return new NextResponse(new Uint8Array(pack.body), {
     status: 200,

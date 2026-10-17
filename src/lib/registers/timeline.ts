@@ -60,7 +60,25 @@ export type RegistrationPeriod = {
   midterm_override_source: MidtermOverrideSource | null;
   last_audit_on: string | null;
   midterm_audit_on: string | null;
+  /** REQ-023 Session C (FR-7; D-2316): the renewal's facts, on the period row; absent on rows read before Session C's migration. */
+  application_submitted_on?: string | null;
+  scope_received_on?: string | null;
+  audit_booked_on?: string | null;
+  auditor_business_name?: string | null;
+  decision_received_on?: string | null;
 };
+
+/**
+ * REQ-023 FR-7 (finding 83): whether a recorded renewal application keeps
+ * the registration in force while the Commission decides, that is, whether
+ * it was made within the six months before the period ends (NDIS Act
+ * s 73K(1)(b)); the FR-2 sentence and the last-call reminder read it.
+ */
+export function applicationInsideWindow(p: RegistrationPeriod): boolean {
+  const on = p.application_submitted_on;
+  if (!on) return false;
+  return on >= renewalWindowOpens(p) && on <= p.period_ends_on;
+}
 
 /** The source word beside every row (finding 31, D-2302). */
 export type TimelineSource =

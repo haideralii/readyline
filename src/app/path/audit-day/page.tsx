@@ -269,6 +269,16 @@ export default async function AuditDayPage({
           </Link>
         </p>
       ) : null}
+      {/* REQ-023 FR-7 (Session C): the renewal path, the ten steps in the Commission's order. */}
+      <p className="mt-2 text-sm print:hidden">
+        <Link
+          href="/path/renewal"
+          className="underline underline-offset-2"
+          data-testid="audit-day-renewal"
+        >
+          Your renewal path
+        </Link>
+      </p>
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
       {[...shown.groups]

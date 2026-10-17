@@ -11,8 +11,9 @@ import {
 } from "@/lib/registers/timeline";
 import type { ReminderKind } from "@/lib/registers/types";
 
+// REQ-023 Session C (FR-7, D-2316): the renewal's five facts ride the same row.
 const COLUMNS =
-  "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on";
+  "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, application_submitted_on, scope_received_on, audit_booked_on, auditor_business_name, decision_received_on";
 
 export async function currentPeriod(
   supabase: SupabaseClient,

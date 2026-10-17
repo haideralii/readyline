@@ -13,12 +13,23 @@ import { lintText } from "@/lib/copy-lint/rules";
 import { ASK_COUNT } from "./audit-day-ask";
 import { AUDIT_DAY_RECORDS } from "./names";
 import {
+  CORRECTIVE_ACTION_ID,
+  CORRECTIVE_ACTION_QUESTION,
+  GOVERNANCE_FIRST_IDS,
+  REHEARSAL_SHEET_COLUMNS,
   SELF_CHECK_FINDING_DAYS,
   SELF_CHECK_QUESTIONS,
   addDaysIso,
   addMonthsIso,
   findingsFrom,
   nextSelfCheckOn,
+  questionFor,
+  rehearsalFileName,
+  rehearsalHeading,
+  rehearsalQuestion,
+  rehearsalRecordIds,
+  rehearsalSheetRows,
+  rehearsalSummary,
   selfCheckOffer,
   selfCheckRecordIds,
   walkSummary,
@@ -151,5 +162,102 @@ describe("the findings (FR-9, AC-7)", () => {
       "1 finding is in your improvement register, due in 30 days. The next check is due 2027-01-15.",
     );
     expect(walkSummary(2, "2026-10-15")).toMatch(/^2 findings are/);
+  });
+});
+
+/**
+ * REQ-023 FR-8 (Session C): the rehearsal asks the walk's questions with
+ * "this quarter" read as "in this period"; the mid-term variant opens with
+ * the corrective-action question and leads with the governance records
+ * (s 13B(5)); the sheet is headed "Our own working note, <date>", lists what
+ * is missing first and carries no name; the closing line says where the
+ * sheet is and that nothing reached the improvement register (D-2309).
+ */
+describe("the rehearsal (REQ-023 FR-8)", () => {
+  it("asks the same questions with the quarter read as the period, and nothing else changes", () => {
+    for (const id of selfCheckRecordIds()) {
+      const q = questionFor(id, "rehearsal");
+      expect(q).not.toMatch(/this quarter/);
+      expect(q).toBe(
+        SELF_CHECK_QUESTIONS[id].replace(/this quarter/g, "in this period"),
+      );
+      expect(questionFor(id, "walk")).toBe(SELF_CHECK_QUESTIONS[id]);
+      expect(lintText(q).map((f) => f.rule)).toEqual([]);
+    }
+    expect(
+      selfCheckRecordIds().some((id) =>
+        /this quarter/.test(SELF_CHECK_QUESTIONS[id]),
+      ),
+    ).toBe(true);
+    expect(rehearsalQuestion(CORRECTIVE_ACTION_ID)).toBe(
+      CORRECTIVE_ACTION_QUESTION,
+    );
+  });
+
+  it("walks the list's order for a renewal and opens the mid-term variant with the corrective-action question, governance first", () => {
+    expect(rehearsalRecordIds("renewal")).toEqual(selfCheckRecordIds());
+    const mid = rehearsalRecordIds("mid-term");
+    expect(mid[0]).toBe(CORRECTIVE_ACTION_ID);
+    const governance = GOVERNANCE_FIRST_IDS.filter((id) =>
+      selfCheckRecordIds().includes(id),
+    );
+    expect(mid.slice(1, 1 + governance.length)).toEqual(governance);
+    expect([...mid].sort()).toEqual(
+      [CORRECTIVE_ACTION_ID, ...selfCheckRecordIds()].sort(),
+    );
+    expect(findProhibitedClaims(CORRECTIVE_ACTION_QUESTION)).toEqual([]);
+  });
+
+  it("heads the sheet as the owner's own working note, names the file by its day, and lists what is missing first", () => {
+    expect(rehearsalHeading("2028-09-20")).toBe(
+      "Our own working note, 20 September 2028",
+    );
+    expect(rehearsalFileName("2028-09-20")).toBe("rehearsal-2028-09-20.csv");
+    expect(REHEARSAL_SHEET_COLUMNS).toEqual([
+      "record",
+      "question",
+      "answer",
+      "note",
+    ]);
+    const [first, second, third] = selfCheckRecordIds();
+    const rows = rehearsalSheetRows(
+      {
+        [first]: { answer: "yes", note: "" },
+        [second]: { answer: "no", note: "Ref P-07 not filed" },
+        [third]: { answer: "yes", note: "" },
+      },
+      "renewal",
+    );
+    expect(rows).toHaveLength(3);
+    expect(rows[0].answer).toBe("no");
+    expect(rows[0].note).toBe("Ref P-07 not filed");
+    expect(rows[0].question).not.toMatch(/this quarter/);
+    expect(rows.slice(1).every((r) => r.answer === "yes")).toBe(true);
+    // The mid-term variant's opening row carries its own name, never a person's.
+    const mid = rehearsalSheetRows(
+      { [CORRECTIVE_ACTION_ID]: { answer: "no", note: "" } },
+      "mid-term",
+    );
+    expect(mid).toEqual([
+      {
+        record:
+          "Your last audit's corrective action plan and the Commissioner's notice",
+        question: CORRECTIVE_ACTION_QUESTION,
+        answer: "no",
+        note: "",
+      },
+    ]);
+  });
+
+  it("closes with the count, the sheet's place and the register left alone", () => {
+    expect(rehearsalSummary(0, "2028-09-20")).toMatch(/^Nothing missing\./);
+    expect(rehearsalSummary(1, "2028-09-20")).toMatch(/^1 thing is missing\./);
+    const line = rehearsalSummary(3, "2028-09-20");
+    expect(line).toMatch(/^3 things are missing\./);
+    expect(line).toContain("rehearsal-2028-09-20.csv");
+    expect(line).toContain("Nothing was written to your improvement register.");
+    expect(line).toMatch(/not in an auditor link's pack unless you tick/);
+    expect(findProhibitedClaims(line)).toEqual([]);
+    expect(lintText(line).map((f) => f.rule)).toEqual([]);
   });
 });

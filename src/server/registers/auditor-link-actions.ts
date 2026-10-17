@@ -29,6 +29,8 @@ export type AuditorLinkActionResult =
 
 const CreateInput = strictObject({
   hours: z.enum(["24", "48", "72"]).default("72"),
+  /** REQ-023 FR-8 (D-2309): the owner's tick, "on" when ticked; absent otherwise, so the default is off. */
+  includeRehearsal: z.enum(["on"]).optional(),
 });
 
 const RevokeInput = strictObject({
@@ -42,8 +44,10 @@ export async function createAuditorLinkAction(
   formData: FormData,
 ): Promise<AuditorLinkActionResult> {
   const raw = formData.get("hours");
+  const tick = formData.get("includeRehearsal");
   const parsed = parseInput(CreateInput, {
     ...(typeof raw === "string" ? { hours: raw } : {}),
+    ...(tick === "on" ? { includeRehearsal: "on" } : {}),
   });
   if (!parsed.ok) return { ok: false, message: "Choose 24, 48 or 72 hours." };
   const viewer = await getViewer();
@@ -78,6 +82,7 @@ export async function createAuditorLinkAction(
       token_hash: hashAuditorToken(token),
       expires_at: expiresAt.toISOString(),
       created_by: viewer.user.id,
+      include_rehearsal: parsed.data.includeRehearsal === "on",
     })
     .select("id")
     .single();
@@ -89,7 +94,7 @@ export async function createAuditorLinkAction(
     account_id: accountId,
     actor_user_id: viewer.user.id,
     action: "auditor_link.created",
-    target: `${ins.data.id as string} ${hours}h`,
+    target: `${ins.data.id as string} ${hours}h${parsed.data.includeRehearsal === "on" ? " rehearsal" : ""}`,
   });
   // The account page reads the live link on the server; without this the panel
   // never shows the new link's state (run 38721614254, PR #61).

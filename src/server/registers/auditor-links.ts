@@ -57,6 +57,8 @@ export type ResolvedAuditorLink = {
   accountId: string;
   tradingName: string;
   expiresAt: Date;
+  /** REQ-023 FR-8 (D-2309): whether the link's pack carries the owner's rehearsal sheet. */
+  includeRehearsal: boolean;
 };
 
 /** The live link behind a token, or null for anything else (never a reason, SR-1). */
@@ -79,6 +81,7 @@ export async function resolveAuditorToken(
           account_id: string;
           trading_name: string;
           expires_at: string;
+          include_rehearsal?: boolean | null;
         }[]
       | null
   )?.[0];
@@ -88,6 +91,7 @@ export async function resolveAuditorToken(
     accountId: row.account_id,
     tradingName: row.trading_name,
     expiresAt: new Date(row.expires_at),
+    includeRehearsal: row.include_rehearsal === true,
   };
 }
 

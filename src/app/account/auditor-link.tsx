@@ -95,6 +95,22 @@ export function AuditorLinkPanel({
           <option value="48">48 hours</option>
           <option value="72">72 hours</option>
         </select>
+        {/* REQ-023 FR-8 (D-2309): the rehearsal sheet is the owner's own working note; off by default, never pre-ticked. */}
+        <label className="mt-3 flex min-h-11 items-start gap-2 text-sm leading-6">
+          <input
+            type="checkbox"
+            name="includeRehearsal"
+            value="on"
+            className="mt-1.5 h-5 w-5"
+            data-testid="auditor-link-include-rehearsal"
+          />
+          <span>
+            Include my rehearsal notes in the pack this link downloads. They are
+            your own working note of what was missing when you rehearsed; left
+            unticked, the link&rsquo;s pack carries the registers and documents
+            alone.
+          </span>
+        </label>
         <button
           type="submit"
           disabled={creating}

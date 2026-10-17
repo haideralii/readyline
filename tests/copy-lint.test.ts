@@ -178,6 +178,8 @@ const COPY_MODULES = [
   "src/app/start/_components/steps/practices-copy.ts",
   // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend and the tags (the "Next:" line went with REQ-028 D-2805).
   "src/app/start/_components/steps/result-copy.ts",
+  // REQ-023 Session C: the renewal path's step titles, states, actions and the Commission's practice lines.
+  "src/lib/path/renewal.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";
 
@@ -628,6 +630,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
     "src/app/start/_components/steps/practices-step.tsx",
   "src/app/start/_components/steps/result-copy.ts":
     "src/app/start/_components/steps/result-step.tsx",
+  // REQ-023 Session C: rendered on the signed-in renewal path, outside D-2710's list.
+  "src/lib/path/renewal.ts": null,
 };
 
 /**
@@ -650,6 +654,8 @@ const GLOSSARY_OUTSIDE_LIST_PREFIXES = [
   "src/app/invite/",
   "src/app/path/audit-day/",
   "src/app/path/before-you-buy/",
+  // REQ-023 Session C: the renewal path is signed-in, outside D-2710's list like audit day.
+  "src/app/path/renewal/",
   "src/app/registers/",
   "src/app/report/",
   "src/app/sign-in/",
