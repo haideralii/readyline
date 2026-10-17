@@ -1,5 +1,5 @@
 # REQ-007: Payments, entitlements and the download flow
-Status: ready
+Status: delivered and accepted (Sessions A to C, 12 and 13 Oct 2026, PR #15; the real Stripe hop ran on the deployed site 13 Oct, see REQ-010's PO review; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-006-010.md`, finding 12)
 Phase: 4   Priority: must   Owner: Dev   Depends on: REQ-004 (accounts), REQ-005 (generator) for the paid path; REQ-008 (legal pages) before anything is charged for real.
 
 ## Why
@@ -17,11 +17,11 @@ In: Stripe Checkout (one-time payment) for the document pack; webhook-driven ent
 - No pre-ticked anything. No "limited time", no countdown, no fake scarcity, no exit pop-ups.
 
 ## Functional requirements
-- FR-1 **Pricing page** `/pricing`: the pack (price, what you get as a list of document types for the visitor's result if they have one, otherwise the core set), the subscription shown as "coming" with its price and no buy button, the refund promise, the AI disclosure, the not-legal-advice line, links to terms and privacy (REQ-008). Works signed out.
+- FR-1 **Pricing page** `/pricing`: the pack (price, what you get as a list of document types for the visitor's result if they have one, otherwise the core set), the subscription shown as "coming" with its price and no buy button *(superseded: since REQ-009 Session C the subscription is offered with a Subscribe button when `STRIPE_PRICE_REGISTERS` is set, else "not available yet"; batch 45 item 2 forbids "coming soon"; D-2001; retro review 15 Oct 2026, finding 15)*, the refund promise, the AI disclosure, the not-legal-advice line, links to terms and privacy (REQ-008). Works signed out.
 - FR-2 **Buy** from the result page and the pricing page: requires sign-in (magic link, REQ-004) first, then creates a Stripe Checkout Session in AUD for the pack with `client_reference_id` = account id and metadata `{assessment_id, pack_version}`. Success URL `/documents?purchase=success`, cancel URL back to where they came from. Stripe collects the email; we pass the account email prefilled.
 - FR-3 **Webhook** `/api/stripe/webhook`: verifies the signature with the raw body; handles `checkout.session.completed` and `checkout.session.async_payment_succeeded` by inserting a `purchases` row (idempotent on `stripe_checkout_session_id`) and an `entitlements` row (`kind: "pack"`, `assessment_id`, `granted_at`); handles `charge.refunded` by marking the purchase refunded and revoking the entitlement; ignores other events. Every event id processed is stored so a replayed event is a no-op. Returns 200 only after the write commits.
 - FR-4 **Entitlement model** (migration): `purchases` (id, account_id, stripe_checkout_session_id unique, stripe_payment_intent_id, amount_cents, currency, status enum paid/refunded, created_at, refunded_at), `entitlements` (id, account_id, kind enum pack/subscription, assessment_id nullable, granted_at, revoked_at nullable, source purchase_id), `stripe_events` (id = Stripe event id, type, received_at). RLS: owners read their own rows; no client writes; only the webhook (service role) writes. Cross-tenant test as in REQ-004.
-- FR-5 **Generation on entitlement**: when a pack entitlement is granted, the document set for that assessment is generated (REQ-005 runner) under the account's quota, once; status visible on `/documents` as "Preparing your documents (usually under 10 minutes)"; the customer gets an email when it is ready (REQ-004 email interface, log-only in dev). If generation fails after the pipeline's retries, the operator is alerted (log line at error level with the purchase id) and the customer sees "We are preparing your documents and will email you", never an error code.
+- FR-5 **Generation on entitlement**: when a pack entitlement is granted, the document set for that assessment is generated (REQ-005 runner) under the account's quota, once; status visible on `/documents` as "Preparing your documents (usually under 10 minutes)" *(now "usually 10 to 20 minutes", batch 23 item 4, D-1005; retro review finding 18)*; the customer gets an email when it is ready (REQ-004 email interface, log-only in dev). If generation fails after the pipeline's retries, the operator is alerted (log line at error level with the purchase id) and the customer sees "We are preparing your documents and will email you", never an error code.
 - FR-6 **Download page** `/documents`: without an entitlement, shows the result summary and the Buy button; with one, the generated set (REQ-005 UI) with zip and individual downloads, the receipt link, and the "request a refund" link (mailto with the purchase id prefilled; no in-app refund yet).
 - FR-7 **Receipts**: Stripe's receipt email is on; the purchase row shows the Stripe receipt URL on `/documents` and on `/account`.
 - FR-8 **Operator refund**: `supabase/ops/refund.md` describes the once-only steps (refund in Stripe dashboard; the webhook revokes). Entitlement revocation hides downloads but keeps the data for the retention window (REQ-004).
@@ -36,12 +36,12 @@ In: Stripe Checkout (one-time payment) for the document pack; webhook-driven ent
 - SR-6 Logs redact the Stripe customer email and never log the full session object.
 
 ## Acceptance criteria
-- AC-1 Stripe test mode, Playwright: result page → Buy → sign-in → Checkout (test card 4242) → `/documents` shows "Preparing" → after the fake runner completes, downloads work. Desktop and android-small.
+- AC-1 Stripe test mode, Playwright: result page → Buy → sign-in → Checkout (test card 4242) → `/documents` shows "Preparing" → after the fake runner completes, downloads work. Desktop and android-small. *(Retro review 15 Oct 2026, finding 12: the fake-mode e2e is `e2e/signed-in/purchase-flow.spec.ts`; the real hop with the test card and a refund is recorded in REQ-010's PO review of 13 Oct 2026.)*
 - AC-2 Webhook unit tests: valid signature grants once; replayed event is a no-op; tampered body rejected; `charge.refunded` revokes; events out of order (refund before completed) end revoked.
 - AC-3 A test asserts the Checkout session's `payment_method_types` is exactly `["card"]` and no `payment_method_options` enable instalments.
 - AC-4 Pricing page copy passes the prohibited-claims lint; refund promise, AI disclosure and not-legal-advice lines present; axe clean; Lighthouse accessibility 100.
 - AC-5 RLS tests: account B cannot read account A's purchases or entitlements; anon cannot read either.
-- AC-6 Startup check fails loudly in production if `PACK_PRICE_AUD_CENTS` differs from the Stripe Price amount.
+- AC-6 Startup check fails loudly in production if `PACK_PRICE_AUD_CENTS` differs from the Stripe Price amount. *(Superseded by REQ-022 FR-3, D-2209: a failed live-mode guard refuses the payment routes, not the process; retro review finding 13.)*
 
 ## Evidence required on delivery
 Screenshots of pricing, purchase, preparing and download states at both viewports; webhook test output; the e2e report; the Stripe test-mode event log for one purchase and one refund (ids only).

@@ -1,5 +1,5 @@
 # REQ-014: Visual identity v1 (tokens, typography, motif, home page)
-Status: ready (apply with REQ-013 P1, before public launch)
+Status: delivered 13 Oct 2026 (batch 19 item 6, D-1401 to D-1404; R-1 to R-3 batch 20; on `main`; the PO review below is unwritten; retro review 15 Oct 2026, `product/qa/req-reviews/2026-10-15-retro-req-013-017.md`)
 Phase: 4   Priority: should   Owner: Dev
 
 ## Why
@@ -19,9 +19,9 @@ The app is correct and accessible but visually generic (black on white, system f
 - `--slate` #4A5553 (secondary text; 6.99:1 on paper)
 - `--ochre` #B4461F (accent: the ready line, primary buttons, focus ring; 4.95:1 on paper, white on it 5.47:1)
 - `--moss` #2F6B4F (success and "ready" states; 5.69:1 on paper)
-- `--signal` #9A2B2B (errors; must test at 4.5:1 on paper)
+- `--signal` #9A2B2B (errors; 6.89:1 on paper, pinned by `tokens.test.ts`)
 - `--sky` #DCE8E6 (info backgrounds only, never text)
-Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0BD, ochre → #E0734A (check 4.5:1 on dark paper), moss → #6FBF95.
+Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0BD, ochre → #E0734A (5.55:1 on dark paper, pinned by `tokens.test.ts`), moss → #6FBF95; dark signal #E07A7A is Dev's choice (D-1404).
 
 ## Typography
 - Headings: a serif with warmth and good screen rendering, self-hosted through `next/font` so the CSP stays strict (candidates: Fraunces, Source Serif 4, Newsreader; Dev proposes one with a rendered sample). Weight 500–600, tight tracking, sizes from a 1.25 modular scale.
@@ -30,8 +30,8 @@ Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0
 
 ## Motif: the ready line
 - Wordmark: "Readyline" in the serif with a thin ochre line under "ready" that extends to the right; the line is also the favicon (ink square, ochre line) and the app icon.
-- Step indicator (replaces the wrapped text indicator, REQ-013 FR-7): a single line across the top of the questionnaire that fills in ochre as steps complete, with "Step 2 of 6: Supports" beneath.
-- Result summary: a line that shows how ready the provider is (documents they have versus need), moss for done, ochre for to-prepare, mist for remainder; the same line later heads the registers dashboard (REQ-009).
+- Step indicator (replaces the wrapped text indicator, REQ-013 FR-7): a single line across the top of the questionnaire that fills in ochre as steps complete, with "Step 2 of 6: Supports" beneath. (Delivered as `ProgressLine`; REQ-025 FR-6 to FR-9, D-2217, replace it with six circles on the line when `req-025-session-b` merges, and `e2e/req-014.spec.ts`'s fill-width assertion moves with it.)
+- Result summary: a line that shows how ready the provider is (documents they have versus need), moss for done, ochre for to-prepare, mist for remainder (two segments since batch 36, D-1310: have and still to do, with one sentence); the account page's register line reuses the same component (D-1310); the registers index does not carry it yet.
 - Never animate the line more than once on load; respect `prefers-reduced-motion`.
 
 ## Imagery
@@ -44,7 +44,7 @@ Dark mode: paper → #141C1B, mist → #1F2A28, ink → #F1EDE6, slate → #B8C0
 - FR-4 A contrast test in CI that checks every token pair used for text against AA, in both themes.
 
 ## Acceptance criteria
-- AC-1 Every text/background pair in the UI meets AA in light and dark themes (automated check plus axe clean, Lighthouse accessibility 100 on all pages).
+- AC-1 Every text/background pair in the UI meets AA in light and dark themes (automated check; axe clean on every page in the e2e specs; Lighthouse accessibility 100 on the CI pages, `/`, `/pricing`, `/start` and `/start/business`, and on the six public pages in the REQ-015 evidence; no signed-in page is measured by Lighthouse; PO decision 15 Oct 2026, retro review finding 13).
 - AC-2 Fonts are self-hosted; CSP unchanged; no external origin added.
 - AC-3 The step line and result line render on both Playwright projects; reduced-motion disables the fill animation.
 - AC-4 Home page copy passes the claims checker; no superlatives.
