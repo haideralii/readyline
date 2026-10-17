@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -11,11 +12,9 @@ export const metadata: Metadata = { title: "Page not found" };
  */
 export default function NotFound() {
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6 sm:py-24">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        That page is not here.
-      </h1>
-      <p className="mt-4 leading-7 text-zinc-700 dark:text-zinc-300">
+    <PageShell kind="reading">
+      <h1 className="">That page is not here.</h1>
+      <p className="text-ink mt-4 leading-7">
         The link may be old or mistyped. Start with the free questions, or read
         the guides.
       </p>
@@ -34,6 +33,6 @@ export default function NotFound() {
           </Link>
         </li>
       </ul>
-    </div>
+    </PageShell>
   );
 }

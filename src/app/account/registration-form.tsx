@@ -33,7 +33,7 @@ const LABELS: Record<keyof Omit<RegistrationFormValues, "id">, string> = {
 };
 
 const input =
-  "mt-1 w-full max-w-xs rounded-md border border-zinc-300 px-3 py-2 text-base dark:border-zinc-700 dark:bg-zinc-950";
+  "mt-1 w-full max-w-xs rounded-md border border-line px-3 py-2 text-base";
 
 function DateField({
   name,
@@ -61,10 +61,7 @@ function DateField({
         {required ? "" : " (optional)"}
       </label>
       {help ? (
-        <p
-          id={helpId}
-          className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={helpId} className="text-slate mt-1 text-sm">
           {help}
         </p>
       ) : null}
@@ -182,10 +179,7 @@ export function RegistrationForm({
 
       <fieldset className="mt-4">
         <legend className="text-sm font-medium">{LABELS.auditType}</legend>
-        <p
-          id="auditType-help"
-          className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-        >
+        <p id="auditType-help" className="text-slate mt-1 text-sm">
           Certification if any class on your certificate is a certification
           class (Rules s 13B(1)); the questionnaire result is our reading of
           your classes.
@@ -306,7 +300,7 @@ export function RegistrationForm({
         <span
           role="status"
           aria-live="polite"
-          className="text-sm text-zinc-600 dark:text-zinc-400"
+          className="text-slate text-sm"
           data-testid="registration-saved"
         >
           {saved ? "Saved." : ""}

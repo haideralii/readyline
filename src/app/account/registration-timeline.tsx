@@ -23,7 +23,7 @@ export function RegistrationTimeline({
     <table className="mt-3 w-full table-fixed text-sm" data-testid={testId}>
       <caption className="sr-only">{caption}</caption>
       <thead>
-        <tr className="text-left text-zinc-600 dark:text-zinc-400">
+        <tr className="text-slate text-left">
           <th scope="col" className="py-1 pr-3 font-medium">
             What
           </th>
@@ -35,7 +35,7 @@ export function RegistrationTimeline({
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+      <tbody className="divide-rule divide-y">
         {rows.map((r) => (
           <tr
             key={r.id}
@@ -50,15 +50,11 @@ export function RegistrationTimeline({
             >
               {r.label}
               {r.plain ? (
-                <span className="block text-xs text-zinc-600 dark:text-zinc-400">
-                  {r.plain}
-                </span>
+                <span className="text-slate block text-sm">{r.plain}</span>
               ) : null}
             </th>
             <td className="py-2 pr-3 break-words">{formatLongDate(r.date)}</td>
-            <td className="py-2 break-words text-zinc-700 dark:text-zinc-300">
-              {r.source}
-            </td>
+            <td className="text-ink py-2 break-words">{r.source}</td>
           </tr>
         ))}
       </tbody>

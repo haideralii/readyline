@@ -12,7 +12,6 @@ import {
   TEXT_PAIRS,
   TOKEN_NAMES,
   TOKENS,
-  WARM_SCALE,
   type ThemeName,
 } from "./tokens";
 
@@ -74,32 +73,5 @@ describe("identity tokens (REQ-014 FR-4, AC-1)", () => {
       expect(media[name], `dark (media) --${name}`).toBe(TOKENS.dark[name]);
       expect(attr[name], `dark (attribute) --${name}`).toBe(TOKENS.dark[name]);
     }
-  });
-
-  it("the warm scale that replaces zinc is monotonic in lightness from paper to ink", () => {
-    const steps = Object.keys(WARM_SCALE);
-    for (let i = 1; i < steps.length; i++) {
-      expect(
-        luminance(WARM_SCALE[steps[i]]),
-        `${steps[i - 1]} -> ${steps[i]}`,
-      ).toBeLessThan(luminance(WARM_SCALE[steps[i - 1]]));
-    }
-    expect(WARM_SCALE["50"]).toBe(TOKENS.light.paper);
-    expect(WARM_SCALE["900"]).toBe(TOKENS.light.ink);
-    expect(WARM_SCALE["950"]).toBe(TOKENS.dark.paper);
-    // The utilities pages use for secondary and small text keep AA on paper.
-    expect(contrastRatio(WARM_SCALE["600"], WARM_SCALE["50"])).toBeGreaterThan(
-      4.5,
-    );
-    expect(contrastRatio(WARM_SCALE["500"], WARM_SCALE["50"])).toBeGreaterThan(
-      4.5,
-    );
-    expect(contrastRatio(WARM_SCALE["400"], WARM_SCALE["950"])).toBeGreaterThan(
-      4.5,
-    );
-    for (const step of steps)
-      expect(css.toLowerCase(), `--color-zinc-${step}`).toContain(
-        `--color-zinc-${step}: ${WARM_SCALE[step].toLowerCase()}`,
-      );
   });
 });

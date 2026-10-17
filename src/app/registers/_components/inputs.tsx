@@ -11,7 +11,7 @@ import { detectParticipantData } from "@/lib/privacy/participant-data";
 import { Field } from "@/app/start/_components/fields";
 
 const inputClass =
-  "block w-full min-h-12 rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 shadow-sm focus:border-zinc-900 focus:outline-2 focus:outline-offset-1 focus:outline-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-100 dark:focus:outline-zinc-100";
+  "block w-full min-h-12 rounded-md border border-line bg-surface px-3 py-2 text-base text-ink shadow-sm focus:border-ink focus:outline-2 focus:outline-offset-1 focus:outline-ink ";
 const invalidClass = "border-red-700 dark:border-red-400";
 
 export function SelectField<V extends string>({
@@ -207,7 +207,7 @@ export function SafeTextArea({
             aria-invalid={invalid || undefined}
             className={`${inputClass} min-h-24 ${invalid ? invalidClass : ""}`}
           />
-          <p className="mt-1 text-right text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-slate mt-1 text-right text-sm">
             {value.length} of {maxLength} characters
           </p>
           {warnings.length ? (
@@ -246,7 +246,7 @@ export function CheckboxField({
     <div className="mb-6">
       <label
         htmlFor={id}
-        className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 has-[:checked]:border-zinc-900 dark:border-zinc-800 dark:has-[:checked]:border-zinc-100"
+        className="border-line has-[:checked]:border-ink flex min-h-12 cursor-pointer items-start gap-3 rounded-md border px-3 py-3"
       >
         <input
           type="checkbox"
@@ -260,10 +260,7 @@ export function CheckboxField({
         <span className="text-base">{label}</span>
       </label>
       {help ? (
-        <p
-          id={helpId}
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={helpId} className="text-slate mt-1 text-sm leading-6">
           {help}
         </p>
       ) : null}

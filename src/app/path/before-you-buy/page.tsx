@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -31,10 +32,8 @@ export default async function BeforeYouBuyPage() {
   const pricing = readPricing();
   const documents = ctx.result.documents.length + 1;
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Get your documents
-      </h1>
+    <PageShell kind="reading">
+      <h1 className="">Get your documents</h1>
       <p className="mt-4 text-lg leading-8" data-testid="buy-line-what">
         {documents} documents drafted for {viewer.account.trading_name}, as Word
         files you can edit.
@@ -60,6 +59,6 @@ export default async function BeforeYouBuyPage() {
           See a sample document first
         </Link>
       </p>
-    </div>
+    </PageShell>
   );
 }

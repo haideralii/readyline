@@ -20,7 +20,7 @@ export function errorsFor(errors: FieldErrors, name: string): string[] {
 }
 
 const inputClass =
-  "block w-full min-h-12 rounded-md border border-zinc-300 bg-white px-3 py-2 text-base text-zinc-900 shadow-sm focus:border-zinc-900 focus:outline-2 focus:outline-offset-1 focus:outline-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-zinc-100 dark:focus:outline-zinc-100";
+  "block w-full min-h-12 rounded-md border border-line bg-surface px-3 py-2 text-base text-ink shadow-sm focus:border-ink focus:outline-2 focus:outline-offset-1 focus:outline-ink";
 const invalidClass = "border-red-700 dark:border-red-400";
 
 export function Field({
@@ -45,10 +45,7 @@ export function Field({
         {label}
       </label>
       {help ? (
-        <p
-          id={helpId}
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={helpId} className="text-slate mt-1 text-sm leading-6">
           {help}
         </p>
       ) : null}
@@ -148,7 +145,7 @@ export function TextArea(props: {
       />
       <p
         id={counterId}
-        className="mt-1 text-right text-xs text-zinc-500 dark:text-zinc-400"
+        className="text-slate mt-1 text-right text-sm"
         aria-live="polite"
       >
         {rest.value.length} of {maxLength} characters
@@ -196,7 +193,7 @@ export function ChoiceRow({
   return (
     <label
       htmlFor={id}
-      className="flex min-h-12 cursor-pointer items-start gap-3 rounded-md border border-zinc-200 px-3 py-3 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
+      className="border-line hover:bg-mist has-[:checked]:border-ink flex min-h-12 cursor-pointer items-start gap-3 rounded-md border px-3 py-3 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
     >
       <input
         type={type}
@@ -214,20 +211,14 @@ export function ChoiceRow({
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-base">
           <span id={labelId}>{label}</span>
           {secondary ? (
-            <span
-              id={secondaryId}
-              className="font-mono text-sm text-zinc-500 dark:text-zinc-400"
-            >
+            <span id={secondaryId} className="text-slate font-mono text-sm">
               {secondary}
             </span>
           ) : null}
           {tag}
         </span>
         {help ? (
-          <span
-            id={helpId}
-            className="block text-sm text-zinc-600 dark:text-zinc-400"
-          >
+          <span id={helpId} className="text-slate block text-sm">
             {help}
           </span>
         ) : null}
@@ -265,10 +256,7 @@ export function RadioGroup<V extends string>({
     >
       <legend className="text-base font-medium">{legend}</legend>
       {help ? (
-        <p
-          id={helpId}
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={helpId} className="text-slate mt-1 text-sm leading-6">
           {help}
         </p>
       ) : null}
@@ -331,10 +319,7 @@ export function CheckboxGroup<V extends string>({
     >
       <legend className="text-base font-medium">{legend}</legend>
       {help ? (
-        <p
-          id={helpId}
-          className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-        >
+        <p id={helpId} className="text-slate mt-1 text-sm leading-6">
           {help}
         </p>
       ) : null}
@@ -345,7 +330,7 @@ export function CheckboxGroup<V extends string>({
             <label
               key={o.value}
               htmlFor={id}
-              className="flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-zinc-200 px-3 py-2 hover:bg-zinc-50 has-[:checked]:border-zinc-900 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 dark:border-zinc-800 dark:hover:bg-zinc-900 dark:has-[:checked]:border-zinc-100"
+              className="border-line hover:bg-mist has-[:checked]:border-ink flex min-h-12 cursor-pointer items-center gap-3 rounded-md border px-3 py-2 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2"
             >
               <input
                 type="checkbox"
@@ -397,9 +382,7 @@ export function ErrorSummary({
       role="alert"
       className="mb-6 rounded-md border border-red-700 bg-red-50 p-4 outline-none dark:border-red-400 dark:bg-red-950"
     >
-      <h2 className="text-base font-semibold">
-        Please fix the following before continuing
-      </h2>
+      <h2 className="">Please fix the following before continuing</h2>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
         {entries.map(([name, msgs]) => (
           <li key={name}>

@@ -94,18 +94,18 @@ export default async function IncidentPage({
       >
         {rows.map(([k, v]) => (
           <div key={k}>
-            <dt className="text-zinc-600 dark:text-zinc-400">{k}</dt>
+            <dt className="text-slate">{k}</dt>
             <dd className="font-medium">{v}</dd>
           </div>
         ))}
       </dl>
-      <h2 className="mt-6 text-lg font-semibold">What happened</h2>
+      <h2 className="mt-6">What happened</h2>
       <p className="mt-1 leading-7" data-testid="incident-summary">
         {r.summary}
       </p>
       {r.actions_taken ? (
         <>
-          <h2 className="mt-4 text-lg font-semibold">What you did about it</h2>
+          <h2 className="mt-4">What you did about it</h2>
           <p className="mt-1 leading-7">{r.actions_taken}</p>
         </>
       ) : null}
@@ -133,7 +133,7 @@ export default async function IncidentPage({
       {ctx.canWrite && r.status !== "rejected" ? (
         // REQ-020 FR-7: a hazard behind the incident goes to the hazard register in one tap.
         <p
-          className="mt-3 rounded-md border border-zinc-300 p-3 text-sm leading-6 dark:border-zinc-700"
+          className="border-rule mt-3 rounded-md border p-3 text-sm leading-6"
           data-testid="hazard-offer"
         >
           Was a hazard behind this?{" "}

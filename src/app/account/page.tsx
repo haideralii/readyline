@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -136,9 +137,9 @@ export default async function AccountPage() {
     liveReportLink(supabase, a.id),
   ]);
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">Your account</h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+    <PageShell kind="grid">
+      <h1 className="">Your account</h1>
+      <p className="text-ink mt-3 leading-7">
         Signed in as the owner of <strong>{a.trading_name}</strong>.{" "}
         <Link href="/start" className="underline underline-offset-2">
           Continue the questionnaire
@@ -152,7 +153,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-registers"
       >
-        <h2 id="registers-heading" className="text-xl font-semibold">
+        <h2 id="registers-heading" className="">
           Registers
         </h2>
         <div className="mt-3">
@@ -165,7 +166,7 @@ export default async function AccountPage() {
             testId="account-registers-line"
           />
         </div>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           {registers.sentence}{" "}
           <Link href="/registers" className="underline underline-offset-2">
             Open the registers
@@ -173,12 +174,9 @@ export default async function AccountPage() {
           .
         </p>
         {/* REQ-009 FR-3: the same rows the reminder emails are sent from. */}
-        <h3 className="mt-4 text-base font-semibold">Due soon</h3>
+        <h3 className="mt-4">Due soon</h3>
         {dueSoon.length === 0 ? (
-          <p
-            className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-            data-testid="due-soon-empty"
-          >
+          <p className="text-slate mt-1 text-sm" data-testid="due-soon-empty">
             Nothing due in the next 30 days.
           </p>
         ) : (
@@ -189,12 +187,7 @@ export default async function AccountPage() {
             {dueSoon.map((d) => (
               <li key={d.id}>
                 {d.line}
-                {d.sent ? (
-                  <span className="text-zinc-600 dark:text-zinc-400">
-                    {" "}
-                    (emailed)
-                  </span>
-                ) : null}
+                {d.sent ? <span className="text-slate"> (emailed)</span> : null}
               </li>
             ))}
           </ul>
@@ -207,10 +200,10 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-registration"
       >
-        <h2 id="registration-heading" className="text-xl font-semibold">
+        <h2 id="registration-heading" className="">
           Your registration
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           Type the dates from your certificate of registration. We work out the
           mid-term audit and renewal dates from them and remind you by email.
         </p>
@@ -221,9 +214,7 @@ export default async function AccountPage() {
         />
         {period ? (
           <>
-            <h3 className="mt-6 text-base font-semibold">
-              Your registration timeline
-            </h3>
+            <h3 className="mt-6">Your registration timeline</h3>
             <RegistrationTimeline
               rows={timelineRows(period)}
               caption="Your registration timeline"
@@ -236,7 +227,7 @@ export default async function AccountPage() {
               {positionSentence(period, today)}
             </p>
             <p
-              className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+              className="text-slate mt-2 text-sm leading-6"
               data-testid="registration-fixed-sentence"
             >
               {TIMELINE_FIXED_SENTENCE}
@@ -262,18 +253,18 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-auditor-link"
       >
-        <h2 id="auditor-heading" className="text-xl font-semibold">
+        <h2 id="auditor-heading" className="">
           Share a read-only view with your auditor
         </h2>
         {/* Retro finding 59: the link is the provider's own disclosure, so the copy says what the view holds, not less. */}
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           A link that opens your registers, your document control register and
           your audit pack, read-only. It expires when you say and you can revoke
           it at any time. You copy it and send it yourself; we send nothing and
           we do not list or recommend auditors.
         </p>
         <p
-          className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+          className="text-ink mt-2 text-sm leading-6"
           data-testid="auditor-link-disclosure"
         >
           Participants appear as the codes you typed. Everything you typed into
@@ -301,7 +292,7 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-team"
       >
-        <h2 id="team-heading" className="text-xl font-semibold">
+        <h2 id="team-heading" className="">
           Your team
         </h2>
         <TeamPanel
@@ -329,13 +320,13 @@ export default async function AccountPage() {
         className="mt-8"
         data-testid="account-subscription"
       >
-        <h2 id="subscription-heading" className="text-xl font-semibold">
+        <h2 id="subscription-heading" className="">
           Registers subscription
         </h2>
         {subscribed ? (
           <>
             <p
-              className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              className="text-ink mt-2 text-sm leading-6"
               data-testid="subscription-status"
             >
               {subscription?.status === "past_due"
@@ -347,7 +338,7 @@ export default async function AccountPage() {
         ) : (
           <>
             <p
-              className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+              className="text-ink mt-2 text-sm leading-6"
               data-testid="subscription-status"
             >
               {subscription
@@ -357,7 +348,7 @@ export default async function AccountPage() {
             {subscription ? (
               // REQ-023 FR-2 (findings 40, 66, 85): the s 73Q records outlive the payment; the pack holds every register.
               <p
-                className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+                className="text-ink mt-2 text-sm leading-6"
                 data-testid="paused-export"
               >
                 {PAUSED_EXPORT_SENTENCE}{" "}
@@ -381,7 +372,7 @@ export default async function AccountPage() {
               />
             ) : (
               <p
-                className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
+                className="text-slate mt-2 text-sm"
                 data-testid="subscription-off"
               >
                 {SUBSCRIPTION_OFF}
@@ -392,7 +383,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="details-heading" className="mt-8">
-        <h2 id="details-heading" className="text-xl font-semibold">
+        <h2 id="details-heading" className="">
           Business details
         </h2>
         <AccountForm
@@ -409,7 +400,7 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="session-heading" className="mt-10">
-        <h2 id="session-heading" className="text-xl font-semibold">
+        <h2 id="session-heading" className="">
           Sessions
         </h2>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">
@@ -432,10 +423,10 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="data-heading" className="mt-10">
-        <h2 id="data-heading" className="text-xl font-semibold">
+        <h2 id="data-heading" className="">
           Your data
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           Download everything stored for this account as a zip of JSON files.
           Nothing about participants is stored here; the export holds your
           business details, questionnaire draft and account history only.
@@ -450,11 +441,11 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="purchases-heading" className="mt-10">
-        <h2 id="purchases-heading" className="text-xl font-semibold">
+        <h2 id="purchases-heading" className="">
           Purchases
         </h2>
         {purchases.length === 0 ? (
-          <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+          <p className="text-ink mt-2 text-sm leading-6">
             No purchases yet.{" "}
             <Link href="/pricing" className="underline underline-offset-2">
               See the document pack
@@ -462,10 +453,7 @@ export default async function AccountPage() {
             .
           </p>
         ) : (
-          <ul
-            className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800"
-            data-testid="purchases"
-          >
+          <ul className="divide-rule mt-3 divide-y" data-testid="purchases">
             {purchases.map((p) => (
               <li
                 key={p.id}
@@ -490,7 +478,7 @@ export default async function AccountPage() {
                     View receipt
                   </a>
                 ) : (
-                  <span className="text-zinc-600 dark:text-zinc-400">
+                  <span className="text-slate">
                     Receipt by email from Stripe
                   </span>
                 )}
@@ -501,11 +489,11 @@ export default async function AccountPage() {
       </section>
 
       <section aria-labelledby="delete-heading" className="mt-10">
-        <h2 id="delete-heading" className="text-xl font-semibold">
+        <h2 id="delete-heading" className="">
           Delete this account
         </h2>
         <DeleteAccountForm tradingName={a.trading_name} />
       </section>
-    </div>
+    </PageShell>
   );
 }

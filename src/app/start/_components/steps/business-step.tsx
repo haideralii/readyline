@@ -105,7 +105,7 @@ export function BusinessStepForm() {
       <ErrorSummary errors={errors} labels={LABELS} />
       {prefilled ? (
         <p
-          className="mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mb-6 text-sm leading-6"
           data-testid="business-prefill-note"
         >
           Filled in from your account. Change anything here; your account

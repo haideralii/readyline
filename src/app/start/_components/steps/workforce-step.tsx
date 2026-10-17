@@ -84,7 +84,7 @@ export function WorkforceStepForm() {
       <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
       {soleTrader ? (
         <p
-          className="mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+          className="text-slate mb-6 text-sm leading-6"
           data-testid="workforce-defaults-note"
         >
           You said you are a sole trader, so we have filled in the usual
@@ -111,10 +111,7 @@ export function WorkforceStepForm() {
         )}
       </Field>
       {large ? (
-        <p
-          className="-mt-3 mb-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
-          role="status"
-        >
+        <p className="text-slate -mt-3 mb-6 text-sm leading-6" role="status">
           Readyline is built for providers with up to about 10 workers. You can
           continue; the result is the same, but larger organisations may need
           more than our documents provide.

@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildGroupPages, groupPagesByCategory } from "@/lib/guides/groups";
@@ -38,7 +39,7 @@ export default function RegistrationGroupsIndexPage() {
     })),
   }));
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="reading">
       <p className="text-sm">
         <Link
           href="/guides"
@@ -47,10 +48,8 @@ export default function RegistrationGroupsIndexPage() {
           ‹ Guides
         </Link>
       </p>
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Registration groups
-      </h1>
-      <p className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300">
+      <h1 className="">Registration groups</h1>
+      <p className="text-ink mt-3 leading-7">
         The Commission registers providers by class of support. Each page below
         says which audit that class needs, which Practice Standards modules
         apply, and which documents the pack produces for it, from the
@@ -59,6 +58,6 @@ export default function RegistrationGroupsIndexPage() {
       {/* REQ-027 FR-3, D-2701: the words on this page, above the search and inside no other disclosure. */}
       <GlossaryTerms ids={INDEX_TERMS} where="page" className="mt-3" />
       <GroupsSearch categories={categories} />
-    </div>
+    </PageShell>
   );
 }

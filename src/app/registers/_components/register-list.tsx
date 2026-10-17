@@ -31,7 +31,7 @@ export function StatusTag({ status }: { status: ListRow["status"] }) {
   const t = TONE[status.tone];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${t.cls}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-sm font-medium ${t.cls}`}
       data-testid="status-tag"
       data-status={status.key}
     >
@@ -71,7 +71,7 @@ export function RegisterList({
             <label
               key={f.key}
               // The radio is invisible, so the label shows its focus (WCAG 2.4.7; backlog 1, D-1508).
-              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-zinc-300 dark:border-zinc-700"}`}
+              className={`relative inline-flex min-h-11 cursor-pointer items-center rounded-md border px-3 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${filter === f.key ? "border-ink bg-ink text-paper" : "hover:bg-mist border-line"}`}
             >
               <input
                 type="radio"
@@ -87,33 +87,31 @@ export function RegisterList({
         </div>
       </fieldset>
       {shown.length === 0 ? (
-        <p
-          className="mt-6 text-zinc-600 dark:text-zinc-400"
-          data-testid={`${testId}-empty`}
-        >
+        <p className="text-slate mt-6" data-testid={`${testId}-empty`}>
           {rows.length === 0 ? empty : "Nothing with that status."}
         </p>
       ) : (
         <ul
-          className="mt-4 divide-y divide-zinc-200 dark:divide-zinc-800"
+          className="divide-rule mt-4 divide-y"
           aria-labelledby="register-title"
         >
           {shown.map((r) => (
             <li key={r.id}>
               <Link
                 href={r.href}
-                className="flex min-h-14 items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
+                className="flex min-h-14 flex-wrap items-center justify-between gap-3 py-3 underline-offset-4 hover:underline"
                 data-testid={`row-${r.id}`}
               >
-                <span className="min-w-0">
+                {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
+                    tag drops under it, so a long status at 14 px never squeezes a title
+                    word into breaking at 360 (the row inherits li's overflow-wrap). */}
+                <span className="min-w-0 flex-1 basis-48">
                   <span className="block text-base font-medium">{r.title}</span>
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">
-                    {r.detail}
-                  </span>
+                  <span className="text-slate block text-sm">{r.detail}</span>
                 </span>
-                <span className="flex shrink-0 items-center gap-2">
+                <span className="ml-auto flex shrink-0 items-center gap-2">
                   <StatusTag status={r.status} />
-                  <span aria-hidden="true" className="text-zinc-500">
+                  <span aria-hidden="true" className="text-slate">
                     ›
                   </span>
                 </span>

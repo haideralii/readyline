@@ -32,10 +32,7 @@ export function BuyButton({
         {pending ? "Taking you to the payment page…" : label}
       </button>
       {state && !state.ok ? (
-        <p
-          role="alert"
-          className="mt-3 text-sm leading-6 text-zinc-800 dark:text-zinc-200"
-        >
+        <p role="alert" className="text-ink mt-3 text-sm leading-6">
           {state.message}
         </p>
       ) : null}

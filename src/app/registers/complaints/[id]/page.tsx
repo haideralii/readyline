@@ -63,20 +63,18 @@ export default async function ComplaintPage({
       >
         {rows.map(([k, v]) => (
           <div key={k}>
-            <dt className="text-zinc-600 dark:text-zinc-400">{k}</dt>
+            <dt className="text-slate">{k}</dt>
             <dd className="font-medium">{v}</dd>
           </div>
         ))}
       </dl>
-      <h2 className="mt-6 text-lg font-semibold">The complaint</h2>
+      <h2 className="mt-6">The complaint</h2>
       <p className="mt-1 leading-7" data-testid="complaint-summary">
         {r.summary}
       </p>
       {r.outcome ? (
         <>
-          <h2 className="mt-4 text-lg font-semibold">
-            What you did and the outcome
-          </h2>
+          <h2 className="mt-4">What you did and the outcome</h2>
           <p className="mt-1 leading-7">{r.outcome}</p>
         </>
       ) : null}

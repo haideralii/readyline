@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
@@ -64,12 +65,11 @@ async function documentsForVisitor(): Promise<{
   };
 }
 
-const h2 = "mt-10 text-xl font-semibold";
-const body = "mt-3 leading-7 text-zinc-700 dark:text-zinc-300";
+const h2 = "mt-10";
+const body = "mt-3 leading-7 text-ink";
 const link = "underline underline-offset-2";
-const half =
-  "scroll-mt-6 rounded-md border border-zinc-300 p-5 dark:border-zinc-700";
-const eyebrow = "text-sm font-medium text-zinc-600 dark:text-zinc-400";
+const half = "scroll-mt-6 rounded-md border border-rule p-5";
+const eyebrow = "text-sm font-medium text-slate";
 
 export default async function PricingPage() {
   const pricing = readPricing();
@@ -77,19 +77,19 @@ export default async function PricingPage() {
   const docs = await documentsForVisitor();
   const offered = subscriptionAvailable();
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">{C.title}</h1>
+    <PageShell kind="grid">
+      <h1 className="">{C.title}</h1>
       <p className={body}>{C.intro}</p>
       {/* REQ-027 FR-3, D-2701: the words on this page, above the first body section and inside no other disclosure. */}
       <GlossaryTerms ids={PRICING_TERMS} where="page" className="mt-3" />
 
       {/* Batch 49 item 3: on a phone the pack price sat below the fold behind the
           subscription card (D-2001's order is right; the fold is the problem), so
-          both prices sit in a two-line strip above the cards, each a link to its
-          card. From 640 px the cards are side by side and the strip is not shown. */}
+ both prices sit in a two-line strip above the cards, each a link to its
+ card. From 640 px the cards are side by side and the strip is not shown. */}
       <nav
         aria-label="Prices"
-        className="mt-6 rounded-md border border-zinc-300 p-3 text-sm sm:hidden dark:border-zinc-700"
+        className="border-line mt-6 rounded-md border p-3 text-sm sm:hidden"
         data-testid="pricing-strip"
       >
         <ul className="space-y-1">
@@ -134,14 +134,14 @@ export default async function PricingPage() {
           data-testid="pricing-subscription"
         >
           <p className={eyebrow}>{C.keepsEyebrow}</p>
-          <h2 id="sub-heading" className="mt-1 text-xl font-semibold">
+          <h2 id="sub-heading" className="mt-1">
             {C.subscriptionHeading}
           </h2>
           {offered ? (
             <>
               {/* REQ-009 Session C: the registers subscription, monthly, cancel any time, no fee.
-                  Batch 49 item 2: a price line, a four-item list and the cancel line, nothing else
-                  on the first phone screen; the linking sentence is on the registers page. */}
+ Batch 49 item 2: a price line, a four-item list and the cancel line, nothing else
+ on the first phone screen; the linking sentence is on the registers page. */}
               <div data-testid="subscription-offer">
                 <p className={body}>
                   {C.subscriptionPriceLine(
@@ -151,7 +151,7 @@ export default async function PricingPage() {
                   )}
                 </p>
                 <ul
-                  className="mt-2 list-disc pl-5 leading-7 text-zinc-700 dark:text-zinc-300"
+                  className="text-ink mt-2 list-disc pl-5 leading-7"
                   data-testid="subscription-includes"
                 >
                   {C.subscriptionIncludes.map((item) => (
@@ -170,7 +170,7 @@ export default async function PricingPage() {
                   cancelPath="/pricing"
                 />
               ) : (
-                <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                <p className="text-slate mt-3 text-sm leading-6">
                   Sign in to subscribe; the registers belong to your account.
                 </p>
               )}
@@ -193,17 +193,18 @@ export default async function PricingPage() {
           data-testid="pricing-pack"
         >
           <p className={eyebrow}>{C.startEyebrow}</p>
-          <h2 id="price-heading" className="mt-1 text-xl font-semibold">
+          <h2 id="price-heading" className="mt-1">
             {C.priceHeading}
           </h2>
           {pricing.packPriceCents ? (
             <p className="mt-2">
-              <span className="text-3xl font-semibold" data-testid="pack-price">
+              <span
+                className="text-3xl font-semibold tabular-nums"
+                data-testid="pack-price"
+              >
                 {formatAud(pricing.packPriceCents)}
               </span>{" "}
-              <span className="text-zinc-600 dark:text-zinc-400">
-                one-off, for the document pack
-              </span>
+              <span className="text-slate">one-off, for the document pack</span>
             </p>
           ) : (
             <p className={body} data-testid="pack-price-unset">
@@ -211,10 +212,7 @@ export default async function PricingPage() {
             </p>
           )}
           {pricing.gstLine ? (
-            <p
-              className="mt-2 text-sm text-zinc-600 dark:text-zinc-400"
-              data-testid="gst-line"
-            >
+            <p className="text-slate mt-2 text-sm" data-testid="gst-line">
               {pricing.gstLine}
             </p>
           ) : null}
@@ -231,12 +229,12 @@ export default async function PricingPage() {
                   {C.signInToBuy}
                 </Link>
               </p>
-              <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              <p className="text-slate mt-3 text-sm leading-6">
                 {C.signInNote}
               </p>
             </>
           )}
-          <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <p className="text-slate mt-3 text-sm leading-6">
             {C.termsLead}{" "}
             <Link href="/terms" className={link}>
               {C.terms}
@@ -254,7 +252,7 @@ export default async function PricingPage() {
         </section>
       </div>
       <p
-        className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-3 text-sm leading-6"
         data-testid="pricing-separate"
       >
         {C.separateLine}
@@ -268,7 +266,7 @@ export default async function PricingPage() {
           {docs.tailored ? C.whatYouGetForYou : C.whatYouGetCore}
         </p>
         <ul
-          className="mt-3 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300"
+          className="text-ink mt-3 list-disc space-y-1 pl-5 leading-7"
           data-testid="pack-documents"
         >
           {docs.titles.map((t) => (
@@ -281,7 +279,7 @@ export default async function PricingPage() {
         <h2 id="not-heading" className={h2}>
           {C.whatItIsNotHeading}
         </h2>
-        <ul className="mt-3 list-disc space-y-2 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+        <ul className="text-ink mt-3 list-disc space-y-2 pl-5 leading-7">
           {C.whatItIsNot.map((t) => (
             <li key={t}>{t}</li>
           ))}
@@ -308,7 +306,7 @@ export default async function PricingPage() {
         {/* REQ-011 (batch 40 item 5): the honest answer to the sector's warning about AI-written policies. */}
         <div data-testid="pricing-ai-honest">
           <p className={body}>{C.aiHonest}</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+          <ul className="text-ink mt-2 list-disc space-y-1 pl-5 leading-7">
             {C.aiHonestPoints.map((t) => (
               <li key={t}>{t}</li>
             ))}
@@ -329,10 +327,10 @@ export default async function PricingPage() {
         </p>
       </section>
 
-      <p className="mt-10 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-sm">
         Questions before you buy? Email {BRAND} at the contact address in the
         footer.
       </p>
-    </div>
+    </PageShell>
   );
 }

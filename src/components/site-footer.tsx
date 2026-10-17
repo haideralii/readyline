@@ -20,8 +20,11 @@ export function SiteFooter() {
   const link =
     "inline-flex min-h-11 items-center underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2";
   return (
-    <footer className="mt-auto border-t border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-8 text-sm text-zinc-600 sm:px-6 dark:text-zinc-400">
+    <footer className="border-rule bg-mist mt-auto border-t">
+      <div
+        data-shell="footer"
+        className="text-slate mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:px-6 lg:px-8"
+      >
         <nav aria-label="Legal and about" data-testid="footer-nav">
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
             {LEGAL_NAV.map((item) => (
@@ -51,7 +54,7 @@ export function SiteFooter() {
           Hosted in Australia. Independent of the NDIA and the NDIS Quality and
           Safeguards Commission.
         </p>
-        <p className="text-xs" data-testid="footer-brand">
+        <p className="text-sm" data-testid="footer-brand">
           {BRAND}
           {abn ? ` (ABN ${abn})` : ""}. NDIS is a registered trade mark of the
           National Disability Insurance Agency and is used here descriptively

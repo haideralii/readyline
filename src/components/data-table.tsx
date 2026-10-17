@@ -49,16 +49,11 @@ export function DataTable({
       {/* Phones: one card per row. */}
       <ol className="sm:hidden" aria-label={name}>
         {rows.map((r, ri) => (
-          <li
-            key={ri}
-            className="border-b border-zinc-200 py-2 dark:border-zinc-800"
-          >
+          <li key={ri} className="border-rule border-b py-2">
             <dl>
               {r.map((cell, ci) => (
                 <div key={ci} className="mt-1">
-                  <dt className="text-slate text-xs tracking-wide uppercase">
-                    {columns[ci]}
-                  </dt>
+                  <dt className="text-slate text-sm">{columns[ci]}</dt>
                   <dd className="leading-6 break-normal [overflow-wrap:normal]">
                     {cellText(cell)}
                   </dd>
@@ -84,7 +79,7 @@ export function DataTable({
                 <th
                   key={c}
                   scope="col"
-                  className={`border-b border-zinc-300 py-1 pr-3 text-left font-semibold break-normal [overflow-wrap:normal] dark:border-zinc-700 ${ci === 0 ? "min-w-36" : ""}`}
+                  className={`border-rule border-b py-1 pr-3 text-left text-xs font-semibold tracking-wide break-normal [overflow-wrap:normal] uppercase ${ci === 0 ? "min-w-36" : ""}`}
                 >
                   {c}
                 </th>
@@ -97,7 +92,7 @@ export function DataTable({
                 {r.map((cell, ci) => (
                   <td
                     key={ci}
-                    className="border-b border-zinc-200 py-1 pr-3 align-top break-normal [overflow-wrap:normal] dark:border-zinc-800"
+                    className="border-rule border-b py-1 pr-3 align-top break-normal [overflow-wrap:normal]"
                   >
                     {cellText(cell)}
                   </td>

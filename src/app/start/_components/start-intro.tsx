@@ -1,4 +1,5 @@
 "use client";
+import { PageShell } from "@/components/page-shell";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import { ConfirmButton } from "@/components/confirm-button";
@@ -62,14 +63,12 @@ export function StartIntro() {
   const preselect = groups.find((g) => g.code === preselectCode) ?? null;
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+    <PageShell kind="reading">
+      <p className="text-slate text-sm font-medium">
         About ten minutes, five steps
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-        Find out what registration needs from you
-      </h1>
-      <p className="mt-4 text-lg leading-8 text-zinc-700 dark:text-zinc-300">
+      <h1 className="mt-2">Find out what registration needs from you</h1>
+      <p className="text-ink mt-4 text-lg leading-8">
         Answer a few questions about your business and the supports you deliver.
         You will see which Practice Standards modules apply, whether you face a
         verification or certification audit, and the documents and registers you
@@ -77,14 +76,14 @@ export function StartIntro() {
       </p>
       {/* REQ-027 FR-3, D-2701: the words on this page, above the steps and inside no other disclosure. */}
       <GlossaryTerms ids={INTRO_TERMS} where="page" className="mt-3" />
-      <ol className="mt-6 list-decimal space-y-2 pl-5 leading-7 text-zinc-700 dark:text-zinc-300">
+      <ol className="text-ink mt-6 list-decimal space-y-2 pl-5 leading-7">
         {STEPS.map((s) => (
           <li key={s}>{s}</li>
         ))}
       </ol>
       {/* Batch 23 item 3: the storage sentence must match where the draft actually lives. */}
       <p
-        className="mt-6 text-sm leading-6 text-zinc-600 dark:text-zinc-400"
+        className="text-slate mt-6 text-sm leading-6"
         data-testid="start-storage-note"
       >
         {mode === "server"
@@ -94,7 +93,7 @@ export function StartIntro() {
 
       {preselect && !hasDraft ? (
         <p
-          className="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300"
+          className="text-ink mt-3 text-sm leading-6"
           data-testid="start-preselect"
         >
           We will tick {preselect.name.toLowerCase()} (class {preselect.code})
@@ -131,6 +130,6 @@ export function StartIntro() {
           blocked). You can still complete the questionnaire in one sitting.
         </p>
       ) : null}
-    </div>
+    </PageShell>
   );
 }

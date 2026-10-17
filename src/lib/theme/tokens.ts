@@ -16,6 +16,13 @@ export const TOKEN_NAMES = [
   "moss",
   "signal",
   "sky",
+  // REQ-028 FR-2 (D-2802): the surface ladder's second step, the two borders, the track and the two washes.
+  "surface",
+  "rule",
+  "line",
+  "track",
+  "signal-wash",
+  "ochre-wash",
 ] as const;
 export type TokenName = (typeof TOKEN_NAMES)[number];
 
@@ -29,10 +36,17 @@ export const TOKENS: Record<ThemeName, Record<TokenName, string>> = {
     moss: "#2F6B4F",
     signal: "#9A2B2B",
     sky: "#DCE8E6",
+    surface: "#FFFDF9",
+    rule: "#D4CCBF",
+    // v4 (Dev response 1(c)): D-2802's #7E8785 measured 2.81:1 on mist; this holds 3:1 on paper, surface and mist.
+    line: "#74807D",
+    track: "#CFC7B9",
+    "signal-wash": "#F3E4E2",
+    "ochre-wash": "#F6E6DC",
   },
   dark: {
-    paper: "#141C1B",
-    mist: "#1F2A28",
+    paper: "#1B2422",
+    mist: "#27322F",
     ink: "#F1EDE6",
     slate: "#B8C0BD",
     ochre: "#E0734A",
@@ -40,6 +54,13 @@ export const TOKENS: Record<ThemeName, Record<TokenName, string>> = {
     // Not in the PO's list: chosen for 4.5:1 on dark paper (checked by the test).
     signal: "#E07A7A",
     sky: "#1E3330",
+    surface: "#222D2A",
+    rule: "#34403D",
+    // v4 (Dev response 1(c)): D-2802's #6B7673 measured 2.82:1 on dark mist.
+    line: "#737F7C",
+    track: "#3A4442",
+    "signal-wash": "#33201F",
+    "ochre-wash": "#3A2A22",
   },
 };
 
@@ -50,7 +71,8 @@ export const TOKENS: Record<ThemeName, Record<TokenName, string>> = {
 export const TEXT_PAIRS: ReadonlyArray<{
   fg: TokenName;
   bg: TokenName;
-  min: 4.5 | 3;
+  /** 4.5 for text, 3 for large text and UI parts, 1.4 for a rule that must still be seen (D-2802, the PO's floor, not a WCAG one). */
+  min: 4.5 | 3 | 1.4;
   use: string;
 }> = [
   { fg: "ink", bg: "paper", min: 4.5, use: "body text on the page" },
@@ -71,6 +93,53 @@ export const TEXT_PAIRS: ReadonlyArray<{
   { fg: "ochre", bg: "mist", min: 3, use: "the ready line on its track" },
   { fg: "moss", bg: "mist", min: 3, use: "the done segment on its track" },
   { fg: "ochre", bg: "paper", min: 3, use: "focus ring" },
+  // REQ-028 FR-2, AC-2 (D-2802): ink and slate on every surface and the two
+  // washes; ochre, moss and signal on paper and surface (never on mist, sky
+  // or a wash); the control border on the three surfaces it sits on at 3:1;
+  // the rule on paper at the PO's 1.4 floor.
+  { fg: "ink", bg: "surface", min: 4.5, use: "body text on a card" },
+  { fg: "slate", bg: "surface", min: 4.5, use: "helper text on a card" },
+  { fg: "ink", bg: "sky", min: 4.5, use: "body text on an info surface" },
+  { fg: "slate", bg: "sky", min: 4.5, use: "helper text on an info surface" },
+  {
+    fg: "ink",
+    bg: "signal-wash",
+    min: 4.5,
+    use: "body text in the error summary",
+  },
+  {
+    fg: "slate",
+    bg: "signal-wash",
+    min: 4.5,
+    use: "helper text in the error summary",
+  },
+  { fg: "ink", bg: "ochre-wash", min: 4.5, use: "body text in a note" },
+  { fg: "slate", bg: "ochre-wash", min: 4.5, use: "helper text in a note" },
+  {
+    fg: "ochre",
+    bg: "surface",
+    min: 4.5,
+    use: "accent text and links on a card",
+  },
+  { fg: "moss", bg: "surface", min: 4.5, use: "done text on a card" },
+  { fg: "signal", bg: "surface", min: 4.5, use: "error text on a card" },
+  {
+    fg: "signal",
+    bg: "signal-wash",
+    min: 4.5,
+    use: "the error summary's text",
+  },
+  { fg: "line", bg: "paper", min: 3, use: "a control's border on the page" },
+  { fg: "line", bg: "surface", min: 3, use: "a control's border on a card" },
+  { fg: "line", bg: "mist", min: 3, use: "a control's border on a notice" },
+  {
+    fg: "ochre",
+    bg: "track",
+    min: 3,
+    use: "the ready line's still-to-do segment",
+  },
+  { fg: "moss", bg: "track", min: 3, use: "the ready line's done segment" },
+  { fg: "rule", bg: "paper", min: 1.4, use: "a decoration line on the page" },
 ];
 
 function channel(hex: string, offset: number): number {
@@ -93,19 +162,3 @@ export function contrastRatio(a: string, b: string): number {
   const [hi, lo] = la >= lb ? [la, lb] : [lb, la];
   return (hi + 0.05) / (lo + 0.05);
 }
-
-/** The zinc scale Tailwind utilities map to: a warm, monotonic ramp from paper to ink (D-1402). */
-export const WARM_SCALE: Record<string, string> = {
-  "50": "#F7F3EC",
-  "100": "#E6E0D6",
-  "200": "#D6CFC3",
-  "300": "#BFB7AA",
-  "400": "#8E9593",
-  // 5.2:1 on paper: the class codes and counters use zinc-500 as text.
-  "500": "#5E6866",
-  "600": "#4A5553",
-  "700": "#3A4442",
-  "800": "#2A3634",
-  "900": "#1C2B2A",
-  "950": "#141C1B",
-};

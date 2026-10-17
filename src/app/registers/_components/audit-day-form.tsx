@@ -161,10 +161,7 @@ export function AuditDayForm({
           >
             <legend className="text-sm font-medium">{f.label}</legend>
             {f.help ? (
-              <p
-                id={`${f.name}-help`}
-                className="mt-1 text-sm text-zinc-600 dark:text-zinc-400"
-              >
+              <p id={`${f.name}-help`} className="text-slate mt-1 text-sm">
                 {f.help}
               </p>
             ) : null}

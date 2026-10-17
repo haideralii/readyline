@@ -93,8 +93,8 @@ export function ConfirmReportForm({
   return (
     <div className="mt-8" data-testid="confirm-report">
       <form onSubmit={confirm} noValidate>
-        <h2 className="text-lg font-semibold">Confirm it into your register</h2>
-        <p className="mt-1 mb-4 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <h2 className="">Confirm it into your register</h2>
+        <p className="text-ink mt-1 mb-4 text-sm leading-6">
           {suggested
             ? "This category is reportable when it happened in connection with your supports. You decide; the Commission's rules apply."
             : "This category is not usually reportable. Tick the box if you decide it is."}

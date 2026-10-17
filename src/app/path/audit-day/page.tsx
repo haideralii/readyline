@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -130,10 +131,8 @@ export default async function AuditDayPage() {
   const groups = setId ? orderDocuments(ctx.documents) : [];
   const have = shown.items.filter((i) => i.status === "have").length;
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Audit day: {viewer.account.trading_name}
-      </h1>
+    <PageShell kind="list">
+      <h1 className="">Audit day: {viewer.account.trading_name}</h1>
       <p className="mt-3 leading-7" data-testid="audit-day-summary">
         {ctx.result.pathway === "verification"
           ? "The auditor reads your documents at their desk and may phone you with questions. "
@@ -189,7 +188,7 @@ export default async function AuditDayPage() {
           className="mt-6"
           data-testid="audit-day-registration"
         >
-          <h2 id="registration-dates-heading" className="text-xl font-semibold">
+          <h2 id="registration-dates-heading" className="">
             Your registration dates
           </h2>
           <RegistrationTimeline
@@ -224,10 +223,10 @@ export default async function AuditDayPage() {
             className="mt-10"
             data-testid="audit-day-group"
           >
-            <h2 id={`ask-${g.id}`} className="text-xl font-semibold">
+            <h2 id={`ask-${g.id}`} className="">
               {ASK[g.id] ?? g.title}
             </h2>
-            <ul className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <ul className="divide-rule mt-3 divide-y">
               {g.items.map((i) => {
                 const t = tick(i);
                 return (
@@ -238,9 +237,7 @@ export default async function AuditDayPage() {
                     <span>
                       {/* Batch 45 item 4: what the auditor says, never the provider's instruction. */}
                       <span className="font-medium">&quot;{i.ask}&quot;</span>{" "}
-                      <span className="text-zinc-700 dark:text-zinc-300">
-                        {t.word}
-                      </span>
+                      <span className="text-ink">{t.word}</span>
                     </span>
                   </li>
                 );
@@ -255,12 +252,12 @@ export default async function AuditDayPage() {
           className="mt-10"
           data-testid="audit-day-pack"
         >
-          <h2 id="pack-heading" className="text-xl font-semibold">
+          <h2 id="pack-heading" className="">
             The documents in your pack
           </h2>
           {groups.map((g) => (
             <div key={g.title} className="mt-3">
-              <h3 className="text-base font-semibold">{g.title}</h3>
+              <h3 className="">{g.title}</h3>
               <ul className="mt-1 list-disc pl-5 leading-7">
                 {g.documents.map((d) => (
                   <li key={d.id}>
@@ -279,10 +276,10 @@ export default async function AuditDayPage() {
         className="mt-10"
         data-testid="audit-day-ask"
       >
-        <h2 id="ask-records-heading" className="text-xl font-semibold">
+        <h2 id="ask-records-heading" className="">
           What the auditor will ask to see
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           Policies are one third of an audit. The rest is records: a register
           with every field filled and a review date on every row. A record
           marked &quot;{KEPT_ON_PAPER}&quot; is a signed or issued document you
@@ -291,10 +288,8 @@ export default async function AuditDayPage() {
         {/* Batch 45 (REQ-018-gated item): the twelve in their two tiers, the paper records marked. */}
         {(["named", "practice"] as const).map((tier) => (
           <div key={tier} data-testid={`ask-tier-${tier}`}>
-            <h3 className="mt-5 text-base font-semibold">
-              {AUDIT_RECORD_TIER_TITLES[tier]}
-            </h3>
-            <ol className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800">
+            <h3 className="mt-5">{AUDIT_RECORD_TIER_TITLES[tier]}</h3>
+            <ol className="divide-rule mt-1 divide-y">
               {asks
                 .filter((a) => a.tier === tier)
                 .map((a) => (
@@ -316,13 +311,9 @@ export default async function AuditDayPage() {
                         &quot;Show me: {a.ask}.&quot;
                       </span>{" "}
                       {a.paper ? (
-                        <span className="text-zinc-700 dark:text-zinc-300">
-                          ({KEPT_ON_PAPER})
-                        </span>
+                        <span className="text-ink">({KEPT_ON_PAPER})</span>
                       ) : null}{" "}
-                      <span className="text-zinc-700 dark:text-zinc-300">
-                        {a.word}
-                      </span>{" "}
+                      <span className="text-ink">{a.word}</span>{" "}
                       <Link
                         href={a.href}
                         className="underline underline-offset-2 print:hidden"
@@ -345,7 +336,7 @@ export default async function AuditDayPage() {
         data-testid="audit-day-check"
         data-due={selfCheck.due ? "true" : "false"}
       >
-        <h2 id="check-heading" className="text-xl font-semibold">
+        <h2 id="check-heading" className="">
           Check my systems
         </h2>
         <p
@@ -368,10 +359,10 @@ export default async function AuditDayPage() {
 
       {/* REQ-018 FR-10: the emergency drill date the reminder counts from. */}
       <section aria-labelledby="drill-heading" className="mt-10">
-        <h2 id="drill-heading" className="text-xl font-semibold">
+        <h2 id="drill-heading" className="">
           Your emergency drill
         </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+        <p className="text-ink mt-2 text-sm leading-6">
           {lastDrill
             ? `Last drill ${lastDrill}. Run one every six months and record it here.`
             : "No drill recorded yet. Walk through your emergency plan with your workers, then record the date here."}
@@ -385,23 +376,21 @@ export default async function AuditDayPage() {
         className="mt-10"
         data-testid="audit-kinds"
       >
-        <h2 id="kinds-heading" className="text-xl font-semibold">
+        <h2 id="kinds-heading" className="">
           The kinds of audit, in plain words
         </h2>
-        <dl className="mt-3 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <dl className="divide-rule mt-3 divide-y">
           {auditKindsContent.items.map((k) => (
             <div key={k.id} className="py-3" data-testid={`audit-kind-${k.id}`}>
               <dt className="font-medium">{k.name}</dt>
-              <dd className="leading-7 text-zinc-700 dark:text-zinc-300">
-                {k.description}
-              </dd>
+              <dd className="text-ink leading-7">{k.description}</dd>
             </div>
           ))}
         </dl>
       </section>
-      <p className="mt-10 text-xs text-zinc-600 dark:text-zinc-400">
+      <p className="text-slate mt-10 text-sm">
         {GENERAL_INFORMATION_STATEMENT}
       </p>
-    </div>
+    </PageShell>
   );
 }

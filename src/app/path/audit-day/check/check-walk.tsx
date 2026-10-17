@@ -103,12 +103,12 @@ export function CheckWalk({
   return (
     <div className="mt-6" data-testid="check-walk">
       <p
-        className="text-sm font-medium text-zinc-600 dark:text-zinc-400"
+        className="text-slate text-sm font-medium"
         data-testid="check-progress"
       >
         {i + 1} of {total}
       </p>
-      <h2 className="mt-1 text-xl font-semibold" data-testid="check-record">
+      <h2 className="mt-1" data-testid="check-record">
         {current.name}
       </h2>
       <p
@@ -138,7 +138,7 @@ export function CheckWalk({
         onChange={(e) => setNote(e.target.value)}
         maxLength={300}
         rows={2}
-        className="mt-1 block w-full rounded-md border border-zinc-400 px-3 py-2 text-base dark:border-zinc-600 dark:bg-zinc-900"
+        className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
       />
       {error ? (
         <p role="alert" className="mt-3 text-sm leading-6">

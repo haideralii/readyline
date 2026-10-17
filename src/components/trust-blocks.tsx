@@ -15,14 +15,9 @@ export function TrustCounters() {
       aria-label="Numbers from the private trial"
     >
       {counters.map((c) => (
-        <div
-          key={c.label}
-          className="rounded-md border border-zinc-200 px-4 py-3 dark:border-zinc-800"
-        >
+        <div key={c.label} className="border-rule rounded-md border px-4 py-3">
           <dd className="text-3xl font-semibold">{c.value}</dd>
-          <dt className="text-sm text-zinc-600 dark:text-zinc-400">
-            {c.label}
-          </dt>
+          <dt className="text-slate text-sm">{c.label}</dt>
         </div>
       ))}
     </dl>
@@ -38,19 +33,19 @@ export function Testimonials() {
       aria-labelledby="testimonials-heading"
       data-testid="testimonials"
     >
-      <h2 id="testimonials-heading" className="text-xl font-semibold">
+      <h2 id="testimonials-heading" className="">
         In providers&apos; own words
       </h2>
       <ul className="mt-4 space-y-4">
         {items.map((t) => (
           <li
             key={`${t.business}-${t.given}`}
-            className="rounded-md border border-zinc-200 p-4 dark:border-zinc-800"
+            className="border-rule rounded-md border p-4"
           >
             <blockquote className="leading-7">
               &ldquo;{t.quote}&rdquo;
             </blockquote>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-slate mt-2 text-sm">
               {t.name}, {t.business}, {t.audit} audit
             </p>
           </li>

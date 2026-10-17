@@ -1,3 +1,4 @@
+import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -39,23 +40,21 @@ export default async function DocumentSetPage({
   // FR-8: a refunded pack keeps its data but serves nothing.
   if (await isSetLocked(supabase, set.id)) {
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+      <PageShell kind="list">
         <p className="text-sm">
           <Link href="/documents" className="underline underline-offset-2">
             All document sets
           </Link>
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Document set
-        </h1>
+        <h1 className="mt-2">Document set</h1>
         <p
           role="status"
-          className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
+          className="text-ink mt-3 leading-7"
           data-testid="set-locked"
         >
           {DOCUMENTS_COPY.lockedSet}
         </p>
-      </div>
+      </PageShell>
     );
   }
   const documents = await listLatestDocuments(supabase, set.id);
@@ -74,19 +73,14 @@ export default async function DocumentSetPage({
   const blanks = formBlanks(documents.flatMap((d) => collectBlanks(d.model)));
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageShell kind="list">
       <p className="text-sm">
         <Link href="/documents" className="underline underline-offset-2">
           All document sets
         </Link>
       </p>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-        Document set
-      </h1>
-      <p
-        className="mt-3 leading-7 text-zinc-700 dark:text-zinc-300"
-        data-testid="set-summary"
-      >
+      <h1 className="mt-2">Document set</h1>
+      <p className="text-ink mt-3 leading-7" data-testid="set-summary">
         Drafted{" "}
         {new Date(set.created_at).toLocaleString("en-AU", {
           timeZone: "Australia/Sydney",
@@ -141,18 +135,16 @@ export default async function DocumentSetPage({
       </div>
 
       <section aria-labelledby="docs-heading" className="mt-10">
-        <h2 id="docs-heading" className="text-xl font-semibold">
+        <h2 id="docs-heading" className="">
           Documents, in audit order
         </h2>
         {/* Batch 45b item 1: one "set-list" wrapper; each group's list has its own id, so a locator is never ambiguous. */}
         <div data-testid="set-list">
           {groups.map((g) => (
             <div key={g.title} className="mt-4" data-testid="set-group">
-              <h3 className="text-base font-semibold text-zinc-700 dark:text-zinc-300">
-                {g.title}
-              </h3>
+              <h3 className="text-ink">{g.title}</h3>
               <ol
-                className="mt-1 divide-y divide-zinc-200 dark:divide-zinc-800"
+                className="divide-rule mt-1 divide-y"
                 data-testid="set-group-list"
               >
                 {g.documents.map((d) => {
@@ -162,7 +154,7 @@ export default async function DocumentSetPage({
                       className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <span>
-                        <span className="mr-2 text-zinc-500 tabular-nums">
+                        <span className="text-slate mr-2 tabular-nums">
                           {d.n}.
                         </span>
                         <Link
@@ -172,7 +164,7 @@ export default async function DocumentSetPage({
                           {d.model.title}
                         </Link>
                       </span>
-                      <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                      <span className="text-slate text-sm">
                         {d.status === "ready"
                           ? "Drafted"
                           : "Drafted, with generic text to make yours"}{" "}
@@ -187,6 +179,6 @@ export default async function DocumentSetPage({
         </div>
       </section>
       <DocumentsNotices />
-    </div>
+    </PageShell>
   );
 }
