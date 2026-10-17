@@ -8,6 +8,14 @@ import type { StepId } from "@/lib/questionnaire/steps";
 import { useQuestionnaire } from "./questionnaire-provider";
 import { Stepper } from "./stepper";
 
+/**
+ * The questionnaire's page (REQ-028 FR-5, D-2276): under `lg` the stepper,
+ * the heading and the step as they were; from `lg` a header grid where line
+ * one ("Step N of 6") sits at the right of the h1 and the circles under it
+ * across the form's columns, through the stepper's subgrid, with the DOM
+ * order unchanged (the stepper first, then the heading). The step's form
+ * is its own grid beneath (`.step-form`, D-2276).
+ */
 export function StepShell({
   step,
   children,
@@ -43,42 +51,51 @@ export function StepShell({
   // has to end inside a 681 px iPhone screen (REQ-015 FR-4), and the stepper's
   // second row had pushed it 13 px past it (run 38772962718).
   return (
-    <PageShell kind="form" padding="compact">
-      {/* Batch 48 item 2: one stepper on every step; a done step is the way back to it. */}
-      <Stepper step={step} answers={answers} ready={ready} />
-      {step === "result" ? (
-        // Batch 48 item 2: "Start again" clears the draft after a one-screen confirm (REQ-015 FR-15);
-        // changing one answer is tapping that step above.
-        <div className="text-sm">
-          <ConfirmButton
-            label="Start again"
-            question="Clear your answers and start again? Your result goes with them."
-            confirmLabel="Yes, start again"
-            className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
-            // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the
-            // provider's `clearing` flag holds the result step's guard back while the
-            // answers empty, so this push is the one navigation.
-            onConfirm={() => {
-              void clearDraft();
-              router.push("/start");
-            }}
-            testId="clear-draft"
-          />
-        </div>
-      ) : null}
+    <PageShell kind="grid" padding="compact">
+      <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-baseline lg:gap-x-6">
+        {/* Batch 48 item 2: one stepper on every step; a done step is the way back to it. */}
+        <Stepper
+          step={step}
+          answers={answers}
+          ready={ready}
+          className="order-1 lg:order-none lg:col-span-2 lg:row-span-2 lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid"
+          lineClassName="lg:col-start-2 lg:row-start-1 lg:justify-self-end"
+          circlesClassName="lg:col-span-2 lg:row-start-2 lg:mt-4 lg:w-[calc(58.333%-1rem)]"
+        />
+        {step === "result" ? (
+          // Batch 48 item 2: "Start again" clears the draft after a one-screen confirm (REQ-015 FR-15);
+          // changing one answer is tapping that step above.
+          <div className="order-2 text-sm lg:order-none lg:col-span-2 lg:row-start-3">
+            <ConfirmButton
+              label="Start again"
+              question="Clear your answers and start again? Your result goes with them."
+              confirmLabel="Yes, start again"
+              className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+              // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the
+              // provider's `clearing` flag holds the result step's guard back while the
+              // answers empty, so this push is the one navigation.
+              onConfirm={() => {
+                void clearDraft();
+                router.push("/start");
+              }}
+              testId="clear-draft"
+            />
+          </div>
+        ) : null}
 
-      <h1
-        ref={headingRef}
-        tabIndex={-1}
-        className="focus-quiet mt-4 outline-none"
-      >
-        {STEP_TITLES[step]}
-      </h1>
+        <h1
+          ref={headingRef}
+          tabIndex={-1}
+          className="focus-quiet order-3 mt-4 outline-none lg:order-none lg:col-start-1 lg:row-start-1 lg:mt-0"
+        >
+          {STEP_TITLES[step]}
+        </h1>
+      </div>
 
       <div className="mt-6">{children}</div>
 
       <p
-        className="text-slate mt-8 text-sm"
+        className="text-slate mt-8 text-sm lg:w-[calc(58.333%-1rem)]"
         role="status"
         data-testid="draft-status"
       >

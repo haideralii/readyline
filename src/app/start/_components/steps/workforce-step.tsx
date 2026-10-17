@@ -102,13 +102,13 @@ export function WorkforceStepForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step (both with their `more`), above its first question. */}
-      <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
+      <GlossaryTerms ids={STEP_TERMS} where="page" className="step-side mb-4" />
       {soleTrader ? (
         <p
-          className="text-slate mb-6 text-sm leading-6"
+          className="step-side text-slate mb-6 text-sm leading-6"
           data-testid="workforce-defaults-note"
         >
           You said you are a sole trader, so we have filled in the usual

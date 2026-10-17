@@ -269,38 +269,63 @@ export function SupportsStepForm() {
   // ticked classes alone), and the SDA note when it is shown. The groups'
   // descriptions name restrictive practices and modules, so a fixed list would
   // say too much or too little as headings open and close.
-  const searching = Boolean(query.trim());
   // REQ-027 D-2730: the hint's sentence follows the business structure answered at step 1.
   const hintText = groupHintText(answers.business?.structure);
+  // REQ-028 FR-5 (AC-5): under lg the hint shows its first sentence until tapped; D-2730's words are unchanged.
+  const hintLead = hintText.match(/^[^.?!]*[.?!]/)?.[0] ?? hintText;
+  const hintRest = hintText.slice(hintLead.length).trim();
+  // The class count by audit type for "Ticked so far".
+  const auditCounts = (() => {
+    const chosen = current
+      .map((code) => groups.find((g) => g.code === code))
+      .filter((g): g is GroupOption => Boolean(g));
+    const desk = chosen.filter((g) => g.auditType === "verification").length;
+    const site = chosen.length - desk;
+    return [
+      desk ? `${desk} desk audit` : null,
+      site ? `${site} site audit` : null,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  })();
+  // REQ-028 FR-5 (audit 18; D-2721 amended): the glossary count comes from the step's data, every class of every
+  // heading whether open or closed, so it is the same at every width.
   const present = findGlossaryTerms(
     [
       GROUP_QUESTION,
       GROUPS_HELP,
       hintText,
-      ...CATEGORIES.flatMap((c) => {
-        const items = byCategory.get(c.id) ?? [];
-        if (items.length === 0 && searching) return [];
-        const shown =
-          searching || isOpen(c.id)
-            ? items
-            : groupsInCategory(groups, c.id).filter((g) =>
-                current.includes(g.code),
-              );
-        return [
-          c.title,
-          c.description,
-          ...shown.flatMap((g) => [g.name, g.description]),
-        ];
-      }),
+      ...CATEGORIES.flatMap((c) => [
+        c.title,
+        c.description,
+        ...groupsInCategory(groups, c.id).flatMap((g) => [
+          g.name,
+          g.description,
+        ]),
+      ]),
       ...(sdaOnly ? [SDA_ONLY_LEAD, SDA_ONLY_TEXT] : []),
     ].join("\n"),
   );
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first question. */}
-      <GlossaryTerms ids={present} where="page" className="mb-4" />
+      {/* REQ-028 FR-5: the hint in full for the aside column from lg (hidden under lg, where the fieldset carries its one-line copy). */}
+      <div
+        className="step-side border-rule bg-mist mb-4 hidden rounded-md border p-4 text-sm leading-6 lg:block"
+        data-testid="aside-hint"
+      >
+        <p>{hintText}</p>
+        <button
+          type="button"
+          onClick={applyHint}
+          className="border-line hover:bg-surface mt-2 inline-flex min-h-11 items-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Choose those two for me
+        </button>
+      </div>
+      <GlossaryTerms ids={present} where="page" className="step-side mb-4" />
 
       <fieldset
         className="mb-6"
@@ -313,11 +338,23 @@ export function SupportsStepForm() {
           {GROUPS_HELP}
         </p>
 
-        <div
-          className="border-rule bg-mist mt-3 rounded-md border p-4 text-sm leading-6"
+        {/* REQ-028 FR-5 (AC-5's first phone exception): under lg the hint is one line until tapped; from lg the
+            aside carries it in full. Two copies, one visible at each width, so the phone's order holds (D-2276 (2)). */}
+        <details
+          className="border-rule bg-mist mt-3 rounded-md border p-4 text-sm leading-6 lg:hidden"
           data-testid="groups-hint"
         >
-          <p data-testid="groups-hint-text">{hintText}</p>
+          <summary
+            className="min-h-11 cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden"
+            data-testid="groups-hint-summary"
+          >
+            {hintLead}
+          </summary>
+          {hintRest ? (
+            <p className="mt-2" data-testid="groups-hint-text">
+              {hintRest}
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={applyHint}
@@ -325,7 +362,7 @@ export function SupportsStepForm() {
           >
             Choose those two for me
           </button>
-        </div>
+        </details>
 
         <div className="mt-4">
           <label htmlFor="group-search" className="block text-sm font-medium">
@@ -344,7 +381,7 @@ export function SupportsStepForm() {
           </div>
         </div>
         <p
-          className="text-ink mt-3 text-sm"
+          className="text-ink mt-3 text-sm lg:hidden"
           aria-live="polite"
           data-testid="groups-chosen"
         >
@@ -402,7 +439,7 @@ export function SupportsStepForm() {
                 {open ? (
                   <ul
                     id={`category-${c.id}-list`}
-                    className="space-y-2 px-3 pb-3"
+                    className="space-y-2 px-3 pb-3 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0"
                   >
                     {items.map((g) => renderGroup(g))}
                   </ul>
@@ -410,7 +447,7 @@ export function SupportsStepForm() {
                 {/* Ticked classes stay visible when the heading is closed (FR-11). */}
                 {!open && ticked.length ? (
                   <ul
-                    className="space-y-2 px-3 pb-3"
+                    className="space-y-2 px-3 pb-3 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0"
                     data-testid={`category-${c.id}-ticked`}
                   >
                     {ticked.map((g) => renderGroup(g, "-ticked"))}
@@ -436,6 +473,52 @@ export function SupportsStepForm() {
         ) : null}
       </fieldset>
 
+      {/* REQ-028 FR-5: the aside from lg, a landmark there only (hidden under lg; D-2276 (2)). */}
+      <aside
+        aria-label="Help for this step"
+        data-testid="step-aside"
+        className="step-side-sticky hidden lg:block"
+      >
+        <section
+          aria-labelledby="ticked-so-far-heading"
+          className="border-rule rounded-md border p-4"
+          data-testid="aside-ticked"
+        >
+          <h2 id="ticked-so-far-heading" className="text-base">
+            Ticked so far ({current.length})
+          </h2>
+          {current.length === 0 ? (
+            <p className="text-slate mt-2 text-sm">Nothing chosen yet.</p>
+          ) : (
+            <>
+              <ul className="mt-2 space-y-1 text-sm">
+                {current.map((code) => (
+                  <li
+                    key={code}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <span className="min-w-0">{nameOf(code)}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggle(code)}
+                      className="btn-secondary-sm shrink-0"
+                      aria-label={`Remove ${nameOf(code)}`}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p
+                className="text-slate mt-3 text-sm"
+                data-testid="aside-ticked-count"
+              >
+                {auditCounts}
+              </p>
+            </>
+          )}
+        </section>
+      </aside>
       {sdaOnly ? (
         <div className="border-rule bg-mist mb-6 rounded-md border p-4 text-sm leading-6">
           <strong>{SDA_ONLY_LEAD}</strong> {SDA_ONLY_TEXT}

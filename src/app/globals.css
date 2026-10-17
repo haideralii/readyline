@@ -559,3 +559,37 @@ th {
     transform: scaleX(1);
   }
 }
+
+/*
+ * REQ-028 FR-5 (D-2276): from lg a questionnaire step's form is one grid. Its
+ * children flow down the form's seven columns in their own order; the blocks
+ * the aside holds (the glossary, the practices examples, the sole-trader
+ * note) take columns 9 to 12 as they come, rendered once and in the phone's
+ * own place under lg; the sticky aside spans the rest of the rows. Dense
+ * flow fills the form's column under a block the aside took.
+ */
+@media (min-width: 1024px) {
+  .step-form {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    grid-auto-flow: row dense;
+    align-items: start;
+  }
+  .step-form > * {
+    grid-column: 1 / span 7;
+    min-width: 0;
+  }
+  .step-form > .step-side {
+    grid-column: 9 / span 4;
+  }
+  .step-form > .step-side-sticky {
+    grid-column: 9 / span 4;
+    grid-row: span 24;
+    position: sticky;
+    top: 6rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+  }
+}
