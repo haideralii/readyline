@@ -114,9 +114,13 @@ export function RegisterTable({
                 return (
                   <td key={i} className={cls}>
                     {i === linkIndex ? (
+                      // D-2814: the first column is the row's link, and its accessible name is the row's title as the
+                      // card gives it (the kind and the code together), so a person tabbing the table hears
+                      // "New worker W-1", not "W-1" (PO 18:10); the visible cell is inside that name.
                       <Link
                         href={r.href}
                         className="font-medium underline-offset-4 hover:underline"
+                        aria-label={shown === r.title ? undefined : r.title}
                       >
                         {shown}
                       </Link>

@@ -223,6 +223,7 @@ export default async function RegistersPage() {
         >
           <ul
             className="list-disc pl-5 leading-7"
+            aria-label="What is in the pack"
             data-testid="pack-contents-list"
           >
             <li>

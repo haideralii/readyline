@@ -44,6 +44,8 @@ describe("RegisterTable", () => {
     const link = first.querySelector("a")!;
     expect(link.getAttribute("href")).toBe("/registers/complaints/a");
     expect(link.textContent).toBe("CMP-0001");
+    // The accessible name is the row's title, the visible cell inside it (PO 18:10).
+    expect(link.getAttribute("aria-label")).toBe("CMP-0001: a title");
     const tag = first.querySelector('[data-testid="status-tag"]')!;
     expect(tag.getAttribute("data-status")).toBe("open");
     expect(tag.textContent).toContain("Open");
@@ -59,6 +61,8 @@ describe("RegisterTable", () => {
     expect(cellsA[2].className.split(" ")).toContain("text-slate");
     const cellsB = screen.getByTestId("trow-b").querySelectorAll("td");
     expect(cellsB[0].querySelector("a")!.textContent).toBe("CMP-0002: another");
+    // When the link already shows the title, no aria-label repeats it.
+    expect(cellsB[0].querySelector("a")!.getAttribute("aria-label")).toBeNull();
     expect(cellsB[1].className.split(" ")).toContain("tabular-nums");
     expect(cellsB[1].className.split(" ")).not.toContain("text-slate");
   });
