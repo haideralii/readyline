@@ -195,16 +195,32 @@ test.describe("REQ-024 A3: the worker files, the two lists and the one-time fill
     await expect(page.locator('input[name="name:W-001"]')).toHaveValue(MARK);
     await shot(page, "export-screen-refused", project);
 
-    // Told: the filled list is a download with the value in it.
-    await page.getByTestId("fill-told").check();
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      page.getByTestId("fill-download-screening-list").click(),
-    ]);
-    expect(download.suggestedFilename()).toMatch(
-      /^screening-list-\d{4}-\d{2}-\d{2}\.csv$/,
+    // Told: the filled list, asserted through the request context (PO 15:05):
+    // WebKit under the iPhone emulation surfaces no download event for a form
+    // post, so the fill is posted with the form's fields and the tick, the
+    // context sharing the page's cookies, and read from the response.
+    const filledRes = await page.request.post(
+      "/registers/staff/export/screening-list",
+      {
+        multipart: {
+          fill: "on",
+          told: "on",
+          as_at: "",
+          "name:W-001": MARK,
+          "dob:W-001": "1990-01-02",
+        },
+        headers,
+      },
     );
-    const filled = readFileSync(await download.path(), "utf8");
+    expect(filledRes.status()).toBe(200);
+    expect(filledRes.headers()["cache-control"]).toBe("no-store");
+    expect(filledRes.headers()["content-disposition"]).toMatch(
+      /^attachment; filename="screening-list-\d{4}-\d{2}-\d{2}\.csv"$/,
+    );
+    const filled = await filledRes.text();
+    const header = filled.split("\r\n")[1];
+    expect(header).toContain("worker_ref");
+    expect(header).toContain("full_name");
     expect(filled).toContain(MARK);
     expect(filled).toContain("1990-01-02");
     expect(filled).toContain("[Address]");
