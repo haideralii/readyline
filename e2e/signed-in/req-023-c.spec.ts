@@ -231,7 +231,7 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     await page.locator("#renewal-date").fill(sydney(2));
     await page.locator("#renewal-auditor").fill("430123456");
     await page.getByTestId("renewal-save").click();
-    await expect(page.getByRole("alert").first()).toBeVisible();
+    await expect(page.getByTestId("renewal-error-auditor")).toBeVisible();
     await expect(page).toHaveURL(/\/path\/renewal\/booking$/);
     await page.locator("#renewal-auditor").fill("Quality Audits Pty Ltd");
     await page.getByTestId("renewal-save").click();
@@ -293,12 +293,12 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     // The last press saves; the button stays busy until the action answers, so wait for the
     // done screen (or the action's own words, which then fail the test with their message).
     const done = page.getByTestId("check-done");
-    await expect(done.or(page.getByRole("alert"))).toBeVisible({
+    await expect(done.or(page.getByTestId("check-error"))).toBeVisible({
       timeout: 30_000,
     });
-    // A refused save shows its words in the alert; they go into the failure message here.
+    // A refused save shows its words in the walk's own alert (never Next's route announcer); they go into the failure message here.
     expect(
-      await page.getByRole("alert").allTextContents(),
+      await page.getByTestId("check-error").allTextContents(),
       "the save's own message",
     ).toEqual([]);
     await expect(done).toBeVisible();

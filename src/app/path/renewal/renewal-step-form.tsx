@@ -83,7 +83,11 @@ export function RenewalStepForm({
           className="border-line bg-surface text-ink mt-1 block min-h-12 w-full max-w-60 rounded-md border px-3 py-2 text-base shadow-sm"
         />
         {fieldErrors.date ? (
-          <p className="mt-1 text-sm leading-6" role="alert">
+          <p
+            className="mt-1 text-sm leading-6"
+            role="alert"
+            data-testid="renewal-error-date"
+          >
             {fieldErrors.date.join(" ")}
           </p>
         ) : null}
@@ -107,14 +111,22 @@ export function RenewalStepForm({
               className="border-line bg-surface text-ink mt-1 block min-h-12 w-full rounded-md border px-3 py-2 text-base shadow-sm"
             />
             {fieldErrors.auditorBusinessName ? (
-              <p className="mt-1 text-sm leading-6" role="alert">
+              <p
+                className="mt-1 text-sm leading-6"
+                role="alert"
+                data-testid="renewal-error-auditor"
+              >
                 {fieldErrors.auditorBusinessName.join(" ")}
               </p>
             ) : null}
           </>
         ) : null}
         {error ? (
-          <p role="alert" className="mt-3 text-sm leading-6">
+          <p
+            role="alert"
+            className="mt-3 text-sm leading-6"
+            data-testid="renewal-error"
+          >
             {error}
           </p>
         ) : null}

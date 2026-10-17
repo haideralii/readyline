@@ -163,7 +163,11 @@ export function CheckWalk({
         className="border-line mt-1 block w-full rounded-md border px-3 py-2 text-base"
       />
       {error ? (
-        <p role="alert" className="mt-3 text-sm leading-6">
+        <p
+          role="alert"
+          className="mt-3 text-sm leading-6"
+          data-testid="check-error"
+        >
           {error}
         </p>
       ) : null}
