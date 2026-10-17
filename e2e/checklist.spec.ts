@@ -44,19 +44,15 @@ test.describe("readiness checklist, signed out (REQ-006 FR-5)", () => {
     page,
   }) => {
     await fillToResult(page);
-    const teaser = page.getByTestId("checklist-teaser");
-    // REQ-013 batch 36 item 3: the link says what it opens. Batch 45 item 6
-    // adds the one sentence that adds up ("Your checklist has N items: the X
+    // Batch 45 item 6: the one sentence that adds up ("Checklist: N items: the X
     // above plus Y about your workers, insurance and the audit"), the line a
-    // provider screenshots for a partner; its numbers must agree.
-    await expect(teaser).toContainText(/Open your checklist \((\d+) things\)/);
-    const things = Number(
-      ((await teaser.textContent()) ?? "").match(
-        /Open your checklist \((\d+) things\)/,
-      )?.[1],
-    );
-    // REQ-025 FR-3: the checklist line is the summary list's third item.
+    // provider screenshots for a partner; its numbers must agree. REQ-028
+    // D-2805 moved the link into the documents section, so the count is read
+    // from the summary list's third item alone.
     const line = page.getByTestId("checklist-count-line");
+    const things = Number(
+      ((await line.textContent()) ?? "").match(/Checklist: (\d+) items/)?.[1],
+    );
     await expect(line).toContainText(
       /Checklist: \d+ items \(\d+ above plus \d+ about your workers, insurance and the audit\)/,
     );
@@ -65,6 +61,13 @@ test.describe("readiness checklist, signed out (REQ-006 FR-5)", () => {
     )!;
     expect(Number(m[1])).toBe(things);
     expect(Number(m[2]) + Number(m[3])).toBe(Number(m[1]));
+    // REQ-028 FR-6, D-2805: the link is at the head of the documents section, in its words.
+    const docs = page.getByTestId("result-section-documents");
+    if ((await docs.getAttribute("open")) === null)
+      await docs.locator("> summary").click();
+    await expect(page.getByTestId("checklist-sign-in")).toHaveText(
+      "Open these in your checklist",
+    );
     await expect(page.getByTestId("checklist-sign-in")).toHaveAttribute(
       "href",
       "/sign-in?next=%2Fchecklist",

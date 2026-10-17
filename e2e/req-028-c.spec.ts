@@ -146,4 +146,83 @@ test.describe("REQ-028 Session C: the questionnaire on a laptop (FR-5, AC-5)", (
     const cb = (await page.getByRole("checkbox").first().boundingBox())!;
     expect(cb.y, "the first tickable class").toBeLessThan(600);
   });
+
+  test("the result at 1280: the card sticky in five columns, the sections in seven and open on a first visit; at 360 the stepper one line and Start again in the card (FR-6, AC-4)", async ({
+    page,
+  }) => {
+    await toSupports(page);
+    await tickGroup(page, "0107");
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await page.locator("#restrictivePractices-no").check();
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    await page.getByLabel("Number of workers").fill("3");
+    await page.locator("#allRiskAssessedScreened-yes").check();
+    await page.getByRole("button", { name: "Save and continue" }).click();
+    for (const key of [
+      "policies",
+      "incidentRegister",
+      "complaintsRegister",
+      "insuranceCertificate",
+      "workerInductionRecords",
+    ])
+      await page.locator(`#${key}-no`).check();
+    await page.getByRole("button", { name: "See my result" }).click();
+    await expect(page.getByTestId("result")).toBeVisible();
+    const card = page.getByTestId("summary");
+    // D-2805: one primary whose label says where it goes, one text link, the footer links.
+    await expect(
+      card.getByRole("link", { name: "Sign in to get ready" }),
+    ).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: "See the price" }),
+    ).toBeVisible();
+    await expect(card.getByTestId("change-answers")).toBeVisible();
+    await expect(card.getByTestId("clear-draft")).toBeVisible();
+    await expect(card.getByTestId("next-line")).toHaveCount(0);
+    if (large(page)) {
+      const shell = (await page.locator('[data-shell="page"]').boundingBox())!;
+      const cb = (await card.boundingBox())!;
+      const sections = (await page
+        .getByTestId("result-section-why")
+        .boundingBox())!;
+      const content = shell.width - 64;
+      const col = (content - 11 * 32) / 12;
+      expect(Math.abs(cb.width - (5 * col + 4 * 32))).toBeLessThanOrEqual(4);
+      expect(Math.abs(sections.width - (7 * col + 6 * 32))).toBeLessThanOrEqual(
+        4,
+      );
+      expect(sections.x).toBeGreaterThan(cb.x + cb.width);
+      // D-2813: open at lg on a first visit.
+      for (const id of ["why", "documents", "registers"])
+        await expect(page.getByTestId(`result-section-${id}`)).toHaveAttribute(
+          "open",
+          "",
+        );
+      // The checklist link heads the documents section.
+      await expect(
+        page
+          .getByTestId("result-section-documents")
+          .getByRole("link", { name: "Open these in your checklist" }),
+      ).toBeVisible();
+      // Sticky: after a scroll the card column stays at 6 rem.
+      await page.evaluate(() => window.scrollTo(0, 900));
+      await page.waitForFunction(() => window.scrollY >= 900);
+      const stuck = (await card.boundingBox())!;
+      expect(Math.abs(stuck.y - 96)).toBeLessThanOrEqual(2);
+    } else {
+      // The two phone exceptions: the stepper is line one alone; Start again sits in the card.
+      await expect(page.getByTestId("progress-line-label")).toBeVisible();
+      await expect(page.getByTestId("stepper-business")).toBeHidden();
+      for (const id of ["why", "documents", "registers"])
+        await expect(
+          page.getByTestId(`result-section-${id}`),
+        ).not.toHaveAttribute("open", "");
+      const button = (await card
+        .getByRole("link", { name: "Sign in to get ready" })
+        .boundingBox())!;
+      expect(button.y + button.height).toBeLessThanOrEqual(
+        page.viewportSize()!.height,
+      );
+    }
+  });
 });

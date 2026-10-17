@@ -48,6 +48,7 @@ export function Stepper({
   className,
   lineClassName,
   circlesClassName,
+  collapseUnderSm = false,
 }: {
   step: StepId;
   answers: QuestionnaireDraft["answers"];
@@ -56,6 +57,8 @@ export function Stepper({
   className?: string;
   lineClassName?: string;
   circlesClassName?: string;
+  /** REQ-028 FR-6: the result's stepper is line one alone under sm; the circles return from sm. */
+  collapseUnderSm?: boolean;
 }) {
   const index = stepIndex(step);
   const states = stepStates(step, answers, ready);
@@ -127,7 +130,12 @@ export function Stepper({
         </details>
       </div>
       <ol
-        className={["mt-2 flex items-start", circlesClassName ?? null]
+        className={[
+          collapseUnderSm
+            ? "mt-2 hidden items-start sm:flex"
+            : "mt-2 flex items-start",
+          circlesClassName ?? null,
+        ]
           .filter(Boolean)
           .join(" ")}
       >

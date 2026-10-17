@@ -279,24 +279,30 @@ test.describe("REQ-015 Section E", () => {
     await expect(card.getByTestId("audit-kind")).toContainText(
       /An approved auditor reads your documents, visits where you work and talks to people/,
     );
-    // REQ-017 step 1: the one button is "Start getting ready"; the checklist and the price are plain links under it.
-    const button = card.getByRole("link", { name: "Start getting ready" });
+    // REQ-028 D-2805 (D-2707 restored): the one button says where it goes; "See the price" is the one link.
+    const button = card.getByRole("link", { name: "Sign in to get ready" });
     const viewport = page.viewportSize()!;
     const box = await button.boundingBox();
     expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
-    // The three disclosures start closed with counts in their summaries.
+    // The three disclosures carry counts in their summaries; closed under lg, open at lg on a first visit (REQ-028 D-2813).
+    const large = (page.viewportSize()?.width ?? 0) >= 1024;
     for (const id of ["why", "documents", "registers"]) {
       const d = page.getByTestId(`result-section-${id}`);
-      await expect(d).not.toHaveAttribute("open", "");
+      if (large) await expect(d).toHaveAttribute("open", "");
+      else await expect(d).not.toHaveAttribute("open", "");
       await expect(d.locator("> summary")).toContainText(/\(\d+/);
     }
     await shot(page, "result-card", testInfo.project.name);
 
-    // FR-5: tags carry text and an icon, never colour alone; FR-7: state is remembered.
-    await page
-      .getByTestId("result-section-documents")
-      .locator("> summary")
-      .click();
+    // FR-5: tags carry text and an icon, never colour alone; FR-7: state is remembered. At lg the sections are
+    // already open, so the click here closes "Why this result" instead and the reload keeps that (D-2813).
+    if (large)
+      await page.getByTestId("result-section-why").locator("> summary").click();
+    else
+      await page
+        .getByTestId("result-section-documents")
+        .locator("> summary")
+        .click();
     await expect(page.getByTestId("have-legend")).toBeVisible();
     // REQ-025 FR-4a as REQ-027 D-2718 amends it: one vocabulary, the reader's answers only.
     const tags = page

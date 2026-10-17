@@ -176,7 +176,7 @@ const COPY_MODULES = [
   // REQ-027 A1 (decision 8, finding 121): a `.ts` under `src/app` the TSX walk never read; its
   // strings are the practices step's legends, helps and examples.
   "src/app/start/_components/steps/practices-copy.ts",
-  // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend, the tags and the "Next:" line.
+  // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend and the tags (the "Next:" line went with REQ-028 D-2805).
   "src/app/start/_components/steps/result-copy.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";

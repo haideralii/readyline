@@ -1,8 +1,6 @@
 "use client";
 import { PageShell } from "@/components/page-shell";
-import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
-import { ConfirmButton } from "@/components/confirm-button";
 import { STEP_TITLES } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
 import { useQuestionnaire } from "./questionnaire-provider";
@@ -23,8 +21,7 @@ export function StepShell({
   step: StepId;
   children: ReactNode;
 }) {
-  const { answers, saveStatus, ready, mode, clearDraft } = useQuestionnaire();
-  const router = useRouter();
+  const { answers, saveStatus, ready, mode } = useQuestionnaire();
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   // AC-11: focus moves to the step heading on every step change, and on a
@@ -61,27 +58,9 @@ export function StepShell({
           className="order-1 lg:order-none lg:col-span-2 lg:row-span-2 lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid"
           lineClassName="lg:col-start-2 lg:row-start-1 lg:justify-self-end"
           circlesClassName="lg:col-span-2 lg:row-start-2 lg:mt-4 lg:w-[calc(58.333%-1rem)]"
+          // REQ-028 FR-6 (AC-4's phone exception): on the result the stepper is line one alone under sm.
+          collapseUnderSm={step === "result"}
         />
-        {step === "result" ? (
-          // Batch 48 item 2: "Start again" clears the draft after a one-screen confirm (REQ-015 FR-15);
-          // changing one answer is tapping that step above.
-          <div className="order-2 text-sm lg:order-none lg:col-span-2 lg:row-start-3">
-            <ConfirmButton
-              label="Start again"
-              question="Clear your answers and start again? Your result goes with them."
-              confirmLabel="Yes, start again"
-              className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
-              // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the
-              // provider's `clearing` flag holds the result step's guard back while the
-              // answers empty, so this push is the one navigation.
-              onConfirm={() => {
-                void clearDraft();
-                router.push("/start");
-              }}
-              testId="clear-draft"
-            />
-          </div>
-        ) : null}
 
         <h1
           ref={headingRef}
