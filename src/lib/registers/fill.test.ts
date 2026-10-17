@@ -85,6 +85,7 @@ const snapshot: WorkerExportSnapshot = {
     },
   ],
   exceptions: [],
+  entries: [],
   events: [],
   states: new Map(),
   itemsByRef: new Map(),

@@ -13,6 +13,7 @@ import type {
   OnboardingItemRow,
   RiskAssessedRoleRow,
   StaffMatrixRow,
+  SupervisionEntryRow,
 } from "@/lib/registers/audit-day-types";
 import {
   WORKER_ROLE_LABELS,
@@ -271,6 +272,8 @@ export type WorkerFile = {
   ownerRow: boolean;
   /** REQ-024 A2 (FR-4): the s 14 exception's gates, the open row and its history; null for a worker who is not risk assessed. */
   exception: ExceptionContext | null;
+  /** REQ-024 Session C (FR-11): the supervision history, oldest first as the table returns it. */
+  supervision: SupervisionEntryRow[];
 };
 
 /** FR-3: one worker's file for the owner's page: the row, the derived list and state, the items' state rows and the clearances. */
@@ -304,7 +307,7 @@ export async function loadWorkerFile(
           .eq("subject_ref", row.worker_ref)
           .maybeSingle()
       ).data as OnboardingChecklistRow | null);
-  const [states, clearances, role] = await Promise.all([
+  const [states, clearances, role, supervision] = await Promise.all([
     checklist
       ? listItems(supabase, accountId, checklist.id)
       : Promise.resolve([]),
@@ -317,6 +320,13 @@ export async function loadWorkerFile(
           .maybeSingle()
           .then((r) => (r.data as RiskAssessedRoleRow | null) ?? null)
       : Promise.resolve(null),
+    supabase
+      .from("supervision_entries")
+      .select("*")
+      .eq("account_id", accountId)
+      .eq("worker_ref", row.worker_ref)
+      .order("held_on", { ascending: true })
+      .then((r) => (r.data as SupervisionEntryRow[] | null) ?? []),
   ]);
   // REQ-024 A2 (FR-4): the exception is a risk-assessed worker's; the gates
   // read with the declaration taken as ticked, the start form holding the tick.
@@ -358,6 +368,7 @@ export async function loadWorkerFile(
     role,
     ownerRow: ctx.ownerRow,
     exception,
+    supervision,
   };
 }
 

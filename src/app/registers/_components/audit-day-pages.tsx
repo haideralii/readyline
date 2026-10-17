@@ -25,6 +25,7 @@ import {
   loadWorkerFile,
   ownerWorkerRef,
 } from "@/server/registers/worker-onboarding";
+import { SupervisionPanel } from "./supervision-panel";
 import { WorkerItems } from "./worker-items";
 import { ExceptionPanel } from "./exception-panel";
 import { part4EndFor } from "@/lib/registers/state-facts";
@@ -410,6 +411,25 @@ export async function AuditDayDetailPage({
             canWrite={ctx.canWrite}
             today={todaySydney()}
           />
+          {slug === "staff-matrix" ? (
+            // REQ-024 Session C (FR-11): the supervision history and its one form, on the staff row alone.
+            <SupervisionPanel
+              workerRef={file.row.worker_ref}
+              entries={file.supervision}
+              lastSupervisionOn={file.row.last_supervision_on}
+              canWrite={ctx.canWrite}
+              today={todaySydney()}
+              ownerRef={
+                (
+                  await ownerWorkerRef(
+                    ctx.supabase,
+                    ctx.viewer.account.id,
+                    ctx.viewer.user.id,
+                  )
+                )?.workerRef ?? null
+              }
+            />
+          ) : null}
           {file.exception && slug === "staff-matrix" ? (
             <ExceptionPanel
               workerRef={file.row.worker_ref}

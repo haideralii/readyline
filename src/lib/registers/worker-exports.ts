@@ -14,12 +14,14 @@ import type {
   RiskAssessedRoleRow,
   ScreeningExceptionRow,
   StaffMatrixRow,
+  SupervisionEntryRow,
 } from "./audit-day-types";
 import {
   WORKER_ROLE_LABELS,
   type WorkerOnboardingItem,
 } from "./onboarding-items";
 import { CSV_COLUMNS, toCsv, toCsvWithFirstLine } from "./csv";
+import { sortEntries } from "./supervision";
 import type { WorkerClearanceRow } from "./types";
 import type { WorkerState } from "./worker-state";
 
@@ -70,6 +72,8 @@ export type WorkerExportSnapshot = {
   clearances: readonly WorkerClearanceRow[];
   roles: readonly RiskAssessedRoleRow[];
   exceptions: readonly ScreeningExceptionRow[];
+  /** REQ-024 Session C (FR-11): the supervision history, filtered by the pack's period where one is chosen (D-2832). */
+  entries: readonly SupervisionEntryRow[];
   events: readonly RegisterEventRow[];
   /** The derived state per worker code (`listWorkerStates`). */
   states: ReadonlyMap<string, WorkerState>;
@@ -382,8 +386,10 @@ export function itemState(
 /**
  * FR-6: one worker's file as rows of one table: the derived items with their
  * state and dates, the clearance rows with their numbers, the exceptions,
- * and the trail (the staff row's, the clearances', the items' and the
- * exceptions' events), oldest first.
+ * the supervision entries (FR-11, AC-9: the kind in `item_id`, the day in
+ * `done_on`, the supervisor's code in `who`, a review's outcome in `state`)
+ * and the trail (the staff row's, the clearances', the items', the
+ * exceptions' and the entries' events), oldest first.
  */
 export function workerFileRows(
   s: WorkerExportSnapshot,
@@ -440,11 +446,23 @@ export function workerFileRows(
       confirmed_on: e.ended_on ?? "",
       note: e.supervisor_ref ? `supervisor ${e.supervisor_ref}` : "",
     });
+  const entries = s.entries.filter((e) => e.worker_ref === ref);
+  for (const e of sortEntries(entries).reverse())
+    out.push({
+      ...blank(),
+      kind: "supervision",
+      item_id: e.kind,
+      who: e.by_ref,
+      state: e.outcome ?? "",
+      done_on: e.held_on,
+      note: e.note,
+    });
   const ids = new Set<string>([
     row.id,
     ...states.map((x) => x.id),
     ...mine.map((c) => c.id),
     ...exceptions.map((e) => e.id),
+    ...entries.map((e) => e.id),
   ]);
   for (const e of s.events
     .filter((e) => ids.has(e.row_id))
