@@ -15,6 +15,7 @@ import {
   hashAddress,
   hashAuditorToken,
 } from "@/lib/registers/auditor-link";
+import { ALL_PERIOD, type Period } from "@/lib/registers/period";
 
 export type AuditorLinkRow = {
   id: string;
@@ -90,12 +91,17 @@ export async function resolveAuditorToken(
   };
 }
 
-/** One open: the count and time on the row, one audit line (link id, hashed address). */
+/**
+ * One open: the count and time on the row, one audit line (link id, hashed
+ * address, and the period shown as `from` and `to`, `-` for an open side;
+ * REQ-023 SR-3, nothing else).
+ */
 export async function recordAuditorOpen(
   admin: SupabaseClient,
   link: ResolvedAuditorLink,
   address: string | null,
   what: "opened" | "pack-downloaded",
+  period: Period = ALL_PERIOD,
 ): Promise<void> {
   const current = await admin
     .from("auditor_links")
@@ -112,7 +118,7 @@ export async function recordAuditorOpen(
     account_id: link.accountId,
     actor_user_id: null,
     action: `auditor_link.${what}`,
-    target: `${link.linkId} viewer:${address ? hashAddress(address) : "unknown"}`,
+    target: `${link.linkId} viewer:${address ? hashAddress(address) : "unknown"} from:${period.from ?? "-"} to:${period.to ?? "-"}`,
   });
 }
 

@@ -9,6 +9,7 @@
  * static and live in next.config.ts `headers()`.
  */
 import { NextResponse, type NextRequest } from "next/server";
+import { parsePeriodSearch, periodGuarded } from "@/lib/registers/period";
 
 /**
  * Routes with a Buy form (REQ-007 SR-5). With JavaScript off the form posts
@@ -88,7 +89,26 @@ export function needsSessionRedirect(
   return `/sign-in?next=${encodeURIComponent(pathname)}`;
 }
 
+/**
+ * REQ-023 FR-5, SR-3 (AC-9): the period filter's query shape on the register
+ * pages, the audit-day pages and the auditor link. A page cannot answer a
+ * status of its own, so a malformed `period`, `from` or `to` (a word off the
+ * closed list, a non-date, `from` after `to`, more than ten years, a repeated
+ * parameter) is refused here with "Bad request" and nothing echoed; the page
+ * and the routes parse it again before any query reads it.
+ */
+export function periodQueryRefused(
+  pathname: string,
+  search: URLSearchParams,
+): boolean {
+  return periodGuarded(pathname) && !parsePeriodSearch(search).ok;
+}
+
 export function proxy(request: NextRequest) {
+  if (
+    periodQueryRefused(request.nextUrl.pathname, request.nextUrl.searchParams)
+  )
+    return new NextResponse("Bad request", { status: 400 });
   const redirectTo = needsSessionRedirect(
     request.nextUrl.pathname,
     request.cookies.getAll().map((c) => c.name),
