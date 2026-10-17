@@ -242,6 +242,20 @@ export default async function AuditDayPage({
           testId="audit-day-period"
         />
       ) : null}
+      {/* REQ-023 FR-6: the summary screen, the same sheet the pack carries. */}
+      {period ? (
+        <p className="mt-3 text-sm print:hidden">
+          <Link
+            href="/path/audit-day/what-changed"
+            className="underline underline-offset-2"
+            data-testid="audit-day-what-changed"
+          >
+            {period.last_audit_on
+              ? "What changed since the last audit"
+              : "What changed in this registration period"}
+          </Link>
+        </p>
+      ) : null}
 
       {/* Batch 45 item 3: the groups in the order the auditor asks, not the checklist's. */}
       {[...shown.groups]
