@@ -103,8 +103,40 @@ export async function loadWorkerSteps(
         .in("document_type_id", ACK_TYPE_IDS),
     ]);
   const row = (rowRes.data as Omit<StaffMatrixRow, "note"> | null) ?? null;
-  const checklist =
-    (checklistRes.data as OnboardingChecklistRow | null) ?? null;
+  let checklist = (checklistRes.data as OnboardingChecklistRow | null) ?? null;
+  // The derived list over the row (no modules: W-7 items the owner's list carries are named from their rows).
+  const derived = row
+    ? workerOnboardingItems(contextFor(row as StaffMatrixRow, [], null, today))
+    : [];
+  // #102's run at f190a70 (D-2282 (8)): a worker whose owner has not opened their page has no checklist and no
+  // item rows, and the controls render on the rows; the function makes them under the worker's own code.
+  if (row && derived.length > 0) {
+    const existing = checklist
+      ? (((
+          await supabase
+            .from("onboarding_items")
+            .select("item_id")
+            .eq("checklist_id", checklist.id)
+        ).data as { item_id: string }[] | null) ?? [])
+      : [];
+    const have = new Set(existing.map((s) => s.item_id));
+    if (!checklist || derived.some((i) => !have.has(i.id))) {
+      const made = await supabase.rpc("worker_ensure_items", {
+        p_account: worker.id,
+        p_items: derived.map((i) => ({ id: i.id, owner_role: i.who })),
+      });
+      if (!made.error) {
+        const again = await supabase
+          .from("onboarding_checklists")
+          .select("*")
+          .eq("account_id", worker.id)
+          .eq("kind", "worker")
+          .eq("subject_ref", ref)
+          .maybeSingle();
+        checklist = (again.data as OnboardingChecklistRow | null) ?? checklist;
+      }
+    }
+  }
   const [statesRes, ticksRes] = checklist
     ? await Promise.all([
         supabase
@@ -122,10 +154,6 @@ export async function loadWorkerSteps(
   const ticks = (ticksRes.data as OnboardingTickRow[] | null) ?? [];
   const clearances =
     (clearancesRes.data as Omit<WorkerClearanceRow, "note">[] | null) ?? [];
-  // The derived list over the row (no modules: W-7 items the owner's list carries are named from their rows).
-  const derived = row
-    ? workerOnboardingItems(contextFor(row as StaffMatrixRow, [], null, today))
-    : [];
   const known = new Set(derived.map((i) => i.id));
   const extra: WorkerOnboardingItem[] = [];
   for (const s of states) {

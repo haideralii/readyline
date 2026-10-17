@@ -365,6 +365,74 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
     expect(direct.error?.code).toBe("42501");
   });
 
+  it("D-2282 (8): a worker with no checklist makes their own checklist and item rows through the function; a second call adds none; a bad item is refused", async () => {
+    const items = [
+      { id: "w1-clearance", owner_role: "owner" },
+      { id: "w4-orientation-module", owner_role: "both" },
+    ];
+    const first = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: items,
+    });
+    expect(first.error).toBeNull();
+    const again = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [...items, { id: "w5-induction", owner_role: "both" }],
+    });
+    expect(again.error).toBeNull();
+    expect(again.data).toBe(first.data);
+    const rows = await stranger.client
+      .from("onboarding_items")
+      .select("item_id, owner_role, done_on, confirmed_on")
+      .eq("checklist_id", first.data as string)
+      .order("item_id");
+    expect(rows.data).toEqual([
+      {
+        item_id: "w1-clearance",
+        owner_role: "owner",
+        done_on: null,
+        confirmed_on: null,
+      },
+      {
+        item_id: "w4-orientation-module",
+        owner_role: "both",
+        done_on: null,
+        confirmed_on: null,
+      },
+      {
+        item_id: "w5-induction",
+        owner_role: "both",
+        done_on: null,
+        confirmed_on: null,
+      },
+    ]);
+    const list = await stranger.client
+      .from("onboarding_checklists")
+      .select("subject_ref, kind")
+      .eq("id", first.data as string)
+      .single();
+    expect(list.data).toEqual({ subject_ref: "W-22", kind: "worker" });
+    const bad = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [{ id: "Robert'); drop", owner_role: "both" }],
+    });
+    expect(bad.error?.code).toBe("42501");
+    // The worker's date on the made W-4 row goes through worker_update_item as before.
+    const w4 = rows.data!.find((r) => r.item_id === "w4-orientation-module")!;
+    void w4;
+    const w4Row = await stranger.client
+      .from("onboarding_items")
+      .select("id")
+      .eq("checklist_id", first.data as string)
+      .eq("item_id", "w4-orientation-module")
+      .single();
+    const dated = await stranger.client.rpc("worker_update_item", {
+      p_item: w4Row.data!.id,
+      p_done_on: "2026-11-05",
+    });
+    expect(dated.error).toBeNull();
+  });
+
   it("D-2243: one role_table_grants line for the table and the view", async () => {
     const admin2 = admin;
     const grants = await admin2.rpc("has_active_subscription", {
