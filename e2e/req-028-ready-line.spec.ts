@@ -38,7 +38,8 @@ test("a result with nothing in place draws a full ochre line under the pack sent
   // Nothing was answered as already in place, so no moss segment is drawn and the track is not shown.
   await expect(page.getByTestId("result-ready-line-done")).toHaveCount(0);
   await expect(page.getByTestId("result-ready-line-track")).toHaveCount(0);
+  // REQ-025 FR-3's pack sentence, word for word at its start; the count follows the fixture.
   await expect(page.getByTestId("result-ready-line-text")).toContainText(
-    "Your pack drafts every document below.",
+    /^The pack drafts all d+ so they match; your checklist shows which to compare with what you have.$/,
   );
 });
