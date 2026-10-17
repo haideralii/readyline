@@ -1,7 +1,10 @@
 "use client";
-import { Tag, type TagVariant } from "@/components/tag";
+import { RegisterTable, StatusTag } from "@/components/register-table";
+import type { TableColumn } from "@/lib/registers/table-columns";
 import Link from "next/link";
 import { useState } from "react";
+
+export { StatusTag };
 
 /**
  * One list for all four registers (REQ-009 FR-5; REQ-015 Section C): each
@@ -14,6 +17,8 @@ export type ListRow = {
   href: string;
   title: string;
   detail: string;
+  /** REQ-028 FR-8: the table's cells in column order (`cellsFor`), when the register has columns. */
+  cells?: (string | null)[];
   status: {
     key: string;
     label: string;
@@ -21,37 +26,20 @@ export type ListRow = {
   };
 };
 
-/** REQ-028 FR-13 (D-2274): the register tones as the one Tag's variants. */
-const TONE_VARIANT: Record<ListRow["status"]["tone"], TagVariant> = {
-  moss: "done",
-  ochre: "doing",
-  signal: "error",
-  slate: "neutral",
-};
-
-export function StatusTag({ status }: { status: ListRow["status"] }) {
-  return (
-    <Tag
-      variant={TONE_VARIANT[status.tone]}
-      testId="status-tag"
-      data-status={status.key}
-    >
-      {status.label}
-    </Tag>
-  );
-}
-
 export function RegisterList({
   rows,
   filters,
   empty,
   testId,
+  columns,
 }: {
   rows: ListRow[];
   /** The status keys offered as filters, in order, with their labels. */
   filters: { key: string; label: string }[];
   empty: string;
   testId: string;
+  /** REQ-028 FR-8 (D-2814): with columns, the table renders from sm and these cards under it. */
+  columns?: readonly TableColumn[];
 }) {
   const [filter, setFilter] = useState<string>("all");
   const shown =
@@ -106,35 +94,54 @@ export function RegisterList({
           )}
         </p>
       ) : (
-        <ul
-          className="divide-rule mt-4 divide-y"
-          aria-labelledby="register-title"
-        >
-          {shown.map((r) => (
-            <li key={r.id}>
-              <Link
-                href={r.href}
-                className="hover:bg-mist -mx-2 flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
-                data-testid={`row-${r.id}`}
-              >
-                {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
+        <div className={columns?.length ? "sm:hidden" : undefined}>
+          <ul
+            className="divide-rule mt-4 divide-y"
+            aria-labelledby="register-title"
+          >
+            {shown.map((r) => (
+              <li key={r.id}>
+                <Link
+                  href={r.href}
+                  className="hover:bg-mist -mx-2 flex min-h-14 flex-wrap items-center justify-between gap-3 rounded-md px-2 py-3 underline-offset-4"
+                  data-testid={`row-${r.id}`}
+                >
+                  {/* REQ-028 FR-12 (#87 run 1): the title keeps at least 12rem before the
                     tag drops under it, so a long status at 14 px never squeezes a title
                     word into breaking at 360 (the row inherits li's overflow-wrap). */}
-                <span className="min-w-0 flex-1 basis-48">
-                  <span className="block text-base font-medium">{r.title}</span>
-                  <span className="text-slate block text-sm">{r.detail}</span>
-                </span>
-                <span className="ml-auto flex shrink-0 items-center gap-2">
-                  <StatusTag status={r.status} />
-                  <span aria-hidden="true" className="text-slate">
-                    ›
+                  <span className="min-w-0 flex-1 basis-48">
+                    <span className="block text-base font-medium">
+                      {r.title}
+                    </span>
+                    <span className="text-slate block text-sm">{r.detail}</span>
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <span className="ml-auto flex shrink-0 items-center gap-2">
+                    <StatusTag status={r.status} />
+                    <span aria-hidden="true" className="text-slate">
+                      ›
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
+      {columns?.length && shown.length > 0 ? (
+        <div className="mt-4">
+          <RegisterTable
+            columns={columns}
+            rows={shown.map((r) => ({
+              id: r.id,
+              href: r.href,
+              title: r.title,
+              status: r.status,
+              cells: r.cells ?? [],
+            }))}
+            testId={`${testId}-table`}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
