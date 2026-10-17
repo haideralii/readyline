@@ -94,10 +94,15 @@ export function ResultStep({
     );
   }
   if (!current?.response) {
+    // REQ-028 AC-10 (D-2280): the view mounts on the client after the draft is read, so the loading state
+    // reserves a viewport's height and the footer starts below the fold; when the view arrives nothing
+    // visible moves (CLS 0.51 before, with the footer climbing into view and back down).
     return (
-      <p role="status" className="text-slate">
-        Working out which standards apply…
-      </p>
+      <div className="min-h-screen" aria-busy="true">
+        <p role="status" className="text-slate">
+          Working out which standards apply…
+        </p>
+      </div>
     );
   }
   const response = current.response;
@@ -362,7 +367,7 @@ function ResultView({
 
   return (
     <div
-      className="lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8"
+      className="min-h-screen lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8"
       data-testid="result"
     >
       {/* REQ-028 FR-6: columns 1 to 5 sticky (the card, then the glossary directly under it, D-2701); 6 to 12 the sections. */}
