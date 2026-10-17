@@ -55,31 +55,58 @@ export type SelfCheckResult =
 export async function finishSelfCheckAction(
   input: unknown,
 ): Promise<SelfCheckResult> {
+  // #105 run 4: every refusal names its gate in the server log (the gate word and the mode only,
+  // never an answer or a note), so a refused save in CI says which gate without the browser.
+  const refused = (
+    reason: string,
+    message: string,
+    mode?: string,
+  ): SelfCheckResult => {
+    log.warn("registers.self-check.refused", { reason, mode });
+    return { ok: false, message };
+  };
+  const sentMode =
+    typeof input === "object" && input !== null && "mode" in input
+      ? String((input as { mode?: unknown }).mode)
+      : undefined;
   const parsed = parseInput(Input, input);
   if (!parsed.ok)
-    return { ok: false, message: "Answer every question with yes or no." };
+    return refused("input", "Answer every question with yes or no.", sentMode);
   const rehearsal = parsed.data.mode === "rehearsal";
   const ids = rehearsal
     ? rehearsalRecordIds(parsed.data.variant)
     : selfCheckRecordIds();
   const answers = parsed.data.answers as SelfCheckAnswers;
   if (ids.some((id) => !answers[id]))
-    return { ok: false, message: "Answer every question with yes or no." };
+    return refused(
+      "answers",
+      "Answer every question with yes or no.",
+      parsed.data.mode,
+    );
   if (
     rehearsal &&
     (!parsed.data.periodFrom ||
       !parsed.data.periodTo ||
       parsed.data.periodFrom > parsed.data.periodTo)
   )
-    return { ok: false, message: "A rehearsal needs the period it reads." };
+    return refused(
+      "period",
+      "A rehearsal needs the period it reads.",
+      parsed.data.mode,
+    );
   const viewer = await getViewer();
   if (!viewer?.account || viewer.deleted)
-    return { ok: false, message: "Sign in to check your systems." };
+    return refused(
+      "viewer",
+      "Sign in to check your systems.",
+      parsed.data.mode,
+    );
   if (!(await checkRegisterWriteAllowed(viewer.user.id)))
-    return {
-      ok: false,
-      message: "Too many changes in a minute. Wait a moment and try again.",
-    };
+    return refused(
+      "rate-limit",
+      "Too many changes in a minute. Wait a moment and try again.",
+      parsed.data.mode,
+    );
   const supabase = await createSupabaseServerClient();
   const stored = Object.fromEntries(ids.map((id) => [id, answers[id]]));
   // #105 run 3: the rehearsal's save was seen busy past five seconds in CI with no error line; the
@@ -103,8 +130,15 @@ export async function finishSelfCheckAction(
       })
       .select("id")
       .single();
-    if (row.error)
+    if (row.error) {
+      log.warn("registers.self-check.refused", {
+        reason: "database",
+        mode: "rehearsal",
+        code: row.error.code,
+        accountId: viewer.account.id,
+      });
       return { ok: false, message: plainDatabaseMessage(row.error) };
+    }
     await supabase.from("audit_log").insert({
       account_id: viewer.account.id,
       actor_user_id: viewer.user.id,
@@ -131,8 +165,15 @@ export async function finishSelfCheckAction(
     })
     .select("id")
     .single();
-  if (walk.error)
+  if (walk.error) {
+    log.warn("registers.self-check.refused", {
+      reason: "database",
+      mode: "walk",
+      code: walk.error.code,
+      accountId: viewer.account.id,
+    });
     return { ok: false, message: plainDatabaseMessage(walk.error) };
+  }
   if (findings.length > 0) {
     const ins = await supabase
       .from("improvements")

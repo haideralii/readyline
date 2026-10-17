@@ -296,7 +296,11 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     await expect(done.or(page.getByRole("alert"))).toBeVisible({
       timeout: 30_000,
     });
-    await expect(page.getByRole("alert")).toHaveCount(0);
+    // A refused save shows its words in the alert; they go into the failure message here.
+    expect(
+      await page.getByRole("alert").allTextContents(),
+      "the save's own message",
+    ).toEqual([]);
     await expect(done).toBeVisible();
     await expect(done).toHaveAttribute("data-mode", "rehearsal");
     await expect(page.getByTestId("check-summary")).toContainText(

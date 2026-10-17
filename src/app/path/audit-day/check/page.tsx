@@ -58,8 +58,9 @@ export default async function CheckPage({
     documentControlForAccount(supabase, viewer.account.id),
     currentPeriod(supabase, viewer.account.id),
   ]);
-  // A rehearsal reads a period; without one the renewal path asks for the dates first.
-  if (mode === "rehearsal" && !period) redirect("/path/renewal");
+  // A rehearsal reads a period; without one the page says so in plain words (FR-8: a rehearsal
+  // can be opened at any time, so "no period" is a message, not a refusal; PO 18 Oct 09:05).
+  const noPeriod = mode === "rehearsal" && !period;
   const today = todaySydney();
   const variant: RehearsalVariant =
     period &&
@@ -116,18 +117,35 @@ export default async function CheckPage({
           ? "Check my systems: a rehearsal"
           : "Check my systems"}
       </h1>
-      <p className="text-ink mt-3 leading-7" data-testid="check-intro">
-        {mode === "rehearsal"
-          ? `One question per record, yes or no, read over the period since ${rehearsalPeriod ? rehearsalPeriod.from : "your last audit"}. Nothing goes to your improvement register; the walk ends with a dated working note of what is missing, in your own audit pack.`
-          : "One question per record, yes or no. Every no becomes a row in your improvement register with a date 30 days out. About ten minutes."}
-      </p>
-      <CheckWalk
-        records={records}
-        today={today}
-        mode={mode}
-        period={rehearsalPeriod}
-        variant={variant}
-      />
+      {noPeriod ? (
+        <>
+          <p className="text-ink mt-3 leading-7" data-testid="check-no-period">
+            A rehearsal reads the period since your last audit, so it needs your
+            registration dates first. Type them from your certificate on the
+            account page and come back; the quarterly walk works without them.
+          </p>
+          <p className="mt-4">
+            <Link href="/account#registration-heading" className="btn-primary">
+              Type your registration dates
+            </Link>
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="text-ink mt-3 leading-7" data-testid="check-intro">
+            {mode === "rehearsal"
+              ? `One question per record, yes or no, read over the period since ${rehearsalPeriod ? rehearsalPeriod.from : "your last audit"}. Nothing goes to your improvement register; the walk ends with a dated working note of what is missing, in your own audit pack.`
+              : "One question per record, yes or no. Every no becomes a row in your improvement register with a date 30 days out. About ten minutes."}
+          </p>
+          <CheckWalk
+            records={records}
+            today={today}
+            mode={mode}
+            period={rehearsalPeriod}
+            variant={variant}
+          />
+        </>
+      )}
     </PageShell>
   );
 }
