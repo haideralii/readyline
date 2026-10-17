@@ -276,14 +276,27 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     );
     await shot(page, "rehearsal-start", project);
     // One "no" with a code, then "yes" to the rest.
+    const total = Number(
+      (await page.getByTestId("check-progress").textContent())?.match(
+        /of (\d+)/,
+      )?.[1],
+    );
+    expect(total).toBeGreaterThan(1);
     await page.locator("#check-note").fill("Ref P-07 not filed");
     await page.getByTestId("check-no").click();
-    for (let i = 0; i < 40; i++) {
-      if (await page.getByTestId("check-done").isVisible()) break;
-      await expect(page.getByTestId("check-yes")).toBeEnabled();
+    for (let i = 2; i <= total; i += 1) {
+      await expect(page.getByTestId("check-progress")).toHaveText(
+        `${i} of ${total}`,
+      );
       await page.getByTestId("check-yes").click();
     }
+    // The last press saves; the button stays busy until the action answers, so wait for the
+    // done screen (or the action's own words, which then fail the test with their message).
     const done = page.getByTestId("check-done");
+    await expect(done.or(page.getByRole("alert"))).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByRole("alert")).toHaveCount(0);
     await expect(done).toBeVisible();
     await expect(done).toHaveAttribute("data-mode", "rehearsal");
     await expect(page.getByTestId("check-summary")).toContainText(

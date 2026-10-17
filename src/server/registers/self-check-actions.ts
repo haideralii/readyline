@@ -82,6 +82,9 @@ export async function finishSelfCheckAction(
     };
   const supabase = await createSupabaseServerClient();
   const stored = Object.fromEntries(ids.map((id) => [id, answers[id]]));
+  // #105 run 3: the rehearsal's save was seen busy past five seconds in CI with no error line; the
+  // save's own timing is logged (no answer, no note) so a slow or stalled save names itself.
+  const startedAt = Date.now();
   if (rehearsal) {
     // FR-8, D-2309: one dated sheet of what is missing; nothing in the improvement register, nothing on the trail.
     const missing = ids.filter((id) => answers[id].answer === "no").length;
@@ -107,6 +110,11 @@ export async function finishSelfCheckAction(
       actor_user_id: viewer.user.id,
       action: "self_check.rehearsed",
       target: `${row.data.id as string} ${missing}`,
+    });
+    log.info("registers.self-check.saved", {
+      accountId: viewer.account.id,
+      mode: "rehearsal",
+      ms: Date.now() - startedAt,
     });
     return { ok: true, findings: missing, id: row.data.id as string };
   }
@@ -157,6 +165,11 @@ export async function finishSelfCheckAction(
     actor_user_id: viewer.user.id,
     action: "self_check.completed",
     target: `${walk.data.id as string} ${findings.length}`,
+  });
+  log.info("registers.self-check.saved", {
+    accountId: viewer.account.id,
+    mode: "walk",
+    ms: Date.now() - startedAt,
   });
   return { ok: true, findings: findings.length, id: walk.data.id as string };
 }
