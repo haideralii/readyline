@@ -33,6 +33,10 @@ export function packStateWord(
  * s 18(3)(d) list it and it is not a name, so the pack and the auditor's
  * view carry it with the worker's code.
  */
+/** REQ-024 SR-1 (findings 31, 37, 165): what an auditor receives about a worker, said on the signed-out page. */
+export const AUDITOR_RECIPIENTS_LINE =
+  "Workers appear by code with their application number and check number; the pack carries no worker's name, date of birth or address.";
+
 export const PACK_HIDDEN_COLUMNS: readonly string[] = [
   "id",
   "account_id",

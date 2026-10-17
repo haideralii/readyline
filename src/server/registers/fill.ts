@@ -12,6 +12,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { log } from "@/lib/logging/logger";
 import {
   EXPORT_SCREEN_PATH,
+  FILL_PATHS,
   buildFillFile,
   type FillFile,
   type FillSubmission,
@@ -35,8 +36,10 @@ export function postedFromExportScreen(request: Request): boolean {
   if (referer !== null) {
     try {
       const r = new URL(referer);
-      if (r.origin !== origin || r.pathname !== EXPORT_SCREEN_PATH)
-        return false;
+      // The refused form posts again from the handler's own page (finding 76).
+      const fromScreen = r.pathname === EXPORT_SCREEN_PATH;
+      const fromRefusal = Object.values(FILL_PATHS).includes(r.pathname);
+      if (r.origin !== origin || !(fromScreen || fromRefusal)) return false;
     } catch {
       return false;
     }
