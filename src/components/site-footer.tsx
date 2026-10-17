@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isProductionDeployment } from "@/lib/env";
 import {
   AI_DISCLOSURE,
   BRAND,
@@ -47,6 +48,17 @@ export function SiteFooter() {
             ) : null}
           </ul>
         </nav>
+        {/* REQ-028 FR-15 (audit 57): under lg the badge sits here, never in the header's one row on a phone. */}
+        {isProductionDeployment() ? null : (
+          <p className="lg:hidden">
+            <span
+              className="border-line text-slate inline-flex rounded-full border px-2.5 py-0.5 text-sm whitespace-nowrap"
+              data-testid="dev-badge-footer"
+            >
+              In development
+            </span>
+          </p>
+        )}
         {/* Independence is stated once, in the trust line below (PO review of REQ-008). */}
         <p data-testid="site-disclaimer">{GENERAL_INFORMATION_STATEMENT}</p>
         <p data-testid="ai-disclosure">{AI_DISCLOSURE}</p>

@@ -88,7 +88,22 @@ export function RegisterList({
       </fieldset>
       {shown.length === 0 ? (
         <p className="text-slate mt-6" data-testid={`${testId}-empty`}>
-          {rows.length === 0 ? empty : "Nothing with that status."}
+          {rows.length === 0 ? (
+            empty
+          ) : (
+            <>
+              No matches. Try another word, or{" "}
+              <button
+                type="button"
+                className="underline underline-offset-2"
+                onClick={() => setFilter("all")}
+                data-testid={`${testId}-clear`}
+              >
+                clear the search
+              </button>{" "}
+              to see every entry.
+            </>
+          )}
         </p>
       ) : (
         <ul

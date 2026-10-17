@@ -156,6 +156,23 @@ export function RefField({
   );
 }
 
+/**
+ * REQ-028 FR-15 (audit 51): the participant-data reminder once at the top of
+ * a register form, where the per-field sentence used to repeat; the
+ * detector's live warning still sits under the field it concerns.
+ */
+export function RegisterParticipantLine() {
+  return (
+    <p
+      className="text-slate mt-4 text-sm leading-6"
+      data-testid="register-participant-line"
+    >
+      No participant names, dates of birth, NDIS numbers, addresses or health
+      details anywhere on this form. Use codes like P-014.
+    </p>
+  );
+}
+
 /** Free text with the participant-data detector (CLAUDE.md 4.5): warns under the field, never blocks. */
 export function SafeTextArea({
   id,
@@ -185,10 +202,7 @@ export function SafeTextArea({
     <Field
       id={id}
       label={optional ? `${label} (optional)` : label}
-      help={
-        help ??
-        "No participant names, dates of birth, NDIS numbers, addresses or health details. Use codes like P-014."
-      }
+      help={help}
       errors={errors}
     >
       {(describedBy, invalid) => (
@@ -214,7 +228,7 @@ export function SafeTextArea({
             <ul
               id={warnId}
               role="status"
-              className="mt-1 space-y-1 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
+              className="border-ochre bg-ochre-wash text-ink mt-1 space-y-1 rounded-md border p-4 text-sm"
               data-testid={`${id}-participant-warning`}
             >
               {warnings.map((w) => (
