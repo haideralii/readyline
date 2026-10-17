@@ -19,6 +19,7 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 import { parseInput, strictObject } from "@/lib/validation";
 import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
+import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -61,6 +62,8 @@ export async function saveChecklistItemAction(
   // REQ-023 FR-4: the dated audit items exist once a period does (finding 62).
   const period = checklistPeriod(
     await currentPeriod(supabase, viewer.account.id),
+    // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
+    await latestOwnershipChangeOn(supabase, viewer.account.id),
   );
   const checklist = deriveChecklist(
     built.result,

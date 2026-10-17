@@ -69,12 +69,13 @@ describe("record names", () => {
   });
 });
 
-describe("the thirteen records an auditor asks for (twelve of REQ-018 and the hazard register of REQ-020)", () => {
-  it("are thirteen, each a canonical record with the same name and page, the hazard register after the delegations", () => {
-    expect(AUDIT_DAY_RECORDS).toHaveLength(13);
+describe("the fourteen records an auditor asks for (twelve of REQ-018, the hazard register of REQ-020 and the changes register of REQ-023)", () => {
+  it("are fourteen, each a canonical record with the same name and page, the hazard register after the delegations and the changes register after it", () => {
+    expect(AUDIT_DAY_RECORDS).toHaveLength(14);
     const ids = AUDIT_DAY_RECORDS.map((r) => r.id);
-    expect(new Set(ids).size).toBe(13);
+    expect(new Set(ids).size).toBe(14);
     expect(ids[ids.indexOf("delegations") + 1]).toBe("hazards");
+    expect(ids[ids.indexOf("hazards") + 1]).toBe("commission-changes");
     for (const r of AUDIT_DAY_RECORDS) {
       const canonical = RECORD_NAMES.find((x) => x.id === r.id);
       expect(canonical, r.id).toBeDefined();
@@ -88,7 +89,7 @@ describe("the thirteen records an auditor asks for (twelve of REQ-018 and the ha
 
   it("the self-assessment list mirrors them in the same order, with the insurances line pointing at the register and the paper records marked", () => {
     const items = itemsToPrepareBeforeAudit();
-    expect(items).toHaveLength(13);
+    expect(items).toHaveLength(14);
     AUDIT_DAY_RECORDS.forEach((r, i) => {
       if (r.id === "insurances") {
         expect(items[i]).toMatch(/^Your insurances and vehicles register:/);
@@ -101,7 +102,7 @@ describe("the thirteen records an auditor asks for (twelve of REQ-018 and the ha
 });
 
 describe("the records in two tiers (batch 45, REQ-018-gated item; REQ-020 FR-7)", () => {
-  it("six are named by the standards or the Rules and seven are asked for in practice; two are kept on paper", () => {
+  it("six are named by the standards or the Rules and eight are asked for in practice; two are kept on paper", () => {
     const named = AUDIT_DAY_RECORDS.filter((r) => r.tier === "named").map(
       (r) => r.id,
     );
@@ -122,6 +123,8 @@ describe("the records in two tiers (batch 45, REQ-018-gated item; REQ-020 FR-7)"
       "conflicts-of-interest",
       "delegations",
       "hazards",
+      // REQ-023 FR-10 (Session D): the changes register, after the hazards.
+      "commission-changes",
       "improvements",
       "onboarding",
     ]);
@@ -135,10 +138,10 @@ describe("the records in two tiers (batch 45, REQ-018-gated item; REQ-020 FR-7)"
     );
   });
 
-  it("the tiered list holds the same thirteen lines as the flat one, each tier in the audit-day order, and the lookup answers by id", () => {
+  it("the tiered list holds the same fourteen lines as the flat one, each tier in the audit-day order, and the lookup answers by id", () => {
     const tiers = itemsToPrepareByTier();
     expect(tiers.named).toHaveLength(6);
-    expect(tiers.practice).toHaveLength(7);
+    expect(tiers.practice).toHaveLength(8);
     expect(new Set([...tiers.named, ...tiers.practice])).toEqual(
       new Set(itemsToPrepareBeforeAudit()),
     );

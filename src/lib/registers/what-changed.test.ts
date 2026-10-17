@@ -4,6 +4,7 @@ import {
   THIS_PERIOD_TITLE,
   WHAT_CHANGED_COLUMNS,
   WHAT_CHANGED_TITLE,
+  changesSummaryLine,
   whatChanged,
   whatChangedFileName,
   whatChangedRows,
@@ -257,5 +258,37 @@ describe("whatChanged (REQ-023 FR-6, AC-4)", () => {
     });
     expect(rows.filter((r) => r.section === "documents")).toHaveLength(3);
     expect(JSON.stringify(rows)).not.toMatch(/W-3|Title of d|Title of e/);
+  });
+
+  // REQ-023 Session D (FR-6's last line, FR-10): the changes notified and the variations applied for in the period.
+  it("counts the changes notified and the variations applied for in the period, with the register's link and the sheet's row", () => {
+    const withChanges = whatChanged({
+      ...fixture,
+      changes: [
+        { kind: "notification", notified_on: "2027-04-20", applied_on: null },
+        { kind: "notification", notified_on: "2027-01-10", applied_on: null },
+        { kind: "notification", notified_on: null, applied_on: null },
+        { kind: "variation", notified_on: null, applied_on: "2027-05-02" },
+        { kind: "variation", notified_on: null, applied_on: null },
+      ],
+    });
+    expect(withChanges.changes).toEqual({
+      notified: 1,
+      applied: 1,
+      href: "/registers/commission-changes",
+    });
+    expect(changesSummaryLine(withChanges)).toBe(
+      "1 change notified to the Commission; 1 variation applied for.",
+    );
+    expect(whatChangedRows(withChanges)).toContainEqual({
+      section: "commission-changes",
+      item: "Changes we told the Commission",
+      detail: "notified 1; variations applied for 1",
+      date: "",
+    });
+    // Without the register's rows the line reads zero, never absent.
+    expect(changesSummaryLine(w)).toBe(
+      "0 changes notified to the Commission; 0 variations applied for.",
+    );
   });
 });

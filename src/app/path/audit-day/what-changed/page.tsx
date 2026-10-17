@@ -9,10 +9,13 @@ import { periodShownLine } from "@/lib/registers/period";
 import { formatLongDate } from "@/lib/registers/status";
 import {
   WHAT_CHANGED_TITLE,
+  changesSummaryLine,
   whatChanged,
   whatChangedFileName,
   workerSummaryLine,
+  type WhatChangedChange,
 } from "@/lib/registers/what-changed";
+import { listAuditDayRows } from "@/server/registers/audit-day-queries";
 import { getViewer } from "@/server/accounts/queries";
 import {
   listComplaints,
@@ -77,11 +80,13 @@ export default async function WhatChangedPage() {
         to: null,
       }
     : { kind: "period" as const, from: period.period_starts_on, to: null };
-  const [incidents, complaints, checks, reviews] = await Promise.all([
+  const [incidents, complaints, checks, reviews, changes] = await Promise.all([
     listIncidents(supabase, accountId),
     listComplaints(supabase, accountId),
     listWorkerChecks(supabase, accountId),
     listPolicyReviews(supabase, accountId),
+    // FR-6's last line (Session D, FR-10): the changes register.
+    listAuditDayRows(supabase, accountId, "commission-changes"),
   ]);
   const w = whatChanged({
     period: summaryPeriod,
@@ -93,6 +98,7 @@ export default async function WhatChangedPage() {
     complaints,
     checks,
     reviews,
+    changes: changes as unknown as WhatChangedChange[],
     titleOf: (typeId, title) =>
       typeId === "other" ? title : documentTitle(typeId) || title || typeId,
   });
@@ -252,6 +258,26 @@ export default async function WhatChangedPage() {
             ))}
           </ul>
         ) : null}
+      </section>
+
+      {/* FR-6's last line (Session D, FR-10): what was told to the Commission and applied for in this period. */}
+      <section
+        aria-labelledby="wc-changes"
+        className="mt-8"
+        data-testid="what-changed-changes"
+      >
+        <h2 id="wc-changes" className="">
+          Changes we told the Commission
+        </h2>
+        <p
+          className="mt-2 text-sm leading-6"
+          data-testid="what-changed-changes-line"
+        >
+          {changesSummaryLine(w)}{" "}
+          <Link href={w.changes.href} className="underline underline-offset-4">
+            Open the changes register
+          </Link>
+        </p>
       </section>
 
       <p className="text-slate mt-10 text-sm">

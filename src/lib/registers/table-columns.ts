@@ -16,6 +16,10 @@ import {
   type ParticipantRiskRow,
   type StaffMatrixRow,
 } from "./audit-day-types";
+import {
+  CHANGE_TYPE_LABELS,
+  type CommissionChangeRow,
+} from "./commission-changes";
 import { CATEGORY_LABELS, CLEARANCE_LABELS } from "./labels";
 import { WORKER_ROLE_LABELS, type WorkerRole } from "./onboarding-items";
 import type {
@@ -461,6 +465,39 @@ export const ONBOARDING_COLUMNS: readonly ColumnSpec<OnboardingChecklistRow>[] =
 /** D-2814: one free-text line and a date make no grid; the record of decisions keeps the list at every width. */
 export const DECISION_COLUMNS: readonly ColumnSpec<DecisionRow>[] = [];
 
+/* ---------- Dev-2 block (D-2317): REQ-023 Session D, the changes register ---------- */
+
+/**
+ * REQ-023 FR-10 (D-2317, posted in CHAT-2 before the page was built): Ref is
+ * the row's own code, Type the fixed list's label, Happened the day it
+ * happened (for a variation, the day applied for), State the view's word.
+ * The kind is a filter chip above the table, not a column; the note and the
+ * Commission's reference stay on the entry's page.
+ */
+export const COMMISSION_CHANGE_COLUMNS: readonly ColumnSpec<CommissionChangeRow>[] =
+  [
+    {
+      label: "Ref",
+      kind: "code",
+      reads: ["reference"],
+      cell: (r) => r.reference,
+    },
+    {
+      label: "Type",
+      kind: "word",
+      reads: ["change_type"],
+      cell: (r) => CHANGE_TYPE_LABELS[r.change_type] ?? r.change_type,
+    },
+    {
+      label: "Happened",
+      kind: "date",
+      reads: ["kind", "happened_on", "applied_on"],
+      cell: (r) => (r.kind === "variation" ? r.applied_on : r.happened_on),
+      empty: "Not yet applied for",
+    },
+    status<CommissionChangeRow>(),
+  ];
+
 /** Every list, by the name the page or the meta uses; the unit test walks this. */
 export const ALL_COLUMN_LISTS: Record<string, readonly ColumnSpec<never>[]> = {
   incidents: INCIDENT_COLUMNS as readonly ColumnSpec<never>[],
@@ -477,6 +514,9 @@ export const ALL_COLUMN_LISTS: Record<string, readonly ColumnSpec<never>[]> = {
   decisions: DECISION_COLUMNS as readonly ColumnSpec<never>[],
   "staff-matrix": STAFF_MATRIX_COLUMNS as readonly ColumnSpec<never>[],
   onboarding: ONBOARDING_COLUMNS as readonly ColumnSpec<never>[],
+  // Dev-2 (REQ-023 Session D, D-2317).
+  "commission-changes":
+    COMMISSION_CHANGE_COLUMNS as readonly ColumnSpec<never>[],
 };
 
 /**

@@ -9,7 +9,7 @@
  */
 import { z } from "zod";
 import { detectParticipantData } from "@/lib/privacy/participant-data";
-import { CorporateRiskForm } from "./audit-day-forms";
+import { CommissionChangeForm, CorporateRiskForm } from "./audit-day-forms";
 import { ComplaintForm, IncidentForm, WorkerCheckForm } from "./forms";
 
 export const IMPORT_REGISTERS = [
@@ -17,6 +17,8 @@ export const IMPORT_REGISTERS = [
   "complaints",
   "worker_clearances",
   "corporate_risks",
+  // REQ-023 FR-10 (Session D).
+  "commission_changes",
 ] as const;
 export type ImportRegister = (typeof IMPORT_REGISTERS)[number];
 
@@ -26,6 +28,7 @@ export const IMPORT_SLUGS: Record<ImportRegister, string> = {
   complaints: "complaints",
   worker_clearances: "worker-checks",
   corporate_risks: "corporate-risks",
+  commission_changes: "commission-changes",
 };
 
 export const IMPORT_LIMITS = {
@@ -88,6 +91,21 @@ export const IMPORT_COLUMNS: Record<ImportRegister, readonly string[]> = {
     "owner_role",
     "review_on",
   ],
+  // REQ-023 FR-10: the register's own columns, less the code and the timestamps the system fills.
+  commission_changes: [
+    "kind",
+    "change_type",
+    "happened_on",
+    "aware_on",
+    "notified_on",
+    "channel",
+    "approved_form",
+    "applied_on",
+    "decided_on",
+    "effective_on",
+    "commission_reference",
+    "note",
+  ],
 };
 
 /** The free-text columns the detector reads (a name, a date of birth, an NDIS number or an address fails the row). */
@@ -96,6 +114,8 @@ const FREE_TEXT: Record<ImportRegister, readonly string[]> = {
   complaints: ["summary", "outcome"],
   worker_clearances: ["role_label", "note"],
   corporate_risks: ["what_could_happen", "controls", "owner_role"],
+  // REQ-023 SR-1: the refusal rule applies to both fields.
+  commission_changes: ["commission_reference", "note"],
 };
 
 /** The empty template: the header row only. */
@@ -227,6 +247,10 @@ function toFormValues(
         owner_role: s("owner_role"),
         review_on: s("review_on"),
       };
+    case "commission_changes":
+      return Object.fromEntries(
+        IMPORT_COLUMNS.commission_changes.map((c) => [c, s(c)]),
+      );
   }
 }
 
@@ -279,6 +303,8 @@ function toRow(
       };
     case "corporate_risks":
       return { ...v };
+    case "commission_changes":
+      return { ...v };
   }
 }
 
@@ -287,6 +313,7 @@ const SCHEMAS: Record<ImportRegister, z.ZodType> = {
   complaints: ComplaintForm,
   worker_clearances: WorkerCheckForm,
   corporate_risks: CorporateRiskForm,
+  commission_changes: CommissionChangeForm,
 };
 
 const LABEL_COLUMN: Record<ImportRegister, string> = {
@@ -294,6 +321,7 @@ const LABEL_COLUMN: Record<ImportRegister, string> = {
   complaints: "received_on",
   worker_clearances: "worker_ref",
   corporate_risks: "area",
+  commission_changes: "change_type",
 };
 
 /** The form field a CSV column maps to, for the reasons list. */
