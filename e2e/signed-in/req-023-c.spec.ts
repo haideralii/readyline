@@ -197,7 +197,8 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
     await expect(page.getByTestId("renewal-window-line")).toHaveCount(0);
     const form = page.getByTestId("renewal-form-application");
     await expect(form.locator("fieldset")).toBeEnabled();
-    await page.locator("#renewal-date").fill(sydney(-3));
+    // Finding 83, the other branch first: a date before the window opened does not count under s 73K.
+    await page.locator("#renewal-date").fill(sydney(-30));
     await checkWidths(page, "application form");
     await shot(page, "renewal-application", project);
     await page.getByTestId("renewal-save").click();
@@ -207,7 +208,18 @@ test.describe("the renewal path and the rehearsal (REQ-023 Session C)", () => {
       "done",
     );
     await expect(page.getByTestId("renewal-step-application")).toContainText(
-      "counts under NDIS Act s 73K",
+      "outside the six months before your period ends: NDIS Act s 73K keeps a registration in force only for an application made inside them.",
+    );
+    // Then the date inside the window: the page's s 73K sentence in plain words (FR-2's reading).
+    await page.goto("/path/renewal/application");
+    await expect(page.getByTestId("renewal-window-line")).toContainText(
+      "outside the six months",
+    );
+    await page.locator("#renewal-date").fill(sydney(-3));
+    await page.getByTestId("renewal-save").click();
+    await expect(page).toHaveURL(/\/path\/renewal\?saved=application$/);
+    await expect(page.getByTestId("renewal-step-application")).toContainText(
+      "inside the six months before your period ends (NDIS Act s 73K): your registration continues while the Commission decides.",
     );
     await expect(page.getByTestId("renewal-next")).toHaveText("Read it");
 
