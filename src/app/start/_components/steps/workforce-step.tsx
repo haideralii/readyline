@@ -105,16 +105,19 @@ export function WorkforceStepForm() {
     <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step (both with their `more`), above its first question. */}
-      <GlossaryTerms ids={STEP_TERMS} where="page" className="step-side mb-4" />
-      {soleTrader ? (
-        <p
-          className="step-side text-slate mb-6 text-sm leading-6"
-          data-testid="workforce-defaults-note"
-        >
-          You said you are a sole trader, so we have filled in the usual
-          answers. Change anything that is different for you.
-        </p>
-      ) : null}
+      {/* REQ-028 FR-5 (D-2276 (2)): the aside column as one sticky item from lg; a plain block under lg. */}
+      <div className="step-side-col">
+        <GlossaryTerms ids={STEP_TERMS} where="page" className="mb-4" />
+        {soleTrader ? (
+          <p
+            className="text-slate mb-6 text-sm leading-6"
+            data-testid="workforce-defaults-note"
+          >
+            You said you are a sole trader, so we have filled in the usual
+            answers. Change anything that is different for you.
+          </p>
+        ) : null}
+      </div>
       <Field
         id="workerCount"
         label={LABELS.workerCount}

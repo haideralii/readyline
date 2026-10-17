@@ -288,21 +288,34 @@ export function SupportsStepForm() {
       .filter(Boolean)
       .join(", ");
   })();
-  // REQ-028 FR-5 (audit 18; D-2721 amended): the glossary count comes from the step's data, every class of every
-  // heading whether open or closed, so it is the same at every width.
+  // REQ-027 FR-3, D-2711, D-2267: the glossary words on this step as it stands,
+  // found at render: the question and its help, the headings and their short
+  // descriptions, the classes an open heading shows (a closed one shows its
+  // ticked classes alone), and the SDA note when it is shown. REQ-028 FR-5
+  // asked for the count from the step's data instead; that lists a term whose
+  // only words sit in a closed heading, which REQ-027's presence check refuses
+  // (run 19:37), so the render-time count stands until the PO rules (D-2276).
+  const searching = Boolean(query.trim());
   const present = findGlossaryTerms(
     [
       GROUP_QUESTION,
       GROUPS_HELP,
       hintText,
-      ...CATEGORIES.flatMap((c) => [
-        c.title,
-        c.description,
-        ...groupsInCategory(groups, c.id).flatMap((g) => [
-          g.name,
-          g.description,
-        ]),
-      ]),
+      ...CATEGORIES.flatMap((c) => {
+        const items = byCategory.get(c.id) ?? [];
+        if (items.length === 0 && searching) return [];
+        const shown =
+          searching || isOpen(c.id)
+            ? items
+            : groupsInCategory(groups, c.id).filter((g) =>
+                current.includes(g.code),
+              );
+        return [
+          c.title,
+          c.description,
+          ...shown.flatMap((g) => [g.name, g.description]),
+        ];
+      }),
       ...(sdaOnly ? [SDA_ONLY_LEAD, SDA_ONLY_TEXT] : []),
     ].join("\n"),
   );
@@ -311,21 +324,71 @@ export function SupportsStepForm() {
     <form onSubmit={onSubmit} noValidate className="step-form">
       <ErrorSummary errors={errors} labels={LABELS} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first question. */}
-      {/* REQ-028 FR-5: the hint in full for the aside column from lg (hidden under lg, where the fieldset carries its one-line copy). */}
-      <div
-        className="step-side border-rule bg-mist mb-4 hidden rounded-md border p-4 text-sm leading-6 lg:block"
-        data-testid="aside-hint"
-      >
-        <p>{hintText}</p>
-        <button
-          type="button"
-          onClick={applyHint}
-          className="border-line hover:bg-surface mt-2 inline-flex min-h-11 items-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+      {/* REQ-028 FR-5 (D-2276 (2)): the aside column as one sticky item from lg; under lg a plain block in the
+          phone's own order (the glossary before the question, the hint's full copy and the landmark hidden). */}
+      <div className="step-side-col" data-testid="step-side-col">
+        {/* REQ-028 FR-5: the hint in full for the aside column from lg (hidden under lg, where the fieldset carries its one-line copy). */}
+        <div
+          className="border-rule bg-mist mb-4 hidden rounded-md border p-4 text-sm leading-6 lg:block"
+          data-testid="aside-hint"
         >
-          Choose those two for me
-        </button>
+          <p>{hintText}</p>
+          <button
+            type="button"
+            onClick={applyHint}
+            className="border-line hover:bg-surface mt-2 inline-flex min-h-11 items-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Choose those two for me
+          </button>
+        </div>
+        <GlossaryTerms ids={present} where="page" className="mb-4" />
+        {/* REQ-028 FR-5: the aside from lg, a landmark there only (hidden under lg; D-2276 (2)). */}
+        <aside
+          aria-label="Help for this step"
+          data-testid="step-aside"
+          className="hidden lg:block"
+        >
+          <section
+            aria-labelledby="ticked-so-far-heading"
+            className="border-rule rounded-md border p-4"
+            data-testid="aside-ticked"
+          >
+            <h2 id="ticked-so-far-heading" className="text-base">
+              Ticked so far ({current.length})
+            </h2>
+            {current.length === 0 ? (
+              <p className="text-slate mt-2 text-sm">Nothing chosen yet.</p>
+            ) : (
+              <>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {current.map((code) => (
+                    <li
+                      key={code}
+                      className="flex items-center justify-between gap-3"
+                    >
+                      <span className="min-w-0">{nameOf(code)}</span>
+                      <button
+                        type="button"
+                        onClick={() => toggle(code)}
+                        className="btn-secondary-sm shrink-0"
+                        aria-label={`Remove ${nameOf(code)}`}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <p
+                  className="text-slate mt-3 text-sm"
+                  data-testid="aside-ticked-count"
+                >
+                  {auditCounts}
+                </p>
+              </>
+            )}
+          </section>
+        </aside>
       </div>
-      <GlossaryTerms ids={present} where="page" className="step-side mb-4" />
 
       <fieldset
         className="mb-6"
@@ -473,52 +536,6 @@ export function SupportsStepForm() {
         ) : null}
       </fieldset>
 
-      {/* REQ-028 FR-5: the aside from lg, a landmark there only (hidden under lg; D-2276 (2)). */}
-      <aside
-        aria-label="Help for this step"
-        data-testid="step-aside"
-        className="step-side-sticky hidden lg:block"
-      >
-        <section
-          aria-labelledby="ticked-so-far-heading"
-          className="border-rule rounded-md border p-4"
-          data-testid="aside-ticked"
-        >
-          <h2 id="ticked-so-far-heading" className="text-base">
-            Ticked so far ({current.length})
-          </h2>
-          {current.length === 0 ? (
-            <p className="text-slate mt-2 text-sm">Nothing chosen yet.</p>
-          ) : (
-            <>
-              <ul className="mt-2 space-y-1 text-sm">
-                {current.map((code) => (
-                  <li
-                    key={code}
-                    className="flex items-center justify-between gap-3"
-                  >
-                    <span className="min-w-0">{nameOf(code)}</span>
-                    <button
-                      type="button"
-                      onClick={() => toggle(code)}
-                      className="btn-secondary-sm shrink-0"
-                      aria-label={`Remove ${nameOf(code)}`}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <p
-                className="text-slate mt-3 text-sm"
-                data-testid="aside-ticked-count"
-              >
-                {auditCounts}
-              </p>
-            </>
-          )}
-        </section>
-      </aside>
       {sdaOnly ? (
         <div className="border-rule bg-mist mb-6 rounded-md border p-4 text-sm leading-6">
           <strong>{SDA_ONLY_LEAD}</strong> {SDA_ONLY_TEXT}

@@ -562,10 +562,11 @@ th {
 
 /*
  * REQ-028 FR-5 (D-2276): from lg a questionnaire step's form is one grid. Its
- * children flow down the form's seven columns in their own order; the blocks
- * the aside holds (the glossary, the practices examples, the sole-trader
- * note) take columns 9 to 12 as they come, rendered once and in the phone's
- * own place under lg; the sticky aside spans the rest of the rows. Dense
+ * children flow down the form's seven columns in their own order; the aside
+ * column is one sticky item from row 1 holding the blocks the aside carries
+ * (the glossary, the sole-trader note, the hint's full copy and the
+ * landmark), rendered once and in the phone's own place under lg; a lone
+ * block such as the practices examples takes columns 9 to 12 as it comes. Dense
  * flow fills the form's column under a block the aside took.
  */
 @media (min-width: 1024px) {
@@ -583,9 +584,11 @@ th {
   .step-form > .step-side {
     grid-column: 9 / span 4;
   }
-  .step-form > .step-side-sticky {
+  /* The aside column as one item from row 1 (a step's fieldset is one tall row, so a second item in the column
+     would land under it): sticky, the viewport less 6 rem, its own scroll. */
+  .step-form > .step-side-col {
     grid-column: 9 / span 4;
-    grid-row: span 24;
+    grid-row: 1 / span 24;
     position: sticky;
     top: 6rem;
     align-self: start;
