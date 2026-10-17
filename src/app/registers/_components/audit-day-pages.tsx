@@ -142,6 +142,11 @@ export async function AuditDayListPage({
       canWrite={ctx.canWrite}
       addHref={`/registers/${slug}/new`}
       addLabel={meta.addLabel}
+      // REQ-024 FR-6b: the worker files and the two Rules lists, with the one-time fill.
+      exportHref={
+        slug === "staff-matrix" ? "/registers/staff-matrix/export" : undefined
+      }
+      exportLabel="Worker files and the two Rules lists"
       // REQ-020 FR-8: the corporate risk register takes a spreadsheet.
       importHref={
         slug === "corporate-risks"
