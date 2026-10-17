@@ -599,6 +599,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/components/open-on-large.tsx": null,
   // REQ-028 FR-8: the register table renders the columns its callers name.
   "src/components/register-table.tsx": null,
+  // REQ-028 FR-11: the "Jump to" nav renders its callers' headings only.
+  "src/components/jump-to.tsx": null,
   // REQ-028 FR-10 (D-2816): the pricing card renders the pricing page's words only.
   "src/app/pricing/pricing-card.tsx": "src/app/pricing/page.tsx",
   "src/lib/home-copy.ts": "src/app/page.tsx",

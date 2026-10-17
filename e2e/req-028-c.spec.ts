@@ -358,3 +358,92 @@ test.describe("REQ-028 Session C: home and pricing (FR-10, AC-8)", () => {
     }
   });
 });
+
+/**
+ * REQ-028 Session C, FR-11: the reading pages. A guide at 1280 has the
+ * shell's aside beside eight columns of prose, holding the "Jump to" nav,
+ * the reviewed line and the short answer, the nav marking the section in
+ * view after a jump and the aside staying put; at 360 the short answer
+ * comes first in the article, the inline "Jump to" follows it and there is
+ * no aside landmark. A legal page likewise with its updated line. QA F10:
+ * the registers guide's table regions take heading-based names and axe's
+ * landmark-unique is quiet. The account page's nav is the signed-in spec's.
+ */
+test.describe("REQ-028 Session C: the reading pages (FR-11)", () => {
+  test("a guide: the aside with Jump to, Last reviewed and the short answer at 1280, the current section marked; the short answer first and no aside at 360", async ({
+    page,
+  }) => {
+    await page.goto("/guides/which-ndis-audit");
+    const aside = page.getByRole("complementary");
+    if (large(page)) {
+      await expect(aside).toBeVisible();
+      await expect(page.getByTestId("aside-reviewed")).toContainText(
+        /Last reviewed/,
+      );
+      await expect(page.getByTestId("aside-short-answer")).toContainText(
+        "Short answer",
+      );
+      await expect(page.getByTestId("guide-jump-to")).toBeHidden();
+      const nav = aside.getByRole("navigation", { name: "Jump to" });
+      const links = nav.getByRole("link");
+      expect(await links.count()).toBeGreaterThan(2);
+      // Four columns beside the prose.
+      const shell = (await page.locator('[data-shell="page"]').boundingBox())!;
+      const col = (shell.width - 64 - 11 * 32) / 12;
+      const ab = (await aside.boundingBox())!;
+      const article = (await page.locator("article").boundingBox())!;
+      expect(Math.abs(ab.width - (4 * col + 3 * 32))).toBeLessThanOrEqual(4);
+      expect(ab.x).toBeGreaterThan(article.x + article.width);
+      // A jump marks its section current and the aside stays at 6 rem.
+      const second = links.nth(1);
+      const name = (await second.textContent())!.trim();
+      await second.click();
+      await expect(nav.getByRole("link", { name })).toHaveAttribute(
+        "aria-current",
+        "location",
+      );
+      await page.waitForFunction(() => window.scrollY > 200);
+      const stuck = (await aside.boundingBox())!;
+      expect(Math.abs(stuck.y - 96)).toBeLessThanOrEqual(2);
+    } else {
+      await expect(aside).toHaveCount(0);
+      const short = page.getByTestId("guide-short-answer");
+      await expect(short).toBeVisible();
+      await expect(page.getByTestId("guide-jump-to")).toBeVisible();
+      const sb = (await short.boundingBox())!;
+      const firstBodyH2 = (await page
+        .locator("article h2")
+        .nth(1)
+        .boundingBox())!;
+      expect(sb.y).toBeLessThan(firstBodyH2.y);
+    }
+  });
+
+  test("a legal page: the aside with Jump to and the updated line at 1280, none at 360; the registers guide's tables carry heading-based names (QA F10)", async ({
+    page,
+  }) => {
+    await page.goto("/terms");
+    const aside = page.getByRole("complementary");
+    if (large(page)) {
+      await expect(aside).toBeVisible();
+      await expect(page.getByTestId("aside-updated")).toContainText(
+        /^Last updated/,
+      );
+      const links = aside
+        .getByRole("navigation", { name: "Jump to" })
+        .getByRole("link");
+      expect(await links.count()).toBeGreaterThan(2);
+      await expect(links.first()).toHaveAttribute("href", /^#1-/);
+    } else {
+      await expect(aside).toHaveCount(0);
+      await expect(page.getByTestId("legal-updated")).toBeVisible();
+    }
+    await page.goto("/guides/registers-an-auditor-asks-for");
+    const names = await page
+      .locator('[data-testid="data-table"] [role="region"]')
+      .evaluateAll((els) => els.map((el) => el.getAttribute("aria-label")));
+    expect(names.length).toBeGreaterThan(1);
+    expect(new Set(names).size).toBe(names.length);
+    for (const n of names) expect(n).not.toMatch(/^Table: /);
+  });
+});
