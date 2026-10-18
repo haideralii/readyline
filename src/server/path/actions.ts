@@ -33,32 +33,61 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
   ADOPT_NEEDS_NAME,
-  ADOPT_NEEDS_NAME_HREF,
   ADOPT_NEEDS_NAME_LINK,
+  detailsHref,
   NOT_CURRENT_PACK,
 } from "@/lib/path/adopt-copy";
 import { latestReadySet } from "@/server/checklist/queries";
 import { loadFacts, saveFact } from "./facts";
+import { isFactValueAllowed } from "@/lib/generator/facts-fill";
+import {
+  DETAILS_CLEARED_ACTION,
+  DETAILS_REFUSED,
+  DETAILS_SAVED_ACTION,
+  DETAILS_SAVE_FAILED,
+  DETAILS_TOO_LONG,
+} from "@/lib/path/details-copy";
 import { loadQuestionnaire } from "./state";
 
 export type PathActionResult =
   | { ok: true; blanksLeft?: number; changed?: number }
   | { ok: false; message: string; href?: string; hrefLabel?: string };
 
+const FactKey = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
 const FactInput = strictObject({
-  key: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
+  key: FactKey,
   value: z.string().trim().min(1).max(200),
 });
+const ClearInput = strictObject({ key: FactKey });
+
+/** REQ-029 SR-3: the audit line carries the key, never the value. */
+async function auditDetail(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  accountId: string,
+  userId: string,
+  action: string,
+  key: string,
+) {
+  const audit = await supabase.from("audit_log").insert({
+    account_id: accountId,
+    actor_user_id: userId,
+    action,
+    target: key,
+  });
+  if (audit.error)
+    log.warn("audit.write.failed", { action, code: audit.error.code });
+}
 
 export async function saveFactAction(
   input: unknown,
 ): Promise<PathActionResult> {
+  // REQ-029 SR-6: square brackets and control characters are refused in
+  // words, so a value is never read as a blank; the length rule stays.
+  const raw = (input as { value?: unknown } | null)?.value;
+  if (typeof raw === "string" && !isFactValueAllowed(raw))
+    return { ok: false, message: DETAILS_REFUSED };
   const parsed = parseInput(FactInput, input);
-  if (!parsed.ok)
-    return {
-      ok: false,
-      message: "A few words are enough; up to 200 characters.",
-    };
+  if (!parsed.ok) return { ok: false, message: DETAILS_TOO_LONG };
   const viewer = await getViewer();
   if (!viewer?.account || viewer.deleted)
     return { ok: false, message: "Sign in to save your answers." };
@@ -74,11 +103,57 @@ export async function saveFactAction(
       accountId: viewer.account.id,
       code: r.code,
     });
-    return {
-      ok: false,
-      message: "We could not save that just now. Try again.",
-    };
+    return { ok: false, message: DETAILS_SAVE_FAILED };
   }
+  // The account form writes the role under both keys (D-1704); the details page keeps them in step.
+  if (parsed.data.key === "role")
+    await saveFact(
+      supabase,
+      viewer.account.id,
+      "owner-role",
+      parsed.data.value,
+    );
+  await auditDetail(
+    supabase,
+    viewer.account.id,
+    viewer.user.id,
+    DETAILS_SAVED_ACTION,
+    parsed.data.key,
+  );
+  return { ok: true };
+}
+
+/** REQ-029 FR-4: a cleared field deletes its row, so the blank shows again in every file. */
+export async function clearFactAction(
+  input: unknown,
+): Promise<PathActionResult> {
+  const parsed = parseInput(ClearInput, input);
+  if (!parsed.ok) return { ok: false, message: DETAILS_SAVE_FAILED };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to save your answers." };
+  const supabase = await createSupabaseServerClient();
+  const keys =
+    parsed.data.key === "role" ? ["role", "owner-role"] : [parsed.data.key];
+  const r = await supabase
+    .from("account_facts")
+    .delete()
+    .eq("account_id", viewer.account.id)
+    .in("key", keys);
+  if (r.error) {
+    log.warn("path.fact.clear-failed", {
+      accountId: viewer.account.id,
+      code: r.error.code,
+    });
+    return { ok: false, message: DETAILS_SAVE_FAILED };
+  }
+  await auditDetail(
+    supabase,
+    viewer.account.id,
+    viewer.user.id,
+    DETAILS_CLEARED_ACTION,
+    parsed.data.key,
+  );
   return { ok: true };
 }
 
@@ -186,7 +261,7 @@ export async function adoptGroupAction(
     return {
       ok: false,
       message: ADOPT_NEEDS_NAME,
-      href: ADOPT_NEEDS_NAME_HREF,
+      href: detailsHref(set.id),
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
 
@@ -338,7 +413,7 @@ export async function adoptDocumentVersionAction(
     return {
       ok: false,
       message: ADOPT_NEEDS_NAME,
-      href: ADOPT_NEEDS_NAME_HREF,
+      href: detailsHref(set.id),
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
   const admin = createSupabaseAdminClient();

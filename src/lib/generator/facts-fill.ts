@@ -289,6 +289,80 @@ export function openFormBlanks<T extends { blank: string }>(
   });
 }
 
+/** REQ-029 FR-1: the details page's order; a key the set uses that is not here follows in reading order. */
+export const DETAILS_ORDER: readonly string[] = [
+  "name",
+  "role",
+  "phone-or-email",
+  "state",
+  "period",
+  "location",
+  "notice-period",
+  "other-tool",
+  "allowed-use",
+  "limits",
+];
+
+/** D-2862, D-2879: "None" for the other tool fills the three AI-appendix keys with the house-style no-tool row. */
+export const NO_TOOL_FACTS: Readonly<Record<string, string>> = {
+  "other-tool": "No other digital tool",
+  "allowed-use": "Not applicable",
+  limits: "If we start using one, we add it to this table first",
+};
+
+/** The four free-text keys the detector's name part runs on (SR-1, D-2860); the rest hold the owner's own details. */
+export const FREE_TEXT_FACT_KEYS: ReadonlySet<string> = new Set([
+  "other-tool",
+  "allowed-use",
+  "limits",
+  "location",
+]);
+
+/** SR-6: a value may not carry square brackets or control characters, so it is never read as a blank. */
+export const FACT_VALUE_FORBIDDEN = /[[\]\u0000-\u001f\u007f]/;
+export function isFactValueAllowed(value: string): boolean {
+  return !FACT_VALUE_FORBIDDEN.test(value);
+}
+
+function questionForKey(key: string): FactQuestion {
+  const inner = key.replace(/-/g, " ");
+  const known = KNOWN[inner];
+  return {
+    key,
+    blank: `[${inner}]`,
+    question:
+      known?.question ?? `What goes where the documents say [${inner}]?`,
+    example: known?.example ?? "A few words are enough.",
+    topic: known?.topic ?? "other",
+    kind: known?.kind ?? "text",
+  };
+}
+
+/**
+ * REQ-029 FR-1 (D-2854): the details page's questions, every fact key the
+ * set's blanks use, once each, in `DETAILS_ORDER` then reading order; the
+ * approver's name and role always (adoption needs them, FR-5); never the
+ * date, which is the adoption day, and never the owner-role mirror.
+ */
+export function detailsQuestionsFor(
+  blanks: readonly DocumentBlank[],
+): FactQuestion[] {
+  const byKey = new Map<string, FactQuestion>();
+  for (const q of questionsFor(blanks))
+    if (q.key !== "date" && q.key !== "owner-role") byKey.set(q.key, q);
+  for (const key of ["name", "role"])
+    if (!byKey.has(key)) byKey.set(key, questionForKey(key));
+  const ordered: FactQuestion[] = [];
+  for (const key of DETAILS_ORDER) {
+    const q = byKey.get(key);
+    if (q) {
+      ordered.push(q);
+      byKey.delete(key);
+    }
+  }
+  return [...ordered, ...byKey.values()];
+}
+
 function fillBlock(
   block: Block,
   facts: Readonly<Record<string, string>>,

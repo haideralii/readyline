@@ -16,6 +16,8 @@ import {
   questionsFor,
   remainingBlanks,
   applyLiveFacts,
+  detailsQuestionsFor,
+  isFactValueAllowed,
   liveFacts,
   openFormBlanks,
 } from "./facts-fill";
@@ -244,5 +246,54 @@ describe("REQ-029: the live fill, the participant rule and the fact-aware count 
         "other-tool": "None",
       }),
     ).toEqual([]);
+  });
+});
+
+describe("REQ-029 FR-1, SR-6: the details page's questions and the value rule", () => {
+  it("asks every key the set uses once, name and role first and always, never the date, in FR-1's order then reading order", () => {
+    const blanks = [
+      "[period]",
+      "[phone or email]",
+      "[name]",
+      "[date]",
+      "[other tool]",
+      "[allowed use]",
+      "[limits]",
+      "[role]",
+      "[owner role]",
+      "[fax number]",
+      "[phone or email]",
+    ].map((blank) => ({
+      typeId: "x",
+      title: "x",
+      sectionNumber: "1",
+      sectionHeading: "h",
+      blank,
+    }));
+    expect(detailsQuestionsFor(blanks).map((q) => q.key)).toEqual([
+      "name",
+      "role",
+      "phone-or-email",
+      "period",
+      "other-tool",
+      "allowed-use",
+      "limits",
+      "fax-number",
+    ]);
+    // A set with no name or role blank still asks for the approver (FR-5).
+    expect(detailsQuestionsFor([]).map((q) => q.key)).toEqual(["name", "role"]);
+  });
+
+  it("refuses square brackets and control characters, so a value is never read as a blank", () => {
+    expect(isFactValueAllowed("Jane Citizen")).toBe(true);
+    expect(isFactValueAllowed("0400 000 000")).toBe(true);
+    expect(isFactValueAllowed("[name]")).toBe(false);
+    expect(isFactValueAllowed("Jane ] Citizen")).toBe(false);
+    expect(isFactValueAllowed("line" + String.fromCharCode(10) + "break")).toBe(
+      false,
+    );
+    expect(isFactValueAllowed("tab" + String.fromCharCode(9) + "here")).toBe(
+      false,
+    );
   });
 });

@@ -180,6 +180,8 @@ const COPY_MODULES = [
   "src/app/start/_components/steps/result-copy.ts",
   // REQ-023 Session C: the renewal path's step titles, states, actions and the Commission's practice lines.
   "src/lib/path/renewal.ts",
+  // REQ-029 FR-12: the "Your details" page's words.
+  "src/lib/path/details-copy.ts",
   // D-2849 (PO acceptance read, 18 Oct 2026 (4)): every module whose strings a customer reads joins the lint.
   // REQ-023 B, C and D: the period selector's words, the "what changed" sheet, the changes register, the self-check.
   "src/lib/registers/period.ts",
@@ -643,6 +645,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
     "src/app/start/_components/steps/result-step.tsx",
   // REQ-023 Session C: rendered on the signed-in renewal path, outside D-2710's list.
   "src/lib/path/renewal.ts": null,
+  // REQ-029: rendered on the signed-in details page.
+  "src/lib/path/details-copy.ts": null,
   // D-2849: the eight modules render on signed-in pages or in email, outside D-2710's list.
   "src/lib/registers/period.ts": null,
   "src/lib/registers/what-changed.ts": null,

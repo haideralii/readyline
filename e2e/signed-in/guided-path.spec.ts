@@ -190,7 +190,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     );
     await page.goto("/documents");
 
-    // Step 4: finish your pack, one question at a time on a phone, grouped on desktop.
+    // Step 4: "Your details" (REQ-029 FR-1): one page, every fact once, saved as each field loses focus.
     await expectStep(page, "finish");
     await page.getByTestId("next-step-button").click();
     await expect(page).toHaveURL(/\/documents\/[0-9a-f-]{36}\/finish$/);
@@ -198,9 +198,8 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await checkWidths(page, "finish your pack");
     await pagePass(page, "finish your pack");
     await shot(page, "finish-pack", project);
-    // The owner's name, role and the approval date are account facts (D-541
-    // as amended, batch 37), so the form never asks for them; the keys stay
-    // here only so an older page would still be answered.
+    // REQ-029 FR-1: the name and the role are asked here (and on the account
+    // page, the same rows); the approval date is never asked (D-2854).
     const answersByKey: Record<string, string> = {
       name: "Jane Citizen",
       role: "Owner",
