@@ -7,6 +7,7 @@ import {
 import {
   ErrorSummary,
   Field,
+  TextInput,
   errorsFor,
   type FieldErrors,
 } from "../start/_components/fields";
@@ -61,10 +62,10 @@ export function SignInForm({ next }: { next?: string }) {
         errors={errorsFor(errors, "email")}
       >
         {(describedBy, invalid) => (
-          // QA live b340ee3 (report B): an email field, so a phone opens the email keyboard. The
-          // shared TextInput is text-only (fields.tsx, Dev-1's this round), so this is the same
-          // control with its own type; the form stays noValidate, so the server's words answer.
-          <input
+          // QA live b340ee3 (report B; PO 12:08): an email field, so a phone opens the email keyboard,
+          // on the shared control now that TextInput takes a type; the form stays noValidate, so the
+          // server's words answer.
+          <TextInput
             id="email"
             name="email"
             type="email"
@@ -72,10 +73,9 @@ export function SignInForm({ next }: { next?: string }) {
             autoComplete="email"
             maxLength={254}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-describedby={describedBy}
-            aria-invalid={invalid || undefined}
-            className={`border-line bg-surface text-ink block min-h-12 w-full rounded-md border px-3 py-2 text-base shadow-sm ${invalid ? "border-red-700 dark:border-red-400" : ""}`}
+            onChange={setEmail}
+            describedBy={describedBy}
+            invalid={invalid}
           />
         )}
       </Field>
