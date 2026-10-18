@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   requestMagicLink,
   type RequestMagicLinkResponse,
@@ -11,7 +11,15 @@ import {
   type FieldErrors,
 } from "../start/_components/fields";
 
+const noop = () => () => {};
+
 export function SignInForm({ next }: { next?: string }) {
+  // D-2853: false in the first HTML and until React is live, true after (D-1012's pattern).
+  const live = useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [done, setDone] = useState<RequestMagicLinkResponse | null>(null);
@@ -55,33 +63,41 @@ export function SignInForm({ next }: { next?: string }) {
         errors={errors}
         labels={{ email: "Email", form: "Sign-in" }}
       />
-      <Field
-        id="email"
-        label="Email address"
-        errors={errorsFor(errors, "email")}
+      {/* D-2853 (QA live b340ee3, batch C): inert until hydrated (D-1012's rule), so a person typing on a
+          phone before React is live loses nothing; WebKit took the typing and hydration emptied it. */}
+      <fieldset
+        disabled={!live}
+        className="min-w-0 border-0 p-0"
+        data-testid="sign-in-fields"
       >
-        {(describedBy, invalid) => (
-          // QA live b340ee3 (report B): an email field, so a phone opens the email keyboard. The
-          // shared TextInput is text-only (fields.tsx, Dev-1's this round), so this is the same
-          // control with its own type; the form stays noValidate, so the server's words answer.
-          <input
-            id="email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            maxLength={254}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-describedby={describedBy}
-            aria-invalid={invalid || undefined}
-            className={`border-line bg-surface text-ink block min-h-12 w-full rounded-md border px-3 py-2 text-base shadow-sm ${invalid ? "border-red-700 dark:border-red-400" : ""}`}
-          />
-        )}
-      </Field>
-      <button type="submit" disabled={busy} className="btn-primary">
-        {busy ? "Sending…" : "Email me a sign-in link"}
-      </button>
+        <Field
+          id="email"
+          label="Email address"
+          errors={errorsFor(errors, "email")}
+        >
+          {(describedBy, invalid) => (
+            // QA live b340ee3 (report B): an email field, so a phone opens the email keyboard. The
+            // shared TextInput is text-only (fields.tsx, Dev-1's this round), so this is the same
+            // control with its own type; the form stays noValidate, so the server's words answer.
+            <input
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={254}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-describedby={describedBy}
+              aria-invalid={invalid || undefined}
+              className={`border-line bg-surface text-ink block min-h-12 w-full rounded-md border px-3 py-2 text-base shadow-sm ${invalid ? "border-red-700 dark:border-red-400" : ""}`}
+            />
+          )}
+        </Field>
+        <button type="submit" disabled={busy} className="btn-primary">
+          {busy ? "Sending…" : "Email me a sign-in link"}
+        </button>
+      </fieldset>
     </form>
   );
 }
