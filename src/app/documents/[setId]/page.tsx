@@ -6,8 +6,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
+import {
+  DETAILS_BEFORE_DOWNLOAD,
+  DETAILS_PAGE_LINK,
+} from "@/lib/path/details-copy";
 import { collectBlanks } from "@/lib/generator/blanks";
-import { formBlanks } from "@/lib/generator/facts-fill";
+import { openFormBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
 import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { getViewer } from "@/server/accounts/queries";
@@ -15,6 +19,7 @@ import {
   getVersionSet,
   listLatestDocuments,
 } from "@/server/generation/queries";
+import { loadFacts } from "@/server/path/facts";
 import { isSetLocked } from "@/server/payments/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { DocumentsNotices } from "../notices";
@@ -70,8 +75,13 @@ export default async function DocumentSetPage({
   // one rule the form and the next-step strip use (`formBlanks`); the example
   // cells of a register template ([Owner], [Risk]) are the paper form's own,
   // and the owner's name, role and the approval date are account facts
-  // (D-1704), so none of them is a detail to fill in here.
-  const blanks = formBlanks(documents.flatMap((d) => collectBlanks(d.model)));
+  // (D-1704), so none of them is a detail to fill in here. REQ-029 FR-10
+  // (D-2855): the stored text keeps its brackets, so a blank is done when
+  // `account_facts` holds its key, the one rule the sheet and the strip read.
+  const blanks = openFormBlanks(
+    documents.flatMap((d) => collectBlanks(d.model)),
+    await loadFacts(supabase, viewer.account.id),
+  );
   // REQ-028 FR-7: the line under the zip button, the size from the stored object (D-2275 (4)).
   const zipLine = zipSizeLine(
     documents.length,
@@ -127,6 +137,21 @@ export default async function DocumentSetPage({
               Readiness summary (PDF)
             </a>
           </div>
+          {blanks.length > 0 ? (
+            <p
+              className="text-slate mt-2 text-sm leading-6"
+              data-testid="details-before-download"
+            >
+              {DETAILS_BEFORE_DOWNLOAD}{" "}
+              <Link
+                href={`/documents/${set.id}/finish`}
+                className="underline underline-offset-2"
+              >
+                {DETAILS_PAGE_LINK}
+              </Link>
+              .
+            </p>
+          ) : null}
           <p
             className="text-slate mt-2 text-sm lg:text-right"
             data-testid="zip-size-line"

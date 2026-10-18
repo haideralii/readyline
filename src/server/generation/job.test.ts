@@ -647,8 +647,8 @@ describe("budget loop (batch 32 item 2, D-1006)", () => {
   });
 });
 
-describe("account facts fill a later pack (REQ-017 FR-2, AC-2)", () => {
-  it("every blank the facts answer is filled before the document is rendered and stored", async () => {
+describe("account facts and the stored model (REQ-017 AC-2 as REQ-029 FR-2 reads it, D-2855)", () => {
+  it("the stored model and its .docx keep every bracket: the facts fill at read time, never into a version", async () => {
     const store = new MemoryStore();
     const backend = new MemoryBackend(store);
     backend.facts = {
@@ -672,12 +672,14 @@ describe("account facts fill a later pack (REQ-017 FR-2, AC-2)", () => {
       (d) => d.document_type_id === "governance-policy",
     )!;
     const text = JSON.stringify(governance.model);
-    expect(text).toContain("Jane Citizen, Owner");
-    expect(text).not.toMatch(/\[name\]|\[role\]|\[date\]/);
-    // The stored .docx carries the filled text too.
+    expect(text).not.toContain("Jane Citizen");
+    expect(text).toContain("[name], [role]");
+    expect(text).toContain("[date]");
+    // The stored .docx keeps the brackets too; the download fills them.
     const docx = store.objects.get(governance.storage_path)!;
     const xml = strFromU8(unzipSync(docx.bytes)["word/document.xml"]);
-    expect(xml).toContain("Jane Citizen");
+    expect(xml).not.toContain("Jane Citizen");
+    expect(xml).toContain("[name]");
     expect(store.sets[0].provider_input_section_count).toBeLessThan(
       governance.model.sections.length * store.documents.length,
     );
