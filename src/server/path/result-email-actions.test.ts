@@ -157,4 +157,22 @@ describe("sendResultEmailAction", () => {
     const line = logged.find((l) => l.event === "result-email.sent")!;
     expect(String(line.hashPrefix)).toMatch(/^[0-9a-f]{8}$/);
   });
+
+  it("AC-3: six sends from one connection to six addresses, and the sixth is refused with the connection's sentence", async () => {
+    let ipHits = 0;
+    refuse = (key) => key.startsWith("result-email-ip:") && ++ipHits > 5;
+    const results = [];
+    for (let i = 1; i <= 6; i += 1)
+      results.push(
+        await sendResultEmailAction({
+          email: `reader-${i}@example.test`,
+          answers,
+        }),
+      );
+    expect(results.slice(0, 5).every((r) => r.ok)).toBe(true);
+    expect(results[5]).toMatchObject({ ok: false, limited: true });
+    expect(results[5].message).toMatch(/connection|again/i);
+    expect(results[5].message).not.toMatch(/d/);
+    expect(sent).toHaveLength(5);
+  });
 });

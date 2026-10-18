@@ -49,6 +49,9 @@ export const HOME_COPY = {
   /** The /sample page's own lead (REQ-025 FR-12). */
   samplePageLead:
     "This is a real document from a recorded run, not a template. The sections marked in colour were drafted from a fictional sole trader's answers; the rest is fixed text every provider gets.",
+  /** REQ-031 FR-3 (D-2896): the line above the Start here sheet on /sample. */
+  sampleSheetLine:
+    "This is the sheet you get with your documents, shown for Sunrise Supports, a fictional sole trader.",
   trustHeading: "What you can count on",
   trust: [
     {

@@ -55,6 +55,16 @@ export type AccountExport = {
   registrationPeriods: Record<string, unknown>[];
   /** REQ-024 FR-6c: the worker tables, as stored, each a CSV in the zip. */
   workerTables: Record<WorkerExportTable, Record<string, unknown>[]>;
+  /** REQ-030 D-2898: the account's own facts that fill the documents. */
+  accountFacts: Record<string, unknown>[];
+  /** REQ-030 D-2898: the reviews of changed documents (REQ-024). */
+  documentChangeReviews: Record<string, unknown>[];
+  /** REQ-030 D-2898: the policies circulated to workers, by code and date. */
+  policyCirculations: Record<string, unknown>[];
+  /** REQ-030 D-2898: the purchase records the privacy page says we keep. */
+  purchases: Record<string, unknown>[];
+  subscriptions: Record<string, unknown>[];
+  entitlements: Record<string, unknown>[];
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -72,43 +82,94 @@ export async function buildAccountExport(
     .maybeSingle();
   if (account.error || !account.data) return null;
 
-  const [memberships, draft, checklist, audit, periods, ...workers] =
-    await Promise.all([
+  const [
+    memberships,
+    draft,
+    checklist,
+    audit,
+    periods,
+    facts,
+    changeReviews,
+    circulations,
+    purchases,
+    subscriptions,
+    entitlements,
+    ...workers
+  ] = await Promise.all([
+    supabase
+      .from("memberships")
+      .select("user_id, role, created_at")
+      .eq("account_id", accountId),
+    supabase
+      .from("questionnaire_drafts")
+      .select("answers, answers_version, current_step, updated_at")
+      .eq("account_id", accountId)
+      .maybeSingle(),
+    supabase
+      .from("checklist_items")
+      .select("item_id, status, note, updated_at")
+      .eq("account_id", accountId)
+      .order("item_id", { ascending: true }),
+    supabase
+      .from("audit_log")
+      .select("id, actor_user_id, action, target, at")
+      .eq("account_id", accountId)
+      .order("at", { ascending: true }),
+    // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
+    supabase
+      .from("registration_periods")
+      .select(
+        "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("period_starts_on", { ascending: true }),
+    // REQ-030 FR-5 (D-2898): the six tables the PO moved into the export,
+    // read with the owner's session under RLS like everything above;
+    // ids that only join rows on the server stay out.
+    supabase
+      .from("account_facts")
+      .select("key, value, created_at, updated_at")
+      .eq("account_id", accountId)
+      .order("key", { ascending: true }),
+    supabase
+      .from("document_change_reviews")
+      .select(
+        "document_type_id, change_id, reviewed_on, reviewer_ref, note, created_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("policy_circulations")
+      .select("document_type_id, circulated_on, worker_refs, how, created_at")
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("purchases")
+      .select(
+        "stripe_checkout_session_id, stripe_payment_intent_id, amount_cents, currency, status, receipt_url, created_at, refunded_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("subscriptions")
+      .select(
+        "stripe_subscription_id, status, current_period_end, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("entitlements")
+      .select("kind, assessment_id, granted_at, revoked_at")
+      .eq("account_id", accountId)
+      .order("granted_at", { ascending: true }),
+    ...WORKER_EXPORT_TABLES.map((table) =>
       supabase
-        .from("memberships")
-        .select("user_id, role, created_at")
-        .eq("account_id", accountId),
-      supabase
-        .from("questionnaire_drafts")
-        .select("answers, answers_version, current_step, updated_at")
+        .from(table)
+        .select("*")
         .eq("account_id", accountId)
-        .maybeSingle(),
-      supabase
-        .from("checklist_items")
-        .select("item_id, status, note, updated_at")
-        .eq("account_id", accountId)
-        .order("item_id", { ascending: true }),
-      supabase
-        .from("audit_log")
-        .select("id, actor_user_id, action, target, at")
-        .eq("account_id", accountId)
-        .order("at", { ascending: true }),
-      // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
-      supabase
-        .from("registration_periods")
-        .select(
-          "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
-        )
-        .eq("account_id", accountId)
-        .order("period_starts_on", { ascending: true }),
-      ...WORKER_EXPORT_TABLES.map((table) =>
-        supabase
-          .from(table)
-          .select("*")
-          .eq("account_id", accountId)
-          .order("created_at", { ascending: true }),
-      ),
-    ]);
+        .order("created_at", { ascending: true }),
+    ),
+  ]);
   // The items and ticks are keyed by their checklist; the export names the worker.
   const workerTables = Object.fromEntries(
     WORKER_EXPORT_TABLES.map((table, i) => [
@@ -138,6 +199,12 @@ export async function buildAccountExport(
     auditLog: audit.data ?? [],
     registrationPeriods: periods.data ?? [],
     workerTables,
+    accountFacts: facts.data ?? [],
+    documentChangeReviews: changeReviews.data ?? [],
+    policyCirculations: circulations.data ?? [],
+    purchases: purchases.data ?? [],
+    subscriptions: subscriptions.data ?? [],
+    entitlements: entitlements.data ?? [],
   };
 }
 
@@ -151,7 +218,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, document change reviews, policy circulations, purchases, subscriptions, entitlements and audit log as JSON.",
     "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",

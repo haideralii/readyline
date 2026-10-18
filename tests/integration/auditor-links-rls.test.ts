@@ -147,18 +147,21 @@ describe.skipIf(!enabled)("auditor links (REQ-020 SR-1, SR-2)", () => {
     });
     expect(unknown.error).toBeNull();
     expect(unknown.data).toEqual([]);
+    // Per run, not fixed: a fixed token left its hash on the stack, and the
+    // restore rehearsal brought it back into the unique column (#115 at 8f06a44).
+    const expiredToken = `old-${randomUUID()}`;
     const expired = await admin
       .from("auditor_links")
       .insert({
         account_id: a.accountId,
-        token_hash: hashAuditorToken("old"),
+        token_hash: hashAuditorToken(expiredToken),
         expires_at: inHours(-1),
       })
       .select("id")
       .single();
     expect(expired.error).toBeNull();
     const gone = await admin.rpc("auditor_link_lookup", {
-      p_token_hash: hashAuditorToken("old"),
+      p_token_hash: hashAuditorToken(expiredToken),
     });
     expect(gone.data).toEqual([]);
   });

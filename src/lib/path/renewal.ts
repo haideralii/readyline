@@ -12,6 +12,7 @@ import {
   renewalWindowOpens,
   type RegistrationPeriod,
 } from "@/lib/registers/timeline";
+import { sydneyDay } from "@/lib/metrics/counters";
 import { formatLongDate } from "@/lib/registers/status";
 
 export const RENEWAL_STEP_IDS = [
@@ -61,7 +62,30 @@ export type RenewalInput = {
   /** The newest rehearsal's day in this period, or null (FR-8). */
   rehearsedOn: string | null;
   today: string;
+  /** REQ-031 FR-5 (D-2890): the period's `what_changed_read_at`, or null before the page was opened. */
+  whatChangedReadAt: string | null;
+  /** REQ-031 FR-5: the newest `updated_at` among the rows the summary reads, or null with none. */
+  latestChangeAt: string | null;
 };
+
+/**
+ * REQ-031 FR-5 (D-2890): the what-changed step's words from the reading and
+ * the newest register change. The rows' own timestamps order them, not the
+ * days the owner typed, so a row written after the reading counts whatever
+ * day it is dated for (AC-10); the date shown is the reading's Sydney day.
+ */
+export function whatChangedReading(
+  readAt: string | null,
+  latestChangeAt: string | null,
+): { state: string; done: boolean } {
+  if (!readAt) return { state: "to read", done: false };
+  if (latestChangeAt && Date.parse(latestChangeAt) >= Date.parse(readAt))
+    return { state: "to read", done: false };
+  return {
+    state: `Read on ${formatLongDate(sydneyDay(new Date(readAt)))}`,
+    done: true,
+  };
+}
 
 /** The Commission's practice lines on the apply step (findings 88 and 89), the REQ's words. */
 export const APPLY_LINES = [
@@ -104,6 +128,10 @@ const notYet = (
 
 export function renewalSteps(input: RenewalInput): RenewalStep[] {
   const p = input.period;
+  const reading = whatChangedReading(
+    input.whatChangedReadAt,
+    input.latestChangeAt,
+  );
   const dates: RenewalStep = p
     ? {
         id: "dates",
@@ -129,10 +157,9 @@ export function renewalSteps(input: RenewalInput): RenewalStep[] {
       title: p?.last_audit_on
         ? "Read what changed since your last audit"
         : "Read what changed in this period",
-      state: "to read",
-      done: false,
+      ...reading,
       href: "/path/audit-day/what-changed",
-      action: "Read it",
+      action: reading.done ? "Read it again" : "Read it",
     },
     {
       id: "documents",

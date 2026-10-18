@@ -7,6 +7,7 @@ import {
   applicationWindowLine,
   renewalNext,
   renewalSteps,
+  whatChangedReading,
 } from "./renewal";
 
 /**
@@ -34,6 +35,8 @@ describe("the renewal path (FR-7, AC-5)", () => {
       period,
       documentsDue: 2,
       rehearsedOn: null,
+      whatChangedReadAt: null,
+      latestChangeAt: null,
       today: "2028-10-01",
     });
     expect(steps.map((s) => s.id)).toEqual([...RENEWAL_STEP_IDS]);
@@ -75,6 +78,8 @@ describe("the renewal path (FR-7, AC-5)", () => {
       },
       documentsDue: 0,
       rehearsedOn: "2028-09-20",
+      whatChangedReadAt: null,
+      latestChangeAt: null,
       today: "2028-11-10",
     });
     const byId = Object.fromEntries(steps.map((s) => [s.id, s]));
@@ -110,6 +115,8 @@ describe("the renewal path (FR-7, AC-5)", () => {
       period: null,
       documentsDue: 0,
       rehearsedOn: null,
+      whatChangedReadAt: null,
+      latestChangeAt: null,
       today: "2028-10-01",
     });
     expect(steps[0].state).toBe("not yet");
@@ -119,5 +126,40 @@ describe("the renewal path (FR-7, AC-5)", () => {
       "Lodge it under the same ABN; a new ABN is a new application (the Commission's renewal page).",
       "Finish the application within 60 days of starting it, or the portal deletes it (the Commission's apply page).",
     ]);
+  });
+
+  it("REQ-031 AC-10 (FR-5; D-2890): the what-changed step reads the reading against the newest register change", () => {
+    // No reading yet.
+    expect(whatChangedReading(null, null)).toEqual({
+      state: "to read",
+      done: false,
+    });
+    expect(whatChangedReading(null, "2028-10-01T02:00:00Z")).toEqual({
+      state: "to read",
+      done: false,
+    });
+    // Read after the newest change, or with no change at all: done, dated by the reading's Sydney day.
+    expect(
+      whatChangedReading("2028-10-01T23:30:00Z", "2028-09-30T05:00:00Z"),
+    ).toEqual({ state: "Read on 2 October 2028", done: true });
+    expect(whatChangedReading("2028-10-01T01:00:00Z", null).done).toBe(true);
+    // A row written after the reading, even the same day, makes it "to read" again.
+    expect(
+      whatChangedReading("2028-10-01T01:00:00Z", "2028-10-01T01:00:01Z"),
+    ).toEqual({ state: "to read", done: false });
+    // On the steps: the state, the done flag, the action's words and the next step.
+    const steps = renewalSteps({
+      period,
+      documentsDue: 0,
+      rehearsedOn: null,
+      today: "2028-10-02",
+      whatChangedReadAt: "2028-10-01T23:30:00Z",
+      latestChangeAt: "2028-09-30T05:00:00Z",
+    });
+    const step = steps.find((s) => s.id === "what-changed")!;
+    expect(step.state).toBe("Read on 2 October 2028");
+    expect(step.done).toBe(true);
+    expect(step.action).toBe("Read it again");
+    expect(renewalNext(steps).id).toBe("rehearsal");
   });
 });

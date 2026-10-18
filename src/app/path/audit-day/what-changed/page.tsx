@@ -26,6 +26,7 @@ import {
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { todaySydney } from "@/server/registers/worker-onboarding";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import { MarkWhatChangedRead } from "./mark-read";
 
 export const metadata: Metadata = { title: WHAT_CHANGED_TITLE };
 
@@ -115,6 +116,8 @@ export default async function WhatChangedPage() {
       <h1 className="" data-testid="what-changed-title">
         {w.title}
       </h1>
+      {/* REQ-031 FR-5 (D-2890): the reading is recorded once this page has rendered. */}
+      <MarkWhatChangedRead />
       {w.why ? (
         <p className="mt-3 leading-7" data-testid="what-changed-why">
           {w.why}
