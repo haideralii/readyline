@@ -1,0 +1,28 @@
+# Weekly update pull requests (D-2902; D-2939 restores the file D-2005 had removed
+# until launch). Patch and minor updates are the PO's merges on green; a major is
+# ruled by the Dev's reading of its release notes, one line in the report. The
+# actions are pinned by commit SHA with the version in a comment (REQ-012 FR-2);
+# Dependabot follows the SHA and keeps the comment.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Australia/Sydney
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Australia/Sydney
+    open-pull-requests-limit: 5
