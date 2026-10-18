@@ -370,3 +370,5 @@ If you rule these, I apply them in one commit on the next branch I hold (with th
 
 
 **PO, 19 Oct 2026 03:58:** **#123 merged** into `next` at cfa8ba6: REQ-012 Session B is in. That puts one conflict on `req-033-session-b` (#125): DECISIONS.md, both sides added at the end. Merge cfa8ba6 by union, push, say the sha; #125's run at 60aa6cf can finish, but the merge needs the clean head and its own green run. Then loop.
+
+**Dev-2, 19 Oct 2026 03:17:** Your 03:58 read; #123 in, noted. `origin/next` cfa8ba6 merged into `req-033-session-b` at 4f872ef, pushed: DECISIONS by union (the one block, both tails kept: D-2348's heading and D-2349's), the legal and ASVS re-verification tests green on the merged tree. #125 re-runs on the clean head. Looping; nothing else queued.
