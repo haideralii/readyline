@@ -121,8 +121,11 @@ const TEMPLATE_PATTERNS: readonly RegExp[] = [
  * Facts the account holds rather than the Finish your pack form (D-541 as
  * amended, batch 37): the owner's name and role come from the account page,
  * the approval date from the day a group is adopted. The form never asks
- * for them; the three fixed blanks in every document (approver, approval
- * date, change-log author) fill from these.
+ * for them. REQ-029 (D-2854, D-2855): the three fixed blanks in every
+ * document (approver, approval date, change-log author) and the
+ * responsibilities "[role]" fill from the adoption snapshot alone
+ * (`applyAdoption`), never from the live account; `date` is no longer
+ * written as a fact, and a row that exists is ignored.
  */
 export const ACCOUNT_FACT_KEYS: ReadonlySet<string> = new Set([
   "name",
@@ -203,15 +206,86 @@ export function questionsFor(blanks: readonly DocumentBlank[]): FactQuestion[] {
   return out;
 }
 
-/** Replaces every blank whose fact is known; the rest stay bracketed. */
+/** The blank a provider fills by hand per participant; a "[name]" in its sentence is the participant's representative, never the owner (REQ-029 FR-7). */
+const PARTICIPANT_REFERENCE = "[participant reference]";
+
+/** The sentence around `index` in `text`: from the last sentence end before it to the next one after it. */
+function sentenceAround(text: string, index: number): string {
+  const ends = /[.!?](?:\s|$)/g;
+  let start = 0;
+  let end = text.length;
+  for (const m of text.matchAll(ends)) {
+    const at = m.index + 1;
+    if (at <= index) start = at;
+    else {
+      end = at;
+      break;
+    }
+  }
+  return text.slice(start, end);
+}
+
+/**
+ * Replaces every blank whose fact is known; the rest stay bracketed.
+ * REQ-029 FR-7 (D-2855): a "[name]" that shares its sentence with
+ * "[participant reference]" names the participant's representative, so it
+ * is a Word blank and is never filled with the owner's name.
+ */
 export function fillText(
   text: string,
   facts: Readonly<Record<string, string>>,
 ): string {
-  return text.replace(BLANK, (blank) => {
+  const hasParticipant = text.includes(PARTICIPANT_REFERENCE);
+  return text.replace(BLANK, (blank, offset: number) => {
     const key = factKeyFor(blank);
+    if (
+      hasParticipant &&
+      key === "name" &&
+      sentenceAround(text, offset).includes(PARTICIPANT_REFERENCE)
+    )
+      return blank;
     const value = key ? facts[key] : undefined;
     return value && value.trim() ? value.trim() : blank;
+  });
+}
+
+/**
+ * REQ-029 FR-3(a), D-2855: the live fill from the account. The approver's
+ * name and role and the approval date are never filled from the live
+ * account (they are the adoption snapshot's, `applyAdoption`); every other
+ * saved fact (how workers reach the approver, the AI-appendix answers, the
+ * business facts) fills at read time.
+ */
+export function liveFacts(
+  facts: Readonly<Record<string, string>>,
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(facts))
+    if (!isAccountFactKey(key) && value.trim()) out[key] = value;
+  return out;
+}
+
+/** The model with the live facts filled and the snapshot's blanks left bracketed. */
+export function applyLiveFacts(
+  model: DocumentModel,
+  facts: Readonly<Record<string, string>>,
+): DocumentModel {
+  return applyFacts(model, liveFacts(facts));
+}
+
+/**
+ * REQ-029 FR-10: a form blank is open until `account_facts` holds its key.
+ * The stored model keeps its brackets from this REQ on, so the count the
+ * set page, the adopt gate and the strip share reads the facts, not the
+ * text. One entry per blank occurrence, as `formBlanks` gives them.
+ */
+export function openFormBlanks<T extends { blank: string }>(
+  blanks: readonly T[],
+  facts: Readonly<Record<string, string>>,
+): T[] {
+  return formBlanks(blanks).filter((b) => {
+    const key = formFactKeyFor(b.blank);
+    return !(key && facts[key]?.trim());
   });
 }
 

@@ -78,6 +78,8 @@ export async function documentControlForSet(
         version: d.version,
         created_at: d.created_at,
         adopted_on: d.adopted_on ?? null,
+        approver_name: d.approver_name ?? null,
+        approver_role: d.approver_role ?? null,
         older_adopted_on: olderByType.get(d.document_type_id) ?? null,
         version_id: d.id,
         sections: d.model.sections.map((s) => ({

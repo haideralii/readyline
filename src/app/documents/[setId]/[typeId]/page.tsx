@@ -17,6 +17,7 @@ import {
   listDocumentVersions,
 } from "@/server/generation/queries";
 import { isSetLocked } from "@/server/payments/queries";
+import { filledForRead, readFillInputs } from "@/server/generation/read-fill";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AdoptVersionButton } from "./adopt-version-button";
 import { RegenerateButton } from "./regenerate-button";
@@ -41,6 +42,13 @@ export default async function ReviewDocumentPage({
   if (versions.length === 0) notFound();
   const current = versions[0];
   const previous = versions[1] ?? null;
+  // REQ-029 FR-3 (D-2855): the page shows each version as a download renders
+  // it, filled at read time; the stored model is the template.
+  const fillInputs = await readFillInputs(supabase, viewer.account.id);
+  const shown = { ...current, model: filledForRead(current, fillInputs) };
+  const shownPrevious = previous
+    ? { ...previous, model: filledForRead(previous, fillInputs) }
+    : null;
   const changedSection = typeof sp.changed === "string" ? sp.changed : null;
   // REQ-024 A0 (D-2427, D-2436): adoption is per version. The newest adopted
   // version of this document in the set, if any, for the line and the
@@ -51,7 +59,7 @@ export default async function ReviewDocumentPage({
     {
       typeId,
       createdAt: current.created_at,
-      sections: current.model.sections.map((s) => ({
+      sections: shown.model.sections.map((s) => ({
         id: s.id,
         text: blocksToText(s.blocks),
       })),
@@ -93,7 +101,7 @@ export default async function ReviewDocumentPage({
           Sections
         </h2>
         <ol className="mt-1" data-testid="reader-toc">
-          {current.model.sections.map((s) => {
+          {shown.model.sections.map((s) => {
             const drafted = s.mode === "tailored" && s.status === "generated";
             return (
               <li key={s.id}>
@@ -131,7 +139,7 @@ export default async function ReviewDocumentPage({
           Back to the set
         </Link>
       </p>
-      <h1 className="mt-2">{current.model.title}</h1>
+      <h1 className="mt-2">{shown.model.title}</h1>
       <p className="text-slate mt-2 text-sm">
         Version {current.version} ·{" "}
         {current.status === "ready" ? "drafted" : "review needed"}
@@ -172,8 +180,8 @@ export default async function ReviewDocumentPage({
       ) : null}
 
       <ol className="mt-8 space-y-6">
-        {current.model.sections.map((s) => {
-          const prev = previous?.model.sections.find((p) => p.id === s.id);
+        {shown.model.sections.map((s) => {
+          const prev = shownPrevious?.model.sections.find((p) => p.id === s.id);
           const showDiff = changedSection === s.id && prev;
           const diff = showDiff
             ? diffLines(blocksToText(prev.blocks), blocksToText(s.blocks))

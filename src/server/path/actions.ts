@@ -171,16 +171,17 @@ export async function adoptGroupAction(
   // Batch 47 item 3 (D-2211): a document with a fact blank the Finish form can
   // still fill is not adopted; the signed copy's own marks (signature, date
   // reported) are not blanks here, so they never block adoption.
-  const open = openBlanks(docs);
+  const facts = await loadFacts(supabase, accountId);
+  const open = openBlanks(docs, facts);
   if (open > 0)
     return {
       ok: false,
       message: `Finish your pack first: ${open} ${open === 1 ? "blank is" : "blanks are"} still open.`,
     };
   // Retro finding 114 (D-2244): adoption is approval by a named person on a
-  // date, so it waits for the account's name fact; the register's "by whom"
-  // then carries it.
-  const facts = await loadFacts(supabase, accountId);
+  // date, so it waits for the account's name fact; REQ-029 D-2855: the
+  // function snapshots that name and role onto the version, and the
+  // register's "by whom" reads the snapshot.
   if (!facts.name?.trim())
     return {
       ok: false,
@@ -188,15 +189,6 @@ export async function adoptGroupAction(
       href: ADOPT_NEEDS_NAME_HREF,
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
-
-  // REQ-024 A0 (D-2437): the adoption day itself is written in Sydney by
-  // `adopt_document_version`; only the words for the date fact are made here.
-  const todayWords = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
 
   // The policy review register exists from the first adoption on (REQ-009
   // FR-7). Its rows are written with the admin client (D-1706): the table's
@@ -206,10 +198,8 @@ export async function adoptGroupAction(
   // proven to be the account's above, and the writes carry its id.
   const admin = createSupabaseAdminClient();
   await seedPolicyReviews(admin, accountId);
-  if (!facts.date) {
-    const r = await saveFact(supabase, accountId, "date", todayWords);
-    if (r.ok) facts.date = todayWords;
-  }
+  // REQ-029 D-2854: the approval date is never a fact; it is the version's
+  // `adopted_on`, written in Sydney by `adopt_document_version`.
 
   // QA pass F1 (17 Oct 2026, D-2269): the set must be the account's newest
   // ready set, the rule `adopt_document_version` holds, said here in plain
@@ -232,8 +222,9 @@ export async function adoptGroupAction(
   // read, as `adoptDocumentVersionAction` reads it; the checklist and the
   // circulation rows are written only once every document of the group is
   // adopted, so a refusal or a throw in the re-render leaves nothing ticked.
+  // REQ-029 D-2855: no re-render before the adoption; the stored model is
+  // the template, and the snapshot fills it at read time.
   const adoptedBefore = await listAdoptedDates(admin, accountId);
-  const out = await rerenderSetWithFacts({ admin, set, facts });
   const own = new Set(group.documents.map((d) => d.document_type_id));
   const notAdopted: string[] = [];
   for (const d of await listLatestDocuments(admin, set.id)) {
@@ -314,7 +305,8 @@ export async function adoptGroupAction(
     group: parsed.data.group,
     documents: group.documents.length,
   });
-  return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
+  // REQ-029 D-2855: no version moved; the gate above proved no blank is open.
+  return { ok: true, changed: 0, blanksLeft: 0 };
 }
 
 const ReadoptInput = strictObject({
