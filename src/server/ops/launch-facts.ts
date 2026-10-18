@@ -225,7 +225,13 @@ export async function gatherLaunchFacts(input: {
   }
 
   const jobs = {} as LaunchFacts["jobs"];
-  for (const job of ["purge", "generate", "reminders", "uptime"] as const)
+  for (const job of [
+    "purge",
+    "generate",
+    "reminders",
+    "uptime",
+    "backup",
+  ] as const)
     jobs[job] = await lastAuditAt(input.admin, jobRunAction(job));
 
   let legal: LaunchFacts["legal"] = [];

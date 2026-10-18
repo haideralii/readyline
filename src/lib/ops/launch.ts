@@ -80,6 +80,8 @@ export type LaunchFacts = {
     reminders: string | null;
     /** REQ-030 FR-3: the last `jobs.uptime.ran` row, written by /api/jobs/uptime from the kick job's check. */
     uptime: string | null;
+    /** REQ-030 FR-2: the last `jobs.backup.ran` row, inserted by backup.yml over the database URL. */
+    backup: string | null;
   };
   /** True when a platform admin has a verified authenticator; null when there is no platform admin. */
   adminTotpEnrolled: boolean | null;
@@ -91,6 +93,8 @@ export const LEGAL_FRESH_DAYS = 90;
 export const JOB_WINDOW_HOURS = 26;
 /** REQ-030 FR-6 (D-2867): the uptime check runs at the kick's cadence (thirty minutes now, hourly after D-059). */
 export const UPTIME_WINDOW_HOURS = 1.5;
+/** REQ-030 FR-6 (D-2866): the weekly backup, with a day's grace for a late Sunday run. */
+export const BACKUP_WINDOW_HOURS = 192;
 export const TEST_SEND_WINDOW_HOURS = 24;
 
 type Verdict = { state: LaunchState; sentence: string };
@@ -584,6 +588,20 @@ const RULES: Rule[] = [
         f,
         UPTIME_WINDOW_HOURS,
         "GitHub, Actions, the kick workflow (its uptime step; PROD_URL and CRON_SECRET)",
+      ),
+  },
+  {
+    // REQ-030 FR-6 (D-2866): the weekly encrypted backup's audit row, within eight days.
+    id: "job-backup",
+    group: "jobs",
+    name: "Backup within 8 days",
+    judge: (f) =>
+      jobRow(
+        "backup",
+        f.jobs.backup,
+        f,
+        BACKUP_WINDOW_HOURS,
+        "GitHub, Actions, the backup workflow (SUPABASE_DB_PASSWORD and BACKUP_PASSPHRASE as repository secrets)",
       ),
   },
   {

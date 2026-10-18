@@ -28,7 +28,13 @@ function facts(
     aboutNamesBusiness: null,
     stripe: { pack: null, registers: null, webhookEndpoint: null },
     email: { provider: "log-only", domainVerified: null, lastTestSendAt: null },
-    jobs: { purge: null, generate: null, reminders: null, uptime: null },
+    jobs: {
+      purge: null,
+      generate: null,
+      reminders: null,
+      uptime: null,
+      backup: null,
+    },
     adminTotpEnrolled: null,
     legal: [{ slug: "terms", updated: "2026-10-12" }],
     now: NOW,
@@ -64,6 +70,7 @@ const everythingSet = (): LaunchFacts =>
         generate: "2026-10-15T02:30:00Z",
         reminders: "2026-10-14T20:00:00Z",
         uptime: "2026-10-15T02:30:00Z",
+        backup: "2026-10-12T16:00:00Z",
       },
       adminTotpEnrolled: true,
     },
@@ -201,11 +208,29 @@ describe("launchRows (REQ-022 FR-1)", () => {
         generate: "2026-10-13T16:00:00Z",
         reminders: null,
         uptime: null,
+        backup: null,
       },
     });
     expect(byId(f)["job-purge"].state).toBe("set");
     expect(byId(f)["job-generate"].state).toBe("mismatched");
     expect(byId(f)["job-reminders"].state).toBe("unset");
+  });
+
+  it("REQ-030 FR-6, AC-5: the backup row is set at 7 days, mismatched at 9, unset with no row", () => {
+    const at = (daysAgo: number) =>
+      new Date(NOW.getTime() - daysAgo * 86_400_000).toISOString();
+    const jobs = { purge: null, generate: null, reminders: null, uptime: null };
+    expect(
+      byId(facts({ jobs: { ...jobs, backup: at(7) } }))["job-backup"].state,
+    ).toBe("set");
+    const late = byId(facts({ jobs: { ...jobs, backup: at(9) } }))[
+      "job-backup"
+    ];
+    expect(late.state).toBe("mismatched");
+    expect(late.sentence).toContain("backup workflow");
+    expect(
+      byId(facts({ jobs: { ...jobs, backup: null } }))["job-backup"].state,
+    ).toBe("unset");
   });
 
   it("REQ-030 FR-6: the uptime row has a 90-minute window and the error-reporting row reads SENTRY_DSN", () => {
@@ -216,6 +241,7 @@ describe("launchRows (REQ-022 FR-1)", () => {
         generate: null,
         reminders: null,
         uptime: "2026-10-15T02:00:00Z",
+        backup: null,
       },
     });
     expect(byId(inside)["job-uptime"].state).toBe("set");
@@ -225,6 +251,7 @@ describe("launchRows (REQ-022 FR-1)", () => {
         generate: null,
         reminders: null,
         uptime: "2026-10-15T01:00:00Z",
+        backup: null,
       },
     });
     expect(byId(late)["job-uptime"].state).toBe("mismatched");
