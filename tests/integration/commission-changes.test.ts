@@ -6,6 +6,7 @@
  * deleting. Skips without the variables.
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
@@ -291,10 +292,32 @@ describe.skipIf(!enabled)("the changes register (REQ-023 Session D)", () => {
       .delete()
       .eq("id", overdueId)
       .select("id");
-    // No delete policy and no delete grant: the owner's delete is refused or matches nothing.
-    expect(
-      ownerDelete.error !== null || (ownerDelete.data ?? []).length === 0,
-    ).toBe(true);
+    // No delete grant (D-2245): Postgres refuses the owner's delete at the grant, 42501, before any policy.
+    expect(ownerDelete.error?.code).toBe("42501");
+    // The grants read back as the other registers' tests read them (adoption-per-version.test.ts):
+    // authenticated holds select, insert and update, never delete; anon holds nothing.
+    const dbUrl = process.env.SUPABASE_DB_URL?.trim();
+    if (dbUrl) {
+      const read = (grantee: string) =>
+        execFileSync(
+          "psql",
+          [
+            dbUrl,
+            "-v",
+            "ON_ERROR_STOP=1",
+            "-At",
+            "-c",
+            `select privilege_type from information_schema.role_table_grants where grantee = '${grantee}' and table_schema = 'public' and table_name = 'commission_changes' order by 1`,
+          ],
+          { encoding: "utf8" },
+        )
+          .split(/\r?\n/)
+          .filter(Boolean);
+      expect(read("authenticated")).toEqual(["INSERT", "SELECT", "UPDATE"]);
+      expect(read("anon")).toEqual([]);
+    } else {
+      expect(process.env.CI, "SUPABASE_DB_URL is not set").toBeFalsy();
+    }
     const still = await admin
       .from("commission_changes")
       .select("id")
