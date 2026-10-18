@@ -49,6 +49,12 @@ export type DocumentControlInput = {
     circulated_on: string;
     worker_refs: string;
   }[];
+  /**
+   * REQ-029 D-2856: when the contact detail ("[phone or email]") was last
+   * saved, ISO; an adopted row whose contact changed after its adoption day
+   * reads "Contact details updated on <date>" and nothing else moves.
+   */
+  contactUpdatedAt?: string | null;
   /** The owner's role from the account facts (D-1704), or a plain default. */
   adoptedByRole: string | null;
   /** The owner's name from the account facts; adoption needs it (retro finding 114, D-2244), so "by whom" names a person. */
@@ -66,12 +72,34 @@ export function adoptedBy(input: {
   return name || role || "Owner";
 }
 
+/** The Sydney day of an ISO instant, YYYY-MM-DD. */
+function sydneyDayOf(iso: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+/** REQ-029 D-2856: the contact line's day, on an adopted row whose contact detail was saved after the adoption day. */
+export function contactUpdatedOn(
+  adoptedOn: string | null,
+  contactUpdatedAt: string | null | undefined,
+): string | null {
+  if (!adoptedOn || !contactUpdatedAt) return null;
+  const day = sydneyDayOf(contactUpdatedAt);
+  return day > adoptedOn ? day : null;
+}
+
 export type DocumentControlRow = {
   document_type_id: string;
   title: string;
   version: string;
   adopted_on: string | null;
   adopted_by: string;
+  /** REQ-029 D-2856: the Sydney day the contact detail was last saved, when that is after the adoption day; null otherwise. */
+  contact_updated_on?: string | null;
   next_review_on: string | null;
   /** The latest circulation at or after the document's current version, if any. */
   circulated: { on: string; workers: number } | null;
@@ -164,6 +192,7 @@ export function documentControlRows(
             adoptedByRole: d.approver_role ?? input.adoptedByRole,
           })
         : "",
+      contact_updated_on: contactUpdatedOn(adopted, input.contactUpdatedAt),
       next_review_on: nextReview,
       circulated: circulation
         ? {

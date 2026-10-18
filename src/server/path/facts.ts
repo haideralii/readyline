@@ -38,3 +38,18 @@ export async function saveFact(
     );
   return r.error ? { ok: false, code: r.error.code } : { ok: true };
 }
+
+/** REQ-029 D-2856: when a fact was last saved (ISO), or null when the account holds no row for the key. */
+export async function loadFactUpdatedAt(
+  supabase: SupabaseClient,
+  accountId: string,
+  key: string,
+): Promise<string | null> {
+  const r = await supabase
+    .from("account_facts")
+    .select("updated_at")
+    .eq("account_id", accountId)
+    .eq("key", key)
+    .maybeSingle();
+  return (r.data as { updated_at?: string } | null)?.updated_at ?? null;
+}

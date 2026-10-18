@@ -421,13 +421,16 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     ).toBeVisible();
     await expect(page.getByText("Jane Citizen")).toHaveCount(0);
 
-    // REQ-026 AC-2: the sheet renders after Finish; the adopt lines wait for
-    // step 5. REQ-029 Session B gives the sheet its one rule over the facts
-    // (the done count and the ticks are asserted there).
+    // REQ-026 AC-2, REQ-029 Session B (FR-10): after Finish every "Fill in" line
+    // reads done by the facts and the count says so; the adopt lines wait for step 5.
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
     await page.getByTestId("start-here-link").click();
-    await expect(page.getByTestId("start-here-counts")).toBeVisible();
+    await expect(page.getByTestId("start-here-counts")).toContainText(
+      /^All \d+ things to fill in are done\.$/,
+    );
+    for (const line of await page.getByTestId("sheet-fill").all())
+      await expect(line).toHaveAttribute("data-done", "true");
     await expect(page.getByTestId("sheet-adopt").first()).toHaveAttribute(
       "data-done",
       "false",

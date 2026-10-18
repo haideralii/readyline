@@ -44,6 +44,15 @@ export type SheetDocumentInput = {
 };
 
 export type StartHereInput = {
+  /**
+   * REQ-029 FR-10 (D-2861): the account's facts. With `templateSet` true a
+   * Fill in line is done when the facts hold its key, since the stored text
+   * keeps its brackets; the approver and date lines fill on adoption. With
+   * it false (a set made before REQ-029, whose text carries the values) a
+   * line is done when the blank is gone from the latest version (REQ-026 FR-4).
+   */
+  facts?: Readonly<Record<string, string>>;
+  templateSet?: boolean;
   tradingName: string;
   pathway: "verification" | "certification";
   result: Pick<QuestionnaireResult, "registers">;
@@ -61,6 +70,8 @@ export type FillLine = {
   /** "Section 2, Scope: [name]" */
   text: string;
   done: boolean;
+  /** REQ-029 FR-4: the words after an open line ("Fill this in on your details page", "Fills in when you adopt this document"); null when done. */
+  note: string | null;
 };
 
 export type SectionLine = { section: string; heading: string; text: string };
@@ -73,6 +84,8 @@ export type SheetDocument = {
   minutes: number;
   fillIn: FillLine[];
   fillInWord: FillLine[];
+  /** REQ-029 FR-4 (D-2854, D-2855): the approver and date blanks, which fill on adoption; empty on an older set whose text carries them. */
+  fillsOnAdoption: FillLine[];
   review: SectionLine[];
   makeYours: SectionLine[];
   /** "Read once: fixed text in sections 1, 3 to 5." or null when nothing is fixed. */
@@ -125,17 +138,49 @@ export function compressNumbers(numbers: readonly string[]): string {
 const sectionWord = (number: string, heading: string) =>
   number ? `Section ${number}, ${heading}` : heading;
 
-function fillLine(b: DocumentBlank, latest: DocumentBlank[]): FillLine {
-  const done = !latest.some(
-    (x) => x.sectionNumber === b.sectionNumber && x.blank === b.blank,
-  );
+function fillLine(
+  b: DocumentBlank,
+  latest: DocumentBlank[],
+  rule: { facts: Readonly<Record<string, string>>; templateSet: boolean },
+  note: string,
+): FillLine {
+  const key = formFactKeyFor(b.blank);
+  const done = rule.templateSet
+    ? Boolean(key && rule.facts[key]?.trim())
+    : !latest.some(
+        (x) => x.sectionNumber === b.sectionNumber && x.blank === b.blank,
+      );
   return {
     section: b.sectionNumber,
     heading: b.sectionHeading,
     blank: b.blank,
     text: `${sectionWord(b.sectionNumber, b.sectionHeading)}: ${b.blank}`,
     done,
+    note: done ? null : note,
   };
+}
+
+/** The approver's name and role and the approval date: account facts the adoption snapshot fills (D-2855). */
+function isAdoptionBlank(blank: string): boolean {
+  const key = factKeyFor(blank);
+  return key !== null && isAccountFactKey(key);
+}
+
+/**
+ * REQ-029 FR-9 (D-2861): a set made from this REQ on keeps its brackets, so
+ * its control table's Approver cell still reads "[name], [role]"; a set made
+ * before had the values written into its text. Read from the latest models.
+ */
+export function isTemplateSet(latest: readonly DocumentModel[]): boolean {
+  const cells = latest.flatMap((m) =>
+    m.sections
+      .filter((s) => s.id === "document-control")
+      .flatMap((s) => s.blocks)
+      .flatMap((b) => (b.type === "table" ? b.rows : []))
+      .filter((r) => r[0] === "Approver")
+      .map((r) => r[1] ?? ""),
+  );
+  return cells.length === 0 || cells.every((c) => c.includes("[name]"));
 }
 
 /** The blanks the app never sees: not a Finish-form fact and not an account fact (the signature and date lines, the register row templates). */
@@ -187,19 +232,42 @@ export function buildStartHere(input: StartHereInput): StartHereSheet {
   const docs = [...input.documents].sort(
     (a, b) => order.indexOf(a.typeId) - order.indexOf(b.typeId),
   );
+  const rule = {
+    facts: input.facts ?? {},
+    templateSet: input.templateSet ?? false,
+  };
   const documents: SheetDocument[] = docs.map((d, i) => {
     const originalBlanks = sheetBlanks(d.original);
     const latestBlanks = sheetBlanks(d.latest);
     const fillIn = dedupe(
       originalBlanks
         .filter((b) => formFactKeyFor(b.blank) !== null)
-        .map((b) => fillLine(b, latestBlanks)),
+        .map((b) => fillLine(b, latestBlanks, rule, c.fillOpenLine)),
     );
     const fillInWord = dedupe(
       originalBlanks
         .filter((b) => isWordBlank(b.blank))
-        .map((b) => ({ ...fillLine(b, latestBlanks), done: false })),
+        .map((b) => ({
+          ...fillLine(b, latestBlanks, rule, c.fillOpenLine),
+          done: false,
+          note: null,
+        })),
     );
+    // REQ-029 FR-4: the approver and date lines, once per blank, done on adoption.
+    const fillsOnAdoption = rule.templateSet
+      ? dedupe(
+          originalBlanks
+            .filter((b) => isAdoptionBlank(b.blank))
+            .map((b) => ({
+              section: "",
+              heading: "",
+              blank: b.blank,
+              text: `Approval line: ${b.blank}`,
+              done: d.adopted,
+              note: d.adopted ? null : c.fillAdoptionLine,
+            })),
+        )
+      : [];
     const fixed = d.latest.sections
       .filter((s) => s.number && s.status === "fixed")
       .map((s) => s.number);
@@ -211,6 +279,7 @@ export function buildStartHere(input: StartHereInput): StartHereSheet {
       minutes: c.estimatesMinutes[d.typeId] ?? c.defaultMinutes,
       fillIn,
       fillInWord,
+      fillsOnAdoption,
       review: sectionLines(d.latest, (s) => s.status === "generated"),
       makeYours: sectionLines(
         d.latest,
@@ -322,6 +391,16 @@ function section(
 }
 
 /** Every line of the sheet as the Word file prints them, a box before each line the provider ticks. */
+/** A Fill in line as printed: ticked when done, the note after an open one (REQ-029 FR-4). */
+export function fillInLine(l: FillLine): string {
+  return `${l.done ? TICK : BOX}Fill in: ${l.text}${l.note ? `. ${l.note}.` : ""}`;
+}
+
+/** An approver or date line as printed (REQ-029 FR-4): ticked once adopted. */
+export function adoptionFillLine(l: FillLine): string {
+  return `${l.done ? TICK : BOX}${l.text}${l.note ? `. ${l.note}.` : ""}`;
+}
+
 export function sheetLines(sheet: StartHereSheet): string[] {
   const out: string[] = [];
   const push = (s: string) => out.push(s);
@@ -334,7 +413,8 @@ export function sheetLines(sheet: StartHereSheet): string[] {
       `${d.n}. ${d.title} (about ${d.minutes} minutes; ${documentCountsLine(d)})`,
     );
     push(`Open: ${d.file}`);
-    d.fillIn.forEach((l) => push(`${BOX}Fill in: ${l.text}`));
+    d.fillIn.forEach((l) => push(fillInLine(l)));
+    d.fillsOnAdoption.forEach((l) => push(adoptionFillLine(l)));
     d.fillInWord.forEach((l) =>
       push(`${BOX}Fill in Word: ${l.text} (fill this in Word)`),
     );
@@ -387,7 +467,8 @@ export function startHereModel(
           type: "bullets",
           items: [
             `Open: ${d.file}`,
-            ...d.fillIn.map((l) => `${BOX}Fill in: ${l.text}`),
+            ...d.fillIn.map(fillInLine),
+            ...d.fillsOnAdoption.map(adoptionFillLine),
             ...d.fillInWord.map(
               (l) => `${BOX}Fill in Word: ${l.text} (fill this in Word)`,
             ),

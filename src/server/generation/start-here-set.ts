@@ -4,6 +4,7 @@ import "server-only";
  * rows read with the caller's client (RLS), then the pure builder.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { loadFacts } from "@/server/path/facts";
 import { listAdoptedTypeIds } from "@/server/path/state";
 import { hasActiveSubscription } from "@/server/registers/queries";
 import { listFirstDocuments, listLatestDocuments } from "./queries";
@@ -14,11 +15,12 @@ export async function startHereForSet(
   supabase: SupabaseClient,
   set: VersionSetRow,
 ): Promise<StartHereBuilt | null> {
-  const [first, latest, adopted, subscribed] = await Promise.all([
+  const [first, latest, adopted, subscribed, facts] = await Promise.all([
     listFirstDocuments(supabase, set.id),
     listLatestDocuments(supabase, set.id),
     listAdoptedTypeIds(supabase, set.account_id),
     hasActiveSubscription(supabase, set.account_id),
+    loadFacts(supabase, set.account_id),
   ]);
   return startHereFromRows({
     set,
@@ -27,5 +29,6 @@ export async function startHereForSet(
     adopted,
     subscribed,
     summaryVersion: "1",
+    facts,
   });
 }

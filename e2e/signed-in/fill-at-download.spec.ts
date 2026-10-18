@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
 import { readFileSync } from "node:fs";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import {
@@ -8,6 +9,7 @@ import {
   type DocumentModel,
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
+import { applyFacts } from "@/lib/generator/facts-fill";
 import { formatDateAu } from "@/lib/generator/fixed-text";
 import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import { sydneyDay } from "@/lib/metrics/counters";
@@ -76,6 +78,9 @@ test.describe("REQ-029 Session A: fill at download", () => {
   let tenant: TestTenant;
   let setId = "";
   let governanceV1 = "";
+  let complaintsV1 = "";
+  /** AC-9: a set made before this REQ, its text carrying the values, dated before the template set. */
+  let olderSetId = "";
   const today = sydneyDay();
 
   test.beforeAll(async ({}, testInfo) => {
@@ -140,7 +145,43 @@ test.describe("REQ-029 Session A: fill at download", () => {
         .single();
       if (ins.error) throw ins.error;
       if (typeId === GOVERNANCE) governanceV1 = ins.data.id as string;
+      if (typeId === COMPLAINTS) complaintsV1 = ins.data.id as string;
     }
+    // AC-9 (FR-9, D-2861): an older set whose governance policy carries "Jane Citizen" in its text.
+    const older = await admin
+      .from("version_sets")
+      .insert({
+        account_id: tenant.accountId,
+        created_by: tenant.userId,
+        answers_snapshot_hash: "req-029-e2e-older",
+        derived_result: c.result,
+        status: "ready",
+        document_count: 1,
+        fallback_section_count: 0,
+        generated_count: 0,
+        storage_prefix: "",
+        created_at: "2026-10-01T00:00:00Z",
+      })
+      .select("id")
+      .single();
+    if (older.error) throw older.error;
+    olderSetId = older.data.id as string;
+    const filled = applyFacts(model(GOVERNANCE), {
+      name: "Jane Citizen",
+      role: "Owner",
+      date: "1 October 2026",
+    });
+    const olderIns = await admin.from("document_versions").insert({
+      version_set_id: olderSetId,
+      account_id: tenant.accountId,
+      document_type_id: GOVERNANCE,
+      version: 1,
+      status: "ready",
+      storage_path: `${tenant.accountId}/${olderSetId}/${GOVERNANCE}.v1.docx`,
+      model: filled,
+      created_at: "2026-10-01T00:00:00Z",
+    });
+    if (olderIns.error) throw olderIns.error;
   });
 
   test.afterAll(async () => {
@@ -160,6 +201,8 @@ test.describe("REQ-029 Session A: fill at download", () => {
           .from("document_versions")
           .select("id, version, adopted_on, approver_name, approver_role")
           .eq("account_id", tenant.accountId)
+          // FR-7: the account also holds an older set (its version 1, filled); this counts the current set alone (#117's run).
+          .eq("version_set_id", setId)
           .eq("document_type_id", typeId)
           .order("version")
       ).data as {
@@ -353,5 +396,154 @@ test.describe("REQ-029 Session A: fill at download", () => {
       expect(await versions(COMPLAINTS)).toHaveLength(1);
       expect(await versions(GOVERNANCE)).toHaveLength(2);
     });
+  });
+  test("Session B, AC-7 and AC-9: the sheet's lines read the facts on the template set; the older set keeps its text and says so", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+
+    await test.step("AC-7: the sheet on screen, the open and done lines, the approver and date lines", async () => {
+      await page.goto(`/documents/${setId}/start-here`);
+      const fills = page.getByTestId("sheet-fill");
+      await expect(fills.first()).toBeVisible();
+      // The three appendix lines read done ("None" filled them in Session A), with no note after them.
+      const doneFill = page.locator(
+        '[data-testid="sheet-fill"][data-done="true"]',
+      );
+      await expect(doneFill.first()).toBeVisible();
+      await expect(doneFill.first()).not.toContainText(
+        "Fill this in on your details page",
+      );
+      const adoption = page.getByTestId("sheet-adoption");
+      await expect(adoption.first()).toBeVisible();
+      // The adopted governance policy's approver lines read done; a draft's say where they fill in.
+      const openAdoption = adoption.filter({
+        hasText: "Fills in when you adopt this document",
+      });
+      await expect(openAdoption.first()).toBeVisible();
+      const doneAdoption = page.locator(
+        '[data-testid="sheet-adoption"][data-done="true"]',
+      );
+      await expect(doneAdoption.first()).toBeVisible();
+      await expect(doneAdoption.first()).not.toContainText(
+        "Fills in when you adopt",
+      );
+      // The Word sheet carries the same lines.
+      const r = await page.request.get(
+        `/documents/${setId}/download?file=${START_HERE_FILE}`,
+      );
+      expect(r.status()).toBe(200);
+      // The renderer tints a bracketed blank in its own run, so the paragraphs' texts are joined
+      // before asserting, as the type downloads are (#117's AC-7, the cause of #112's AC-3).
+      const sheet = await docxText(
+        page,
+        setId,
+        START_HERE_FILE.replace(/\.docx$/, ""),
+      );
+      expect(sheet).toContain("Fills in when you adopt this document");
+      expect(sheet).toContain("Approval line: [date]");
+    });
+
+    await test.step("AC-9: the older set still downloads 'Jane Citizen' after the name changed, and its page says why", async () => {
+      await page.goto(`/documents/${setId}/finish`);
+      await expect(page.getByTestId("details-fields")).toBeEnabled();
+      await page.locator("#name").fill("Sam Worker");
+      await page.locator("#name").blur();
+      await expect(page.getByTestId("fact-name-status")).toHaveText("Saved");
+      const older = await docxText(page, olderSetId, GOVERNANCE);
+      expect(older).toContain("Jane Citizen, Owner");
+      expect(older).not.toContain("Sam Worker");
+      await page.goto(`/documents/${olderSetId}`);
+      await expect(page.getByTestId("set-older")).toContainText(
+        "filled before your details page existed",
+      );
+      await page.goto(`/documents/${setId}`);
+      await expect(page.getByTestId("set-older")).toHaveCount(0);
+      // Back to the name the rest of the journey used.
+      await page.goto(`/documents/${setId}/finish`);
+      await expect(page.getByTestId("details-fields")).toBeEnabled();
+      await page.locator("#name").fill("Jane Citizen");
+      await page.locator("#name").blur();
+      await expect(page.getByTestId("fact-name-status")).toHaveText("Saved");
+    });
+  });
+
+  test("Session B, AC-8: the auditor link's pack is one render, the same bytes twice; a new link carries the new number", async ({
+    page,
+    context,
+    browser,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+    const admin = tenant.admin;
+    // The complaints policy adopted, so the pack carries it with its contact line filled.
+    const r = await admin.rpc("adopt_document_version", {
+      p_account: tenant.accountId,
+      p_version: complaintsV1,
+    });
+    expect(r.error).toBeNull();
+    await page.goto(`/documents/${setId}/finish`);
+    await expect(page.getByTestId("details-fields")).toBeEnabled();
+    await page.locator("#phone-or-email").fill("0422 222 222");
+    await page.locator("#phone-or-email").blur();
+    await expect(page.getByTestId("fact-phone-or-email-status")).toHaveText(
+      "Saved",
+    );
+
+    const createLink = async () => {
+      await page.goto("/account");
+      await page.getByTestId("auditor-link-create").click();
+      const urlField = page.getByTestId("auditor-link-url");
+      await expect(urlField).toBeVisible();
+      return urlField.inputValue();
+    };
+    const packOf = async (url: string) => {
+      const auditor = await browser.newContext();
+      const res = await auditor.request.get(`${url}/audit-pack.zip`);
+      expect(res.status()).toBe(200);
+      const body = new Uint8Array(await res.body());
+      await auditor.close();
+      return body;
+    };
+    const complaintsIn = (zip: Uint8Array) =>
+      strFromU8(
+        unzipSync(unzipSync(zip)[`documents/${COMPLAINTS}.docx`])[
+          "word/document.xml"
+        ],
+      );
+
+    const first = await createLink();
+    const a = await packOf(first);
+    const files = Object.keys(unzipSync(a));
+    expect(files).toContain("cover-sheet.pdf");
+    expect(files).toContain(`documents/${COMPLAINTS}.docx`);
+    expect(complaintsIn(a)).toContain("0422 222 222");
+    const b = await packOf(first);
+    expect(Buffer.from(b).equals(Buffer.from(a))).toBe(true);
+
+    await page.goto(`/documents/${setId}/finish`);
+    await expect(page.getByTestId("details-fields")).toBeEnabled();
+    await page.locator("#phone-or-email").fill("0433 333 333");
+    await page.locator("#phone-or-email").blur();
+    await expect(page.getByTestId("fact-phone-or-email-status")).toHaveText(
+      "Saved",
+    );
+    const c = await packOf(first);
+    expect(Buffer.from(c).equals(Buffer.from(a))).toBe(true);
+    expect(complaintsIn(c)).toContain("0422 222 222");
+
+    // A new link replaces the first and is a new render with the new number; the first link is dead.
+    const second = await createLink();
+    expect(second).not.toBe(first);
+    const d = await packOf(second);
+    expect(complaintsIn(d)).toContain("0433 333 333");
+    expect(Buffer.from(d).equals(Buffer.from(a))).toBe(false);
+    const dead = await browser.newContext();
+    expect((await dead.request.get(`${first}/audit-pack.zip`)).status()).toBe(
+      404,
+    );
+    await dead.close();
   });
 });

@@ -38,12 +38,12 @@ describe("sentryOptions (REQ-030 FR-1)", () => {
 
 describe("scrubEvent (REQ-030 AC-2, SR-1)", () => {
   const event = {
-    message: "Mail to test@example.com failed with sk_test_abcdefghij12345678",
+    message: "Mail to test@example.com failed with sk_test_abcdefghij12345678", // gitleaks:allow
     exception: {
       values: [
         {
           type: "Error",
-          value: "token sk_test_abcdefghij12345678 for test@example.com",
+          value: "token sk_test_abcdefghij12345678 for test@example.com", // gitleaks:allow
         },
       ],
     },
@@ -58,7 +58,7 @@ describe("scrubEvent (REQ-030 AC-2, SR-1)", () => {
       url: "https://readyline.example/registers/incidents/8f1c2d3e-4b5a-4c6d-8e7f-9a0b1c2d3e4f?token=abc",
       method: "GET",
       headers: {
-        cookie: "sb-access-token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.sig",
+        cookie: "sb-access-token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.sig", // gitleaks:allow
         authorization: "Bearer abcdefghijklmnopqrstuvwxyz",
         "user-agent": "Mozilla/5.0",
         "content-type": "application/json",
