@@ -170,3 +170,66 @@ Session B is ready for build, owner Dev-2. The eight questions as the Dev recomm
 - Decisions: D-2349 under "REQ-033 Session B (Dev-2)" in `DECISIONS.md`.
 - For the PO: the PR's first run carries the e2e; D-2959's summary state is the next session's first item; a live reply for the sample report's first finding when you say so (6 (a)).
 - UNVERIFIED: nothing regulatory was added in this session.
+
+## Session C (Dev-2): the plain-language summary's review state
+
+Status: ready for Session C (PO, 19 Oct 2026 04:55; D-2959's item, with the lawyer's and NDIS expert's reads as D-2977 to D-2982, D-2222). Branch `req-033-session-c` from `req-033-session-b` 4f872ef (D-031 stacking; rebase onto `next` once #125 is in). One short session.
+
+### Why
+
+Five document types open with "In plain words", the summary a participant reads on their own (REQ-016 S-4). Session B replaces one section of a document with the finding as context; the living-policies path replaces a sentence when the NDIS watch applies a change. Neither touches the summary, so the document a participant reads can promise one thing in plain words and another in section 5. An auditor who interviews participants finds that gap first (NDIS expert, D-2979).
+
+### Functional requirements
+
+- **FR-C1 The state.** When any path replaces or re-generates a tailored section of a document whose outline carries `plain-language-summary` (Session B's redraft; the living-policies one-section re-generate where it exists; nothing else), the new version's document control row takes the state `summary-review` with the line "In plain words may be out of date: section N <heading> changed on <date>". The state is on the control register row and the document's page; it never changes the document's adoption state (D-2977). A document without the summary section never takes it (D-2977).
+- **FR-C2 Two ways out.** On the document's page, under the summary: "Redraft the summary" (owner; one model request through Session B's builder with the changed section's new text as the context instead of a finding, the summary's own brief, the Year 6 readability gate the generator already applies to this section, the same limiter and quota; accepted into a new unadopted version with the change-log row "In plain words redrafted after section N changed; approved by [role]") or "The summary is still right" (owner or the role Session B lets approve; records the day and the role as a change-log row "In plain words confirmed after section N changed"; no model call). Either clears the state (D-2978).
+- **FR-C3 The Easy Read place.** The fixed section "Easy Read version" takes no state; while `summary-review` is set, the page shows one line under it: "If you keep an Easy Read version, check it too." (D-2980).
+- **FR-C4 Where it shows.** The control register's filter gains the state; the audit-day page's documents card counts "1 summary to check"; the auditor's view shows the state's line on the document row as the other states (D-2981).
+- **FR-C5 Words.** No "compliant", "closed" or "resolved"; the state's label is "Summary to check". Pinned.
+
+### Acceptance criteria
+
+- AC-C1 A Session B redraft of a section in a participant-facing document sets `summary-review` on the new version's row with the line; a redraft in a document without the summary does not (unit on the version function, e2e on the row).
+- AC-C2 "The summary is still right" clears the state and writes the change-log row with the role and day (e2e, integration for the member's refusal).
+- AC-C3 "Redraft the summary" under the fake mode produces the new unadopted version with the summary replaced, the change-log row and the state cleared; the readability gate runs on the reply (unit with a reply above Year 6 refused, e2e for the walk).
+- AC-C4 The control register filter, the audit-day count and the auditor's view carry the state (e2e).
+- AC-C5 `npm run check` green; the a11y spec covers the document page with the state at 360 and 1280.
+
+### Lawyer's read (D-2977, D-2978, D-2980)
+
+The summary is the part of the policy a participant relies on; a summary that contradicts the policy is the misleading document, whatever the policy says, so the state must follow every path that changes the policy's substance and must be visible wherever the document's state is read (D-2977). The way out is the provider's act, recorded with a role and a day; Readyline never clears the state on its own and never sends the summary to the model without the owner's click (D-2978). The Easy Read version is the provider's own document outside Readyline, so the line asks, and asserts nothing about it (D-2980).
+
+### NDIS expert's read (D-2979, D-2981, D-2982)
+
+The Core module's rights standard asks that participants get information in the language, mode of communication and terms they are most likely to understand; auditors check it by asking participants what they were told and reading what they were given, so the plain-words summary is evidence in its own right and must match the policy it summarises (D-2979). The state belongs on the control register and the auditor's view, because that is where the auditor reads a document's standing (D-2981). D-2982: the summary's redraft keeps Session B's rule that the policy text never names the audit or the finding; the change-log row is the record.
+
+### Dev response
+
+**Dev-2, 19 Oct 2026 (Session C), on `req-033-session-c` from `req-033-session-b` 4f872ef (D-031).** D-2977 to D-2982 read first.
+
+**Which paths replace a tailored section today** (every `insertDocumentVersion` call read): two. (1) `regenerateSection` in `src/server/generation/run.ts`, the document page's "Regenerate" button through `regenerateSectionAction`: one tailored section drafted again from the stored facts, version n+1. (2) Session B's `acceptRedraftAction` through `redraftModel`: one tailored section replaced with the finding as context, version n+1. Not: the first generation (the summary is drafted beside the sections from the same facts); `reapproveAction` (the approver cells and change-log rows alone, REQ-029 FR-6); `rerenderSetWithFacts` (the read-time fill, no stored text); `updateProcedureAction` (inserts the Division 3 plan into the worker screening procedure, which carries no summary); the pack's zip refresh. The summary itself is never Session B's target: the mapping's candidates are the numbered sections since 8b5948a and the summary is unnumbered front matter, so FR-C1's "not the summary" case needs no special rule; `regenerateSection` can be pointed at the summary and must not set the state when it is.
+
+**The state's storage.** Two nullable columns on `document_versions`: `summary_check_section_id text` and `summary_check_on date`, written by the two paths' version insert when `sectionsFor(type)` carries `plain-language-summary` and the changed section is another one; a pure `summaryCheckFor(type, sectionId, today)` decides, tested. The control register's input (`document-control-queries.ts`) carries them to `documentControlRows`, whose row gains `summaryCheck: { sectionId, number, heading, on } | null` and the line "In plain words may be out of date: section N <heading> changed on <date>"; the state word `summary-review` joins the union; `documentControlSentence` gains "N summary to check" (the registers index and the audit-day page read that sentence); the auditor's view's document control table gets the line in its state cell (`DOCUMENT_CONTROL_COLUMNS` unchanged in count). FR-C2's redraft clears it by making version n+1 with the columns null; "The summary is still right" nulls them on the current version (question 1). The summary's redraft is `buildRedraftRequest`'s shape with a `CHANGED SECTION` block in place of `FINDING` and `STANDARD`, the summary's own brief, the Year 6 gate (`PARTICIPANT_READING_GRADE` through `readabilityGateFor`), Session B's forbidden words (D-2982) and no anchor rule (a summary need not name a state); the change-log row "In plain words redrafted after section N changed; approved by [role]".
+
+**Questions (none blocks the start; I build on the recommendation).**
+
+1. *"The summary is still right": where the record goes.* (a) The current version's model gains the change-log row "In plain words confirmed after section N changed" with the day and the role, the .docx at that version's path is rendered again so the file matches, the two columns are nulled; no new version, no re-adoption. (b) Version n+1 carrying only the change-log row, adopted again through the flow (D-2855's shape). **(a)**: the policy's text and its approver are unchanged, so D-2855's reason (the approver and date as the record of who approved that text) is untouched; a version bump would ask the provider to adopt again words they did not change, and the row is the record either way.
+2. *The one-word state when the version is also unadopted* (a Session B redraft's version always is). (a) The adoption states keep the word (`not-adopted`, `new-version`, then `overdue`), the summary line shows on the row whatever the word, and `summary-review` is the word once the version is adopted and nothing more urgent stands. (b) `summary-review` always wins the word. **(a)**: the register's word has been the adoption and review standing since REQ-024 A0, the line carries the summary's message in every case, and D-2977's "never changes the adoption state" reads the same.
+3. *Who confirms.* "The role Session B lets approve": Session B's actions are the owner's (the owned account is the viewer's). (a) Owner alone for both buttons, the role written being the account's approver role from the facts, else "Owner"; (b) any member. **(a)**: the adopt flow is the owner's.
+4. *The summary redraft's context.* (a) The changed section's new text, the summary's current text and its brief, the outline headings; (b) every tailored section's text. **(a)**: the model needs the change and the summary; the rest is noise, and nothing names an audit or a finding (D-2982: no FINDING block exists in this request).
+5. *Where the regenerate path sets the state.* (a) Inside `regenerateSection`, so the action and any job share it; (b) in the action alone. **(a)**.
+6. *FR-C3's line.* Under the Easy Read section's heading on the document page while the state is set; the register row carries the summary line alone. As written.
+
+**Order, one commit each, `npm run check` before each push, `next` merged first (D-2827; rebased onto `next` once #125 is in, D-031).**
+
+1. The migration, `summaryCheckFor`, the control row's field, line, word and sentence, the words file (FR-C5's label "Summary to check" pinned), tests over `documentControlRows`.
+2. The two paths set the columns (`regenerateSection`, `acceptRedraftAction`); the unit tests of both gain the case (AC-C1 unit).
+3. The two ways out: `confirmSummaryAction` (the row in place, the columns nulled, the audit line) and `redraftSummaryAction` (the request variant, the Year 6 gate, the limiter and quota, version n+1), with tests (AC-C3's reply above Year 6 refused; AC-C2's member refusal in the integration suite).
+4. The document page's block under the summary with the two buttons, the Easy Read line (FR-C3), the register filter and row line, the sentence on the registers index and the audit-day page, the auditor's view cell (FR-C4); the legal and claims pins.
+5. The e2e on the fake mode (the fake answers a summary request the same way: the summary's lines kept, one short sentence added), the a11y rows at 360 and 1280 (AC-C5), the report and the Delivery evidence block.
+
+**Estimate.** Six to eight hours, five commits; the fourth (five surfaces) is the long one.
+
+### Delivery evidence (Session C)
+
+(Dev appends.)
