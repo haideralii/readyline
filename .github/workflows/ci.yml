@@ -91,6 +91,24 @@ jobs:
       - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
         run: node scripts/ci/check-client-bundle.mjs
 
+      # REQ-012 FR-1d (AC-2): the production build on its own port, every route class
+      # compared with the expected-values table in scripts/ops/check-headers-lib.mjs
+      # (HSTS, nosniff, referrer, permissions, frame options, no X-Powered-By, the nonce
+      # CSP with Checkout on the purchase page alone). Same fixture values the Playwright
+      # web server uses; the server is stopped when the check has run.
+      - name: Security headers on every route class (REQ-012 FR-1d, AC-2)
+        env:
+          PORT: "3200"
+          STRIPE_FAKE: "1"
+          PACK_PRICE_AUD_CENTS: "39900"
+          SUBSCRIPTION_PRICE_AUD_CENTS: "3900"
+          HASH_PEPPER: e2e-hash-pepper-0123456789abcdef # gitleaks:allow
+          CRON_SECRET: e2e-cron-secret-0123456789abcdef # gitleaks:allow
+        run: |
+          npm run start > /tmp/headers-server.log 2>&1 &
+          node scripts/ops/check-headers.mjs --base http://localhost:3200 --wait 90 --json out/headers.json
+          kill %1
+
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 

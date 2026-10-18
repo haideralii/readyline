@@ -137,6 +137,20 @@ describe("every action is pinned by commit SHA with its version, or keeps its ta
     }
   });
 
+  it("the e2e job runs the headers check against the production build before the specs (REQ-012 FR-1d, AC-2)", () => {
+    const ci = readFileSync(".github/workflows/ci.yml", "utf8");
+    const step = ci.indexOf(
+      "Security headers on every route class (REQ-012 FR-1d, AC-2)",
+    );
+    expect(step).toBeGreaterThan(ci.indexOf("- run: npm run build"));
+    expect(step).toBeLessThan(ci.indexOf("Install Playwright"));
+    expect(ci).toContain(
+      "node scripts/ops/check-headers.mjs --base http://localhost:3200 --wait 90",
+    );
+    expect(ci).toContain("npm run start > /tmp/headers-server.log 2>&1 &");
+    expect(ci).toContain("          kill %1");
+  });
+
   it("the e2e job asserts the lockfile and the tree are unchanged after npm ci (FR-2)", () => {
     const ci = readFileSync(".github/workflows/ci.yml", "utf8");
     expect(ci).toContain("git diff --exit-code -- package-lock.json");
