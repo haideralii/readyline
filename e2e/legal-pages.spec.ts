@@ -117,6 +117,16 @@ test.describe("legal and trust pages (REQ-008)", () => {
       await expect(page.getByTestId("legal-draft-note"), path).toContainText(
         /^Draft\./,
       );
+      // QA live b340ee3 (PO): the draft note sits at the foot, under the last heading, in the small type.
+      const noteTop =
+        (await page.getByTestId("legal-draft-note").boundingBox())?.y ?? 0;
+      const lastHeadingTop =
+        (await page.getByRole("heading", { level: 2 }).last().boundingBox())
+          ?.y ?? Infinity;
+      expect(noteTop, path).toBeGreaterThan(lastHeadingTop);
+      await expect(page.getByTestId("legal-draft-note"), path).toHaveClass(
+        /text-sm/,
+      );
       // REQ-028 FR-11: the aside (Jump to and the updated line) from lg, none under it.
       await expect(page.getByRole("complementary"), path).toHaveCount(
         (page.viewportSize()?.width ?? 0) >= 1024 ? 1 : 0,

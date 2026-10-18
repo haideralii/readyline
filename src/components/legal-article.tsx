@@ -196,20 +196,21 @@ export function LegalArticle({ page }: { page: LegalPage }) {
         >
           {updated}
         </p>
-        {note ? (
-          <p
-            className="mt-4 rounded-md border border-amber-700 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-400 dark:bg-amber-950 dark:text-amber-100"
-            data-testid="legal-draft-note"
-          >
-            <strong className="font-semibold">Draft.</strong> {note}
-          </p>
-        ) : null}
         <Markdown
           remarkPlugins={markdownPlugins}
           components={markdownComponents}
         >
           {page.markdown}
         </Markdown>
+        {/* QA live b340ee3 (PO): the draft status stays until the lawyer's review, at the foot in the smaller type, not under the heading. */}
+        {note ? (
+          <p
+            className="text-slate border-rule mt-10 border-t pt-4 text-sm leading-6"
+            data-testid="legal-draft-note"
+          >
+            <strong className="font-semibold">Draft.</strong> {note}
+          </p>
+        ) : null}
       </article>
     </PageShell>
   );

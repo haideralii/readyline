@@ -133,8 +133,9 @@ export const CHANGE_TYPES: readonly ChangeType[] = [
     kind: "notification",
     rule: "s13A-ownership",
     label: "Change of ownership (Rules s 13A(3))",
+    // D-2849: the copy lint reads this file; the helper is one paragraph under sixty words, the Rule's words kept.
     helper:
-      'Rules s 13A(3): notice "by the earlier of" when you become aware the change in ownership will occur and when a step that is a necessary precondition to it occurs. Type the day of that first step as the day it happened. A certification provider then has a certification audit that must start within 3 months of the change (s 13BA), unless a mid-term audit is under way or the registration ends within those months.',
+      'Rules s 13A(3): notice "by the earlier of" when you become aware the change will occur and when a necessary first step occurs; type the day of that first step as the day it happened. A certification provider\'s audit must start within 3 months (s 13BA), unless a mid-term audit is under way or the registration ends first.',
     policyRow: "financial-or-governance",
   },
   {

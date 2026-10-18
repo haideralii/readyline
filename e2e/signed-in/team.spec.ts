@@ -163,6 +163,10 @@ test.describe("the worker role and the report link (REQ-020 Session B)", () => {
       "/checklist",
       "/account",
       "/path/audit-day",
+      // REQ-023 AC-8, SR-5 (PO acceptance read, 18 Oct 2026 (2)): the renewal path, its dated steps and the changes register.
+      "/path/renewal",
+      "/path/renewal/application",
+      "/registers/commission-changes",
     ]) {
       await w.goto(path);
       await expect(w, path).toHaveURL(/\/worker$/);
