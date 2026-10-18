@@ -232,4 +232,11 @@ The Core module's rights standard asks that participants get information in the 
 
 ### Delivery evidence (Session C)
 
-(Dev appends.)
+**Session C (Dev-2, 19 Oct 2026)** on `req-033-session-c` (the head of the PR) (from `req-033-session-b` 4f872ef, D-031; rebased onto `next` when #125 landed; PR to `next`; body: `product/evidence/req-033/pr-body-session-c.md`).
+
+- Commits, one per requirement: 492428c the Dev response; 8c5ca22 FR-C1, FR-C4, FR-C5 the migration `20261019020000_summary_check.sql`, `summaryCheckFor`, the control register's line, word and sentence, the words file (tests over the register and the helper); 1e67187 FR-C1 the two paths set the state (`regenerateSection`, Session B's accept; AC-C1 unit); e8897c9 FR-C2 `confirmSummaryAction` and `redraftSummaryAction` with `buildSummaryRedraftRequest` (twelve tests; AC-C2 and AC-C3 unit, the reply above Year 6 refused); 1917761 FR-C2, FR-C3, FR-C4 the document page's block and Easy Read line, the register row's line, the auditor's view and pack column; fddfe25 AC-C1 to AC-C5 on the fake mode.
+- AC mapping: AC-C1 → `summary-check.test.ts`, `run.test.ts` (the governance policy sets nothing, the complaints policy sets the section and day), `findings-redraft-actions.test.ts`, and the spec's version 2 read; AC-C2 → `summary-actions.test.ts` (the row with the role and day, the columns nulled, the file rendered again) and the spec's confirm; the member's refusal is the owner gate in `summaryContext` (a signed-out caller refused in the unit test; the registers' RLS admits no member write to `document_versions`); AC-C3 → `summary-actions.test.ts` (a reply above Year 6 refused, nothing stored; the happy path to version 3) and the spec's redraft on the fake mode; AC-C4 → `document-control.test.ts` (the sentence's "1 summary to check", the gaps' line) and the spec (the register row, the registers index, the audit-day page, the auditor's view); AC-C5 → `npm run check` green (counts below) and the spec's axe at 1280 and 360 on the document page with the state and after the redraft.
+- `npm run check`: green, 228 files (1 skipped), 1,709 tests, 6 skipped.
+- Decisions: D-2350 under "REQ-033 Session C (Dev-2)" in `DECISIONS.md`.
+- For the PO: the first run of the Session C walk is this PR's; question 1 (a) and 2 (a) as built (D-2350 (3), (4)).
+- UNVERIFIED: nothing regulatory was added in this session.
