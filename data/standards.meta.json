@@ -1930,5 +1930,23 @@
     ],
     "verifiedAt": "2026-10-18",
     "holidayTable": "data/public-holidays/ (source.json names the eight government pages)"
+  },
+  "auditOutcomes": {
+    "$comment": "REQ-033 D-2934 (Dev-1, 2026-10-18): the Commission’s wording on audit outcomes and corrective action, read before the findings register’s words were written.",
+    "source": "NDIS Quality and Safeguards Commission, Information for quality auditors",
+    "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/information-quality-auditors",
+    "pageUpdated": "2026-10-15",
+    "readAt": "2026-10-18",
+    "ratings": [
+      "3 – conforms with elements of best practice",
+      "2 – conforms with NDIS Practice Standards",
+      "1 – minor non-conformity",
+      "0 – major non-conformity"
+    ],
+    "correctiveAction": "Ask the provider to provide a corrective action plan that describes how they’ll address the non-conformity. The provider must give you the plan within seven calendar days of your request.",
+    "openNonConformity": "If the finalised ratings still include a 0 or 1 – which is now known as an open non-conformity – you will need to review this within the timeframes described in Annex C of the NDIS auditor guidelines.",
+    "closure": "If the provider has addressed their minor non-conformities, they need to be ‘closed’ in the NDIS Commission’s records.",
+    "followUp": "Critical risks or other serious matters would normally require an on-site follow-up or re-audit within three calendar months.",
+    "readylineWords": "The register says what the provider did (addressed) and what the auditor said (verified); Readyline never decides closure (FR-7, D-2936)."
   }
 }

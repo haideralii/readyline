@@ -96,7 +96,7 @@ test.describe("REQ-028 Session B: the registers on a laptop", () => {
     );
     // Nothing started yet: a full ochre line and the sentence.
     await expect(page.getByTestId("registers-ready-line-text")).toHaveText(
-      "0 of 16 registers started",
+      "0 of 17 registers started",
     );
     await expect(page.getByTestId("registers-ready-line-todo")).toBeVisible();
     // The cards: two columns from lg, one under it; every register is a link.
@@ -190,7 +190,7 @@ test.describe("REQ-028 Session B: the registers on a laptop", () => {
     // AC-7: three registers hold a row now (the starter rows made the corporate risks one of them).
     await page.goto("/registers");
     await expect(page.getByTestId("registers-ready-line-text")).toHaveText(
-      "3 of 16 registers started",
+      "3 of 17 registers started",
     );
     await expect(page.getByTestId("registers-ready-line-done")).toBeVisible();
   });

@@ -115,10 +115,14 @@ describe("product/legal copy (REQ-008)", () => {
       "If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.",
       // REQ-029 FR-13 (D-2858), verbatim.
       "Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.",
+      // REQ-033 SR-1, D-2938: the findings bullet; the uploaded report is never kept (D-2930).
+      "Audit findings you type or paste, in your own words, with the standard, the severity and the dates you record. A report you upload is read in Sydney to pick out its findings and is not kept, logged or sent to a model. Your findings are in your account export and are deleted with your account.",
     ],
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
       "so it sits with your privacy commitments, where an auditor would look for it.",
+      // REQ-033 D-2937: a finding's own words may reach the model, after the participant check; the report never does.
+      "If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check. The report you uploaded is never sent.",
       // REQ-034 FR-3: the first paragraph links the trust page.
       "Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).",
     ],
@@ -155,6 +159,7 @@ describe("product/legal copy (REQ-008)", () => {
   // subscription's reminders, which the provider can turn off, and the
   // privacy page's updated date moves with it; the other pages keep Session E's day.
   // REQ-029 FR-13 (D-2858): the two sentences moved terms and privacy to 18 October 2026.
+  // REQ-033 D-2937: the model sentence moved the AI page to 18 October 2026.
   const UPDATED: Record<LegalSlug, string> = {
     terms: "2026-10-18",
     refunds: "2026-10-16",

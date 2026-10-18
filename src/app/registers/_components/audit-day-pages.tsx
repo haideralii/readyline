@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { FindingActions } from "../findings/finding-actions";
+import { FindingAnswers } from "../findings/finding-answers";
 import { notFound, redirect } from "next/navigation";
 import {
   AUDIT_DAY_META,
@@ -13,6 +15,7 @@ import {
 } from "@/lib/registers/table-columns";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
+  FindingRow,
   OnboardingKind,
   StaffMatrixRow,
   OnboardingTickRow,
@@ -165,7 +168,10 @@ export async function AuditDayListPage({
       exportLabel="Worker files and the two Rules lists"
       // REQ-020 FR-8: the corporate risk register takes a spreadsheet; REQ-024 FR-13: so does the staff matrix.
       importHref={
-        slug === "corporate-risks" || slug === "staff-matrix"
+        // REQ-033 FR-1: the findings register takes a report, pasted or as a file.
+        slug === "corporate-risks" ||
+        slug === "staff-matrix" ||
+        slug === "findings"
           ? `/registers/${slug}/import`
           : undefined
       }
@@ -224,7 +230,9 @@ export async function AuditDayListPage({
         }
         importHref={
           ctx.canWrite &&
-          (slug === "corporate-risks" || slug === "staff-matrix")
+          (slug === "corporate-risks" ||
+            slug === "staff-matrix" ||
+            slug === "findings")
             ? `/registers/${slug}/import`
             : undefined
         }
@@ -418,6 +426,18 @@ export async function AuditDayDetailPage({
         <p className="text-ink mt-3 text-sm leading-6" data-testid="row-note">
           {meta.noteOf(row as never)}
         </p>
+      ) : null}
+      {/* REQ-033 FR-4 (D-2933): where the pack answers the finding, with links into the newest set. */}
+      {slug === "findings" ? (
+        <FindingAnswers
+          row={row as unknown as FindingRow}
+          supabase={ctx.supabase}
+          accountId={ctx.viewer.account.id}
+        />
+      ) : null}
+      {/* REQ-033 FR-5 (D-2935): the provider's record of addressing it and of the auditor's verification. */}
+      {slug === "findings" && ctx.canWrite ? (
+        <FindingActions row={row as unknown as FindingRow} />
       ) : null}
       {slug === "corporate-risks" && row.starter ? (
         <p

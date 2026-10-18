@@ -20,6 +20,8 @@ import {
   CHANGE_TYPE_LABELS,
   type CommissionChangeRow,
 } from "./commission-changes";
+import { FINDING_SEVERITY_LABELS } from "./audit-day-types";
+import { standardName, type FindingListRow } from "./findings";
 import { CATEGORY_LABELS, CLEARANCE_LABELS } from "./labels";
 import { WORKER_ROLE_LABELS, type WorkerRole } from "./onboarding-items";
 import type {
@@ -499,6 +501,36 @@ export const COMMISSION_CHANGE_COLUMNS: readonly ColumnSpec<CommissionChangeRow>
   ];
 
 /** Every list, by the name the page or the meta uses; the unit test walks this. */
+// REQ-033 FR-3: the findings register's table; the status column carries the provider's record.
+export const FINDING_COLUMNS: readonly ColumnSpec<FindingListRow>[] = [
+  {
+    label: "Ref",
+    kind: "code",
+    reads: ["reference"],
+    cell: (r) => r.reference,
+  },
+  {
+    label: "Standard",
+    kind: "word",
+    reads: ["standard_id"],
+    cell: (r) => standardName(r.standard_id),
+  },
+  {
+    label: "Severity",
+    kind: "word",
+    reads: ["severity"],
+    cell: (r) => FINDING_SEVERITY_LABELS[r.severity],
+  },
+  {
+    label: "Fix by",
+    kind: "date",
+    reads: ["due_on"],
+    cell: (r) => r.due_on,
+    empty: "No date given",
+  },
+  status<FindingListRow>(),
+];
+
 export const ALL_COLUMN_LISTS: Record<string, readonly ColumnSpec<never>[]> = {
   incidents: INCIDENT_COLUMNS as readonly ColumnSpec<never>[],
   complaints: COMPLAINT_COLUMNS as readonly ColumnSpec<never>[],
@@ -514,6 +546,8 @@ export const ALL_COLUMN_LISTS: Record<string, readonly ColumnSpec<never>[]> = {
   decisions: DECISION_COLUMNS as readonly ColumnSpec<never>[],
   "staff-matrix": STAFF_MATRIX_COLUMNS as readonly ColumnSpec<never>[],
   onboarding: ONBOARDING_COLUMNS as readonly ColumnSpec<never>[],
+  // REQ-033 FR-3.
+  findings: FINDING_COLUMNS as readonly ColumnSpec<never>[],
   // Dev-2 (REQ-023 Session D, D-2317).
   "commission-changes":
     COMMISSION_CHANGE_COLUMNS as readonly ColumnSpec<never>[],

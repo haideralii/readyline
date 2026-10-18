@@ -35,6 +35,8 @@ type Row = {
 
 /** The REQ-018 registers you add to as things happen, in the order an auditor follows them. */
 const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
+  // REQ-033 FR-3: the findings from the last audit, the first thing an auditor asks about.
+  "findings",
   "improvements",
   "decisions",
   "onboarding",
@@ -146,8 +148,8 @@ export default async function RegistersPage() {
     },
     ...AUDIT_DAY_KEEP_CURRENT.map(auditDayRow),
   ];
-  // REQ-028 FR-7 (first pass 17): "N of 16 registers started", the sixteen being the five named registers and
-  // the eleven audit-day registers (REQ-023 D's changes register made it eleven); document control counts once the
+  // REQ-028 FR-7 (first pass 17): "N of 17 registers started", the seventeen being the five named registers and
+  // the twelve audit-day registers (REQ-023 D's changes register made it eleven, REQ-033's findings twelve); document control counts once the
   // set is ready, since it is built, never added to.
   const allRows = [...fromYourPack, ...asThingsHappen, ...keepCurrent];
   const started = allRows.filter((r) => r.total > 0).length;

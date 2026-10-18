@@ -67,6 +67,8 @@ export type AccountExport = {
   purchases: Record<string, unknown>[];
   subscriptions: Record<string, unknown>[];
   entitlements: Record<string, unknown>[];
+  /** REQ-033 FR-3 (D-2932): the audit findings, in the provider's words. */
+  findings: Record<string, unknown>[];
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -97,6 +99,7 @@ export async function buildAccountExport(
     purchases,
     subscriptions,
     entitlements,
+    findings,
     ...workers
   ] = await Promise.all([
     supabase
@@ -173,6 +176,14 @@ export async function buildAccountExport(
       .select("kind, assessment_id, granted_at, revoked_at")
       .eq("account_id", accountId)
       .order("granted_at", { ascending: true }),
+    // REQ-033 FR-3 (D-2932): the findings register, as stored.
+    supabase
+      .from("findings")
+      .select(
+        "reference, standard_id, indicator, severity, finding, due_on, status, addressed_on, addressed_by_role, verified_on, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
     ...WORKER_EXPORT_TABLES.map((table) =>
       supabase
         .from(table)
@@ -218,6 +229,7 @@ export async function buildAccountExport(
     purchases: purchases.data ?? [],
     subscriptions: subscriptions.data ?? [],
     entitlements: entitlements.data ?? [],
+    findings: (findings.data as Record<string, unknown>[] | null) ?? [],
   };
 }
 
@@ -231,7 +243,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, each document version's approver and adoption day, document change reviews, policy circulations, purchases, subscriptions, entitlements and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, each document version's approver and adoption day, document change reviews, policy circulations, purchases, subscriptions, entitlements, your audit findings and audit log as JSON.",
     "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",
