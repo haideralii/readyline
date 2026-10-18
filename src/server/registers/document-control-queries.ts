@@ -91,6 +91,8 @@ export async function documentControlForSet(
         approver_role: d.approver_role ?? null,
         older_adopted_on: olderByType.get(d.document_type_id) ?? null,
         version_id: d.id,
+        summary_check_section_id: d.summary_check_section_id ?? null,
+        summary_check_on: d.summary_check_on ?? null,
         sections: d.model.sections.map((s) => ({
           id: s.id,
           text: blocksToText(s.blocks),

@@ -14,6 +14,7 @@ import {
   type WatchChange,
 } from "./living-policies";
 import { addMonths } from "./reminders";
+import { changedSectionLabel, summariesToCheckClause } from "./summary-check";
 
 export type DocumentControlInput = {
   documents: {
@@ -32,6 +33,9 @@ export type DocumentControlInput = {
     version_id?: string;
     /** Section texts from the stored model, for the living-policies match (backlog 8). */
     sections?: { id: string; text: string }[];
+    /** REQ-033 Session C FR-C1 (D-2977): the section whose change left the plain-words summary to check, and the day; null when none. */
+    summary_check_section_id?: string | null;
+    summary_check_on?: string | null;
   }[];
   /** The watch's applied changes (backlog 8); the ledger by default, a list in tests. */
   changes?: readonly WatchChange[];
@@ -110,7 +114,15 @@ export type DocumentControlRow = {
     | "review-due"
     | "overdue"
     | "review-needed"
-    | "new-version";
+    | "new-version"
+    | "summary-review";
+  /** REQ-033 Session C FR-C1: the plain-words summary is to check after this section changed; shown as a line whatever the state word (D-2977). */
+  summaryCheck?: {
+    sectionId: string;
+    number: string;
+    heading: string;
+    on: string;
+  } | null;
   /** The stored version's id when known. */
   version_id: string | null;
   /** Rule changes this adopted document still needs checked for (backlog 8). */
@@ -170,17 +182,30 @@ export function documentControlRows(
           c.circulated_on >= versionDay,
       )
       .sort((a, b) => (a.circulated_on < b.circulated_on ? 1 : -1))[0];
+    const summaryCheck =
+      d.summary_check_section_id && d.summary_check_on
+        ? {
+            sectionId: d.summary_check_section_id,
+            ...changedSectionLabel(
+              d.document_type_id,
+              d.summary_check_section_id,
+            ),
+            on: d.summary_check_on,
+          }
+        : null;
     const state: DocumentControlRow["state"] = !adopted
       ? "not-adopted"
       : newVersion
         ? "new-version"
         : nextReview && nextReview < today
           ? "overdue"
-          : reviewNeeded.length > 0
-            ? "review-needed"
-            : nextReview && nextReview <= addMonths(today, 1)
-              ? "review-due"
-              : "adopted";
+          : summaryCheck
+            ? "summary-review"
+            : reviewNeeded.length > 0
+              ? "review-needed"
+              : nextReview && nextReview <= addMonths(today, 1)
+                ? "review-due"
+                : "adopted";
     return {
       document_type_id: d.document_type_id,
       title: d.title,
@@ -203,6 +228,7 @@ export function documentControlRows(
       state,
       version_id: d.version_id ?? null,
       reviewNeeded,
+      summaryCheck,
     };
   });
 }
@@ -214,6 +240,8 @@ export function documentControlGaps(rows: DocumentControlRow[]): string[] {
     if (!r.adopted_on) out.push(`${r.title}: not adopted`);
     else if (r.state === "new-version")
       out.push(`${r.title}: new version to adopt`);
+    else if (r.summaryCheck)
+      out.push(`${r.title}: the plain-words summary to check`);
     else if (!r.next_review_on) out.push(`${r.title}: no review date`);
     else if (!r.circulated) out.push(`${r.title}: not circulated to workers`);
     else if (r.reviewNeeded.length > 0)
@@ -239,6 +267,11 @@ export function documentControlSentence(rows: DocumentControlRow[]): string {
   if (needReview) parts.push(`${needReview} to check after a rule change`);
   // REQ-024 A0 (D-2436): the clause is appended, so "N of T adopted" stands.
   if (newVersions) parts.push(`${newVersions} with a new version to adopt`);
+  // REQ-033 Session C FR-C4: the summaries left to check after a section changed.
+  const summaries = summariesToCheckClause(
+    rows.filter((r) => r.summaryCheck).length,
+  );
+  if (summaries) parts.push(summaries);
   return `${parts.join(", ")}.`;
 }
 

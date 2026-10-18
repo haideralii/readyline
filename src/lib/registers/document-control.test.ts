@@ -398,4 +398,65 @@ describe("living policies in the document control register (backlog 8)", () => {
       ),
     ).toBe(true);
   });
+
+  // REQ-033 Session C FR-C1, FR-C4 (D-2977): the summary's state.
+  it("reads the summary's state as a line whatever the word, and as the word once adopted (Session C)", () => {
+    const flagged = {
+      ...docs[1],
+      version: 2,
+      summary_check_section_id: "scope",
+      summary_check_on: "2026-10-13",
+    };
+    const reviews = docs.map((d) => ({
+      document_type_id: d.document_type_id,
+      adopted_on: "2026-10-12",
+      review_cycle_months: 12,
+      last_reviewed_on: null,
+      next_review_on: null,
+    }));
+    const adopted = documentControlRows(
+      {
+        documents: [docs[0], flagged],
+        reviews,
+        circulations: [],
+        adoptedByRole: "Owner",
+      },
+      TODAY,
+    );
+    const row = adopted.find(
+      (r) => r.document_type_id === flagged.document_type_id,
+    )!;
+    expect(row.state).toBe("summary-review");
+    expect(row.summaryCheck).toEqual({
+      sectionId: "scope",
+      number: "2",
+      heading: "Scope",
+      on: "2026-10-13",
+    });
+    expect(documentControlSentence(adopted)).toContain("1 summary to check");
+    expect(documentControlGaps(adopted)).toContain(
+      "Complaints management policy and register: the plain-words summary to check",
+    );
+    // Unadopted with an older adopted version: the adoption word stands and the line still shows (question 2 (a)).
+    const pending = documentControlRows(
+      {
+        documents: [
+          { ...flagged, adopted_on: null, older_adopted_on: "2026-10-12" },
+        ],
+        reviews,
+        circulations: [],
+        adoptedByRole: "Owner",
+      },
+      TODAY,
+    )[0];
+    expect(pending.state).toBe("new-version");
+    expect(pending.summaryCheck?.sectionId).toBe("scope");
+    // Without the columns there is no state and no clause.
+    const plain = documentControlRows(
+      { documents: docs, reviews, circulations: [], adoptedByRole: "Owner" },
+      TODAY,
+    );
+    expect(plain.every((r) => r.summaryCheck === null)).toBe(true);
+    expect(documentControlSentence(plain)).not.toContain("to check");
+  });
 });

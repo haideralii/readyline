@@ -43,6 +43,9 @@ export type DocumentVersionRow = {
   /** REQ-029 D-2855: the approver's name and role as the account held them on the adoption day, written by `adopt_document_version` alone and never updated; null until adoption. */
   approver_name?: string | null;
   approver_role?: string | null;
+  /** REQ-033 Session C FR-C1 (D-2977): the section whose change left the plain-words summary to check, and the day; null when none. */
+  summary_check_section_id?: string | null;
+  summary_check_on?: string | null;
 };
 
 export type GenerationLogRow = {
