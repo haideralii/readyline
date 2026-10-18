@@ -12,6 +12,7 @@ import "server-only";
  * with the template name and the hashed address, never the body.
  */
 import { createHash } from "node:crypto";
+import { appendFileSync } from "node:fs";
 import nodemailer, { type Transporter } from "nodemailer";
 import { log } from "@/lib/logging/logger";
 import { emailHash } from "@/lib/peppered-hash";
@@ -40,6 +41,16 @@ export class LogOnlyEmailProvider implements EmailProvider {
   readonly sent: EmailMessage[] = [];
   async send(message: EmailMessage): Promise<void> {
     this.sent.push(message);
+    // QA live b340ee3, batch C (3) (PO 18 Oct 2026 12:20): the one test-only outbox. With
+    // EMAIL_OUTBOX_FILE set (the e2e web server sets it; production never does) each message is
+    // appended as one JSON line so an end-to-end test can read what a provider would have sent.
+    // The SMTP provider ignores the variable.
+    const outbox = process.env.EMAIL_OUTBOX_FILE?.trim();
+    if (outbox)
+      appendFileSync(
+        outbox,
+        `${JSON.stringify({ at: new Date().toISOString(), ...message })}\n`,
+      );
     log.info("email.not-sent", {
       provider: this.name,
       template: message.template ?? "untitled",

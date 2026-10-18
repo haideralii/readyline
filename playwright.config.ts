@@ -82,6 +82,12 @@ export default defineConfig({
       STRIPE_WEBHOOK_SECRET: "",
       // The job route and the webhook's hand-on need the cron secret the spec also sends.
       CRON_SECRET: e2eCronSecret(),
+      // QA live b340ee3, batch C (3) and (4): the log provider's test-only outbox (one JSON line a
+      // message, read by e2e/signed-in/reminder-emails.spec.ts) and the pepper the unsubscribe
+      // token hangs off (REQ-022 SR-6); neither is set in production this way.
+      EMAIL_OUTBOX_FILE: ".e2e-outbox.ndjson",
+      HASH_PEPPER:
+        process.env.HASH_PEPPER ?? "e2e-hash-pepper-0123456789abcdef", // gitleaks:allow
       // The paid job replays the recorded sole-trader fixtures: never record, never live.
       GENERATION_RECORD: "",
       GENERATION_LIVE: "",
