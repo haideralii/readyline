@@ -158,6 +158,14 @@ describe("data-promises workflow (REQ-030 FR-5)", () => {
 describe("the restore rehearsal in CI (REQ-030 AC-3, SR-5)", () => {
   it("dumps with the fixture passphrase, resets the stack, restores, and runs the integration suite again", () => {
     expect(ci).toContain("Backup and restore rehearsal (REQ-030 FR-2, AC-3)");
+    // The runner's own client is 16 and the stack is 17 (config.toml): the
+    // 17 client is installed before the rehearsal, as backup.yml installs it,
+    // or pg_dump stops at once on the version mismatch (#115's first red).
+    const client = ci.indexOf("postgresql-client-17");
+    expect(client).toBeGreaterThan(-1);
+    expect(client).toBeLessThan(
+      ci.indexOf("Backup and restore rehearsal (REQ-030 FR-2, AC-3)"),
+    );
     expect(ci).toContain(
       "BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789",
     );
