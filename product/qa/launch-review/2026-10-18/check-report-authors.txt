@@ -1,0 +1,6 @@
+ok   product\qa\launch-review\2026-10-18\check-report-authors.txt (0 hits)
+ok   product\qa\launch-review\2026-10-18\headers-local-build.json (0 hits)
+ok   product\qa\launch-review\2026-10-18\npm-audit.json (0 hits)
+ok   product\qa\launch-review\2026-10-18\rls-coverage-map.md (0 hits)
+ok   product\qa\launch-review\2026-10-18\session-a.md (0 hits)
+authors: 5 file(s) carry no git-log name or email and no address
