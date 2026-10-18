@@ -12,8 +12,13 @@ import { getStandardsDataset } from "@/lib/standards/dataset";
 export type AnsweredIn = {
   typeId: string;
   title: string;
-  /** The section's number in the document and its heading, or null when no brief names the indicator and no tailored section exists. */
-  section: { number: number; heading: string } | null;
+  /** The section's number in the document, its heading, its id and its mode (REQ-033 Session B redrafts a tailored one), or null when no brief names the indicator and no tailored section exists. */
+  section: {
+    number: number;
+    heading: string;
+    id: string;
+    mode: "fixed" | "tailored";
+  } | null;
 };
 
 export type FindingMapping = {
@@ -72,7 +77,12 @@ const words = (s: string) =>
 export function sectionForIndicator(
   typeId: string,
   indicator: string,
-): { number: number; heading: string } | null {
+): {
+  number: number;
+  heading: string;
+  id: string;
+  mode: "fixed" | "tailored";
+} | null {
   const type = catalogue.items.find((t) => t.id === typeId);
   if (!type) return null;
   const sections = sectionsFor(type);
@@ -90,7 +100,12 @@ export function sectionForIndicator(
       ? (best as { index: number }).index
       : sections.findIndex((s) => s.mode === "tailored");
   if (index < 0) return null;
-  return { number: index + 1, heading: sections[index].heading };
+  return {
+    number: index + 1,
+    heading: sections[index].heading,
+    id: sections[index].id,
+    mode: sections[index].mode,
+  };
 }
 
 /** The indicator text to match by: the row's own, else the standard's indicators joined. */

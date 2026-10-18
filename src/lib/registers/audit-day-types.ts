@@ -317,6 +317,9 @@ export type FindingRow = {
   addressed_by_role: string;
   verified_on: string | null;
   improvement_id: string | null;
+  /** REQ-033 Session B FR-B6: the version an accepted redraft made and the section it changed; null and "" until then. */
+  redraft_version_id?: string | null;
+  redraft_section_id?: string;
   created_by: string | null;
   created_at: string;
   updated_at: string;

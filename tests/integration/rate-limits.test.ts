@@ -22,6 +22,7 @@ import {
   EXPORT_LIMIT,
   FILL_LIMIT,
   MAGIC_LINK_LIMITS,
+  REDRAFT_LIMIT,
   REGISTER_EXPORT_LIMIT,
   REGISTER_WRITE_LIMIT,
 } from "@/server/auth/rate-limit";
@@ -84,6 +85,13 @@ export const LIMITS: ReadonlyArray<{
     name: "one-time fill",
     prefix: "fill",
     value: FILL_LIMIT,
+    expected: { limit: 10, windowSeconds: 3600 },
+  },
+  {
+    // REQ-033 Session B SR-B3: ten section redrafts an hour per account.
+    name: "section redraft",
+    prefix: "redraft",
+    value: REDRAFT_LIMIT,
     expected: { limit: 10, windowSeconds: 3600 },
   },
   {

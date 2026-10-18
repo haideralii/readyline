@@ -180,7 +180,7 @@ export async function buildAccountExport(
     supabase
       .from("findings")
       .select(
-        "reference, standard_id, indicator, severity, finding, due_on, status, addressed_on, addressed_by_role, verified_on, created_at, updated_at",
+        "reference, standard_id, indicator, severity, finding, due_on, status, addressed_on, addressed_by_role, verified_on, redraft_version_id, redraft_section_id, created_at, updated_at",
       )
       .eq("account_id", accountId)
       .order("created_at", { ascending: true }),
