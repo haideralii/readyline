@@ -17,9 +17,9 @@ describe("the backup dump and the seeded reference tables (D-2952)", () => {
   const runbook = readFileSync("product/ops/INCIDENTS.md", "utf8");
 
   it("excludes exactly the seeded reference tables' data from the dump", () => {
-    const excluded = [
-      ...script.matchAll(/--exclude-table-data=(\S+)/g),
-    ].map((m) => m[1].replace(/^['"]|['"]$/g, ""));
+    const excluded = [...script.matchAll(/--exclude-table-data=(\S+)/g)].map(
+      (m) => m[1].replace(/^['"]|['"]$/g, ""),
+    );
     expect(excluded.sort()).toEqual([...SEEDED_REFERENCE_TABLES].sort());
     // Still a data-only dump of every other table in public and of auth.users.
     expect(script).toContain("--data-only");
