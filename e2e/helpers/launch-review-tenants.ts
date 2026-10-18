@@ -150,7 +150,6 @@ export const OWNER_PAGES = [
   "/documents",
   "/account",
   "/registers",
-  "/registers/staff",
   "/registers/document-control",
   ...REGISTERS.flatMap((r) => [`/registers/${r}`, `/registers/${r}/new`]),
   "/path/before-you-buy",
