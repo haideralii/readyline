@@ -141,7 +141,7 @@ describe("the fact-sentence extractor (REQ-012 FR-4b)", () => {
     );
     expect(p.found).toBe(2);
     expect(p.mapped).toBe(1);
-    expect(p.unmapped.map((f) => f.sentence)).toEqual([
+    expect(p.unmapped.map((f: { sentence: string }) => f.sentence)).toEqual([
       "Usually the auditor visits.",
     ]);
   });
