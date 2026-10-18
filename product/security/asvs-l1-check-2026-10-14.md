@@ -129,3 +129,12 @@ Scope: the controls in `threat-model.md` that ASVS 4.0 level 1 asks of every web
 | V7 Logging | Each saved step appends `registration.period.updated <step>` (the step word, never the date or the name); a rehearsal appends `self_check.rehearsed <id> <count>`; a ticked link's `auditor_link.created` line carries the word "rehearsal"; no free text reaches a log | Met |
 | V8 Data protection | The rehearsal sheet holds the records' names, the questions, yes or no and the owner's coded note; it is the owner's own working note and leaves the account only in the owner's pack or in a link's pack the owner ticked for it, off by default (D-2309); the auditing company's name is business information about the provider's own audit, not a person's, and the shape of a person's number is refused | Met |
 | V13 API | One new server action file keeps the validation import and the owner gate; the two pack routes pass the tick from the session (owner) or the signed-out lookup (auditor) and read nothing new from the request; `handlers.test.ts` asserts the imports and gates | Met |
+
+## REQ-030 Session A additions (18 Oct 2026, Dev-2)
+
+| Chapter | Control as built | State |
+| --- | --- | --- |
+| V7 Logging and error handling | Server-side error reporting is on only with SENTRY_DSN; every event passes `scrubEvent` before it leaves (redact() over message, exceptions, breadcrumbs, headers and extra; user, cookies, body and query stripped; URL path segments redacted); `sendDefaultPii` false, no tracing or replay; `sentry.test.ts` holds the markers; the reader sees one reference (the digest), never the error's text | Met |
+| V7 | The uptime route writes one `audit_log` row with up and two status codes and reads no data (SR-4); the "Site down" issue carries status codes and times only (SR-3); the runbook names every secret by name and `incidents-runbook.test.ts` proves no address or token shape is on any line (SR-1) | Met |
+| V4 Access control | `/api/jobs/uptime` answers 404 without the cron bearer and `{ skipped }` off the production deployment, as the other job routes; the kick workflow's permissions are `contents: read` and `issues: write` only, nothing writes to the repository (SR-3) | Met |
+| V14 Configuration | A DSN lets anyone send events, so it rotates with the rest (runbook section 3, SR-5); no new secret for the uptime check (`GITHUB_TOKEN` is the job's own); `.env.example` names SENTRY_DSN and the check's variables and drops the unused `NEXT_PUBLIC_SENTRY_DSN` | Met |
