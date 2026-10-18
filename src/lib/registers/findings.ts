@@ -233,6 +233,18 @@ export function findingStateTag(r: FindingListRow): ListStatus {
   }
 }
 
+/** FR-6: "Findings from your last audit: 3 open, 2 addressed, 1 verified by the auditor", the zero parts left out. */
+export function findingsCardLine(rows: readonly FindingListRow[]): string {
+  const count = (state: string) => rows.filter((r) => r.state === state).length;
+  const open = count("open") + count("overdue");
+  const parts = [
+    open ? `${open} open` : "",
+    count("addressed") ? `${count("addressed")} addressed` : "",
+    count("verified") ? `${count("verified")} verified by the auditor` : "",
+  ].filter(Boolean);
+  return `Findings from your last audit: ${parts.length ? parts.join(", ") : "none open"}`;
+}
+
 export function findingTitle(r: FindingRow): string {
   return `${r.reference}: ${standardName(r.standard_id)}`;
 }

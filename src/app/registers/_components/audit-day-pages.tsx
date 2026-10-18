@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FindingActions } from "../findings/finding-actions";
 import { FindingAnswers } from "../findings/finding-answers";
 import { notFound, redirect } from "next/navigation";
 import {
@@ -433,6 +434,10 @@ export async function AuditDayDetailPage({
           supabase={ctx.supabase}
           accountId={ctx.viewer.account.id}
         />
+      ) : null}
+      {/* REQ-033 FR-5 (D-2935): the provider's record of addressing it and of the auditor's verification. */}
+      {slug === "findings" && ctx.canWrite ? (
+        <FindingActions row={row as unknown as FindingRow} />
       ) : null}
       {slug === "corporate-risks" && row.starter ? (
         <p

@@ -183,6 +183,37 @@ export async function saveAuditDayRowAction(
   const r = await q;
   if (r.error) return { ok: false, message: plainDatabaseMessage(r.error) };
   const id = r.data.id as string;
+  // REQ-033 FR-5 (D-2935): an improvement row done addresses the open finding it came from.
+  if (slug === "improvements" && values.done_on) {
+    const linked = await ctx.supabase
+      .from("findings")
+      .update({
+        status: "addressed",
+        addressed_on: values.done_on,
+        addressed_by_role: values.owner_role ?? "Owner",
+      })
+      .eq("account_id", ctx.account.id)
+      .eq("improvement_id", id)
+      .eq("status", "open")
+      .select("id");
+    for (const f of (linked.data as { id: string }[] | null) ?? []) {
+      await trail(
+        ctx.supabase,
+        ctx.account.id,
+        "findings",
+        f.id,
+        "updated",
+        `Addressed ${values.done_on} with the improvement row.`,
+      );
+      await audit(
+        ctx.supabase,
+        ctx.account.id,
+        ctx.viewer.user.id,
+        "register.findings.addressed",
+        f.id,
+      );
+    }
+  }
   if (slug !== "decisions")
     await trail(
       ctx.supabase,

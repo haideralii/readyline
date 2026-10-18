@@ -50,17 +50,17 @@ export async function FindingAnswers({
         >
           {mapping.documents.map((d) => (
             <li key={d.typeId} data-testid="finding-answer">
-              {setId ? (
+              {
                 <Link
-                  href={`/documents/${setId}/${d.typeId}`}
+                  href={
+                    setId ? `/documents/${setId}/${d.typeId}` : "/documents"
+                  }
                   className="underline underline-offset-4"
                   data-testid="finding-answer-link"
                 >
                   {d.title}
                 </Link>
-              ) : (
-                <span>{d.title}</span>
-              )}
+              }
               {d.section ? (
                 <span className="text-ink">
                   , section {d.section.number} {d.section.heading}
