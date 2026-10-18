@@ -232,7 +232,7 @@ test.describe("bring your audit findings (REQ-033)", () => {
       .getByTestId("audit-day-form-improvements")
       .getByRole("button", { name: "Save changes" })
       .click();
-    await expect(page.getByText("Done 2026-10-05")).toBeVisible();
+    await expect(page.getByText("Done 2026-10-05").first()).toBeVisible();
     await page.goto("/registers/findings");
     await page
       .getByTestId("findings-list")
