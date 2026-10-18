@@ -1,5 +1,4 @@
 import type { TestInfo } from "@playwright/test";
-import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import {
   generateAuditorToken,
@@ -92,7 +91,8 @@ export async function createLaunchReviewTenants(
       })
     ).error,
   );
-  const inviteToken = `inv-${randomUUID()}`;
+  // The invite and report pages accept the auditor token's own shape (AUDITOR_TOKEN_PATTERN); #123, run 39135999695.
+  const inviteToken = generateAuditorToken();
   fail(
     "invitation",
     (
@@ -105,7 +105,7 @@ export async function createLaunchReviewTenants(
       })
     ).error,
   );
-  const reportToken = `rep-${randomUUID()}`;
+  const reportToken = generateAuditorToken();
   fail(
     "report link",
     (

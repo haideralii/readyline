@@ -128,14 +128,26 @@ export async function keyboardPass(
   // A page may focus its heading on arrival (the questionnaire steps do, REQ-003
   // AC-11); the walk starts from the top of the document so the header's links
   // are counted too.
-  await page.evaluate(() => {
-    // Blurring alone leaves the sequential-focus starting point on the heading;
-    // focusing the body moves it to the top, so the first Tab lands on the first
-    // focusable element.
-    document.body.tabIndex = -1;
-    document.body.focus();
-    document.body.removeAttribute("tabindex");
-  });
+  // The step's own focus move can land after the walk has started (#123, run
+  // 39135999695: the runner reached the supports step's heading focus late and
+  // the header's links were counted as never reached), so the start point is
+  // taken again until the body has held focus for a moment.
+  await page.waitForLoadState("networkidle").catch(() => undefined);
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    await page.evaluate(() => {
+      // Blurring alone leaves the sequential-focus starting point on the heading;
+      // focusing the body moves it to the top, so the first Tab lands on the first
+      // focusable element.
+      document.body.tabIndex = -1;
+      document.body.focus();
+      document.body.removeAttribute("tabindex");
+    });
+    await page.waitForTimeout(150);
+    const onBody = await page.evaluate(
+      () => document.activeElement === document.body,
+    );
+    if (onBody) break;
+  }
   const numbered = await numberFocusables(page);
   const reached = new Set<number>();
   const trail: string[] = [];
