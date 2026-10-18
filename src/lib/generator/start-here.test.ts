@@ -251,7 +251,7 @@ describe("the Start here sheet (REQ-026)", () => {
       },
     ]);
     // The Word file's section 5 carries the same three, in order.
-    const model = startHereModel(sheet);
+    const model = startHereModel(sheet, input.documents[0].original.facts);
     const five = model.sections.find((s) => s.number === "5")!;
     const items = five.blocks.flatMap((b) =>
       b.type === "steps" ? b.items : [],
