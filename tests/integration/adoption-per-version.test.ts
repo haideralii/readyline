@@ -503,7 +503,10 @@ describe.skipIf(!enabled)(
       const summary = pdfText(files["readiness-summary.pdf"]);
       expect(summary).toContain("document control register");
       expect(
-        summary.match(new RegExp(`Adopted ${today} by Owner`, "g")),
+        // REQ-029 D-2855: "by whom" reads the version's snapshot, the name and the role the owner has from the start of this suite.
+        summary.match(
+          new RegExp(`Adopted ${today} by Jane Citizen, Owner`, "g"),
+        ),
       ).toHaveLength(2);
       expect(summary).not.toContain("Adopted not yet");
       const sheet = unzipSync(files[START_HERE_FILE]);

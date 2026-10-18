@@ -1,7 +1,12 @@
 "use client";
 import { PageShell } from "@/components/page-shell";
+import Link from "next/link";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
-import { STEP_TITLES } from "@/lib/questionnaire/navigation";
+import {
+  STEP_TITLES,
+  canOpenStep,
+  stepHref,
+} from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
 import { useQuestionnaire } from "./questionnaire-provider";
 import { Stepper } from "./stepper";
@@ -71,7 +76,21 @@ export function StepShell({
         </h1>
       </div>
 
-      <div className="mt-6">{children}</div>
+      <div className="mt-6">
+        {/* Live QA of b340ee3 (report A): after "Change my answers" the way back to the result is on every step while one exists. */}
+        {step !== "result" && ready && canOpenStep("result", answers) ? (
+          <p className="mb-4 text-sm">
+            <Link
+              href={stepHref("result")}
+              className="inline-flex min-h-11 items-center underline underline-offset-4"
+              data-testid="back-to-result"
+            >
+              Back to your result
+            </Link>
+          </p>
+        ) : null}
+        {children}
+      </div>
 
       <p
         className="text-slate mt-8 text-sm lg:w-[calc(58.333%-1rem)]"

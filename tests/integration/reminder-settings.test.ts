@@ -166,6 +166,43 @@ describe.skipIf(!enabled)("reminder settings (REQ-022 Session B)", () => {
     expect(still.data).toHaveLength(1);
   });
 
+  it("D-2836: the owner turns the reminders back on through resumeReminders, with one audit line; a second call changes nothing", async () => {
+    const { resumeReminders, REMINDERS_RESUMED_ACTION } =
+      await import("@/server/email/reminder-settings");
+    const off = await owner.client
+      .from("reminder_settings")
+      .update({
+        do_not_send: true,
+        do_not_send_reason: "unsubscribed",
+        do_not_send_at: new Date().toISOString(),
+      })
+      .eq("account_id", accountId)
+      .select("do_not_send");
+    expect(off.data?.[0]?.do_not_send).toBe(true);
+    const first = await resumeReminders(owner.client, accountId, owner.userId);
+    expect(first).toEqual({ ok: true, changed: true });
+    const row = await admin
+      .from("reminder_settings")
+      .select("do_not_send, do_not_send_reason, do_not_send_at")
+      .eq("account_id", accountId)
+      .single();
+    expect(row.data).toEqual({
+      do_not_send: false,
+      do_not_send_reason: null,
+      do_not_send_at: null,
+    });
+    const again = await resumeReminders(owner.client, accountId, owner.userId);
+    expect(again).toEqual({ ok: true, changed: false });
+    const audit = await admin
+      .from("audit_log")
+      .select("action, actor_user_id")
+      .eq("account_id", accountId)
+      .eq("action", REMINDERS_RESUMED_ACTION);
+    expect(audit.data).toEqual([
+      { action: REMINDERS_RESUMED_ACTION, actor_user_id: owner.userId },
+    ]);
+  });
+
   it("the flag needs its reason and time (the CHECK), and the reason is one of three", async () => {
     const bare = await admin
       .from("reminder_settings")

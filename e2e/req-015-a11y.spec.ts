@@ -277,7 +277,7 @@ test.describe("REQ-015 Section E", () => {
     await expect(card).toContainText(/Your audit: certification/);
     // REQ-025 FR-13: the audit kind's meaning under the heading comes from the glossary.
     await expect(card.getByTestId("audit-kind")).toContainText(
-      /An approved auditor reads your documents, visits where you work and talks to people/,
+      /The fuller audit: the auditor visits and talks to you, your workers and participants/,
     );
     // REQ-028 D-2805 (D-2707 restored): the one button says where it goes; "See the price" is the one link.
     const button = card.getByRole("link", { name: "Sign in to get ready" });

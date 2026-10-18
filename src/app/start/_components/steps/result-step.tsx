@@ -325,7 +325,7 @@ const MID_TERM_NONE = "Does not apply.";
 const REGISTERS_LEGEND =
   "Your pack includes a template for every register below; the subscription keeps them for you. An auditor samples them at the mid-term audit and at renewal.";
 const WHAT_NEXT_TEXT =
-  "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already have one.";
+  "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already bought the pack.";
 
 function ResultView({
   result,
@@ -468,6 +468,12 @@ function ResultView({
               // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the provider's
               // `clearing` flag holds the result step's guard back while the answers empty.
               onConfirm={() => {
+                // Live QA (report A): the open-sections memory goes with the draft.
+                try {
+                  localStorage.removeItem(OPEN_KEY);
+                } catch {
+                  // Storage blocked: nothing was kept.
+                }
                 void clearDraft();
                 router.push("/start");
               }}
@@ -555,7 +561,8 @@ function ResultView({
               standards below still apply to you.
             </p>
           ) : null}
-          {/* REQ-025 FR-5: one list item per reason, the source as the link text; "opens in a new tab" said once. */}
+          {/* REQ-025 FR-5: one list item per reason, the source as the link text. Live QA of b340ee3, D7: each
+            link says it opens a new tab in its own name, as the guides do; the intro line stays for sighted readers. */}
           <p className="text-slate mt-2 text-sm" data-testid="reasons-intro">
             Each reason links to its source; the sources open in a new tab.
           </p>
@@ -577,7 +584,7 @@ function ResultView({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {x.source.title}
+                  {x.source.title} (opens in a new tab)
                 </a>
               </li>
             ))}
@@ -790,7 +797,7 @@ function ResultView({
             <Link href="/documents" className="underline underline-offset-2">
               Go to your documents
             </Link>{" "}
-            if you already have one.
+            if you already bought the pack.
           </p>
         </section>
 

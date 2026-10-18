@@ -633,3 +633,73 @@ export async function accountWorkerStates(
     riskAssessed: r.risk_assessed,
   }));
 }
+
+/**
+ * D-2845 (the acceptance read of REQ-024 B): the owner's confirmation of a
+ * worker's item, as the tick action writes it: the item row takes the
+ * confirmation date (and the worker's date when the owner records it for
+ * them, `recorded_by_owner`), the owner's tick row is appended with the
+ * owner as its actor, and the trail takes one `confirmed` line. One
+ * function, so the integration test confirms the way the page does rather
+ * than by a direct update of `confirmed_on`.
+ */
+export async function confirmWorkerItem(
+  supabase: SupabaseClient,
+  input: {
+    accountId: string;
+    userId: string;
+    listId: string;
+    item: Pick<WorkerOnboardingItem, "id" | "who">;
+    tickedOn: string;
+    tickedByRef: string;
+  },
+): Promise<
+  | { ok: true; itemRowId: string; tickId: string; recordedByOwner: boolean }
+  | { ok: false; error: { code?: string; message?: string } }
+> {
+  const current = await supabase
+    .from("onboarding_items")
+    .select("id, done_on, confirmed_on")
+    .eq("checklist_id", input.listId)
+    .eq("item_id", input.item.id)
+    .maybeSingle();
+  if (!current.data)
+    return { ok: false, error: { message: "That item was not found." } };
+  const recordedByOwner = input.item.who !== "owner" && !current.data.done_on;
+  const upd = await supabase
+    .from("onboarding_items")
+    .update({
+      confirmed_on: input.tickedOn,
+      done_on: current.data.done_on ?? input.tickedOn,
+      recorded_by_owner: recordedByOwner,
+    })
+    .eq("id", current.data.id)
+    .eq("account_id", input.accountId);
+  if (upd.error) return { ok: false, error: upd.error };
+  const inserted = await supabase
+    .from("onboarding_ticks")
+    .insert({
+      checklist_id: input.listId,
+      account_id: input.accountId,
+      item_id: input.item.id,
+      ticked_on: input.tickedOn,
+      ticked_by_ref: input.tickedByRef,
+      actor_user_id: input.userId,
+    })
+    .select("id")
+    .single();
+  if (inserted.error) return { ok: false, error: inserted.error };
+  await supabase.from("register_events").insert({
+    account_id: input.accountId,
+    register: "onboarding_items",
+    row_id: current.data.id,
+    kind: "confirmed",
+    note: `${input.item.id} confirmed on ${input.tickedOn}${recordedByOwner ? ", recorded by the manager" : ""}`,
+  });
+  return {
+    ok: true,
+    itemRowId: current.data.id as string,
+    tickId: inserted.data.id as string,
+    recordedByOwner,
+  };
+}
