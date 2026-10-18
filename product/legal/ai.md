@@ -1,6 +1,6 @@
 ---
 title: How Readyline uses AI
-updated: 2026-10-16
+updated: 2026-10-18
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -19,7 +19,7 @@ Every document shows which sections are which.
 
 ## Which model, and where your data goes
 
-We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
+We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check. The report you uploaded is never sent. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
 
 ## How we check the drafts
 
