@@ -147,7 +147,7 @@ function channel(hex: string, offset: number): number {
   return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
 }
 
-/** Relative luminance per WCAG 2.1. */
+/** Relative luminance per WCAG 2.2 (the 2.1 formula, unchanged). */
 export function luminance(hex: string): number {
   const h = hex.replace("#", "");
   return (
@@ -155,7 +155,7 @@ export function luminance(hex: string): number {
   );
 }
 
-/** Contrast ratio per WCAG 2.1, 1 to 21. */
+/** Contrast ratio per WCAG 2.2 (the 2.1 formula, unchanged), 1 to 21. */
 export function contrastRatio(a: string, b: string): number {
   const la = luminance(a);
   const lb = luminance(b);

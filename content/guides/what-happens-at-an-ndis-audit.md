@@ -112,7 +112,7 @@ No. The Commission describes it as a desktop review of the required documentary 
 
 ### Can I leave a participant out of the interviews?
 
-Participants are automatically enrolled unless they opt out; you tell them that. In practice auditors expect the full list and may choose not to interview someone who would be distressed, but you do not remove people from it.
+Participants are automatically enrolled unless they opt out; you tell them that. Auditors sample from the full list ("opt out"): every participant is included unless they decline, you record and pass on any decline, and you do not trim the list yourself.
 
 ### What happens if I get a non-conformity?
 
@@ -124,7 +124,7 @@ Within 14 days of a verification audit, and within 28 days of a certification or
 
 ### Who pays for the mid-term audit?
 
-You do, as with the first audit. It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date.
+You do, as with the first audit. It applies to certified providers at 18 months, and the Commission's own timeline has you preparing from 12 months after your registration date.
 
 ### What is a condition audit?
 

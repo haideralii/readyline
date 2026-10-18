@@ -7,7 +7,7 @@
   "items": [
     {
       "id": "verification",
-      "description": "A desk-based review of your documents by an approved auditor. No site visit. Typically the quicker and cheaper audit."
+      "description": "A desk-based review of your documents by an approved auditor. Usually the quicker audit, and usually the cheaper one, because there is no site visit."
     },
     {
       "id": "certification",

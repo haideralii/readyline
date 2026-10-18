@@ -153,7 +153,7 @@ Data model (first pass):
 
 - Before each phase, restate the plan in a few lines and list open questions; then proceed with sensible defaults and record them in `DECISIONS.md`.
 - Never invent regulatory content. If a fact about the standards, audit process or fees cannot be verified from the Commission's site, mark it `UNVERIFIED` in code comments and in `DECISIONS.md`.
-- Keep the UI plain, fast and accessible (WCAG 2.1 AA); many users are on phones.
+- Keep the UI plain, fast and accessible (WCAG 2.2 AA, D-2912); many users are on phones.
 - Write tests for anything deterministic before the implementation. Keep the generator outputs diffable so changes to prompts can be reviewed like code.
 - Do not add features outside this brief without asking.
 - Import the brand constant from `src/lib/brand.ts` everywhere the product name appears; the value is Readyline via `NEXT_PUBLIC_BRAND_NAME`, never hard-coded.

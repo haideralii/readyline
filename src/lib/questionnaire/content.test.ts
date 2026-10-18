@@ -81,6 +81,7 @@ describe("readyline content files", () => {
       ...documentSetsContent.always.map(documentTitle),
       ...documentSetsContent.registers.map((r) => r.title),
     ].join("\n");
+    // REQ-012 FR-4a (D-2942): no hold; the rule names claims against anyone.
     expect(findProhibitedClaims(text)).toEqual([]);
   });
 

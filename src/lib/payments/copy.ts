@@ -57,7 +57,7 @@ export const PRICING_COPY = {
   aiAppendixLink: "How Readyline uses AI",
   notLegalAdvice: GENERAL_INFORMATION_STATEMENT,
   /** Batch 45 item 9 (D-2001): two halves of equal weight, the subscription first, the pack second; no bundling, no discount. */
-  keepsEyebrow: "What keeps you audit-ready",
+  keepsEyebrow: "What keeps your evidence current",
   startEyebrow: "Where you start",
   /** Batch 49 item 2: the subscription card as a price line, a four-item list and the cancel line; the linking sentence lives on the registers page. */
   subscriptionPriceLine: (price: string | null) =>

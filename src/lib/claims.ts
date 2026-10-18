@@ -67,6 +67,60 @@ export const PROHIBITED_CLAIM_RULES: readonly Rule[] = [
       /(?:\bwe|\bour\s+(?:company|business|service)|Readyline)\s+(?:is|are)\s+(?:an?\s+)?(?:ndis[\s-]?)?registered\s+provider/gi,
     why: "We are not a registered provider and must not say so.",
   },
+  // REQ-012 FR-4a (D-2905, the lawyer's read L1, L3, L4): promises about the customer's
+  // outcome. Each is a promise, not a description: "certified providers have a mid-term
+  // audit" describes the sector; "certified documents" claims a status for ours.
+  {
+    id: "compliant-promise",
+    pattern:
+      /\b(?:you(?:'ll|\s+will)?\s+(?:be|are|become|stay|remain)|makes?\s+you|keeps?\s+you|your\s+(?:business|organisation|service)\s+(?:is|will\s+be|becomes?))\s+(?:fully\s+)?compliant\b/gi,
+    why: "Compliance is the auditor's and the Commission's finding, never ours to promise.",
+  },
+  {
+    id: "certified-claim",
+    pattern:
+      /\b(?:we|readyline|our\s+\w+)\s+certif(?:y|ies)\b|\bcertified\s+(?:documents?|policies|policy|pack|templates?|set|by\s+us|compliant)\b/gi,
+    why: "Only an approved quality auditor certifies, and only a provider, never a document.",
+  },
+  {
+    id: "audit-ready-promise",
+    pattern:
+      /\b(?:you(?:'ll|\s+will)?\s+(?:be|are|become|stay|remain)|makes?\s+you|keeps?\s+you|gets?\s+you|become)\s+audit[\s-]?ready\b|\baudit[\s-]?ready\s+in\s+\d/gi,
+    why: "Audit readiness is a promise about the outcome; the registers and reminders are what we sell.",
+  },
+  {
+    id: "ensures-you",
+    pattern: /\bensures?\s+(?:you|your)\b/gi,
+    why: "Nothing we provide ensures a customer's outcome.",
+  },
+  {
+    id: "will-pass",
+    pattern: /(?<!\bnot\b[^.]{0,40})\bwill\s+pass\b/gi,
+    why: "The audit's outcome is the auditor's.",
+  },
+  {
+    id: "ready-to-register",
+    pattern: /\bready\s+to\s+register\b/gi,
+    why: "Readiness to register is the Commission's judgement on the application, not ours.",
+  },
+  {
+    id: "free-with-fee",
+    pattern:
+      /\bfree\b[^.!?]{0,40}\b(?:pack|subscription|trial)\b|\b(?:pack|subscription|trial)\b[^.!?]{0,40}\bfree\b|\bfree\b[^.!?]{0,40}\$\s?\d|\$\s?\d[\d,.]*[^.!?]{0,40}\bfree\b/gi,
+    why: '"Free" within reach of a price or a paid product reads as a free paid product (ACL 29(1)(i)).',
+  },
+  // REQ-012 FR-4a (D-2906, L2; D-2942): comparative claims for Readyline
+  // against anyone. A comparison between the two audit kinds ("usually the
+  // cheaper one") is a fact about the Commission's process and passes. "The
+  // only" and "leading" are read with the noun they claim about (a tool, a
+  // provider, a service): the generator's lint reuses these rules on the
+  // model's replies, where a sole trader writes "I am the only worker".
+  {
+    id: "comparative",
+    pattern:
+      /\b(?:cheaper\s+than|cheapest|better\s+than|unlike\s+other|the\s+only\s+(?:tool|platform|product|service|software|app|system|provider|company|way)|(?:market|industry|australia'?s|the|a)[\s-]+leading\s+(?:\w+\s+)?(?:tool|platform|product|service|software|app|system|provider|company|compliance))\b/gi,
+    why: "A comparative claim needs a substantiated comparison we do not make.",
+  },
 ];
 
 /**

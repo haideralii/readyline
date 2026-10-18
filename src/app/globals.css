@@ -172,9 +172,15 @@ input[type="checkbox"] {
 /* A date or time input focuses a segment inside its own shadow tree, so the
    host matches :focus but not :focus-visible in Chromium and WebKit alike, and
    a keyboard user saw no ring (#39, run 38623216096). The ring is shown on
-   :focus for those two; a mouse user seeing it on a date field is fine. */
+   :focus for those two; a mouse user seeing it on a date field is fine. On the
+   runner's Linux Chromium the host matched neither pseudo-class (#123, run
+   39132527726: hasFocus=true, focus=false, outline none), so :focus-within,
+   which a focused shadow-tree segment satisfies, carries the same ring
+   (REQ-012 FR-3b). */
 input[type="date"]:focus,
-input[type="time"]:focus {
+input[type="time"]:focus,
+input[type="date"]:focus-within,
+input[type="time"]:focus-within {
   outline: 2px solid var(--ochre);
   outline-offset: 2px;
 }

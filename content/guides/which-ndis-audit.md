@@ -25,7 +25,7 @@ You do not choose. An auditor does not choose either. The list below is the Comm
 
 **Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
 
-Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+Nobody visits you, and nobody speaks to the people you support. Usually the quicker audit, and usually the cheaper one, because there is no site visit.
 
 **Certification** is a full audit in two stages.
 
@@ -107,5 +107,5 @@ An approved quality auditor, chosen and paid by you, from the Commission's list.
 - [NDIS Quality and Safeguards Commission: types of audits, audit outcome ratings and report timeframes](https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits) (read 11 October 2026)
 - [NDIS Quality and Safeguards Commission: mandatory registration (reform hub)](https://www.ndiscommission.gov.au/about-us/ndis-commission-reform-hub/mandatory-registration) (read 11 October 2026)
 - [NDIS Practice Standards and Quality Indicators](https://www.ndiscommission.gov.au/rules-and-standards/ndis-practice-standards)
-- [Mid-term audits](https://www.ndiscommission.gov.au/providers/registered-ndis-providers/mid-term-audits)
+- [NDIS Quality and Safeguards Commission: mid-term audit (on the types of audits page)](https://www.ndiscommission.gov.au/provider-registration/apply-registration/types-audits#midterm)
 - Readyline market research, 13 October 2026 (the later compulsory registration dates; marked UNVERIFIED above)
