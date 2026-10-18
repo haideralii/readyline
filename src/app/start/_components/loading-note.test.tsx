@@ -1,16 +1,19 @@
 // @vitest-environment jsdom
-import { act, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   LOADING_NOTE_AFTER_MS,
   LOADING_NOTE_TEXT,
   LoadingNote,
-} from "./loading-note";
+} from "./fields";
 
 /** Live QA of b340ee3, D8: the loading state says something after five seconds and nothing before. */
 describe("LoadingNote", () => {
   beforeEach(() => vi.useFakeTimers());
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
 
   it("shows nothing before the delay and the one line after it, as a status", () => {
     render(<LoadingNote />);

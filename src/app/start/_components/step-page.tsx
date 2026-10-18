@@ -7,7 +7,7 @@ import {
   stepHref,
 } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
-import { LoadingNote } from "./loading-note";
+import { LoadingNote } from "./fields";
 import { useQuestionnaire } from "./questionnaire-provider";
 import { StepShell } from "./step-shell";
 
