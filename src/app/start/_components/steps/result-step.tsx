@@ -396,7 +396,10 @@ function ResultView({
           <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
             {glossarySentence(`${pathwayWord}-audit`)}{" "}
             {/* REQ-031 D-2895, D-2887: the scope sentence, in the same line block so the card keeps its shape. */}
-            <span className="text-slate" data-testid="result-scope">
+            <span
+              className="text-slate block text-xs leading-5"
+              data-testid="result-scope"
+            >
               {RESULT_SCOPE_SENTENCE}
             </span>
           </p>
@@ -440,7 +443,9 @@ function ResultView({
           {/* REQ-028 FR-6, D-2805 (D-2707 restored): one primary button whose label says where it goes, one text
             link with no figure; the checklist link lives in the documents section; the "Next:" line is gone. */}
           <div data-testid="checklist-teaser">
-            <div className="mt-3 flex flex-col gap-3 sm:mt-4 sm:flex-row sm:items-center">
+            {/* REQ-031 D-2895: the scope sentence joined the card, so the row sits 4 px higher from sm and the button
+              ends inside the first screen again (REQ-015 FR-4; run read 731 of 720). */}
+            <div className="mt-3 flex flex-col gap-3 sm:mt-3 sm:flex-row sm:items-center">
               <Link
                 href={
                   signedIn
