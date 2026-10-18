@@ -43,11 +43,13 @@ We do not sell your information. We do not share it with anyone except the servi
 - Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States. Never the worker-detail fill, which runs in Sydney.
 - Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}. Anthropic processes our requests in the United States.
 - Stripe takes payments and keeps card details. Stripe may process data in the United States and elsewhere under its own privacy policy.
+- GitHub, in the United States, keeps a weekly encrypted copy of our database for up to 90 days; only the owner holds the key that opens it, and each copy is deleted after 90 days.
+- Sentry receives reports of errors on our servers, with email addresses and free text removed before they leave Australia, and stores them in the United States.
 - An email provider sends service emails.
 
 ## How long we keep it
 
-Your data stays while your account is open. If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires. Backups are deleted on their normal schedule after that.
+Your data stays while your account is open. If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires. An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted.
 
 ## Your choices
 

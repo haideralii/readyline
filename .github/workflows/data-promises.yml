@@ -1,0 +1,62 @@
+name: Data promises check
+
+# REQ-030 FR-5 (D-2869): once a month, the newest `jobs.purge.ran` row is read
+# over the database URL migrate.yml builds, and the run fails when it is older
+# than two days, so a purge job that has stopped is noticed within the month
+# rather than at an account deletion. The export's coverage of every account
+# table is a unit test in CI (src/lib/ops/data-coverage.test.ts), not this job.
+# First of the month, 07:00 Sydney (20:00 UTC on the last day of the month
+# before; daylight-saving drift accepted). Skips with a notice until the
+# secret exists. Minutes: about two a month.
+
+on:
+  schedule:
+    - cron: "0 20 1 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: data-promises
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  purge-age:
+    name: The purge job ran within two days (project dpwwzhylcyosnkmlcnnp)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_PROJECT_REF: dpwwzhylcyosnkmlcnnp
+      SUPABASE_POOLER_HOST: aws-0-ap-southeast-2.pooler.supabase.com
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - name: Check that the secret exists
+        id: gate
+        run: |
+          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "::notice title=Check skipped::SUPABASE_DB_PASSWORD is not set as a repository secret; nothing was read."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::add-mask::$SUPABASE_DB_PASSWORD"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          sparse-checkout: scripts/ops
+          sparse-checkout-cone-mode: false
+
+      - name: Build the database URL (never printed)
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          ENCODED="$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')"
+          echo "::add-mask::$ENCODED"
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_REF}:${ENCODED}@${SUPABASE_POOLER_HOST}:5432/postgres"
+          echo "::add-mask::$DB_URL"
+          echo "DB_URL=$DB_URL" >> "$GITHUB_ENV"
+
+      - name: Read the newest purge run and judge its age
+        if: steps.gate.outputs.ready == 'true'
+        run: node scripts/ops/data-promises.mjs "$(psql "$DB_URL" -At -v ON_ERROR_STOP=1 -c "select max(at) from public.audit_log where action = 'jobs.purge.ran'")"
