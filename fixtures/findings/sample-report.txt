@@ -1,0 +1,12 @@
+Sunrise Supports - Certification audit report (extract)
+Audit dates: 14 and 15 September 2026. Auditor: Example Certifiers Pty Ltd. This is a fictional report for Readyline's tests.
+
+Summary of findings
+
+1. Minor non-conformity. Core Module, Governance and operational management: incident management. The incident register showed two reportable incidents in the period with no record of the Commission being notified within the required time. Corrective action due by 30 November 2026.
+
+2. Major non-conformity. Core Module, Provision of supports: risk management. Quality indicator: "Risks to participants, workers and the provider are identified, analysed, prioritised and treated." No participant risk assessment was on file for three of the five participants sampled. Corrective action plan required within seven calendar days; follow-up within three months.
+
+3. Observation. Core Module, Rights and responsibilities: privacy and dignity. A support note for Mr J. Smith named him in full in the complaints register. Consider using participant codes in all registers.
+
+End of extract.

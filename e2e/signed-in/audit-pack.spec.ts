@@ -170,6 +170,8 @@ test.describe("the audit pack and the auditor link (REQ-020 Session A)", () => {
         expect.stringMatching(/^policy-reviews-\d{4}-\d{2}-\d{2}\.csv$/),
         expect.stringMatching(/^document-control-\d{4}-\d{2}-\d{2}\.csv$/),
         expect.stringMatching(/^corporate-risks-\d{4}-\d{2}-\d{2}\.csv$/),
+        // REQ-033 AC-5: the audit findings register is a file in every pack.
+        expect.stringMatching(/^findings-\d{4}-\d{2}-\d{2}\.csv$/),
         // Finding 25: the audit-day registers' shared event trail is a file too.
         expect.stringMatching(/^register-events-\d{4}-\d{2}-\d{2}\.csv$/),
       ]),

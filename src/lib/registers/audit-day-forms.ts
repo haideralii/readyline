@@ -67,8 +67,22 @@ import {
 // #74's run 38858109250: a raw ISO date in a list's detail line breaks at its
 // hyphen at 360 px (`2027-02-13` read "2027-02-" and "13."), so every date a
 // `detailOf` prints is the long form, "13 February 2027".
+import {
+  FINDINGS_ADD_LABEL,
+  FINDINGS_EMPTY,
+  FINDINGS_INTRO,
+  FINDINGS_TITLE,
+  FINDING_FIELDS,
+  FINDING_FILTERS,
+  FindingForm,
+  findingDetail,
+  findingStateTag,
+  findingTitle,
+  type FindingListRow,
+} from "./findings";
 import { formatLongDate } from "./status";
 import {
+  FINDING_COLUMNS,
   COMMISSION_CHANGE_COLUMNS,
   CONFLICT_COLUMNS,
   CORPORATE_RISK_COLUMNS,
@@ -965,6 +979,8 @@ export const AUDIT_DAY_SLUGS = [
   "hazards",
   // REQ-023 FR-10 (Session D).
   "commission-changes",
+  // REQ-033 FR-3.
+  "findings",
 ] as const;
 export type AuditDaySlug = (typeof AUDIT_DAY_SLUGS)[number];
 
@@ -1344,6 +1360,25 @@ export const AUDIT_DAY_META: Record<AuditDaySlug, RegisterMeta<never>> = {
   } satisfies RegisterMeta<
     CommissionChangeRow & { state: string; notify_by: string | null }
   >,
+  // REQ-033 FR-3, FR-7: the findings from the provider's last audit, in their words; the state is the provider's record.
+  findings: {
+    slug: "findings",
+    table: "findings",
+    view: "findings_status",
+    title: FINDINGS_TITLE,
+    singular: "finding",
+    intro: FINDINGS_INTRO,
+    addLabel: FINDINGS_ADD_LABEL,
+    empty: FINDINGS_EMPTY,
+    fields: FINDING_FIELDS,
+    schema: FindingForm,
+    filters: FINDING_FILTERS,
+    titleOf: (r) => findingTitle(r),
+    detailOf: (r) => findingDetail(r),
+    statusOf: (r) => findingStateTag(r),
+    orderBy: { column: "created_at", ascending: false },
+    columns: FINDING_COLUMNS,
+  } satisfies RegisterMeta<FindingListRow>,
 };
 
 export function metaFor(

@@ -90,6 +90,8 @@ export const IMPROVEMENT_SOURCES = [
   "other",
   // REQ-020 FR-9: a "no" in the quarterly self-check.
   "self-check",
+  // REQ-033 FR-5 (D-2935): a finding from the provider's last audit.
+  "audit-finding",
 ] as const;
 export type ImprovementSource = (typeof IMPROVEMENT_SOURCES)[number];
 
@@ -102,6 +104,25 @@ export const IMPROVEMENT_SOURCE_LABELS: Record<ImprovementSource, string> = {
   "external-audit": "The audit",
   other: "Something else",
   "self-check": "Our quarterly self-check",
+  "audit-finding": "Audit finding",
+};
+
+/** REQ-033 FR-3 (D-2932): the severity as the auditor wrote it, a closed list; major and minor are the Commission's ratings 0 and 1, an observation sits outside them. */
+export const FINDING_SEVERITIES = ["major", "minor", "observation"] as const;
+export type FindingSeverity = (typeof FINDING_SEVERITIES)[number];
+export const FINDING_SEVERITY_LABELS: Record<FindingSeverity, string> = {
+  major: "Major non-conformity",
+  minor: "Minor non-conformity",
+  observation: "Observation",
+};
+
+/** REQ-033 FR-3, FR-5: open until the provider addresses it; verified is the provider's record that the auditor accepted the change. */
+export const FINDING_STATUSES = ["open", "addressed", "verified"] as const;
+export type FindingStatus = (typeof FINDING_STATUSES)[number];
+export const FINDING_STATUS_LABELS: Record<FindingStatus, string> = {
+  open: "Open",
+  addressed: "Addressed",
+  verified: "Verified by the auditor",
 };
 
 /** REQ-020 FR-7: who a hazard could harm. */
@@ -276,6 +297,27 @@ export type ImprovementRow = {
   owner_role: string;
   due_on: string;
   done_on: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** REQ-033 FR-3: one finding from the provider's last audit, in the provider's words. */
+export type FindingRow = {
+  id: string;
+  account_id: string;
+  reference: string;
+  /** A standards.json id, or "" while unmapped (D-2933). */
+  standard_id: string;
+  indicator: string;
+  severity: FindingSeverity;
+  finding: string;
+  due_on: string | null;
+  status: FindingStatus;
+  addressed_on: string | null;
+  addressed_by_role: string;
+  verified_on: string | null;
+  improvement_id: string | null;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
 };
