@@ -63,13 +63,11 @@ describe.skipIf(!enabled)(
       if (rpc.error) throw rpc.error;
       accountId = rpc.data as string;
       member = await signUp(admin, env.url, env.publishableKey, "member");
-      const m = await admin
-        .from("memberships")
-        .insert({
-          user_id: member.userId,
-          account_id: accountId,
-          role: "member",
-        });
+      const m = await admin.from("memberships").insert({
+        user_id: member.userId,
+        account_id: accountId,
+        role: "member",
+      });
       if (m.error) throw m.error;
       const ent = await admin
         .from("entitlements")
