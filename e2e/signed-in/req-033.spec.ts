@@ -1,10 +1,15 @@
 import { test, expect, type Page } from "@playwright/test";
 import { unzipSync } from "fflate";
 import { readFileSync } from "node:fs";
+import { documentTypeById } from "@/lib/generator/catalogue";
+import { buildSkeleton } from "@/lib/generator/document-model";
+import { buildProviderFacts } from "@/lib/generator/facts";
+import { loadReferenceCases } from "@/lib/generator/reference-cases";
 import {
   generateAuditorToken,
   hashAuditorToken,
 } from "@/lib/registers/auditor-link";
+import { getStandardsDataset } from "@/lib/standards/dataset";
 import { axeSerious } from "../helpers/a11y";
 import { hasSupabaseForE2e } from "../helpers/env";
 import {
@@ -45,6 +50,8 @@ test.describe("bring your audit findings (REQ-033)", () => {
   test.describe.configure({ mode: "serial", timeout: 240_000 });
 
   let tenant: TestTenant;
+  let setId = "";
+  const INCIDENT_TYPE = "incident-management-policy-and-register";
 
   test.beforeAll(async ({}, testInfo) => {
     tenant = await createTenant({
@@ -56,6 +63,45 @@ test.describe("bring your audit findings (REQ-033)", () => {
       .from("entitlements")
       .insert({ account_id: tenant.accountId, kind: "subscription" });
     if (ent.error) throw ent.error;
+    // AC-3 needs the provider's set: one ready version of the incident
+    // management policy from the sole-trader fixture's skeleton, as the
+    // fill-at-download spec seeds its set.
+    const c = loadReferenceCases()[0];
+    const set = await tenant.admin
+      .from("version_sets")
+      .insert({
+        account_id: tenant.accountId,
+        created_by: tenant.userId,
+        answers_snapshot_hash: "req-033-e2e",
+        derived_result: c.result,
+        status: "ready",
+        document_count: 1,
+        fallback_section_count: 0,
+        generated_count: 0,
+        storage_prefix: "",
+      })
+      .select("id")
+      .single();
+    if (set.error) throw set.error;
+    setId = set.data.id as string;
+    const model = buildSkeleton({
+      type: documentTypeById(INCIDENT_TYPE)!,
+      facts: buildProviderFacts(c.answers, c.result),
+      dataset: getStandardsDataset(),
+      result: c.result,
+      version: "1",
+      generatedAt: "2026-10-14",
+    });
+    const ins = await tenant.admin.from("document_versions").insert({
+      version_set_id: setId,
+      account_id: tenant.accountId,
+      document_type_id: INCIDENT_TYPE,
+      version: 1,
+      status: "ready",
+      storage_path: `${tenant.accountId}/${setId}/${INCIDENT_TYPE}.v1.docx`,
+      model,
+    });
+    if (ins.error) throw ins.error;
   });
 
   test.afterAll(async () => {
@@ -86,6 +132,9 @@ test.describe("bring your audit findings (REQ-033)", () => {
     await expect(page.getByTestId("findings-blocked")).toContainText(
       "1 marked above cannot be saved",
     );
+    // AC-8: the new page, with its candidates showing, at both widths.
+    await axeAt(page, 1280, "findings import");
+    await axeAt(page, 360, "findings import");
     // The provider's own words: the name becomes a code and the save opens.
     const third = candidates.nth(2).getByTestId("findings-candidate-text");
     await third.fill(
@@ -123,9 +172,12 @@ test.describe("bring your audit findings (REQ-033)", () => {
     await expect(answers).toContainText(/section \d+/);
     await expect(answers).toContainText("Incident register");
     const link = page.getByTestId("finding-answer-link").first();
-    const href = await link.getAttribute("href");
-    expect(href).toMatch(/^\/documents/);
+    await expect(link).toHaveAttribute(
+      "href",
+      `/documents/${setId}/${INCIDENT_TYPE}`,
+    );
     await link.click();
+    await expect(page).toHaveURL(new RegExp(`/documents/${setId}/`));
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await axeAt(page, 360, "finding row");
   });
@@ -166,9 +218,31 @@ test.describe("bring your audit findings (REQ-033)", () => {
       page.getByText("Verified by the auditor 9 October 2026"),
     ).toBeVisible();
     await expect(page.getByTestId("finding-actions")).toHaveCount(0);
+    // AC-4's other direction: closing the improvement row from its own
+    // register marks its finding addressed with the row's day.
+    await page.goto("/registers/improvements");
+    await page
+      .getByTestId("improvements-list")
+      .getByRole("link", { name: /Audit finding FND-0002/ })
+      .first()
+      .click();
+    await page.getByTestId("row-edit").locator("summary").click();
+    await page.getByTestId("field-done_on").fill("2026-10-05");
+    await page
+      .getByTestId("audit-day-form-improvements")
+      .getByRole("button", { name: "Save changes" })
+      .click();
+    await expect(page.getByText("Done 2026-10-05")).toBeVisible();
+    await page.goto("/registers/findings");
+    await page
+      .getByTestId("findings-list")
+      .getByRole("link", { name: /FND-0002/ })
+      .first()
+      .click();
+    await expect(page.getByText("Addressed 5 October 2026")).toBeVisible();
     await page.goto("/path/audit-day");
     await expect(page.getByTestId("audit-day-findings")).toContainText(
-      "Findings from your last audit: 2 open, 1 verified by the auditor",
+      "Findings from your last audit: 1 open, 1 addressed, 1 verified by the auditor",
     );
     // The auditor's view and the pack.
     const token = generateAuditorToken();
