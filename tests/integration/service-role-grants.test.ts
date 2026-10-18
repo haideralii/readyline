@@ -195,6 +195,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   registration_periods: ["INSERT", "SELECT", "UPDATE"],
   // REQ-023 Session D (D-2341): the changes register; members read, subscribed members insert and update, nobody deletes.
   commission_changes: ["INSERT", "SELECT", "UPDATE"],
+  // REQ-032 FR-1 (SR-1): the holiday table; the client roles read it and nothing else.
+  public_holidays: ["SELECT"],
   // The status views.
   incidents_status: ["SELECT"],
   worker_clearances_status: ["SELECT"],

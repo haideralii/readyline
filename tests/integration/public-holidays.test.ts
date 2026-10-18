@@ -176,7 +176,11 @@ describe.skipIf(!enabled)(
       // A changed date moves it through the trigger; a changed severity makes it the 24-hour window.
       const moved = await nsw.client
         .from("incidents")
-        .update({ occurred_on: "2026-04-01", reported_on: "2026-04-01" })
+        .update({
+          occurred_on: "2026-04-01",
+          aware_on: "2026-04-01",
+          reported_on: "2026-04-01",
+        })
         .eq("id", a.data!.id)
         .select("notify_by")
         .single();
