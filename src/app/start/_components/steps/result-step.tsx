@@ -377,7 +377,7 @@ function ResultView({
 
   return (
     <div
-      className="min-h-screen lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8"
+      className="min-h-screen lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8 print:min-h-0"
       data-testid="result"
     >
       {/* REQ-028 FR-6: columns 1 to 5 sticky (the card, then the glossary directly under it, D-2701); 6 to 12 the sections. */}
