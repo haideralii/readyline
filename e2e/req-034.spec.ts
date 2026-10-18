@@ -66,7 +66,7 @@ test.describe("the trust page and the sample in both formats (REQ-034)", () => {
         .first()
         .click();
       await expect(page).toHaveURL(new RegExp(`/privacy#${anchor}$`));
-      await expect(page.locator(`h2#${anchor}`)).toBeInViewport();
+      await expect(page.locator(`h2[id="${anchor}"]`)).toBeInViewport();
     }
   });
 
