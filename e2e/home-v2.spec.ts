@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
 import { glossaryOnPage } from "./helpers/glossary";
-import { checkTables } from "./helpers/width";
+import { checkTables, checkWidths } from "./helpers/width";
 
 /**
  * Home page v2 (batch 24) on both projects: the hero asks the audit question
@@ -127,6 +127,66 @@ test.describe("home page v2 (batch 24)", () => {
     expect(bytes.length).toBeGreaterThan(5_000);
     const bad = await request.get("/sample/complaints-policy.docx?x=1");
     expect(bad.status()).toBe(400);
+  });
+
+  test("REQ-031 AC-8: the Start here sheet for the fictional sole trader sits under the sample, every line to do, with no link into an account", async ({
+    page,
+  }, testInfo) => {
+    await page.goto("/");
+    await page.getByTestId("home-cta-sample").click();
+    await expect(page).toHaveURL(/\/sample$/);
+    const block = page.getByTestId("sample-start-here");
+    await expect(block).toBeVisible();
+    // D-2896: the line above the sheet names the fictional provider.
+    await expect(page.getByTestId("sample-start-here-line")).toHaveText(
+      "This is the sheet you get with your documents, shown for Sunrise Supports, a fictional sole trader.",
+    );
+    await expect(block).toContainText("Start here: Sunrise Supports");
+    // Under the document and above "See which audit I need".
+    const docBox = (await page.getByTestId("sample-document").boundingBox())!;
+    const blockBox = (await block.boundingBox())!;
+    const ctaBox = (await page.getByTestId("sample-cta").boundingBox())!;
+    expect(blockBox.y).toBeGreaterThanOrEqual(docBox.y + docBox.height);
+    expect(ctaBox.y).toBeGreaterThanOrEqual(blockBox.y + blockBox.height);
+    // The REQ-026 page's headings, in order.
+    expect(
+      await block.getByRole("heading", { level: 3 }).allTextContents(),
+    ).toEqual([
+      "1. Your pack in one minute",
+      "2. Do these first",
+      "3. For each document",
+      "4. Registers",
+      "5. When you are done",
+    ]);
+    await expect(block.getByTestId("sheet-next").locator("li")).toHaveCount(3);
+    await expect(block.getByTestId("sheet-next")).toContainText(
+      "Check your systems before the audit",
+    );
+    // Every line to do, no tick, and no link into an account.
+    const lines = block.locator("[data-done]");
+    expect(await lines.count()).toBeGreaterThan(10);
+    expect(await block.locator('[data-done="true"]').count()).toBe(0);
+    await expect(block).not.toContainText("☑");
+    expect(
+      await block
+        .locator(
+          'a[href^="/documents"], a[href^="/checklist"], a[href^="/path"]',
+        )
+        .count(),
+    ).toBe(0);
+    expect(await block.getByTestId("start-here-download").count()).toBe(0);
+    // The sheet's words are in the page's one disclosure (REQ-027 FR-3).
+    await glossaryOnPage(page, { label: "sample with sheet" });
+    await checkWidths(page, "sample with sheet");
+    const axe = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa"])
+      .analyze();
+    expect(
+      axe.violations.filter((v) =>
+        ["serious", "critical"].includes(v.impact ?? ""),
+      ),
+    ).toEqual([]);
+    await shot(page, "sample-start-here", testInfo.project.name);
   });
 
   test("mission present; no counter or testimonial while the trust file is empty (items 3, 4); axe clean", async ({

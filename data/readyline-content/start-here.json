@@ -92,6 +92,10 @@
     {
       "text": "See what the auditor asks for on the day",
       "href": "/path/audit-day"
+    },
+    {
+      "text": "Check your systems before the audit",
+      "href": "/path/audit-day/check"
     }
   ]
 }

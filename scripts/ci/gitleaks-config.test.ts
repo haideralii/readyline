@@ -41,8 +41,10 @@ describe("the gitleaks exemptions are justified (REQ-012 FR-1g)", () => {
       // The nearest comment block above the entry names the file and a reason.
       let j = i - 1;
       const block: string[] = [];
-      while (j >= 0 && ignore[j].trim().startsWith("#"))
-        (block.unshift(ignore[j]), j--);
+      while (j >= 0 && ignore[j].trim().startsWith("#")) {
+        block.unshift(ignore[j]);
+        j--;
+      }
       const text = block.join(" ");
       expect(text, `comment above ${l}`).toContain(file);
       expect(text, `reason above ${l}`).toMatch(

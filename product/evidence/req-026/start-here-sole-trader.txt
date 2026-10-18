@@ -1,11 +1,11 @@
-Your audit: verification (an auditor checks your documents at a desk; nobody visits).
+Your audit: verification (an approved auditor checks your documents without coming to see you).
 15 documents and 5 registers.
 A document counts when it is filled in, read, and adopted.
 About how long: most documents take 15 to 30 minutes to fill in and read; the self-assessment about an hour.
 The owner's name, role and the approval date fill in from your account and on adoption.
 If a blank does not apply to you, write "not applicable" and why; do not delete the line.
-self-assessment: the form where you say how you meet each rule.
-adopt: sign and date a document so it is yours.
+self-assessment: the part of your application where you show, with evidence, how you meet each rule.
+adopt: take a document as your own and date it.
 You have 5 things to fill in across 3 documents.
 1. Governance policy: Who decides what; read first.
 2. Risk management policy and register: Every other document points here.
@@ -92,7 +92,6 @@ Read once: fixed text in sections 3, 7 to 10.
 7. Complaints management policy, procedure and register (about 25 minutes; 1 to fill in, 0 to review)
 Open: complaints-management-policy-and-register.docx
 ☐ Fill in: Section 8, Complaints register: [Action and outcome]
-☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
 ☐ Fill in Word: Section 8, Complaints register: [Code] (fill this in Word)
 ☐ Fill in Word: Section 8, Complaints register: [Summary] (fill this in Word)
 ☐ Make it yours: Section 1, Purpose (generic text: add your details)
@@ -154,7 +153,6 @@ Read once: fixed text in sections 2, 4 to 6.
 ☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
 13. Service agreement template (about 20 minutes; 0 to fill in, 0 to review)
 Open: service-agreement-template.docx
-☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
 ☐ Make it yours: Section 2, Parties (generic text: add your details)
 ☐ Make it yours: Section 3, Agreement terms (generic text: add your details)
 ☐ Make it yours: Section 4, Easy-read summary (generic text: add your details)
@@ -162,7 +160,6 @@ Read once: fixed text in sections 1, 5 to 7.
 ☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
 14. Participant rights, choice and control policy (about 20 minutes; 0 to fill in, 0 to review)
 Open: participant-rights-and-choice-policy.docx
-☐ Fill in Word: Easy Read version: [Easy Read version] (fill this in Word)
 ☐ Make it yours: Section 1, Purpose (generic text: add your details)
 ☐ Make it yours: Section 2, Scope (generic text: add your details)
 ☐ Make it yours: Section 4, Policy statement (generic text: add your details)
@@ -193,3 +190,4 @@ Policy review register: When each document was adopted and is next reviewed.
 Where: the template in your Governance policy.
 Tick off your readiness checklist: /checklist
 See what the auditor asks for on the day: /path/audit-day
+Check your systems before the audit: /path/audit-day/check

@@ -225,6 +225,77 @@ jobs:
       - name: Row-level security and tenancy tests
         run: npm run test:integration
 
+      # REQ-030 FR-2, AC-3 (D-2866): the restore rehearsal. The seeded stack is dumped and
+      # encrypted under a fixture passphrase (the production one never enters CI, SR-5), the
+      # plaintext never touching disk (SR-2); the stack is reset to a fresh one with the
+      # migrations applied, the copy is restored into it, and the integration suite runs again
+      # on the restored stack. The size and the seconds are in the log (the evidence).
+      # The runner image ships the PostgreSQL 16 client and the stack is major 17
+      # (supabase/config.toml); pg_dump refuses a server newer than itself, so the
+      # rehearsal needs the 17 client, installed as backup.yml installs it.
+      - name: PostgreSQL 17 client (the stack's major; the dump must not be older)
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          # The runner's /usr/bin/pg_dump is postgresql-common's wrapper, which picks the
+          # runner's own 16 cluster even with the 17 client installed (#115 at 7f37b36);
+          # the 17 binaries go first on PATH for every later step.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/17/bin/pg_dump --version
+          /usr/lib/postgresql/17/bin/pg_restore --version
+
+      # One step per command, so the jobs API (public) names the one that fails and
+      # the first step proves the database URL reaches the stack before any dump.
+      - name: Backup and restore rehearsal (REQ-030 FR-2, AC-3), the connection
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: |
+          test -n "$DB_URL" || { echo "FAIL SUPABASE_DB_URL is empty: supabase status -o env did not give DB_URL" >&2; exit 1; }
+          psql "$DB_URL" -Atc "select version()"
+          # The counts the restore must give back (PO, 18 Oct 18:50): auth.users and public.accounts.
+          before=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows before the dump: $before"
+          echo "ROWS_BEFORE=$before" >> "$GITHUB_ENV"
+
+      - name: Backup and restore rehearsal, the dump (scripts/ops/backup.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/backup.sh
+
+      - name: Backup and restore rehearsal, a fresh stack (migrations applied, no seed)
+        run: supabase db reset --local --no-seed
+
+      - name: Backup and restore rehearsal, the restore (scripts/ops/restore-rehearsal.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/restore-rehearsal.sh
+
+      - name: Backup and restore rehearsal, the counts after the restore match the counts before
+        env:
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+        run: |
+          after=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows after the restore: $after (before the dump: $ROWS_BEFORE)"
+          test "$after" = "$ROWS_BEFORE" || { echo "FAIL the restored stack does not hold what was dumped" >&2; exit 1; }
+
+      - name: Backup and restore rehearsal, the integration suite on the restored stack
+        run: npm run test:integration
+
       - name: Build for the signed-in end-to-end run
         run: npm run build
 

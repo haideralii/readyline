@@ -143,3 +143,12 @@ Scope: the controls in `threat-model.md` that ASVS 4.0 level 1 asks of every web
 | V7 | The uptime route writes one `audit_log` row with up and two status codes and reads no data (SR-4); the "Site down" issue carries status codes and times only (SR-3); the runbook names every secret by name and `incidents-runbook.test.ts` proves no address or token shape is on any line (SR-1) | Met |
 | V4 Access control | `/api/jobs/uptime` answers 404 without the cron bearer and `{ skipped }` off the production deployment, as the other job routes; the kick workflow's permissions are `contents: read` and `issues: write` only, nothing writes to the repository (SR-3) | Met |
 | V14 Configuration | A DSN lets anyone send events, so it rotates with the rest (runbook section 3, SR-5); no new secret for the uptime check (`GITHUB_TOKEN` is the job's own); `.env.example` names SENTRY_DSN and the check's variables and drops the unused `NEXT_PUBLIC_SENTRY_DSN` | Met |
+
+## REQ-030 Session B additions (18 Oct 2026, Dev-2)
+
+| Chapter | Control as built | State |
+| --- | --- | --- |
+| V6 Cryptography | The backup is encrypted with gpg's symmetric AES-256 under a repository secret of at least 24 random characters (the script refuses a shorter one), the passphrase read from a descriptor and masked in the workflow; the plaintext is piped and never on disk; the artifact alone is uploaded (SR-2) | Met |
+| V8 Data protection | The copy is the provider's data at rest in another jurisdiction, which the privacy page now names with the country, the 90 days and the owner's key (D-2872, D-2875); the lawyer's question 5.8 records the APP 8 reading (D-2871); the coverage test keeps every account table inside the export, the pack or a named reason | Met |
+| V14 Configuration | Both workflows gate on their secrets and skip with a notice, run under `contents: read`, build the database URL unprinted, and add no new database secret; CI's rehearsal uses a committed fixture passphrase and never the production one (SR-5); `workflows.test.ts` holds the shapes | Met |
+| V7 Logging | The backup writes one `audit_log` row with the size and the seconds, nothing else (SR-4); the monthly check prints an age and exits, naming no value | Met |
