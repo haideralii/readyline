@@ -7,6 +7,7 @@ import {
   stepHref,
 } from "@/lib/questionnaire/navigation";
 import type { StepId } from "@/lib/questionnaire/steps";
+import { LoadingNote } from "./loading-note";
 import { useQuestionnaire } from "./questionnaire-provider";
 import { StepShell } from "./step-shell";
 
@@ -68,14 +69,18 @@ export function StepPage({
           // A disabled fieldset, not `inert`: a browser refuses input to both,
           // but only "disabled" is what an automated test waits on before it
           // types, so nothing is typed into the form before it is live.
-          <fieldset
-            key="loading"
-            disabled
-            aria-busy="true"
-            className="m-0 min-h-[70vh] min-w-0 border-0 p-0"
-          >
-            {form}
-          </fieldset>
+          <>
+            <fieldset
+              key="loading"
+              disabled
+              aria-busy="true"
+              className="m-0 min-h-[70vh] min-w-0 border-0 p-0"
+            >
+              {form}
+            </fieldset>
+            {/* Live QA D8: a word after five seconds, so a form that stays disabled is never silent. */}
+            <LoadingNote />
+          </>
         ) : (
           <div className="min-h-[70vh]">
             <p className="text-slate" role="status">
