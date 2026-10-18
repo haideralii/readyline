@@ -54,6 +54,21 @@ export type GroupPage = {
 };
 
 /** "Assistance with daily personal activities" becomes "assistance-with-daily-personal-activities". */
+/**
+ * Slugs pinned where the name's spelling changed after the URL was published, so no link breaks
+ * (QA live b340ee3, report B): 0136 now reads "centre-based" (the Commission's Registration
+ * Requirements by Supports and Services document and the group's own description) while the
+ * registration-groups list page spells it "centrebased", which the slug keeps.
+ */
+const PINNED_SLUGS: Record<string, string> = {
+  "0136": "group-and-centrebased-activities",
+};
+
+/** The group's page slug: the pinned one where there is one, else the name's. */
+export function groupSlug(g: { code: string; name: string }): string {
+  return PINNED_SLUGS[g.code] ?? groupPageSlug(g.name);
+}
+
 export function groupPageSlug(name: string): string {
   return name
     .toLowerCase()
@@ -164,7 +179,7 @@ export function buildGroupPage(
   return {
     code: g.code,
     name: g.name,
-    slug: groupPageSlug(g.name),
+    slug: groupSlug(g),
     description: groupDescription(g.code) ?? "",
     synonyms: groupSynonyms(g.code),
     category: { id: categoryId, title: category?.title ?? "Other" },
@@ -211,9 +226,7 @@ export function findGroupPage(
   dataset: StandardsDataset,
   slug: string,
 ): GroupPage | null {
-  const g = dataset.registrationGroups.find(
-    (x) => groupPageSlug(x.name) === slug,
-  );
+  const g = dataset.registrationGroups.find((x) => groupSlug(x) === slug);
   return g ? buildGroupPage(dataset, g) : null;
 }
 
