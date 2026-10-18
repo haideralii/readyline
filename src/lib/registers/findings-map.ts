@@ -7,6 +7,7 @@
  * the account's own set.
  */
 import { catalogue, sectionsFor } from "@/lib/generator/catalogue";
+import { sectionNumbers } from "@/lib/generator/document-model";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 
 export type AnsweredIn = {
@@ -85,7 +86,10 @@ export function sectionForIndicator(
 } | null {
   const type = catalogue.items.find((t) => t.id === typeId);
   if (!type) return null;
-  const sections = sectionsFor(type);
+  // The document's rendered numbering (REQ-033 Session B found "section 5 Scope" for the document's
+  // section 2: the index counted the unnumbered front matter); only numbered sections are candidates.
+  const numbers = sectionNumbers(type);
+  const sections = sectionsFor(type).filter((s) => numbers.get(s.id));
   const want = words(indicator);
   let best: { index: number; score: number } | null = null;
   if (want.size > 0)
@@ -101,7 +105,7 @@ export function sectionForIndicator(
       : sections.findIndex((s) => s.mode === "tailored");
   if (index < 0) return null;
   return {
-    number: index + 1,
+    number: Number(numbers.get(sections[index].id)),
     heading: sections[index].heading,
     id: sections[index].id,
     mode: sections[index].mode,

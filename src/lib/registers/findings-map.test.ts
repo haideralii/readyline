@@ -6,6 +6,8 @@
  * unmapped finding has no line yet.
  */
 import { describe, expect, it } from "vitest";
+import { documentTypeById } from "@/lib/generator/catalogue";
+import { outlineFor } from "@/lib/generator/document-model";
 import { catalogue } from "@/lib/generator/catalogue";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
@@ -49,6 +51,20 @@ describe("the finding's mapping to the pack (REQ-033 FR-4)", () => {
     );
     expect(fallback).not.toBeNull();
     expect(sectionForIndicator("no-such-document", "x")).toBeNull();
+  });
+
+  it("numbers the section as the document renders it, never counting the unnumbered front matter (Session B)", () => {
+    const type = documentTypeById("complaints-management-policy-and-register")!;
+    const outline = outlineFor(type);
+    const s = sectionForIndicator(
+      type.id,
+      "The scope of the policy covers who can complain, including family members, nominees and advocates acting for a participant.",
+    )!;
+    expect(s.id).toBe("scope");
+    expect(String(s.number)).toBe(
+      outline.find((o) => o.id === "scope")!.number,
+    );
+    expect(s.mode).toBe("tailored");
   });
 
   it("AC-6: a standard no document carries reads D-2933's line; an unmapped finding has no line", () => {
