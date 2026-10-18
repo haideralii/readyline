@@ -28,17 +28,24 @@ function Line({
   kind,
 }: {
   line: FillLine | SectionLine;
-  kind: "fill" | "word" | "review" | "yours";
+  kind: "fill" | "adoption" | "word" | "review" | "yours";
 }) {
-  const done = "done" in line && kind === "fill" ? line.done : false;
+  const done =
+    "done" in line && (kind === "fill" || kind === "adoption")
+      ? line.done
+      : false;
+  // REQ-029 FR-4: an open line says where it fills in.
+  const note = "note" in line && !done ? line.note : null;
   const label =
     kind === "fill"
       ? "Fill in"
-      : kind === "word"
-        ? "Fill in Word"
-        : kind === "review"
-          ? "Review"
-          : "Make it yours";
+      : kind === "adoption"
+        ? "Fills in"
+        : kind === "word"
+          ? "Fill in Word"
+          : kind === "review"
+            ? "Review"
+            : "Make it yours";
   return (
     <li
       className="flex items-start gap-2 py-1 leading-7"
@@ -51,6 +58,7 @@ function Line({
       <span>
         <span className="sr-only">{done ? "Done: " : "To do: "}</span>
         <span className="font-medium">{label}:</span> {line.text}
+        {note ? `. ${note}.` : ""}
         {kind === "word" ? " (fill this in Word)" : ""}
         {kind === "yours" ? " (generic text: add your details)" : ""}
       </span>
@@ -165,6 +173,9 @@ export default async function StartHerePage({
                     line={l}
                     kind="fill"
                   />
+                ))}
+                {d.fillsOnAdoption.map((l) => (
+                  <Line key={`a-${l.blank}`} line={l} kind="adoption" />
                 ))}
                 {d.fillInWord.map((l) => (
                   <Line

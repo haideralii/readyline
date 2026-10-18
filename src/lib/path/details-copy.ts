@@ -131,3 +131,7 @@ export const DETAILS_REAPPROVED_LINE = (count: number) =>
     : `Re-approved. ${count} documents have new versions.`;
 export const DETAILS_REAPPROVE_NEEDS_NAME =
   "Add your name above first; a document is approved by a named person.";
+
+/** REQ-029 FR-9 (D-2861): the set page's sentence for a set filled before the details page existed. */
+export const DETAILS_OLDER_SET =
+  "This set was filled before your details page existed; to change the name in it, regenerate the section or start a new pack.";

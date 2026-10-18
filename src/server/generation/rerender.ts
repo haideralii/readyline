@@ -64,6 +64,8 @@ async function writeSummaryAndZip(input: {
   entries: Record<string, Uint8Array>;
   summaries: Summary[];
   blanks: DocumentBlank[];
+  /** REQ-029 FR-10: the facts the sheet's lines read done by. */
+  facts: Readonly<Record<string, string>>;
 }): Promise<void> {
   const { admin, store, set, rows, entries, summaries, blanks } = input;
   const first = rows[0]?.model;
@@ -106,6 +108,7 @@ async function writeSummaryAndZip(input: {
     adopted,
     subscribed,
     summaryVersion: "1",
+    facts: input.facts,
   });
   const ordered: Record<string, Uint8Array> = startHere
     ? {
@@ -167,6 +170,7 @@ async function rebuildDerivedFiles(input: {
       entries,
       summaries,
       blanks,
+      facts: inputs.facts,
     });
     await admin
       .from("version_sets")

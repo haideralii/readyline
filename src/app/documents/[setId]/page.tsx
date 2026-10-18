@@ -8,8 +8,10 @@ import { notFound, redirect } from "next/navigation";
 import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
 import {
   DETAILS_BEFORE_DOWNLOAD,
+  DETAILS_OLDER_SET,
   DETAILS_PAGE_LINK,
 } from "@/lib/path/details-copy";
+import { isTemplateSet } from "@/lib/generator/start-here";
 import { collectBlanks } from "@/lib/generator/blanks";
 import { openFormBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
@@ -99,6 +101,11 @@ export default async function DocumentSetPage({
       <div className="lg:flex lg:flex-wrap lg:items-start lg:justify-between lg:gap-8">
         <div className="min-w-0 lg:max-w-prose">
           <h1 className="mt-2">Document set</h1>
+          {!isTemplateSet(documents.map((d) => d.model)) ? (
+            <p className="text-slate mt-3 leading-7" data-testid="set-older">
+              {DETAILS_OLDER_SET}
+            </p>
+          ) : null}
           <p className="text-ink mt-3 leading-7" data-testid="set-summary">
             Drafted{" "}
             {new Date(set.created_at).toLocaleString("en-AU", {
