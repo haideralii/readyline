@@ -242,14 +242,15 @@ test.describe("REQ-029 Session A: fill at download", () => {
       expect(await axeSerious(page, "your details")).toEqual([]);
     });
 
+    // Next's route announcer is an alert too (#105, #112), so the summary is the one with its heading.
+    const summary = page.getByRole("alert").filter({ hasText: "Please fix" });
+
     await test.step("AC-12: square brackets are refused in words; a name in the free-text field warns and saves", async () => {
       await field("name").fill("[Jane]");
       await field("name").blur();
       await expect(page.getByTestId("fact-name")).toContainText(
         "No square brackets",
       );
-      // Next's route announcer is an alert too (#105, #112), so the summary is the one with its heading.
-      const summary = page.getByRole("alert").filter({ hasText: "Please fix" });
       await expect(summary).toContainText("Your name");
       await expect(
         page.locator('[role="alert"] a[href="#name"]'),
