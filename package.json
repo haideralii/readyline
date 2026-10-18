@@ -17,6 +17,7 @@
     "prebuild": "node --experimental-strip-types --no-warnings=ExperimentalWarning scripts/ops/check-env.ts",
     "build": "next build",
     "smoke": "node scripts/ops/smoke.mjs",
+    "headers": "node scripts/ops/check-headers.mjs",
     "legal:bundle": "node scripts/ops/legal-bundle.mjs",
     "check:bundle": "node scripts/ci/check-client-bundle.mjs",
     "generator:skeletons": "vitest run src/lib/generator/skeletons.test.ts",

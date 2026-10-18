@@ -60,7 +60,7 @@ jobs:
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       KICK_MAX_SECONDS: "1200"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           sparse-checkout: scripts/ops
           sparse-checkout-cone-mode: false
@@ -71,7 +71,7 @@ jobs:
       # CRON_SECRET is set and opens or closes the "Site down <date>" issue with GITHUB_TOKEN.
       - name: Restore the uptime check's state
         if: env.PROD_URL != ''
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .uptime-state.json
           key: uptime-state-${{ github.run_id }}
@@ -85,7 +85,7 @@ jobs:
 
       - name: Save the uptime check's state
         if: env.PROD_URL != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .uptime-state.json
           key: uptime-state-${{ github.run_id }}

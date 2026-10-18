@@ -19,6 +19,9 @@ export async function renderCoverSheet(input: {
   files: string[];
   /** REQ-023 FR-5: "Period shown: <label>." when the register files are filtered; null for the whole register. */
   periodLine?: string | null;
+  /** REQ-029 FR-11 (D-2863): the stored render's day line, and the statements every point of delivery carries. */
+  renderedLine?: string | null;
+  statements?: string[];
 }): Promise<Uint8Array> {
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -61,8 +64,16 @@ export async function renderCoverSheet(input: {
     wrap(input.periodLine, 11);
     wrap(PERIOD_COUNTS_LINE, 9);
   }
+  if (input.renderedLine) {
+    y -= 2;
+    wrap(input.renderedLine, 10);
+  }
   y -= 8;
-  wrap(GENERAL_INFORMATION_NOTICE, 9);
+  // The general-information notice is on every cover; a link's render adds the AI statement beside it (D-2863).
+  for (const s of input.statements?.length
+    ? input.statements
+    : [GENERAL_INFORMATION_NOTICE])
+    wrap(s, 9);
   y -= 10;
   text("What is inside, and the state of each record", 13, bold);
   y -= 2;

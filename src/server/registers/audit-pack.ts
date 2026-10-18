@@ -27,6 +27,9 @@ import {
   type PackLine,
 } from "@/lib/registers/audit-pack";
 import { renderCoverSheet } from "@/lib/registers/audit-pack-pdf";
+import type { DocumentModel } from "@/lib/generator/document-model";
+import { renderDocx } from "@/lib/generator/render-docx";
+import { filledForRead, readFillInputs } from "@/server/generation/read-fill";
 import { CSV_COLUMNS, toCsv, toCsvWithFirstLine } from "@/lib/registers/csv";
 import { documentTitle } from "@/lib/questionnaire/content";
 import {
@@ -97,6 +100,8 @@ export const DOCUMENT_CONTROL_COLUMNS = [
   "circulated_on",
   "circulated_workers",
   "state",
+  // REQ-029 D-2856: the day the contact detail changed after adoption, or empty.
+  "contact_updated_on",
 ] as const;
 
 /**
@@ -254,6 +259,8 @@ export async function buildAuditPack(input: {
   period?: Period;
   /** REQ-023 FR-8 (D-2309): the owner's rehearsal sheet rides the owner's pack, and the auditor link's only when ticked. */
   includeRehearsal?: boolean;
+  /** REQ-029 FR-11 (D-2863): the link's stored render says its day and carries the two statements on its cover. */
+  cover?: { renderedLine?: string; statements?: string[] };
 }): Promise<AuditPack> {
   const { supabase, admin, accountId, now } = input;
   const period = input.period ?? ALL_PERIOD;
@@ -377,7 +384,9 @@ export async function buildAuditPack(input: {
     // version the owner has not adopted never ships.
     const adoptedRows = await supabase
       .from("document_versions")
-      .select("document_type_id, version, adopted_on, storage_path")
+      .select(
+        "document_type_id, version, adopted_on, storage_path, model, approver_name, approver_role",
+      )
       .eq("account_id", accountId)
       .not("adopted_on", "is", null)
       .limit(2000);
@@ -388,14 +397,20 @@ export async function buildAuditPack(input: {
             version: number;
             adopted_on: string | null;
             storage_path: string;
+            model: DocumentModel;
+            approver_name: string | null;
+            approver_role: string | null;
           }[]
         | null) ?? [],
     );
+    // REQ-029 FR-3, FR-11 (D-2855): the stored file keeps its brackets; the
+    // pack carries each adopted document as a download renders it, both
+    // fills as they stand on the render day, without the draft mark.
+    const fillInputs = await readFillInputs(admin, accountId);
     for (const d of documents) {
       try {
-        files[`documents/${d.document_type_id}.docx`] = await downloadObject(
-          admin,
-          d.storage_path,
+        files[`documents/${d.document_type_id}.docx`] = new Uint8Array(
+          await renderDocx(filledForRead(d, fillInputs), { adopted: true }),
         );
       } catch (e) {
         log.warn("audit-pack.document-missing", {
@@ -414,6 +429,8 @@ export async function buildAuditPack(input: {
     lines: view.lines,
     files: names,
     periodLine: period.kind === "all" ? null : periodShownLine(period),
+    renderedLine: input.cover?.renderedLine ?? null,
+    statements: input.cover?.statements ?? [],
   });
   return {
     body: zipSync(files, { level: 6 }),

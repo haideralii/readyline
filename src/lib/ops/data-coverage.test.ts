@@ -1,7 +1,6 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { WORKER_EXPORT_TABLES } from "@/server/accounts/export";
+import { accountTables, accountTablesInSql } from "./account-tables";
 
 /**
  * REQ-030 FR-5, AC-8 (D-2869): every table whose migration gives it an
@@ -99,21 +98,6 @@ const SYSTEM_TABLES: Record<string, string> = {
  */
 const PENDING_PO_DECISION: Record<string, string> = {};
 
-/** Every `create table public.<name> (...)` whose body names an account_id column. */
-export function accountTables(dir = "supabase/migrations"): string[] {
-  const out = new Set<string>();
-  for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql"))) {
-    const sql = readFileSync(join(dir, file), "utf8");
-    const re =
-      /create table (?:if not exists )?public\.([a-z_]+)\s*\(([\s\S]*?)\);/gi;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(sql))) {
-      if (/\baccount_id\b/.test(m[2])) out.add(m[1]);
-    }
-  }
-  return [...out].sort();
-}
-
 describe("the data promises cover every account table (REQ-030 FR-5, AC-8)", () => {
   const tables = accountTables();
 
@@ -153,11 +137,7 @@ describe("the data promises cover every account table (REQ-030 FR-5, AC-8)", () 
   account_id uuid not null references public.accounts (id) on delete cascade,
   name text not null
 );`;
-    const re =
-      /create table (?:if not exists )?public\.([a-z_]+)\s*\(([\s\S]*?)\);/gi;
-    const found = [...fixture.matchAll(re)]
-      .filter((m) => /\baccount_id\b/.test(m[2]))
-      .map((m) => m[1]);
+    const found = accountTablesInSql(fixture);
     expect(found).toEqual(["widgets"]);
     const covered = new Set([
       ...EXPORT_TABLES,

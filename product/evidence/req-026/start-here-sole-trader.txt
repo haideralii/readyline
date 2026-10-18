@@ -65,9 +65,9 @@ Read once: fixed text in sections 3, 7 to 10.
 ☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
 5. Privacy and information management policy (about 30 minutes; 3 to fill in, 0 to review)
 Open: privacy-and-information-management-policy.docx
-☐ Fill in: Appendix: AI and digital tools: [other tool]
-☐ Fill in: Appendix: AI and digital tools: [allowed use]
-☐ Fill in: Appendix: AI and digital tools: [limits]
+☐ Fill in: Appendix: AI and digital tools: [other tool]. Fill this in on your details page.
+☐ Fill in: Appendix: AI and digital tools: [allowed use]. Fill this in on your details page.
+☐ Fill in: Appendix: AI and digital tools: [limits]. Fill this in on your details page.
 ☐ Fill in Word: Section 7, Consent form: [Yes / No] (fill this in Word)
 ☐ Fill in Word: Section 7, Consent form: [Notes] (fill this in Word)
 ☐ Fill in Word: Section 7, Consent form: [Who] (fill this in Word)
@@ -91,7 +91,7 @@ Read once: fixed text in sections 3, 7 to 10.
 ☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
 7. Complaints management policy, procedure and register (about 25 minutes; 1 to fill in, 0 to review)
 Open: complaints-management-policy-and-register.docx
-☐ Fill in: Section 8, Complaints register: [Action and outcome]
+☐ Fill in: Section 8, Complaints register: [Action and outcome]. Fill this in on your details page.
 ☐ Fill in Word: Section 8, Complaints register: [Code] (fill this in Word)
 ☐ Fill in Word: Section 8, Complaints register: [Summary] (fill this in Word)
 ☐ Make it yours: Section 1, Purpose (generic text: add your details)
@@ -104,7 +104,7 @@ Read once: fixed text in sections 3, 8 to 11.
 ☐ Adopt: sign and date the document control table, then mark it adopted on your documents page.
 8. Incident management policy, procedure and register (about 30 minutes; 1 to fill in, 0 to review)
 Open: incident-management-policy-and-register.docx
-☐ Fill in: Section 9, Incident register: [Action and outcome]
+☐ Fill in: Section 9, Incident register: [Action and outcome]. Fill this in on your details page.
 ☐ Fill in Word: Section 9, Incident register: [Code] (fill this in Word)
 ☐ Fill in Word: Section 9, Incident register: [Summary] (fill this in Word)
 ☐ Make it yours: Section 1, Purpose (generic text: add your details)
