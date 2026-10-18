@@ -38,8 +38,13 @@ export function stepStates(
   );
 }
 
+// Live QA of b340ee3, D4: six 2.75 rem circles are 396 px at 150 % text and 528 px at 200 %, wider than a 360 px
+// row, so they overlapped. The circle is the smaller of 2.75 rem and 15 % of the viewport (54 px at 360, 48 px at
+// 320), which keeps the 44 px tap target on every phone and lets the row hold six at any text size; the joining
+// lines sit at half the circle through the same variable.
+const CIRCLE_VAR = "[--circle:min(2.75rem,15vw)]";
 const circle =
-  "flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2";
+  "flex size-(--circle) items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2";
 
 export function Stepper({
   step,
@@ -134,6 +139,7 @@ export function Stepper({
           collapseUnderSm
             ? "mt-2 hidden items-start sm:flex"
             : "mt-2 flex items-start",
+          CIRCLE_VAR,
           circlesClassName ?? null,
         ]
           .filter(Boolean)
@@ -152,13 +158,13 @@ export function Stepper({
               {i > 0 ? (
                 <span
                   aria-hidden="true"
-                  className={`absolute top-[21px] right-1/2 left-0 h-0.5 ${i <= index ? "bg-ochre" : "bg-mist"}`}
+                  className={`absolute top-[calc(var(--circle)/2-1px)] right-1/2 left-0 h-0.5 ${i <= index ? "bg-ochre" : "bg-mist"}`}
                 />
               ) : null}
               {i < total - 1 ? (
                 <span
                   aria-hidden="true"
-                  className={`absolute top-[21px] right-0 left-1/2 h-0.5 ${i < index ? "bg-ochre" : "bg-mist"}`}
+                  className={`absolute top-[calc(var(--circle)/2-1px)] right-0 left-1/2 h-0.5 ${i < index ? "bg-ochre" : "bg-mist"}`}
                 />
               ) : null}
               {state === "done" ? (

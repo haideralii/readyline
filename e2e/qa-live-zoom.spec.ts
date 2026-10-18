@@ -44,5 +44,25 @@ test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
         expect(box.x + box.width).toBeLessThanOrEqual(width);
       }
     });
+
+    test(`D4 and D5: /start/business fits ${width} px at 200 % text and the six circles do not overlap`, async ({
+      page,
+    }) => {
+      await zoomed(page, width, "/start/business");
+      const circles = page
+        .getByTestId("stepper")
+        .locator("ol")
+        .last()
+        .locator("li > a, li > span[aria-current], li > span[aria-disabled]");
+      await expect(circles).toHaveCount(6);
+      let lastRight = 0;
+      for (const c of await circles.all()) {
+        const box = (await c.boundingBox())!;
+        expect(box.x).toBeGreaterThanOrEqual(lastRight - 1);
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        lastRight = box.x + box.width;
+      }
+      expect(lastRight).toBeLessThanOrEqual(width);
+    });
   }
 });
