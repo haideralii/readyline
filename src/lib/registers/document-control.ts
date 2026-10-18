@@ -23,6 +23,9 @@ export type DocumentControlInput = {
     created_at: string;
     /** REQ-024 A0 (D-2427): the Sydney day this latest version was adopted, from `document_versions.adopted_on`; null when it is not. */
     adopted_on: string | null;
+    /** REQ-029 D-2855: the approver snapshot on the version; "by whom" reads it before the account's facts. */
+    approver_name?: string | null;
+    approver_role?: string | null;
     /** D-2436: the date of an older adopted version of the type, in any set, when this one is not adopted; the row then reads "new version to adopt". */
     older_adopted_on?: string | null;
     /** The stored version's id, so the page can re-generate a section (backlog 8). */
@@ -155,7 +158,12 @@ export function documentControlRows(
       title: d.title,
       version: String(d.version),
       adopted_on: adopted,
-      adopted_by: adopted ? adoptedBy(input) : "",
+      adopted_by: adopted
+        ? adoptedBy({
+            adoptedByName: d.approver_name ?? input.adoptedByName,
+            adoptedByRole: d.approver_role ?? input.adoptedByRole,
+          })
+        : "",
       next_review_on: nextReview,
       circulated: circulation
         ? {

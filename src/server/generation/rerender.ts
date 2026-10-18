@@ -1,19 +1,15 @@
 import "server-only";
 /**
- * Re-renders a ready set with the account's facts filled into every blank
- * (REQ-017 FR-2, D-1702): a new document version per document whose text
- * changed, a fresh readiness summary and a fresh zip, so the provider never
- * opens Word to fill a blank. Deterministic and model-free: the stored
- * models are the input. Uses the admin client for storage and the version
- * rows the way the job does (D-538). REQ-024 A0 (D-2441): the summary and
- * the zip can also be rebuilt on their own, after an adoption, with no new
- * version row.
+ * The derived files of a ready set (REQ-017 FR-2, D-1702; REQ-029 FR-2,
+ * FR-3, D-2855): the readiness summary, the README, the Start here sheet
+ * and the zip, rendered from the stored models through the two read-time
+ * fills, so the provider never opens Word to fill a blank and no document
+ * version is ever inserted for a fact. Deterministic and model-free. Uses
+ * the admin client for storage the way the job does (D-538).
  */
 import { strToU8, zipSync } from "fflate";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { adoptionsByType, applyAdoption } from "@/lib/generator/adoption";
 import { collectBlanks, type DocumentBlank } from "@/lib/generator/blanks";
-import { applyFacts } from "@/lib/generator/facts-fill";
 import { renderSummaryPdf } from "@/lib/generator/pdf-summary";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { auditOrder } from "@/lib/generator/set-order";
@@ -28,8 +24,9 @@ import {
   listFirstDocuments,
   listLatestDocuments,
 } from "./queries";
-import { DOCX_TYPE, documentStatus, readmeText } from "./run";
+import { documentStatus, readmeText } from "./run";
 import { renderStartHere, startHereFromRows } from "./start-here";
+import { filledForRead, readFillInputs } from "./read-fill";
 import { objectPath } from "./storage";
 import {
   SupabaseGenerationStore,
@@ -123,75 +120,50 @@ async function writeSummaryAndZip(input: {
   );
 }
 
-export async function rerenderSetWithFacts(input: {
+/**
+ * REQ-029 FR-2, FR-3 (D-2855): the derived files of a set, rebuilt from the
+ * stored models through the two fills (`filledForRead`). No document version
+ * is inserted for a fact change: the stored model stays the template, and
+ * every `.docx` in the zip, the summary's blank list and the Start here
+ * sheet are rendered from the filled models here, the adopted ones without
+ * the draft mark. A version changes only for content (a regenerated section,
+ * a rule change, a re-approval, a new pack).
+ */
+async function rebuildDerivedFiles(input: {
   admin: SupabaseClient;
   set: VersionSetRow;
-  facts: Readonly<Record<string, string>>;
-}): Promise<{ changed: number; blanksLeft: number }> {
-  const { admin, set, facts } = input;
-  const startedAt = Date.now();
+  /** The facts to fill with; read from the account when not given. */
+  facts?: Readonly<Record<string, string>>;
+}): Promise<{ documents: number; blanksLeft: number }> {
+  const { admin, set } = input;
   const store = new SupabaseGenerationStore(admin);
   const sorted = inAuditOrder(await listLatestDocuments(admin, set.id));
-  let changed = 0;
+  const inputs = await readFillInputs(admin, set.account_id);
+  if (input.facts) inputs.facts = { ...input.facts };
   const entries: Record<string, Uint8Array> = {};
   const summaries: Summary[] = [];
   const blanks: DocumentBlank[] = [];
-  const rows: DocumentVersionRow[] = [];
   let providerInputSections = 0;
-  // Retro review of REQ-018 to 021, finding 3 (PO decision 3): an adopted
-  // document's own control table carries the register's adoption date and
-  // next review date, so the Word file and the summary's first page agree.
-  // Read before the loop; the summary reads the register again after it so
-  // its version column is current.
-  const adoptions = adoptionsByType(
-    await documentControlForSet(admin, set.account_id, set.id),
-  );
   for (const d of sorted) {
-    const withFacts = applyFacts(d.model, facts);
-    const adoption = adoptions.get(d.document_type_id);
-    const filled = adoption ? applyAdoption(withFacts, adoption) : withFacts;
-    const same = JSON.stringify(filled) === JSON.stringify(d.model);
-    let row = d;
-    if (!same) {
-      const docx = await renderDocx(filled);
-      const version = d.version + 1;
-      const path = objectPath(
-        set.account_id,
-        set.id,
-        `${d.document_type_id}.v${version}.docx`,
-      );
-      await store.putObject(path, new Uint8Array(docx), DOCX_TYPE);
-      const { status } = documentStatus(filled);
-      row = await store.insertDocumentVersion({
-        version_set_id: set.id,
-        account_id: set.account_id,
-        document_type_id: d.document_type_id,
-        version,
-        status,
-        storage_path: path,
-        model: filled,
-      });
-      changed += 1;
-    }
-    rows.push(row);
-    const s = documentStatus(row.model);
+    const filled = filledForRead(d, inputs);
+    entries[`${d.document_type_id}.docx`] = new Uint8Array(
+      await renderDocx(filled, { adopted: Boolean(d.adopted_on) }),
+    );
+    const s = documentStatus(filled);
     summaries.push({
-      title: row.model.title,
+      title: filled.title,
       status: s.status,
       fallbackSections: s.fallbackSections,
     });
     providerInputSections += s.providerInputSections;
-    blanks.push(...collectBlanks(row.model));
-    entries[`${row.document_type_id}.docx`] = await store.getObject(
-      row.storage_path,
-    );
+    blanks.push(...collectBlanks(filled));
   }
-  if (rows.length) {
+  if (sorted.length) {
     await writeSummaryAndZip({
       admin,
       store,
       set,
-      rows,
+      rows: sorted,
       entries,
       summaries,
       blanks,
@@ -201,30 +173,43 @@ export async function rerenderSetWithFacts(input: {
       .update({ provider_input_section_count: providerInputSections })
       .eq("id", set.id);
   }
-  // The guided-path spec waits on this step; `ms` says how long a whole-set
-  // re-render took on the host (runs 38665790472 and 38826340580). D-2266
-  // (PO 16 Oct 21:30, #78's run 38881965824): CI's web server surfaces warn
-  // and above alone, so in CI the line is written at warn and the number
-  // reaches the job log; production keeps it at info.
+  return { documents: sorted.length, blanksLeft: blanks.length };
+}
+
+/**
+ * The Finish page's step and the facts' rebuild (REQ-017 FR-2 as REQ-029
+ * FR-2 reads it): the zip and the summary carry the facts; `changed` is
+ * always 0 now, kept in the line for the runs that read it.
+ */
+export async function rerenderSetWithFacts(input: {
+  admin: SupabaseClient;
+  set: VersionSetRow;
+  facts: Readonly<Record<string, string>>;
+}): Promise<{ changed: number; blanksLeft: number }> {
+  const startedAt = Date.now();
+  const out = await rebuildDerivedFiles(input);
+  // `ms` says how long a whole-set rebuild took on the host (runs
+  // 38665790472 and 38826340580). D-2266 (PO 16 Oct 21:30, #78's run
+  // 38881965824): CI's web server surfaces warn and above alone, so in CI
+  // the line is written at warn and the number reaches the job log;
+  // production keeps it at info.
   const fields = {
-    accountId: set.account_id,
-    versionSetId: set.id,
-    changed,
-    documents: sorted.length,
-    blanksLeft: blanks.length,
+    accountId: input.set.account_id,
+    versionSetId: input.set.id,
+    changed: 0,
+    documents: out.documents,
+    blanksLeft: out.blanksLeft,
     ms: Date.now() - startedAt,
   };
   if (reasonForCi()) log.warn("path.finish.rerendered", fields);
   else log.info("path.finish.rerendered", fields);
-  return { changed, blanksLeft: blanks.length };
+  return { changed: 0, blanksLeft: out.blanksLeft };
 }
 
 /**
- * REQ-024 A0 (D-2441): the summary-only pass after an adoption. The latest
- * rows are read, their stored docx bytes reused, the register and the Start
- * here sheet re-read, the summary PDF and the zip rewritten; no document
- * version is inserted and `provider_input_section_count` is left alone, so
- * the pack the owner downloads reads the adoption and nothing else moves.
+ * REQ-024 A0 (D-2441): the pass after an adoption; since REQ-029 the same
+ * rebuild, so the zip's adopted documents carry the snapshot and lose the
+ * draft mark. No document version is inserted.
  */
 export async function refreshSetSummary(
   admin: SupabaseClient,
@@ -232,36 +217,11 @@ export async function refreshSetSummary(
 ): Promise<{ documents: number }> {
   const set = await getVersionSet(admin, setId);
   if (!set) return { documents: 0 };
-  const store = new SupabaseGenerationStore(admin);
-  const rows = inAuditOrder(await listLatestDocuments(admin, set.id));
-  const entries: Record<string, Uint8Array> = {};
-  const summaries: Summary[] = [];
-  const blanks: DocumentBlank[] = [];
-  for (const row of rows) {
-    const s = documentStatus(row.model);
-    summaries.push({
-      title: row.model.title,
-      status: s.status,
-      fallbackSections: s.fallbackSections,
-    });
-    blanks.push(...collectBlanks(row.model));
-    entries[`${row.document_type_id}.docx`] = await store.getObject(
-      row.storage_path,
-    );
-  }
-  await writeSummaryAndZip({
-    admin,
-    store,
-    set,
-    rows,
-    entries,
-    summaries,
-    blanks,
-  });
+  const out = await rebuildDerivedFiles({ admin, set });
   log.info("path.adopt.summary-refreshed", {
     accountId: set.account_id,
     versionSetId: set.id,
-    documents: rows.length,
+    documents: out.documents,
   });
-  return { documents: rows.length };
+  return { documents: out.documents };
 }

@@ -5,9 +5,10 @@
  * then names that person. The one-line reason and the link the screen and
  * the action both use.
  */
-export const ADOPT_NEEDS_NAME = "Type your name on the account page first.";
-export const ADOPT_NEEDS_NAME_HREF = "/account#ownerName";
-export const ADOPT_NEEDS_NAME_LINK = "Go to your account page";
+export const ADOPT_NEEDS_NAME = "Add your name on your details page first.";
+export const ADOPT_NEEDS_NAME_LINK = "Go to your details page";
+/** REQ-029 FR-1, FR-5: the set's "Your details" page. */
+export const detailsHref = (setId: string) => `/documents/${setId}/finish`;
 
 /**
  * QA pass F1 (17 Oct 2026, D-2269): the adopt step's refusal when the set its
