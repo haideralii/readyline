@@ -1,0 +1,98 @@
+{
+  "note": "REQ-032 FR-1 (D-2914 to D-2916). The public holidays that count in a business-day window, one file a year, one row per holiday and jurisdiction, typed from the eight state and territory government pages on the read date below. The national dataset the REQ named is retired (see retiredDataset), so the pages its record points to are the source. Statewide whole-day holidays only: part-day holidays, regional days and public-service-only days are left out (see excluded). Facts, not instructions: the loader refuses a row whose date or jurisdiction is not in the closed list (SR-2).",
+  "readAt": "2026-10-18",
+  "definition": {
+    "instrument": "Acts Interpretation Act 1901 s 2B (Compilation No. 39, 28 March 2026)",
+    "url": "https://www.legislation.gov.au/C1901A00002/latest/text",
+    "text": "business day means a day that is not a Saturday, a Sunday or a public holiday in the place concerned.",
+    "appliesThrough": "Legislation Act 2003 s 13; neither the Incident Management and Reportable Incidents Rules 2018 (s 4) nor the Practice Standards—Worker Screening Rules 2018 (s 5) defines the term",
+    "readAt": "2026-10-18"
+  },
+  "retiredDataset": {
+    "title": "Australian Public Holidays Dates Machine Readable Dataset [INACTIVE]",
+    "publisher": "Department of the Prime Minister and Cabinet",
+    "url": "https://data.gov.au/data/dataset/australian-holidays-machine-readable-dataset",
+    "licence": "Creative Commons Attribution 3.0 Australia",
+    "coverage": "2019-01-01 to 2025-12-31",
+    "status": "The record says the department is no longer maintaining the dataset and no further updates will be released, and points to the state and territory pages below",
+    "readAt": "2026-10-18"
+  },
+  "jurisdictions": {
+    "NSW": {
+      "title": "NSW Government, Public holidays",
+      "url": "https://www.nsw.gov.au/about-nsw/public-holidays",
+      "licence": "Copyright © 2026 NSW Government; no licence statement on the page",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "VIC": {
+      "title": "Business Victoria, Victorian public holidays 2026 and 2027",
+      "url": "https://business.vic.gov.au/business-information/public-holidays/victorian-public-holidays-2026",
+      "url2027": "https://business.vic.gov.au/business-information/public-holidays/victorian-public-holidays-2027",
+      "licence": "State of Victoria; no licence statement on the page",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "QLD": {
+      "title": "Queensland Government, Queensland public holidays",
+      "url": "https://www.qld.gov.au/recreation/travel/holidays/public",
+      "licence": "© The State of Queensland 1995 - 2026; no licence statement on the page; last updated 16 January 2026",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "SA": {
+      "title": "SafeWork SA, Public holidays (Public Holidays Act 2023)",
+      "url": "https://www.safework.sa.gov.au/resources/public-holidays",
+      "licence": "Government of South Australia; no licence statement on the page",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "WA": {
+      "title": "Government of Western Australia, Public holidays in Western Australia",
+      "url": "https://www.wa.gov.au/service/employment/workplace-arrangements/public-holidays-western-australia",
+      "licence": "© Government of Western Australia 2017 to 2026; no licence statement on the page; last updated 2 September 2026",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "TAS": {
+      "title": "WorkSafe Tasmania, Public holidays (Statutory Holidays Act 2000), Table 1 statewide",
+      "url": "https://worksafe.tas.gov.au/topics/laws-and-compliance/public-holidays",
+      "licence": "Tasmanian Government; no licence statement on the page",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "ACT": {
+      "title": "ACT Government, Public holidays, school terms and daylight saving",
+      "url": "https://www.act.gov.au/living-in-the-act/public-holidays-school-terms-and-daylight-saving",
+      "licence": "ACT Government; no licence statement on the page; last updated 14 August 2026",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    },
+    "NT": {
+      "title": "Northern Territory Government, NT public holidays",
+      "url": "https://nt.gov.au/nt-public-holidays",
+      "licence": "© 2026 Northern Territory Government of Australia; no licence statement on the page",
+      "years": [2026, 2027],
+      "readAt": "2026-10-18"
+    }
+  },
+  "excluded": [
+    "Part-day holidays (Christmas Eve and New Year's Eve from 6 or 7 pm in QLD, SA and NT): not a day.",
+    "Regional days (Brisbane's Royal Queensland Show; WA's Karratha and Port Hedland King's Birthday; the NT's five show days; Tasmania's Table 2 regional days): local, the REQ's exclusion.",
+    "Days observed generally by a state's public service alone (Tasmania's Easter Tuesday, Launceston Cup and Devonport Cup).",
+    "The NSW Bank Holiday (the page says it is not a declared public holiday)."
+  ],
+  "unverified": [
+    {
+      "jurisdiction": "VIC",
+      "year": 2027,
+      "name": "Friday before the AFL Grand Final",
+      "reason": "The page reads 'Subject to AFL schedule'; no row until the date is published, so a Victorian count across late September 2027 may read one business day short until then."
+    },
+    {
+      "jurisdiction": "QLD",
+      "name": "Easter Saturday",
+      "reason": "The page lists it in its holiday table as 'The day after Good Friday'; counted as a public holiday."
+    }
+  ]
+}

@@ -1910,6 +1910,27 @@
       "sourceId": "mandatory-sil"
     }
   },
+  "businessDay": {
+    "$comment": "REQ-032 D-2914 (Dev-1, 2026-10-18): the meaning of business day in the Rules, verified against the instruments on legislation.gov.au.",
+    "definition": "business day means a day that is not a Saturday, a Sunday or a public holiday in the place concerned.",
+    "instrument": "Acts Interpretation Act 1901 s 2B, Compilation No. 39 (28 March 2026)",
+    "url": "https://www.legislation.gov.au/C1901A00002/latest/text",
+    "appliesThrough": "Legislation Act 2003 s 13",
+    "rulesChecked": [
+      {
+        "instrument": "NDIS (Incident Management and Reportable Incidents) Rules 2018, F2018L00633",
+        "definitions": "s 4 defines only \"Act\"; business days used in s 21(2)(b)",
+        "url": "https://www.legislation.gov.au/F2018L00633/latest/text"
+      },
+      {
+        "instrument": "NDIS (Practice Standards—Worker Screening) Rules 2018, F2018L00887 (F2021C00788)",
+        "definitions": "s 5 defines twenty-six terms, not business day; business days used in s 17(2)(b)",
+        "url": "https://www.legislation.gov.au/F2018L00887/latest/text"
+      }
+    ],
+    "verifiedAt": "2026-10-18",
+    "holidayTable": "data/public-holidays/ (source.json names the eight government pages)"
+  },
   "auditOutcomes": {
     "$comment": "REQ-033 D-2934 (Dev-1, 2026-10-18): the Commission’s wording on audit outcomes and corrective action, read before the findings register’s words were written.",
     "source": "NDIS Quality and Safeguards Commission, Information for quality auditors",

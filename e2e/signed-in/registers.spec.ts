@@ -10,10 +10,10 @@ import {
 } from "../helpers/session";
 import { checkTables, checkWidths } from "../helpers/width";
 import {
-  addBusinessDays,
-  minusBusinessDays,
-  todaySydney,
-} from "../helpers/dates";
+  addBusinessDaysDetailed,
+  businessDaysBracket,
+} from "@/lib/registers/public-holidays";
+import { minusBusinessDays, todaySydney } from "../helpers/dates";
 
 /**
  * REQ-009 Session B (batch 28) on all three projects: a subscribed owner
@@ -97,7 +97,11 @@ test.describe("registers (REQ-009 Session B)", () => {
     // for the incident, so a low-severity unauthorised restrictive practice's
     // five business days land ahead of today and the row reads "Notify by".
     const occurred = minusBusinessDays(today, 2);
-    const notifyBy = addBusinessDays(occurred, 5);
+    // REQ-032: the tenant is an NSW account, so its public holidays do not count and the line names any skipped.
+    const count = addBusinessDaysDetailed(occurred, 5, ["NSW"]);
+    const notifyBy = count.date;
+    const bracket = businessDaysBracket(count);
+    const notifyByLine = `${notifyBy}${bracket ? ` ${bracket}` : ""}`;
     await signInContext(context, tenant, baseURL!);
     await page.goto("/registers");
     await expect(page.getByTestId("registers-index")).toContainText(
@@ -163,7 +167,7 @@ test.describe("registers (REQ-009 Session B)", () => {
     await expect(
       page.getByTestId("due-soon").getByRole("listitem").first(),
     ).toContainText(
-      `Notify the Commission about incident INC-0001 by ${notifyBy}.`,
+      `Notify the Commission about incident INC-0001 by ${notifyByLine}.`,
     );
     await page.goto(incidentUrl);
 

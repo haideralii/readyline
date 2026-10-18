@@ -1,0 +1,531 @@
+{
+  "year": 2026,
+  "holidays": [
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "NSW",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "VIC",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "QLD",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "SA",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "WA",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "TAS",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "ACT",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-01",
+      "jurisdiction": "NT",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "NSW",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "VIC",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "QLD",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "SA",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "WA",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "TAS",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "ACT",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-01-26",
+      "jurisdiction": "NT",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2026-03-02",
+      "jurisdiction": "WA",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-03-09",
+      "jurisdiction": "VIC",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-03-09",
+      "jurisdiction": "SA",
+      "name": "Adelaide Cup Day"
+    },
+    {
+      "date": "2026-03-09",
+      "jurisdiction": "TAS",
+      "name": "Eight Hours Day"
+    },
+    {
+      "date": "2026-03-09",
+      "jurisdiction": "ACT",
+      "name": "Canberra Day"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "NSW",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "VIC",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "QLD",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "SA",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "WA",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "TAS",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "ACT",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-03",
+      "jurisdiction": "NT",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "NSW",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "VIC",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "QLD",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "SA",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "ACT",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-04",
+      "jurisdiction": "NT",
+      "name": "Easter Saturday",
+      "note": "VIC names it the Saturday before Easter Sunday; QLD the day after Good Friday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "NSW",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "VIC",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "QLD",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "SA",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "WA",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "ACT",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-05",
+      "jurisdiction": "NT",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "NSW",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "VIC",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "QLD",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "SA",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "WA",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "TAS",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "ACT",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-06",
+      "jurisdiction": "NT",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "NSW",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "VIC",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "QLD",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "SA",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "WA",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "TAS",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "ACT",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-25",
+      "jurisdiction": "NT",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2026-04-27",
+      "jurisdiction": "NSW",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Saturday"
+    },
+    {
+      "date": "2026-04-27",
+      "jurisdiction": "WA",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Saturday"
+    },
+    {
+      "date": "2026-04-27",
+      "jurisdiction": "ACT",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Saturday"
+    },
+    {
+      "date": "2026-05-04",
+      "jurisdiction": "QLD",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-05-04",
+      "jurisdiction": "NT",
+      "name": "May Day"
+    },
+    {
+      "date": "2026-06-01",
+      "jurisdiction": "WA",
+      "name": "Western Australia Day"
+    },
+    {
+      "date": "2026-06-01",
+      "jurisdiction": "ACT",
+      "name": "Reconciliation Day"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "NSW",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "VIC",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "SA",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "TAS",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "ACT",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-06-08",
+      "jurisdiction": "NT",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-08-03",
+      "jurisdiction": "NT",
+      "name": "Picnic Day"
+    },
+    {
+      "date": "2026-09-25",
+      "jurisdiction": "VIC",
+      "name": "Friday before the AFL Grand Final"
+    },
+    {
+      "date": "2026-09-28",
+      "jurisdiction": "WA",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-10-05",
+      "jurisdiction": "NSW",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-10-05",
+      "jurisdiction": "QLD",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2026-10-05",
+      "jurisdiction": "SA",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-10-05",
+      "jurisdiction": "ACT",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2026-11-03",
+      "jurisdiction": "VIC",
+      "name": "Melbourne Cup Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "NSW",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "VIC",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "QLD",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "SA",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "WA",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "TAS",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "ACT",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-25",
+      "jurisdiction": "NT",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "NSW",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "VIC",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "QLD",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "SA",
+      "name": "Proclamation Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "WA",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "ACT",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-26",
+      "jurisdiction": "NT",
+      "name": "Boxing Day"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "NSW",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "VIC",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "QLD",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "SA",
+      "name": "Proclamation Day additional day"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "WA",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "TAS",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "ACT",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    },
+    {
+      "date": "2026-12-28",
+      "jurisdiction": "NT",
+      "name": "Boxing Day additional day",
+      "note": "TAS observes the Monday alone when Boxing Day falls on a Saturday"
+    }
+  ]
+}

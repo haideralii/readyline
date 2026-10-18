@@ -1,0 +1,565 @@
+{
+  "year": 2027,
+  "holidays": [
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "NSW",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "VIC",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "QLD",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "SA",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "WA",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "TAS",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "ACT",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-01",
+      "jurisdiction": "NT",
+      "name": "New Year's Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "NSW",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "VIC",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "QLD",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "SA",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "WA",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "TAS",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "ACT",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-01-26",
+      "jurisdiction": "NT",
+      "name": "Australia Day"
+    },
+    {
+      "date": "2027-03-01",
+      "jurisdiction": "WA",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-03-08",
+      "jurisdiction": "VIC",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-03-08",
+      "jurisdiction": "SA",
+      "name": "Adelaide Cup Day"
+    },
+    {
+      "date": "2027-03-08",
+      "jurisdiction": "TAS",
+      "name": "Eight Hours Day"
+    },
+    {
+      "date": "2027-03-08",
+      "jurisdiction": "ACT",
+      "name": "Canberra Day"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "NSW",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "VIC",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "QLD",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "SA",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "WA",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "TAS",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "ACT",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-26",
+      "jurisdiction": "NT",
+      "name": "Good Friday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "NSW",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "VIC",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "QLD",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "SA",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "ACT",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-27",
+      "jurisdiction": "NT",
+      "name": "Easter Saturday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "NSW",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "VIC",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "QLD",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "SA",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "WA",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "ACT",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-28",
+      "jurisdiction": "NT",
+      "name": "Easter Sunday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "NSW",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "VIC",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "QLD",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "SA",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "WA",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "TAS",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "ACT",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-03-29",
+      "jurisdiction": "NT",
+      "name": "Easter Monday"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "NSW",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "VIC",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "SA",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "WA",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "TAS",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-25",
+      "jurisdiction": "ACT",
+      "name": "Anzac Day",
+      "note": "QLD and NT observe Anzac Day on Monday 26 April 2027"
+    },
+    {
+      "date": "2027-04-26",
+      "jurisdiction": "NSW",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Sunday"
+    },
+    {
+      "date": "2027-04-26",
+      "jurisdiction": "QLD",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2027-04-26",
+      "jurisdiction": "WA",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Sunday"
+    },
+    {
+      "date": "2027-04-26",
+      "jurisdiction": "ACT",
+      "name": "Anzac Day additional day",
+      "note": "NSW an additional day; WA and ACT a substitute for the Sunday"
+    },
+    {
+      "date": "2027-04-26",
+      "jurisdiction": "NT",
+      "name": "Anzac Day"
+    },
+    {
+      "date": "2027-05-03",
+      "jurisdiction": "QLD",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-05-03",
+      "jurisdiction": "NT",
+      "name": "May Day"
+    },
+    {
+      "date": "2027-05-31",
+      "jurisdiction": "ACT",
+      "name": "Reconciliation Day"
+    },
+    {
+      "date": "2027-06-07",
+      "jurisdiction": "WA",
+      "name": "Western Australia Day"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "NSW",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "VIC",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "SA",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "TAS",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "ACT",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-06-14",
+      "jurisdiction": "NT",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-08-02",
+      "jurisdiction": "NT",
+      "name": "Picnic Day"
+    },
+    {
+      "date": "2027-09-27",
+      "jurisdiction": "WA",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-10-04",
+      "jurisdiction": "NSW",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-10-04",
+      "jurisdiction": "QLD",
+      "name": "King's Birthday"
+    },
+    {
+      "date": "2027-10-04",
+      "jurisdiction": "SA",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-10-04",
+      "jurisdiction": "ACT",
+      "name": "Labour Day"
+    },
+    {
+      "date": "2027-11-02",
+      "jurisdiction": "VIC",
+      "name": "Melbourne Cup Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "NSW",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "VIC",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "QLD",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "SA",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "WA",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "TAS",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "ACT",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-25",
+      "jurisdiction": "NT",
+      "name": "Christmas Day"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "NSW",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "VIC",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "QLD",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "SA",
+      "name": "Proclamation Day"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "WA",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "ACT",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-26",
+      "jurisdiction": "NT",
+      "name": "Boxing Day",
+      "note": "TAS observes the Tuesday alone when Boxing Day falls on a Sunday"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "NSW",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "VIC",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "QLD",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "SA",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "WA",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "TAS",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "ACT",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-27",
+      "jurisdiction": "NT",
+      "name": "Christmas Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "NSW",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "VIC",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "QLD",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "SA",
+      "name": "Proclamation Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "WA",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "TAS",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "ACT",
+      "name": "Boxing Day additional day"
+    },
+    {
+      "date": "2027-12-28",
+      "jurisdiction": "NT",
+      "name": "Boxing Day additional day"
+    }
+  ]
+}

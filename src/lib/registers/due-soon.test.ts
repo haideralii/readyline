@@ -19,6 +19,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "i1",
           reference: "INC-0001",
           reportable: true,
+          occurred_on: "2026-09-01",
+          category: "death",
+          severity: "high",
           notify_by: "2026-10-16",
           reportable_notified_on: null,
           status: "open",
@@ -62,6 +65,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "a",
           reference: "INC-0002",
           reportable: true,
+          occurred_on: "2026-09-01",
+          category: "death",
+          severity: "high",
           notify_by: "2026-12-01",
           reportable_notified_on: null,
           status: "open",
@@ -70,6 +76,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "b",
           reference: "INC-0003",
           reportable: true,
+          occurred_on: "2026-09-01",
+          category: "death",
+          severity: "high",
           notify_by: "2026-10-15",
           reportable_notified_on: "2026-10-14",
           status: "open",
@@ -78,6 +87,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "c",
           reference: "INC-0004",
           reportable: false,
+          occurred_on: "2026-09-01",
+          category: "other",
+          severity: "low",
           notify_by: null,
           reportable_notified_on: null,
           status: "open",
@@ -86,6 +98,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "d",
           reference: "INC-0005",
           reportable: true,
+          occurred_on: "2026-09-01",
+          category: "death",
+          severity: "high",
           notify_by: "2026-10-15",
           reportable_notified_on: null,
           status: "closed",
@@ -113,6 +128,9 @@ describe("due soon on the account page (batch 45 item 5)", () => {
           id: "i",
           reference: "INC-0009",
           reportable: true,
+          occurred_on: "2026-09-01",
+          category: "death",
+          severity: "high",
           notify_by: "2026-10-01",
           reportable_notified_on: null,
           status: "under-review",
@@ -139,5 +157,38 @@ describe("due soon on the account page (batch 45 item 5)", () => {
       "Notify the Commission about incident INC-0009 by 2026-10-01.",
       "Your mid-term audit is due on 2027-04-01.",
     ]);
+  });
+});
+
+describe("REQ-032 FR-5: the holidays that moved a notify-by date, on the account page's line", () => {
+  it("names them for the account's states, and says nothing when no state is recorded", () => {
+    const incident = {
+      id: "rp",
+      reference: "INC-0010",
+      reportable: true,
+      occurred_on: "2026-04-02",
+      category: "restrictive-practice-unauthorised" as const,
+      severity: "low" as const,
+      notify_by: "2026-04-13",
+      reportable_notified_on: null,
+      status: "open",
+    };
+    const withStates = dueSoonLines({
+      ...base,
+      today: "2026-04-02",
+      incidents: [incident],
+      states: ["NSW"],
+    });
+    expect(withStates[0].line).toBe(
+      "Notify the Commission about incident INC-0010 by 2026-04-13 (Good Friday and Easter Monday do not count).",
+    );
+    const noState = dueSoonLines({
+      ...base,
+      today: "2026-04-02",
+      incidents: [incident],
+    });
+    expect(noState[0].line).toBe(
+      "Notify the Commission about incident INC-0010 by 2026-04-13.",
+    );
   });
 });

@@ -15,7 +15,7 @@ export default async function NewIncidentPage() {
       canWrite={ctx.canWrite}
       back={{ href: "/registers/incidents", label: "Incidents" }}
     >
-      <IncidentFormView />
+      <IncidentFormView states={ctx.viewer.account.states} />
     </RegisterPage>
   );
 }

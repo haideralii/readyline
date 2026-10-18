@@ -25,7 +25,11 @@ export default async function EditIncidentPage({
       canWrite={ctx.canWrite}
       back={{ href: `/registers/incidents/${id}`, label: found.row.reference }}
     >
-      <IncidentFormView id={id} initial={fromIncidentRow(found.row)} />
+      <IncidentFormView
+        id={id}
+        initial={fromIncidentRow(found.row)}
+        states={ctx.viewer.account.states}
+      />
     </RegisterPage>
   );
 }
