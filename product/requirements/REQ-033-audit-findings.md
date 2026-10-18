@@ -1,6 +1,6 @@
 # REQ-033: Bring your audit findings: each one mapped to the document and section that answers it
 
-Status: ready for Session A (PO, 18 Oct 2026 21:25; lawyer's and NDIS expert's reads applied as D-2929 to D-2938, D-2222)
+Status: Session A delivered (#122); Session B ready for build, owner Dev-2 (PO, 19 Oct 2026 01:32; the lawyer's and NDIS expert's reads of the Session B proposal applied as D-2955 to D-2960)
 Phase: 6   Priority: should   Owner: Dev (Session A now, Session B later, Dev-1)
 
 ## Why (user and business outcome)
@@ -141,6 +141,22 @@ Unit: the request builder (SR-B2), the three redraft checks, the version-with-on
 8. *Chaining.* A second finding on the same section redrafts from the newest version, adopted or not. (a) Yes; (b) only from an adopted version. **(a)**: the provider sees the newest text on the page and a redraft of older text would surprise.
 
 **Estimate.** Ten to twelve hours, five commits: the request builder and the redraft checks (2 to 3); the version-with-one-section function and the action with the rows, the log and the limiter (3); the page with the side-by-side (2 to 3); the words, the legal pins and ai.md (1); the e2e and the a11y rows (1 to 2).
+
+### PO decisions on the proposal (19 Oct 2026 01:32)
+
+Session B is ready for build, owner Dev-2. The eight questions as the Dev recommended: 1 (a) the outline's numbers and headings ride in the prompt; 2 (a) the policy text never names the audit; 3 (a) both entitlements; 4 (a) one against the daily quota plus 10 an hour; 5 (a) no in-place editing of the redraft; 6 (b) fake replies to build, (a) one live reply before the trial; 7 (a) the plain-language summary is out of this session, with (b) the first item of the next session; 8 (a) a second finding on the same section redrafts from the newest version.
+
+### Lawyer's read (D-2955, D-2956, D-2957)
+
+- D-2955 The policy text never names the audit; the change-log row with the finding's reference is the record, and the provider's adoption is the only approval, so no version is ever adopted by the model (FR-B5 as written).
+- D-2956 ai.md's sentence as FR-B7 words it, pinned.
+- D-2957 A redraft that fails the checks changes nothing and says so; no silent fallback.
+
+### NDIS expert's read (D-2958, D-2959, D-2960)
+
+- D-2958 An auditor reads a revised policy by its version, approval date and change-log line; "Section N redrafted after audit finding FND-0001" is the line they look for, so FR-B6's wording stands.
+- D-2959 The plain-language summary left behind is itself a finding risk, so question 7 (b) is the first item of the next session: when a section a summary covers changes, the summary's control-register row takes the "review" state.
+- D-2960 Chaining from the newest version, adopted or not (question 8 (a)).
 
 ## Delivery evidence
 
