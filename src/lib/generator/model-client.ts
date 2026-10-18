@@ -7,6 +7,7 @@
  * the API's stop reason so a truncated reply is recognised (R-6).
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { fakeRedraftReply } from "./fake-redraft";
 import { join } from "node:path";
 import type {
   Message,
@@ -316,6 +317,30 @@ function isThinkingRejection(error: unknown): boolean {
 }
 
 /**
+ * REQ-033 Session B (AC-B1 to AC-B3): the e2e's model. A redraft request is
+ * answered from the request itself (the current section echoed plus one
+ * sentence); every other request goes to the replay client, so the
+ * generator's fixtures still rule. Chosen by GENERATION_FAKE=1 alone and
+ * never in production.
+ */
+export class FakeRedraftClient implements ModelClient {
+  readonly mode = "fake" as const;
+  constructor(private readonly fallback: ModelClient) {}
+  async complete(
+    request: ModelRequest,
+    labels: FixtureLabels,
+  ): Promise<ModelReply> {
+    const text = fakeRedraftReply(request);
+    if (text === null) return this.fallback.complete(request, labels);
+    return {
+      text,
+      usage: { inputTokens: 0, outputTokens: 0 },
+      stopReason: "end_turn",
+    };
+  }
+}
+
+/**
  * Replay unless asked otherwise: GENERATION_RECORD=1 with a key writes
  * fixtures through a real call (D-502); GENERATION_LIVE=1 with a key calls
  * the model without touching fixtures and is the production setting for the
@@ -331,5 +356,7 @@ export function createModelClient(
   const key = env.ANTHROPIC_API_KEY?.trim();
   if (record && key) return new RecordingClient(new AnthropicClient(key), dir);
   if (live && key) return new AnthropicClient(key);
+  if (env.GENERATION_FAKE === "1" && env.VERCEL_ENV !== "production")
+    return new FakeRedraftClient(new ReplayClient(dir));
   return new ReplayClient(dir);
 }

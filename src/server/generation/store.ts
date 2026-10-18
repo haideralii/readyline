@@ -64,6 +64,8 @@ export type GenerationLogRow = {
   failure_kind:
     "model-error" | "gate" | "truncation" | "fixture-missing" | null;
   failure_detail: string | null;
+  /** REQ-033 Session B SR-B5: "redraft:FND-0001" on a redraft's row; absent ('' in the table) on a section's. */
+  source?: string;
 };
 
 export interface GenerationStore {

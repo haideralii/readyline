@@ -16,6 +16,7 @@ Row states: **Set** (done), **Not set** (the step is still to do), **Mismatched*
 5. Stripe, Developers, Webhooks: an endpoint at `https://<domain>/api/stripe/webhook` with the events `supabase/ops/DEPLOY.md` section 7 and 7a list. Vercel: `STRIPE_WEBHOOK_SECRET` from that endpoint. Rows: **Stripe webhook secret**, **Stripe webhook endpoint** (needs "Webhook Endpoints: read" on the restricted key; otherwise the row says Not verified here and you check the list by eye).
 6. Vercel: `GST_LINE`, the sentence beside the price. Row: **GST line**.
 7. Vercel: make sure `STRIPE_FAKE` does not exist in Production. Row: **Fake Checkout off**.
+8. Vercel: make sure `GENERATION_FAKE` does not exist in Production either (REQ-033 Session B: the e2e's fake model). Row: **Fake model off**.
 
 ## 3. Generation
 

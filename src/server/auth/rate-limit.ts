@@ -82,6 +82,13 @@ export async function checkFillAllowed(accountId: string): Promise<boolean> {
   return hitRateLimit(`fill:${accountId}`, FILL_LIMIT);
 }
 
+/** REQ-033 Session B SR-B3: ten section redrafts per account per rolling hour, beside the daily generation quota each one also spends. */
+export const REDRAFT_LIMIT = { limit: 10, windowSeconds: 3600 } as const;
+
+export async function checkRedraftAllowed(accountId: string): Promise<boolean> {
+  return hitRateLimit(`redraft:${accountId}`, REDRAFT_LIMIT);
+}
+
 /** REQ-007 SR-4: five Checkout Sessions per account per rolling hour. */
 export const CHECKOUT_LIMIT = { limit: 5, windowSeconds: 3600 } as const;
 

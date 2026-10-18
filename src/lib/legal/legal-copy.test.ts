@@ -121,8 +121,8 @@ describe("product/legal copy (REQ-008)", () => {
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
       "so it sits with your privacy commitments, where an auditor would look for it.",
-      // REQ-033 D-2937: a finding's own words may reach the model, after the participant check; the report never does.
-      "If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check. The report you uploaded is never sent.",
+      // REQ-033 D-2937 and Session B D-2956: a finding's own words may reach the model, after the participant check, and on a redraft the one section with them; the report never does.
+      "If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check; and when you ask for a redraft of one section, we send that finding's words and that one section's text, and nothing else from your registers. The report you uploaded is never sent.",
       // REQ-034 FR-3: the first paragraph links the trust page.
       "Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).",
     ],

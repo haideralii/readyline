@@ -53,14 +53,16 @@ async function matrix(
   path: string,
   widths: readonly number[],
   sweep: Sweep,
+  schemes: readonly ("light" | "dark")[] = SCHEMES,
+  textZoom = true,
 ) {
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    for (const scheme of SCHEMES) {
+    for (const scheme of schemes) {
       await page.emulateMedia({ colorScheme: scheme });
       await gotoSettled(page, path);
       await axe(page, `${path} @${width} ${scheme}`, sweep);
-      if (width === widths[0]) {
+      if (textZoom && width === widths[0]) {
         await setTextZoom(page, 200);
         await axe(page, `${path} @${width} ${scheme} text 200%`, sweep);
         await setTextZoom(page, null);
@@ -70,10 +72,20 @@ async function matrix(
   await page.emulateMedia({ colorScheme: "light" });
 }
 
+const isDesktop = (testInfo: TestInfo) =>
+  testInfo.project.name === "desktop-chromium";
+
 const widthsFor = (testInfo: TestInfo) =>
-  testInfo.project.name === "desktop-chromium"
+  isDesktop(testInfo)
     ? A11Y_WIDTHS
     : [testInfo.project.use.viewport?.width ?? 1280];
+
+// D-2983's run (#125, 39151292700) put the signed-in step at 49 minutes: the
+// phone projects take the public sweep's sampling rule (D-2348 (1)): one pass at
+// their own width in the light scheme over the owner pages; the desktop project
+// carries the whole matrix (three widths, both schemes, 200 % text).
+const schemesFor = (testInfo: TestInfo) =>
+  isDesktop(testInfo) ? SCHEMES : (["light"] as const);
 
 async function run(
   page: Page,
@@ -83,12 +95,14 @@ async function run(
 ) {
   const sweep: Sweep = { lines: [], problems: [] };
   const widths = widthsFor(testInfo);
+  const schemes = schemesFor(testInfo);
   try {
-    for (const path of paths) await matrix(page, path, widths, sweep);
+    for (const path of paths)
+      await matrix(page, path, widths, sweep, schemes, isDesktop(testInfo));
   } finally {
     await testInfo.attach(`axe-signed-in-${name}.txt`, {
       body: [
-        `WCAG 2.2 AA (tags ${A11Y_TAGS.join(", ")}); project ${testInfo.project.name}; widths ${widths.join("/")}`,
+        `WCAG 2.2 AA (tags ${A11Y_TAGS.join(", ")}); project ${testInfo.project.name}; widths ${widths.join("/")}; schemes ${schemes.join("/")}; text 200 % ${isDesktop(testInfo) ? "yes" : "no"}`,
         ...sweep.lines,
         "",
         ...sweep.problems,
@@ -128,6 +142,10 @@ test.describe("launch review: axe at WCAG 2.2 AA on every signed-in route (REQ-0
   test("auditor: the shared audit view through a live link, signed out", async ({
     page,
   }, testInfo) => {
+    test.skip(
+      !isDesktop(testInfo),
+      "D-2985: the phones sample the owner pages alone",
+    );
     await run(page, testInfo, "auditor", [`/auditor/${t.auditorToken}`]);
   });
 
@@ -136,6 +154,10 @@ test.describe("launch review: axe at WCAG 2.2 AA on every signed-in route (REQ-0
     context,
     baseURL,
   }, testInfo) => {
+    test.skip(
+      !isDesktop(testInfo),
+      "D-2985: the phones sample the owner pages alone",
+    );
     await signInContext(context, t.worker, baseURL!);
     await run(page, testInfo, "worker", WORKER_PAGES);
   });
@@ -143,6 +165,10 @@ test.describe("launch review: axe at WCAG 2.2 AA on every signed-in route (REQ-0
   test("tokens: the invite page and the report form, signed out", async ({
     page,
   }, testInfo) => {
+    test.skip(
+      !isDesktop(testInfo),
+      "D-2985: the phones sample the owner pages alone",
+    );
     await run(page, testInfo, "tokens", [
       `/invite/${t.inviteToken}`,
       `/report/${t.reportToken}`,

@@ -7,13 +7,19 @@
  * the account's own set.
  */
 import { catalogue, sectionsFor } from "@/lib/generator/catalogue";
+import { sectionNumbers } from "@/lib/generator/document-model";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 
 export type AnsweredIn = {
   typeId: string;
   title: string;
-  /** The section's number in the document and its heading, or null when no brief names the indicator and no tailored section exists. */
-  section: { number: number; heading: string } | null;
+  /** The section's number in the document, its heading, its id and its mode (REQ-033 Session B redrafts a tailored one), or null when no brief names the indicator and no tailored section exists. */
+  section: {
+    number: number;
+    heading: string;
+    id: string;
+    mode: "fixed" | "tailored";
+  } | null;
 };
 
 export type FindingMapping = {
@@ -72,10 +78,18 @@ const words = (s: string) =>
 export function sectionForIndicator(
   typeId: string,
   indicator: string,
-): { number: number; heading: string } | null {
+): {
+  number: number;
+  heading: string;
+  id: string;
+  mode: "fixed" | "tailored";
+} | null {
   const type = catalogue.items.find((t) => t.id === typeId);
   if (!type) return null;
-  const sections = sectionsFor(type);
+  // The document's rendered numbering (REQ-033 Session B found "section 5 Scope" for the document's
+  // section 2: the index counted the unnumbered front matter); only numbered sections are candidates.
+  const numbers = sectionNumbers(type);
+  const sections = sectionsFor(type).filter((s) => numbers.get(s.id));
   const want = words(indicator);
   let best: { index: number; score: number } | null = null;
   if (want.size > 0)
@@ -90,7 +104,12 @@ export function sectionForIndicator(
       ? (best as { index: number }).index
       : sections.findIndex((s) => s.mode === "tailored");
   if (index < 0) return null;
-  return { number: index + 1, heading: sections[index].heading };
+  return {
+    number: Number(numbers.get(sections[index].id)),
+    heading: sections[index].heading,
+    id: sections[index].id,
+    mode: sections[index].mode,
+  };
 }
 
 /** The indicator text to match by: the row's own, else the standard's indicators joined. */

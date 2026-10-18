@@ -1,6 +1,6 @@
 # REQ-033: Bring your audit findings: each one mapped to the document and section that answers it
 
-Status: ready for Session A (PO, 18 Oct 2026 21:25; lawyer's and NDIS expert's reads applied as D-2929 to D-2938, D-2222)
+Status: Session A delivered (#122); Session B ready for build, owner Dev-2 (PO, 19 Oct 2026 01:32; the lawyer's and NDIS expert's reads of the Session B proposal applied as D-2955 to D-2960)
 Phase: 6   Priority: should   Owner: Dev (Session A now, Session B later, Dev-1)
 
 ## Why (user and business outcome)
@@ -76,6 +76,97 @@ Dev-1, 18 Oct 2026, on `req-033-session-a` from `next` b14206d. D-2929 to D-2938
 
 **Hours.** 11 to 13: the register and migration 2 to 3, the parser and the gate 3 (the PDF reader and its caps), the mapping and the proposal 2 to 3, the trail and the card 1 to 2, the words, pages and tests 2 to 3. Five commits as above; if the day runs out, commit 5's e2e lands first thing next session.
 
+## Session B: the redraft (Dev proposal, Dev-2, 19 Oct 2026; PO 01:00)
+
+Written on `req-033-session-b` from `req-033-session-a` 7c8bcac for the PO's lawyer's and NDIS reads; it becomes the build when the PO sets the status. Session A's Scope line "Session B (deferred…)" is what this section fills in. Read first: Session A's Dev response and D-2929 to D-2938; REQ-029 FR-6 and D-2855 (a change behind an adopted document is a new version, approved again, never a silent edit); REQ-024 A0 (D-2436, the "new-version" state); REQ-005 FR-2 (one section through prompt, model, schema, lint, readability); CLAUDE.md 4.5 (nothing typed into a register reaches the model except what REQ-033 D-2937 disclosed).
+
+### Why
+
+- A finding says a section of a policy does not do what the indicator asks. Session A tells the provider which section; the provider then opens Word, rewrites it alone, and the change leaves no version, no change-log row and no approval, so the corrective action trail (D-2929, D-2935) stops at "addressed" with nothing an auditor can read.
+- The generator already drafts a section from a brief; a redraft is the same pipeline with one more input, the finding, and one more output, a new version the provider reviews and adopts. Nothing new goes to the model but the finding's words the provider wrote and the section itself.
+
+### Scope
+
+- In: one mapped tailored section of one document, redrafted from the finding row, shown beside the current text, accepted into a new unadopted version with a change-log row, adopted through the existing flow; the finding and the improvement rows carry the link; the auditor's view reads the adoption.
+- Out: redrafting a fixed-text section (the model never writes those, FR-0a), more than one section at a time, a redraft of the plain-language summary or the Easy Read place (listed, question 7), a finding mapped only to a register (the row says the register is where the change goes), any wording that a redraft closes the finding (D-2936).
+
+### Functional requirements
+
+- **FR-B1 Where it starts.** On a finding row whose mapping names a document and a tailored section (FR-4), each "Answered in" line gains "Redraft this section with the finding" (owner only; the entitlement of question 3). A line that names a register, a fixed-text section or a document with no version in the account's set has no button and says why in one sentence.
+- **FR-B2 What the model sees.** The request is the house style (system prompt, `PROMPT_VERSION`) and one user prompt with exactly: the document's title and kind; the section's number, heading and brief from the catalogue; the section's current blocks from the newest version's stored model, through `fillForRead` so no bracketed blank reaches the model; the standard's name, outcome and the one indicator the finding names (or all of the standard's indicators when none is named); the finding's words from the row (the provider's, after FR-2's gate ran again at the click); the outline's numbers and headings alone (question 1). No FACTS block, no other section's text, no register row, no file (D-2930). The instruction: rewrite the section so it meets the indicator the finding names, keep every provider-specific fact the current text carries, keep the section id and length band, do not mention the audit, the auditor or the finding (question 2), reply as the section JSON.
+- **FR-B3 What comes back.** The reply runs the section pipeline unchanged (`generateTailoredSection`'s parse, schema, lint, readability, one retry, truncation rule), plus three redraft checks: the claims and terminology lint of REQ-005 with the words "audit", "auditor", "finding", "non-conformity", "closed" refused in the body; the finding's own sentence must not appear verbatim; every proper noun of the current text (trading name, state names, the document's own cross-references by number) must still be present (the tailoring rule of REQ-003 Phase 3, applied as a diff). A failure after the retry is a plain message ("The redraft did not pass our checks; nothing was changed") and a log line with the kind, never a generic placeholder (FR-0b does not apply: the current text stands).
+- **FR-B4 The review.** The page shows the current section and the redraft side by side (stacked under `lg`), changed sentences marked, the finding's words above both, and two buttons: "Use this redraft" and "Keep the current text". Nothing is stored until "Use this redraft". The provider cannot edit the redraft in place (question 5): editing is the adoption flow's business in Word, and a typed edit here would be a second untested path into the stored model.
+- **FR-B5 The version.** "Use this redraft" inserts a `document_versions` row for the document at version n+1 with `status: "review"`, the model being the newest version's model with the one section replaced and a change-log row added, bracketed for the adoption snapshot as D-2855 does for re-approval: "Section N <heading> redrafted after audit finding FND-0001; approved by [role]". The version is unadopted: the document control register shows "new-version" (REQ-024 A0), the pack's download carries it as the newest with its "Draft prepared with Readyline" footer, and adoption goes through `adopt_document_version` (the snapshot of that day, D-2855). The earlier adopted version stays readable as before. *As built (D-2349 (3)):* `document_versions.status` is the generation quality (ready or review, from `documentStatus`), not adoption, so the redraft version keeps that value and is unadopted through `adopted_on` null, which is what the register reads as "new-version".
+- **FR-B6 The trail.** The finding row gains `redraft_version_id` and shows "Redrafted: <document>, version n+1, awaiting adoption" then "adopted <date>" once adopted; the improvement row's action text gains one line, "Section N of <document> redrafted (version n+1)", written by the server, and closing the improvement row remains the provider's act (D-2935). The auditor's view's findings table and `findings.csv` gain a "Redraft" column with the version number and the adoption date or "awaiting adoption". Audit log: `documents.redrafted` (document type, version, finding reference, section id; no text).
+- **FR-B7 Words.** On the button's page: "Readyline rewrites this one section with your finding as context and shows you the result beside the current text. Nothing changes until you choose the redraft, and the new version waits for your approval like any other. Your auditor decides whether the finding is closed." No "fix", "resolve", "comply" or "close" on any control (D-2936 extended). ai.md's sentence from D-2937 gains "…and, when you ask for a redraft, the words of that finding and the one section are sent to the model; nothing else from your registers is." Pinned in `legal-copy.test.ts`.
+
+### Security and privacy
+
+- SR-B1 The finding's words pass `detectParticipantData` again at the click (the detector may have gained a rule since the row was saved); a flag refuses the redraft with the detector's message and no model call is made (SR-2's pattern).
+- SR-B2 The request text is built by one pure function with a test that asserts, over a fixture account, what it contains and what it does not: no FACTS block, no other section, no register row, no email, no token (the REQ-030 scrub test's shape).
+- SR-B3 Quota and rate: a redraft counts one against the account's daily generation quota (`generation_quota_hit`, D-424's message) and a per-account limiter of 10 an hour in `rate-limit.ts` joins `tests/integration/rate-limits.test.ts`'s table (question 4).
+- SR-B4 The new version's row is inserted by the service role inside the action and nothing else: no client write path to `document_versions`; RLS as today (members read, no member writes).
+- SR-B5 `generation_log` gets a row per redraft as every section does (prompt version, model, tokens, status) plus a nullable `source` column reading `redraft:FND-0001`, never the text (REQ-005 SR-6).
+- SR-B6 Fixtures and tests use the fake and replay clients as every generator test does; one live reply is recorded only when the PO says (question 6).
+
+### Data
+
+- `document_versions`: no new column; the change-log row and the model carry the change. `findings`: `redraft_version_id uuid null references document_versions(id)`, `redraft_section_id text null`; the `findings_status` view unchanged. `generation_log.source text null` (the finding reference on a redraft row). `audit_log` kind `documents.redrafted`. Export: the two columns ride with the findings rows (D-2932); the version is already in the pack.
+
+### Acceptance criteria
+
+- AC-B1 Given a finding mapped to a tailored section of a document that has a version in the set, when the owner clicks the button, then the current text and a redraft show side by side with the finding's words above, and nothing is in `document_versions` yet (e2e, desktop and Android; the fake client).
+- AC-B2 Given AC-B1, when the owner chooses "Use this redraft", then version n+1 exists with `status: "review"`, its model differs from version n in that one section and the change-log row alone, the document control register reads "new-version", the finding row names the version and "awaiting adoption", the improvement row carries the one action line, and `audit_log` has `documents.redrafted` without text (e2e; integration over the rows).
+- AC-B3 Given AC-B2, when the owner adopts the version, then the snapshot fills the change-log row's "[role]" and the finding row reads "adopted <date>"; the auditor's view and `findings.csv` carry the redraft column (e2e, audit-pack spec extended).
+- AC-B4 Given a redraft reply that names the audit, quotes the finding, drops the trading name or fails the schema twice, then no version is written and the page shows the plain message (unit over the pipeline with a fake reply per case).
+- AC-B5 Given the request builder over the fixture account, then the request text contains the section, the brief, the standard, the indicator, the finding and the outline headings, and contains no fact key, no other section's text, no register text, no email and no token (unit, SR-B2).
+- AC-B6 Given a finding whose words the detector flags today, then the click is refused with the detector's message and `generation_log` has no row (integration).
+- AC-B7 Given the eleventh redraft in an hour, or the account's daily quota spent, then the plain refusal shows and no model call is made (integration, the limits table).
+- AC-B8 A finding mapped to a register alone, a fixed-text section or a document without a version shows the one-sentence reason and no button (unit over the mapping; e2e for one case).
+- AC-B9 `legal-copy.test.ts` pins FR-B7's words and the ai.md sentence; the a11y spec covers the redraft page at 360 and 1280; `npm run check` green.
+
+### Test expectations
+
+Unit: the request builder (SR-B2), the three redraft checks, the version-with-one-section-replaced function (pure, like `reapprovalModel`), the change-log row text, the mapping's "no button" cases. Integration: the version insert and the finding and improvement rows under RLS (a member cannot write), the limiter, the gate. E2E: AC-B1 to AC-B3 on three projects through the seeded set of Session A's spec. Snapshot: the request text over the fixture account, diffable.
+
+### Questions for the PO (none blocks the build; I build on the recommendation)
+
+1. *The outline.* The model's cross-references are safe only when it sees the document's numbers and headings (R-9, D-044). (a) The outline's numbers and headings ride in the prompt as part of "the section"; (b) no outline, and the instruction forbids cross-references. **(a)**: headings are not content, and the current text may already say "see section 4".
+2. *Mentioning the audit.* (a) The redrafted policy text never names the audit, the auditor or the finding; the change-log row is the record (FR-B3 refuses the words). (b) A sentence such as "Updated after our 2026 mid-term audit" is allowed. **(a)**: a policy says what the provider does; the trail lives in the change log and the registers, where an auditor reads it.
+3. *Entitlement.* (a) The pack (a version to redraft) and the subscription (the findings register) both; (b) the pack alone. **(a)**: without the register there is no finding row to redraft from.
+4. *Caps.* (a) One against the daily generation quota plus 10 an hour; (b) a separate daily cap of 5 redrafts. **(a)**: the quota already exists and a redraft costs what a section costs.
+5. *Editing the redraft before accepting.* (a) No; accept or keep, then edit in Word after download as today; (b) a text box over the redraft. **(a)**: a typed edit here would be a second write path into the stored model with none of the pipeline's checks.
+6. *Fixture.* (a) Record one live reply for the sample report's first finding when you say so (one call, a few hundred tokens); (b) fake replies only. **(b)** to build, **(a)** before the trial.
+7. *The plain-language summary and the Easy Read place.* A redrafted section can leave the summary behind. (a) Out of this session; the summary's own review state is a later REQ. (b) Mark the summary "review" in the control register when a section it summarises changes. **(a)**, with (b) as the first item for the next session.
+8. *Chaining.* A second finding on the same section redrafts from the newest version, adopted or not. (a) Yes; (b) only from an adopted version. **(a)**: the provider sees the newest text on the page and a redraft of older text would surprise.
+
+**Estimate.** Ten to twelve hours, five commits: the request builder and the redraft checks (2 to 3); the version-with-one-section function and the action with the rows, the log and the limiter (3); the page with the side-by-side (2 to 3); the words, the legal pins and ai.md (1); the e2e and the a11y rows (1 to 2).
+
+### PO decisions on the proposal (19 Oct 2026 01:32)
+
+Session B is ready for build, owner Dev-2. The eight questions as the Dev recommended: 1 (a) the outline's numbers and headings ride in the prompt; 2 (a) the policy text never names the audit; 3 (a) both entitlements; 4 (a) one against the daily quota plus 10 an hour; 5 (a) no in-place editing of the redraft; 6 (b) fake replies to build, (a) one live reply before the trial; 7 (a) the plain-language summary is out of this session, with (b) the first item of the next session; 8 (a) a second finding on the same section redrafts from the newest version.
+
+### Lawyer's read (D-2955, D-2956, D-2957)
+
+- D-2955 The policy text never names the audit; the change-log row with the finding's reference is the record, and the provider's adoption is the only approval, so no version is ever adopted by the model (FR-B5 as written).
+- D-2956 ai.md's sentence as FR-B7 words it, pinned.
+- D-2957 A redraft that fails the checks changes nothing and says so; no silent fallback.
+
+### NDIS expert's read (D-2958, D-2959, D-2960)
+
+- D-2958 An auditor reads a revised policy by its version, approval date and change-log line; "Section N redrafted after audit finding FND-0001" is the line they look for, so FR-B6's wording stands.
+- D-2959 The plain-language summary left behind is itself a finding risk, so question 7 (b) is the first item of the next session: when a section a summary covers changes, the summary's control-register row takes the "review" state.
+- D-2960 Chaining from the newest version, adopted or not (question 8 (a)).
+
 ## Delivery evidence
 
 (Dev appends: branch, commits, test counts, screenshots of AC-1 and AC-3 on desktop and Android.)
+
+**Session B (Dev-2, 19 Oct 2026)** on `req-033-session-b` (the head of the PR) (from `req-033-session-a` 7c8bcac, `origin/next` merged before each push (a4ae860, #124); PR to `next`; body: `product/evidence/req-033/pr-body-session-b.md`).
+
+- Commits, one per requirement: a849942 the PO's answers and the two reads in this REQ; 5c84829 FR-B2, FR-B3, FR-B5 `src/lib/generator/redraft.ts` (the request, the reply reading with the three redraft checks, the version with one section replaced; twelve tests over the committed sample); cb543f9 FR-B1, FR-B5, FR-B6, SR-B1 to SR-B5 the draft and accept actions, migration `20261019010000_findings_redraft.sql`, `REDRAFT_LIMIT`, the words (ten tests over a fake database); 6e576e3 the merge of `next`; 8b5948a a Session A fix (the mapping's section number is the document's own); 8811ffb FR-B1, FR-B4, FR-B6 the redraft page and the links; 398ecde FR-B7 the AI page's sentence (D-2956) and the words' tests; 4a035b8 AC-B1 to AC-B3, AC-B8, AC-B9 the end-to-end walk on the e2e's fake model (`GENERATION_FAKE`).
+- AC mapping: AC-B1, AC-B2, AC-B3 → `e2e/signed-in/req-033.spec.ts` "Session B AC-B1 to AC-B3…" (the first run is the PR's Supabase job; three projects); AC-B4 → `redraft.test.ts` (audit named, finding quoted, name dropped, bad JSON, wrong id, unknown block) and `findings-redraft-actions.test.ts` (the refused reply logged as a fallback, nothing stored); AC-B5 → `redraft.test.ts` "carries no facts block, no other section's text, no register row, no email and no token"; AC-B6 → `findings-redraft-actions.test.ts` "runs the gate again and never calls the model on a flagged finding"; AC-B7 → the same file's limiter and quota cases and `tests/integration/rate-limits.test.ts` (the "section redraft" row, 10 an hour); AC-B8 → `findings-redraft-actions.test.ts` "says when the finding maps to no section" and the spec's register line; AC-B9 → `legal-copy.test.ts` (the AI page's sentence), `findings-redraft.test.ts` (the words), the spec's axe at 1280 and 360 before and after the redraft; `npm run check` green: 216 files (1 skipped), 1,618 tests, 6 skipped.
+- As built against the proposal: FR-B5's `status: "review"` reads as `documentStatus`'s value with `adopted_on` null (D-2349 (3)); FR-B2's "no FACTS block" holds and the brief is the generator's own; the fake model mode is new (D-2349 (5)) and guarded like `STRIPE_FAKE`.
+- Decisions: D-2349 under "REQ-033 Session B (Dev-2)" in `DECISIONS.md`.
+- For the PO: the PR's first run carries the e2e; D-2959's summary state is the next session's first item; a live reply for the sample report's first finding when you say so (6 (a)).
+- UNVERIFIED: nothing regulatory was added in this session.

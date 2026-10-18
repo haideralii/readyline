@@ -361,6 +361,20 @@ const RULES: Rule[] = [
         : { state: "set", sentence: "STRIPE_FAKE is not set." },
   },
   {
+    // REQ-033 Session B: the e2e's fake model must not exist in production.
+    id: "generation-fake",
+    group: "generation",
+    name: "Fake model off",
+    judge: (f) =>
+      present(f.env, "GENERATION_FAKE")
+        ? {
+            state: "mismatched",
+            sentence:
+              "GENERATION_FAKE is set; it must not exist in production.",
+          }
+        : { state: "set", sentence: "GENERATION_FAKE is not set." },
+  },
+  {
     id: "generation-enabled",
     group: "generation",
     name: "Generation enabled",
