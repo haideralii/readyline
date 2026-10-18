@@ -100,6 +100,21 @@ jobs:
           CI: "true"
           STRIPE_FAKE: "0"
 
+      # REQ-022 FR-13 (AC-7, D-2289): the same name and ABN on every surface, three projects. The
+      # full run above has the two unset and asserts no placeholder; this step sets fixture values.
+      # 51 824 753 556 is the ATO's published example ABN, no business's.
+      - name: The registered name and ABN on every surface (REQ-022 FR-13, AC-7; fixture values)
+        run: npx playwright test e2e/business-identity.spec.ts
+        env:
+          CI: "true"
+          BUSINESS_NAME: "Fixture Supports"
+          BUSINESS_ABN: "51824753556"
+
+      # REQ-022 FR-11 (AC-6): the lawyer's bundle index builds from the committed files alone and
+      # refuses to write itself with a fixture address or an unfilled token in it.
+      - name: The lawyer's bundle index builds with no fixture address (REQ-022 FR-11, AC-6)
+        run: node scripts/ops/legal-bundle.mjs --out "$RUNNER_TEMP/legal-bundle"
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
