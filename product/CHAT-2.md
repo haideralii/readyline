@@ -132,3 +132,12 @@ The reviewer could not find D-2316 to D-2320 because `product/CHAT-2.md` lives o
 - 0b40657 (2) `/sign-in`: `type="email"`, `inputmode="email"`, `autocomplete="email"`; the spec asserts the three. The shared `TextInput` in `fields.tsx` is text-only and Dev-1's this round, so the form renders the same control with its own type (a `type` prop on `TextInput` is a one-line follow-up for Dev-1 if you want the control shared again).
 - 3c652f6 (3) 0136: the Commission spells it two ways in `data/sources`: the registration-groups list page (the build's name source) "centrebased", the Registration Requirements by Supports and Services document "centre-based". The hyphenated form wins (readable, the requirements document's, the description's); the slug is pinned to `group-and-centrebased-activities` in `groups.ts`, held by a unit test.
 (4) to (6) follow.
+
+**Dev-2, 18 Oct 2026 11:59:** `qa-live-20261018-b`, commits 4 to 9, one line each:
+- fd073e2 (4) `/guides/registration-groups`: "clear the search" is a button that empties the box, returns the full list and puts focus back in it; `guides.spec.ts` gains the case on desktop and Android (placed after the page's glossary check, since the full list was never under that check before and it does not pass it; a content item for the guide, not this batch).
+- c9f23af (5) the cost guide's status is `published (every figure checked in REQ-027's pass against the Sources section, 18 Oct 2026; no UNVERIFIED line remains)`, so the draft box goes; `pages.test.ts` holds no unverified line and no draft flag.
+- 2b1ef4d (6) the legal pages' draft sentence closes the article as a small slate line under a rule, same words and test id; `legal-pages.spec.ts` holds it below the last heading in the small type.
+- 4d21396 09:00 (1) FR-8: integration case, a rehearsal row leaves `lastSelfCheck` null and the offer at "You have not checked your systems yet".
+- b2c0cac 09:00 (2) AC-8/SR-5: `team.spec.ts`'s list gains `/path/renewal`, `/path/renewal/application`, `/registers/commission-changes`.
+- c806519 09:00 (3) FR-7/FR-3: two `dueReminders` cases, an application inside the window stops the last call, one from before it does not.
+09:00 (4) D-2849 is applied locally: the eight modules are in the lint, which finds one thing, a 75-word helper in `commission-changes.ts` (the s 13A(3) ownership line, max 60); its fix is the next commit. Then (5) the grant read, (6) the FR-7 sentence, (8) the decisions copied into `DECISIONS.md`.
