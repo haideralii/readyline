@@ -56,6 +56,8 @@ export type RegistrationPeriod = {
   audit_type: RegistrationKind;
   midterm_applies: boolean;
   midterm_exempt_reason: string | null;
+  /** REQ-031 FR-5 (D-2890): when the owner last opened "What changed since the last audit" in this period; absent on rows read before Session B's migration. */
+  what_changed_read_at?: string | null;
   midterm_start_by_override: string | null;
   midterm_override_source: MidtermOverrideSource | null;
   last_audit_on: string | null;

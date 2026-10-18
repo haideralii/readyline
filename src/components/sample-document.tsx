@@ -102,7 +102,11 @@ function blockText(b: Block): string[] {
  * sections name the Practice Standards and key personnel), so the page carries
  * the disclosure rather than D-2715's one-term bracket.
  */
-function samplePresent(doc: DocumentModel, tailored: number): string[] {
+function samplePresent(
+  doc: DocumentModel,
+  tailored: number,
+  moreText: string,
+): string[] {
   return findGlossaryTerms(
     [
       C.sampleHeading,
@@ -117,6 +121,7 @@ function samplePresent(doc: DocumentModel, tailored: number): string[] {
         ...s.blocks.flatMap(blockText),
       ]),
       doc.footer,
+      moreText,
     ].join("\n"),
   );
 }
@@ -157,9 +162,12 @@ function Section({
 
 export function SampleDocument({
   level = 3,
+  moreText = "",
 }: {
   /** The title's heading level: 2 on the sample's own page, 3 under a page section (REQ-025 FR-12). */
   level?: 2 | 3;
+  /** REQ-031 FR-3: the page's other words (the Start here sheet), so the one disclosure covers them. */
+  moreText?: string;
 } = {}) {
   const doc = SAMPLE_DOCUMENT;
   const tailored = doc.sections.filter((s) => s.mode === "tailored").length;
@@ -179,7 +187,7 @@ export function SampleDocument({
       <p className="text-slate text-sm">{sampleLine(doc, tailored)}</p>
       {/* REQ-027 FR-3, D-2701: the words on this page, the document's own included, above the document. */}
       <GlossaryTerms
-        ids={samplePresent(doc, tailored)}
+        ids={samplePresent(doc, tailored, moreText)}
         where="page"
         className="mt-2"
       />
