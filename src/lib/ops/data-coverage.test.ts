@@ -29,6 +29,9 @@ const EXPORT_TABLES: readonly string[] = [
   "entitlements",
   // REQ-033 FR-3 (D-2932, D-2300): the audit findings, under their own key; the pack carries them too.
   "findings",
+  // REQ-035 FR-4, SR-3 (D-2962): the gap checks' lists, under their own keys.
+  "gap_checks",
+  "gap_check_sections",
 ];
 
 /** Tables the audit pack writes (`src/server/registers/audit-pack.ts` through the register files and the audit-day meta). */

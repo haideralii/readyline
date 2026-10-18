@@ -59,7 +59,8 @@ const STOP = new Set([
   "be",
   "its",
 ]);
-const words = (s: string) =>
+/** The content words of a text (REQ-035 reuses it for the gap check's outline). */
+export const wordsOf = (s: string) =>
   new Set(
     s
       .toLowerCase()
@@ -76,11 +77,11 @@ export function sectionForIndicator(
   const type = catalogue.items.find((t) => t.id === typeId);
   if (!type) return null;
   const sections = sectionsFor(type);
-  const want = words(indicator);
+  const want = wordsOf(indicator);
   let best: { index: number; score: number } | null = null;
   if (want.size > 0)
     sections.forEach((s, index) => {
-      const have = words(`${s.heading} ${s.brief}`);
+      const have = wordsOf(`${s.heading} ${s.brief}`);
       let score = 0;
       for (const w of want) if (have.has(w)) score += 1;
       if (score >= 2 && (!best || score > best.score)) best = { index, score };

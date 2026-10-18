@@ -169,6 +169,9 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   improvements: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   // REQ-033 FR-3 (D-2932): the audit findings register and its view.
   findings: ["DELETE", "INSERT", "SELECT", "UPDATE"],
+  // REQ-035 SR-3 (D-2962): the gap check's list, written once and removed, never edited.
+  gap_checks: ["DELETE", "INSERT", "SELECT"],
+  gap_check_sections: ["DELETE", "INSERT", "SELECT"],
   staff_matrix: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   onboarding_checklists: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   hazards: ["DELETE", "INSERT", "SELECT", "UPDATE"],
