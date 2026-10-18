@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Browser, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import {
   pagePass,
@@ -57,6 +57,34 @@ async function expectStep(page: Page, id: string, timeout?: number) {
   await expect(page.getByTestId("next-step-button")).toHaveCount(1);
 }
 
+/**
+ * REQ-017 FR-4 (QA live b340ee3, batch C (2); report D flow 4): a week later, a
+ * fresh browser with the same session lands on the same step. A second context
+ * is signed in with the tenant's session, opens a signed-in page, and the
+ * "Your next step" strip names the step the first browser was on, with its
+ * button leading to the step's screen; then the second browser is closed.
+ */
+async function resumesAt(
+  browser: Browser,
+  tenant: TestTenant,
+  baseURL: string,
+  id: string,
+  href: RegExp,
+) {
+  const again = await browser.newContext();
+  try {
+    await signInContext(again, tenant, baseURL);
+    const back = await again.newPage();
+    await back.goto("/account");
+    await expectStep(back, id);
+    await back.getByTestId("next-step-button").click();
+    await expect(back, `resume at ${id}`).toHaveURL(href);
+    await expectStep(back, id);
+  } finally {
+    await again.close();
+  }
+}
+
 test.describe("the guided path, result to audit day (REQ-017)", () => {
   test.skip(!enabled, "needs the Supabase variables");
   // One journey, serial, with no retry (batch 45b item 2, replacing backlog
@@ -87,6 +115,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     context,
     baseURL,
     request,
+    browser,
   }, testInfo) => {
     const project = testInfo.project.name;
     await signInContext(context, tenant, baseURL!);
@@ -96,6 +125,14 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expectStep(page, "buy");
     await page.getByTestId("start-getting-ready").click();
     await expect(page).toHaveURL(/\/path\/before-you-buy$/);
+    // FR-4: a fresh browser a week later lands here too.
+    await resumesAt(
+      browser,
+      tenant,
+      baseURL!,
+      "buy",
+      /\/path\/before-you-buy$/,
+    );
 
     // Step 2: three lines and one button.
     await expect(page.getByTestId("buy-line-what")).toContainText("documents");
@@ -192,6 +229,14 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
 
     // Step 4: "Your details" (REQ-029 FR-1): one page, every fact once, saved as each field loses focus.
     await expectStep(page, "finish");
+    // FR-4: the same in a fresh browser.
+    await resumesAt(
+      browser,
+      tenant,
+      baseURL!,
+      "finish",
+      /\/documents\/[0-9a-f-]{36}\/finish$/,
+    );
     await page.getByTestId("next-step-button").click();
     await expect(page).toHaveURL(/\/documents\/[0-9a-f-]{36}\/finish$/);
     await expect(page.getByTestId("finish-form")).toBeVisible();
@@ -394,6 +439,8 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     // Step 5: adopt, one group per screen.
     await page.goto("/documents");
     await expectStep(page, "adopt");
+    // FR-4: the same in a fresh browser.
+    await resumesAt(browser, tenant, baseURL!, "adopt", /\/path\/adopt\//);
     await page.getByTestId("next-step-button").click();
     await expect(page).toHaveURL(/\/path\/adopt\//);
     // Four content groups, "Other" and the self-assessment at most. On
