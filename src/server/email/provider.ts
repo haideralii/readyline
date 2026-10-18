@@ -61,6 +61,17 @@ export const SMTP_NAMES = [
   "HASH_PEPPER",
 ] as const;
 
+/**
+ * D-2837 (the acceptance read of REQ-022 B): a hung SMTP host held the
+ * reminders job and the admin's test send to the function's own limit, since
+ * the transport set no timeouts. Connect and greeting 10 s, the socket 30 s.
+ */
+export const SMTP_TIMEOUTS = {
+  connectionTimeout: 10_000,
+  greetingTimeout: 10_000,
+  socketTimeout: 30_000,
+} as const;
+
 export type SmtpConfig = {
   host: string;
   port: number;
@@ -130,6 +141,7 @@ export class SmtpEmailProvider implements EmailProvider {
         // TLS from the first byte on 465 (SMTPS); STARTTLS on the others.
         secure: config.port === 465,
         auth: { user: config.user, pass: config.pass },
+        ...SMTP_TIMEOUTS,
       });
   }
   async send(message: EmailMessage): Promise<void> {

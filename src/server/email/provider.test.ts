@@ -2,6 +2,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
+// D-2837: the transport's options are read from nodemailer's factory, so the timeouts are asserted, not assumed.
+const createTransport = vi.fn(() => ({ sendMail: vi.fn() }));
+vi.mock("nodemailer", () => ({
+  default: { createTransport: (o: unknown) => createTransport(o) },
+}));
 import {
   configuredEmailProvider,
   createEmailProvider,
@@ -112,5 +117,36 @@ describe("createEmailProvider (REQ-022 FR-5, D-2821)", () => {
     const p = new LogOnlyEmailProvider();
     await p.send({ to: "a@example.test", subject: "s", text: "t" });
     expect(p.sent).toHaveLength(1);
+  });
+});
+
+describe("the SMTP transport's timeouts (D-2837)", () => {
+  it("connects and greets within 10 s and gives a socket 30 s, so a hung host never holds the job", async () => {
+    const { SMTP_TIMEOUTS, SmtpEmailProvider } = await import("./provider");
+    createTransport.mockClear();
+    new SmtpEmailProvider(
+      {
+        host: "smtp.example.test",
+        port: 587,
+        user: "u",
+        pass: "p",
+        from: "Readyline <no-reply@readyline.example>",
+        replyTo: null,
+      },
+      null,
+    );
+    expect(createTransport).toHaveBeenCalledTimes(1);
+    const options = createTransport.mock.calls[0][0] as Record<string, unknown>;
+    expect(options).toMatchObject({
+      host: "smtp.example.test",
+      port: 587,
+      secure: false,
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 30_000,
+    });
+    expect(SMTP_TIMEOUTS.socketTimeout).toBeGreaterThan(
+      SMTP_TIMEOUTS.connectionTimeout,
+    );
   });
 });
