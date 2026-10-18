@@ -373,6 +373,8 @@ First review 16 Oct 2026 (`product/qa/req-reviews/2026-10-16-req-027.md`, SHA 64
 
 ## Delivery evidence
 
+Dev, 17 Oct 2026 (REQ-028 D-2805, built in REQ-028 Session C commit 26eff8b on `req-028-session-c`, PR #96): D-2707's "Next:" line and `NEXT_LINE` are gone from the result page, which carries one primary button whose label says where it goes and one "See the price" link, with the checklist link heading the documents section as "Open these in your checklist" (D-2707's one button and one link, restored); FR-3a's record is REQ-028's. The tests D-2805 names changed with it (`e2e/req-027.spec.ts`'s next-line block, `tests/path-screens.test.ts`, `e2e/req-015-a11y.spec.ts`'s two result cases, `result-copy.test.ts`'s Next test, the copy lint's comment); the evidence is `product/evidence/req-028/c-evidence.md`.
+
 ### Session A1 (Dev, 16 Oct 2026)
 
 Branch `req-027-session-a1` at 0565315 (cut from `next` a9cd6cf; the four A1 commits, 257f95d's `status: reviewed` and D-2729, then one merge of `next` 8a658ea, DECISIONS.md resolved as both sides with D-2245 before D-2701 to D-2728), PR into `next` opened by the PO from the compare link in CHAT. `npm run check` green (137 files, 1016 tests, 6 skipped); `home`, `req-015-a11y` and `security-headers` green on desktop from the main tree.

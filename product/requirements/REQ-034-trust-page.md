@@ -76,4 +76,29 @@ Dev-1, 19 Oct 2026, on `req-034-session-a` from `next` a60f7df. The REQ cites D-
 
 ## Delivery evidence
 
-(Dev appends: branch, commits, test counts, screenshots of `/trust` and `/sample` on desktop and Android.)
+**Session A.** Dev-1, 19 Oct 2026. Branch `req-034-session-a` from `next` a60f7df. Head: a0ae3f6. PR body: `product/evidence/req-034/pr-body-session-a.md`.
+
+Commits:
+
+1. e6fc899: the trust page (FR-1, FR-2, FR-7, SR-1): `src/lib/trust/answers.ts`, `src/app/trust/page.tsx`, the pins in `legal-copy.test.ts`, the footer link, the a11y page list, the copy lint.
+2. 70de6b3: the ASVS table's five stale file:line references on `next`.
+3. c03eac7: the pricing page's three plain lines and the four links (FR-3, FR-6).
+4. 45f760e: the sample as PDF and Word with the footer on every page, the files line, "What a pack holds" (FR-4, FR-5, SR-2); `pdfjs-dist` added.
+5. 779f763: `e2e/req-034.spec.ts`, D-2301.
+6. 54052a4: the links carry the renderer's numbered heading ids, looked up by the heading's words (`legalHeadingId`), after AC-1's first run.
+7. a0ae3f6: the spec finds a numbered id through an attribute selector.
+
+| AC | Test | Level | Status |
+| --- | --- | --- | --- |
+| AC-1 | `e2e/req-034.spec.ts` "AC-1": eight rows in order, each heading, answer and link; every link lands on `/privacy#<anchor>` with the `h2` in view; axe serious/critical and the width check at 1280 and 360 | e2e (desktop, Android) | green locally from the main tree's build |
+| AC-2 | `legal-copy.test.ts` "the trust page's pins": every source sentence in `privacy.md`; every answer pinned; every place and number in its sources; the breach row quoted as it stands | unit | green |
+| AC-3 | `req-034.spec.ts` "AC-3": footer link, home card link, pricing card link, the AI page's first paragraph | e2e | green locally from the main tree's build |
+| AC-4 | `req-034.spec.ts` "AC-4, AC-5": the PDF's pages each carry the footer (pdfjs), the Word footer part carries it, the files line pinned; `pdf-document.test.ts` | e2e, unit | green locally from the main tree's build; unit green |
+| AC-5 | `sample-pack-lists.test.ts` (two cases, counts, the catalogue's titles, the certification case larger); the spec's counts against the open lists | unit, e2e | green; green locally from the main tree's build |
+| AC-6 | `payments/copy.test.ts` (the three lines verbatim, the claims lint); `req-034.spec.ts` "AC-6" (three lines under the price) | unit, e2e | green; green locally from the main tree's build |
+| AC-7 | `trust/answers.test.ts` (banned words, questions, 20 words, Year 8, claims); the copy lint over `answers.ts` and the page | unit | green |
+| AC-8 | `npm run check` (205 files, 1558 passed | 6 skipped (1564)); `req-015-a11y.spec.ts` with `/trust` in its pages | unit, e2e | green; green locally from the main tree's build |
+
+Checks: `npm run check` green on the head. From the main tree's production build of the head: `req-034`, `home-v2`, `req-025`, `req-028-c`, `business-identity`, `req-013-p2`, `req-015-a11y`, `health` on desktop-chromium and android-small: 54 passed in 2.5 min. Screenshots of `/trust` and `/sample` at 360 and desktop come from the a11y spec's artefacts in CI.
+
+Open for the PO: question 1 (the PDF is pdf-lib's rendering, not LibreOffice's); rows 3 and 7 derive from several policy sentences; D-2944 to D-2951 are not yet in `DECISIONS.md` on main.

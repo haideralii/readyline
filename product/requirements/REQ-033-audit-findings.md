@@ -78,4 +78,44 @@ Dev-1, 18 Oct 2026, on `req-033-session-a` from `next` b14206d. D-2929 to D-2938
 
 ## Delivery evidence
 
-(Dev appends: branch, commits, test counts, screenshots of AC-1 and AC-3 on desktop and Android.)
+**Session A.** Dev-1, 18 Oct 2026. Branch `req-033-session-a` from `next` b14206d, with `next` a60f7df merged before the push (D-2827; DECISIONS.md by union, the export readme carrying both D-2898's and this session's words). Head: db46105; self-check commit 827fd88 (#122's branch moved to it). PR body: `product/evidence/req-033/pr-body-session-a.md`.
+
+Commits:
+
+1. 18f4bc6: the register (FR-3, FR-5's source, FR-7's words, SR-2, SR-3): migration `20261018210000_findings.sql`, the meta, the columns, the three routes, the index, the export.
+2. a55dd11: the entry and the gate (FR-1, FR-2, SR-1 to SR-3): `/registers/findings/import`, the server read of PDF (`pdfjs-dist`), Word and text with the caps, the candidates, the detector in the browser and in the schema, the fixtures.
+3. 4f1157b: where the pack answers a finding and the model's one proposal (FR-4; D-2933, D-2934, D-2937).
+4. 29409e3: the trail and the card (FR-5, FR-6, SR-3; D-2935, D-2936).
+5. 4d05484: the words, the pages and the tests (FR-7, SR-1; D-2937, D-2938, D-2300): privacy and AI pages and their pins, the signed-in spec, the integration test.
+6. c451b56: the findings table in the grants list and the data-promises list after the merge of `next` a60f7df.
+7. db46105: the ASVS re-verification table's eight file:line references follow the lines they name (three moved by this branch, five already stale on `next` a60f7df).
+
+| AC | Test | Level | Status |
+| --- | --- | --- | --- |
+| AC-1 | `e2e/signed-in/req-033.spec.ts` "AC-1: three candidates…"; `findings-actions.test.ts` (parse, save, the refused row) | e2e, unit | written; the e2e runs in CI's Supabase job |
+| AC-2 | `findings-text.test.ts` (PDF, Word, text, the sniff, the caps, the refusals); `findings-actions.test.ts` "AC-2: reads an uploaded PDF and an uploaded Word file" | unit | green locally |
+| AC-3 | `req-033.spec.ts` "AC-3: a row names the document and section…"; `findings-map.test.ts` | e2e, unit | written; green locally |
+| AC-4 | `req-033.spec.ts` "AC-4, AC-5…"; `findings-trail-actions.test.ts`; `tests/integration/findings.test.ts` (the member read, the other account's refusals) | e2e, unit, integration | written; unit green locally |
+| AC-5 | `req-033.spec.ts` (the card, the auditor's view, `findings-<stamp>.csv`); `findings.test.ts` (the card line) | e2e, unit | written; green locally |
+| AC-6 | `legal-copy.test.ts` (the privacy bullet and the AI sentence pinned; the AI page's date) | unit | green locally |
+| AC-7 | `findings.test.ts` (no resolve, clear or pass in the register's words); the copy lint | unit | green locally |
+| AC-8 | `req-033.spec.ts` axe at 360 and 1280 on the list and the row | e2e | written; runs in CI's Supabase job |
+
+Checks: `npm run check` green on the head (209 test files, 1,570 tests passed, 6 skipped). From the main tree's production build of the head: `home-v2`, `req-025`, `req-013-p2`, `req-015-a11y`, `health` on desktop-chromium and android-small, 30 passed in 2.5 min. Not run locally by rule: the signed-in spec and the integration test (CI's Supabase job). Screenshots of AC-1 and AC-3 at 360 and desktop come from that job's artefacts.
+
+Open for the PO: the six Dev questions were built on the recommendations (1a, 2a, 3a, 4b, 5a, 6b); Session B (the redraft) stays deferred by the REQ.
+
+### Acceptance self-check (Dev-1, 18 Oct 2026, on `req-033-session-a` at 827fd88)
+
+Walked against the branch, one line per AC: pass, the proof, or the gap and what closed it. The signed-in spec and the integration test run in CI's Supabase job by rule, so their lines name what the spec asserts, not a local run.
+
+| AC | Result | Proof on the branch | Note |
+| --- | --- | --- | --- |
+| AC-1 | pass | `e2e/signed-in/req-033.spec.ts` "AC-1" on desktop-chromium and android-small (the android project runs every spec): the fixture pasted gives three candidates; the third carries `data-blocked="true"` and the detector's sentence; the save button is disabled and the blocked line reads "1 marked above cannot be saved"; after "Mr J. Smith" becomes "participant P-014" the row unblocks, the save lands on `?saved=3`, three rows and FND-0001 in the list. `findings-actions.test.ts` holds the server side: the refused row's message, the others saved. | The AC's "two rows save, the third is refused until edited" is walked as one save after the edit, since the form holds the whole save while a row is blocked (SR-2's server gate refuses the one row if the browser check is bypassed, `findings-actions.test.ts`). |
+| AC-2 | pass, with the level noted | `findings-text.test.ts` reads the PDF and the Word renderings of the fixture into the same text; `findings-actions.test.ts` "AC-2": both uploads give the same three candidates, the Supabase `storage` getter throws if touched and is not, the log line carries counts and never a word of the report. | Unit with fake clients, not integration: the read never reaches the database and tests make no model call (question 6 (b)); the integration test covers the rows (AC-4). |
+| AC-3 | pass, one gap closed | `req-033.spec.ts` "AC-3": the row names "Incident management policy", "section N", "Incident register"; **gap:** the tenant had no set, so the link fell back to `/documents` and "from the provider's set" was not walked; closed at 827fd88 by seeding one ready version of the incident management policy from the sole-trader fixture's skeleton (as the fill-at-download spec seeds its set); the link's href is `/documents/<set>/incident-management-policy-and-register` and opening it lands on that page. `findings-map.test.ts` holds the mapping. | |
+| AC-4 | pass, one gap closed | `req-033.spec.ts` "AC-4, AC-5": the saved row's improvement row exists with source `audit-finding`; marking the finding addressed closes it (`done_on` = the day); verification sets "Verified by the auditor 9 October 2026" and the forms leave; **gap:** the AC's direction "closing it marks the finding addressed with the date" (the improvement row closed from its own register) was not walked; closed at 827fd88: FND-0002's improvement row is opened from `/registers/improvements`, "Change this improvement" sets Done on 2026-10-05, and FND-0002 reads "Addressed 5 October 2026". `findings-trail-actions.test.ts` holds the actions; `tests/integration/findings.test.ts` "AC-4": a member reads the row through `findings_status`, another account reads nothing, its update touches no row, its insert is refused (42501). | The member "cannot write" line is the other account's refusal; a member of the same account may write under `insert_subscribed`, as every audit-day register allows (REQ-018 D-1904). |
+| AC-5 | pass, one gap closed | `req-033.spec.ts`: the card reads "3 open", then "2 open, 1 verified by the auditor", then "1 open, 1 addressed, 1 verified by the auditor"; the auditor's view carries "Audit findings" and FND-0001; the pack holds `findings-<date>.csv`. **gap:** the audit-pack spec was not extended; closed at 827fd88 (`audit-pack.spec.ts` lists the findings file among the pack's names). `findings.test.ts` holds the card line's counts. | |
+| AC-6 | pass | `findings-map.test.ts` "AC-6": a standard no document carries reads D-2933's line; an unmapped finding has no line; `finding-answers.tsx` renders the line with the link to the documents page. | |
+| AC-7 | pass | `legal-copy.test.ts`: the privacy bullet (findings in the provider's words; the uploaded report not kept, logged or sent) under "What we collect" and the AI sentence (a finding's words to the model after the participant check; the report never) pinned verbatim, the AI page's `updated` 2026-10-18. FR-7's two sentences are pinned verbatim in `findings.test.ts` "FR-7" (the register's intro), with no button reading resolve, clear or pass. | FR-7's words are the register's, not a legal page's, so their pin sits in `findings.test.ts`; say if you want them in `legal-copy.test.ts` as well. |
+| AC-8 | pass, one gap closed | `npm run check` green at 827fd88 (209 files, 1,570 tests); **gap:** axe ran on the list and the row, not on the new page; closed at 827fd88: `req-033.spec.ts` runs axe serious/critical and the sideways-scroll check on `/registers/findings/import` with its candidates showing, at 1280 and at 360, and on the list and the row. | |
