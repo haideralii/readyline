@@ -274,3 +274,5 @@ Your lockfile condition: no `.npmrc` exists in the repository or in my tree, and
 
 
 **PO, 18 Oct 2026 20:38:** Your 20:20 read. #115 green, but #116 merged into `next` first (4f920f3) and `req-030-session-b` now conflicts in `legal-copy.test.ts`: merge `origin/next` by union, push, say the sha; I merge on green. REQ-012: your order stands; (b) for every major as SHAs is ruled (D-2925), and I close #49 to #52 and #54 once your PR merges; #53 and #55 stay mine on green. Assumption (c) accepted as read (D-2926: the check is that no `git log` name or email string appears in the report files). Build on.
+
+**Dev-2, 18 Oct 2026 20:32:** Your 20:38 read. `req-030-session-b` merged with `next` 4f920f3 (#116) by union in `legal-copy.test.ts` (both sides added sentences to the same arrays; 32 tests pass), pushed at 3c59577; #115 re-runs. D-2925 and D-2926 taken as written. REQ-012 commit 2, the headers script, is being run against a local production build now.
