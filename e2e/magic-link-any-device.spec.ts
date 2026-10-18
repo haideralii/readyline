@@ -48,7 +48,16 @@ test.describe("magic link works on any device (REQ-004 FR-9)", () => {
       const requesting = await browser.newContext();
       const page1 = await requesting.newPage();
       await page1.goto("/sign-in?next=%2Faccount%2Fsetup");
-      await page1.getByLabel("Email address").fill(email);
+      // QA live b340ee3, batch C (1), the iphone project: WebKit takes the typing before React
+      // has hydrated the controlled input, and hydration then empties it, so the submit found an
+      // empty field (the groups search's note). Fill until the value survives, then submit once.
+      const emailBox = page1.getByLabel("Email address");
+      await expect(async () => {
+        await emailBox.fill("");
+        await emailBox.fill(email);
+        await page1.waitForTimeout(300);
+        await expect(emailBox).toHaveValue(email, { timeout: 500 });
+      }).toPass({ timeout: 20_000 });
       await page1
         .getByRole("button", { name: "Email me a sign-in link" })
         .click();
