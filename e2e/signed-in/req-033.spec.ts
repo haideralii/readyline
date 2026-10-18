@@ -52,6 +52,7 @@ test.describe("bring your audit findings (REQ-033)", () => {
   let tenant: TestTenant;
   let setId = "";
   const INCIDENT_TYPE = "incident-management-policy-and-register";
+  const COMPLAINTS_TYPE = "complaints-management-policy-and-register";
 
   test.beforeAll(async ({}, testInfo) => {
     tenant = await createTenant({
@@ -121,6 +122,45 @@ test.describe("bring your audit findings (REQ-033)", () => {
       model: drafted,
     });
     if (ins.error) throw ins.error;
+    // Session C (AC-C1 to AC-C5): a participant-facing document with its plain-words summary in words.
+    const complaintsModel = buildSkeleton({
+      type: documentTypeById(COMPLAINTS_TYPE)!,
+      facts: buildProviderFacts(c.answers, c.result),
+      dataset: getStandardsDataset(),
+      result: c.result,
+      version: "1",
+      generatedAt: "2026-10-14",
+    });
+    const complaintsDrafted = {
+      ...complaintsModel,
+      sections: complaintsModel.sections.map((sec) =>
+        sec.mode === "tailored"
+          ? {
+              ...sec,
+              status: "generated" as const,
+              blocks: [
+                {
+                  type: "paragraph" as const,
+                  text:
+                    sec.id === "plain-language-summary"
+                      ? "This document is about how Sunrise Supports works with you. You choose your supports. We listen to you. If something is wrong, tell us. We will put it right."
+                      : `Sunrise Supports, a sole trader in New South Wales, keeps this ${sec.heading.toLowerCase()} in writing and reads it with every worker. We record what we do and keep the record for 7 years.`,
+                },
+              ],
+            }
+          : sec,
+      ),
+    };
+    const ins2 = await tenant.admin.from("document_versions").insert({
+      version_set_id: setId,
+      account_id: tenant.accountId,
+      document_type_id: COMPLAINTS_TYPE,
+      version: 1,
+      status: "ready",
+      storage_path: `${tenant.accountId}/${setId}/${COMPLAINTS_TYPE}.v1.docx`,
+      model: complaintsDrafted,
+    });
+    if (ins2.error) throw ins2.error;
   });
 
   test.afterAll(async () => {
@@ -419,5 +459,168 @@ test.describe("bring your audit findings (REQ-033)", () => {
       "version 2, adopted 2026-10-01",
     );
     await axeAt(page, 360, "finding row after the redraft");
+  });
+
+  test("Session C AC-C1 to AC-C5: a redraft in a participant-facing document leaves the summary to check; the two ways out clear it; the register, the audit-day page and the auditor's view carry it", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+    // A finding against the complaints standard whose words map to the policy's Scope section.
+    const fnd = await tenant.admin
+      .from("findings")
+      .insert({
+        account_id: tenant.accountId,
+        standard_id: "core.governance.feedback-and-complaints-management",
+        indicator:
+          "The scope of the policy covers who can complain, including family members, nominees and advocates acting for a participant.",
+        severity: "minor",
+        finding:
+          "The complaints policy does not say that family members and advocates can complain on a participant's behalf. Widen the scope and tell participants.",
+        status: "open",
+      })
+      .select("id")
+      .single();
+    if (fnd.error) throw fnd.error;
+    await page.goto(
+      `/registers/findings/${fnd.data.id}/redraft/${COMPLAINTS_TYPE}`,
+    );
+    await page.getByTestId("redraft-draft").click();
+    await expect(page.getByTestId("redraft-review")).toBeVisible({
+      timeout: 60_000,
+    });
+    await page.getByTestId("redraft-use").click();
+    await expect(page).toHaveURL(
+      new RegExp(`/documents/${setId}/${COMPLAINTS_TYPE}`),
+      {
+        timeout: 60_000,
+      },
+    );
+    // AC-C1: the new version carries the state; the page shows the block under the summary and the Easy Read line.
+    const v2 = await tenant.admin
+      .from("document_versions")
+      .select("id, version, summary_check_section_id, summary_check_on")
+      .eq("account_id", tenant.accountId)
+      .eq("document_type_id", COMPLAINTS_TYPE)
+      .eq("version", 2)
+      .single();
+    expect(v2.data!.summary_check_section_id).toBe("scope");
+    expect(v2.data!.summary_check_on).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    await expect(page.getByTestId("summary-check-line")).toContainText(
+      /In plain words may be out of date: section \d+ Scope changed on/,
+    );
+    await expect(page.getByTestId("easy-read-check")).toContainText(
+      "If you keep an Easy Read version, check it too.",
+    );
+    // The incident policy's redraft (Session B's test) set no state: it carries no summary.
+    const incident = await tenant.admin
+      .from("document_versions")
+      .select("summary_check_section_id")
+      .eq("account_id", tenant.accountId)
+      .eq("document_type_id", INCIDENT_TYPE)
+      .order("version", { ascending: false })
+      .limit(1)
+      .single();
+    expect(incident.data!.summary_check_section_id).toBeNull();
+    // AC-C5: the document page with the state, both widths.
+    await axeAt(page, 1280, "document page with the summary to check");
+    await axeAt(page, 360, "document page with the summary to check");
+    // AC-C4: the register row, the registers index, the audit-day page and the auditor's view.
+    await page.goto("/registers/document-control");
+    const row = page.getByTestId(`summary-check-${COMPLAINTS_TYPE}`);
+    await expect(row).toContainText("Summary to check");
+    await expect(row).toContainText("In plain words may be out of date");
+    await page.goto("/registers");
+    await expect(page.locator("body")).toContainText("1 summary to check");
+    await page.goto("/path/audit-day");
+    await expect(page.locator("body")).toContainText("1 summary to check");
+    const token2 = generateAuditorToken();
+    const link2 = await tenant.admin.from("auditor_links").insert({
+      account_id: tenant.accountId,
+      token_hash: hashAuditorToken(token2),
+      expires_at: new Date(Date.now() + 86_400_000).toISOString(),
+    });
+    if (link2.error) throw link2.error;
+    const auditor = await context.newPage();
+    await auditor.goto(`/auditor/${token2}`);
+    await expect(auditor.getByTestId("auditor-document-control")).toContainText(
+      "In plain words may be out of date",
+    );
+    await auditor.close();
+    // AC-C2: "The summary is still right" clears the state and writes the change-log row with the role and the day.
+    await page.goto(`/documents/${setId}/${COMPLAINTS_TYPE}`);
+    await page.getByTestId("summary-confirm").click();
+    await expect(page.getByTestId("summary-check")).toHaveCount(0, {
+      timeout: 60_000,
+    });
+    const confirmed = await tenant.admin
+      .from("document_versions")
+      .select("summary_check_section_id, model")
+      .eq("id", v2.data!.id)
+      .single();
+    expect(confirmed.data!.summary_check_section_id).toBeNull();
+    const confirmedLog = (
+      confirmed.data!.model as {
+        sections: {
+          id: string;
+          blocks: { type: string; rows?: string[][] }[];
+        }[];
+      }
+    ).sections.find((x) => x.id === "change-log")!;
+    const confirmedRows = confirmedLog.blocks.find(
+      (b) => b.type === "table",
+    )!.rows!;
+    expect(confirmedRows.at(-1)![2]).toMatch(
+      /^In plain words confirmed after section \d+ changed$/,
+    );
+    expect(confirmedRows.at(-1)![3]).toMatch(/Owner|Director|Sunrise/);
+    // AC-C3: the state again (set as the paths set it), then "Redraft the summary" on the fake mode makes version 3 with the summary replaced and the state cleared.
+    const reset = await tenant.admin
+      .from("document_versions")
+      .update({
+        summary_check_section_id: "purpose",
+        summary_check_on: "2026-10-18",
+      })
+      .eq("id", v2.data!.id);
+    if (reset.error) throw reset.error;
+    await page.reload();
+    await page.getByTestId("summary-redraft").click();
+    await expect(page.getByTestId("summary-check")).toHaveCount(0, {
+      timeout: 60_000,
+    });
+    const v3 = await tenant.admin
+      .from("document_versions")
+      .select("version, adopted_on, summary_check_section_id, model")
+      .eq("account_id", tenant.accountId)
+      .eq("document_type_id", COMPLAINTS_TYPE)
+      .order("version", { ascending: false })
+      .limit(1)
+      .single();
+    expect(v3.data!.version).toBe(3);
+    expect(v3.data!.adopted_on).toBeNull();
+    expect(v3.data!.summary_check_section_id).toBeNull();
+    const v3model = v3.data!.model as {
+      sections: {
+        id: string;
+        blocks: { type: string; text?: string; rows?: string[][] }[];
+      }[];
+    };
+    const summary = v3model.sections.find(
+      (x) => x.id === "plain-language-summary",
+    )!;
+    expect(summary.blocks.map((b) => b.text ?? "").join(" ")).toContain(
+      "You can ask us about any change.",
+    );
+    const v3rows = v3model.sections
+      .find((x) => x.id === "change-log")!
+      .blocks.find((b) => b.type === "table")!.rows!;
+    expect(v3rows.at(-1)![2]).toMatch(
+      /^In plain words redrafted after section \d+ changed; approved by \[role\]$/,
+    );
+    await expect(
+      page.getByTestId("section-plain-language-summary"),
+    ).toContainText("You can ask us about any change.");
+    await axeAt(page, 360, "document page after the summary's redraft");
   });
 });
