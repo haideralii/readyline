@@ -55,7 +55,7 @@ export default defineConfig({
       // desktop and Android alone join: the subscription states, REQ-023 B, C and D, the REQ-028
       // register pages and account nav, and the magic-link spec; D-2207 no longer keeps REQ-023 off WebKit.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision|subscription|req-023-b|req-023-c|req-023-d|req-028-b|req-028-c|magic-link-any-device))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|business-identity|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision|subscription|req-023-b|req-023-c|req-023-d|req-028-b|req-028-c|magic-link-any-device))\.spec\.ts$/,
     },
   ],
   webServer: {
@@ -92,6 +92,15 @@ export default defineConfig({
       GENERATION_RECORD: "",
       GENERATION_LIVE: "",
       ANTHROPIC_MODEL: "claude-sonnet-5-5",
+      // REQ-022 FR-13 (D-2289): the registered name and ABN reach the server only when the
+      // run sets them (CI's identity step; locally by exporting them), so the full run keeps
+      // the unset state the spec's other half asserts.
+      ...(process.env.BUSINESS_NAME
+        ? { BUSINESS_NAME: process.env.BUSINESS_NAME }
+        : {}),
+      ...(process.env.BUSINESS_ABN
+        ? { BUSINESS_ABN: process.env.BUSINESS_ABN }
+        : {}),
     },
   },
 });

@@ -6,12 +6,16 @@
  * route must not touch the database; it only stops a tight loop of
  * requests from one address.
  */
+import { siteUrl } from "@/lib/site";
+
 export type Health = {
   ok: true;
   version: string;
   sha: string;
   region: string;
   deployment: "production" | "preview" | "development";
+  /** REQ-022 FR-9 (Session C): the canonical origin, so a smoke record names the host it ran against. */
+  siteUrl: string;
 };
 
 export function healthBody(
@@ -31,6 +35,7 @@ export function healthBody(
     sha,
     region: env.VERCEL_REGION ?? "local",
     deployment,
+    siteUrl: siteUrl(env),
   };
 }
 

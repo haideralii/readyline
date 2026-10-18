@@ -107,6 +107,9 @@ export const OPTIONAL: ReadonlyArray<{
     without: "the thirty-minute schedule picks jobs up instead",
   },
   {
+    name: "HSTS_MAX_AGE",
+    from: "REQ-022 Session C (FR-10: one week after the alias redirect is proven, one year a week later)",
+    without: "the header carries the one-week default without preload",
     name: "SENTRY_DSN",
     from: "REQ-030 FR-1 (D-2865): server-side error reporting, scrubbed before it leaves",
     without: "errors reach the server log alone",
