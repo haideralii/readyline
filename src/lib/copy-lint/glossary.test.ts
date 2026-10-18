@@ -5,7 +5,11 @@
  * bracket stripping for the term pass and the token list.
  */
 import { describe, expect, it } from "vitest";
-import { glossaryContent, glossaryBracket } from "@/lib/questionnaire/content";
+import {
+  glossaryBracket,
+  glossaryContent,
+  glossaryTerm,
+} from "@/lib/questionnaire/content";
 import {
   GLOSSARY_FORMS,
   findGlossaryTerms,
@@ -90,9 +94,12 @@ describe("the glossary term match (REQ-027 FR-2)", () => {
 
   it("strips a bracket's rendered text for the term pass, and the meaning is still found in the full text (D-2714, D-2724)", () => {
     const page = `Each ${glossaryBracket("module")} is listed. A module can be long.`;
-    // The module meaning holds "Practice Standards": stripped, it pulls no second term in.
-    expect(findGlossaryTerms(stripGlossaryBrackets(page))).toEqual(["module"]);
-    expect(findGlossaryTerms(page)).toEqual(["module", "practice-standards"]);
+    // The strip takes the whole bracket out, so a meaning that named another term would pull none in
+    // (D-2714). Since D-2852 no meaning names another term, so the full text finds one term too.
+    const stripped = stripGlossaryBrackets(page);
+    expect(stripped).not.toContain(glossaryTerm("module").meaning);
+    expect(findGlossaryTerms(stripped)).toEqual(["module"]);
+    expect(findGlossaryTerms(page)).toEqual(["module"]);
     expect(hasMeaning(page, "module")).toBe(true);
     expect(hasMeaning("Each module is listed.", "module")).toBe(false);
   });

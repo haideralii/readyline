@@ -49,7 +49,9 @@ export function PricingCard({
     <section
       id={id}
       aria-labelledby={headingId}
-      className="border-rule flex h-full scroll-mt-6 flex-col rounded-md border p-5"
+      // Live QA of b340ee3, D3: a grid item's minimum width is its content's unless told otherwise, so at 200 % text
+      // on a 360 px screen the two cards ran 353 px wide and the page scrolled sideways; the card takes the column.
+      className="border-rule flex h-full min-w-0 scroll-mt-6 flex-col rounded-md border p-5 [overflow-wrap:anywhere]"
       data-testid={testId}
     >
       <p className="text-slate text-sm font-medium">{eyebrow}</p>

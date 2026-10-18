@@ -24,7 +24,8 @@ export const PRICING_COPY = {
   /** REQ-028 FR-10: the page is "Pricing"; each card carries its product's name. */
   title: "Pricing",
   intro: `One fixed price for the policies, procedures, registers and self-assessment your answers call for, as editable Word files. ${BRAND} drafts them; you review and adopt them.`,
-  priceHeading: "Price",
+  // Live QA of b340ee3 (report A): the card's heading names the thing, as the other card's does.
+  priceHeading: "Document pack",
   priceUnset:
     "The price is not set in this environment. In production it is a single fixed amount in Australian dollars.",
   whatYouGetHeading: "What you get",

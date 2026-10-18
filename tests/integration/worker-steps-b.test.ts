@@ -8,8 +8,10 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
+
+vi.mock("server-only", () => ({}));
 
 const enabled = hasSupabaseEnv();
 
@@ -296,13 +298,30 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
       confirmed_on: null,
       recorded_by_owner: false,
     });
-    // The owner confirms; the worker reads both dates.
-    const confirm = await owner.client
-      .from("onboarding_items")
-      .update({ confirmed_on: "2026-11-04" })
-      .eq("id", w6ItemId)
-      .select("confirmed_on");
-    expect(confirm.data?.[0]?.confirmed_on).toBe("2026-11-04");
+    // The owner confirms through the page's own path (D-2845), not a direct update; the worker reads both dates.
+    const { confirmWorkerItem } =
+      await import("@/server/registers/worker-onboarding");
+    const confirm = await confirmWorkerItem(owner.client, {
+      accountId: owner.accountId,
+      userId: owner.userId,
+      listId: checklistId,
+      item: { id: "w6-policies", who: "both" },
+      tickedOn: "2026-11-04",
+      tickedByRef: "KP-1",
+    });
+    expect(confirm.ok).toBe(true);
+    const ownersTick = await admin
+      .from("onboarding_ticks")
+      .select("ticked_by_ref, actor_user_id")
+      .eq("checklist_id", checklistId)
+      .eq("item_id", "w6-policies")
+      .order("ticked_on", { ascending: false })
+      .limit(1)
+      .single();
+    expect(ownersTick.data).toEqual({
+      ticked_by_ref: "KP-1",
+      actor_user_id: owner.userId,
+    });
     const after = await worker.client
       .from("onboarding_items")
       .select("done_on, confirmed_on")
@@ -417,6 +436,34 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
       p_items: [{ id: "Robert'); drop", owner_role: "both" }],
     });
     expect(bad.error?.code).toBe("42501");
+    // D-2840: a regex-valid id outside the closed list is refused too, and nothing of the list is written.
+    const unknown = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [
+        { id: "w5-induction", owner_role: "owner" },
+        { id: "w99-made-up", owner_role: "both" },
+      ],
+    });
+    expect(unknown.error?.code).toBe("42501");
+    const none = await stranger.client
+      .from("onboarding_items")
+      .select("item_id")
+      .eq("checklist_id", first.data as string)
+      .eq("item_id", "w99-made-up");
+    expect(none.data ?? []).toEqual([]);
+    // D-2840: the caller's owner_role is ignored; the owner's own setting per item stands (w1-clearance is the owner's).
+    const forged = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [{ id: "w10-other-checks", owner_role: "worker" }],
+    });
+    expect(forged.error).toBeNull();
+    const role = await stranger.client
+      .from("onboarding_items")
+      .select("owner_role")
+      .eq("checklist_id", first.data as string)
+      .eq("item_id", "w10-other-checks")
+      .single();
+    expect(role.data?.owner_role).toBe("owner");
     // The worker's date on the made W-4 row goes through worker_update_item as before.
     const w4 = rows.data!.find((r) => r.item_id === "w4-orientation-module")!;
     void w4;
