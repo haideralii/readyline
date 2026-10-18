@@ -1,6 +1,6 @@
 ---
 title: Terms of use
-updated: 2026-10-16
+updated: 2026-10-18
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -39,7 +39,7 @@ You own the documents Readyline produces for you. You can edit, copy and use the
 
 Do not enter personal, health or disability information about NDIS participants into Readyline. Do not use Readyline to produce documents for a business you do not run or represent. Do not try to break, overload or reverse-engineer the service. We may suspend an account that breaks these rules, and we will tell you why. A suspended account keeps its export, and you can email us to have the decision looked at again.
 
-When you share a link to your registers or your audit pack, you share your records with whoever you send it to, exactly as you typed them; that is your disclosure, so check them for names before you share.
+When you share a link to your registers or your audit pack, you share your records and the name, role and contact details on your account with whoever you send it to, exactly as you typed them; that is your disclosure, so check them for names before you share.
 
 ## Availability and changes
 
