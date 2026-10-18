@@ -9,12 +9,8 @@ import { fillBusiness } from "./helpers/questionnaire";
  * font size, not a device, so one project carries it (D-2825's reasoning).
  */
 test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
-  test.skip(
-    ({ browserName }, testInfo) =>
-      testInfo.project.name !== "desktop-chromium" ||
-      browserName !== "chromium",
-    "one project is enough for a viewport check",
-  );
+  // One project is enough for a viewport check (D-2825's reasoning): the skip sits in each test, where testInfo is typed.
+  const ONE_PROJECT = "desktop-chromium";
 
   async function zoomed(page: Page, width: number, path: string) {
     await page.setViewportSize({ width, height: width === 320 ? 568 : 740 });
@@ -35,7 +31,10 @@ test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
   }
 
   for (const width of [360, 320]) {
-    test(`D3: /pricing fits ${width} px at 200 % text`, async ({ page }) => {
+    test(`D3: /pricing fits ${width} px at 200 % text`, async ({
+      page,
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== ONE_PROJECT, "one project is enough");
       await zoomed(page, width, "/pricing");
       const cards = page.locator(
         "[data-testid='pricing-pack'], [data-testid='pricing-subscription']",
@@ -48,7 +47,8 @@ test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
 
     test(`D4 and D5: /start/business fits ${width} px at 200 % text and the six circles do not overlap`, async ({
       page,
-    }) => {
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== ONE_PROJECT, "one project is enough");
       await zoomed(page, width, "/start/business");
       const circles = page
         .getByTestId("stepper")
@@ -68,7 +68,8 @@ test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
 
     test(`D6: /start/supports fits ${width} px at 200 % text`, async ({
       page,
-    }) => {
+    }, testInfo) => {
+      test.skip(testInfo.project.name !== ONE_PROJECT, "one project is enough");
       // The supports step opens only after a valid business step.
       await page.goto("/start/business");
       await expect(page.locator("fieldset[aria-busy='true']")).toHaveCount(0);
