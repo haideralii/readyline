@@ -49,6 +49,56 @@ A page that restates the privacy policy is safe only while it says exactly what 
 
 The provider's privacy indicator asks how participant and worker information is protected in the systems the provider uses; a dated page from the tool, written in plain words, is the evidence a provider attaches to their own privacy policy's digital-tools appendix (D-2944). The home card's "No participant data" stays as is; the trust page carries the longer answer (D-2946). The reading level matters because the page is read by sole traders, not procurement teams (D-2949). D-2951: the pack lists on `/sample` show the verification and certification cases, because the choice between them is the first thing a buyer wants to see, and the result page is where the real answer comes from.
 
+## Dev response
+
+Dev-1, 19 Oct 2026, on `req-034-session-a` from `next` a60f7df. The REQ cites D-2944 to D-2951; they are not yet in `DECISIONS.md` on main, so I read them from the REQ's text.
+
+**What is on the branch today that this builds on.** The legal pages render `product/legal/*.md` through `LegalArticle`, which gives every `h2` an id from `slugify(heading)`, so the privacy policy already has the anchors FR-1 needs (`#who-helps-us-run-the-service`, `#what-we-never-collect`, `#how-long-we-keep-it`, `#your-choices`, `#security`). `legal-copy.test.ts` pins sentences verbatim per page. The sample Word file is rendered from `data/samples/complaints-policy.json` by `renderDocx` in a route that caches the bytes once per server process. `deriveDocumentSet(moduleIds, groupCodes, existing)` gives a result's document list from `document-sets.json`; `loadReferenceCases()` gives the sole-trader verification and the personal-care certification cases with their results. `GlossaryTerms` carries D-2852's one-sentence glossary; `verification-audit` and `certification-audit` are in it. `PRICING_COPY` holds every pricing string and `copy.test.ts` runs the claims lint over all of them.
+
+**Approach, Session A (four commits).**
+
+1. **The trust page (FR-1, FR-2, FR-7, SR-1).** `src/lib/trust/answers.ts`: eight rows, each `{ id, question, answer, anchor, sources }`, where `sources` are the privacy policy sentences the answer derives from, verbatim. `/trust` (`src/app/trust/page.tsx`, static, public): the title "Where your data lives and who can see it", a two-column table from `sm` (a stacked list at 360), each row the question, the one-sentence answer and a link "In the privacy policy" to `/privacy#<anchor>`; under it "Last reviewed <date>" from `privacy.md`'s `updated` and the footer's business line (name and ABN once set, else the brand alone, D-2810's rule). The pins (AC-2) live in `legal-copy.test.ts`: every source sentence is in `privacy.md` verbatim, every answer is pinned verbatim, and every number and place name in an answer ("Sydney", "United States", "30 days", "90 days") appears in its sources, so a change to the policy or the answer fails alone. `trust/answers.test.ts` holds FR-7: none of secure, safe, bank-level, guaranteed, compliant, certified; every heading ends in a question mark; every sentence under 20 words; the page's reading grade at or under 8 (a failure, not a warning, since the words are ours; question 4). `LEGAL_NAV` gains `trust` ("Where your data lives"); `req-015-a11y.spec.ts` gains `/trust`; the copy lint's page list gains the page.
+2. **The links and the pricing lines (FR-3, FR-6).** `PRICING_COPY` gains the link words and the three lines, rendered under the pack card's price; `copy.test.ts` pins the three and runs the claims lint over them (D-2948). The home "No participant data" card keeps its words and gains the link line "Where your data lives" (question 7). `ai.md`'s first paragraph gains one sentence linking the page; its `updated` is already 18 October (REQ-033) and moves to the 19th with this change, the pin following.
+3. **The sample in both formats and the pack lists (FR-4, FR-5, SR-2).** `data/samples/complaints-policy.json`'s `footer` becomes "Sample prepared with Readyline for a fictional sole trader", so the Word file's footer reads it on every page through `footerLead` as today. The PDF comes from a pdf-lib renderer of the same model (question 1), `src/lib/generator/pdf-document.ts`: title, document control table as rows, numbered headings, paragraphs, bullets, steps, callouts and tables as text rows, the footer and page number on every page; served by `/sample/complaints-policy.pdf`, rendered once per server process and cached, rate-limited like the Word route (question 5). `/sample` shows the two files side by side with the FR-4 line above them, pinned in `home-copy.test.ts`. Under the sample, "What a pack holds": two disclosures, the sole-trader verification case and the personal-care certification case, each the result's document titles from `deriveDocumentSet` with the count in the summary ("18 documents"), and the glossary line for the two audit words; `sample-pack-lists.test.ts` holds the counts and titles against the catalogue (AC-5).
+4. **The spec and the evidence.** `e2e/req-034.spec.ts` (public; desktop and Android): AC-1 the eight rows, each link opening the privacy policy with the hash and the heading in view, axe serious/critical at 360 and 1280 and the sideways-scroll check; AC-3 the four links; AC-4 the PDF fetched and read page by page (`pdfjs-dist`, question 6) for the footer, the Word file's `footer1.xml` for the same words, the page's line; AC-6 the three lines on the pricing page. D-2301 in `DECISIONS.md`.
+
+**Questions (none blocks the start; I build on the recommendations).**
+
+1. *FR-4's "same LibreOffice step the pack uses".* LibreOffice runs only in D-504's CI job, which converts every rendered Word file to prove it converts and ships nothing; the pack itself holds Word files, and neither Vercel nor my laptop has LibreOffice. (a) Render the sample PDF with pdf-lib from the same model (the repo's readiness summary already renders this way), the footer guaranteed by code on every page; it will not look identical to Word's rendering. (b) Convert in CI with LibreOffice, upload the artefact, commit `data/samples/complaints-policy.pdf`, and have the LibreOffice job fail when a fresh conversion's text differs from the committed file's. (c) (a) now, (b) later. **(a)**: one code path, no committed binary to go stale, SR-2 met.
+2. *Row 7, "Who can sign in".* `privacy.md` has no single sentence for it; the answer derives from three: "Each account can only see its own data, enforced in the database", the invited worker's hashed email address, and the auditor's time-limited link. (a) Pin the answer to those three, anchored at Security. (b) Ask you to add one sentence to `privacy.md` (its substance is out of scope for me). **(a)**.
+3. *Row 3, "the forms warn and refuse".* The policy says warn and "we may remove it and tell you"; refusing a name in a code field or an NDIS-number shape is what the register schemas do (REQ-018's tests). (a) "Never. Readyline is for your business information only. The forms warn you, and refuse a name or an NDIS number where they can tell." pinned to "What we never collect", with the refusal half tied to the schema tests. (b) Drop "refuse". **(a)**: it is true and it is the answer a provider wants.
+4. *FR-7's reading level.* The legal pages warn above their grade; the trust page's words are ours and short. (a) Fail at grade 9 or above. (b) Warn. **(a)**.
+5. *SR-2 "built once at build time".* (a) Once per server process at the first request, cached, as the Word route does; no request leaves the server and no model is called. (b) A committed file (question 1 (b)). **(a)**.
+6. *Reading the PDF in the test.* `pdfjs-dist` arrives on `next` with #122 (REQ-033). (a) Add the same version here so the branch stands alone; identical lock lines merge clean. (b) Wait for #122. **(a)**.
+7. *The home card (D-2946).* The cards are title and text. (a) The "No participant data" card gains one link line under its words, "Where your data lives", nothing else changes. **(a)**.
+
+**Hours.** 7 to 9: the page and its pins 2 to 3, the links and lines 1, the PDF renderer and the lists 2 to 3, the spec and evidence 1 to 2.
+
 ## Delivery evidence
 
-(Dev appends: branch, commits, test counts, screenshots of `/trust` and `/sample` on desktop and Android.)
+**Session A.** Dev-1, 19 Oct 2026. Branch `req-034-session-a` from `next` a60f7df. Head: a0ae3f6. PR body: `product/evidence/req-034/pr-body-session-a.md`.
+
+Commits:
+
+1. e6fc899: the trust page (FR-1, FR-2, FR-7, SR-1): `src/lib/trust/answers.ts`, `src/app/trust/page.tsx`, the pins in `legal-copy.test.ts`, the footer link, the a11y page list, the copy lint.
+2. 70de6b3: the ASVS table's five stale file:line references on `next`.
+3. c03eac7: the pricing page's three plain lines and the four links (FR-3, FR-6).
+4. 45f760e: the sample as PDF and Word with the footer on every page, the files line, "What a pack holds" (FR-4, FR-5, SR-2); `pdfjs-dist` added.
+5. 779f763: `e2e/req-034.spec.ts`, D-2301.
+6. 54052a4: the links carry the renderer's numbered heading ids, looked up by the heading's words (`legalHeadingId`), after AC-1's first run.
+7. a0ae3f6: the spec finds a numbered id through an attribute selector.
+
+| AC | Test | Level | Status |
+| --- | --- | --- | --- |
+| AC-1 | `e2e/req-034.spec.ts` "AC-1": eight rows in order, each heading, answer and link; every link lands on `/privacy#<anchor>` with the `h2` in view; axe serious/critical and the width check at 1280 and 360 | e2e (desktop, Android) | green locally from the main tree's build |
+| AC-2 | `legal-copy.test.ts` "the trust page's pins": every source sentence in `privacy.md`; every answer pinned; every place and number in its sources; the breach row quoted as it stands | unit | green |
+| AC-3 | `req-034.spec.ts` "AC-3": footer link, home card link, pricing card link, the AI page's first paragraph | e2e | green locally from the main tree's build |
+| AC-4 | `req-034.spec.ts` "AC-4, AC-5": the PDF's pages each carry the footer (pdfjs), the Word footer part carries it, the files line pinned; `pdf-document.test.ts` | e2e, unit | green locally from the main tree's build; unit green |
+| AC-5 | `sample-pack-lists.test.ts` (two cases, counts, the catalogue's titles, the certification case larger); the spec's counts against the open lists | unit, e2e | green; green locally from the main tree's build |
+| AC-6 | `payments/copy.test.ts` (the three lines verbatim, the claims lint); `req-034.spec.ts` "AC-6" (three lines under the price) | unit, e2e | green; green locally from the main tree's build |
+| AC-7 | `trust/answers.test.ts` (banned words, questions, 20 words, Year 8, claims); the copy lint over `answers.ts` and the page | unit | green |
+| AC-8 | `npm run check` (205 files, 1558 passed | 6 skipped (1564)); `req-015-a11y.spec.ts` with `/trust` in its pages | unit, e2e | green; green locally from the main tree's build |
+
+Checks: `npm run check` green on the head. From the main tree's production build of the head: `req-034`, `home-v2`, `req-025`, `req-028-c`, `business-identity`, `req-013-p2`, `req-015-a11y`, `health` on desktop-chromium and android-small: 54 passed in 2.5 min. Screenshots of `/trust` and `/sample` at 360 and desktop come from the a11y spec's artefacts in CI.
+
+Open for the PO: question 1 (the PDF is pdf-lib's rendering, not LibreOffice's); rows 3 and 7 derive from several policy sentences; D-2944 to D-2951 are not yet in `DECISIONS.md` on main.
