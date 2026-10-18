@@ -17,7 +17,7 @@ import {
 import { checkWidths } from "../helpers/width";
 
 /**
- * REQ-023 Session C on desktop and Android (D-2207), AC-5: the certification
+ * REQ-023 Session C on the three projects (D-2207 lifted for WebKit, PO 18 Oct 2026 12:20), AC-5: the certification
  * fixture at the renewal window with the dates confirmed, two documents due,
  * no rehearsal and no application reads the ten states the AC lists; the
  * dated steps take a date (and the booking the auditing company's name, the

@@ -1,5 +1,8 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 vi.mock("server-only", () => ({}));
 import {
@@ -112,5 +115,45 @@ describe("createEmailProvider (REQ-022 FR-5, D-2821)", () => {
     const p = new LogOnlyEmailProvider();
     await p.send({ to: "a@example.test", subject: "s", text: "t" });
     expect(p.sent).toHaveLength(1);
+  });
+});
+
+describe("the log provider's test-only outbox (QA live b340ee3, batch C (3))", () => {
+  it("appends one JSON line per message when EMAIL_OUTBOX_FILE is set, and writes nothing without it", async () => {
+    const file = join(
+      tmpdir(),
+      `readyline-outbox-${process.pid}-${Date.now()}.ndjson`,
+    );
+    const before = process.env.EMAIL_OUTBOX_FILE;
+    try {
+      delete process.env.EMAIL_OUTBOX_FILE;
+      const quiet = new LogOnlyEmailProvider();
+      await quiet.send({ to: "a@example.test", subject: "s", text: "t" });
+      expect(existsSync(file)).toBe(false);
+      process.env.EMAIL_OUTBOX_FILE = file;
+      const loud = new LogOnlyEmailProvider();
+      await loud.send({
+        to: "b@example.test",
+        subject: "Readyline: a register reminder",
+        text: "Reminders for X:\n\n- one",
+        template: "reminders",
+        accountId: "acc-1",
+      });
+      await loud.send({ to: "c@example.test", subject: "s2", text: "t2" });
+      const lines = readFileSync(file, "utf8").trim().split("\n");
+      expect(lines).toHaveLength(2);
+      const first = JSON.parse(lines[0]) as Record<string, unknown>;
+      expect(first).toMatchObject({
+        to: "b@example.test",
+        subject: "Readyline: a register reminder",
+        template: "reminders",
+        accountId: "acc-1",
+      });
+      expect(typeof first.at).toBe("string");
+    } finally {
+      if (before === undefined) delete process.env.EMAIL_OUTBOX_FILE;
+      else process.env.EMAIL_OUTBOX_FILE = before;
+      rmSync(file, { force: true });
+    }
   });
 });
