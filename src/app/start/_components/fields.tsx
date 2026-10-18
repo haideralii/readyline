@@ -248,7 +248,7 @@ export function RadioGroup<V extends string>({
   const errorId = errors.length ? `${name}-error` : undefined;
   return (
     <fieldset
-      className="mb-6"
+      className="mb-6 min-w-0"
       aria-describedby={
         [helpId, errorId].filter(Boolean).join(" ") || undefined
       }
@@ -312,7 +312,7 @@ export function CheckboxGroup<V extends string>({
     );
   return (
     <fieldset
-      className="mb-6"
+      className="mb-6 min-w-0"
       aria-describedby={
         [helpId, errorId].filter(Boolean).join(" ") || undefined
       }

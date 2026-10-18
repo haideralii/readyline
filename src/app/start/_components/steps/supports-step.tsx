@@ -394,7 +394,8 @@ export function SupportsStepForm() {
       </div>
 
       <fieldset
-        className="mb-6"
+        // Live QA of b340ee3, D5 and D6: a fieldset's minimum width is its content's; the column's width rules.
+        className="mb-6 min-w-0"
         aria-describedby={
           groupsErrors.length ? "groups-error groups-help" : "groups-help"
         }
@@ -490,7 +491,7 @@ export function SupportsStepForm() {
                     >
                       {open ? "▾" : "▸"}
                     </span>
-                    <span className="min-w-0">
+                    <span className="min-w-0 [overflow-wrap:anywhere]">
                       <span className="text-base font-semibold">{c.title}</span>{" "}
                       <span className="text-slate text-sm">
                         ({all.length} {all.length === 1 ? "class" : "classes"}

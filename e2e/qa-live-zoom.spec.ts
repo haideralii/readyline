@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { fillBusiness } from "./helpers/questionnaire";
 
 /**
  * Live QA pass of release b340ee3, report C, D3 to D6: at 200 % text on a
@@ -63,6 +64,17 @@ test.describe("live QA b340ee3: 200 % text on narrow screens", () => {
         lastRight = box.x + box.width;
       }
       expect(lastRight).toBeLessThanOrEqual(width);
+    });
+
+    test(`D6: /start/supports fits ${width} px at 200 % text`, async ({
+      page,
+    }) => {
+      // The supports step opens only after a valid business step.
+      await page.goto("/start/business");
+      await expect(page.locator("fieldset[aria-busy='true']")).toHaveCount(0);
+      await fillBusiness(page);
+      await expect(page).toHaveURL(/supports$/);
+      await zoomed(page, width, "/start/supports");
     });
   }
 });
