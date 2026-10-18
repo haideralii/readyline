@@ -1,7 +1,10 @@
 /**
  * The glossary disclosure's fixed words (REQ-027 D-2706, D-2719), in a `.ts`
  * beside the component so the e2e render check (`e2e/helpers/glossary.ts`)
- * reads them without loading JSX; the component re-exports them.
+ * reads them without loading JSX; the component re-exports them. D-2852:
+ * the block no longer opens with the attribution line (Haider could not get
+ * through the block); the words stay here for the bracket's title and the
+ * copy lint that reads them.
  */
 export const GLOSSARY_ATTRIBUTION = {
   result:

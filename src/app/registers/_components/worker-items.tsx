@@ -57,8 +57,6 @@ export function WorkerItems({
 }) {
   const router = useRouter();
   const byId = new Map(states.map((s) => [s.item_id, s]));
-  const lastTick = new Map<string, OnboardingTickRow>();
-  for (const t of ticks) lastTick.set(t.item_id, t);
   const [who, setWho] = useState("");
   const [on, setOn] = useState(today);
   const [errors, setErrors] = useState<string[]>([]);
@@ -148,7 +146,10 @@ export function WorkerItems({
       <ol className="divide-rule mt-3 divide-y">
         {items.map((item) => {
           const s = byId.get(item.id);
-          const t = lastTick.get(item.id);
+          // D-2845: every tick on the item, oldest first, each with its actor's role.
+          const itemTicks = ticks
+            .filter((x) => x.item_id === item.id)
+            .sort((a, b) => a.ticked_on.localeCompare(b.ticked_on));
           const open = item.beforeFirstShift
             ? outstanding.has(item.id)
             : !s?.confirmed_on;
@@ -197,8 +198,19 @@ export function WorkerItems({
                     <p className="text-slate mt-1 text-sm">
                       {s.done_on ? `Done ${s.done_on}` : "Not yet done"}
                       {s.recorded_by_owner ? " (recorded by your manager)" : ""}
-                      {s.confirmed_on
-                        ? `; confirmed ${s.confirmed_on}${t ? ` by ${t.ticked_by_ref}${t.actor_user_id && actorRoles?.[t.actor_user_id] ? ` (${actorRoles[t.actor_user_id]})` : ""}` : ""}.`
+                      {/* D-2845: every tick with its actor's code and role, the worker's and the owner's alike. */}
+                      {itemTicks.length
+                        ? `; ${itemTicks
+                            .map((x) => {
+                              const role =
+                                x.actor_user_id && actorRoles?.[x.actor_user_id]
+                                  ? actorRoles[x.actor_user_id]
+                                  : null;
+                              return `${role === "owner" ? "confirmed" : "ticked"} by ${x.ticked_by_ref}${role ? ` (${role})` : ""} on ${x.ticked_on}`;
+                            })
+                            .join(
+                              "; ",
+                            )}${s.confirmed_on ? "" : "; waiting for your confirmation"}.`
                         : "; waiting for your confirmation."}
                     </p>
                   ) : null}

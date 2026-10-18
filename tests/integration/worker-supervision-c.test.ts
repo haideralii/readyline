@@ -197,6 +197,49 @@ describe.skipIf(!enabled)("REQ-024 C: supervision entries", () => {
     ]);
   });
 
+  it("D-2847: an entry may be deleted within 24 hours of its creation and not after; the trail's date on the row stands", async () => {
+    const fresh = await owner.client
+      .from("supervision_entries")
+      .insert(entry({ kind: "conversation", held_on: "2026-09-15" }))
+      .select("id")
+      .single();
+    expect(fresh.error).toBeNull();
+    const old = await owner.client
+      .from("supervision_entries")
+      .insert(entry({ kind: "conversation", held_on: "2026-09-16" }))
+      .select("id")
+      .single();
+    expect(old.error).toBeNull();
+    const aged = await admin
+      .from("supervision_entries")
+      .update({
+        created_at: new Date(Date.now() - 25 * 3_600_000).toISOString(),
+      })
+      .eq("id", old.data!.id);
+    expect(aged.error).toBeNull();
+    const goneFresh = await owner.client
+      .from("supervision_entries")
+      .delete()
+      .eq("id", fresh.data!.id)
+      .select("id");
+    expect(goneFresh.data).toHaveLength(1);
+    const keptOld = await owner.client
+      .from("supervision_entries")
+      .delete()
+      .eq("id", old.data!.id)
+      .select("id");
+    expect(keptOld.data ?? []).toEqual([]);
+    const still = await admin
+      .from("supervision_entries")
+      .select("id")
+      .eq("id", old.data!.id);
+    expect(still.data).toHaveLength(1);
+    // The trigger kept the row's date the latest held day among what remains.
+    expect(await lastSupervisionOn()).toBe("2026-10-01");
+    await admin.from("supervision_entries").delete().eq("id", old.data!.id);
+    expect(await lastSupervisionOn()).toBe("2026-10-01");
+  });
+
   it("the CHECKs: a review carries an outcome and no note, nothing else carries an outcome, the supervisor is a staff code, the note is capped (finding 78)", async () => {
     const codes = await Promise.all(
       [

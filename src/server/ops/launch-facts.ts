@@ -29,6 +29,8 @@ import { jobRunAction } from "@/server/jobs/record-run";
 import { createStripeClient } from "@/server/payments/stripe";
 
 export const TEST_SEND_ACTION = "email.test-sent";
+/** D-2841: a failed attempt is audited too, so the one-a-minute limit holds for a failing provider as well. */
+export const TEST_FAILED_ACTION = "email.test-failed";
 
 const DNS_TIMEOUT_MS = 2_500;
 
@@ -41,8 +43,9 @@ async function txt(name: string): Promise<string[][] | null> {
       ),
     ]);
   } catch {
-    // NXDOMAIN or no TXT records is an answer: none there.
-    return [];
+    // D-2842: a resolver error (SERVFAIL, ECONNREFUSED, NXDOMAIN alike) is a lookup that did not answer, and
+    // D-2824 reads that as unverified, never as "none there" (mismatched); null, the same as the timeout.
+    return null;
   }
 }
 

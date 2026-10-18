@@ -158,9 +158,15 @@ test.describe("REQ-024 B: the worker's own steps", () => {
     await expect(page.getByTestId("worker-items")).toBeVisible();
     await page.locator("#ticked-by").fill("kp-1");
     await page.getByTestId("record-w4-orientation-module").click();
-    await expect(
-      page.getByTestId("worker-item-w4-orientation-module"),
-    ).toContainText(/confirmed .* by KP-1 \(owner\)/);
+    // D-2845 (#109's first run): every tick with its actor's code and role, the worker's then the owner's.
+    const w4 = page.getByTestId("worker-item-w4-orientation-module");
+    await expect(w4).toContainText(
+      /ticked by W-003 \(worker\) on \d{4}-\d{2}-\d{2}/,
+    );
+    await expect(w4).toContainText(
+      /confirmed by KP-1 \(owner\) on \d{4}-\d{2}-\d{2}/,
+    );
+    await expect(w4).not.toContainText("waiting for your confirmation");
     await w.goto("/worker");
     await expect(
       w.getByTestId("worker-step-state-w4-orientation-module"),

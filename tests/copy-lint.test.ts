@@ -10,6 +10,7 @@ import { join, relative } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { glossaryBracket } from "@/lib/questionnaire/content";
 import {
   GLOSSARY_ATTRIBUTION,
   GLOSSARY_BRACKET_TITLE,
@@ -893,13 +894,14 @@ describe("glossary presence (REQ-027 FR-2)", () => {
       "term:adopt",
       "token:module",
     ]);
-    // One term, the module, whose bracket meaning holds "Practice Standards", and the term again outside the bracket.
+    // One term, the module, with its bracket and the term again outside the bracket.
     const oneTerm = `export function P() {\n  return <main><p>Each <GlossaryBracket id="module" /> is listed. A module can be long.</p></main>;\n}\n`;
     expect(
       glossaryFindings(extractTsxText(oneTerm, at), meaningWays(oneTerm, at)),
     ).toEqual([]);
+    // D-2852: the bracket is the glossary's own, so the strip of D-2714 still recognises it.
     const brackets = extractMarkdownText(
-      "---\nslug: x\n---\n\nEach module (a group of the Practice Standards rules on one topic) is listed. A module can be long.\n",
+      `---\nslug: x\n---\n\nEach ${glossaryBracket("module")} is listed. A module can be long.\n`,
     );
     expect(
       glossaryFindings(brackets, { ids: new Set(), tokens: [] }).map(

@@ -15,6 +15,76 @@ import {
 import { log } from "@/lib/logging/logger";
 
 export const UNSUBSCRIBED_ACTION = "reminders.unsubscribed";
+/** D-2836: the owner turned the reminders back on from the account page. */
+export const REMINDERS_RESUMED_ACTION = "email.reminders-resumed";
+
+export type ReminderSettingsView = {
+  doNotSend: boolean;
+  reason: string | null;
+  /** When the person stopped them, as an instant; null while they are on. */
+  since: string | null;
+};
+
+/** D-2836: the account page's read of its own row, under the owner's RLS; no row yet means the reminders are on. */
+export async function readReminderSettings(
+  supabase: SupabaseClient,
+  accountId: string,
+): Promise<ReminderSettingsView> {
+  const r = await supabase
+    .from("reminder_settings")
+    .select("do_not_send, do_not_send_reason, do_not_send_at")
+    .eq("account_id", accountId)
+    .maybeSingle();
+  const row = r.data as {
+    do_not_send: boolean;
+    do_not_send_reason: string | null;
+    do_not_send_at: string | null;
+  } | null;
+  if (!row) return { doNotSend: false, reason: null, since: null };
+  return {
+    doNotSend: row.do_not_send,
+    reason: row.do_not_send_reason,
+    since: row.do_not_send ? row.do_not_send_at : null,
+  };
+}
+
+/**
+ * D-2836: the owner clears `do_not_send` on their own row (the owner's
+ * update policy) and one audit line records it; a row that was already on
+ * writes nothing new. Runs with the owner's session.
+ */
+export async function resumeReminders(
+  supabase: SupabaseClient,
+  accountId: string,
+  actorUserId: string,
+): Promise<{ ok: boolean; changed: boolean }> {
+  const up = await supabase
+    .from("reminder_settings")
+    .update({
+      do_not_send: false,
+      do_not_send_reason: null,
+      do_not_send_at: null,
+    })
+    .eq("account_id", accountId)
+    .eq("do_not_send", true)
+    .select("account_id");
+  if (up.error) {
+    log.warn("email.reminders-resume.failed", {
+      accountId,
+      code: up.error.code,
+    });
+    return { ok: false, changed: false };
+  }
+  const changed = (up.data?.length ?? 0) > 0;
+  if (changed)
+    await supabase.from("audit_log").insert({
+      account_id: accountId,
+      actor_user_id: actorUserId,
+      action: REMINDERS_RESUMED_ACTION,
+      target: accountId,
+    });
+  return { ok: true, changed };
+}
 
 type Row = {
   account_id: string;
