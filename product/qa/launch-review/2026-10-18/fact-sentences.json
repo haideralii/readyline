@@ -1,0 +1,1847 @@
+{
+  "extractedAt": "2026-10-18T12:37:28.795Z",
+  "distinct": [
+    {
+      "file": "src/lib/home-copy.ts",
+      "line": 59,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Every module, standard and audit rule comes from the NDIS Quality and Safeguards Commission's published Practice Standards and registration pages, with a link to the source on your result."
+    },
+    {
+      "file": "src/lib/home-copy.ts",
+      "line": 81,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards module"
+    },
+    {
+      "file": "src/lib/checklist/derive.ts",
+      "line": 406,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list."
+    },
+    {
+      "file": "src/lib/payments/documents-copy.ts",
+      "line": 22,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Come back in about 20 minutes and your documents will be here."
+    },
+    {
+      "file": "src/lib/questionnaire/result-text.ts",
+      "line": 10,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards modules that apply"
+    },
+    {
+      "file": "src/lib/path/details-copy.ts",
+      "line": 52,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "Most providers write 7 years."
+    },
+    {
+      "file": "src/lib/registers/period.ts",
+      "line": 280,
+      "classes": [
+        "number"
+      ],
+      "sentence": "1 entry has no date in this column and is always shown."
+    },
+    {
+      "file": "src/lib/registers/worker-steps.ts",
+      "line": 15,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Read the NDIS Code of Conduct acknowledgement from your manager's pack and acknowledge it."
+    },
+    {
+      "file": "src/lib/registers/worker-steps.ts",
+      "line": 17,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Read the Code of Conduct, incident, complaints, privacy and safeguarding policies and acknowledge each one."
+    },
+    {
+      "file": "src/app/admin/mfa/page.tsx",
+      "line": 24,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Scan the code with an authenticator app, then enter the 6-digit code it shows."
+    },
+    {
+      "file": "src/app/dev/stripe-checkout/[id]/page.tsx",
+      "line": 59,
+      "classes": [
+        "number"
+      ],
+      "sentence": "mt-4 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-base"
+    },
+    {
+      "file": "src/app/guides/page.tsx",
+      "line": 20,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Registration groups: which audit and which documents each of the 38 classes needs"
+    },
+    {
+      "file": "src/app/guides/registration-groups/page.tsx",
+      "line": 21,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "All 38 NDIS registration groups under everyday headings, with the audit type, the Practice Standards modules and the documents each one needs, generated from the Commission's published tables."
+    },
+    {
+      "file": "src/app/guides/registration-groups/[slug]/page.tsx",
+      "line": 77,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards modules"
+    },
+    {
+      "file": "src/app/guides/registration-groups/[slug]/page.tsx",
+      "line": 79,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Drafted from your questionnaire answers for your review, as Word files, with a Practice Standards self-assessment."
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 48,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Tailored policies, a Practice Standards self-assessment and a readiness checklist for sole-trader and small NDIS providers preparing for registration."
+    },
+    {
+      "file": "src/app/path/audit-day/check/page.tsx",
+      "line": 154,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Every no becomes a row in your improvement register with a date 30 days out."
+    },
+    {
+      "file": "src/app/path/audit-day/page.tsx",
+      "line": 247,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Your registration dates, from your certificate, the Rules and the Act"
+    },
+    {
+      "file": "src/app/pricing/page.tsx",
+      "line": 67,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards self-assessment"
+    },
+    {
+      "file": "src/app/registers/incidents/[id]/confirm/confirm-form.tsx",
+      "line": 100,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "This category is not usually reportable."
+    },
+    {
+      "file": "src/app/registers/staff-matrix/export/page.tsx",
+      "line": 16,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Worker files and the two Rules lists"
+    },
+    {
+      "file": "src/app/registers/_components/exception-panel.tsx",
+      "line": 615,
+      "classes": [
+        "number"
+      ],
+      "sentence": "State whose Part 4 section applied"
+    },
+    {
+      "file": "src/app/registers/_components/exception-panel.tsx",
+      "line": 626,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "QLD: about three years from the card held at 31 January 2021, unverified until the yellow card's term is read."
+    },
+    {
+      "file": "src/app/registers/_components/import-form.tsx",
+      "line": 53,
+      "classes": [
+        "number"
+      ],
+      "sentence": "The file is over 1 MB."
+    },
+    {
+      "file": "src/app/start/page.tsx",
+      "line": 8,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Answer a few questions about your supports and workforce to see which NDIS Practice Standards modules apply, which audit you face and what documents you will need."
+    },
+    {
+      "file": "src/app/start/_components/start-intro.tsx",
+      "line": 90,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Step 1 starts with your account's business details."
+    },
+    {
+      "file": "src/app/start/_components/stepper.tsx",
+      "line": 99,
+      "classes": [
+        "number"
+      ],
+      "sentence": "border-line bg-surface inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden"
+    },
+    {
+      "file": "src/app/start/_components/steps/result-step.tsx",
+      "line": 331,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Class 0138 and the SIL module are not in your result."
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 50,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Supported independent living question 1"
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Supported independent living question 2"
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 415,
+      "classes": [
+        "number"
+      ],
+      "sentence": "min-h-11 cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden"
+    },
+    {
+      "file": "src/app/start/_components/steps/workforce-step.tsx",
+      "line": 157,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For a sole trader that is you: 1."
+    },
+    {
+      "file": "data/readyline-content/audit-types.json",
+      "line": 0,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Typically the quicker and cheaper audit."
+    },
+    {
+      "file": "data/readyline-content/audit-types.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Followed by a mid-term audit about 18 months after registration."
+    },
+    {
+      "file": "data/readyline-content/document-sets.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "First-pass mapping from Practice Standards modules to the documents and registers a provider will need."
+    },
+    {
+      "file": "data/readyline-content/document-sets.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "REQ-005 refines it."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The NDIS Code of Conduct"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Chunked into tables of 20 rows."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "the NDIS Code of Conduct applies to every provider and worker"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "NDIS Code of Conduct acknowledgement"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Records that each worker and key person has read the NDIS Code of Conduct and understands what it means in this business."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use"
+    },
+    {
+      "file": "data/readyline-content/modules.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Plain-English, one-sentence descriptions of each Practice Standards module for the questionnaire result page."
+    },
+    {
+      "file": "data/readyline-content/modules.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Standards, from 1 July 2026, for managing and delivering supported independent living packages: decision-making, safeguarding, practice governance and tenancy arrangements."
+    },
+    {
+      "file": "data/readyline-content/start-here.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "A Rules requirement with a register."
+    },
+    {
+      "file": "data/readyline-content/start-here.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Required since the 2021 changes."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 14,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "NDIS registration cost in 2026-27: what a small provider really pays"
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 29,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "About AUD 900 to 1,800."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 30,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "About AUD 2,800 to 12,000 and more."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 31,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 65 to 1,960 for a one-off pack."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 2,500 to 8,000 over 2 to 4 weeks."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Consultants' own pages read on 13 October 2026."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 33,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 59 to 899 a month, or AUD 695 to 1,500 a year."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 43,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers pay for a second, smaller audit about 18 months in."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 51,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "Paying a consultant AUD 2,500 or more for documents when the groups only need verification."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 31,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "What the Rules and the Practice Standards require is marked."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 33,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Two records the Rules require you to keep"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 37,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "The Incident Management and Reportable Incidents Rules 2018 require an incident management system with records of incidents and of what you did."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 37,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Reportable incidents must be notified to the Commission within the Rules' time frames.."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 38,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "The Complaints Management and Resolution Rules 2018 require a complaints management and resolution system with records of complaints and how they were dealt with.."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 40,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The records the Practice Standards expect"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 52,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "The records auditors ask for in practice"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 54,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "These are not named in the Rules, but auditors ask for them because they show the system is alive."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 82,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Rules require an incident register and a complaints register."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 82,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Practice Standards that apply to you decide the rest."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 94,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "An incident that the Incident Management and Reportable Incidents Rules 2018 say must be notified to the Commission, within the time frames the Rules set."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 34,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 41,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Two stages: a desktop audit of your evidence, then an onsite audit within 3 months.."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 42,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers, at 18 months into the registration period."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For a certification audit, stage 1 is a desktop audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 52,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "The auditor asks for information and evidence against every module that applies to your groups, usually off site."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 54,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Stage 2 is the onsite audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 62,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Participant interviews are a key part of a certification audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 75,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "2: conforms with the NDIS Practice Standards"
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 79,
+      "classes": [
+        "number"
+      ],
+      "sentence": "A major non-conformity gives you 3 months to fix the issue, and your registration does not progress until it is fixed."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 83,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 93,
+      "classes": [
+        "number",
+        "date",
+        "dollar"
+      ],
+      "sentence": "Quotes for a sole support coordinator's renewal ranged from about AUD 5,000 to 7,000 in 2026."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 115,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "In practice auditors expect the full list and may choose not to interview someone who would be distressed, but you do not remove people from it."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 123,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Within 14 days of a verification audit, and within 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 127,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 26,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 28,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "It is the quicker and usually the cheaper audit."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 32,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 33,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 58,
+      "classes": [
+        "number"
+      ],
+      "sentence": "A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 60,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 64,
+      "classes": [
+        "number"
+      ],
+      "sentence": "If your audit is certification, the Commission requires a mid-term audit about 18 months after registration."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 66,
+      "classes": [
+        "number"
+      ],
+      "sentence": "The Commission says to start preparing 12 months after your registration date."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 72,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 74,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 76,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "UNVERIFIED: the 2027 and 2030 dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 94,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers also have the mid-term audit at about 18 months."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 109,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "NDIS Practice Standards and Quality Indicators"
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 12,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Registering as an NDIS provider means passing an audit against the NDIS Practice Standards."
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 14,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing."
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 34,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "One person reads every message, usually within two business days."
+    },
+    {
+      "file": "product/legal/ai.md",
+      "line": 26,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as \"guaranteed\" or \"audit-proof\", and refer to the fixed sections for legal timeframes rather than restating them."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 23,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 52,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 65,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Privacy Act"
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 67,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "Some small businesses are not covered by the Privacy Act 1988."
+    },
+    {
+      "file": "product/legal/refunds.md",
+      "line": 16,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "You can have a full refund within 14 days of buying the pack if you have not downloaded any of the documents."
+    },
+    {
+      "file": "product/legal/refunds.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "Banks usually take 5 to 10 business days to show it."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 24,
+      "classes": [
+        "number"
+      ],
+      "sentence": "You must be at least 18 and buying for a business."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 46,
+      "classes": [
+        "number"
+      ],
+      "sentence": "We give at least 30 days' notice of changes to prices or terms that affect a subscription."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 46,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Documents you have already bought stay available for download for at least 12 months after purchase."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 50,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim."
+    }
+  ],
+  "unmapped": [
+    {
+      "file": "src/lib/home-copy.ts",
+      "line": 59,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Every module, standard and audit rule comes from the NDIS Quality and Safeguards Commission's published Practice Standards and registration pages, with a link to the source on your result."
+    },
+    {
+      "file": "src/lib/home-copy.ts",
+      "line": 81,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards module"
+    },
+    {
+      "file": "src/lib/checklist/derive.ts",
+      "line": 406,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list."
+    },
+    {
+      "file": "src/lib/payments/documents-copy.ts",
+      "line": 22,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Come back in about 20 minutes and your documents will be here."
+    },
+    {
+      "file": "src/lib/questionnaire/result-text.ts",
+      "line": 10,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards modules that apply"
+    },
+    {
+      "file": "src/lib/path/details-copy.ts",
+      "line": 52,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "Most providers write 7 years."
+    },
+    {
+      "file": "src/lib/registers/period.ts",
+      "line": 280,
+      "classes": [
+        "number"
+      ],
+      "sentence": "1 entry has no date in this column and is always shown."
+    },
+    {
+      "file": "src/lib/registers/worker-steps.ts",
+      "line": 15,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Read the NDIS Code of Conduct acknowledgement from your manager's pack and acknowledge it."
+    },
+    {
+      "file": "src/lib/registers/worker-steps.ts",
+      "line": 17,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Read the Code of Conduct, incident, complaints, privacy and safeguarding policies and acknowledge each one."
+    },
+    {
+      "file": "src/app/admin/mfa/page.tsx",
+      "line": 24,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Scan the code with an authenticator app, then enter the 6-digit code it shows."
+    },
+    {
+      "file": "src/app/dev/stripe-checkout/[id]/page.tsx",
+      "line": 59,
+      "classes": [
+        "number"
+      ],
+      "sentence": "mt-4 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-base"
+    },
+    {
+      "file": "src/app/guides/page.tsx",
+      "line": 20,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Registration groups: which audit and which documents each of the 38 classes needs"
+    },
+    {
+      "file": "src/app/guides/registration-groups/page.tsx",
+      "line": 21,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "All 38 NDIS registration groups under everyday headings, with the audit type, the Practice Standards modules and the documents each one needs, generated from the Commission's published tables."
+    },
+    {
+      "file": "src/app/guides/registration-groups/[slug]/page.tsx",
+      "line": 77,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards modules"
+    },
+    {
+      "file": "src/app/guides/registration-groups/[slug]/page.tsx",
+      "line": 79,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Drafted from your questionnaire answers for your review, as Word files, with a Practice Standards self-assessment."
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 48,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Tailored policies, a Practice Standards self-assessment and a readiness checklist for sole-trader and small NDIS providers preparing for registration."
+    },
+    {
+      "file": "src/app/path/audit-day/check/page.tsx",
+      "line": 154,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Every no becomes a row in your improvement register with a date 30 days out."
+    },
+    {
+      "file": "src/app/path/audit-day/page.tsx",
+      "line": 247,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Your registration dates, from your certificate, the Rules and the Act"
+    },
+    {
+      "file": "src/app/pricing/page.tsx",
+      "line": 67,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Practice Standards self-assessment"
+    },
+    {
+      "file": "src/app/registers/incidents/[id]/confirm/confirm-form.tsx",
+      "line": 100,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "This category is not usually reportable."
+    },
+    {
+      "file": "src/app/registers/staff-matrix/export/page.tsx",
+      "line": 16,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Worker files and the two Rules lists"
+    },
+    {
+      "file": "src/app/registers/_components/exception-panel.tsx",
+      "line": 615,
+      "classes": [
+        "number"
+      ],
+      "sentence": "State whose Part 4 section applied"
+    },
+    {
+      "file": "src/app/registers/_components/exception-panel.tsx",
+      "line": 626,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "QLD: about three years from the card held at 31 January 2021, unverified until the yellow card's term is read."
+    },
+    {
+      "file": "src/app/registers/_components/import-form.tsx",
+      "line": 53,
+      "classes": [
+        "number"
+      ],
+      "sentence": "The file is over 1 MB."
+    },
+    {
+      "file": "src/app/start/page.tsx",
+      "line": 8,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Answer a few questions about your supports and workforce to see which NDIS Practice Standards modules apply, which audit you face and what documents you will need."
+    },
+    {
+      "file": "src/app/start/_components/start-intro.tsx",
+      "line": 90,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Step 1 starts with your account's business details."
+    },
+    {
+      "file": "src/app/start/_components/stepper.tsx",
+      "line": 99,
+      "classes": [
+        "number"
+      ],
+      "sentence": "border-line bg-surface inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden"
+    },
+    {
+      "file": "src/app/start/_components/steps/result-step.tsx",
+      "line": 331,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Class 0138 and the SIL module are not in your result."
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 50,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Supported independent living question 1"
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Supported independent living question 2"
+    },
+    {
+      "file": "src/app/start/_components/steps/supports-step.tsx",
+      "line": 415,
+      "classes": [
+        "number"
+      ],
+      "sentence": "min-h-11 cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden"
+    },
+    {
+      "file": "src/app/start/_components/steps/workforce-step.tsx",
+      "line": 157,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For a sole trader that is you: 1."
+    },
+    {
+      "file": "data/readyline-content/audit-types.json",
+      "line": 0,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Typically the quicker and cheaper audit."
+    },
+    {
+      "file": "data/readyline-content/audit-types.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Followed by a mid-term audit about 18 months after registration."
+    },
+    {
+      "file": "data/readyline-content/document-sets.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "First-pass mapping from Practice Standards modules to the documents and registers a provider will need."
+    },
+    {
+      "file": "data/readyline-content/document-sets.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "REQ-005 refines it."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The NDIS Code of Conduct"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Chunked into tables of 20 rows."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "the NDIS Code of Conduct applies to every provider and worker"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "NDIS Code of Conduct acknowledgement"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Records that each worker and key person has read the NDIS Code of Conduct and understands what it means in this business."
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI"
+    },
+    {
+      "file": "data/readyline-content/document-types.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use"
+    },
+    {
+      "file": "data/readyline-content/modules.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Plain-English, one-sentence descriptions of each Practice Standards module for the questionnaire result page."
+    },
+    {
+      "file": "data/readyline-content/modules.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Standards, from 1 July 2026, for managing and delivering supported independent living packages: decision-making, safeguarding, practice governance and tenancy arrangements."
+    },
+    {
+      "file": "data/readyline-content/start-here.json",
+      "line": 0,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "A Rules requirement with a register."
+    },
+    {
+      "file": "data/readyline-content/start-here.json",
+      "line": 0,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Required since the 2021 changes."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 14,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "NDIS registration cost in 2026-27: what a small provider really pays"
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 29,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "About AUD 900 to 1,800."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 30,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "About AUD 2,800 to 12,000 and more."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 31,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 65 to 1,960 for a one-off pack."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 2,500 to 8,000 over 2 to 4 weeks."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Consultants' own pages read on 13 October 2026."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 33,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "AUD 59 to 899 a month, or AUD 695 to 1,500 a year."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 43,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers pay for a second, smaller audit about 18 months in."
+    },
+    {
+      "file": "content/guides/ndis-registration-cost.md",
+      "line": 51,
+      "classes": [
+        "number",
+        "dollar"
+      ],
+      "sentence": "Paying a consultant AUD 2,500 or more for documents when the groups only need verification."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 31,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "What the Rules and the Practice Standards require is marked."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 33,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Two records the Rules require you to keep"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 37,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "The Incident Management and Reportable Incidents Rules 2018 require an incident management system with records of incidents and of what you did."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 37,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Reportable incidents must be notified to the Commission within the Rules' time frames.."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 38,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "The Complaints Management and Resolution Rules 2018 require a complaints management and resolution system with records of complaints and how they were dealt with.."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 40,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The records the Practice Standards expect"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 52,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "The records auditors ask for in practice"
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 54,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "These are not named in the Rules, but auditors ask for them because they show the system is alive."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 82,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Rules require an incident register and a complaints register."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 82,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Practice Standards that apply to you decide the rest."
+    },
+    {
+      "file": "content/guides/registers-an-auditor-asks-for.md",
+      "line": 94,
+      "classes": [
+        "number",
+        "date",
+        "instrument"
+      ],
+      "sentence": "An incident that the Incident Management and Reportable Incidents Rules 2018 say must be notified to the Commission, within the time frames the Rules set."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 34,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 41,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Two stages: a desktop audit of your evidence, then an onsite audit within 3 months.."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 42,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers, at 18 months into the registration period."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For a certification audit, stage 1 is a desktop audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 52,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "The auditor asks for information and evidence against every module that applies to your groups, usually off site."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 54,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Stage 2 is the onsite audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 62,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "Participant interviews are a key part of a certification audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 75,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "2: conforms with the NDIS Practice Standards"
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 79,
+      "classes": [
+        "number"
+      ],
+      "sentence": "A major non-conformity gives you 3 months to fix the issue, and your registration does not progress until it is fixed."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 83,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 93,
+      "classes": [
+        "number",
+        "date",
+        "dollar"
+      ],
+      "sentence": "Quotes for a sole support coordinator's renewal ranged from about AUD 5,000 to 7,000 in 2026."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 115,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "In practice auditors expect the full list and may choose not to interview someone who would be distressed, but you do not remove people from it."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 123,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Within 14 days of a verification audit, and within 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/what-happens-at-an-ndis-audit.md",
+      "line": 127,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 26,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 28,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "It is the quicker and usually the cheaper audit."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 32,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 33,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 58,
+      "classes": [
+        "number"
+      ],
+      "sentence": "A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 60,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 64,
+      "classes": [
+        "number"
+      ],
+      "sentence": "If your audit is certification, the Commission requires a mid-term audit about 18 months after registration."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 66,
+      "classes": [
+        "number"
+      ],
+      "sentence": "The Commission says to start preparing 12 months after your registration date."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 72,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 74,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 76,
+      "classes": [
+        "number",
+        "date"
+      ],
+      "sentence": "UNVERIFIED: the 2027 and 2030 dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 94,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Certified providers also have the mid-term audit at about 18 months."
+    },
+    {
+      "file": "content/guides/which-ndis-audit.md",
+      "line": 109,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "NDIS Practice Standards and Quality Indicators"
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 12,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Registering as an NDIS provider means passing an audit against the NDIS Practice Standards."
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 14,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing."
+    },
+    {
+      "file": "product/legal/about.md",
+      "line": 34,
+      "classes": [
+        "hedge"
+      ],
+      "sentence": "One person reads every message, usually within two business days."
+    },
+    {
+      "file": "product/legal/ai.md",
+      "line": 26,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as \"guaranteed\" or \"audit-proof\", and refer to the fixed sections for legal timeframes rather than restating them."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 23,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 52,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 52,
+      "classes": [
+        "number"
+      ],
+      "sentence": "An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted."
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 65,
+      "classes": [
+        "instrument"
+      ],
+      "sentence": "The Privacy Act"
+    },
+    {
+      "file": "product/legal/privacy.md",
+      "line": 67,
+      "classes": [
+        "number",
+        "instrument"
+      ],
+      "sentence": "Some small businesses are not covered by the Privacy Act 1988."
+    },
+    {
+      "file": "product/legal/refunds.md",
+      "line": 16,
+      "classes": [
+        "number",
+        "time"
+      ],
+      "sentence": "You can have a full refund within 14 days of buying the pack if you have not downloaded any of the documents."
+    },
+    {
+      "file": "product/legal/refunds.md",
+      "line": 32,
+      "classes": [
+        "number",
+        "hedge"
+      ],
+      "sentence": "Banks usually take 5 to 10 business days to show it."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 24,
+      "classes": [
+        "number"
+      ],
+      "sentence": "You must be at least 18 and buying for a business."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 46,
+      "classes": [
+        "number"
+      ],
+      "sentence": "We give at least 30 days' notice of changes to prices or terms that affect a subscription."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 46,
+      "classes": [
+        "number"
+      ],
+      "sentence": "Documents you have already bought stay available for download for at least 12 months after purchase."
+    },
+    {
+      "file": "product/legal/terms.md",
+      "line": 50,
+      "classes": [
+        "number"
+      ],
+      "sentence": "For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim."
+    }
+  ]
+}

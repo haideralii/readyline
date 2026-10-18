@@ -1,0 +1,116 @@
+{
+  "$comment": "REQ-012 FR-4b (D-2907, D-2908): the source mapping behind product/qa/launch-review/<date>/claims-and-sources.md. One entry per public sentence (verbatim, whitespace folded); the table generator (scripts/ops/claims-table.mjs) joins them to the extractor's sentences. Statuses: VERIFIED (read against the instrument named, with the fetched date), VERIFIED-SECONDARY (a Commission web page or a third party, not the instrument), CHANGED (the copy's words differ from the instrument; D-2222 wording pending), UNVERIFIED (no source today). The eight D-2908 facts are entered first. Dates are ISO days; read-by is a role.",
+  "entries": [
+    {
+      "sentence": "The Commission does not charge an application fee.",
+      "where": "content/guides/ndis-registration-cost.md:60",
+      "type": "regulatory fact",
+      "instrument": "No instrument sets a fee; the ABLIS entry for NDIS provider registration lists none (secondary)",
+      "sourceId": "ablis-ndis-registration",
+      "url": "https://ablis.business.gov.au/",
+      "versionLabel": "",
+      "fetchedAt": "2026-10-13",
+      "readBy": "PO (REQ-027's pass)",
+      "lawyerRead": "",
+      "staleOn": "2026-11-12",
+      "status": "VERIFIED-SECONDARY",
+      "note": "D-2908 (1): ABLIS-sourced with the caveat kept in the guide's Sources section; the cost guide's status line records the pass of 18 Oct 2026."
+    },
+    {
+      "sentence": "Certified providers pay for a second, smaller audit about 18 months in.",
+      "type": "regulatory fact",
+      "instrument": "NDIS (Provider Registration and Practice Standards) Rules 2018 s 13B: the mid-term audit no later than 18 months after registration",
+      "sourceId": "legislation-rules-toc",
+      "url": "https://www.legislation.gov.au/F2018L00631/latest/text",
+      "versionLabel": "Compilation No. 6, 1 July 2026 (F2026C00527)",
+      "fetchedAt": "2026-10-11",
+      "readBy": "Dev (REQ-012 Session B)",
+      "lawyerRead": "",
+      "staleOn": "",
+      "status": "CHANGED",
+      "note": "D-2908 (2): the Rules say no later than 18 months; the copy says about 18 months. Wording for the PO (D-2222): \"no later than 18 months in\"."
+    },
+    {
+      "sentence": "If your audit is certification, the Commission requires a mid-term audit about 18 months after registration.",
+      "type": "regulatory fact",
+      "instrument": "Rules s 13B (no later than 18 months)",
+      "sourceId": "legislation-rules-toc",
+      "url": "https://www.legislation.gov.au/F2018L00631/latest/text",
+      "versionLabel": "Compilation No. 6, 1 July 2026 (F2026C00527)",
+      "fetchedAt": "2026-10-11",
+      "readBy": "Dev (REQ-012 Session B)",
+      "status": "CHANGED",
+      "note": "D-2908 (2): \"about\" against the Rules' \"no later than\"; D-2222."
+    },
+    {
+      "sentence": "Three years. A renewal audit happens before it expires. Certified providers also have the mid-term audit at about 18 months.",
+      "type": "regulatory fact",
+      "instrument": "NDIS Act 2013 s 73E (the period of registration, usually three years); Rules s 13B for the mid-term audit",
+      "sourceId": "ndis-act-2013",
+      "url": "https://www.legislation.gov.au/C2013A00020/latest/text",
+      "versionLabel": "",
+      "fetchedAt": "",
+      "readBy": "",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (5) and (2): the PO names s 73E (\"usually\"); the Act is not among the fetched sources, so the row waits for a read with its date; the \"about 18 months\" half is the s 13B CHANGED item."
+    },
+    {
+      "sentence": "The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit.",
+      "type": "time",
+      "instrument": "",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (3): no source id today; the Regulatory Expectations for Approved Quality Auditors (aqa-expectations, V1 June 2026) is the first place to read."
+    },
+    {
+      "sentence": "Within 14 days of a verification audit, and within 28 days of a certification or mid-term audit.",
+      "type": "time",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (3), the same fact in the audit guide's FAQ."
+    },
+    {
+      "sentence": "The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit.",
+      "type": "time",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (3), the same fact in the which-audit guide."
+    },
+    {
+      "sentence": "Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.",
+      "type": "time",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (4): no source today for the three months."
+    },
+    {
+      "sentence": "Finish the application within 60 days of starting it, or the portal deletes it (the Commission's apply page).",
+      "where": "src/lib/path/renewal.ts:94",
+      "type": "time",
+      "instrument": "The Commission's apply-for-registration page (a web page, not an instrument)",
+      "sourceId": "commission-apply-page",
+      "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration",
+      "fetchedAt": "2026-10-16",
+      "readBy": "Dev (REQ-023 Session A; src/lib/registers/timeline.ts)",
+      "staleOn": "2026-11-15",
+      "status": "VERIFIED-SECONDARY",
+      "note": "D-2908 (8): read 16 Oct 2026; a Commission apply page re-reads every 30 days (D-2910)."
+    },
+    {
+      "sentence": "No public sentence carries the worker screening clearance's five years or the 90-day renewal window.",
+      "where": "(no public sentence; the registers' status rules use 90 days: src/lib/registers/status.ts:138)",
+      "type": "regulatory fact",
+      "instrument": "NDIS (Worker Screening) Rules 2018; the Worker Screening Act of each state (the clearance's term)",
+      "status": "UNVERIFIED",
+      "note": "D-2908 (6): the fact lives in the registers' rules and the generated documents' fixed text, not on a public page; listed so it is not lost."
+    },
+    {
+      "sentence": "No public sentence carries the reportable incident's 24 hours or 5 business days.",
+      "where": "(no public sentence; the generated documents' fixed text, batch 45 Session B, carries ss 20 and 21)",
+      "type": "regulatory fact",
+      "instrument": "NDIS (Incident Management and Reportable Incidents) Rules 2018 ss 20 and 21",
+      "sourceId": "watch-changes ledger wc-2026-10-15-02",
+      "url": "https://www.legislation.gov.au/F2018L00633/latest/text",
+      "fetchedAt": "2026-10-15",
+      "readBy": "Dev (batch 45 Session B)",
+      "status": "VERIFIED",
+      "note": "D-2908 (7): read against the Rules on 15 Oct 2026 for the fixed text; no public page states it."
+    }
+  ]
+}
