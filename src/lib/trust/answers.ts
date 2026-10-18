@@ -16,8 +16,8 @@ export type TrustRow = {
   answer: readonly string[];
   /** Row 2 names six processors: one line each. */
   list?: true;
-  /** The privacy policy's heading id the link opens (`slugify` of the h2). */
-  anchor: string;
+  /** The privacy policy's "## " heading the link opens, by its words; the renderer's id is looked up at render (`legalHeadingId`). */
+  section: string;
   /** The policy's sentences, verbatim, the answer derives from. */
   sources: readonly string[];
 };
@@ -32,7 +32,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
     id: "where-stored",
     question: "Where is my data stored?",
     answer: ["In Sydney, Australia, on Supabase's servers."],
-    anchor: "who-helps-us-run-the-service",
+    section: "Who helps us run the service",
     sources: [
       "Supabase stores your account and data on servers in Sydney, Australia.",
     ],
@@ -49,7 +49,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
       "Sentry receives error reports, with email addresses and free text removed, in the United States.",
       "An email provider sends service emails.",
     ],
-    anchor: "who-helps-us-run-the-service",
+    section: "Who helps us run the service",
     sources: [
       "Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States.",
       "Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document.",
@@ -67,7 +67,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
       "Never. Readyline is for your business information only.",
       "The forms warn you, and refuse a name or an NDIS number where they can tell.",
     ],
-    anchor: "what-we-never-collect",
+    section: "What we never collect",
     sources: [
       "Readyline is for your business information only.",
       "Do not enter personal, health or disability information about NDIS participants anywhere in Readyline, including in notes and registers.",
@@ -80,7 +80,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
     answer: [
       "No. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.",
     ],
-    anchor: "who-helps-us-run-the-service",
+    section: "Who helps us run the service",
     sources: [
       "It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.",
     ],
@@ -94,7 +94,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
       "We keep only the purchase records the tax law requires, for as long as it requires.",
       "An encrypted backup copy may hold your data for up to 90 days after that.",
     ],
-    anchor: "how-long-we-keep-it",
+    section: "How long we keep it",
     sources: [
       "Your data stays while your account is open.",
       "If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires.",
@@ -108,7 +108,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
       "Yes, from your account page, at any time.",
       "The file holds your account, answers, checklist, registers with the worker tables, and audit log.",
     ],
-    anchor: "your-choices",
+    section: "Your choices",
     sources: [
       "Export: you can download everything we hold about you from your account page at any time: your account, your answers, your checklist, your registers (including the worker tables) and your audit log.",
     ],
@@ -120,7 +120,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
       "You, the workers you invite, and an auditor through a time-limited link you share.",
       "Each account sees its own data only, enforced in the database.",
     ],
-    anchor: "security",
+    section: "Security",
     sources: [
       "Each account can only see its own data, enforced in the database.",
       "the hashed email address of a worker you invite",
@@ -134,7 +134,7 @@ export const TRUST_ROWS: readonly TrustRow[] = [
     answer: [
       "If a breach happens that is likely to cause serious harm, we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
     ],
-    anchor: "security",
+    section: "Security",
     sources: [
       "If a breach happens that is likely to cause serious harm, we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
     ],

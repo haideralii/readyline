@@ -2,7 +2,11 @@ import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { businessIdentityLine } from "@/lib/legal/config";
-import { formatUpdated, loadLegalPage } from "@/lib/legal/pages";
+import {
+  formatUpdated,
+  legalHeadingId,
+  loadLegalPage,
+} from "@/lib/legal/pages";
 import { vendorTermsDate } from "@/lib/legal/vendor-terms";
 import {
   TRUST_REVIEWED_LEAD,
@@ -29,6 +33,11 @@ export default function TrustPage() {
   const vendorDate = formatUpdated(vendorTermsDate() ?? privacy.updated);
   const render = (text: string) =>
     text.replace(/\{\{vendor-terms-date\}\}/g, vendorDate);
+  // The policy's numbered heading ids, looked up by the heading's words (FR-1).
+  const hrefFor = (section: string) => {
+    const id = legalHeadingId(privacy.markdown, section);
+    return id ? `/privacy#${id}` : "/privacy";
+  };
   return (
     <PageShell kind="reading">
       <h1 className="">{TRUST_TITLE}</h1>
@@ -63,7 +72,7 @@ export default function TrustPage() {
             )}
             <p className="mt-2 text-sm">
               <Link
-                href={`/privacy#${r.anchor}`}
+                href={hrefFor(r.section)}
                 className="inline-flex min-h-11 items-center underline underline-offset-4"
                 data-testid="trust-source"
               >

@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
 import { PRICING_COPY } from "@/lib/payments/copy";
 import { SAMPLE_FOOTER } from "@/lib/sample-document";
+import { legalHeadingId, loadLegalPage } from "@/lib/legal/pages";
 import { TRUST_ROWS, TRUST_TITLE } from "@/lib/trust/answers";
 import { HOME_COPY } from "@/lib/home-copy";
 import { axeSerious } from "./helpers/a11y";
@@ -20,6 +21,9 @@ async function axeAt(page: Page, width: number, label: string) {
   expect(await axeSerious(page, `${label} at ${width}`)).toEqual([]);
   await checkWidths(page, `${label} at ${width}`);
 }
+
+const privacyMarkdown = loadLegalPage("privacy").markdown;
+const anchorOf = (section: string) => legalHeadingId(privacyMarkdown, section)!;
 
 test.describe("the trust page and the sample in both formats (REQ-034)", () => {
   test("AC-1: eight rows, each answered, each link opening the privacy policy at its section; axe at 360 and 1280", async ({
@@ -47,7 +51,7 @@ test.describe("the trust page and the sample in both formats (REQ-034)", () => {
       await expect(row.getByTestId("trust-answer")).not.toBeEmpty();
       await expect(row.getByTestId("trust-source")).toHaveAttribute(
         "href",
-        `/privacy#${r.anchor}`,
+        `/privacy#${anchorOf(r.section)}`,
       );
     }
     // The token rendered, never shown raw.
@@ -55,7 +59,7 @@ test.describe("the trust page and the sample in both formats (REQ-034)", () => {
     await axeAt(page, 1280, "trust");
     await axeAt(page, 360, "trust");
     // Every link lands on the policy with its heading in view.
-    for (const anchor of new Set(TRUST_ROWS.map((r) => r.anchor))) {
+    for (const anchor of new Set(TRUST_ROWS.map((r) => anchorOf(r.section)))) {
       await page.goto("/trust");
       await page
         .locator(`[data-testid="trust-source"][href="/privacy#${anchor}"]`)
@@ -88,7 +92,11 @@ test.describe("the trust page and the sample in both formats (REQ-034)", () => {
       "/trust",
     );
     await page.goto("/ai");
-    const first = page.locator("article p").first();
+    // The first paragraph of the page's text (the dated line above it is not the text).
+    const first = page.locator('article p:has(a[href="/trust"])').first();
+    await expect(first).toContainText(
+      "Every document Readyline produces has two kinds of text.",
+    );
     await expect(
       first.getByRole("link", { name: /where your data lives/i }),
     ).toHaveAttribute("href", "/trust");

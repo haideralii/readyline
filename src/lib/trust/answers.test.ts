@@ -8,7 +8,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
-import { loadLegalPage } from "@/lib/legal/pages";
+import { legalHeadingId, loadLegalPage } from "@/lib/legal/pages";
 import { slugify } from "@/lib/text/slug";
 import { readability } from "@/lib/text/readability";
 import {
@@ -60,12 +60,19 @@ describe("the trust page's words (REQ-034 FR-7, AC-7)", () => {
     expect(readability(text).grade).toBeLessThanOrEqual(8);
   });
 
-  it("anchors every row to a heading the privacy policy has", () => {
-    const headings = loadLegalPage("privacy")
-      .body.split("\n")
+  it("points every row at a heading the privacy policy has, and the renderer gives it an id", () => {
+    const page = loadLegalPage("privacy");
+    const headings = page.body
+      .split("\n")
       .filter((l) => l.startsWith("## "))
-      .map((l) => slugify(l.slice(3)));
-    for (const r of TRUST_ROWS) expect(headings, r.id).toContain(r.anchor);
+      .map((l) => l.slice(3).trim());
+    for (const r of TRUST_ROWS) {
+      expect(headings, r.id).toContain(r.section);
+      const id = legalHeadingId(page.markdown, r.section);
+      expect(id, r.id).toMatch(/^\d+-[a-z-]+$/);
+      expect(id).toBe(slugify(`${id!.split("-")[0]} ${r.section}`));
+    }
+    expect(legalHeadingId(page.markdown, "No such heading")).toBeNull();
   });
 
   it("names the places and numbers an answer carries so the pin has something to hold", () => {
