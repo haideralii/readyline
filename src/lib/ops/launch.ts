@@ -78,6 +78,8 @@ export type LaunchFacts = {
     purge: string | null;
     generate: string | null;
     reminders: string | null;
+    /** REQ-030 FR-3: the last `jobs.uptime.ran` row, written by /api/jobs/uptime from the kick job's check. */
+    uptime: string | null;
   };
   /** True when a platform admin has a verified authenticator; null when there is no platform admin. */
   adminTotpEnrolled: boolean | null;
@@ -87,6 +89,8 @@ export type LaunchFacts = {
 
 export const LEGAL_FRESH_DAYS = 90;
 export const JOB_WINDOW_HOURS = 26;
+/** REQ-030 FR-6 (D-2867): the uptime check runs at the kick's cadence (thirty minutes now, hourly after D-059). */
+export const UPTIME_WINDOW_HOURS = 1.5;
 export const TEST_SEND_WINDOW_HOURS = 24;
 
 type Verdict = { state: LaunchState; sentence: string };
@@ -183,17 +187,23 @@ function hoursSince(iso: string | null, now: Date): number | null {
   return (now.getTime() - t) / 3_600_000;
 }
 
-function jobRow(name: string, last: string | null, f: LaunchFacts): Verdict {
+function jobRow(
+  name: string,
+  last: string | null,
+  f: LaunchFacts,
+  windowHours: number = JOB_WINDOW_HOURS,
+  where = "Vercel, Settings, Cron Jobs",
+): Verdict {
   const h = hoursSince(last, f.now);
   if (h === null)
     return {
       state: "unset",
-      sentence: `No run of the ${name} job is recorded yet; it runs from Vercel, Settings, Cron Jobs, and records each run.`,
+      sentence: `No run of the ${name} job is recorded yet; it runs from ${where}, and records each run.`,
     };
-  if (h > JOB_WINDOW_HOURS)
+  if (h > windowHours)
     return {
       state: "mismatched",
-      sentence: `The ${name} job last ran longer ago than its schedule; check Vercel, Settings, Cron Jobs, and CRON_SECRET.`,
+      sentence: `The ${name} job last ran longer ago than its schedule; check ${where}, and CRON_SECRET.`,
     };
   return { state: "set", sentence: `The ${name} job ran within its schedule.` };
 }
@@ -547,6 +557,27 @@ const RULES: Rule[] = [
     group: "jobs",
     name: "Reminders job ran in the last 26 hours",
     judge: (f) => jobRow("reminders", f.jobs.reminders, f),
+  },
+  {
+    // REQ-030 FR-6 (D-2867): the check inside the kick job, reported through /api/jobs/uptime.
+    id: "job-uptime",
+    group: "jobs",
+    name: "Uptime check within 90 minutes",
+    judge: (f) =>
+      jobRow(
+        "uptime",
+        f.jobs.uptime,
+        f,
+        UPTIME_WINDOW_HOURS,
+        "GitHub, Actions, the kick workflow (its uptime step; PROD_URL and CRON_SECRET)",
+      ),
+  },
+  {
+    // REQ-030 FR-6 (D-2865): server-side error reporting is on when the DSN is set.
+    id: "error-reporting",
+    group: "jobs",
+    name: "Error reporting",
+    judge: presence("SENTRY_DSN", VERCEL),
   },
   {
     id: "hash-pepper",
