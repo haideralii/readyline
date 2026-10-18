@@ -9,6 +9,7 @@
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
 import { BUSINESS_DAY_SENTENCE } from "@/lib/generator/fixed-extras";
+import { GAP_CHECK_INTRO } from "@/lib/gap-check/words";
 import { pinnedFacts, TRUST_ROWS } from "@/lib/trust/answers";
 import { readability } from "@/lib/text/readability";
 import { contactEmail } from "./config";
@@ -115,6 +116,8 @@ describe("product/legal copy (REQ-008)", () => {
       "If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.",
       // REQ-029 FR-13 (D-2858), verbatim.
       "Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.",
+      // REQ-035 FR-7, D-2969: the gap check's list; the document is read once and not kept (D-2962).
+      "The gap check's list, if you compare a policy you already have with Readyline's outline: the document type, the title you give it, and the state and reason for each outline section. The document itself is read once and not kept.",
       // REQ-033 SR-1, D-2938: the findings bullet; the uploaded report is never kept (D-2930).
       "Audit findings you type or paste, in your own words, with the standard, the severity and the dates you record. A report you upload is read in Sydney to pick out its findings and is not kept, logged or sent to a model. Your findings are in your account export and are deleted with your account.",
     ],
@@ -123,6 +126,8 @@ describe("product/legal copy (REQ-008)", () => {
       "so it sits with your privacy commitments, where an auditor would look for it.",
       // REQ-033 D-2937: a finding's own words may reach the model, after the participant check; the report never does.
       "If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check. The report you uploaded is never sent.",
+      // REQ-035 FR-7, D-2969: a checked policy's text goes to the model once, after the participant check.
+      "If you ask Readyline to check a policy you already have, we send the model that document's text once, after the participant check, and do not keep it.",
       // REQ-034 FR-3: the first paragraph links the trust page.
       "Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).",
     ],
@@ -163,7 +168,8 @@ describe("product/legal copy (REQ-008)", () => {
   const UPDATED: Record<LegalSlug, string> = {
     terms: "2026-10-18",
     refunds: "2026-10-16",
-    privacy: "2026-10-18",
+    // REQ-035 FR-7 (D-2969): the gap check's bullet moved the privacy page to 19 October 2026.
+    privacy: "2026-10-19",
     // REQ-034 FR-3: the trust link moved the AI page to 19 October 2026.
     ai: "2026-10-19",
     about: "2026-10-16",
@@ -199,6 +205,16 @@ describe("REQ-032 FR-7 (D-2919): the business-day sentence in the documents' fix
 // REQ-034 FR-1, AC-2 (D-2945): the trust page restates the privacy policy; every
 // answer is pinned here and tied to the policy's sentences it derives from, so a
 // change to the page without the policy, or the policy without the page, fails.
+// REQ-035 FR-6, AC-6 (D-2968): the gap check's intro is the lawyer's, verbatim, beside the pages it describes.
+describe("the gap check's intro (REQ-035 FR-6, D-2968)", () => {
+  it("is the lawyer's sentence verbatim and says it is a comparison with Readyline's outline, not an audit", () => {
+    expect(GAP_CHECK_INTRO).toBe(
+      "Compare a policy you already have with the outline Readyline writes from the NDIS Practice Standards' quality indicators. The check tells you which sections of the outline your document covers, partly covers or leaves out. It is a comparison with Readyline's outline, not an audit, and an auditor may read your document differently.",
+    );
+    expect(findProhibitedClaims(GAP_CHECK_INTRO)).toEqual([]);
+  });
+});
+
 describe("the trust page's pins to the privacy policy (REQ-034 AC-2, D-2945)", () => {
   const body = loadLegalPage("privacy").body;
   const ANSWERS: Record<string, readonly string[]> = {

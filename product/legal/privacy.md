@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-18
+updated: 2026-10-19
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -19,6 +19,7 @@ We collect only what we need to run the service:
 - Your questionnaire answers: trading name, ABN if you give it, business structure, states and territories, the supports you deliver, your number of workers and key personnel, whether you use restrictive practices, and which documents you already have.
 - The documents we draft for you and the notes you add to your checklist or registers.
 - Audit findings you type or paste, in your own words, with the standard, the severity and the dates you record. A report you upload is read in Sydney to pick out its findings and is not kept, logged or sent to a model. Your findings are in your account export and are deleted with your account.
+- The gap check's list, if you compare a policy you already have with Readyline's outline: the document type, the title you give it, and the state and reason for each outline section. The document itself is read once and not kept.
 - If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.
 - Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.
 - Worker codes, each worker's role and the states they work in, the kind of check, its dates, the application number and, if you choose, the check number you enter in the worker checks register, the onboarding items with their dates and who recorded them, the supervision dates on the staff matrix, and the hashed email address of a worker you invite. We ask you to use codes for workers. We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself. If you choose to fill names, dates of birth and addresses into an export, we use them to build that one file in Sydney and do not keep them.
