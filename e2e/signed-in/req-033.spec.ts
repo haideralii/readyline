@@ -227,7 +227,7 @@ test.describe("bring your audit findings (REQ-033)", () => {
       .first()
       .click();
     await page.getByTestId("row-edit").locator("summary").click();
-    await page.getByTestId("field-done_on").fill("2026-10-05");
+    await page.locator("#done_on").fill("2026-10-05");
     await page
       .getByTestId("audit-day-form-improvements")
       .getByRole("button", { name: "Save changes" })
