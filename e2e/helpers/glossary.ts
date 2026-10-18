@@ -137,10 +137,11 @@ export async function glossaryOnPage(
       summary,
       `${label}: the disclosure's count (present on the page: ${counted.join(", ")}; listed: ${dds.map((d) => d.id).join(", ")})`,
     ).toBe(`What these words mean (${counted.length})`);
+    // D-2852: the block carries no intro line.
     expect(
-      Object.values(GLOSSARY_ATTRIBUTION) as string[],
-      `${label}: the disclosure opens with D-2706's line`,
-    ).toContain(attribution);
+      attribution,
+      `${label}: the disclosure carries no intro line`,
+    ).toBeNull();
     expect(
       dds.map((d) => d.id).sort(),
       `${label}: the disclosure lists the terms present`,
@@ -148,8 +149,8 @@ export async function glossaryOnPage(
     for (const d of dds) {
       const t = glossaryTerm(d.id);
       const sentence = `${t.meaning[0].toUpperCase()}${t.meaning.slice(1)}.`;
-      expect(d.text, `${label}: ${d.id} reads the sentence then more`).toBe(
-        `${t.term}: ${sentence}${t.more ? ` ${t.more}` : ""}`,
+      expect(d.text, `${label}: ${d.id} reads its one sentence`).toBe(
+        `${t.term}: ${sentence}`,
       );
     }
   } else {

@@ -83,7 +83,7 @@ test.describe("REQ-025 Session A", () => {
     const card = page.getByTestId("summary");
     await expect(card).toContainText("Your audit: certification");
     await expect(card.getByTestId("audit-kind")).toHaveText(
-      "An approved auditor reads your documents, visits where you work and talks to people.",
+      "The fuller audit: the auditor visits and talks to you, your workers and participants.",
     );
 
     // AC-2, FR-3: the list's numbers equal what the page shows elsewhere.
