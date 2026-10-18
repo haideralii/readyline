@@ -55,7 +55,7 @@ Out: the browser Sentry SDK and any CSP change; a status page; email alerts; Sup
 
 ## Acceptance criteria
 - AC-1 Given `SENTRY_DSN` unset, when a route throws, then a stubbed transport sees no call and the existing log line with `errorId` appears.
-- AC-2 Given a fixture DSN and an error holding `test@example.com`, `sk_test_abcdefghij12345678` and a `note` extra, when `beforeSend` runs, then the event holds `[email]`, `[redacted]`, `[free-text omitted]`, no `user` or cookies, and the fixture `VERCEL_ENV` and sha.
+- AC-2 Given a fixture DSN and an error holding `test@example.com`, a string shaped like a Stripe test key (built in the test from `sk_test_` plus eighteen letters, never written as one literal, so the secret scan never trips on a fixture) and a `note` extra, when `beforeSend` runs, then the event holds `[email]`, `[redacted]`, `[free-text omitted]`, no `user` or cookies, and the fixture `VERCEL_ENV` and sha.
 - AC-3 Given CI's seeded local stack, when the rehearsal runs, then the dump is encrypted with the fixture passphrase, the plaintext is gone, a fresh stack restored from it passes the integration suite, and size and duration are printed.
 - AC-4 Given `backup.yml`, when `workflows.test.ts` reads it, then it has the weekly cron, two gated and masked secrets, `contents: read`, `retention-days: 90`, one command.
 - AC-5 Given a `jobs.backup.ran` row 7 days old, then **Backup within 8 days** is Set; at 9 days, Mismatched; with none, Not set.
