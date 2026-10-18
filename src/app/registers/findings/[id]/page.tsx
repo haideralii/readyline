@@ -1,4 +1,5 @@
-// REQ-033 FR-3 (D-1904's shape): one route file per page; the words and fields come from the register meta.
+// REQ-033 FR-3, FR-4 (D-1904's shape): one route file per page; the words and fields come from the
+// register meta, and the detail page adds where the pack answers the finding.
 import type { Metadata } from "next";
 import { AuditDayDetailPage } from "../../_components/audit-day-pages";
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FindingAnswers } from "../findings/finding-answers";
 import { notFound, redirect } from "next/navigation";
 import {
   AUDIT_DAY_META,
@@ -13,6 +14,7 @@ import {
 } from "@/lib/registers/table-columns";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
+  FindingRow,
   OnboardingKind,
   StaffMatrixRow,
   OnboardingTickRow,
@@ -423,6 +425,14 @@ export async function AuditDayDetailPage({
         <p className="text-ink mt-3 text-sm leading-6" data-testid="row-note">
           {meta.noteOf(row as never)}
         </p>
+      ) : null}
+      {/* REQ-033 FR-4 (D-2933): where the pack answers the finding, with links into the newest set. */}
+      {slug === "findings" ? (
+        <FindingAnswers
+          row={row as unknown as FindingRow}
+          supabase={ctx.supabase}
+          accountId={ctx.viewer.account.id}
+        />
       ) : null}
       {slug === "corporate-risks" && row.starter ? (
         <p

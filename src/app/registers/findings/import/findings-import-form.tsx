@@ -12,6 +12,7 @@ import {
   parseFindingsAction,
   saveFindingsAction,
 } from "@/server/registers/findings-actions";
+import { proposeStandardAction } from "@/server/registers/findings-propose-actions";
 
 /** D-2930: the one sentence above the control. */
 export const NEVER_STORED_LINE =
@@ -20,7 +21,13 @@ export const NEVER_STORED_LINE =
 const INPUT =
   "border-line bg-surface text-ink block w-full rounded-md border px-3 py-2 text-base shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2";
 
-type Draft = FindingCandidate & { include: boolean; standardId: string };
+type Draft = FindingCandidate & {
+  include: boolean;
+  standardId: string;
+  /** D-2934: the model's proposal, shown for the provider to check; never saved on its own. */
+  suggested?: string | null;
+  suggesting?: boolean;
+};
 
 export function FindingsImportForm({
   standards,
@@ -98,6 +105,24 @@ export function FindingsImportForm({
           )
         : d,
     );
+  }
+
+  // D-2934: the model proposes a standard for a finding that names none, after the gate; the provider confirms by saving.
+  async function suggest(i: number) {
+    const d = drafts?.[i];
+    if (!d || d.warnings.length > 0) return;
+    update(i, { suggesting: true, suggested: null });
+    try {
+      const r = await proposeStandardAction({ finding: d.text });
+      if (r.ok) update(i, { standardId: r.standardId, suggested: r.name });
+      else update(i, { suggested: r.message });
+    } catch {
+      update(i, {
+        suggested: "No suggestion this time. Pick the standard from the list.",
+      });
+    } finally {
+      update(i, { suggesting: false });
+    }
   }
 
   const included = (drafts ?? []).filter((d) => d.include);
@@ -267,6 +292,28 @@ export function FindingsImportForm({
                         </option>
                       ))}
                     </select>
+                    {!d.standardId && d.warnings.length === 0 ? (
+                      <button
+                        type="button"
+                        className="mt-1 inline-flex min-h-11 items-center text-sm underline underline-offset-4"
+                        onClick={() => void suggest(i)}
+                        disabled={d.suggesting === true}
+                        data-testid="findings-candidate-suggest"
+                      >
+                        {d.suggesting ? "Asking…" : "Suggest the standard"}
+                      </button>
+                    ) : null}
+                    {d.suggested ? (
+                      <span
+                        className="text-slate mt-1 block text-xs"
+                        role="status"
+                        data-testid="findings-candidate-suggested"
+                      >
+                        {d.standardId
+                          ? `Suggested: ${d.suggested}. Check it before saving.`
+                          : d.suggested}
+                      </span>
+                    ) : null}
                   </label>
                 </div>
                 <label className="mt-3 block text-sm">
