@@ -146,15 +146,14 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-  # Batch 45a (D-1013): the Lighthouse budget runs in its own job and does
-  # not block a merge until it has gone green on the runner; the step prints
-  # Lighthouse's own error when it fails. Flip `continue-on-error` back to
-  # false by 21 October 2026 (one week), or sooner once a run is green.
+  # Batch 45a (D-1013) let this job fail without blocking until it had gone green on
+  # the runner; REQ-012 FR-5 (D-2901, D-2348) made it blocking on 19 October
+  # 2026 after four green runs on next. The step prints Lighthouse's own
+  # error when it fails; one retry covers a single run's noise.
   performance-budget:
-    name: Performance budgets, mobile profile, public pages (REQ-010, D-1012; advisory until green, D-1013)
+    name: Performance budgets, mobile profile, public content and questionnaire pages (REQ-010, D-1012; blocking, REQ-012 FR-5)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    continue-on-error: true
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -305,8 +304,7 @@ jobs:
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 
-      - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012; advisory until green, D-1013)
-        continue-on-error: true
+      - name: Performance budgets on the signed-in pages (REQ-010, backlog 2, D-1012; blocking, REQ-012 FR-5)
         run: npm run perf:budget || npm run perf:budget
         env:
           LIGHTHOUSE_BUDGET: "1"
