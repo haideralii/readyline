@@ -1,5 +1,5 @@
 {
-  "extractedAt": "2026-10-18T13:06:32.720Z",
+  "extractedAt": "2026-10-18T14:26:12.894Z",
   "distinct": [
     {
       "file": "src/lib/home-copy.ts",
@@ -40,15 +40,6 @@
         "instrument"
       ],
       "sentence": "Practice Standards modules that apply"
-    },
-    {
-      "file": "src/lib/path/details-copy.ts",
-      "line": 52,
-      "classes": [
-        "number",
-        "hedge"
-      ],
-      "sentence": "Most providers write 7 years."
     },
     {
       "file": "src/lib/registers/period.ts",
@@ -159,9 +150,9 @@
       "file": "src/app/registers/incidents/[id]/confirm/confirm-form.tsx",
       "line": 100,
       "classes": [
-        "hedge"
+        "instrument"
       ],
-      "sentence": "This category is not usually reportable."
+      "sentence": "This category is not on the NDIS Act's list of reportable incidents."
     },
     {
       "file": "src/app/registers/staff-matrix/export/page.tsx",
@@ -529,14 +520,6 @@
     },
     {
       "file": "content/guides/registers-an-auditor-asks-for.md",
-      "line": 52,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "The records auditors ask for in practice"
-    },
-    {
-      "file": "content/guides/registers-an-auditor-asks-for.md",
       "line": 54,
       "classes": [
         "instrument"
@@ -568,14 +551,6 @@
         "instrument"
       ],
       "sentence": "An incident that the Incident Management and Reportable Incidents Rules 2018 say must be notified to the Commission, within the time frames the Rules set."
-    },
-    {
-      "file": "content/guides/what-happens-at-an-ndis-audit.md",
-      "line": 34,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule."
     },
     {
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
@@ -664,14 +639,6 @@
     },
     {
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
-      "line": 115,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "In practice auditors expect the full list and may choose not to interview someone who would be distressed, but you do not remove people from it."
-    },
-    {
-      "file": "content/guides/what-happens-at-an-ndis-audit.md",
       "line": 123,
       "classes": [
         "number",
@@ -683,10 +650,9 @@
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
       "line": 127,
       "classes": [
-        "number",
-        "hedge"
+        "number"
       ],
-      "sentence": "It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date."
+      "sentence": "It applies to certified providers at 18 months, and the Commission's own timeline has you preparing from 12 months after your registration date."
     },
     {
       "file": "content/guides/which-ndis-audit.md",
@@ -804,14 +770,6 @@
         "instrument"
       ],
       "sentence": "Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing."
-    },
-    {
-      "file": "product/legal/about.md",
-      "line": 34,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "One person reads every message, usually within two business days."
     },
     {
       "file": "product/legal/ai.md",
@@ -956,15 +914,6 @@
       "sentence": "Practice Standards modules that apply"
     },
     {
-      "file": "src/lib/path/details-copy.ts",
-      "line": 52,
-      "classes": [
-        "number",
-        "hedge"
-      ],
-      "sentence": "Most providers write 7 years."
-    },
-    {
       "file": "src/lib/registers/period.ts",
       "line": 280,
       "classes": [
@@ -1073,9 +1022,9 @@
       "file": "src/app/registers/incidents/[id]/confirm/confirm-form.tsx",
       "line": 100,
       "classes": [
-        "hedge"
+        "instrument"
       ],
-      "sentence": "This category is not usually reportable."
+      "sentence": "This category is not on the NDIS Act's list of reportable incidents."
     },
     {
       "file": "src/app/registers/staff-matrix/export/page.tsx",
@@ -1443,14 +1392,6 @@
     },
     {
       "file": "content/guides/registers-an-auditor-asks-for.md",
-      "line": 52,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "The records auditors ask for in practice"
-    },
-    {
-      "file": "content/guides/registers-an-auditor-asks-for.md",
       "line": 54,
       "classes": [
         "instrument"
@@ -1482,14 +1423,6 @@
         "instrument"
       ],
       "sentence": "An incident that the Incident Management and Reportable Incidents Rules 2018 say must be notified to the Commission, within the time frames the Rules set."
-    },
-    {
-      "file": "content/guides/what-happens-at-an-ndis-audit.md",
-      "line": 34,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule."
     },
     {
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
@@ -1578,14 +1511,6 @@
     },
     {
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
-      "line": 115,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "In practice auditors expect the full list and may choose not to interview someone who would be distressed, but you do not remove people from it."
-    },
-    {
-      "file": "content/guides/what-happens-at-an-ndis-audit.md",
       "line": 123,
       "classes": [
         "number",
@@ -1597,10 +1522,9 @@
       "file": "content/guides/what-happens-at-an-ndis-audit.md",
       "line": 127,
       "classes": [
-        "number",
-        "hedge"
+        "number"
       ],
-      "sentence": "It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date."
+      "sentence": "It applies to certified providers at 18 months, and the Commission's own timeline has you preparing from 12 months after your registration date."
     },
     {
       "file": "content/guides/which-ndis-audit.md",
@@ -1718,14 +1642,6 @@
         "instrument"
       ],
       "sentence": "Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing."
-    },
-    {
-      "file": "product/legal/about.md",
-      "line": 34,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "One person reads every message, usually within two business days."
     },
     {
       "file": "product/legal/ai.md",

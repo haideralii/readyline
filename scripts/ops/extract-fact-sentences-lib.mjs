@@ -23,6 +23,8 @@ export const CLASSES = Object.freeze({
 
 /** Sentences that carry a class but state no fact a source could back; exact text after whitespace folding. */
 export const NOISE = new Set([
+  // D-2954 (2): the audit guide's own disclosure that practice is not a rule, ruled as such.
+  "Where we add what auditors do in practice, from sector webinars, we say so: practice is not a rule.",
   "Step 1 of 6",
   "Step 2 of 6",
   "Step 3 of 6",
