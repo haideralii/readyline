@@ -55,3 +55,6 @@ product/evidence-review/
 
 # PO review scratch (screenshots extracted from branches)
 .po-review/
+
+# QA live b340ee3, batch C (3): the e2e web server's test-only email outbox (EMAIL_OUTBOX_FILE)
+.e2e-outbox.ndjson

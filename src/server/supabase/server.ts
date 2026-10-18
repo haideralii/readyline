@@ -6,6 +6,7 @@ import "server-only";
  */
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { siteIsHttps } from "@/lib/site";
 import { readSupabaseEnv } from "./env";
 
 export async function createSupabaseServerClient() {
@@ -22,7 +23,9 @@ export async function createSupabaseServerClient() {
             cookieStore.set(name, value, {
               ...options,
               httpOnly: true,
-              secure: process.env.NODE_ENV === "production",
+              // Secure over https, which production is; CI's production build serves http://localhost,
+              // where WebKit drops a Secure cookie and Chromium keeps it (#108 run 1, the iphone case).
+              secure: siteIsHttps(),
               sameSite: "lax",
             });
           }
