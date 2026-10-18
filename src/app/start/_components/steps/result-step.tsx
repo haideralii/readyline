@@ -396,7 +396,10 @@ function ResultView({
           <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
             {glossarySentence(`${pathwayWord}-audit`)}{" "}
             {/* REQ-031 D-2895, D-2887: the scope sentence, in the same line block so the card keeps its shape. */}
-            <span className="text-slate" data-testid="result-scope">
+            <span
+              className="text-slate mt-0.5 block text-xs leading-4"
+              data-testid="result-scope"
+            >
               {RESULT_SCOPE_SENTENCE}
             </span>
           </p>
@@ -419,7 +422,7 @@ function ResultView({
             five lines (28 px from sm up) and the button ends inside the screen
             again with every word kept. */}
           <ul
-            className="mt-2 space-y-1 text-base leading-6 sm:mt-2 sm:leading-7"
+            className="mt-2 space-y-1 text-base leading-6 sm:mt-2"
             data-testid="summary-list"
           >
             <li className="tabular-nums" data-testid="summary-documents">
@@ -442,8 +445,10 @@ function ResultView({
           <div data-testid="checklist-teaser">
             {/* REQ-031 D-2895: the scope sentence joined the card (two lines from sm), so the groups, the list, the
               ready line and this row each give up 4 px from sm and the button ends inside the first screen again
-              (REQ-015 FR-4; the run read 731 of 720 with the sentence inline). */}
-            <div className="mt-3 flex flex-col gap-3 sm:mt-3 sm:flex-row sm:items-center">
+              (REQ-015 FR-4; the run read 731 of 720 with the sentence inline). #116's run then read 735 on the
+              1280x720 desktop, so the sentence is its own small tight line under the meaning (text-xs, 16 px leading),
+              the list keeps its phone leading from sm (24 px) and this row sits 4 px higher again. */}
+            <div className="mt-3 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center">
               <Link
                 href={
                   signedIn
