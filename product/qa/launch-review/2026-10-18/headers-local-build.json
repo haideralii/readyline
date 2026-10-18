@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-10-18T09:32:29.093Z",
+  "results": [
+    {
+      "id": "content page",
+      "path": "/",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "purchase page",
+      "path": "/pricing",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "questionnaire",
+      "path": "/start",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "sign-in",
+      "path": "/sign-in",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "guide",
+      "path": "/guides/which-ndis-audit",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "legal page",
+      "path": "/privacy",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "404",
+      "path": "/this-page-does-not-exist",
+      "status": 404,
+      "ok": true
+    },
+    {
+      "id": "API route",
+      "path": "/api/health",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "id": "auditor page (unknown token)",
+      "path": "/auditor/not-a-real-token",
+      "status": 404,
+      "ok": true
+    },
+    {
+      "id": "report page (unknown token)",
+      "path": "/report/not-a-real-token",
+      "status": 404,
+      "ok": true
+    },
+    {
+      "id": "worker home (signed out)",
+      "path": "/worker",
+      "status": 307,
+      "ok": true
+    },
+    {
+      "id": "register page (signed out)",
+      "path": "/registers",
+      "status": 307,
+      "ok": true
+    },
+    {
+      "id": "documents (signed out, the proxy's redirect)",
+      "path": "/documents",
+      "status": 307,
+      "ok": true
+    }
+  ],
+  "problems": []
+}

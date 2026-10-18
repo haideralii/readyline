@@ -2,6 +2,9 @@
 # Default rules stay on. The only allow-list is path-scoped to the verbatim
 # Commission text snapshots, which can contain key-like strings; nothing
 # else is exempt, and no rule is disabled.
+# Reviewed 18 Oct 2026 (REQ-012 FR-1g): data/sources/ holds 32 text snapshots
+# of Commission pages and PDFs, read-only fixtures the standards:verify step
+# hashes; no code, no configuration, no credential lives there. Kept.
 title = "Readyline secret scan"
 
 [extend]
