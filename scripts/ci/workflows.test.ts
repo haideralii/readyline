@@ -8,7 +8,7 @@
  * minute loop inside the job's timeout, and the loop script as the only
  * command.
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const text = readFileSync(".github/workflows/generate-kick.yml", "utf8");
@@ -61,7 +61,9 @@ describe("generate-kick workflow (batch 32 item 1)", () => {
     );
     expect(gated).toHaveLength(1);
     expect(text).not.toMatch(/npm (ci|install)/);
-    expect(text).toContain("uses: actions/checkout@v4");
+    expect(text).toContain(
+      "uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+    );
   });
 
   it("REQ-030 FR-3 (D-2867, SR-3): the uptime step runs ahead of the gate on PROD_URL alone, with the issue permission and its cached state", () => {
@@ -79,13 +81,66 @@ describe("generate-kick workflow (batch 32 item 1)", () => {
     // The three uptime steps run only with PROD_URL, never needing the cron secret.
     const onProd = code.filter((l) => l === "        if: env.PROD_URL != ''");
     expect(onProd).toHaveLength(3);
-    expect(text).toContain("uses: actions/cache/restore@v4");
-    expect(text).toContain("uses: actions/cache/save@v4");
+    expect(text).toContain(
+      "uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
+    );
+    expect(text).toContain(
+      "uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
+    );
     expect(text).toContain("          path: .uptime-state.json");
     expect(text).toContain(
       "          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}",
     );
     // The minutes note names the step's cost.
     expect(text).toContain("the uptime step rides inside");
+  });
+});
+
+describe("every action is pinned by commit SHA with its version, or keeps its tag with a reason (REQ-012 FR-2, AC-6)", () => {
+  const files = readdirSync(".github/workflows").filter((f) =>
+    f.endsWith(".yml"),
+  );
+  const uses: { file: string; line: string }[] = [];
+  for (const f of files)
+    for (const line of readFileSync(`.github/workflows/${f}`, "utf8").split(
+      "\n",
+    ))
+      if (/^\s*-?\s*uses:/.test(line))
+        uses.push({ file: f, line: line.trim() });
+
+  it("finds the uses lines across the workflows", () => {
+    expect(files.length).toBeGreaterThanOrEqual(6);
+    expect(uses.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it("each is owner/name@<40 hex> # vX.Y.Z, or carries '# tag kept:' and a reason", () => {
+    for (const { file, line } of uses) {
+      const m = /^uses:\s*([\w.-]+\/[\w./-]+)@(\S+)(?:\s+#\s*(.*))?$/.exec(
+        line,
+      );
+      expect(m, `${file}: ${line}`).not.toBeNull();
+      const [, , ref, comment = ""] = m!;
+      const pinned =
+        /^[0-9a-f]{40}$/.test(ref) && /^v\d+\.\d+\.\d+/.test(comment);
+      const kept = /^tag kept:\s*\S/.test(comment);
+      expect(pinned || kept, `${file}: ${line}`).toBe(true);
+    }
+  });
+
+  it("supabase/setup-cli v3 takes no github-token input and keeps the fixed CLI version (D-038)", () => {
+    for (const f of files) {
+      const text = readFileSync(`.github/workflows/${f}`, "utf8");
+      expect(text, f).not.toContain("github-token: ${{ github.token }}");
+      if (text.includes("supabase/setup-cli@"))
+        expect(text, f).toMatch(/version: \d+\.\d+\.\d+/);
+    }
+  });
+
+  it("the e2e job asserts the lockfile and the tree are unchanged after npm ci (FR-2)", () => {
+    const ci = readFileSync(".github/workflows/ci.yml", "utf8");
+    expect(ci).toContain("git diff --exit-code -- package-lock.json");
+    expect(
+      ci.indexOf("git diff --exit-code -- package-lock.json"),
+    ).toBeLessThan(ci.indexOf("npm audit --omit=dev"));
   });
 });
