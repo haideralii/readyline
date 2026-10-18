@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 /**
  * Footer contact details (REQ-008 FR-2). Both values are public once set, but
  * they are read on the server (the footer is a server component) so nothing
@@ -30,4 +31,12 @@ export function businessAbn(
   const digits = (env.BUSINESS_ABN ?? "").replace(/\s+/g, "");
   if (!/^\d{11}$/.test(digits)) return null;
   return `${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
+}
+
+/** REQ-034 FR-2 (D-2810's rule): the one-line business identity the footer and the trust page share: the brand, and the ABN once set. */
+export function businessIdentityLine(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const abn = businessAbn(env);
+  return `${BRAND}${abn ? ` (ABN ${abn})` : ""}`;
 }

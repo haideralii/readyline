@@ -271,6 +271,18 @@ export default function Home() {
             <li key={t.title} className="border-rule rounded-md border p-4">
               <strong className="text-ink font-semibold">{t.title}.</strong>{" "}
               {t.text}
+              {"href" in t ? (
+                <>
+                  {" "}
+                  <Link
+                    href={t.href}
+                    className="underline underline-offset-2"
+                    data-testid="home-trust-link"
+                  >
+                    {t.linkLabel}
+                  </Link>
+                </>
+              ) : null}
             </li>
           ))}
         </ul>

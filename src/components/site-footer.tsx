@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { isProductionDeployment } from "@/lib/env";
-import {
-  AI_DISCLOSURE,
-  BRAND,
-  GENERAL_INFORMATION_STATEMENT,
-} from "@/lib/brand";
-import { businessAbn, contactEmail } from "@/lib/legal/config";
+import { AI_DISCLOSURE, GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
+import { businessIdentityLine, contactEmail } from "@/lib/legal/config";
 import { LEGAL_NAV } from "@/lib/legal/nav";
 
 /**
@@ -17,7 +13,6 @@ import { LEGAL_NAV } from "@/lib/legal/nav";
  */
 export function SiteFooter() {
   const email = contactEmail();
-  const abn = businessAbn();
   const link =
     "inline-flex min-h-11 items-center underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2";
   return (
@@ -67,8 +62,7 @@ export function SiteFooter() {
           Safeguards Commission.
         </p>
         <p className="text-sm" data-testid="footer-brand">
-          {BRAND}
-          {abn ? ` (ABN ${abn})` : ""}. NDIS is a registered trade mark of the
+          {businessIdentityLine()}. NDIS is a registered trade mark of the
           National Disability Insurance Agency and is used here descriptively
           only.
         </p>
