@@ -46,6 +46,11 @@ export const HOME_COPY = {
     "The sections marked in colour were drafted from that provider's answers; the rest is fixed text every provider gets.",
   sampleRead: "Read the sample",
   sampleDownload: "Download it as a Word file",
+  /** REQ-034 FR-4 (D-2947): the line above the two files on /sample. */
+  sampleFilesLine:
+    "This sample is from a recorded run for a fictional provider. Your own documents come from your answers.",
+  sampleDownloadWord: "Download this sample as a Word file",
+  sampleDownloadPdf: "Download this sample as a PDF",
   /** The /sample page's own lead (REQ-025 FR-12). */
   samplePageLead:
     "This is a real document from a recorded run, not a template. The sections marked in colour were drafted from a fictional sole trader's answers; the rest is fixed text every provider gets.",
