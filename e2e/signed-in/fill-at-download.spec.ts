@@ -200,6 +200,8 @@ test.describe("REQ-029 Session A: fill at download", () => {
           .from("document_versions")
           .select("id, version, adopted_on, approver_name, approver_role")
           .eq("account_id", tenant.accountId)
+          // FR-7: the account also holds an older set (its version 1, filled); this counts the current set alone (#117's run).
+          .eq("version_set_id", setId)
           .eq("document_type_id", typeId)
           .order("version")
       ).data as {
