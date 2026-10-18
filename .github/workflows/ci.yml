@@ -221,7 +221,9 @@ jobs:
           pg_dump --version
           pg_restore --version
 
-      - name: Backup and restore rehearsal (REQ-030 FR-2, AC-3)
+      # One step per command, so the jobs API (public) names the one that fails and
+      # the first step proves the database URL reaches the stack before any dump.
+      - name: Backup and restore rehearsal (REQ-030 FR-2, AC-3), the connection
         env:
           BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
           DB_URL: ${{ env.SUPABASE_DB_URL }}
@@ -229,10 +231,33 @@ jobs:
           IN: /tmp/rehearsal.sql.gpg
           SKIP_AUDIT: "1"
         run: |
-          scripts/ops/backup.sh
-          supabase db reset --local --no-seed
-          scripts/ops/restore-rehearsal.sh
-          npm run test:integration
+          test -n "$DB_URL" || { echo "FAIL SUPABASE_DB_URL is empty: supabase status -o env did not give DB_URL" >&2; exit 1; }
+          psql "$DB_URL" -Atc "select version()"
+          psql "$DB_URL" -Atc "select count(*) from auth.users" | sed 's/^/auth.users rows before the dump: /'
+
+      - name: Backup and restore rehearsal, the dump (scripts/ops/backup.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/backup.sh
+
+      - name: Backup and restore rehearsal, a fresh stack (migrations applied, no seed)
+        run: supabase db reset --local --no-seed
+
+      - name: Backup and restore rehearsal, the restore (scripts/ops/restore-rehearsal.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/restore-rehearsal.sh
+
+      - name: Backup and restore rehearsal, the integration suite on the restored stack
+        run: npm run test:integration
 
       - name: Build for the signed-in end-to-end run
         run: npm run build

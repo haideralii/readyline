@@ -169,9 +169,21 @@ describe("the restore rehearsal in CI (REQ-030 AC-3, SR-5)", () => {
     expect(ci).toContain(
       "BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789",
     );
-    expect(ci).toContain("          scripts/ops/backup.sh");
-    expect(ci).toContain("          supabase db reset --local --no-seed");
-    expect(ci).toContain("          scripts/ops/restore-rehearsal.sh");
+    // One step per command (the jobs API names the failing one), in order.
+    const at = (s: string) => {
+      const i = ci.indexOf(s);
+      expect(i, s).toBeGreaterThan(-1);
+      return i;
+    };
+    const dump = at("run: scripts/ops/backup.sh");
+    const reset = at("run: supabase db reset --local --no-seed");
+    const restore = at("run: scripts/ops/restore-rehearsal.sh");
+    const suite = at(
+      "the integration suite on the restored stack\n        run: npm run test:integration",
+    );
+    expect(dump).toBeLessThan(reset);
+    expect(reset).toBeLessThan(restore);
+    expect(restore).toBeLessThan(suite);
     expect(ci.split("npm run test:integration").length - 1).toBe(2);
     expect(ci).not.toMatch(/secrets\.BACKUP_PASSPHRASE/);
   });
