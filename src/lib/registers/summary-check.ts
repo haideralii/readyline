@@ -26,6 +26,12 @@ export const EASY_READ_CHECK_LINE =
 export const SUMMARY_CHECK_INTRO =
   "A section of this document changed. Read the plain-words summary again: redraft it with the change as context, or record that it is still right. Either is your act, with your role and the day.";
 
+export const SUMMARY_CONFIRM_AUDIT_ACTION = "documents.summary.confirmed";
+export const SUMMARY_REDRAFT_AUDIT_ACTION = "documents.summary.redrafted";
+export const SUMMARY_NOTHING_TO_CHECK =
+  "This document's summary has nothing to check right now.";
+export const SUMMARY_NOT_FOUND = "That document was not found.";
+
 export type SummaryCheck = {
   /** The section that changed (never the summary itself). */
   sectionId: string;

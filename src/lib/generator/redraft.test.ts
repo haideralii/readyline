@@ -14,6 +14,7 @@ import {
   REDRAFT_PROMPT_VERSION,
   REDRAFT_REFUSED_MESSAGE,
   buildRedraftRequest,
+  buildSummaryRedraftRequest,
   readRedraftReply,
   redraftChangeText,
   redraftChecks,
@@ -276,5 +277,100 @@ describe("redraftModel (FR-B5, FR-B6; D-2855, D-2958)", () => {
       log.blocks.find((b) => b.type === "table") as { rows: string[][] }
     ).rows;
     expect(rows[0][3]).toBe("[name]");
+  });
+});
+
+describe("buildSummaryRedraftRequest (REQ-033 Session C FR-C2, D-2982)", () => {
+  const request = buildSummaryRedraftRequest({
+    type,
+    model,
+    changedSectionId: "scope",
+    modelId: "m",
+  });
+
+  it("carries the summary's current text and brief, the changed section's text and the outline, and no facts, finding or standard", () => {
+    expect(request.user).toContain("<<<CURRENT SECTION>>>");
+    expect(request.user).toContain("You choose your supports");
+    expect(request.user).toContain("Section brief: Four to six sentences");
+    expect(request.user).toContain("<<<CHANGED SECTION 2 Scope>>>");
+    expect(request.user).toContain("This policy covers Example Supports");
+    expect(request.user).toContain(
+      'sectionId must be "plain-language-summary"',
+    );
+    expect(request.user).not.toContain("<<<FACTS>>>");
+    expect(request.user).not.toContain("<<<FINDING>>>");
+    expect(request.user).not.toContain("<<<STANDARD>>>");
+    expect(request.user).not.toContain(
+      (
+        model.sections.find((s) => s.id === "procedure")!.blocks[0] as {
+          text: string;
+        }
+      ).text.slice(0, 60),
+    );
+  });
+
+  it("refuses a document without the summary or a section outside the outline", () => {
+    const governance = documentTypeById("governance-policy")!;
+    expect(() =>
+      buildSummaryRedraftRequest({
+        type: governance,
+        model: { ...model, typeId: governance.id },
+        changedSectionId: "scope",
+        modelId: "m",
+      }),
+    ).toThrow(/no plain-words summary/);
+    expect(() =>
+      buildSummaryRedraftRequest({
+        type,
+        model,
+        changedSectionId: "change-log",
+        modelId: "m",
+      }),
+    ).toThrow(/not a numbered section/);
+  });
+
+  it("reads a summary reply without the anchors and with the Year 6 gate", () => {
+    const current = model.sections.find(
+      (s) => s.id === "plain-language-summary",
+    )!.blocks;
+    const plain = readRedraftReply({
+      text: JSON.stringify({
+        sectionId: "plain-language-summary",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "We listen to you. Tell us if something is wrong. Family or friends can speak for you. We will put it right.",
+          },
+        ],
+      }),
+      sectionId: "plain-language-summary",
+      current,
+      finding: "",
+      tradingName: model.facts.tradingName,
+      allowedPhrases: allowed,
+      readabilityGate: { failAbove: 6, shortSectionWords: 20 },
+      anchors: false,
+    });
+    expect(plain.ok, JSON.stringify(plain)).toBe(true);
+    const hard = readRedraftReply({
+      text: JSON.stringify({
+        sectionId: "plain-language-summary",
+        blocks: [
+          {
+            type: "paragraph",
+            text: "Notwithstanding the aforementioned organisational commitments, participants and their authorised representatives are entitled to initiate complaint proceedings through the established escalation mechanisms, whereupon the provider undertakes comprehensive investigation procedures in accordance with regulatory obligations and documented methodologies, subsequently communicating determinations transparently.",
+          },
+        ],
+      }),
+      sectionId: "plain-language-summary",
+      current,
+      finding: "",
+      tradingName: model.facts.tradingName,
+      allowedPhrases: allowed,
+      readabilityGate: { failAbove: 6, shortSectionWords: 20 },
+      anchors: false,
+    });
+    expect(hard.ok).toBe(false);
+    if (!hard.ok) expect(hard.problems.join(" ")).toMatch(/readability grade/);
   });
 });

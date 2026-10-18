@@ -12,6 +12,8 @@ import type { ModelRequest } from "./prompts";
 
 export const FAKE_REDRAFT_SENTENCE =
   "We tell every participant, and the people who act for them, how to raise a concern when supports begin, and we check they understood.";
+/** REQ-033 Session C: the plain-words summary's echo adds a short sentence instead, so the Year 6 gate holds. */
+export const FAKE_SUMMARY_SENTENCE = "You can ask us about any change.";
 
 /** The echo reply for a redraft request, or null when the request is not one. */
 export function fakeRedraftReply(request: ModelRequest): string | null {
@@ -27,7 +29,13 @@ export function fakeRedraftReply(request: ModelRequest): string | null {
     .slice(0, 11);
   const blocks = [
     ...lines.map((text) => ({ type: "paragraph" as const, text })),
-    { type: "paragraph" as const, text: FAKE_REDRAFT_SENTENCE },
+    {
+      type: "paragraph" as const,
+      text:
+        id === "plain-language-summary"
+          ? FAKE_SUMMARY_SENTENCE
+          : FAKE_REDRAFT_SENTENCE,
+    },
   ];
   return JSON.stringify({ sectionId: id, blocks });
 }

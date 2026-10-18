@@ -8,7 +8,11 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { documentTypeById } from "./catalogue";
 import type { DocumentModel } from "./document-model";
-import { FAKE_REDRAFT_SENTENCE, fakeRedraftReply } from "./fake-redraft";
+import {
+  FAKE_REDRAFT_SENTENCE,
+  FAKE_SUMMARY_SENTENCE,
+  fakeRedraftReply,
+} from "./fake-redraft";
 import { createModelClient, MissingFixtureError } from "./model-client";
 import {
   buildRedraftRequest,
@@ -64,6 +68,21 @@ describe("fakeRedraftReply", () => {
         tradingName: model.facts.tradingName,
       }),
     ).toEqual([]);
+  });
+
+  it("answers the plain-words summary with a short sentence (Session C)", () => {
+    const user = request.user
+      .replace("section id: scope", "section id: plain-language-summary")
+      .replace(
+        /<<<CURRENT SECTION>>>[\s\S]*?<<<END CURRENT SECTION>>>/,
+        "<<<CURRENT SECTION>>>\nWe listen to you.\n<<<END CURRENT SECTION>>>",
+      );
+    const parsed = JSON.parse(fakeRedraftReply({ ...request, user })!) as {
+      sectionId: string;
+      blocks: { text: string }[];
+    };
+    expect(parsed.sectionId).toBe("plain-language-summary");
+    expect(parsed.blocks.at(-1)!.text).toBe(FAKE_SUMMARY_SENTENCE);
   });
 
   it("answers null for a request that is not a redraft", () => {
