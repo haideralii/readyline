@@ -684,6 +684,8 @@ const GLOSSARY_OUTSIDE_LIST_PREFIXES = [
 const GLOSSARY_OUTSIDE_LIST = [
   "src/app/layout.tsx",
   "src/app/not-found.tsx",
+  // REQ-030 FR-1: the page-level error boundary, one plain line and the reference; no glossary term.
+  "src/app/error.tsx",
   "src/app/guides/[slug]/cost-calculator.tsx",
   "src/components/confirm-button.tsx",
   "src/components/data-table.tsx",

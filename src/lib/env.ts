@@ -106,6 +106,11 @@ export const OPTIONAL: ReadonlyArray<{
     from: "D-059 (the app starts the kicker workflow when work exists)",
     without: "the thirty-minute schedule picks jobs up instead",
   },
+  {
+    name: "SENTRY_DSN",
+    from: "REQ-030 FR-1 (D-2865): server-side error reporting, scrubbed before it leaves",
+    without: "errors reach the server log alone",
+  },
   // REQ-022 Session B (D-2822): plain SMTP; every name or none.
   ...[
     "EMAIL_PROVIDER",
