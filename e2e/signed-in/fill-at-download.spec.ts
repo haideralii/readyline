@@ -248,7 +248,9 @@ test.describe("REQ-029 Session A: fill at download", () => {
       await expect(page.getByTestId("fact-name")).toContainText(
         "No square brackets",
       );
-      await expect(page.getByRole("alert")).toContainText("Your name");
+      // Next's route announcer is an alert too (#105, #112), so the summary is the one with its heading.
+      const summary = page.getByRole("alert").filter({ hasText: "Please fix" });
+      await expect(summary).toContainText("Your name");
       await expect(
         page.locator('[role="alert"] a[href="#name"]'),
       ).toBeVisible();
@@ -262,7 +264,7 @@ test.describe("REQ-029 Session A: fill at download", () => {
     await test.step("AC-2: name, role and phone saved on blur, three rows and no version", async () => {
       await field("name").fill("Jane Citizen");
       await saved("name");
-      await expect(page.getByRole("alert")).toHaveCount(0);
+      await expect(summary).toHaveCount(0);
       await field("role").fill("Owner");
       await saved("role");
       await field("phone-or-email").fill("0400 000 000");
