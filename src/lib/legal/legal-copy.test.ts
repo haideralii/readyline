@@ -89,6 +89,8 @@ describe("product/legal copy (REQ-008)", () => {
       "A suspended account keeps its export, and you can email us to have the decision looked at again.",
       "If you do not accept a change, you can cancel before it takes effect and nothing further is charged.",
       "Nothing in these terms limits rights you have under the Australian Consumer Law; where a consumer guarantee applies, your remedies are the ones that law gives. For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim. We are not liable for loss that comes from documents you did not review or adopt, or from information you entered that was not true.",
+      // REQ-030 FR-7, D-2877 (the NDIS expert's read): record keeping is the provider's.
+      "Your registers and exports are yours to keep; download them and keep them with your own files for as long as the NDIS rules require, because Readyline is not your record-keeping system and a restore from our backup can lose up to a week of entries.",
     ],
     refunds: [
       "We want you to be happy with what you buy. If you are not, tell us and we will put it right or refund you as set out below.",
@@ -101,6 +103,10 @@ describe("product/legal copy (REQ-008)", () => {
       "we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
       "Readyline has not registered a choice to be covered by the Privacy Act; what this page promises is our own undertaking to you, and the Australian Consumer Law holds us to it.",
       "The owner decides and tells you the outcome in writing.",
+      // REQ-030 FR-7, D-2872, D-2875, D-2873: the backup copy, the error reports, the retention line; `updated` does not move (D-2870).
+      "GitHub, in the United States, keeps a weekly encrypted copy of our database for up to 90 days; only the owner holds the key that opens it, and each copy is deleted after 90 days.",
+      "Sentry receives reports of errors on our servers, with email addresses and free text removed before they leave Australia, and stores them in the United States.",
+      "An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted.",
     ],
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
@@ -114,6 +120,8 @@ describe("product/legal copy (REQ-008)", () => {
     terms: ["or a qualified consultant"],
     privacy: [
       "handled elsewhere briefly",
+      // REQ-030 D-2873: the old line named a schedule nobody had written.
+      "Backups are deleted on their normal schedule after that.",
       "we tell you and the regulator as the law requires",
     ],
     ai: ["so an auditor finds it with your privacy commitments"],
