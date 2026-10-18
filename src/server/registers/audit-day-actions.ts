@@ -30,6 +30,7 @@ import { loadQuestionnaire } from "@/server/path/state";
 import {
   accountModuleIds,
   afterStaffMatrixSave,
+  confirmWorkerItem,
   contextFor,
   ensureItems,
   listItems,
@@ -397,45 +398,22 @@ async function recordWorkerItem(
   const item = items.find((i) => i.id === tick.item_id);
   if (!item) return { ok: false, message: "That item is not on this list." };
   await ensureItems(ctx.supabase, ctx.account.id, list.id, items);
-  const current = await ctx.supabase
-    .from("onboarding_items")
-    .select("id, done_on, confirmed_on")
-    .eq("checklist_id", list.id)
-    .eq("item_id", item.id)
-    .maybeSingle();
-  if (!current.data) return { ok: false, message: "That item was not found." };
-  const recordedByOwner = item.who !== "owner" && !current.data.done_on;
-  const upd = await ctx.supabase
-    .from("onboarding_items")
-    .update({
-      confirmed_on: tick.ticked_on,
-      done_on: current.data.done_on ?? tick.ticked_on,
-      recorded_by_owner: recordedByOwner,
-    })
-    .eq("id", current.data.id)
-    .eq("account_id", ctx.account.id);
-  if (upd.error) return { ok: false, message: plainDatabaseMessage(upd.error) };
-  const inserted = await ctx.supabase
-    .from("onboarding_ticks")
-    .insert({
-      checklist_id: list.id,
-      account_id: ctx.account.id,
-      item_id: item.id,
-      ticked_on: tick.ticked_on,
-      ticked_by_ref: tick.ticked_by_ref,
-      actor_user_id: ctx.viewer.user.id,
-    })
-    .select("id")
-    .single();
-  if (inserted.error)
-    return { ok: false, message: plainDatabaseMessage(inserted.error) };
-  await ctx.supabase.from("register_events").insert({
-    account_id: ctx.account.id,
-    register: "onboarding_items",
-    row_id: current.data.id,
-    kind: "confirmed",
-    note: `${item.id} confirmed on ${tick.ticked_on}${recordedByOwner ? ", recorded by the manager" : ""}`,
+  // D-2845: the one confirm path the page and the integration test share.
+  const confirmed = await confirmWorkerItem(ctx.supabase, {
+    accountId: ctx.account.id,
+    userId: ctx.viewer.user.id,
+    listId: list.id,
+    item,
+    tickedOn: tick.ticked_on,
+    tickedByRef: tick.ticked_by_ref,
   });
+  if (!confirmed.ok)
+    return {
+      ok: false,
+      message: confirmed.error.code
+        ? plainDatabaseMessage(confirmed.error)
+        : (confirmed.error.message ?? "That item was not found."),
+    };
   // The completion rule is the derived state (FR-2, finding 148).
   if (row && !list.completed_on) {
     const states = await listItems(ctx.supabase, ctx.account.id, list.id);
@@ -494,9 +472,9 @@ async function recordWorkerItem(
     ctx.account.id,
     ctx.viewer.user.id,
     "register.onboarding_items.confirmed",
-    inserted.data.id as string,
+    confirmed.tickId,
   );
-  return { ok: true, id: inserted.data.id as string };
+  return { ok: true, id: confirmed.tickId };
 }
 
 const ReviewInput = strictObject({

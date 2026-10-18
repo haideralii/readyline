@@ -8,8 +8,10 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
+
+vi.mock("server-only", () => ({}));
 
 const enabled = hasSupabaseEnv();
 
@@ -296,13 +298,30 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
       confirmed_on: null,
       recorded_by_owner: false,
     });
-    // The owner confirms; the worker reads both dates.
-    const confirm = await owner.client
-      .from("onboarding_items")
-      .update({ confirmed_on: "2026-11-04" })
-      .eq("id", w6ItemId)
-      .select("confirmed_on");
-    expect(confirm.data?.[0]?.confirmed_on).toBe("2026-11-04");
+    // The owner confirms through the page's own path (D-2845), not a direct update; the worker reads both dates.
+    const { confirmWorkerItem } =
+      await import("@/server/registers/worker-onboarding");
+    const confirm = await confirmWorkerItem(owner.client, {
+      accountId: owner.accountId,
+      userId: owner.userId,
+      listId: checklistId,
+      item: { id: "w6-policies", who: "both" },
+      tickedOn: "2026-11-04",
+      tickedByRef: "KP-1",
+    });
+    expect(confirm.ok).toBe(true);
+    const ownersTick = await admin
+      .from("onboarding_ticks")
+      .select("ticked_by_ref, actor_user_id")
+      .eq("checklist_id", checklistId)
+      .eq("item_id", "w6-policies")
+      .order("ticked_on", { ascending: false })
+      .limit(1)
+      .single();
+    expect(ownersTick.data).toEqual({
+      ticked_by_ref: "KP-1",
+      actor_user_id: owner.userId,
+    });
     const after = await worker.client
       .from("onboarding_items")
       .select("done_on, confirmed_on")
