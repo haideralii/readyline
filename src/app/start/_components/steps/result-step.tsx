@@ -25,6 +25,15 @@ import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import {
+  GROUPS_LABEL,
+  MID_TERM_APPLIES,
+  MID_TERM_HEADING,
+  MID_TERM_NONE,
+  MODULES_HEADING,
+  REGISTERS_LEGEND,
+  midTermLine,
+} from "@/lib/questionnaire/result-text";
+import {
   deriveResult,
   type DeriveResultResponse,
   type ResultChanges,
@@ -311,19 +320,11 @@ function termsPresent(r: QuestionnaireResult, legend: string): string[] {
   return findGlossaryTerms(text).filter((id) => id !== inline);
 }
 
-const GROUPS_LABEL = "Registration groups in scope";
 const MODULE_STANDARDS_SUMMARY = "The standards in this module";
 const SIL_EXCLUDED_TEXT =
   "The service you described is not supported independent living under the Commission's definition. Class 0138 and the SIL module are not in your result.";
 const RP_ASSUMED_TEXT =
   "You were not sure about restrictive practices, and at least one of your answers to the three helper questions pointed to yes, so we included the implementing behaviour support plans module. Change the answer on the restrictive practices step and the module drops out.";
-const MODULES_HEADING = "Practice Standards modules that apply";
-const MID_TERM_HEADING = "Mid-term audit";
-const MID_TERM_APPLIES =
-  "Applies: about N months after registration, against the provider governance and operational management standards. Start preparing from month N.";
-const MID_TERM_NONE = "Does not apply.";
-const REGISTERS_LEGEND =
-  "Your pack includes a template for every register below; the subscription keeps them for you. An auditor samples them at the mid-term audit and at renewal.";
 const WHAT_NEXT_TEXT =
   "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already bought the pack.";
 
@@ -623,15 +624,7 @@ function ResultView({
           </ul>
           <h3 className="mt-5">{MID_TERM_HEADING}</h3>
           <p className="mt-1 text-sm leading-6" data-testid="mid-term">
-            {r.midTermAudit.applies
-              ? MID_TERM_APPLIES.replace(
-                  "about N months",
-                  `about ${r.midTermAudit.monthsAfterRegistration} months`,
-                ).replace(
-                  "month N.",
-                  `month ${r.midTermAudit.prepareFromMonth}.`,
-                )
-              : `${MID_TERM_NONE} ${r.midTermAudit.exemptReason ?? ""}`}
+            {midTermLine(r)}
           </p>
         </Disclosure>
 
