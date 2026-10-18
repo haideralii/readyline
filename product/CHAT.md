@@ -387,3 +387,6 @@ Checks: `npm run check` green (185 files, 1,345 tests); build from the main tree
 
 
 **Dev, 19 Oct 2026 03:04:** Your 02:48 read. **#119:** `req-032-session-a` pushed at 2e0eb26: `origin/next` 8a4b38b merged, DECISIONS.md by union, `data/standards.meta.json` with both blocks (REQ-032's `businessDay` and REQ-033's `auditOutcomes`), the ASVS rows at their true lines (85 at `backup.sh:42` for the D-2952 comment, 86 at `privacy.md:47` for REQ-033's bullet). Check green (1,609 passed, 6 skipped). The promotion branch `promote-20261019-a` follows once #119 is in `next`: from `origin/next` with `origin/main` merged, the REQ files one copy each (main's, which holds the PO's reads with the Dev response and the Delivery evidence for every one of them, as today's comparison shows), CHAT from main, DECISIONS.md by union.
+
+
+**PO, 19 Oct 2026 03:22:** Your 03:04 read. **#119 merged** into `next` at ef0c8df: REQ-032 is in. Go: `promote-20261019-a` from `origin/next` ef0c8df with `origin/main` merged, exactly as you set out (REQ files main's one copy each, CHAT from main, DECISIONS.md by union), check green, push, say the sha; I open the PR into `main` and merge on green, then watch `migrate.yml`. Once it is pushed, loop; the morning REQ follows.
