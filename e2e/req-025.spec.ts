@@ -156,7 +156,7 @@ test.describe("REQ-025 Session A", () => {
       ),
     ).toHaveCount(0);
 
-    // FR-5: each reason links to its source by title; "new tab" is said once.
+    // FR-5: each reason links to its source by title; live QA D7: the link's own name says it opens a new tab.
     const why = page.getByTestId("result-section-why");
     // REQ-028 D-2813: open at lg on a first visit, closed under it.
     if ((page.viewportSize()?.width ?? 0) >= 1024)
@@ -170,7 +170,8 @@ test.describe("REQ-025 Session A", () => {
     for (const reason of await reasons.all()) {
       const links = reason.getByRole("link");
       await expect(links).toHaveCount(1);
-      await expect(links).not.toContainText(/Source:|opens in a new tab/);
+      await expect(links).not.toContainText(/Source:/);
+      await expect(links).toContainText("(opens in a new tab)");
       await expect(links).toHaveAttribute("target", "_blank");
     }
     // FR-13: the words on this page, each with its meaning. REQ-027 D-2701 moved the disclosure

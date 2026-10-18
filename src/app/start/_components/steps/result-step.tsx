@@ -555,7 +555,8 @@ function ResultView({
               standards below still apply to you.
             </p>
           ) : null}
-          {/* REQ-025 FR-5: one list item per reason, the source as the link text; "opens in a new tab" said once. */}
+          {/* REQ-025 FR-5: one list item per reason, the source as the link text. Live QA of b340ee3, D7: each
+            link says it opens a new tab in its own name, as the guides do; the intro line stays for sighted readers. */}
           <p className="text-slate mt-2 text-sm" data-testid="reasons-intro">
             Each reason links to its source; the sources open in a new tab.
           </p>
@@ -577,7 +578,7 @@ function ResultView({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {x.source.title}
+                  {x.source.title} (opens in a new tab)
                 </a>
               </li>
             ))}

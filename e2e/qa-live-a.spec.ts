@@ -58,4 +58,19 @@ test.describe("live QA b340ee3: the questionnaire's focus and words", () => {
     await expect(page.getByTestId("clear-draft")).toBeFocused();
     await expect(page.getByTestId("clear-draft-confirm")).toHaveCount(0);
   });
+
+  test("D7: every source link on the result says it opens a new tab, in its own name", async ({
+    page,
+  }) => {
+    await reachResult(page);
+    const why = page.getByTestId("result-section-why");
+    if ((page.viewportSize()?.width ?? 0) < 1024)
+      await why.locator("> summary").click();
+    const links = why.getByTestId("reason").getByRole("link");
+    expect(await links.count()).toBeGreaterThan(0);
+    for (const link of await links.all()) {
+      await expect(link).toContainText("(opens in a new tab)");
+      await expect(link).toHaveAttribute("target", "_blank");
+    }
+  });
 });
