@@ -29,6 +29,8 @@ export type ShownItem = ChecklistItem & {
   doneOn: string | null;
   /** REQ-024 Session C (FR-10; D-2831): the line under the title when the status came from the staff list. */
   derived?: string;
+  /** REQ-035 FR-5 (D-2967): the newest gap check on this document type, dated, linking its result; the status is untouched. */
+  gapLine?: { text: string; href: string };
 };
 
 export type ShownGroup = {

@@ -28,6 +28,14 @@ import { WritingIndicator } from "@/components/writing-indicator";
 import type { WritingStatus } from "@/lib/generation/writing-state";
 import { writingStatusFor } from "@/server/generation/writing-status";
 import { listLatestDocuments } from "@/server/generation/queries";
+import { documentTypeById } from "@/lib/generator/catalogue";
+import { gapCountsLine } from "@/lib/gap-check/words";
+import { resultDocuments } from "@/server/documents/result-types";
+import {
+  gapCheckDay,
+  latestPerType,
+  listGapChecks,
+} from "@/server/gap-check/queries";
 import { setZipSize } from "@/server/generation/zip-size";
 import { zipSizeLine } from "@/lib/generator/zip-line";
 import { AutoRefresh } from "./auto-refresh";
@@ -311,12 +319,18 @@ export default async function DocumentsPage({
   const enabled = isGenerationEnabled();
   const supabase = await createSupabaseServerClient();
   const accountId = viewer.account.id;
-  const [purchases, entitlements, jobs, sets] = await Promise.all([
-    listPurchases(supabase, accountId),
-    listEntitlements(supabase, accountId),
-    listGenerationJobs(supabase, accountId),
-    listVersionSets(supabase, accountId),
-  ]);
+  const [purchases, entitlements, jobs, sets, gapChecks, resultDocs] =
+    await Promise.all([
+      listPurchases(supabase, accountId),
+      listEntitlements(supabase, accountId),
+      listGenerationJobs(supabase, accountId),
+      listVersionSets(supabase, accountId),
+      // REQ-035 FR-5: the owner's gap checks, newest first.
+      listGapChecks(supabase, accountId),
+      // REQ-035 D-2966 (question 2 (a)): the result's documents, for the catalogue list before a set exists.
+      resultDocuments(),
+    ]);
+  const latestGapChecks = latestPerType(gapChecks);
   const state = deriveDocumentsState({ purchases, entitlements, jobs });
   // REQ-021: the writing indicator's status while a pack is being written and once it is ready.
   const writing =
@@ -385,6 +399,82 @@ export default async function DocumentsPage({
           .
         </p>
       ) : null}
+
+      {/* REQ-035 D-2966 (question 2 (a)): before a set exists, the documents the answers call for, one anchor each, so a gap check's "In the Readyline pack" link lands on its entry. */}
+      {state.kind !== "ready" && resultDocs && resultDocs.length > 0 ? (
+        <section
+          aria-labelledby="pack-holds-heading"
+          className="mt-10"
+          data-testid="pack-holds"
+        >
+          <h2 id="pack-holds-heading" className="">
+            {C.packHoldsHeading}
+          </h2>
+          <p className="text-ink mt-2 text-sm leading-6">{C.packHoldsLead}</p>
+          <ol className="text-ink mt-3 list-decimal space-y-1 pl-6 leading-7">
+            {resultDocs.map((d) => (
+              <li
+                key={d.id}
+                id={d.id}
+                className="scroll-mt-24"
+                data-testid="pack-holds-item"
+              >
+                {d.title}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
+      {/* REQ-035 FR-5 (D-2966): the owner's own policies checked against the outline, the newest per type. */}
+      <section
+        aria-labelledby="gap-heading"
+        className="mt-10"
+        data-testid="documents-gap-checks"
+      >
+        <h2 id="gap-heading" className="">
+          {C.gapHeading}
+        </h2>
+        <p className="text-ink mt-2 text-sm leading-6">{C.gapLead}</p>
+        {latestGapChecks.length === 0 ? (
+          <p
+            className="text-slate mt-2 text-sm"
+            data-testid="documents-gap-none"
+          >
+            {C.gapNone}
+          </p>
+        ) : (
+          <ul className="divide-rule mt-3 divide-y">
+            {latestGapChecks.map((c) => (
+              <li key={c.id} className="py-3" data-testid="documents-gap-item">
+                <Link
+                  href={`/documents/gap-check/${c.id}`}
+                  className="font-medium underline-offset-4 hover:underline"
+                >
+                  {gapCountsLine(
+                    c.title,
+                    documentTypeById(c.document_type_id)?.title ??
+                      c.document_type_id,
+                    c,
+                  )}
+                </Link>
+                <p className="text-slate text-sm">
+                  {gapCheckDay(c.created_at)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-3">
+          <Link
+            href="/documents/gap-check"
+            className="btn-secondary text-sm"
+            data-testid="documents-gap-link"
+          >
+            {C.gapLink}
+          </Link>
+        </p>
+      </section>
 
       {otherSets.length > 0 ? (
         <section aria-labelledby="sets-heading" className="mt-10">

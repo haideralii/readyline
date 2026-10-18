@@ -34,6 +34,8 @@ import {
   listAuditDayRows,
 } from "@/server/registers/audit-day-queries";
 import { findingsCardLine } from "@/lib/registers/findings";
+import { gapCheckCardLine } from "@/lib/gap-check/words";
+import { gapCheckSummary, listGapChecks } from "@/server/gap-check/queries";
 import type { FindingListRow } from "@/lib/registers/findings";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
@@ -105,6 +107,7 @@ export default async function AuditDayPage({
     ownershipChangeOn,
     latestChangeAt,
     findingRows,
+    gapRows,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -133,7 +136,10 @@ export default async function AuditDayPage({
     latestRegisterChangeAt(supabase, viewer.account.id),
     // REQ-033 FR-6: the findings from the last audit, for the card.
     listAuditDayRows(supabase, viewer.account.id, "findings"),
+    // REQ-035 FR-5: the owner's gap checks, for the documents card's count.
+    listGapChecks(supabase, viewer.account.id),
   ]);
+  const gapSummary = gapCheckSummary(gapRows);
   const peopleLine = workerStatesLine(workers, todaySydney());
   // REQ-023 FR-5: the period the pack link carries, "This registration period"
   // by default when a period exists (D-2305); the list's states stay live
@@ -299,6 +305,20 @@ export default async function AuditDayPage({
             className="underline underline-offset-2"
           >
             {findingsCardLine(findingRows as unknown as FindingListRow[])}
+          </Link>
+        </p>
+      ) : null}
+      {/* REQ-035 FR-5 (D-2966): the provider's own policies checked against the outline, and the sections left to close. */}
+      {gapSummary.checked > 0 ? (
+        <p
+          className="mt-3 text-sm print:hidden"
+          data-testid="audit-day-gap-checks"
+        >
+          <Link
+            href="/documents/gap-check"
+            className="underline underline-offset-2"
+          >
+            {gapCheckCardLine(gapSummary.checked, gapSummary.toClose)}
           </Link>
         </p>
       ) : null}

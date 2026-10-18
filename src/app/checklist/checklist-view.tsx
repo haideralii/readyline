@@ -496,6 +496,20 @@ function ChecklistRow({
             {item.haveNote}
           </p>
         ) : null}
+        {item.gapLine ? (
+          // REQ-035 FR-5 (D-2967): the newest gap check on this type, dated; the status stays the provider's call.
+          <p
+            className="mt-1 text-sm leading-6"
+            data-testid={`checklist-gap-${b}`}
+          >
+            <Link
+              href={item.gapLine.href}
+              className="underline underline-offset-2"
+            >
+              {item.gapLine.text}
+            </Link>
+          </p>
+        ) : null}
         {item.unverified ? (
           <p
             className="text-slate mt-1 text-sm leading-6"

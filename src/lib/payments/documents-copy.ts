@@ -40,6 +40,15 @@ export const DOCUMENTS_COPY = {
     "Your document pack was refunded, so the downloads are closed. Your questionnaire answers are kept; you can buy a new pack at any time.",
   lockedSet:
     "The downloads for this set are closed because the purchase was refunded.",
+  /** REQ-035 FR-5 (D-2966): the gap checks on the documents page, and the catalogue list before a set exists. */
+  gapHeading: "Your own policies checked",
+  gapLead:
+    "A policy you already have, compared with Readyline's outline for its document type.",
+  gapLink: "Check a policy you already have",
+  gapNone: "No checks yet.",
+  packHoldsHeading: "What your pack holds",
+  packHoldsLead:
+    "The documents your answers call for. Each one is written for you when you buy the pack.",
 } as const;
 
 /** Every fixed string the page can show, for the claims lint test. */

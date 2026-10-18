@@ -14,6 +14,8 @@ import {
   statusLabel,
 } from "@/lib/checklist/state";
 import { applyWorkerStates } from "@/lib/checklist/worker-states";
+import { applyGapChecks } from "@/lib/checklist/gap-checks";
+import { gapCheckDay, listGapChecks } from "@/server/gap-check/queries";
 import { ANSWERS_VERSION, answersSchemaFor } from "@/lib/questionnaire/schema";
 import { buildResult } from "@/lib/questionnaire/result";
 import { getStandardsDataset } from "@/lib/standards/dataset";
@@ -68,7 +70,7 @@ export default async function ChecklistPage() {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [stored, latest, period, workers, ownershipChangeOn] =
+  const [stored, latest, period, workers, ownershipChangeOn, gapChecks] =
     await Promise.all([
       listChecklistItems(supabase, viewer.account.id),
       latestReadySet(supabase, viewer.account.id),
@@ -83,6 +85,8 @@ export default async function ChecklistPage() {
       ),
       // REQ-023 FR-4 (Session D): the change-of-ownership item reads the changes register.
       latestOwnershipChangeOn(supabase, viewer.account.id),
+      // REQ-035 FR-5 (D-2967): the owner's gap checks, for the dated line on a document item.
+      listGapChecks(supabase, viewer.account.id),
     ]);
   // REQ-023 FR-4: the dated audit items once a registration period exists.
   const checklist = deriveChecklist(
@@ -91,14 +95,22 @@ export default async function ChecklistPage() {
     dataset,
     checklistPeriod(period, ownershipChangeOn),
   );
-  const shown = applyWorkerStates(
-    mergeChecklist({
-      checklist,
-      stored,
-      draftedDocumentTypeIds: latest.documentTypeIds,
-    }),
-    workers,
-    todaySydney(),
+  const shown = applyGapChecks(
+    applyWorkerStates(
+      mergeChecklist({
+        checklist,
+        stored,
+        draftedDocumentTypeIds: latest.documentTypeIds,
+      }),
+      workers,
+      todaySydney(),
+    ),
+    gapChecks.map((c) => ({
+      id: c.id,
+      documentTypeId: c.document_type_id,
+      day: gapCheckDay(c.created_at),
+      missing: c.missing,
+    })),
   );
   const today = new Intl.DateTimeFormat("en-AU", {
     day: "numeric",

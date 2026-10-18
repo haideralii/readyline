@@ -9,11 +9,8 @@ import {
   gapCountsLine,
 } from "@/lib/gap-check/words";
 import { documentTypeById } from "@/lib/generator/catalogue";
-import { ANSWERS_VERSION, answersSchemaFor } from "@/lib/questionnaire/schema";
-import { buildResult } from "@/lib/questionnaire/result";
-import { getStandardsDataset } from "@/lib/standards/dataset";
-import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
+import { resultDocuments } from "@/server/documents/result-types";
 import { gapCheckDay, listGapChecks } from "@/server/gap-check/queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { GapCheckForm } from "./gap-check-form";
@@ -23,24 +20,6 @@ export const metadata: Metadata = {
   description:
     "Compare a policy you already have with the outline Readyline writes from the quality indicators, section by section.",
 };
-
-/** The document type ids the account's result calls for, or null without a result. */
-async function resultTypeIds(): Promise<Set<string> | null> {
-  const draft = await loadServerDraft();
-  if (!draft) return null;
-  const dataset = getStandardsDataset();
-  const schema = answersSchemaFor(
-    new Set(dataset.registrationGroups.map((g) => g.code)),
-  );
-  const parsed = schema.safeParse({
-    ...(draft.answers as Record<string, unknown>),
-    answersVersion: ANSWERS_VERSION,
-  });
-  if (!parsed.success) return null;
-  const built = buildResult(dataset, parsed.data);
-  if (!built.ok) return null;
-  return new Set(built.result.documents.map((d) => d.id));
-}
 
 /**
  * REQ-035 FR-1, FR-5 (D-2962, D-2966): the owner's page to check a policy
@@ -53,10 +32,11 @@ export default async function GapCheckPage() {
   if (viewer.deleted) redirect("/account/deleted");
   if (!viewer.account) redirect(viewer.worker ? "/worker" : "/account/setup");
   const supabase = await createSupabaseServerClient();
-  const [ids, checks] = await Promise.all([
-    resultTypeIds(),
+  const [docs, checks] = await Promise.all([
+    resultDocuments(),
     listGapChecks(supabase, viewer.account.id),
   ]);
+  const ids = docs ? new Set(docs.map((d) => d.id)) : null;
   const types = gapCheckTypes();
   const inAudit = ids ? types.filter((t) => ids.has(t.id)) : types;
   const notInAudit = ids ? types.filter((t) => !ids.has(t.id)) : [];
