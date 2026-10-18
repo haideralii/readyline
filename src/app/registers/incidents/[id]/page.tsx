@@ -7,6 +7,7 @@ import { INCIDENT_COLUMNS } from "@/lib/registers/names";
 import { EventsTrail } from "../../_components/events-trail";
 import { StatusTag } from "../../_components/register-list";
 import { RegisterPage, registerContext } from "../../_components/shell";
+import { notifyByWords } from "@/lib/registers/notify-by-line";
 import { incidentStatus } from "../page";
 import { RejectedReportForm } from "./rejected-form";
 
@@ -49,8 +50,14 @@ export default async function IncidentPage({
       ? [["Rejected because", r.rejected_reason] as [string, string]]
       : []),
     [INCIDENT_COLUMNS.reportable, r.reportable ? "Yes" : "No"],
+    // REQ-032 FR-5: the date with the holidays that moved it, for the account's states.
     ...(r.notify_by
-      ? [["Notify the Commission by", r.notify_by] as [string, string]]
+      ? [
+          [
+            "Notify the Commission by",
+            notifyByWords(r, ctx.viewer.account.states),
+          ] as [string, string],
+        ]
       : []),
     ...(r.reportable_notified_on
       ? [
@@ -86,7 +93,7 @@ export default async function IncidentPage({
         </p>
       ) : null}
       <p className="mt-3">
-        <StatusTag status={incidentStatus(r)} />
+        <StatusTag status={incidentStatus(r, ctx.viewer.account.states)} />
       </p>
       <dl
         className="mt-5 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2"

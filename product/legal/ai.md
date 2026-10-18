@@ -1,6 +1,6 @@
 ---
 title: How Readyline uses AI
-updated: 2026-10-16
+updated: 2026-10-19
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -9,7 +9,7 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 ## What is written by people and what is drafted by AI
 
-Every document Readyline produces has two kinds of text.
+Every document Readyline produces has two kinds of text. Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).
 
 Fixed text is written and reviewed by people. It holds the parts that must be exact: the Commission's standards and quality indicators, the reportable incident rules and timeframes, definitions, register layouts, and the review sections. Fixed text is the same for every provider and does not come from an AI model.
 
@@ -19,7 +19,7 @@ Every document shows which sections are which.
 
 ## Which model, and where your data goes
 
-We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
+We use Claude, a model made by Anthropic. When we draft a document, we send the model your questionnaire answers and the fixed text for that document. We do not send participant information, because we never collect it. If you ask us to suggest which Practice Standard an audit finding sits under, we send the model that finding's words as you typed them, after they pass our participant check. The report you uploaded is never sent. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.
 
 ## How we check the drafts
 

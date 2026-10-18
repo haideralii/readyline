@@ -27,6 +27,8 @@ const EXPORT_TABLES: readonly string[] = [
   "purchases",
   "subscriptions",
   "entitlements",
+  // REQ-033 FR-3 (D-2932, D-2300): the audit findings, under their own key; the pack carries them too.
+  "findings",
 ];
 
 /** Tables the audit pack writes (`src/server/registers/audit-pack.ts` through the register files and the audit-day meta). */

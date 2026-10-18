@@ -32,7 +32,10 @@ export default async function WorkerNewIncidentPage() {
       <p className="mt-3 leading-7" data-testid="emergency-line">
         {EMERGENCY_LINE}
       </p>
-      <IncidentFormView afterSave="/worker?saved=1" />
+      <IncidentFormView
+        afterSave="/worker?saved=1"
+        states={viewer.worker.states}
+      />
     </PageShell>
   );
 }

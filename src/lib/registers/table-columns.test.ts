@@ -191,6 +191,26 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
     status: "in-progress",
   },
   // Dev-2 (REQ-023 Session D, D-2317): the note and the Commission's reference carry the planted name; no cell reads them.
+  findings: {
+    id: "f1",
+    account_id: "a",
+    reference: "FND-0001",
+    standard_id: "core.governance.incident-management",
+    indicator: "",
+    severity: "minor",
+    finding:
+      "The incident register had no record of the Commission being told.",
+    due_on: DAY,
+    status: "open",
+    addressed_on: null,
+    addressed_by_role: "",
+    verified_on: null,
+    improvement_id: null,
+    created_by: null,
+    created_at: DAY,
+    updated_at: DAY,
+    state: "open",
+  },
   "commission-changes": {
     id: "cc1",
     reference: "CHG-0001",

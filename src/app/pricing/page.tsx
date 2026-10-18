@@ -195,6 +195,29 @@ export default async function PricingPage() {
             }
             priceTestId="pack-price"
             priceNote={C.packPriceNote}
+            underPrice={
+              <>
+                {/* REQ-034 FR-6 (D-2948): what the one price rules out, in our own terms. */}
+                <ul
+                  className="text-ink mt-2 space-y-1 text-sm leading-6"
+                  data-testid="pack-plain-lines"
+                >
+                  {C.plainLines.map((l) => (
+                    <li key={l}>{l}</li>
+                  ))}
+                </ul>
+                {/* REQ-034 FR-3: the trust page, under the price. */}
+                <p className="mt-2 text-sm">
+                  <Link
+                    href="/trust"
+                    className={link}
+                    data-testid="pack-trust-link"
+                  >
+                    {C.trustLink}
+                  </Link>
+                </p>
+              </>
+            }
             bullets={C.packIncludes}
             bulletsTestId="pack-includes"
             priceLine={

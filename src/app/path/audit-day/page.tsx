@@ -29,7 +29,12 @@ import {
   listDraftedDocumentTypeIds,
 } from "@/server/checklist/queries";
 import { loadPathContext } from "@/server/path/state";
-import { auditDayOverview } from "@/server/registers/audit-day-queries";
+import {
+  auditDayOverview,
+  listAuditDayRows,
+} from "@/server/registers/audit-day-queries";
+import { findingsCardLine } from "@/lib/registers/findings";
+import type { FindingListRow } from "@/lib/registers/findings";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { registerOverview } from "@/server/registers/queries";
 import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
@@ -99,6 +104,7 @@ export default async function AuditDayPage({
     workers,
     ownershipChangeOn,
     latestChangeAt,
+    findingRows,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -125,6 +131,8 @@ export default async function AuditDayPage({
     latestOwnershipChangeOn(supabase, viewer.account.id),
     // REQ-031 FR-5 (D-2890): the newest register change, for the what-changed link's words.
     latestRegisterChangeAt(supabase, viewer.account.id),
+    // REQ-033 FR-6: the findings from the last audit, for the card.
+    listAuditDayRows(supabase, viewer.account.id, "findings"),
   ]);
   const peopleLine = workerStatesLine(workers, todaySydney());
   // REQ-023 FR-5: the period the pack link carries, "This registration period"
@@ -280,6 +288,20 @@ export default async function AuditDayPage({
           registration dates on the account page to filter by period).
         </p>
       )}
+      {/* REQ-033 FR-6: the findings from the last audit, counted by the provider's record. */}
+      {findingRows.length > 0 ? (
+        <p
+          className="mt-3 text-sm print:hidden"
+          data-testid="audit-day-findings"
+        >
+          <Link
+            href="/registers/findings"
+            className="underline underline-offset-2"
+          >
+            {findingsCardLine(findingRows as unknown as FindingListRow[])}
+          </Link>
+        </p>
+      ) : null}
       {/* REQ-023 FR-6: the summary screen, the same sheet the pack carries. */}
       {period ? (
         <p className="mt-3 text-sm print:hidden">
