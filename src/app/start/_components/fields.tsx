@@ -365,15 +365,25 @@ export function CheckboxGroup<V extends string>({
 export function ErrorSummary({
   errors,
   labels,
+  attempt = 0,
 }: {
   errors: FieldErrors;
   labels: Record<string, string>;
+  /** The step's submit count: focus moves to the summary on the submit that produced it and on no other change (live QA D1). */
+  attempt?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const entries = Object.entries(errors).filter(([, msgs]) => msgs.length > 0);
+  const hasEntries = entries.length > 0;
+  // Live QA pass of b340ee3, D1: an effect on the entry count re-ran every
+  // time a field's error cleared and pulled focus back to the alert mid-word
+  // ("Sunrise Supports" left "S" in the field). The submit count is the only
+  // trigger; a shrink of the list changes nothing about focus.
   useEffect(() => {
-    if (entries.length) ref.current?.focus();
-  }, [entries.length]);
+    if (attempt > 0 && hasEntries) ref.current?.focus();
+    // hasEntries is read at the attempt that produced the summary, never a trigger of its own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt]);
   if (!entries.length) return null;
   return (
     <div

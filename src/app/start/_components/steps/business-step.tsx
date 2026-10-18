@@ -78,6 +78,8 @@ export function BusinessStepForm() {
   );
   const [abn, setAbn] = useState(saved?.abn ?? prefilled?.abn ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
+  // Live QA D1: the submit count the error summary focuses on.
+  const [attempt, setAttempt] = useState(0);
   const [pending, setPending] = useState(false);
 
   // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
@@ -87,6 +89,7 @@ export function BusinessStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setAttempt((a) => a + 1);
     const parsed = await parseStep("business", {
       tradingName,
       structure,
@@ -108,7 +111,7 @@ export function BusinessStepForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="step-form">
-      <ErrorSummary errors={errors} labels={LABELS} />
+      <ErrorSummary errors={errors} labels={LABELS} attempt={attempt} />
       {prefilled ? (
         <p
           className="text-slate mb-6 text-sm leading-6"

@@ -121,6 +121,8 @@ export function SupportsStepForm() {
   const [note, setNote] = useState(saved?.servicesNote ?? "");
   const [query, setQuery] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
+  // Live QA D1: the submit count the error summary focuses on.
+  const [attempt, setAttempt] = useState(0);
   // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
   // change and its message, summary entry and aria-invalid go when it passes.
   const clear = async (name: string, values: unknown) =>
@@ -201,6 +203,7 @@ export function SupportsStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setAttempt((a) => a + 1);
     const values: Record<string, unknown> = { groups: current };
     if (note.trim()) values.servicesNote = note;
     if (silChosen) {
@@ -322,7 +325,7 @@ export function SupportsStepForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="step-form">
-      <ErrorSummary errors={errors} labels={LABELS} />
+      <ErrorSummary errors={errors} labels={LABELS} attempt={attempt} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first question. */}
       {/* REQ-028 FR-5 (D-2276 (2)): the aside column as one sticky item from lg; under lg a plain block in the
           phone's own order (the glossary before the question, the hint's full copy and the landmark hidden). */}

@@ -62,6 +62,8 @@ export function ExistingStepForm() {
     answers.existing ?? {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // Live QA D1: the submit count the error summary focuses on.
+  const [attempt, setAttempt] = useState(0);
   // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
   // change and its message, summary entry and aria-invalid go when it passes.
   const clear = async (name: string, values: unknown) =>
@@ -70,6 +72,7 @@ export function ExistingStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setAttempt((a) => a + 1);
     const parsed = await parseStep("existing", values);
     if (!parsed.ok) {
       setErrors(parsed.fieldErrors);
@@ -98,7 +101,7 @@ export function ExistingStepForm() {
           counts as no.
         </p>
       </div>
-      <ErrorSummary errors={errors} labels={LABELS} />
+      <ErrorSummary errors={errors} labels={LABELS} attempt={attempt} />
       {ITEMS.map((item) => (
         <RadioGroup
           key={item.key}
