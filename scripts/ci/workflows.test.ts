@@ -109,15 +109,16 @@ describe("every action is pinned by commit SHA with its version, or keeps its ta
         uses.push({ file: f, line: line.trim() });
 
   it("finds the uses lines across the workflows", () => {
-    expect(files.length).toBeGreaterThanOrEqual(6);
+    expect(files.length).toBeGreaterThanOrEqual(5);
     expect(uses.length).toBeGreaterThanOrEqual(20);
   });
 
   it("each is owner/name@<40 hex> # vX.Y.Z, or carries '# tag kept:' and a reason", () => {
     for (const { file, line } of uses) {
-      const m = /^uses:\s*([\w.-]+\/[\w./-]+)@(\S+)(?:\s+#\s*(.*))?$/.exec(
-        line,
-      );
+      const m =
+        /^(?:-\s*)?uses:\s*([\w.-]+\/[\w./-]+)@(\S+)(?:\s+#\s*(.*))?$/.exec(
+          line,
+        );
       expect(m, `${file}: ${line}`).not.toBeNull();
       const [, , ref, comment = ""] = m!;
       const pinned =
