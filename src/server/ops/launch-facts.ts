@@ -110,18 +110,42 @@ export async function readPriceFact(
   }
 }
 
+/** The path the webhook route answers on. */
+export const WEBHOOK_PATH = "/api/stripe/webhook";
+
+/**
+ * REQ-022 FR-1 and FR-8 (Session C): the endpoint is judged against the host
+ * the page was served on, not NEXT_PUBLIC_SITE_URL, so after the domain move
+ * the row turns green only when Stripe calls the domain. No request host
+ * (outside a request) is "unverified", never a guess.
+ */
+export function webhookEndpointState(
+  urls: readonly string[],
+  requestHost: string | null,
+): "matches" | "missing" | "unverified" {
+  const host = requestHost?.trim().toLowerCase();
+  if (!host) return "unverified";
+  const matches = urls.some((raw) => {
+    try {
+      const u = new URL(raw);
+      return u.host.toLowerCase() === host && u.pathname === WEBHOOK_PATH;
+    } catch {
+      return false;
+    }
+  });
+  return matches ? "matches" : "missing";
+}
+
 export async function readWebhookEndpoint(
   stripe: StripeLike,
-  siteUrl: string | undefined,
+  requestHost: string | null,
 ): Promise<"matches" | "missing" | "unverified"> {
-  const want = siteUrl?.trim()
-    ? `${siteUrl.trim().replace(/\/$/, "")}/api/stripe/webhook`
-    : null;
   try {
     const list = await stripe.webhookEndpoints.list({ limit: 100 });
-    return want && list.data.some((w) => w.url === want)
-      ? "matches"
-      : "missing";
+    return webhookEndpointState(
+      list.data.map((w) => w.url),
+      requestHost,
+    );
   } catch (e) {
     return classify(e).ok === false ? "unverified" : "unverified";
   }
@@ -186,7 +210,7 @@ export async function gatherLaunchFacts(input: {
     stripe.registers = await readPriceFact(client, env.STRIPE_PRICE_REGISTERS);
     stripe.webhookEndpoint = await readWebhookEndpoint(
       client,
-      env.NEXT_PUBLIC_SITE_URL,
+      input.requestHost,
     );
   }
 

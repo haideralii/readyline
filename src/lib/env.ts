@@ -106,6 +106,11 @@ export const OPTIONAL: ReadonlyArray<{
     from: "D-059 (the app starts the kicker workflow when work exists)",
     without: "the thirty-minute schedule picks jobs up instead",
   },
+  {
+    name: "HSTS_MAX_AGE",
+    from: "REQ-022 Session C (FR-10: one week after the alias redirect is proven, one year a week later)",
+    without: "the header carries the one-week default without preload",
+  },
   // REQ-022 Session B (D-2822): plain SMTP; every name or none.
   ...[
     "EMAIL_PROVIDER",

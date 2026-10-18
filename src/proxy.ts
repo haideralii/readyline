@@ -9,6 +9,7 @@
  * static and live in next.config.ts `headers()`.
  */
 import { NextResponse, type NextRequest } from "next/server";
+import { aliasRedirectTarget } from "@/lib/ops/alias-redirect";
 import { parsePeriodSearch, periodGuarded } from "@/lib/registers/period";
 
 /**
@@ -105,6 +106,15 @@ export function periodQueryRefused(
 }
 
 export function proxy(request: NextRequest) {
+  // REQ-022 FR-8 (D-2203): the vercel.app alias answers 301 to the domain for every path but /api/*.
+  const alias = aliasRedirectTarget({
+    host:
+      request.headers.get("x-forwarded-host") ?? request.headers.get("host"),
+    pathname: request.nextUrl.pathname,
+    search: request.nextUrl.search,
+    env: process.env,
+  });
+  if (alias) return NextResponse.redirect(alias, 301);
   if (
     periodQueryRefused(request.nextUrl.pathname, request.nextUrl.searchParams)
   )
