@@ -5,10 +5,7 @@ import {
   stripGlossaryBrackets,
 } from "@/lib/copy-lint/glossary";
 import { glossaryTerm } from "@/lib/questionnaire/content";
-import {
-  GLOSSARY_ATTRIBUTION,
-  GLOSSARY_BRACKET_TITLE,
-} from "@/components/glossary-copy";
+import { GLOSSARY_BRACKET_TITLE } from "@/components/glossary-copy";
 import {
   AI_DISCLOSURE,
   GENERAL_INFORMATION_NOTICE,

@@ -20,7 +20,6 @@ export { GLOSSARY_ATTRIBUTION, GLOSSARY_BRACKET_TITLE };
 
 export function GlossaryTerms({
   ids,
-  where,
   className,
 }: {
   /** The glossary ids present on the page, in the order they first appear. */
