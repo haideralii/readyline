@@ -9,6 +9,7 @@
  * that prefix from every bucket, so new buckets are covered without a change
  * here (D-416).
  */
+import { removeLinkPacks } from "@/server/registers/link-pack";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { log } from "@/lib/logging/logger";
 import type { EmailProvider } from "@/server/email/provider";
@@ -58,8 +59,21 @@ export async function runPurge(input: {
       const userIds = (members.data ?? []).map((m) => m.user_id as string);
 
       let objectsRemoved = 0;
-      if (!dryRun)
-        objectsRemoved = await removeStorageObjects(input.admin, account.id);
+      if (!dryRun) {
+        // REQ-029 SR-5 (D-2863): the auditor links' stored packs sit one folder
+        // deeper than the account's prefix lists, so each goes by name first.
+        const links = await input.admin
+          .from("auditor_links")
+          .select("id")
+          .eq("account_id", account.id);
+        for (const l of (links.data as { id: string }[] | null) ?? [])
+          objectsRemoved += await removeLinkPacks(
+            input.admin,
+            account.id,
+            l.id,
+          );
+        objectsRemoved += await removeStorageObjects(input.admin, account.id);
+      }
 
       let usersRemoved = 0;
       if (!dryRun) {

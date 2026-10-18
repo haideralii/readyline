@@ -20,7 +20,7 @@ import {
   checkAuditorOpenAllowed,
   checkRegisterExportAllowed,
 } from "@/server/auth/rate-limit";
-import { buildAuditPack } from "@/server/registers/audit-pack";
+import { linkPackFor } from "@/server/registers/link-pack";
 import {
   recordAuditorOpen,
   resolveAuditorToken,
@@ -90,10 +90,13 @@ export async function GET(
     "pack-downloaded",
     resolved.period,
   );
-  const pack = await buildAuditPack({
-    supabase: admin,
+  // REQ-029 FR-11 (D-2863, D-2294): the pack is rendered once per link and
+  // period and served from storage after that, so two downloads are the
+  // same bytes; the default period's render was made when the link was.
+  const pack = await linkPackFor({
     admin,
     accountId: link.accountId,
+    linkId: link.linkId,
     tradingName: link.tradingName,
     now: new Date(),
     period: resolved.period,
