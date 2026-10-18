@@ -413,23 +413,21 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       /^Download .+ \(\.docx\)$/,
     );
     await page.getByTestId("set-list").getByRole("link").first().click();
-    // The control table renders twice (batch 36's data table: cards on a
-    // phone, a table from sm up) and the hidden copy comes first in the DOM,
-    // so the assertion takes the copy this viewport shows.
+    // REQ-029 D-2854 (AC-3): a draft keeps its brackets until adoption; the
+    // control table renders twice (batch 36's data table: cards on a phone, a
+    // table from sm up), so the assertion takes the copy this viewport shows.
     await expect(
-      page.getByText("Jane Citizen").filter({ visible: true }).first(),
+      page.getByText("[name], [role]").filter({ visible: true }).first(),
     ).toBeVisible();
+    await expect(page.getByText("Jane Citizen")).toHaveCount(0);
 
-    // REQ-026 AC-2: after Finish every "Fill in" line reads done and the count
-    // says so; the adopt lines wait for step 5.
+    // REQ-026 AC-2: the sheet renders after Finish; the adopt lines wait for
+    // step 5. REQ-029 Session B gives the sheet its one rule over the facts
+    // (the done count and the ticks are asserted there).
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
     await page.getByTestId("start-here-link").click();
-    await expect(page.getByTestId("start-here-counts")).toContainText(
-      /^All \d+ things to fill in are done\.$/,
-    );
-    for (const line of await page.getByTestId("sheet-fill").all())
-      await expect(line).toHaveAttribute("data-done", "true");
+    await expect(page.getByTestId("start-here-counts")).toBeVisible();
     await expect(page.getByTestId("sheet-adopt").first()).toHaveAttribute(
       "data-done",
       "false",
@@ -514,6 +512,12 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page.getByTestId("set-summary")).toContainText(
       "No blanks to fill in",
     );
+    // REQ-029 D-2855 (AC-4): adopted, the document page shows the approver from the snapshot.
+    await page.getByTestId("set-list").getByRole("link").first().click();
+    await expect(
+      page.getByText("Jane Citizen").filter({ visible: true }).first(),
+    ).toBeVisible();
+    await page.goBack();
     // REQ-026 FR-4: adoption ticks every document's Adopt line on the sheet.
     await page.getByTestId("start-here-link").click();
     for (const line of await page.getByTestId("sheet-adopt").all())
