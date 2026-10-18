@@ -90,4 +90,12 @@ Test output; the rehearsal's size and seconds; `/admin/launch` on CI's stack wit
 - Decisions: D-2344 (the Secure cookie follows the site URL's scheme, from batch C) and D-2345 (seven calls) under Dev-2 headings in `DECISIONS.md`; the ASVS rows under "REQ-030 Session A additions".
 - Said, not built: the two-strike memory is a cached state file (the Dev response's fifth question, recommendation (a)); `npm install` needs `--legacy-peer-deps` for the Sentry package in the Dev-2 tree (an npm arborist fault; `npm ci` is unaffected).
 
+**Session B (Dev-2, 18 Oct 2026)** on `req-030-session-b` 191ec96 (stacked on Session A 6f11a93; PR to `next`; body: `product/evidence/req-030/pr-body-session-b.md`; evidence: `product/evidence/req-030/b-evidence.md`). Commits: ef336f5 FR-7 (the D-2872, D-2873, D-2875 and D-2877 lines verbatim on the privacy and terms pages, QL 5.8 for the lawyer, pinned with `updated` unmoved); 724708f FR-6 (**Backup within 8 days**, `LAUNCH.md` 18b); e19f736 FR-5 (`data-coverage.test.ts` over every `account_id` table, with the fourteen tables in no list reported to the PO and held in a named pending list; `data-promises.yml` with `data-promises.mjs`); 7c10fc3 FR-2 (`backup.yml`, `backup.sh`, `restore-rehearsal.sh`, the CI rehearsal, `workflows.test.ts`, `DEPLOY.md` section 11); 191ec96 the evidence, D-2346 and the ASVS rows. No migration.
+
+- AC mapping: AC-3 → the CI rehearsal step (dump under the fixture passphrase, reset, restore, the integration suite again; size and seconds in the job's log); AC-4 → `workflows.test.ts`; AC-5 → `launch.test.ts`; AC-8 → `data-coverage.test.ts`; AC-9 → `scripts/ops/data-promises.test.ts`; AC-11 → `legal-copy.test.ts`. AC-12 is Haider's (the passphrase, the first Sunday artifact, the first green row).
+- `npm run check`: green, 188 files (1 skipped), 1,356 tests, 6 skipped. The once-a-session public run in CI mode on the three projects from a production build of 7c10fc3 (D-2319): 332 passed, 44 skipped, none failed in 16.8 minutes.
+- Decisions: D-2346 (seven calls) under "REQ-030 Session B (Dev-2)" in `DECISIONS.md`; the ASVS rows under "REQ-030 Session B additions".
+- For the PO (D-2869): the fourteen tables and a recommendation each are in CHAT-2 (18 Oct 16:05) and in the test's `PENDING_PO_DECISION`; nothing joined the export.
+- UNVERIFIED: the hosted restore's `--disable-triggers` permission; whether the pooler accepts `pg_dump`; the hosted server's major (17 pinned); the minutes question stays as the REQ has it.
+
 ## PO review
