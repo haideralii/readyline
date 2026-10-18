@@ -235,4 +235,27 @@ describe("the Start here sheet (REQ-026)", () => {
     );
     expect(compressNumbers([])).toBe("");
   });
+
+  it("REQ-031 AC-9 (FR-4; D-2889): section 5 holds exactly three steps, the checklist, the audit day, then the systems check", () => {
+    const { input } = pack("verification-sole-trader");
+    const sheet = buildStartHere(input);
+    expect(sheet.next).toEqual([
+      { text: "Tick off your readiness checklist", href: "/checklist" },
+      {
+        text: "See what the auditor asks for on the day",
+        href: "/path/audit-day",
+      },
+      {
+        text: "Check your systems before the audit",
+        href: "/path/audit-day/check",
+      },
+    ]);
+    // The Word file's section 5 carries the same three, in order.
+    const model = startHereModel(sheet);
+    const five = model.sections.find((s) => s.number === "5")!;
+    const items = five.blocks.flatMap((b) =>
+      b.type === "steps" ? b.items : [],
+    );
+    expect(items).toEqual(sheet.next.map((n) => `${n.text}: ${n.href}`));
+  });
 });
