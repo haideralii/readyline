@@ -63,9 +63,8 @@ test.describe("live QA b340ee3: the questionnaire's focus and words", () => {
     page,
   }) => {
     await reachResult(page);
+    // reachResult opens every result section, at every width.
     const why = page.getByTestId("result-section-why");
-    if ((page.viewportSize()?.width ?? 0) < 1024)
-      await why.locator("> summary").click();
     const links = why.getByTestId("reason").getByRole("link");
     expect(await links.count()).toBeGreaterThan(0);
     for (const link of await links.all()) {

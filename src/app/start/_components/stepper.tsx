@@ -38,11 +38,12 @@ export function stepStates(
   );
 }
 
-// Live QA of b340ee3, D4: six 2.75 rem circles are 396 px at 150 % text and 528 px at 200 %, wider than a 360 px
-// row, so they overlapped. The circle is the smaller of 2.75 rem and 15 % of the viewport (54 px at 360, 48 px at
-// 320), which keeps the 44 px tap target on every phone and lets the row hold six at any text size; the joining
-// lines sit at half the circle through the same variable.
-const CIRCLE_VAR = "[--circle:min(2.75rem,15vw)]";
+// Live QA of b340ee3, D4: six 2.75 rem circles are 396 px at 150 % text and 528 px at 200 %, wider than a phone's
+// row, so they overlapped. The row is the viewport less the two 1 rem gutters, which double with the text too, so
+// the circle is the smaller of 2.75 rem and a sixth of that row: 44 px at 360 and 100 % (as before), 49 px at 360
+// and 200 %, 43 px at 320 and 200 %, the one case under 44 px (WCAG 2.5.8's floor is 24 px). The joining lines sit
+// at half the circle through the same variable.
+const CIRCLE_VAR = "[--circle:min(2.75rem,calc((100vw_-_2rem)/6))]";
 const circle =
   "flex size-(--circle) items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2";
 

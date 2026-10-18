@@ -377,13 +377,17 @@ export function ErrorSummary({
   const hasEntries = entries.length > 0;
   // Live QA pass of b340ee3, D1: an effect on the entry count re-ran every
   // time a field's error cleared and pulled focus back to the alert mid-word
-  // ("Sunrise Supports" left "S" in the field). The submit count is the only
-  // trigger; a shrink of the list changes nothing about focus.
+  // ("Sunrise Supports" left "S" in the field). Focus moves once per submit
+  // attempt, at the render in which that attempt's errors are on the page
+  // (the step's parse is async, so they arrive a render after the count
+  // rises), and never again for the same attempt: a shrink of the list
+  // changes nothing about focus.
+  const focusedFor = useRef(0);
   useEffect(() => {
-    if (attempt > 0 && hasEntries) ref.current?.focus();
-    // hasEntries is read at the attempt that produced the summary, never a trigger of its own.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attempt]);
+    if (!hasEntries || attempt === 0 || focusedFor.current === attempt) return;
+    focusedFor.current = attempt;
+    ref.current?.focus();
+  }, [attempt, hasEntries]);
   if (!entries.length) return null;
   return (
     <div
