@@ -8,6 +8,7 @@
  * time is written; no log line.
  */
 import { revalidatePath } from "next/cache";
+import { parseInput, strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { createSupabaseServerClient } from "@/server/supabase/server";
@@ -15,7 +16,13 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 export type MarkWhatChangedReadResult =
   { ok: true; readAt: string } | { ok: false };
 
-export async function markWhatChangedReadAction(): Promise<MarkWhatChangedReadResult> {
+// The action takes nothing; a body with anything in it is refused, as every action parses its input.
+const Input = strictObject({});
+
+export async function markWhatChangedReadAction(
+  input?: unknown,
+): Promise<MarkWhatChangedReadResult> {
+  if (!parseInput(Input, input ?? {}).ok) return { ok: false };
   const viewer = await getViewer();
   if (!viewer?.account) return { ok: false };
   const supabase = await createSupabaseServerClient();
