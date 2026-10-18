@@ -36,19 +36,23 @@ describe("the gitleaks exemptions are justified (REQ-012 FR-1g)", () => {
     expect(entries.length).toBeGreaterThan(0);
     for (const { l, i } of entries) {
       const [, file, rule] = l.split(":");
-      expect(file, l).toMatch(/\.(ts|tsx|mjs|yml|json)$/);
+      expect(file, l).toMatch(/\.(ts|tsx|mjs|yml|json|md)$/);
       expect(rule, l).toMatch(/^[a-z-]+$/);
       // The nearest comment block above the entry names the file and a reason.
       let j = i - 1;
       const block: string[] = [];
-      while (j >= 0 && ignore[j].trim().startsWith("#")) {
-        block.unshift(ignore[j]);
+      // A group of fingerprints shares the comment block above the first of them.
+      while (
+        j >= 0 &&
+        (ignore[j].trim().startsWith("#") || /^[0-9a-f]{40}:/.test(ignore[j]))
+      ) {
+        if (ignore[j].trim().startsWith("#")) block.unshift(ignore[j]);
         j--;
       }
       const text = block.join(" ");
       expect(text, `comment above ${l}`).toContain(file);
       expect(text, `reason above ${l}`).toMatch(
-        /not a secret|before its marker|fixture|test constant/,
+        /not a secret|not secrets|before its marker|fixture|test constant/i,
       );
     }
   });
@@ -80,7 +84,7 @@ describe("the gitleaks exemptions are justified (REQ-012 FR-1g)", () => {
     expect(marked.length).toBeGreaterThanOrEqual(4);
     for (const m of marked)
       expect(m, m).toMatch(
-        /e2e|rehearsal|fixture|passphrase-0123456789|0123456789abcdef/,
+        /e2e|rehearsal|fixture|passphrase-0123456789|0123456789abcdef|sk_test_abcdefghij12345678|eyJzdWIiOiIxIn0\.sig/,
       );
   });
 });
