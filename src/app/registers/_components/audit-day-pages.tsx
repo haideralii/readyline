@@ -433,6 +433,7 @@ export async function AuditDayDetailPage({
           row={row as unknown as FindingRow}
           supabase={ctx.supabase}
           accountId={ctx.viewer.account.id}
+          canWrite={ctx.canWrite}
         />
       ) : null}
       {/* REQ-033 FR-5 (D-2935): the provider's record of addressing it and of the auditor's verification. */}

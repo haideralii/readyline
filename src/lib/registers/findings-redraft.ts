@@ -28,6 +28,8 @@ export const REDRAFT_NO_VERSION =
 export const REDRAFT_LIMITED =
   "You have asked for ten redrafts this hour. Wait a while and try again.";
 export const REDRAFT_NOT_FOUND = "That finding was not found.";
+/** SR-B3 of REQ-033 (D-2306's kinds): the audit line an accepted redraft writes. */
+export const REDRAFT_AUDIT_ACTION = "documents.redrafted";
 export const REDRAFT_UNAVAILABLE =
   "The redraft could not be drafted just now; nothing was changed. Try again in a few minutes.";
 

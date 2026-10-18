@@ -181,10 +181,14 @@ vi.mock("@/server/generation/store", () => ({
   },
 }));
 
-const { draftRedraftAction, acceptRedraftAction, REDRAFT_AUDIT_ACTION } =
+const { draftRedraftAction, acceptRedraftAction } =
   await import("./findings-redraft-actions");
-const { REDRAFT_LIMITED, REDRAFT_NEEDS_SUBSCRIPTION, REDRAFT_NO_SECTION } =
-  await import("@/lib/registers/findings-redraft");
+const {
+  REDRAFT_AUDIT_ACTION,
+  REDRAFT_LIMITED,
+  REDRAFT_NEEDS_SUBSCRIPTION,
+  REDRAFT_NO_SECTION,
+} = await import("@/lib/registers/findings-redraft");
 const { REDRAFT_REFUSED_MESSAGE } = await import("@/lib/generator/redraft");
 
 const finding =

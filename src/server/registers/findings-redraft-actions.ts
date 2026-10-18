@@ -39,6 +39,7 @@ import { mapFinding } from "@/lib/registers/findings-map";
 import {
   REDRAFT_LIMITED,
   REDRAFT_NEEDS_SUBSCRIPTION,
+  REDRAFT_AUDIT_ACTION,
   REDRAFT_NOT_FOUND,
   REDRAFT_NO_PACK,
   REDRAFT_NO_SECTION,
@@ -71,7 +72,6 @@ import { createSupabaseServerClient } from "@/server/supabase/server";
 const SIGN_IN = "Sign in to use the registers.";
 const WRITE_LIMITED =
   "Too many changes in a minute. Wait a moment and try again.";
-export const REDRAFT_AUDIT_ACTION = "documents.redrafted";
 
 const TypeId = z.string().regex(/^[a-z0-9]+(?:[.-][a-z0-9]+)*$/);
 const TargetInput = strictObject({
