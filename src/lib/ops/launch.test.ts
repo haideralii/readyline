@@ -252,7 +252,8 @@ describe("launchRows (REQ-022 FR-1)", () => {
     expect(byId(f)["email-provider"].state).toBe("set");
     // The domain row reads the sender's DNS (D-2824): no EMAIL_FROM in these facts, so not verified here.
     expect(byId(f)["email-domain"].state).toBe("unverified");
-    expect(byId(f)["email-test-send"].state).toBe("unset");
+    // D-2839: a send five days old is still a send; the row no longer expires.
+    expect(byId(f)["email-test-send"].state).toBe("set");
     expect(byId(f)["admin-totp"].state).toBe("unset");
     expect(byId(facts())["email-domain"].state).toBe("unverified");
   });
@@ -365,7 +366,8 @@ describe("the test-email row (D-2839)", () => {
     f.now = new Date("2026-10-18T00:00:00Z");
     const row = launchRows(f).find((r) => r.id === "email-test-send")!;
     expect(row.state).toBe("set");
-    expect(row.sentence).toBe("Test email sent 1 October 2026, 3:04 pm.");
+    // 1 October 2026 is before Sydney's daylight saving starts (4 October), so 04:04Z is 2:04 pm AEST.
+    expect(row.sentence).toBe("Test email sent 1 October 2026 at 2:04 pm.");
     expect(sydneyDateTime("not a date")).toBe("not a date");
   });
 });
