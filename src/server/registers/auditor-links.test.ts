@@ -26,6 +26,12 @@ function fakeAdmin(counts: Record<string, number> = {}) {
   const admin = {
     from(table: string) {
       return {
+        // REQ-029 FR-11 (D-2863): the purge reads the ended links first to remove their stored packs; none here.
+        select() {
+          return {
+            or: () => ({ limit: async () => ({ data: [], error: null }) }),
+          };
+        },
         delete() {
           return {
             lt: async (column: string, cutoff: string) => {

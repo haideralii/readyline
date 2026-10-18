@@ -6,6 +6,14 @@
  * and stored only as its hash; every step writes its audit line. Plain form
  * posts that work without JavaScript.
  */
+import {
+  parsePeriodParams,
+  periodContextFrom,
+  resolvePeriod,
+} from "@/lib/registers/period";
+import { currentPeriod } from "@/server/registers/registration-queries";
+import { createSupabaseAdminClient } from "@/server/supabase/admin";
+import { removeLinkPacks, renderAndStoreLinkPack } from "./link-pack";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { log } from "@/lib/logging/logger";
@@ -71,6 +79,8 @@ export async function createAuditorLinkAction(
       action: "auditor_link.revoked",
       target: `${current.id} replaced`,
     });
+    // REQ-029 FR-11 (D-2863): the replaced link's stored packs go with it.
+    await removeLinkPacks(createSupabaseAdminClient(), accountId, current.id);
   }
   const hours = Number(parsed.data.hours) as AuditorLinkHours;
   const token = generateAuditorToken();
@@ -96,6 +106,36 @@ export async function createAuditorLinkAction(
     action: "auditor_link.created",
     target: `${ins.data.id as string} ${hours}h${parsed.data.includeRehearsal === "on" ? " rehearsal" : ""}`,
   });
+  // REQ-029 FR-11 (D-2863, D-2294): the pack for the link's default period
+  // (the registration period, D-2305) is rendered now, with both fills as
+  // they stand, and served for the link's life; a failure here leaves the
+  // link standing and the first download renders instead.
+  try {
+    const admin = createSupabaseAdminClient();
+    const selection = parsePeriodParams({});
+    const resolved = selection.ok
+      ? resolvePeriod(
+          selection.selection,
+          periodContextFrom(await currentPeriod(admin, accountId)),
+          "period",
+        )
+      : null;
+    if (resolved && !resolved.unavailable)
+      await renderAndStoreLinkPack({
+        admin,
+        accountId,
+        linkId: ins.data.id as string,
+        tradingName: viewer.account.trading_name,
+        period: resolved.period,
+        includeRehearsal: parsed.data.includeRehearsal === "on",
+        now,
+      });
+  } catch (e) {
+    log.warn("auditor-link.pack-render-failed", {
+      accountId,
+      name: e instanceof Error ? e.name : "unknown",
+    });
+  }
   // The account page reads the live link on the server; without this the panel
   // never shows the new link's state (run 38721614254, PR #61).
   revalidatePath("/account");
@@ -130,6 +170,12 @@ export async function revokeAuditorLinkAction(
     action: "auditor_link.revoked",
     target: parsed.data.id,
   });
+  // REQ-029 FR-11 (D-2863): a revoked link's stored packs go with it.
+  await removeLinkPacks(
+    createSupabaseAdminClient(),
+    viewer.account.id,
+    parsed.data.id,
+  );
   revalidatePath("/account");
   return { ok: true, revoked: true, id: parsed.data.id };
 }

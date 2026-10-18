@@ -1,7 +1,37 @@
 # gitleaks fingerprint allow-list (REQ-002). Add entries only for confirmed
-# false positives, one comment line each: commit:file:rule:line.
+# false positives, one comment line each: commit:file:rule:line. The secret
+# scan runs over the whole history (secrets.yml checks out with fetch-depth 0),
+# so a line that later gained an inline `gitleaks:allow` marker still needs its
+# fingerprint for the commits before the marker; that is what both entries are.
+# Reviewed 18 Oct 2026 (REQ-012 FR-1g): both lines re-read at their commits, the
+# same test constant, no secret; kept. The inline markers in force today are in
+# e2e/helpers/env.ts, playwright.config.ts and .github/workflows/ci.yml, each a
+# fixture value built from words and a digit run for the e2e server.
 
 # e2e/helpers/env.ts: the e2e CRON_SECRET fallback, a test constant built at runtime
 # from the words "e2e", "cron", "secret" and a digit run; not a secret (PO batch 21).
+# The commit of 12 Oct 2026 (REQ-007 Session C) carries the line before its marker.
 dfa050bd13b48e5473d32bdd246b95e923bd6038:e2e/helpers/env.ts:generic-api-key:31
+# e2e/helpers/env.ts: the same line in the commit of 12 Oct 2026 (REQ-006 Session B),
+# before its marker; the same test constant, not a secret.
 3a48546e8748d15a422a96185c187dc6d18ba3b0:e2e/helpers/env.ts:generic-api-key:31
+
+# src/lib/ops/sentry.test.ts: REQ-030 AC-2's fixtures that the scrub test feeds in to prove
+# they come out redacted: a Stripe test-mode key shape (the sk_test_ prefix and a made-up
+# run of letters and digits, never a key of ours; the real keys live in Vercel and Stripe)
+# on lines 41 and 46, and a JWT-shaped session cookie (a header, a one-field body and the
+# word "sig" as its third part) on line 61. The commit of 18 Oct 2026 (REQ-030
+# Session A, 4c39a57) carries the lines; the lines in the tree now carry the inline marker.
+# Not secrets (PO, 18 Oct 2026 21:10; D-2927). Reviewed 18 Oct 2026 (REQ-012 FR-1g).
+4c39a57de8006bf6abfb6036afb83099c40b9d90:src/lib/ops/sentry.test.ts:stripe-access-token:41
+4c39a57de8006bf6abfb6036afb83099c40b9d90:src/lib/ops/sentry.test.ts:stripe-access-token:46
+4c39a57de8006bf6abfb6036afb83099c40b9d90:src/lib/ops/sentry.test.ts:jwt:61
+# product/requirements/REQ-030-operations-part-2.md: the same fixture string in the REQ's
+# AC-2, as the PO wrote it (commit of 18 Oct 2026, the Dev response, 269a96e); the
+# requirement names the string the test must redact. Not a secret (D-2927).
+269a96ec3d034e8c78e0b20339bb680fb98ca5aa:product/requirements/REQ-030-operations-part-2.md:stripe-access-token:58
+# .gitleaksignore itself: the commit of 18 Oct 2026 (c87abe4) wrote the fake Stripe key's
+# literal into the comment above to explain it, and the pull-request scan walks every
+# commit; the comment now describes the shape without the literal. Not a secret (PO,
+# 18 Oct 2026 22:14).
+c87abe49f14389a5ae51866fb86bc7e51fdf9e62:.gitleaksignore:stripe-access-token:20

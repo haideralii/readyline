@@ -55,8 +55,10 @@ export type AccountExport = {
   registrationPeriods: Record<string, unknown>[];
   /** REQ-024 FR-6c: the worker tables, as stored, each a CSV in the zip. */
   workerTables: Record<WorkerExportTable, Record<string, unknown>[]>;
-  /** REQ-030 D-2898: the account's own facts that fill the documents. */
+  /** REQ-030 D-2898, REQ-029 SR-5: the account's own facts that fill the documents (key, value, when). */
   accountFacts: Record<string, unknown>[];
+  /** REQ-029 SR-5: every document version's adoption snapshot (approver and day). */
+  documentVersions: Record<string, unknown>[];
   /** REQ-030 D-2898: the reviews of changed documents (REQ-024). */
   documentChangeReviews: Record<string, unknown>[];
   /** REQ-030 D-2898: the policies circulated to workers, by code and date. */
@@ -89,6 +91,7 @@ export async function buildAccountExport(
     audit,
     periods,
     facts,
+    documentVersions,
     changeReviews,
     circulations,
     purchases,
@@ -131,6 +134,14 @@ export async function buildAccountExport(
       .select("key, value, created_at, updated_at")
       .eq("account_id", accountId)
       .order("key", { ascending: true }),
+    // REQ-029 SR-5 (D-2859): the snapshots the downloads fill from.
+    supabase
+      .from("document_versions")
+      .select(
+        "version_set_id, document_type_id, version, status, adopted_on, approver_name, approver_role, created_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
     supabase
       .from("document_change_reviews")
       .select(
@@ -200,6 +211,8 @@ export async function buildAccountExport(
     registrationPeriods: periods.data ?? [],
     workerTables,
     accountFacts: facts.data ?? [],
+    documentVersions:
+      (documentVersions.data as Record<string, unknown>[] | null) ?? [],
     documentChangeReviews: changeReviews.data ?? [],
     policyCirculations: circulations.data ?? [],
     purchases: purchases.data ?? [],
@@ -218,7 +231,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, document change reviews, policy circulations, purchases, subscriptions, entitlements and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, each document version's approver and adoption day, document change reviews, policy circulations, purchases, subscriptions, entitlements and audit log as JSON.",
     "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",
