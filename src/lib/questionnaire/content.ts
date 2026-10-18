@@ -184,6 +184,9 @@ export const StartHereContent = z.object({
   firstWhy: z.record(slug, z.string().min(5)),
   registerPurpose: z.record(slug, z.string().min(10)),
   registerDocuments: z.record(slug, z.array(slug)),
+  /** REQ-029 FR-4, AC-7: an open Fill in line's words, and the approver and date lines' words on a template set. */
+  fillOpenLine: z.string().min(10),
+  fillAdoptionLine: z.string().min(10),
   next: z
     .array(
       z.object({

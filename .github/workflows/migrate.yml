@@ -42,15 +42,14 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.gate.outputs.ready == 'true'
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         if: steps.gate.outputs.ready == 'true'
         with:
-          # Pinned (D-038): 'latest' asks the GitHub API anonymously and shared runners hit the rate limit.
+          # Pinned (D-038): a fixed CLI version, so every run installs the same binary; v3 installs from npm (REQ-012 FR-2).
           version: 2.120.0
-          github-token: ${{ github.token }}
 
       - name: Build the database URL (never printed)
         if: steps.gate.outputs.ready == 'true'
