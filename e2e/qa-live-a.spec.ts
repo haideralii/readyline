@@ -27,6 +27,9 @@ test.describe("live QA b340ee3: the questionnaire's focus and words", () => {
     await alert.getByRole("link", { name: /Trading name/ }).click();
     const field = page.getByLabel("Trading name");
     await expect(field).toBeFocused();
+    // A tap on the field as well (report C's mouse case): WebKit's phone emulation drops keystrokes into a field
+    // that only a fragment navigation focused, and the point here is what happens while typing.
+    await field.click();
     await field.pressSequentially("Sunrise Supports", { delay: 40 });
     await expect(field).toHaveValue("Sunrise Supports");
     await expect(field).toBeFocused();
