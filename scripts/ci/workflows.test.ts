@@ -48,15 +48,44 @@ describe("generate-kick workflow (batch 32 item 1)", () => {
       'if [ -z "$PROD_URL" ] || [ -z "$CRON_SECRET" ]; then',
     );
     expect(text).toContain("::add-mask::$CRON_SECRET");
-    // The gate's shell block is `run: |`; every other command is one line.
+    // The gate's shell block is `run: |`; every other command is one line: the uptime check
+    // (REQ-030 FR-3) and the kick.
     const runs = code.filter((l) => /^\s+run: (?!\|)/.test(l));
-    expect(runs).toEqual(["        run: node scripts/ops/kick-generation.mjs"]);
-    // Every step after the gate is conditional on it.
+    expect(runs).toEqual([
+      "        run: node scripts/ops/uptime.mjs",
+      "        run: node scripts/ops/kick-generation.mjs",
+    ]);
+    // The kick is conditional on the gate; the checkout and the uptime steps sit ahead of it.
     const gated = code.filter((l) =>
       l.includes("if: steps.gate.outputs.ready == 'true'"),
     );
-    expect(gated).toHaveLength(2);
+    expect(gated).toHaveLength(1);
     expect(text).not.toMatch(/npm (ci|install)/);
     expect(text).toContain("uses: actions/checkout@v4");
+  });
+
+  it("REQ-030 FR-3 (D-2867, SR-3): the uptime step runs ahead of the gate on PROD_URL alone, with the issue permission and its cached state", () => {
+    const gate = code.indexOf("        id: gate");
+    const uptime = code.indexOf("        run: node scripts/ops/uptime.mjs");
+    expect(uptime).toBeGreaterThan(-1);
+    expect(uptime).toBeLessThan(gate);
+    // The permission block: contents read, then issues write for the "Site down" issue, nothing else.
+    const permissions = code.indexOf("permissions:");
+    expect(code[permissions + 1]).toBe("  contents: read");
+    expect(code.slice(permissions, permissions + 4)).toContain(
+      "  issues: write",
+    );
+    expect(text).not.toMatch(/actions:\s*write|contents:\s*write/);
+    // The three uptime steps run only with PROD_URL, never needing the cron secret.
+    const onProd = code.filter((l) => l === "        if: env.PROD_URL != ''");
+    expect(onProd).toHaveLength(3);
+    expect(text).toContain("uses: actions/cache/restore@v4");
+    expect(text).toContain("uses: actions/cache/save@v4");
+    expect(text).toContain("          path: .uptime-state.json");
+    expect(text).toContain(
+      "          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}",
+    );
+    // The minutes note names the step's cost.
+    expect(text).toContain("the uptime step rides inside");
   });
 });
