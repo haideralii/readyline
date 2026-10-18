@@ -1,6 +1,8 @@
 import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import { notFoundMetadata } from "@/lib/page-titles";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import {
   AUDITOR_TOKEN_PATTERN,
@@ -11,10 +13,33 @@ import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { ReportForm } from "./report-form";
 
-export const metadata: Metadata = {
-  title: "Report an incident",
-  robots: { index: false, follow: false },
-};
+type ReportLink = { account_id: string; trading_name: string };
+
+/** One lookup per request, shared by the title and the page (React cache). */
+const reportLinkFor = cache(
+  async (token: string): Promise<ReportLink | null> => {
+    const r = await createSupabaseAdminClient().rpc("report_link_lookup", {
+      p_token_hash: hashAuditorToken(token),
+    });
+    return (r.data as ReportLink[] | null)?.[0] ?? null;
+  },
+);
+
+/** QA live b340ee3, B #57: the title follows `notFound()`. */
+export async function generateMetadata({
+  params,
+}: PageProps<"/report/[token]">): Promise<Metadata> {
+  const { token } = await params;
+  const known =
+    AUDITOR_TOKEN_PATTERN.test(token) &&
+    (await reportLinkFor(token).then(
+      (row) => row !== null,
+      () => false,
+    ));
+  return known
+    ? { title: "Report an incident", robots: { index: false, follow: false } }
+    : notFoundMetadata;
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -35,12 +60,7 @@ export default async function ReportPage({
   let codes: string[] = [];
   try {
     const admin = createSupabaseAdminClient();
-    const r = await admin.rpc("report_link_lookup", {
-      p_token_hash: hashAuditorToken(token),
-    });
-    const row = (
-      r.data as { account_id: string; trading_name: string }[] | null
-    )?.[0];
+    const row = await reportLinkFor(token);
     if (row) {
       name = row.trading_name;
       const w = await admin
