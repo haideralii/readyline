@@ -284,3 +284,66 @@ describe("the restore rehearsal in CI (REQ-030 AC-3, SR-5)", () => {
     expect(ci).not.toMatch(/secrets\.BACKUP_PASSPHRASE/);
   });
 });
+
+/**
+ * D-2984 (PO, 19 Oct 2026 05:50): the two long end-to-end steps run as two-shard matrix jobs,
+ * one worker each, retries untouched, the artefacts named by shard; the checks job keeps the
+ * build and the headers check; the Supabase job keeps the stack, the RLS tests (run once, then
+ * again on the restored stack) and the budget, and no longer runs the signed-in specs; the
+ * timeouts stay at 20 and 40 on the sharded jobs.
+ */
+describe("the end-to-end shards (D-2984)", () => {
+  const ci = readFileSync(".github/workflows/ci.yml", "utf8");
+  const job = (name: string) => {
+    const a = ci.indexOf(`\n  ${name}:\n`);
+    expect(a, name).toBeGreaterThan(-1);
+    const rest = ci.slice(a + 1);
+    const b = rest.search(/\n  [a-z0-9_-]+:\n/);
+    return b < 0 ? rest : rest.slice(0, b + 1);
+  };
+
+  it("the public suite runs as two shards with one worker each, the report named by shard, 20 minutes each", () => {
+    const e2e = job("e2e");
+    expect(e2e).toContain("shard: [1, 2]");
+    expect(e2e).toContain("npm run test:e2e -- --shard=${{ matrix.shard }}/2");
+    expect(e2e).toContain("timeout-minutes: 20");
+    expect(e2e).toContain("name: playwright-report-shard-${{ matrix.shard }}");
+    expect(e2e).toContain("fail-fast: false");
+    expect(e2e).not.toMatch(/--workers|retries/);
+    // The two small public runs ride one shard each.
+    expect(e2e).toContain("e2e/subscription-off.spec.ts");
+    expect(e2e).toContain("e2e/business-identity.spec.ts");
+    const checks = job("checks");
+    expect(checks).not.toContain("npm run test:e2e");
+    expect(checks).not.toContain("playwright install");
+    expect(checks).toContain("- run: npm run build");
+    expect(checks).toContain("Security headers on every route class");
+    expect(checks).toContain("timeout-minutes: 20");
+  });
+
+  it("the signed-in suite runs as two shards against a stack each shard starts, the screenshots and report named by shard, 40 minutes each", () => {
+    const shards = job("signed-in-e2e");
+    expect(shards).toContain("shard: [1, 2]");
+    expect(shards).toContain(
+      "npx playwright test e2e/signed-in --shard=${{ matrix.shard }}/2",
+    );
+    expect(shards).toContain(
+      "supabase start -x studio,imgproxy,logflare,vector",
+    );
+    expect(shards).toContain("timeout-minutes: 40");
+    expect(shards).toContain(
+      "name: signed-in-screenshots-shard-${{ matrix.shard }}",
+    );
+    expect(shards).toContain(
+      "name: playwright-report-signed-in-shard-${{ matrix.shard }}",
+    );
+    expect(shards).toContain("supabase stop --no-backup");
+    expect(shards).not.toContain("npm run test:integration");
+    const stack = job("supabase-integration");
+    expect(stack).not.toContain("e2e/signed-in");
+    expect(stack).toContain("npm run perf:budget");
+    expect(stack).toContain("timeout-minutes: 40");
+    expect(stack.split("npm run test:integration").length - 1).toBe(2);
+    expect(stack).toContain("supabase stop --no-backup");
+  });
+});

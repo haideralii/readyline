@@ -21,8 +21,9 @@ env:
 
 jobs:
   checks:
-    name: Lint, typecheck, unit, build, e2e
+    name: Lint, typecheck, unit, build, headers
     runs-on: ubuntu-latest
+    # D-2984: the end-to-end run has its own two-shard job below; this one is lint, unit, build and the headers check.
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -109,15 +110,45 @@ jobs:
           node scripts/ops/check-headers.mjs --base http://localhost:3200 --wait 90 --json out/headers.json
           kill %1
 
+      # REQ-022 FR-11 (AC-6): the lawyer's bundle index builds from the committed files alone and
+      # refuses to write itself with a fixture address or an unfilled token in it.
+      - name: The lawyer's bundle index builds with no fixture address (REQ-022 FR-11, AC-6)
+        run: node scripts/ops/legal-bundle.mjs --out "$RUNNER_TEMP/legal-bundle"
+
+  # D-2984 (PO, 19 Oct 2026 05:50): the public end-to-end run in two shards, one worker each, so
+  # the wall time comes back under the 20-minute job limit (#123's green run was at 18 of 20 and
+  # #125's were cut). Each shard builds and installs its own browsers; the report and the two
+  # small extra runs (the subscription off, the fixture business identity) are split between them.
+  e2e:
+    name: End-to-end tests, shard ${{ matrix.shard }} of 2 (desktop, small Android viewport, iPhone WebKit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
 
-      - name: End-to-end tests (desktop, small Android viewport, iPhone WebKit)
-        run: npm run test:e2e
+      - name: End-to-end tests, this shard
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/2
         env:
           CI: "true"
 
       - name: The public pages with the subscription off (batch 47 item 1; no Stripe at all)
+        if: matrix.shard == 1
         run: npx playwright test e2e/subscription-off.spec.ts --project=desktop-chromium
         env:
           CI: "true"
@@ -127,22 +158,18 @@ jobs:
       # full run above has the two unset and asserts no placeholder; this step sets fixture values.
       # 51 824 753 556 is the ATO's published example ABN, no business's.
       - name: The registered name and ABN on every surface (REQ-022 FR-13, AC-7; fixture values)
+        if: matrix.shard == 2
         run: npx playwright test e2e/business-identity.spec.ts
         env:
           CI: "true"
           BUSINESS_NAME: "Fixture Supports"
           BUSINESS_ABN: "51824753556"
 
-      # REQ-022 FR-11 (AC-6): the lawyer's bundle index builds from the committed files alone and
-      # refuses to write itself with a fixture address or an unfilled token in it.
-      - name: The lawyer's bundle index builds with no fixture address (REQ-022 FR-11, AC-6)
-        run: node scripts/ops/legal-bundle.mjs --out "$RUNNER_TEMP/legal-bundle"
-
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: playwright-report
+          name: playwright-report-shard-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 7
 
@@ -195,6 +222,8 @@ jobs:
     name: Supabase local stack, migrations and RLS tests (REQ-004 SR-1, SR-6)
     runs-on: ubuntu-latest
     # Batch 45b item 2: the signed-in suites now run the guided path to the end on three projects; run 595 was cut at 20 minutes.
+    # D-2984: those suites have their own two-shard job below; this one keeps the stack, the migrations, the RLS
+    # tests (run once), the restore rehearsal and the signed-in performance budget.
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -301,9 +330,6 @@ jobs:
       - name: Build for the signed-in end-to-end run
         run: npm run build
 
-      - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
-        run: npx playwright install --with-deps chromium webkit
-
       - name: Performance budgets on the signed-in pages (REQ-010, backlog 2, D-1012; blocking, REQ-012 FR-5)
         run: npm run perf:budget || npm run perf:budget
         env:
@@ -320,8 +346,54 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Signed-in end-to-end specs against the local stack (three projects)
-        run: npx playwright test e2e/signed-in
+      - name: Stop the local stack
+        if: always()
+        run: supabase stop --no-backup
+  # D-2984 (PO, 19 Oct 2026 05:50): the signed-in end-to-end specs in two shards, one worker each,
+  # against a local stack each shard starts for itself (a stack lives on one runner; the migration
+  # and RLS tests run once, in the job above). The screenshots and the report carry the shard.
+  signed-in-e2e:
+    name: Signed-in end-to-end specs, shard ${{ matrix.shard }} of 2 (local stack, three projects)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+        with:
+          version: 2.120.0
+
+      - name: Start the local stack and apply supabase/migrations
+        run: supabase start -x studio,imgproxy,logflare,vector
+
+      - name: Export local stack settings under the app's variable names
+        run: |
+          supabase status -o env > /tmp/supabase.env
+          set -a; . /tmp/supabase.env; set +a
+          echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}" >> "$GITHUB_ENV"
+          echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
+          echo "SUPABASE_DB_URL=${DB_URL}" >> "$GITHUB_ENV"
+
+      - name: Build for the signed-in end-to-end run
+        run: npm run build
+
+      - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Signed-in end-to-end specs against the local stack (three projects), this shard
+        run: npx playwright test e2e/signed-in --shard=${{ matrix.shard }}/2
         env:
           CI: "true"
           EVIDENCE: "1"
@@ -330,6 +402,7 @@ jobs:
           GENERATION_ENABLED: "true"
 
       - name: The documents page with generation off (batch 45 item 2; the variable unset)
+        if: matrix.shard == 2
         run: npx playwright test e2e/signed-in/generation-off.spec.ts
         env:
           CI: "true"
@@ -338,7 +411,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: signed-in-screenshots
+          name: signed-in-screenshots-shard-${{ matrix.shard }}
           path: product/evidence/
           retention-days: 14
           if-no-files-found: ignore
@@ -347,13 +420,14 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: playwright-report-signed-in
+          name: playwright-report-signed-in-shard-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 7
 
       - name: Stop the local stack
         if: always()
         run: supabase stop --no-backup
+
   docx-render:
     name: Render skeleton .docx sets and convert with LibreOffice (REQ-005 AC-1 mechanics, D-504)
     runs-on: ubuntu-latest
