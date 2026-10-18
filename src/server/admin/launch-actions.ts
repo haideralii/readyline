@@ -16,6 +16,16 @@ import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
 
 const TEST_SEND_MIN_SECONDS = 60;
+/** D-2841: a failed attempt is audited too, so the one-a-minute limit holds for a failing provider as well. */
+export const TEST_FAILED_ACTION = "email.test-failed";
+
+/** The error's code or class name, never its message, which a server response can fill with host and account names. */
+function errorKind(e: unknown): string {
+  const code = (e as { code?: unknown } | null)?.code;
+  if (typeof code === "string" && code) return code.slice(0, 40);
+  if (e instanceof Error) return e.constructor.name.slice(0, 40);
+  return "unknown";
+}
 /** The form carries nothing; a field smuggled into it is refused (the boundary convention). */
 const Input = strictObject({});
 
@@ -39,7 +49,7 @@ export async function sendTestEmailAction(
   const last = await admin
     .from("audit_log")
     .select("at")
-    .eq("action", TEST_SEND_ACTION)
+    .in("action", [TEST_SEND_ACTION, TEST_FAILED_ACTION])
     .order("at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -56,10 +66,13 @@ export async function sendTestEmailAction(
   try {
     await provider.send(testEmail({ to }));
   } catch (e) {
-    log.warn("email.test-send.failed", {
-      provider: provider.name,
-      error: e instanceof Error ? e.message : String(e),
-    });
+    const kind = errorKind(e);
+    log.warn("email.test-send.failed", { provider: provider.name, kind });
+    await writeAdminAudit(
+      ctx.user.id,
+      TEST_FAILED_ACTION,
+      `${provider.name} ${kind}`,
+    );
     return {
       ok: false,
       message:
