@@ -129,3 +129,11 @@ Scope: the controls in `threat-model.md` that ASVS 4.0 level 1 asks of every web
 | V7 Logging | Each saved step appends `registration.period.updated <step>` (the step word, never the date or the name); a rehearsal appends `self_check.rehearsed <id> <count>`; a ticked link's `auditor_link.created` line carries the word "rehearsal"; no free text reaches a log | Met |
 | V8 Data protection | The rehearsal sheet holds the records' names, the questions, yes or no and the owner's coded note; it is the owner's own working note and leaves the account only in the owner's pack or in a link's pack the owner ticked for it, off by default (D-2309); the auditing company's name is business information about the provider's own audit, not a person's, and the shape of a person's number is refused | Met |
 | V13 API | One new server action file keeps the validation import and the owner gate; the two pack routes pass the tick from the session (owner) or the signed-out lookup (auditor) and read nothing new from the request; `handlers.test.ts` asserts the imports and gates | Met |
+
+## REQ-022 Session C additions (18 Oct 2026, Dev-2)
+
+| Chapter | Control as built | State |
+| --- | --- | --- |
+| V9 Communications | HSTS stays on every response; its max-age is HSTS_MAX_AGE read at build, one week by default and `preload` only from one year, so the domain is pinned in two steps after the redirect is proven (FR-10) and nothing submits it to the preload list; `hsts.test.ts` and `security-headers.spec.ts` hold the header | Met |
+| V12 / V13 Redirects and APIs | The alias redirect answers 301 only to NEXT_PUBLIC_SITE_URL's origin with the request's own path and query, never to a host taken from the request, so it is not an open redirect; it runs only on the production deployment and only off a vercel.app host; `/api/*` is excluded so the cron and webhook callers keep working until they move (`alias-redirect.test.ts`) | Met |
+| V14 Configuration | The health route's new field is the public origin and nothing else; the launch rows judge the webhook endpoint against the request host and print no value, as before (REQ-010 FR-2) | Met |

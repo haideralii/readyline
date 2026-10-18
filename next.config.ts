@@ -1,16 +1,19 @@
 import type { NextConfig } from "next";
+import { hstsHeaderValue } from "./src/lib/ops/hsts";
 
 /**
  * Static security headers from product/security/threat-model.md (REQ-002 FR-2).
  * The Content-Security-Policy is per request with a nonce and lives in
  * src/proxy.ts. HSTS is only honoured by browsers over HTTPS, so it is
- * harmless on localhost; `preload` is set now so the domain can be submitted
- * to the preload list once it is live.
+ * harmless on localhost. REQ-022 FR-10 (Session C): its max-age is
+ * HSTS_MAX_AGE, read here at build (one week by default, `preload` only
+ * from one year), so the domain's two-step is two variable edits and two
+ * redeploys, never a code change.
  */
 const securityHeaders = [
   {
     key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
+    value: hstsHeaderValue(process.env.HSTS_MAX_AGE),
   },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
