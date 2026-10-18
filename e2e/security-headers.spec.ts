@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { hstsHeaderValue } from "@/lib/ops/hsts";
+
+// REQ-022 FR-10, AC-8: the production build serves the header for the configured HSTS_MAX_AGE
+// (one week by default in CI, no preload); the unit test holds the one-year form with preload.
+const HSTS = hstsHeaderValue(process.env.HSTS_MAX_AGE);
 
 /**
  * REQ-002 AC-3: the threat-model headers are present on "/" and the page
@@ -51,9 +56,7 @@ test.describe("security headers", () => {
     expect(pricingCsp.match(/stripe/g)?.length).toBe(1);
     expect(csp).not.toContain("stripe");
 
-    expect(headers["strict-transport-security"]).toBe(
-      "max-age=63072000; includeSubDomains; preload",
-    );
+    expect(headers["strict-transport-security"]).toBe(HSTS);
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
     expect(headers["permissions-policy"]).toBe(
@@ -95,9 +98,7 @@ test.describe("security headers", () => {
     for (const path of paths) {
       const res = await request.get(path, { maxRedirects: 0 });
       const h = res.headers();
-      expect(h["strict-transport-security"], path).toBe(
-        "max-age=63072000; includeSubDomains; preload",
-      );
+      expect(h["strict-transport-security"], path).toBe(HSTS);
       expect(h["x-content-type-options"], path).toBe("nosniff");
       expect(h["referrer-policy"], path).toBe(
         "strict-origin-when-cross-origin",

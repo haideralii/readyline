@@ -8,6 +8,7 @@ describe("health body (REQ-010 FR-4)", () => {
         VERCEL_GIT_COMMIT_SHA: "0123456789abcdef0123456789abcdef01234567",
         VERCEL_REGION: "syd1",
         VERCEL_ENV: "production",
+        NEXT_PUBLIC_SITE_URL: "https://readyline.example/",
         SUPABASE_SECRET_KEY: "never-shown",
       },
       "0.1.0",
@@ -18,6 +19,8 @@ describe("health body (REQ-010 FR-4)", () => {
       sha: "0123456789ab",
       region: "syd1",
       deployment: "production",
+      // REQ-022 FR-9: the origin without its trailing slash.
+      siteUrl: "https://readyline.example",
     });
     expect(JSON.stringify(body)).not.toContain("never-shown");
   });
@@ -29,6 +32,7 @@ describe("health body (REQ-010 FR-4)", () => {
       sha: "local",
       region: "local",
       deployment: "development",
+      siteUrl: "http://localhost:3000",
     });
   });
 });
