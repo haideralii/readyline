@@ -121,13 +121,11 @@ describe.skipIf(!enabled)(
         expect(
           fixture.has(`${row.holiday_date}|${row.jurisdiction}|${row.name}`),
         ).toBe(true);
-      const ins = await nsw.client
-        .from("public_holidays")
-        .insert({
-          holiday_date: "2026-07-01",
-          jurisdiction: "NSW",
-          name: "Made up",
-        });
+      const ins = await nsw.client.from("public_holidays").insert({
+        holiday_date: "2026-07-01",
+        jurisdiction: "NSW",
+        name: "Made up",
+      });
       expect(ins.error?.code).toBe("42501");
       const del = await nsw.client
         .from("public_holidays")
