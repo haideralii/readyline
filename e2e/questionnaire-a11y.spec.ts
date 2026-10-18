@@ -4,7 +4,7 @@ import { tickGroup } from "./helpers/groups";
 import { openResultSections } from "./helpers/result";
 
 /**
- * REQ-003 AC-9 / AC-11 support: automated accessibility scan (axe, WCAG 2.1 A
+ * REQ-003 AC-9 / AC-11 support: automated accessibility scan (axe, WCAG 2.2 A
  * and AA rules) on every step of the questionnaire on both projects. Zero
  * serious or critical violations allowed. Lighthouse cannot reach steps behind
  * the draft gate on a fresh load, so this is the per-step evidence; Lighthouse
@@ -23,7 +23,7 @@ async function scan(page: Page, label: string, heading: string) {
   ).toBeVisible();
   await page.waitForFunction((h) => document.title.includes(h), heading);
   const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
   const serious = results.violations.filter(
     (v) => v.impact === "serious" || v.impact === "critical",
