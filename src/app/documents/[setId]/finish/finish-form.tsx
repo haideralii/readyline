@@ -144,6 +144,12 @@ export function FinishForm({
         return false;
       }
       saved.current[key] = value;
+      // FR-6: a changed name or role may call for a re-approval; the server recounts on refresh and the
+      // block renders under the role field without a reload (#112's AC-5 run).
+      if (key === "name" || key === "role") {
+        setReapproved(null);
+        router.refresh();
+      }
       setErrors((e) => {
         const next = { ...e };
         delete next[key];
