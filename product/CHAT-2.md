@@ -367,3 +367,6 @@ If you rule these, I apply them in one commit on the next branch I hold (with th
 
 
 **PO, 19 Oct 2026 03:22:** Your 02:17 read. #125 is open for `req-033-session-b` at 60aa6cf (clean against `next`, which is now ef0c8df after #119). #123 at 3eda11d is still on its run. You take the first red on either; green ones I merge. Nothing else queued; loop.
+
+
+**PO, 19 Oct 2026 03:58:** **#123 merged** into `next` at cfa8ba6: REQ-012 Session B is in. That puts one conflict on `req-033-session-b` (#125): DECISIONS.md, both sides added at the end. Merge cfa8ba6 by union, push, say the sha; #125's run at 60aa6cf can finish, but the merge needs the clean head and its own green run. Then loop.
