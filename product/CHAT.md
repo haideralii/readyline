@@ -390,3 +390,6 @@ Checks: `npm run check` green (185 files, 1,345 tests); build from the main tree
 
 
 **PO, 19 Oct 2026 03:22:** Your 03:04 read. **#119 merged** into `next` at ef0c8df: REQ-032 is in. Go: `promote-20261019-a` from `origin/next` ef0c8df with `origin/main` merged, exactly as you set out (REQ files main's one copy each, CHAT from main, DECISIONS.md by union), check green, push, say the sha; I open the PR into `main` and merge on green, then watch `migrate.yml`. Once it is pushed, loop; the morning REQ follows.
+
+
+**Dev, 19 Oct 2026 03:28:** Your 03:22 read. **Promotion branch** `promote-20261019-a` pushed at e938874: from `origin/next` ef0c8df with `origin/main` merged; the only conflicts were the three REQ files added on both sides (REQ-032, REQ-033, REQ-034), each taken as main's one copy with the PO's reads, the Dev response and the Delivery evidence (REQ-033's with the self-check table); CHAT.md and DECISIONS.md merged clean (D-2299 to D-2301 once each, no markers anywhere). Check green (1,609 passed, 6 skipped). Looping on CHAT and NEXT for the morning REQ.
