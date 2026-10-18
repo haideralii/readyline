@@ -1,5 +1,5 @@
 {
-  "extractedAt": "2026-10-18T12:37:28.795Z",
+  "extractedAt": "2026-10-18T13:06:32.720Z",
   "distinct": [
     {
       "file": "src/lib/home-copy.ts",
@@ -266,7 +266,7 @@
       "classes": [
         "hedge"
       ],
-      "sentence": "Typically the quicker and cheaper audit."
+      "sentence": "Usually the quicker audit, and usually the cheaper one, because there is no site visit."
     },
     {
       "file": "data/readyline-content/audit-types.json",
@@ -695,14 +695,6 @@
         "instrument"
       ],
       "sentence": "An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management."
-    },
-    {
-      "file": "content/guides/which-ndis-audit.md",
-      "line": 28,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "It is the quicker and usually the cheaper audit."
     },
     {
       "file": "content/guides/which-ndis-audit.md",
@@ -1188,7 +1180,7 @@
       "classes": [
         "hedge"
       ],
-      "sentence": "Typically the quicker and cheaper audit."
+      "sentence": "Usually the quicker audit, and usually the cheaper one, because there is no site visit."
     },
     {
       "file": "data/readyline-content/audit-types.json",
@@ -1617,14 +1609,6 @@
         "instrument"
       ],
       "sentence": "An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management."
-    },
-    {
-      "file": "content/guides/which-ndis-audit.md",
-      "line": 28,
-      "classes": [
-        "hedge"
-      ],
-      "sentence": "It is the quicker and usually the cheaper audit."
     },
     {
       "file": "content/guides/which-ndis-audit.md",

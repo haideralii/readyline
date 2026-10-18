@@ -1,4 +1,4 @@
-found (110):
+found (109):
 src/lib/home-copy.ts:59 | instrument | Every module, standard and audit rule comes from the NDIS Quality and Safeguards Commission's published Practice Standards and registration pages, with a link to the source on your result.
 src/lib/home-copy.ts:81 | instrument | Practice Standards module
 src/lib/checklist/derive.ts:406 | instrument | Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list.
@@ -31,7 +31,7 @@ src/app/start/_components/steps/supports-step.tsx:50 | number | Supported indepe
 src/app/start/_components/steps/supports-step.tsx:52 | number | Supported independent living question 2
 src/app/start/_components/steps/supports-step.tsx:415 | number | min-h-11 cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden
 src/app/start/_components/steps/workforce-step.tsx:157 | number | For a sole trader that is you: 1.
-data/readyline-content/audit-types.json:0 | hedge | Typically the quicker and cheaper audit.
+data/readyline-content/audit-types.json:0 | hedge | Usually the quicker audit, and usually the cheaper one, because there is no site visit.
 data/readyline-content/audit-types.json:0 | number | Followed by a mid-term audit about 18 months after registration.
 data/readyline-content/document-sets.json:0 | instrument | First-pass mapping from Practice Standards modules to the documents and registers a provider will need.
 data/readyline-content/document-sets.json:0 | number | REQ-005 refines it.
@@ -82,7 +82,6 @@ content/guides/what-happens-at-an-ndis-audit.md:115 | hedge | In practice audito
 content/guides/what-happens-at-an-ndis-audit.md:123 | number,time | Within 14 days of a verification audit, and within 28 days of a certification or mid-term audit.
 content/guides/what-happens-at-an-ndis-audit.md:127 | number,hedge | It applies to certified providers at 18 months, and the Commission suggests you start preparing 12 months after your registration date.
 content/guides/which-ndis-audit.md:26 | instrument | An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
-content/guides/which-ndis-audit.md:28 | hedge | It is the quicker and usually the cheaper audit.
 content/guides/which-ndis-audit.md:32 | number | Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add.
 content/guides/which-ndis-audit.md:33 | number,time | Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
 content/guides/which-ndis-audit.md:58 | number | A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have.
@@ -110,4 +109,4 @@ product/legal/terms.md:46 | number | We give at least 30 days' notice of changes
 product/legal/terms.md:46 | number | Documents you have already bought stay available for download for at least 12 months after purchase.
 product/legal/terms.md:50 | number | For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim.
 
-facts: 120 sentence(s) in 41 file(s), 110 distinct
+facts: 120 sentence(s) in 41 file(s), 109 distinct
