@@ -103,13 +103,15 @@ export function incidentNotifyBy(
   category: IncidentCategory,
   reportable: boolean,
   severity: IncidentSeverity,
+  /** REQ-032 FR-2: the account's states, whose public holidays the five days skip. */
+  states: readonly string[] = [],
 ): string | null {
   if (!reportable) return null;
   if (INCIDENT_CATEGORIES_24H.includes(category)) return addDays(occurredOn, 1);
   if (INCIDENT_CATEGORIES_5BD.includes(category))
     return HARM_SEVERITIES.includes(severity)
       ? addDays(occurredOn, 1)
-      : addBusinessDays(occurredOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS);
+      : addBusinessDays(occurredOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS, states);
   return null;
 }
 

@@ -5,6 +5,7 @@ import {
   type IncidentListRow,
 } from "@/server/registers/queries";
 import { CATEGORY_LABELS } from "@/lib/registers/labels";
+import { notifyByWords } from "@/lib/registers/notify-by-line";
 import { reportsToConfirmLine } from "@/lib/registers/worker";
 import {
   INCIDENT_COLUMNS,
@@ -30,7 +31,14 @@ export const metadata: Metadata = { title: "Incidents register" };
  * a reportable category (retro finding 62, Incident Rules s 17): received,
  * not recorded, with its Commission clock until the owner settles it.
  */
-export function incidentStatus(r: IncidentListRow): ListRow["status"] {
+/** The notify-by date with REQ-032 FR-5's bracket, for the account's states. */
+const notifyBy = (r: IncidentListRow, states: readonly string[]) =>
+  notifyByWords(r, states);
+
+export function incidentStatus(
+  r: IncidentListRow,
+  states: readonly string[] = [],
+): ListRow["status"] {
   if (r.status === "draft")
     return { key: "draft", label: "To confirm", tone: "signal" };
   if (r.status === "rejected") {
@@ -43,7 +51,7 @@ export function incidentStatus(r: IncidentListRow): ListRow["status"] {
     if (r.reportable && r.notification_status === "notification-due")
       return {
         key: "received-not-recorded",
-        label: `Received, not recorded; notify by ${r.notify_by}`,
+        label: `Received, not recorded; notify by ${notifyBy(r, states)}`,
         tone: "signal",
       };
     if (r.reportable)
@@ -65,7 +73,7 @@ export function incidentStatus(r: IncidentListRow): ListRow["status"] {
   if (r.notification_status === "notification-due")
     return {
       key: "notification-due",
-      label: `Notify by ${r.notify_by}`,
+      label: `Notify by ${notifyBy(r, states)}`,
       tone: "ochre",
     };
   if (r.status === "under-review")
@@ -174,7 +182,7 @@ export default async function IncidentsPage({
                 : `/registers/incidents/${r.id}`,
             title: `${r.reference}: ${CATEGORY_LABELS[r.category]}`,
             detail: incidentDetail(r),
-            status: incidentStatus(r),
+            status: incidentStatus(r, ctx.viewer.account.states),
             cells: cellsFor(INCIDENT_COLUMNS, r),
           }))}
           filters={INCIDENT_FILTERS}

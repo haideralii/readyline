@@ -160,6 +160,25 @@ describe("the owner's lines (FR-5, FR-6; PO review 14 Oct)", () => {
     expect(REPORT_WINDOW_WORDS).toBe(
       "within 24 hours of the report for most kinds, or within 5 business days for an unauthorised restrictive practice that caused no harm",
     );
+    // REQ-032 FR-2, FR-5: the account's states skip their public holidays, and the sentence names them.
+    const easter = new Date("2026-04-02T09:30:00Z"); // Thursday 2 April, 8:30 pm Sydney
+    expect(
+      awareSentence(
+        easter,
+        { category: "restrictive-practice-unauthorised", severity: "low" },
+        ["NSW"],
+      ),
+    ).toBe(
+      "Reported 2 April, 8:30 pm; if this is a reportable incident the Commission must be told by 13 April 2026 (five business days, for an unauthorised restrictive practice that caused no harm; Good Friday and Easter Monday do not count; 24 hours if it did).",
+    );
+    expect(
+      awareSentence(easter, {
+        category: "restrictive-practice-unauthorised",
+        severity: "low",
+      }),
+    ).toContain(
+      "told by 9 April 2026 (five business days, for an unauthorised restrictive practice that caused no harm; 24 hours if it did)",
+    );
   });
   it("counts reports in words and says nothing at zero", () => {
     expect(reportsToConfirmLine(0)).toBeNull();

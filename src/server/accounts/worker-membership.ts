@@ -13,6 +13,8 @@ export type WorkerMembership = {
   /** The account the worker logs for. */
   id: string;
   trading_name: string;
+  /** REQ-032 FR-2: the account's states, so a worker's incident form previews the same notify-by date the row gets. */
+  states: string[];
   worker_ref: string | null;
   /** REQ-024 SR-1 (AC-11): null until the worker has seen the collection notice once. */
   notice_seen_at: string | null;
@@ -42,18 +44,20 @@ export async function getWorkerMembership(
   const reader = admin ?? supabase;
   const a = await reader
     .from("accounts")
-    .select("id, trading_name, deleted_at")
+    .select("id, trading_name, deleted_at, states")
     .eq("id", accountId)
     .maybeSingle();
   const row = a.data as {
     id: string;
     trading_name: string;
     deleted_at: string | null;
+    states: string[] | null;
   } | null;
   if (a.error || !row || row.deleted_at) return null;
   return {
     id: row.id,
     trading_name: row.trading_name,
+    states: row.states ?? [],
     worker_ref: (m.data.worker_ref as string | null) ?? null,
     notice_seen_at: (m.data.notice_seen_at as string | null) ?? null,
   };

@@ -18,7 +18,7 @@ import { reminderReference } from "@/server/registers/queries";
 
 export async function dueSoonForAccount(
   supabase: SupabaseClient,
-  account: { id: string; trading_name: string },
+  account: { id: string; trading_name: string; states?: string[] | null },
   today: string,
   days = 30,
 ): Promise<DueSoonLine[]> {
@@ -26,7 +26,7 @@ export async function dueSoonForAccount(
     supabase
       .from("incidents")
       .select(
-        "id, reference, reportable, notify_by, reportable_notified_on, status",
+        "id, reference, reportable, notify_by, reportable_notified_on, status, occurred_on, aware_on, category, severity",
       )
       .eq("account_id", account.id)
       .eq("reportable", true)
@@ -74,8 +74,13 @@ export async function dueSoonForAccount(
           | "notify_by"
           | "reportable_notified_on"
           | "status"
+          | "occurred_on"
+          | "aware_on"
+          | "category"
+          | "severity"
         >
       >(inc),
+    states: account.states ?? [],
     clearances:
       rows<
         Pick<

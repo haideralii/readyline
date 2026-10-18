@@ -43,6 +43,8 @@ type AccountRow = {
   trading_name: string;
   /** REQ-018 FR-10: the last emergency drill, recorded on the audit-day page. */
   last_emergency_drill_on: string | null;
+  /** REQ-032 FR-2: the states whose public holidays the business-day windows skip. */
+  states: string[] | null;
 };
 
 async function accountsWithRegisters(
@@ -80,7 +82,7 @@ async function accountsWithRegisters(
   if (ids.size === 0) return [];
   const r = await admin
     .from("accounts")
-    .select("id, trading_name, last_emergency_drill_on")
+    .select("id, trading_name, last_emergency_drill_on, states")
     .in("id", [...ids])
     .is("deleted_at", null);
   return (r.data as AccountRow[] | null) ?? [];
@@ -114,6 +116,12 @@ export async function computeAccountReminders(
   account: AccountRow,
   today: string,
 ): Promise<ReminderDue[]> {
+  // REQ-032 FR-4 (D-2917): each incident's notify-by date re-derived from the row, the account's states and the
+  // holiday table before the rules read it, so a holiday added to the table moves the date.
+  const recomputed = await admin.rpc("recompute_incident_notify_by", {
+    p_account: account.id,
+  });
+  if (recomputed.error) throw recomputed.error;
   // REQ-018 Session C (D-1905): the audit-day registers that send reminders.
   const [insurance, staff, participants, corporate, conflicts, hazards, roles] =
     await Promise.all([
@@ -267,6 +275,7 @@ export async function computeAccountReminders(
     today,
     now: new Date().toISOString(),
     account: { id: account.id },
+    states: account.states ?? [],
     period: registration,
     reports: incidentRows
       .filter((i) => i.status === "draft")
