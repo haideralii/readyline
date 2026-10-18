@@ -604,6 +604,9 @@ const GLOSSARY_PAGES = [
  */
 const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/components/sample-document.tsx": "src/app/sample/page.tsx",
+  // REQ-031 FR-3 (D-2888): the Start here sheet renders on /sample (the computed route, D-2267) and on the
+  // documents pages outside the list; its own words carry "adopt", whose meaning the sheet gives in section 1.
+  "src/components/start-here-sheet.tsx": "src/app/sample/page.tsx",
   "src/components/trust-blocks.tsx": "src/app/page.tsx",
   "src/app/guides/registration-groups/groups-search.tsx":
     "src/app/guides/registration-groups/page.tsx",
