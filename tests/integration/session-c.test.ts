@@ -168,6 +168,96 @@ describe.skipIf(!enabled)(
           .staff_matrix,
       ).toEqual([]);
 
+      // REQ-030 FR-5 (D-2898): the six tables the PO moved into the export,
+      // seeded as the system writes them and read back under the owner's
+      // RLS; the other tenant's export has none of them.
+      const purchase = await admin
+        .from("purchases")
+        .insert({
+          account_id: a.accountId,
+          stripe_checkout_session_id: `cs_test_${randomUUID()}`,
+          amount_cents: 39900,
+          currency: "aud",
+          status: "paid",
+        })
+        .select("id")
+        .single();
+      expect(purchase.error).toBeNull();
+      const entitlement = await admin
+        .from("entitlements")
+        .insert({
+          account_id: a.accountId,
+          kind: "pack",
+          assessment_id: "asmt-sc",
+          source_purchase_id: purchase.data!.id,
+        })
+        .select("id")
+        .single();
+      expect(entitlement.error).toBeNull();
+      for (const [table, row] of [
+        [
+          "subscriptions",
+          {
+            stripe_subscription_id: `sub_test_${randomUUID()}`,
+            status: "active",
+            entitlement_id: entitlement.data!.id,
+          },
+        ],
+        ["account_facts", { key: "owner-role", value: "Director" }],
+        [
+          "policy_circulations",
+          {
+            document_type_id: "code-of-conduct",
+            circulated_on: "2026-02-01",
+            worker_refs: "W-77",
+            how: "Team meeting",
+          },
+        ],
+        [
+          "document_change_reviews",
+          {
+            document_type_id: "code-of-conduct",
+            change_id: "wc-2026-02-01-01",
+            reviewer_ref: "KP-1",
+            note: "Read and adopted",
+          },
+        ],
+      ] as const) {
+        const r = await admin
+          .from(table)
+          .insert({ account_id: a.accountId, ...row });
+        expect(r.error, table).toBeNull();
+      }
+      const withRecords = (await buildAccountExport(a.client, a.accountId))!;
+      expect(withRecords.purchases).toMatchObject([
+        { amount_cents: 39900, currency: "aud", status: "paid" },
+      ]);
+      expect(withRecords.entitlements).toMatchObject([
+        { kind: "pack", assessment_id: "asmt-sc" },
+      ]);
+      expect(withRecords.subscriptions).toMatchObject([{ status: "active" }]);
+      expect(withRecords.accountFacts).toMatchObject([
+        { key: "owner-role", value: "Director" },
+      ]);
+      expect(withRecords.policyCirculations).toMatchObject([
+        { document_type_id: "code-of-conduct", worker_refs: "W-77" },
+      ]);
+      expect(withRecords.documentChangeReviews).toMatchObject([
+        { change_id: "wc-2026-02-01-01", reviewer_ref: "KP-1" },
+      ]);
+      // Row ids that only join rows on the server stay out of the file.
+      expect(JSON.stringify(withRecords)).not.toContain(purchase.data!.id);
+      const other = (await buildAccountExport(b.client, b.accountId))!;
+      for (const key of [
+        "purchases",
+        "entitlements",
+        "subscriptions",
+        "accountFacts",
+        "policyCirculations",
+        "documentChangeReviews",
+      ] as const)
+        expect(other[key], key).toEqual([]);
+
       const cross = await buildAccountExport(b.client, a.accountId);
       expect(cross).toBeNull();
     });

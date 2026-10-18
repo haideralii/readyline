@@ -12,7 +12,7 @@ import { WORKER_EXPORT_TABLES } from "@/server/accounts/export";
  * (the privacy page's export and deletion sentences).
  */
 
-/** Tables the account export writes (`src/server/accounts/export.ts`): the account's own rows and the worker tables. */
+/** Tables the account export writes (`src/server/accounts/export.ts`): the account's own rows, the worker tables and the six the PO moved here (D-2898). */
 // The account row itself (`accounts`) has no account_id column; the export writes it as the first file.
 const EXPORT_TABLES: readonly string[] = [
   "audit_log",
@@ -21,6 +21,13 @@ const EXPORT_TABLES: readonly string[] = [
   "questionnaire_drafts",
   "registration_periods",
   ...WORKER_EXPORT_TABLES,
+  // D-2898 (18 Oct 2026): in account.json under their own keys.
+  "account_facts",
+  "document_change_reviews",
+  "policy_circulations",
+  "purchases",
+  "subscriptions",
+  "entitlements",
 ];
 
 /** Tables the audit pack writes (`src/server/registers/audit-pack.ts` through the register files and the audit-day meta). */
@@ -31,6 +38,11 @@ const PACK_TABLES: readonly string[] = [
   "policy_reviews",
   "document_versions",
   "register_events",
+  // D-2898: the older per-register trails, in the pack as
+  // `incidents-events-<date>.csv` and `complaints-events-<date>.csv`
+  // (`src/server/registers/export.ts`, `registerFiles`).
+  "incident_events",
+  "complaint_events",
   "self_checks",
   "improvements",
   "commission_changes",
@@ -61,43 +73,31 @@ const SYSTEM_TABLES: Record<string, string> = {
     "Import receipts (file name, row counts); the rows they created are in the registers.",
   generation_log:
     "The model's prompt version, tokens and timing per document; the documents are in the pack.",
+  // D-2898 (PO, 18 Oct 2026): the six below, each with the line from the
+  // Dev's report of the same day.
+  auditor_links:
+    "Auditor links: a token hash, the hours and the opens; the hash is useless to the provider and the opens are audit_log lines, exported.",
+  report_links:
+    "Incident report links: a token hash and the dates; the hash is useless to the provider.",
+  invitations:
+    "Worker invitations: a hashed token, the worker code and the dates; the hash is useless and the membership that results is exported.",
+  reminder_settings:
+    "One row per account: do_not_send and the hashed unsubscribe token; the preference is on the account page and the hash is useless.",
+  generation_jobs:
+    "The paid generation job queue; a queue, not a record; the sets are the documents, in the pack.",
+  version_sets:
+    "The generated set's metadata (status, counts, storage prefix); the documents themselves are in the pack.",
 };
 
 /**
- * Tables the first run found in no list (18 Oct 2026). Each waits for the PO's
- * decision per table (D-2869: the Dev reports them, the PO decides); it leaves
- * this list when it joins the export, the pack or SYSTEM_TABLES.
+ * Tables found in no list and waiting for the PO's decision per table
+ * (D-2869: the Dev reports them with a recommendation each, the PO decides).
+ * The first run (18 Oct 2026) listed fourteen; D-2898 moved every one into
+ * the export, the pack or SYSTEM_TABLES the same day, so this is empty. A
+ * table named here passes the test while the decision is pending; it leaves
+ * when it joins a list.
  */
-const PENDING_PO_DECISION: Record<string, string> = {
-  account_facts:
-    "The account's own facts (owner name, role, approval date and the like) that fill the documents; recommended: the export.",
-  auditor_links:
-    "Auditor links: a token hash, the hours and the opens; recommended: system (the hash is useless to the provider; the opens are audit_log lines, exported).",
-  complaint_events:
-    "The complaints register's trail (the older per-register trail); recommended: the pack, beside register_events.",
-  incident_events:
-    "The incidents register's trail; recommended: the pack, beside register_events.",
-  document_change_reviews:
-    "A review of a changed document (REQ-024); recommended: the export.",
-  entitlements:
-    "What the account may use (pack, subscription) and since when; recommended: the export, as purchase records the privacy page says we keep.",
-  purchases:
-    "The Stripe purchase rows; recommended: the export (purchase records).",
-  subscriptions:
-    "The Stripe subscription state; recommended: the export (purchase records).",
-  generation_jobs:
-    "The paid generation job queue; recommended: system (a queue, not a record; the sets are the documents).",
-  invitations:
-    "Worker invitations: a hashed token, the worker code and the dates; recommended: system (the hash is useless; the membership that results is exported).",
-  policy_circulations:
-    "A policy circulated to workers with the date (REQ-024 B); recommended: the export, with the worker tables.",
-  reminder_settings:
-    "One row per account: do_not_send and the hashed unsubscribe token; recommended: system (the preference is on the account page; the hash is useless).",
-  report_links:
-    "Incident report links: a token hash and the dates; recommended: system.",
-  version_sets:
-    "The generated set's metadata (status, counts, storage prefix); recommended: system (the documents themselves are in the pack).",
-};
+const PENDING_PO_DECISION: Record<string, string> = {};
 
 /** Every `create table public.<name> (...)` whose body names an account_id column. */
 export function accountTables(dir = "supabase/migrations"): string[] {
