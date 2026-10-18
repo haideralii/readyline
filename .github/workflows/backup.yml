@@ -1,0 +1,105 @@
+name: Weekly encrypted backup
+
+# REQ-030 FR-2 (D-2866, D-2876): Supabase's free tier has no point-in-time
+# recovery and no downloadable automated backup (UNVERIFIED from the
+# committed docs; the copy must be ours either way), so every Sunday at
+# 03:00 Sydney (one UTC cron, 16:00 Saturday UTC; daylight-saving drift
+# accepted) this job dumps the data of every `public` table and of
+# `auth.users` over the database URL migrate.yml builds (no new database
+# secret), encrypts it with gpg's symmetric AES-256 under the repository
+# secret BACKUP_PASSPHRASE (Haider generates it, at least 24 random
+# characters, and keeps it in his password manager; the PO and the Devs never
+# see it), uploads `readyline-<date>.sql.gpg` as an artifact for 90 days, and
+# inserts one audit_log row `jobs.backup.ran` so the switchboard's row
+# **Backup within 8 days** is a database read. The artifact is unreadable to
+# GitHub by design, the key never entering GitHub (D-2871); the passphrase is
+# the only protection whether the repository is public or private (D-2876).
+#
+# The restore is rehearsed in CI's Supabase job on every run
+# (scripts/ops/restore-rehearsal.sh with a fixture passphrase), never here.
+# Skips with a notice until both secrets exist. Minutes: about two a week,
+# nine a month, against GitHub's 2,000 free for a private repository.
+#
+# Dev response (REQ-030, 18 Oct 2026): gpg over age (on every runner, reads
+# the passphrase from a descriptor); the session pooler URL first, the direct
+# host `db.<ref>.supabase.co` as the fallback (both UNVERIFIED until the first
+# real run); the runner's pg_dump must not be older than the hosted server's
+# major, so the PostgreSQL apt repository supplies the client that matches
+# (the dashboard says which; 17 is pinned below).
+
+on:
+  schedule:
+    - cron: "0 16 * * 6"
+  workflow_dispatch:
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: pg_dump, gpg, artifact (project dpwwzhylcyosnkmlcnnp, ap-southeast-2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_PROJECT_REF: dpwwzhylcyosnkmlcnnp
+      SUPABASE_POOLER_HOST: aws-0-ap-southeast-2.pooler.supabase.com
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Check that the secrets exist
+        id: gate
+        run: |
+          if [ -z "$SUPABASE_DB_PASSWORD" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::notice title=Backup skipped::SUPABASE_DB_PASSWORD and BACKUP_PASSPHRASE are not both set as repository secrets; nothing was dumped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::add-mask::$SUPABASE_DB_PASSWORD"
+            echo "::add-mask::$BACKUP_PASSPHRASE"
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          sparse-checkout: scripts/ops
+          sparse-checkout-cone-mode: false
+
+      - name: PostgreSQL 17 client (the hosted server's major; the dump must not be older)
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          pg_dump --version
+
+      - name: Build the database URL (never printed)
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          ENCODED="$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"], safe=""))')"
+          echo "::add-mask::$ENCODED"
+          DB_URL="postgresql://postgres.${SUPABASE_PROJECT_REF}:${ENCODED}@${SUPABASE_POOLER_HOST}:5432/postgres"
+          DB_URL_DIRECT="postgresql://postgres:${ENCODED}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres"
+          echo "::add-mask::$DB_URL"
+          echo "::add-mask::$DB_URL_DIRECT"
+          echo "DB_URL=$DB_URL" >> "$GITHUB_ENV"
+          echo "DB_URL_DIRECT=$DB_URL_DIRECT" >> "$GITHUB_ENV"
+          echo "OUT=readyline-$(date -u +%Y-%m-%d).sql.gpg" >> "$GITHUB_ENV"
+
+      - name: Dump, encrypt and record (the pooler first, the direct host if it refuses)
+        if: steps.gate.outputs.ready == 'true'
+        run: scripts/ops/backup.sh || DB_URL="$DB_URL_DIRECT" scripts/ops/backup.sh
+
+      - name: Upload the encrypted copy (90 days)
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OUT }}
+          path: ${{ env.OUT }}
+          retention-days: 90
+          if-no-files-found: error

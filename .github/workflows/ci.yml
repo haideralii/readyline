@@ -203,6 +203,24 @@ jobs:
       - name: Row-level security and tenancy tests
         run: npm run test:integration
 
+      # REQ-030 FR-2, AC-3 (D-2866): the restore rehearsal. The seeded stack is dumped and
+      # encrypted under a fixture passphrase (the production one never enters CI, SR-5), the
+      # plaintext never touching disk (SR-2); the stack is reset to a fresh one with the
+      # migrations applied, the copy is restored into it, and the integration suite runs again
+      # on the restored stack. The size and the seconds are in the log (the evidence).
+      - name: Backup and restore rehearsal (REQ-030 FR-2, AC-3)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: |
+          scripts/ops/backup.sh
+          supabase db reset --local --no-seed
+          scripts/ops/restore-rehearsal.sh
+          npm run test:integration
+
       - name: Build for the signed-in end-to-end run
         run: npm run build
 
