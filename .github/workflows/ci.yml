@@ -330,6 +330,10 @@ jobs:
       - name: Build for the signed-in end-to-end run
         run: npm run build
 
+      # D-2984: Lighthouse drives Playwright's Chromium, so the budget still needs the browser though the specs left.
+      - name: Install Playwright Chromium (the Chrome Lighthouse drives)
+        run: npx playwright install --with-deps chromium
+
       - name: Performance budgets on the signed-in pages (REQ-010, backlog 2, D-1012; blocking, REQ-012 FR-5)
         run: npm run perf:budget || npm run perf:budget
         env:
