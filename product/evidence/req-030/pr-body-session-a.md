@@ -18,6 +18,6 @@ Branch `req-030-session-a` from `next` 41825d4; PR to `next`. Dev-2, 18 Oct 2026
 ## For the PO
 
 - The Dev response's fifth question (the two-strike memory as a cached state file) is built as recommended; if you would rather the issue itself be the memory, the judge's inputs are the same and only the command changes.
-- `npm install` in the Dev-2 tree needs `--legacy-peer-deps` for this package (an npm arborist fault on its peer set); the lockfile is consistent and CI's `npm ci` is unaffected.
+- The lockfile was re-resolved with npm 12.2.0 after npm 10.9.2's arborist fault on this package's tree; `npm ci` with npm 10.9.2 from a clean `node_modules` succeeds (674 packages), and no `.npmrc` is in the repository (PO 14:57).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
