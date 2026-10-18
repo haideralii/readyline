@@ -1,3 +1,4 @@
+import { TRUST_NAV_LABEL } from "@/lib/trust/answers";
 /**
  * The legal and trust pages (REQ-008): slugs, routes and footer labels. Kept
  * free of Node imports so the footer and any client code can use it.
@@ -12,12 +13,14 @@ export const LEGAL_SLUGS = [
 export type LegalSlug = (typeof LEGAL_SLUGS)[number];
 
 export const LEGAL_NAV: ReadonlyArray<{
-  slug: LegalSlug | "guides";
-  href: `/${LegalSlug}` | "/guides";
+  slug: LegalSlug | "guides" | "trust";
+  href: `/${LegalSlug}` | "/guides" | "/trust";
   label: string;
 }> = [
   { slug: "terms", href: "/terms", label: "Terms" },
   { slug: "privacy", href: "/privacy", label: "Privacy" },
+  // REQ-034 FR-3: the trust page, beside the policy it restates.
+  { slug: "trust", href: "/trust", label: TRUST_NAV_LABEL },
   { slug: "refunds", href: "/refunds", label: "Refunds" },
   { slug: "ai", href: "/ai", label: "How we use AI" },
   { slug: "about", href: "/about", label: "About" },

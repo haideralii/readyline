@@ -22,6 +22,10 @@ describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
     expect(heroHeadline(null)).toMatch(/for one fixed price\.$/);
     expect(HOME_COPY.cta).toBe("See which audit I need");
     expect(HOME_COPY.ctaSecondary).toBe("See a sample document");
+    // REQ-034 FR-4, AC-4 (D-2947): the line above the two sample files, verbatim.
+    expect(HOME_COPY.sampleFilesLine).toBe(
+      "This sample is from a recorded run for a fictional provider. Your own documents come from your answers.",
+    );
     expect(HOME_COPY.priceLine("AUD 399")).toMatch(
       /^AUD 399 one-off .*No subscription needed, no instalments, no interest\./,
     );
