@@ -403,7 +403,8 @@ select
     else i.status
   end as notification_status
 from public.incidents i;
-revoke all on public.incidents_status from anon;
+-- D-2245: the recreated view takes the default grants, so every verb is revoked before select is given back (#119 run 3).
+revoke all on public.incidents_status from public, anon, authenticated;
 grant select on public.incidents_status to authenticated, service_role;
 
 notify pgrst, 'reload schema';
