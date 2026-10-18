@@ -60,7 +60,7 @@ export function StepShell({
           step={step}
           answers={answers}
           ready={ready}
-          className="order-1 lg:order-none lg:col-span-2 lg:row-span-2 lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid"
+          className="order-1 lg:order-none lg:col-span-2 lg:row-span-2 lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid print:hidden"
           lineClassName="lg:col-start-2 lg:row-start-1 lg:justify-self-end"
           circlesClassName="lg:col-span-2 lg:row-start-2 lg:mt-4 lg:w-[calc(58.333%-1rem)]"
           // REQ-028 FR-6 (AC-4's phone exception): on the result the stepper is line one alone under sm.

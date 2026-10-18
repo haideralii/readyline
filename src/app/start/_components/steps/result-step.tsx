@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ConfirmButton } from "@/components/confirm-button";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { BRAND } from "@/lib/brand";
+import { BRAND, GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
 import { Disclosure as SharedDisclosure } from "@/components/disclosure";
 import { ReadyLine } from "@/components/ready-line";
 import { Tag, type TagVariant } from "@/components/tag";
@@ -31,7 +31,10 @@ import {
   MID_TERM_NONE,
   MODULES_HEADING,
   REGISTERS_LEGEND,
+  RESULT_SCOPE_SENTENCE,
+  auditHeading,
   midTermLine,
+  resultPreparedLine,
 } from "@/lib/questionnaire/result-text";
 import {
   deriveResult,
@@ -47,6 +50,7 @@ import {
   UNCONFIRMED_SOURCE_HEDGE,
   haveCounts,
   haveLegend,
+  RESULT_PRINT_BUTTON,
 } from "./result-copy";
 
 /**
@@ -145,6 +149,82 @@ export function ResultStep({
       userEmail={userEmail}
       changes={response.changes}
     />
+  );
+}
+
+/** Today in Sydney, in words, for the closing line (client-side, after the result has mounted). */
+function todayWords(): string {
+  return new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Sydney",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+}
+
+/**
+ * REQ-031 FR-2 (D-2887, D-2895): the print view, hidden on screen, from the
+ * same result object: the audit kind and its meaning, the scope sentence,
+ * the groups, the three counts, the modules with their standard counts, the
+ * mid-term line, the reasons with their sources' short names, the
+ * general-information line and the closing line with today's date. Every
+ * word here is on the screen too (the e2e checks each text node).
+ */
+function ResultPrint({
+  r,
+  lines,
+  pathwayWord,
+  today,
+}: {
+  r: QuestionnaireResult;
+  lines: ReturnType<typeof summaryLines>;
+  pathwayWord: string;
+  today: string;
+}) {
+  return (
+    <section
+      aria-hidden="true"
+      className="hidden text-sm leading-5 print:block"
+      data-testid="result-print"
+    >
+      <h2 className="">{auditHeading(r)}</h2>
+      <p className="mt-1">{glossarySentence(`${pathwayWord}-audit`)}</p>
+      <p className="mt-1">{RESULT_SCOPE_SENTENCE}</p>
+      <h3 className="mt-3">{GROUPS_LABEL}</h3>
+      <ul className="mt-1 list-disc pl-5">
+        {r.groups.map((g) => (
+          <li key={g.code}>
+            {g.name} {g.code}
+          </li>
+        ))}
+      </ul>
+      <ul className="mt-3">
+        <li>{lines.documents}</li>
+        <li>{lines.registers}</li>
+        <li>{lines.checklist}</li>
+      </ul>
+      <h3 className="mt-3">{MODULES_HEADING}</h3>
+      <ul className="mt-1 list-disc pl-5">
+        {r.modules.map((m) => (
+          <li key={m.id}>
+            {m.name}: {m.standardCount}{" "}
+            {m.standardCount === 1 ? "standard" : "standards"}
+          </li>
+        ))}
+      </ul>
+      <h3 className="mt-3">{MID_TERM_HEADING}</h3>
+      <p className="mt-1">{midTermLine(r)}</p>
+      <h3 className="mt-3">Why this result</h3>
+      <ul className="mt-1 list-disc pl-5">
+        {r.reasons.map((x, i) => (
+          <li key={`${x.rule}-${i}`}>
+            {x.text} Source: {x.source.title}.
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3">{GENERAL_INFORMATION_STATEMENT}</p>
+      <p className="mt-1">{resultPreparedLine(today)}</p>
+    </section>
   );
 }
 
@@ -377,7 +457,7 @@ function ResultView({
       data-testid="result"
     >
       {/* REQ-028 FR-6: columns 1 to 5 sticky (the card, then the glossary directly under it, D-2701); 6 to 12 the sections. */}
-      <div className="lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <div className="lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto print:hidden">
         {/* FR-4: the first screen is one card: the answer, one sentence, the counts, the line, one button. */}
         <section
           aria-labelledby="summary-heading"
@@ -390,7 +470,11 @@ function ResultView({
           </h2>
           {/* Batch 42 item 6 (D-549), REQ-025 FR-13: what the word means, from the glossary, in one line under the heading. */}
           <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
-            {glossarySentence(`${pathwayWord}-audit`)}
+            {glossarySentence(`${pathwayWord}-audit`)}{" "}
+            {/* REQ-031 D-2895, D-2887: the scope sentence, in the same line block so the card keeps its shape. */}
+            <span className="text-slate" data-testid="result-scope">
+              {RESULT_SCOPE_SENTENCE}
+            </span>
           </p>
           <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
             {r.groups.map((g) => (
@@ -453,6 +537,13 @@ function ResultView({
               </Link>
             </div>
           </div>
+          {/* REQ-031 D-2895, D-2887: the closing line the print carries, on the screen too. */}
+          <p
+            className="text-slate mt-3 text-xs leading-5"
+            data-testid="result-prepared"
+          >
+            {resultPreparedLine(todayWords())}
+          </p>
           {/* FR-6: "Change my answers" and "Start again" as small links in the card's footer (the phone exception that
             returns the row under the stepper to the fold; batch 48 item 2's confirm kept). */}
           <div
@@ -466,6 +557,15 @@ function ResultView({
             >
               Change my answers
             </Link>
+            {/* REQ-031 FR-2 (AC-6): the browser's own print, so "save as PDF" is one tap; no server PDF. */}
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+              data-testid="result-print-button"
+            >
+              {RESULT_PRINT_BUTTON}
+            </button>
             <ConfirmButton
               label="Start again"
               question="Clear your answers and start again? Your result goes with them."
@@ -541,7 +641,7 @@ function ResultView({
         <GlossaryTerms ids={present} where="result" className="mt-2" />
       </div>
 
-      <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-0">
+      <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-0 print:hidden">
         {/* FR-5: three disclosures with counts in their summaries, closed under lg, open at lg on a first visit (D-2813). */}
         <Disclosure
           id="why"
@@ -830,6 +930,13 @@ function ResultView({
           We answer product and process questions, not legal ones.
         </p>
       </div>
+      {/* REQ-031 FR-2 (D-2887, D-2895): the print view, from the same result; the screen hides, this shows. */}
+      <ResultPrint
+        r={r}
+        lines={lines}
+        pathwayWord={pathwayWord}
+        today={todayWords()}
+      />
     </div>
   );
 }

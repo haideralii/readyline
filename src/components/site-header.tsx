@@ -24,7 +24,7 @@ export async function SiteHeader() {
         ]
       : [{ href: "/sign-in", label: "Sign in" }];
   return (
-    <header className="border-rule border-b">
+    <header className="border-rule border-b print:hidden">
       {/*
        * REQ-015 FR-16a: this row was the shared cause of the sideways scroll
        * on phones. Signed in, the badge plus three links ran to 438 px on a
