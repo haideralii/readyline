@@ -17,6 +17,9 @@ import {
   listDocumentVersions,
 } from "@/server/generation/queries";
 import { isSetLocked } from "@/server/payments/queries";
+import { collectBlanks } from "@/lib/generator/blanks";
+import { openFormBlanks } from "@/lib/generator/facts-fill";
+import { DETAILS_OPEN_LINE, DETAILS_PAGE_LINK } from "@/lib/path/details-copy";
 import { filledForRead, readFillInputs } from "@/server/generation/read-fill";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { AdoptVersionButton } from "./adopt-version-button";
@@ -49,6 +52,11 @@ export default async function ReviewDocumentPage({
   const shownPrevious = previous
     ? { ...previous, model: filledForRead(previous, fillInputs) }
     : null;
+  // REQ-029 FR-1: the way to the details page while this document has a detail open.
+  const openDetails = openFormBlanks(
+    collectBlanks(current.model),
+    fillInputs.facts,
+  ).length;
   const changedSection = typeof sp.changed === "string" ? sp.changed : null;
   // REQ-024 A0 (D-2427, D-2436): adoption is per version. The newest adopted
   // version of this document in the set, if any, for the line and the
@@ -80,6 +88,18 @@ export default async function ReviewDocumentPage({
       >
         Download .docx
       </a>
+      {openDetails > 0 ? (
+        <p className="text-slate mt-3" data-testid="details-before-download">
+          {DETAILS_OPEN_LINE(openDetails)}:{" "}
+          <Link
+            href={`/documents/${set.id}/finish`}
+            className="underline underline-offset-2"
+          >
+            {DETAILS_PAGE_LINK}
+          </Link>
+          .
+        </p>
+      ) : null}
       {current.adopted_on ? (
         <p className="text-slate mt-3" data-testid="version-adopted-on">
           Adopted {current.adopted_on}.

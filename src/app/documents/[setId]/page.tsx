@@ -6,6 +6,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DOCUMENTS_COPY } from "@/lib/payments/documents-copy";
+import {
+  DETAILS_BEFORE_DOWNLOAD,
+  DETAILS_PAGE_LINK,
+} from "@/lib/path/details-copy";
 import { collectBlanks } from "@/lib/generator/blanks";
 import { openFormBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
@@ -133,6 +137,21 @@ export default async function DocumentSetPage({
               Readiness summary (PDF)
             </a>
           </div>
+          {blanks.length > 0 ? (
+            <p
+              className="text-slate mt-2 text-sm leading-6"
+              data-testid="details-before-download"
+            >
+              {DETAILS_BEFORE_DOWNLOAD}{" "}
+              <Link
+                href={`/documents/${set.id}/finish`}
+                className="underline underline-offset-2"
+              >
+                {DETAILS_PAGE_LINK}
+              </Link>
+              .
+            </p>
+          ) : null}
           <p
             className="text-slate mt-2 text-sm lg:text-right"
             data-testid="zip-size-line"

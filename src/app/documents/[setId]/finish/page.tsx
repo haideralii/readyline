@@ -9,6 +9,7 @@ import {
   openFormBlanks,
 } from "@/lib/generator/facts-fill";
 import { STATE_NAMES, formatAbn } from "@/lib/generator/facts";
+import { needsReapproval } from "@/lib/generator/reapproval";
 import { orderDocuments } from "@/lib/generator/set-order";
 import {
   DETAILS_ADOPT_NEXT,
@@ -65,6 +66,8 @@ export default async function YourDetailsPage({
       .maybeSingle(),
   ]);
   const open = openFormBlanks(blanks, facts).length;
+  // FR-6: adopted documents whose snapshot no longer matches the name and role above.
+  const reapprovals = documents.filter((d) => needsReapproval(d, facts)).length;
   const dateBlank = blanks.some((b) => factKeyFor(b.blank) === "date");
   const a = (account.data ?? null) as {
     trading_name: string;
@@ -112,6 +115,7 @@ export default async function YourDetailsPage({
         initial={facts}
         documentCount={documents.length}
         prefill={stateName ? { state: stateName } : {}}
+        reapprovals={reapprovals}
         business={{
           name: a?.trading_name ?? viewer.account.trading_name,
           abn: formatAbn(a?.abn),

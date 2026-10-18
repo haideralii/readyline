@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { ErrorSummary, type FieldErrors } from "@/app/start/_components/fields";
+import { ConfirmButton } from "@/components/confirm-button";
 import {
   FREE_TEXT_FACT_KEYS,
   NO_TOOL_FACTS,
@@ -20,6 +21,12 @@ import {
   DETAILS_READ_ONLY_HEADING,
   DETAILS_READ_ONLY_HELP,
   DETAILS_REAPPROVAL_LINE,
+  DETAILS_REAPPROVED_LINE,
+  DETAILS_REAPPROVE_BUTTON,
+  DETAILS_REAPPROVE_CONFIRM,
+  DETAILS_REAPPROVE_HEADING,
+  DETAILS_REAPPROVE_LINE,
+  DETAILS_REAPPROVE_QUESTION,
   DETAILS_SAVED,
   DETAILS_SAVING,
   DETAILS_UNREACHABLE,
@@ -29,6 +36,7 @@ import { detectParticipantData } from "@/lib/privacy/participant-data";
 import {
   clearFactAction,
   finishPackAction,
+  reapproveAction,
   saveFactAction,
 } from "@/server/path/actions";
 
@@ -56,6 +64,7 @@ export function FinishForm({
   documentCount,
   prefill,
   business,
+  reapprovals,
 }: {
   setId: string;
   questions: FactQuestion[];
@@ -64,6 +73,8 @@ export function FinishForm({
   /** FR-1: the state from the account when it has one; saved on the first render when the fact is empty. */
   prefill: Record<string, string>;
   business: { name: string; abn: string | null };
+  /** FR-6: adopted documents whose snapshot differs from the name and role on the account. */
+  reapprovals: number;
 }) {
   const router = useRouter();
   const [values, setValues] = useState<Record<string, string>>(() => ({
@@ -79,7 +90,30 @@ export function FinishForm({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [done, setDone] = useState<number | null>(null);
+  const [reapproved, setReapproved] = useState<number | null>(null);
   const inFlight = useRef(false);
+
+  async function reapprove() {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
+    setMessage(null);
+    try {
+      for (const key of ["name", "role"]) if (!(await saveKey(key))) return;
+      const r = await reapproveAction({ setId });
+      if (!r.ok) {
+        setMessage(r.message);
+        return;
+      }
+      setReapproved(r.reapproved ?? 0);
+      router.refresh();
+    } catch {
+      setMessage(DETAILS_UNREACHABLE);
+    } finally {
+      setBusy(false);
+      inFlight.current = false;
+    }
+  }
 
   const keys = questions.map((q) => q.key);
   const hasNoTool =
@@ -291,6 +325,42 @@ export function FinishForm({
               >
                 {DETAILS_REAPPROVAL_LINE}
               </p>
+            ) : null}
+            {q.key === "role" && (reapprovals > 0 || reapproved !== null) ? (
+              <section
+                aria-labelledby="reapprove-heading"
+                className="border-ochre mt-3 rounded-md border p-3"
+                data-testid="reapprove"
+              >
+                <h2 id="reapprove-heading" className="text-base font-medium">
+                  {DETAILS_REAPPROVE_HEADING}
+                </h2>
+                {reapproved !== null ? (
+                  <p
+                    role="status"
+                    className="mt-1 text-sm leading-6"
+                    data-testid="reapproved-line"
+                  >
+                    {DETAILS_REAPPROVED_LINE(reapproved)}
+                  </p>
+                ) : (
+                  <>
+                    <p className="mt-1 text-sm leading-6">
+                      {DETAILS_REAPPROVE_LINE(reapprovals)}
+                    </p>
+                    <div className="mt-2">
+                      <ConfirmButton
+                        label={DETAILS_REAPPROVE_BUTTON(reapprovals)}
+                        question={DETAILS_REAPPROVE_QUESTION}
+                        confirmLabel={DETAILS_REAPPROVE_CONFIRM}
+                        confirmClassName="btn-secondary"
+                        onConfirm={() => void reapprove()}
+                        testId="reapprove-button"
+                      />
+                    </div>
+                  </>
+                )}
+              </section>
             ) : null}
             {warnings[q.key]?.length ? (
               <p

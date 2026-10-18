@@ -28,6 +28,12 @@ import { countEvent } from "@/server/metrics/counters";
 import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
+import { needsReapproval, reapprovalModel } from "@/lib/generator/reapproval";
+import { renderDocx } from "@/lib/generator/render-docx";
+import { sydneyDay } from "@/lib/metrics/counters";
+import { DOCX_TYPE, documentStatus } from "@/server/generation/run";
+import { objectPath } from "@/server/generation/storage";
+import { SupabaseGenerationStore } from "@/server/generation/store";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { getStandardsDataset } from "@/lib/standards/dataset";
@@ -42,6 +48,7 @@ import { loadFacts, saveFact } from "./facts";
 import { isFactValueAllowed } from "@/lib/generator/facts-fill";
 import {
   DETAILS_CLEARED_ACTION,
+  DETAILS_REAPPROVED_ACTION,
   DETAILS_REFUSED,
   DETAILS_SAVED_ACTION,
   DETAILS_SAVE_FAILED,
@@ -158,6 +165,102 @@ export async function clearFactAction(
 }
 
 const SetInput = strictObject({ setId: z.string().uuid() });
+
+/**
+ * REQ-029 FR-6 (D-2855): a changed name or role behind an adopted document
+ * is a re-approval. Each adopted latest version whose snapshot differs from
+ * the account's facts gets a new version (the same template with the
+ * version moved and a change-log row that reads "Approver changed to
+ * [role]; re-approved", the earlier rows fixed to the earlier approver),
+ * adopted at once through `adopt_document_version`, which takes today's
+ * snapshot; one audit line per document, the type and the version, never
+ * a value. A changed phone or email never comes here (the next download
+ * carries it).
+ */
+export async function reapproveAction(
+  input: unknown,
+): Promise<PathActionResult & { reapproved?: number }> {
+  const parsed = parseInput(SetInput, input);
+  if (!parsed.ok) return { ok: false, message: "That set was not found." };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to re-approve your documents." };
+  const accountId = viewer.account.id;
+  const supabase = await createSupabaseServerClient();
+  const set = await getVersionSet(supabase, parsed.data.setId);
+  if (!set || set.account_id !== accountId || set.status !== "ready")
+    return { ok: false, message: "That set was not found." };
+  const facts = await loadFacts(supabase, accountId);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: detailsHref(set.id),
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
+  const newest = await latestReadySet(supabase, accountId);
+  if (newest.setId !== set.id) return { ok: false, message: NOT_CURRENT_PACK };
+  const admin = createSupabaseAdminClient();
+  const store = new SupabaseGenerationStore(admin);
+  const today = sydneyDay();
+  let reapproved = 0;
+  for (const d of await listLatestDocuments(supabase, set.id)) {
+    if (!needsReapproval(d, facts)) continue;
+    const version = d.version + 1;
+    const model = reapprovalModel(d.model, {
+      version,
+      today,
+      previous: {
+        name: d.approver_name ?? "",
+        role: d.approver_role ?? null,
+      },
+    });
+    const path = objectPath(
+      accountId,
+      set.id,
+      `${d.document_type_id}.v${version}.docx`,
+    );
+    await store.putObject(
+      path,
+      new Uint8Array(await renderDocx(model)),
+      DOCX_TYPE,
+    );
+    await store.insertDocumentVersion({
+      version_set_id: set.id,
+      account_id: accountId,
+      document_type_id: d.document_type_id,
+      version,
+      status: documentStatus(model).status,
+      storage_path: path,
+      model,
+    });
+    const day = await markAdopted(admin, accountId, d.document_type_id, set.id);
+    if (!day) {
+      log.warn("path.reapprove.not-adopted", {
+        accountId,
+        versionSetId: set.id,
+        documentTypeId: d.document_type_id,
+        version,
+      });
+      continue;
+    }
+    const audit = await admin.from("audit_log").insert({
+      account_id: accountId,
+      actor_user_id: viewer.user.id,
+      action: DETAILS_REAPPROVED_ACTION,
+      target: `${d.document_type_id}:${version}`,
+    });
+    if (audit.error)
+      log.warn("audit.write.failed", {
+        action: DETAILS_REAPPROVED_ACTION,
+        code: audit.error.code,
+      });
+    reapproved += 1;
+  }
+  if (reapproved > 0) await refreshSetSummary(admin, set.id);
+  log.info("path.reapproved", { accountId, versionSetId: set.id, reapproved });
+  return { ok: true, reapproved };
+}
 
 /** Re-renders the set with every saved fact filled in (FR-2 "re-render on finish"). */
 export async function finishPackAction(

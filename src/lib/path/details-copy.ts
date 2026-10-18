@@ -112,3 +112,22 @@ export const DETAILS_PAGE_LINK = "Your details page";
 /** The audit log's actions for the details page (SR-3: the key is the target, never the value). */
 export const DETAILS_SAVED_ACTION = "documents.details.saved";
 export const DETAILS_CLEARED_ACTION = "documents.details.cleared";
+export const DETAILS_REAPPROVED_ACTION = "documents.reapproved";
+
+/** FR-6: the re-approval control on the details page. */
+export const DETAILS_REAPPROVE_HEADING = "Re-approve your adopted documents";
+export const DETAILS_REAPPROVE_LINE = (count: number) =>
+  count === 1
+    ? "1 adopted document still names the approver you had before."
+    : `${count} adopted documents still name the approver you had before.`;
+export const DETAILS_REAPPROVE_BUTTON = (count: number) =>
+  count === 1 ? "Re-approve 1 document" : `Re-approve ${count} documents`;
+export const DETAILS_REAPPROVE_QUESTION =
+  "Each document gets a new version whose change log reads who approved it and when. Go ahead?";
+export const DETAILS_REAPPROVE_CONFIRM = "Yes, re-approve";
+export const DETAILS_REAPPROVED_LINE = (count: number) =>
+  count === 1
+    ? "Re-approved. 1 document has a new version."
+    : `Re-approved. ${count} documents have new versions.`;
+export const DETAILS_REAPPROVE_NEEDS_NAME =
+  "Add your name above first; a document is approved by a named person.";
