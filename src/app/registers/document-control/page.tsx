@@ -5,6 +5,10 @@ import {
   documentControlGaps,
   documentControlSentence,
 } from "@/lib/registers/document-control";
+import {
+  SUMMARY_CHECK_LABEL,
+  summaryCheckLine,
+} from "@/lib/registers/summary-check";
 import { documentControlForAccount } from "@/server/registers/document-control-queries";
 import { RegisterPage, registerContext } from "../_components/shell";
 import { ChangeReview } from "./change-review";
@@ -91,6 +95,22 @@ export default async function DocumentControlPage() {
                     className="underline underline-offset-2"
                   >
                     Read and adopt it
+                  </Link>
+                  .
+                </p>
+              ) : null}
+              {/* REQ-033 Session C FR-C1, FR-C4 (D-2977): the plain-words summary is to check; the line shows whatever the state word. */}
+              {r.summaryCheck ? (
+                <p
+                  className="text-ochre mt-1 text-sm"
+                  data-testid={`summary-check-${r.document_type_id}`}
+                >
+                  {SUMMARY_CHECK_LABEL}: {summaryCheckLine(r.summaryCheck)}.{" "}
+                  <Link
+                    href={`/documents/${setId}/${r.document_type_id}#section-plain-language-summary`}
+                    className="underline underline-offset-2"
+                  >
+                    Read the summary
                   </Link>
                   .
                 </p>

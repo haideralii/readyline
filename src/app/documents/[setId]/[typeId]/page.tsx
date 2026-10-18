@@ -22,8 +22,16 @@ import { openFormBlanks } from "@/lib/generator/facts-fill";
 import { DETAILS_OPEN_LINE, DETAILS_PAGE_LINK } from "@/lib/path/details-copy";
 import { filledForRead, readFillInputs } from "@/server/generation/read-fill";
 import { createSupabaseServerClient } from "@/server/supabase/server";
+import {
+  EASY_READ_CHECK_LINE,
+  EASY_READ_SECTION_ID,
+  SUMMARY_SECTION_ID,
+  changedSectionLabel,
+  summaryCheckLine,
+} from "@/lib/registers/summary-check";
 import { AdoptVersionButton } from "./adopt-version-button";
 import { RegenerateButton } from "./regenerate-button";
+import { SummaryCheckButtons } from "./summary-check-buttons";
 
 export const metadata: Metadata = { title: "Review document" };
 
@@ -75,6 +83,14 @@ export default async function ReviewDocumentPage({
     loadWatchChanges(),
   );
 
+  // REQ-033 Session C FR-C1 (D-2977): the plain-words summary is to check after another section changed.
+  const summaryCheck =
+    current.summary_check_section_id && current.summary_check_on
+      ? summaryCheckLine({
+          ...changedSectionLabel(typeId, current.summary_check_section_id),
+          on: current.summary_check_on,
+        })
+      : null;
   // REQ-028 FR-7: the aside holds the file, the adoption and the section list, the drafted sections marked in ochre.
   const aside = (
     <div
@@ -236,6 +252,23 @@ export default async function ReviewDocumentPage({
               <div className="mt-3 text-sm">
                 <Blocks blocks={s.blocks} />
               </div>
+              {/* REQ-033 Session C FR-C2 (D-2978): the two ways out, under the summary, while it is to check. */}
+              {summaryCheck && s.id === SUMMARY_SECTION_ID ? (
+                <SummaryCheckButtons
+                  setId={set.id}
+                  typeId={typeId}
+                  line={summaryCheck}
+                />
+              ) : null}
+              {/* REQ-033 Session C FR-C3 (D-2980): the Easy Read version is the provider's own; the line asks. */}
+              {summaryCheck && s.id === EASY_READ_SECTION_ID ? (
+                <p
+                  className="text-ochre mt-3 text-sm leading-6"
+                  data-testid="easy-read-check"
+                >
+                  {EASY_READ_CHECK_LINE}
+                </p>
+              ) : null}
               {diff ? (
                 <div
                   className="bg-mist mt-3 rounded-md p-4 text-sm"

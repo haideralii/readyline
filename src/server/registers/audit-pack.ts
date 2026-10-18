@@ -65,6 +65,7 @@ import {
   listAuditDayRows,
 } from "./audit-day-queries";
 import { documentControlForAccount } from "./document-control-queries";
+import { summaryCheckLine } from "@/lib/registers/summary-check";
 import { registerFiles } from "./export";
 import {
   listComplaints,
@@ -102,6 +103,8 @@ export const DOCUMENT_CONTROL_COLUMNS = [
   "state",
   // REQ-029 D-2856: the day the contact detail changed after adoption, or empty.
   "contact_updated_on",
+  // REQ-033 Session C FR-C4 (D-2981): the plain-words summary to check, as the register's line, or empty.
+  "summary_to_check",
 ] as const;
 
 /**
@@ -181,6 +184,8 @@ export async function collectAuditView(
     circulated_on: r.circulated?.on ?? null,
     circulated_workers: r.circulated?.workers ?? null,
     state: r.state,
+    // REQ-033 Session C FR-C4 (D-2981): the plain-words summary to check, as the line, or empty.
+    summary_to_check: r.summaryCheck ? summaryCheckLine(r.summaryCheck) : null,
   }));
   const asks = auditDayAskList({
     registers,
