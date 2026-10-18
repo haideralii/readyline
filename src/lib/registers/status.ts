@@ -7,6 +7,8 @@
  * Dates are ISO `YYYY-MM-DD` strings and all arithmetic is in UTC on
  * calendar days, so daylight-saving changes never move a boundary.
  */
+import { formatIsoDate, parseIsoDate } from "./iso-date";
+import { addBusinessDaysDetailed } from "./public-holidays";
 import {
   INCIDENT_CATEGORIES_5BD,
   INCIDENT_CATEGORIES_24H,
@@ -29,27 +31,7 @@ export const REVIEW_DUE_SOON_DAYS = 60;
 /** Business days the Commission allows for an unauthorised restrictive practice (Rules s 21). */
 export const RESTRICTIVE_PRACTICE_BUSINESS_DAYS = 5;
 
-const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
-
-/** Parses `YYYY-MM-DD` to a UTC day number; throws on anything else. */
-export function parseIsoDate(value: string): number {
-  const m = ISO_DATE.exec(value);
-  if (!m) throw new Error(`Not an ISO date: ${value}`);
-  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  const ms = Date.UTC(y, mo - 1, d);
-  const back = new Date(ms);
-  if (
-    back.getUTCFullYear() !== y ||
-    back.getUTCMonth() !== mo - 1 ||
-    back.getUTCDate() !== d
-  )
-    throw new Error(`Not a calendar date: ${value}`);
-  return Math.floor(ms / 86_400_000);
-}
-
-export function formatIsoDate(day: number): string {
-  return new Date(day * 86_400_000).toISOString().slice(0, 10);
-}
+export { formatIsoDate, parseIsoDate };
 
 /** Calendar days from `from` to `to` (negative when `to` is earlier). */
 export function daysBetween(from: string, to: string): number {
@@ -95,22 +77,18 @@ export function addDays(date: string, days: number): string {
 }
 
 /**
- * `date` plus `days` business days, Monday to Friday, matching the SQL
- * `add_business_days`: a weekend start counts from the next Monday; public
- * holidays are not modelled.
+ * `date` plus `days` business days, Monday to Friday less the public
+ * holidays of `states` (REQ-032 FR-3; none with no state, as before),
+ * matching the SQL `add_business_days`: a weekend or holiday start counts
+ * from the next business day. The two-argument call is the weekends-only
+ * count every earlier caller relied on.
  */
-export function addBusinessDays(date: string, days: number): string {
-  if (!Number.isInteger(days) || days < 0)
-    throw new Error("addBusinessDays: days must be a whole number >= 0");
-  let day = parseIsoDate(date);
-  let left = days;
-  while (left > 0) {
-    day += 1;
-    // Day 0 (1970-01-01) was a Thursday; weekday 0 = Sunday.
-    const weekday = (((day + 4) % 7) + 7) % 7;
-    if (weekday !== 0 && weekday !== 6) left -= 1;
-  }
-  return formatIsoDate(day);
+export function addBusinessDays(
+  date: string,
+  days: number,
+  states: readonly string[] = [],
+): string {
+  return addBusinessDaysDetailed(date, days, states).date;
 }
 
 /**
