@@ -170,12 +170,15 @@ jobs:
       - name: Install Playwright Chromium (the Chrome Lighthouse drives)
         run: npx playwright install --with-deps chromium
 
-      - name: Lighthouse, four public pages, median of three
-        run: npm run perf:budget
+      # REQ-012 FR-5: the public-content and questionnaire classes, the
+      # median of five runs, and one retry so a single run's noise does not
+      # fail the job on its own; the report carries the budgets per class.
+      - name: Lighthouse, public content and questionnaire pages, median of five
+        run: npm run perf:budget || npm run perf:budget
         env:
           LIGHTHOUSE_BUDGET: "1"
-          LIGHTHOUSE_RUNS: "3"
-          LIGHTHOUSE_PAGES: "/,/pricing,/start,/start/business"
+          LIGHTHOUSE_RUNS: "5"
+          LIGHTHOUSE_PAGES: "/,/pricing,/guides/which-ndis-audit,/start,/start/business"
 
       - name: Upload the Lighthouse budget report
         if: always()
@@ -304,11 +307,11 @@ jobs:
 
       - name: Performance budget on the documents page, signed in (REQ-010, backlog 2, D-1012; advisory until green, D-1013)
         continue-on-error: true
-        run: npm run perf:budget
+        run: npm run perf:budget || npm run perf:budget
         env:
           LIGHTHOUSE_BUDGET: "1"
-          LIGHTHOUSE_RUNS: "3"
-          LIGHTHOUSE_PAGES: "/documents"
+          LIGHTHOUSE_RUNS: "5"
+          LIGHTHOUSE_PAGES: "/documents,/registers,/worker"
 
       - name: Upload the signed-in Lighthouse budget report
         if: always()

@@ -50,11 +50,40 @@ export const BUDGETS = {
   lcpMs: 2500,
   cls: 0.1,
   questionnaireJsBytes: 250_000,
+  /** REQ-012 FR-5 (AC-13): the server's first byte, every class. */
+  ttfbMs: 800,
 } as const;
 
-const ALL_PAGES = ["/", "/pricing", "/start", "/start/business", "/documents"];
-const QUESTIONNAIRE_PAGES = new Set(["/start", "/start/business"]);
-const SIGNED_IN_PAGES = new Set(["/documents"]);
+/**
+ * REQ-012 FR-5: the page classes and their total-transfer budgets (every
+ * resource the page loads, as Lighthouse's resource summary counts them).
+ * A page over its class's budget fails the run; the report prints the
+ * measured values beside the budgets.
+ */
+export const PAGE_CLASSES = {
+  "public content": {
+    pages: ["/", "/pricing", "/guides/which-ndis-audit"],
+    bytes: 450_000,
+  },
+  questionnaire: { pages: ["/start", "/start/business"], bytes: 550_000 },
+  "signed-in": {
+    pages: ["/documents", "/registers", "/worker"],
+    bytes: 900_000,
+  },
+} as const;
+export type PageClass = keyof typeof PAGE_CLASSES;
+
+const ALL_PAGES = Object.values(PAGE_CLASSES).flatMap((c) => [...c.pages]);
+const QUESTIONNAIRE_PAGES = new Set<string>(PAGE_CLASSES.questionnaire.pages);
+const SIGNED_IN_PAGES = new Set<string>(PAGE_CLASSES["signed-in"].pages);
+/** The worker home needs a worker member's session, not the owner's. */
+const WORKER_PAGES = new Set<string>(["/worker"]);
+
+export function pageClassOf(path: string): PageClass {
+  for (const [name, c] of Object.entries(PAGE_CLASSES))
+    if ((c.pages as readonly string[]).includes(path)) return name as PageClass;
+  return "public content";
+}
 
 export type PageResult = {
   path: string;
@@ -63,6 +92,10 @@ export type PageResult = {
   lcpMs: number;
   cls: number;
   jsBytes: number;
+  /** REQ-012 FR-5: every resource's transfer size (Lighthouse's resource-summary total). */
+  bytes: number;
+  /** REQ-012 FR-5: the server's first byte (Lighthouse's server-response-time). */
+  ttfbMs: number;
   /** The audits Lighthouse flags for the page, for the report. */
   opportunities: string[];
 };
@@ -233,6 +266,11 @@ function runLighthouse(
       (audits["cumulative-layout-shift"]?.numericValue ?? 0).toFixed(3),
     ),
     jsBytes: scripts.reduce((n, i) => n + (i.transferSize ?? 0), 0),
+    bytes:
+      (audits["resource-summary"]?.details?.items ?? []).find(
+        (i) => i.resourceType === "total",
+      )?.transferSize ?? 0,
+    ttfbMs: Math.round(audits["server-response-time"]?.numericValue ?? 0),
     opportunities: Object.values(audits)
       .filter(
         (a) =>
@@ -255,11 +293,19 @@ function formatReport(results: PageResult[], notes: string[], base: string) {
     "",
     `Lighthouse ${LIGHTHOUSE_VERSION}, mobile profile (emulated phone, 4G and a 4x slower CPU applied for real), performance category, against ${base}, one warm-up request per page; the median of each page's runs counts. Budgets: performance ${BUDGETS.performance}+, LCP ${BUDGETS.lcpMs} ms, CLS ${BUDGETS.cls}, JavaScript on the questionnaire under ${kb(BUDGETS.questionnaireJsBytes)}.`,
     "",
-    "| Page | Runs | Performance | LCP | CLS | JavaScript | Flagged audits |",
-    "| --- | --- | --- | --- | --- | --- | --- |",
+    "| Page | Class | Runs | Performance | LCP | CLS | JavaScript | Bytes | TTFB | Flagged audits |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ...results.map(
       (r) =>
-        `| ${r.path} | ${r.runs} | ${r.performance} | ${r.lcpMs} ms | ${r.cls} | ${kb(r.jsBytes)} | ${r.opportunities.join(", ") || "none"} |`,
+        `| ${r.path} | ${pageClassOf(r.path)} | ${r.runs} | ${r.performance} | ${r.lcpMs} ms | ${r.cls} | ${kb(r.jsBytes)} | ${kb(r.bytes)} | ${r.ttfbMs} ms | ${r.opportunities.join(", ") || "none"} |`,
+    ),
+    "",
+    "Budgets (REQ-012 FR-5): performance 90 or more, LCP 2,500 ms or less, CLS 0.1 or less, TTFB 800 ms or less on every page; questionnaire JavaScript under 250 kB; total transfer per class:",
+    "",
+    "| Class | Pages | Bytes budget |",
+    "| --- | --- | --- |",
+    ...Object.entries(PAGE_CLASSES).map(
+      ([name, c]) => `| ${name} | ${c.pages.join(", ")} | ${kb(c.bytes)} |`,
     ),
     "",
     ...notes.map((n) => `- ${n}`),
@@ -272,6 +318,7 @@ describe.skipIf(!enabled)("performance budgets (REQ-010, backlog 2)", () => {
   let child: ChildProcess | null = null;
   let base = process.env.LIGHTHOUSE_BASE_URL?.replace(/\/$/, "") ?? "";
   let tenant: TestTenant | null = null;
+  let worker: TestTenant | null = null;
   const results: PageResult[] = [];
   const notes: string[] = [];
 
@@ -298,14 +345,31 @@ describe.skipIf(!enabled)("performance budgets (REQ-010, backlog 2)", () => {
           tradingName: "Sunrise Supports",
           answers,
         });
+        if (pagesWanted().some((p) => WORKER_PAGES.has(p))) {
+          // REQ-012 FR-5: the worker home needs a worker member's session.
+          worker = await createTenant({
+            label: "lighthouse-worker",
+            tradingName: "",
+            answers: {},
+            withAccount: false,
+          });
+          const { error } = await tenant.admin.from("memberships").insert({
+            user_id: worker.userId,
+            account_id: tenant.accountId,
+            role: "worker",
+            worker_ref: "W-003",
+          });
+          if (error) throw new Error(`worker membership: ${error.message}`);
+        }
       } else
         notes.push(
-          "/documents skipped: no Supabase variables, so no signed-in session.",
+          "signed-in pages skipped: no Supabase variables, so no signed-in session.",
         );
     }
   }, 120_000);
 
   afterAll(async () => {
+    if (worker) await deleteTenant(worker);
     if (tenant) await deleteTenant(tenant);
     if (child) stopServer(child);
     mkdirSync("out", { recursive: true });
@@ -333,7 +397,11 @@ describe.skipIf(!enabled)("performance budgets (REQ-010, backlog 2)", () => {
     for (const path of pagesWanted()) {
       const signedIn = SIGNED_IN_PAGES.has(path);
       if (signedIn && !tenant) continue;
-      const cookie = signedIn && tenant ? cookieHeader(tenant) : null;
+      // REQ-012 FR-5: the worker home is the worker member's page, the rest the owner's.
+      if (WORKER_PAGES.has(path) && !worker) continue;
+      const cookie = signedIn
+        ? cookieHeader(WORKER_PAGES.has(path) && worker ? worker : tenant!)
+        : null;
       const name =
         path === "/" ? "home" : path.replace(/^\//, "").replace(/\//g, "-");
       // One plain request first: the first render of a route warms the
@@ -360,6 +428,8 @@ describe.skipIf(!enabled)("performance budgets (REQ-010, backlog 2)", () => {
         lcpMs: median(samples.map((s) => s.lcpMs)),
         cls: median(samples.map((s) => s.cls)),
         jsBytes: median(samples.map((s) => s.jsBytes)),
+        bytes: median(samples.map((s) => s.bytes)),
+        ttfbMs: median(samples.map((s) => s.ttfbMs)),
         opportunities: [...new Set(samples.flatMap((s) => s.opportunities))],
       };
       results.push(r);
@@ -371,6 +441,16 @@ describe.skipIf(!enabled)("performance budgets (REQ-010, backlog 2)", () => {
         failures.push(`${path}: LCP ${r.lcpMs} ms is over ${BUDGETS.lcpMs} ms`);
       if (r.cls > BUDGETS.cls)
         failures.push(`${path}: CLS ${r.cls} is over ${BUDGETS.cls}`);
+      // REQ-012 FR-5 (AC-13): total transfer against the class's budget; the first byte against every page's.
+      const classBudget = PAGE_CLASSES[pageClassOf(path)].bytes;
+      if (r.bytes > classBudget)
+        failures.push(
+          `${path}: ${kb(r.bytes)} transferred is over the ${pageClassOf(path)} budget of ${kb(classBudget)}`,
+        );
+      if (r.ttfbMs > BUDGETS.ttfbMs)
+        failures.push(
+          `${path}: TTFB ${r.ttfbMs} ms is over ${BUDGETS.ttfbMs} ms`,
+        );
       if (
         QUESTIONNAIRE_PAGES.has(path) &&
         r.jsBytes >= BUDGETS.questionnaireJsBytes
