@@ -12,7 +12,7 @@ export type ParticipantDataWarning = {
 
 // REQ-033 (D-2931): a title may be followed by an initial ("Mr J. Smith"), as auditors' reports write names.
 const NAME =
-  /\b(?:Mr|Mrs|Ms|Miss|Dr)\.?\s+(?:[A-Z]\.?\s+)?[A-Z][a-z]+\b|\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b/;
+  /\b(?:Mr|Mrs|Ms|Miss|Dr)\.?\s+(?:[A-Z]\.?\s+)?[A-Z][a-z]+\b|\b[A-Z][a-z]{2,}[ \t]+[A-Z][a-z]{2,}\b/;
 const DOB =
   /\b(?:dob|date of birth|born)\b[^\n]{0,20}\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}|\b\d{1,2}[\/.-]\d{1,2}[\/.-](?:19|20)\d{2}\b/i;
 const NDIS_NUMBER = /\b43\d{7}\b/;
@@ -23,8 +23,10 @@ const HEALTH =
 
 /** Capitalised words that make a two-word match a place or organisation, not a person. */
 // REQ-033 (D-2931): the audit's own words ("Core Module", "Quality Indicator", "Audit Report") are not names.
+// REQ-035 (D-2302): the two-word form stays on one line, so a heading and the next line's first word
+// ("Purpose\nThis policy…") are not a name; nor a business name or a policy's own words ("Example Supports", "Bright Futures Care", "Policy Statement"), since a provider's whole policy now runs through the gate.
 const PLACE_WORDS =
-  /^(?:North|South|East|West|Northern|Southern|Eastern|Western|Central|Greater|Inner|Outer|Upper|Lower|New|Sydney|Melbourne|Brisbane|Perth|Adelaide|Hobart|Darwin|Canberra|Newcastle|Wollongong|Geelong|Gold|Coast|Sunshine|Bay|Region|Shire|Council|Hospital|Centre|Center|Street|Road|Australia|Wales|Territory|Island|Valley|Hills|Park|Beach|River|Lake|Mount|Port|NDIS|Commission|Practice|Standards|Standard|Quality|Safeguards|Core|Module|Modules|Supplementary|Indicator|Indicators|Verification|Certification|Audit|Auditor|Auditors|Finding|Findings|Report|Rules|Act|Scheme|Agency)$/;
+  /^(?:North|South|East|West|Northern|Southern|Eastern|Western|Central|Greater|Inner|Outer|Upper|Lower|New|Sydney|Melbourne|Brisbane|Perth|Adelaide|Hobart|Darwin|Canberra|Newcastle|Wollongong|Geelong|Gold|Coast|Sunshine|Bay|Region|Shire|Council|Hospital|Centre|Center|Street|Road|Australia|Wales|Territory|Island|Valley|Hills|Park|Beach|River|Lake|Mount|Port|NDIS|Commission|Practice|Standards|Standard|Quality|Safeguards|Core|Module|Modules|Supplementary|Indicator|Indicators|Verification|Certification|Audit|Auditor|Auditors|Finding|Findings|Report|Rules|Act|Scheme|Agency|Supports|Services|Care|Pty|Ltd|Group|Community|Disability|Health|Policy|Statement|Complaints|Feedback|Incident|Management)$/;
 
 const COMMON_FALSE_POSITIVES =
   /^(?:New South Wales|Western Australia|South Australia|Northern Territory|Practice Standards|Quality Indicators|Household Tasks|Daily Living|Early Childhood|Support Coordination)$/;

@@ -110,3 +110,12 @@ export async function checkAuditorOpenAllowed(
 ): Promise<boolean> {
   return hitRateLimit(auditorOpenKey(linkId, address), AUDITOR_OPEN_LIMIT);
 }
+
+/** REQ-035 FR-3, SR-5 (D-2965): three gap checks an hour per account. */
+export const GAP_CHECK_LIMIT = { limit: 3, windowSeconds: 3600 } as const;
+
+export async function checkGapCheckAllowed(
+  accountId: string,
+): Promise<boolean> {
+  return hitRateLimit(`gap-check:${accountId}`, GAP_CHECK_LIMIT);
+}

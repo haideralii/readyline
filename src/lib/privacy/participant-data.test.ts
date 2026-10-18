@@ -50,3 +50,28 @@ describe("detectParticipantData", () => {
     for (const x of w) expect(x.message.length).toBeGreaterThan(20);
   });
 });
+
+// REQ-035 (D-2302): a provider's whole policy runs through the gate, so its business name, its
+// own headings and a heading followed by the next line's sentence are not read as a person; a
+// titled name and a plain two-word name on one line still are.
+describe("the gate over a whole policy (REQ-035)", () => {
+  it("passes a business name, a policy's headings and a heading over a sentence, and still catches a name", () => {
+    for (const ok of [
+      "Example Supports welcomes complaints as a way to improve.",
+      "Sunrise Supports delivers household tasks in Newcastle.",
+      "Policy Statement\nIncident Management and Complaints Feedback",
+      "Purpose\n\nThis policy says what we do.\n\nResponsibilities\n\nThe owner decides.",
+    ])
+      expect(detectParticipantData(ok), ok).toEqual([]);
+    expect(
+      detectParticipantData("A complaint from Mr J. Smith was handled.").map(
+        (w) => w.kind,
+      ),
+    ).toEqual(["name"]);
+    expect(
+      detectParticipantData("Spoke with Jane Citizen about the roster.").map(
+        (w) => w.kind,
+      ),
+    ).toEqual(["name"]);
+  });
+});
