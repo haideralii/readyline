@@ -17,6 +17,10 @@ test.describe("sign-in", () => {
     ).toBeVisible();
     const email = page.getByLabel("Email address");
     await expect(email).toBeVisible();
+    // QA live b340ee3 (report B): an email field, so a phone opens the email keyboard.
+    await expect(email).toHaveAttribute("type", "email");
+    await expect(email).toHaveAttribute("inputmode", "email");
+    await expect(email).toHaveAttribute("autocomplete", "email");
 
     await page.getByRole("button", { name: "Email me a sign-in link" }).click();
     await expect(
