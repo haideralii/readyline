@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { ErrorSummary, type FieldErrors } from "@/app/start/_components/fields";
 import { ConfirmButton } from "@/components/confirm-button";
 import {
@@ -53,6 +53,15 @@ import {
 const INPUT =
   "border-line bg-surface text-ink block min-h-12 w-full rounded-md border px-3 py-2 text-base shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2";
 const NO_TOOL_KEYS = Object.keys(NO_TOOL_FACTS);
+// D-1012, D-2270 (9): a client form in the first HTML of a signed-in page is
+// inert until React is live, so a value typed before hydration is never lost.
+const noop = () => () => {};
+const useLive = () =>
+  useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
 const FINISH_REPLY_MS = 60_000;
 
 type Status = "idle" | "saving" | "saved" | "cleared";
@@ -77,6 +86,7 @@ export function FinishForm({
   reapprovals: number;
 }) {
   const router = useRouter();
+  const live = useLive();
   const [values, setValues] = useState<Record<string, string>>(() => ({
     ...initial,
     ...Object.fromEntries(
@@ -249,152 +259,154 @@ export function FinishForm({
           {DETAILS_DONE_LINE(done)}
         </p>
       ) : null}
-      {questions.map((q) => {
-        const copy = DETAILS_FIELDS[q.key];
-        const label = copy?.label ?? q.question;
-        const help = copy?.help ?? q.example;
-        const err = errors[q.key]?.[0];
-        const st = status[q.key] ?? "idle";
-        const describedBy = [
-          `${q.key}-help`,
-          err ? `${q.key}-error` : null,
-          warnings[q.key]?.length ? `${q.key}-warning` : null,
-        ]
-          .filter(Boolean)
-          .join(" ");
-        const readOnly = noTool && NO_TOOL_KEYS.includes(q.key);
-        return (
-          <div key={q.key} className="mb-6" data-testid={`fact-${q.key}`}>
-            <label htmlFor={q.key} className="block text-base font-medium">
-              {label}
-            </label>
-            <p
-              id={`${q.key}-help`}
-              className="text-slate mt-1 text-sm leading-6"
-            >
-              {help}
-            </p>
-            <div className="mt-2 flex items-center gap-3">
-              <input
-                id={q.key}
-                name={q.key}
-                type="text"
-                inputMode={q.key === "phone-or-email" ? "email" : "text"}
-                autoComplete={
-                  q.key === "name"
-                    ? "name"
-                    : q.key === "phone-or-email"
-                      ? "tel"
-                      : "off"
-                }
-                maxLength={200}
-                value={values[q.key] ?? ""}
-                readOnly={readOnly}
-                aria-describedby={describedBy}
-                aria-invalid={err ? true : undefined}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setValues((a) => ({ ...a, [q.key]: v }));
-                  setStatus((s) => ({ ...s, [q.key]: "idle" }));
-                  warn(q.key, v);
-                }}
-                onBlur={() => void saveKey(q.key)}
-                className={`${INPUT} ${err ? "border-red-700 dark:border-red-400" : ""}`}
-              />
-              <span
-                role="status"
-                className="text-slate min-w-14 text-sm"
-                data-testid={`fact-${q.key}-status`}
-              >
-                {st === "saving"
-                  ? DETAILS_SAVING
-                  : st === "saved"
-                    ? DETAILS_SAVED
-                    : ""}
-              </span>
-            </div>
-            {st === "cleared" ? (
-              <p className="text-slate mt-1 text-sm leading-6">
-                {DETAILS_CLEARED}
-              </p>
-            ) : null}
-            {q.key === "name" || q.key === "role" ? (
-              <p
-                className="text-slate mt-1 text-sm leading-6"
-                data-testid={`fact-${q.key}-reapproval`}
-              >
-                {DETAILS_REAPPROVAL_LINE}
-              </p>
-            ) : null}
-            {q.key === "role" && (reapprovals > 0 || reapproved !== null) ? (
-              <section
-                aria-labelledby="reapprove-heading"
-                className="border-ochre mt-3 rounded-md border p-3"
-                data-testid="reapprove"
-              >
-                <h2 id="reapprove-heading" className="text-base font-medium">
-                  {DETAILS_REAPPROVE_HEADING}
-                </h2>
-                {reapproved !== null ? (
-                  <p
-                    role="status"
-                    className="mt-1 text-sm leading-6"
-                    data-testid="reapproved-line"
-                  >
-                    {DETAILS_REAPPROVED_LINE(reapproved)}
-                  </p>
-                ) : (
-                  <>
-                    <p className="mt-1 text-sm leading-6">
-                      {DETAILS_REAPPROVE_LINE(reapprovals)}
-                    </p>
-                    <div className="mt-2">
-                      <ConfirmButton
-                        label={DETAILS_REAPPROVE_BUTTON(reapprovals)}
-                        question={DETAILS_REAPPROVE_QUESTION}
-                        confirmLabel={DETAILS_REAPPROVE_CONFIRM}
-                        confirmClassName="btn-secondary"
-                        onConfirm={() => void reapprove()}
-                        testId="reapprove-button"
-                      />
-                    </div>
-                  </>
-                )}
-              </section>
-            ) : null}
-            {warnings[q.key]?.length ? (
-              <p
-                id={`${q.key}-warning`}
-                role="status"
-                className="border-ochre mt-2 rounded-md border p-3 text-sm leading-6"
-                data-testid={`fact-${q.key}-warning`}
-              >
-                {warnings[q.key][0]}
-              </p>
-            ) : null}
-            {err ? (
-              <p
-                id={`${q.key}-error`}
-                className="mt-2 text-sm font-medium text-red-700 dark:text-red-400"
-              >
-                {err}
-              </p>
-            ) : null}
-            {hasNoTool && q.key === "other-tool" ? (
-              <label className="mt-3 flex min-h-11 items-center gap-3 text-base">
-                <input
-                  type="checkbox"
-                  checked={noTool}
-                  onChange={(e) => void setNoTool(e.target.checked)}
-                  data-testid="fact-other-tool-none"
-                  className="size-5"
-                />
-                {DETAILS_NO_TOOL_LABEL}
+      <fieldset disabled={!live} data-testid="details-fields">
+        {questions.map((q) => {
+          const copy = DETAILS_FIELDS[q.key];
+          const label = copy?.label ?? q.question;
+          const help = copy?.help ?? q.example;
+          const err = errors[q.key]?.[0];
+          const st = status[q.key] ?? "idle";
+          const describedBy = [
+            `${q.key}-help`,
+            err ? `${q.key}-error` : null,
+            warnings[q.key]?.length ? `${q.key}-warning` : null,
+          ]
+            .filter(Boolean)
+            .join(" ");
+          const readOnly = noTool && NO_TOOL_KEYS.includes(q.key);
+          return (
+            <div key={q.key} className="mb-6" data-testid={`fact-${q.key}`}>
+              <label htmlFor={q.key} className="block text-base font-medium">
+                {label}
               </label>
-            ) : null}
-          </div>
-        );
-      })}
+              <p
+                id={`${q.key}-help`}
+                className="text-slate mt-1 text-sm leading-6"
+              >
+                {help}
+              </p>
+              <div className="mt-2 flex items-center gap-3">
+                <input
+                  id={q.key}
+                  name={q.key}
+                  type="text"
+                  inputMode={q.key === "phone-or-email" ? "email" : "text"}
+                  autoComplete={
+                    q.key === "name"
+                      ? "name"
+                      : q.key === "phone-or-email"
+                        ? "tel"
+                        : "off"
+                  }
+                  maxLength={200}
+                  value={values[q.key] ?? ""}
+                  readOnly={readOnly}
+                  aria-describedby={describedBy}
+                  aria-invalid={err ? true : undefined}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setValues((a) => ({ ...a, [q.key]: v }));
+                    setStatus((s) => ({ ...s, [q.key]: "idle" }));
+                    warn(q.key, v);
+                  }}
+                  onBlur={() => void saveKey(q.key)}
+                  className={`${INPUT} ${err ? "border-red-700 dark:border-red-400" : ""}`}
+                />
+                <span
+                  role="status"
+                  className="text-slate min-w-14 text-sm"
+                  data-testid={`fact-${q.key}-status`}
+                >
+                  {st === "saving"
+                    ? DETAILS_SAVING
+                    : st === "saved"
+                      ? DETAILS_SAVED
+                      : ""}
+                </span>
+              </div>
+              {st === "cleared" ? (
+                <p className="text-slate mt-1 text-sm leading-6">
+                  {DETAILS_CLEARED}
+                </p>
+              ) : null}
+              {q.key === "name" || q.key === "role" ? (
+                <p
+                  className="text-slate mt-1 text-sm leading-6"
+                  data-testid={`fact-${q.key}-reapproval`}
+                >
+                  {DETAILS_REAPPROVAL_LINE}
+                </p>
+              ) : null}
+              {q.key === "role" && (reapprovals > 0 || reapproved !== null) ? (
+                <section
+                  aria-labelledby="reapprove-heading"
+                  className="border-ochre mt-3 rounded-md border p-3"
+                  data-testid="reapprove"
+                >
+                  <h2 id="reapprove-heading" className="text-base font-medium">
+                    {DETAILS_REAPPROVE_HEADING}
+                  </h2>
+                  {reapproved !== null ? (
+                    <p
+                      role="status"
+                      className="mt-1 text-sm leading-6"
+                      data-testid="reapproved-line"
+                    >
+                      {DETAILS_REAPPROVED_LINE(reapproved)}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="mt-1 text-sm leading-6">
+                        {DETAILS_REAPPROVE_LINE(reapprovals)}
+                      </p>
+                      <div className="mt-2">
+                        <ConfirmButton
+                          label={DETAILS_REAPPROVE_BUTTON(reapprovals)}
+                          question={DETAILS_REAPPROVE_QUESTION}
+                          confirmLabel={DETAILS_REAPPROVE_CONFIRM}
+                          confirmClassName="btn-secondary"
+                          onConfirm={() => void reapprove()}
+                          testId="reapprove-button"
+                        />
+                      </div>
+                    </>
+                  )}
+                </section>
+              ) : null}
+              {warnings[q.key]?.length ? (
+                <p
+                  id={`${q.key}-warning`}
+                  role="status"
+                  className="border-ochre mt-2 rounded-md border p-3 text-sm leading-6"
+                  data-testid={`fact-${q.key}-warning`}
+                >
+                  {warnings[q.key][0]}
+                </p>
+              ) : null}
+              {err ? (
+                <p
+                  id={`${q.key}-error`}
+                  className="mt-2 text-sm font-medium text-red-700 dark:text-red-400"
+                >
+                  {err}
+                </p>
+              ) : null}
+              {hasNoTool && q.key === "other-tool" ? (
+                <label className="mt-3 flex min-h-11 items-center gap-3 text-base">
+                  <input
+                    type="checkbox"
+                    checked={noTool}
+                    onChange={(e) => void setNoTool(e.target.checked)}
+                    data-testid="fact-other-tool-none"
+                    className="size-5"
+                  />
+                  {DETAILS_NO_TOOL_LABEL}
+                </label>
+              ) : null}
+            </div>
+          );
+        })}
+      </fieldset>
       <section
         aria-labelledby="details-business-heading"
         className="border-rule mb-6 rounded-md border p-3"
