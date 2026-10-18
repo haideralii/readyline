@@ -41,8 +41,9 @@ async function txt(name: string): Promise<string[][] | null> {
       ),
     ]);
   } catch {
-    // NXDOMAIN or no TXT records is an answer: none there.
-    return [];
+    // D-2842: a resolver error (SERVFAIL, ECONNREFUSED, NXDOMAIN alike) is a lookup that did not answer, and
+    // D-2824 reads that as unverified, never as "none there" (mismatched); null, the same as the timeout.
+    return null;
   }
 }
 
