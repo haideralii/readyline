@@ -88,3 +88,27 @@ Countdown timers, strikethrough list prices, Afterpay, "audit-proof", invented p
 - Buy the domain before any content goes live.
 - The subscription (REQ-009 registers, AUD 39/month) is priced well under ONDIS ($59) and Auditly's QMS ($395); keep it simple and sole-trader shaped.
 - Add a verification-pathway case study and a personal-care (certification) case study to the evidence set before July 2027 demand arrives.
+
+
+## KoalaOne (koalanotes.com.au) and a provider-group thread, read by the PO on 18 Oct 2026
+
+What KoalaOne is: practice management for registered providers (rostering, invoicing, Xero/MYOB/QuickBooks sync, AI case notes, behaviour-support and allied-health modules, a compliance hub for staff certificate and service-agreement expiry). Post-registration operations; adjacent to Readyline, not a competitor for the audit itself. Their migration list names ShiftCare, SupportAbility and Brevity as the operations incumbents. Claims we never make, seen there: "100% Audit-Proof Compliance", "Zero risk of audit failure", unsourced "50%" savings and testimonials.
+
+The thread (a public NDIS participants-and-providers group, June 2026, 13 replies): a provider asking which AI tool to run alongside their business; a consultant replying that he has audited most of the "vibe coded" SaaS tools posted there and reported all but one for privacy breaches; a dispute over whether ChatGPT may be used at all (one side: never; the other: fine once participant data is de-identified).
+
+What we take from it:
+1. "No participant data" is our strongest privacy position and it is already built (home page card, privacy.md, ai.md, the detector); keep it on the first screen and in the FAQ, and keep the AI page's plain sentence that participant information is never sent to a model.
+2. Launch readiness (REQ-012) before any public post: the people in that group audit tools and name them.
+3. Where we post: only in a thread asking about registration or audit preparation, answer first and link second; never a product plug in an unrelated thread (honest-marketing rule).
+4. Backlog: a referral note for registered customers who ask "what runs my rosters" (KoalaOne, ShiftCare, SupportAbility, Brevity); no partnership until paying clients exist.
+
+
+## Audit Rocket (auditrocket.com.au), read by the PO on 18 Oct 2026
+
+What they are: the closest direct competitor seen so far. Australian Regulated Care Advisors Pty Ltd (ABN 63 695 074 036), in beta. AI-drafted policies, procedures, risk assessments and registers for NDIS (verification and certification), aged care and Support at Home, built on the organisation's details, delivered as editable Word plus matching PDF in an organised ZIP with version numbers and review dates. Entry point is an upload: the auditor's findings, checklists and existing documents; the tool works out which documents are missing and drafts to answer each finding, with "Needs info" and "Clarifications" states where it asks the provider mid-generation. Pay once, no subscription, prices inc. GST: Starter $499 for 5 document credits, Business $799 for 15, Professional $999 for 30, Enterprise custom; credits last 12 months, 3 free revisions per document; a refund policy page exists. Honest footer: "prepares draft documentation. It does not guarantee audit outcomes or regulatory approval." Coming: childcare, RTOs, WHS, ISO.
+
+What we take from it:
+1. Price: a first-time provider needs 15 to 20 documents; their $799 to $999 against our one fixed AUD 399 for the whole pack is a line for the pricing page, stated as a range for "per-document AI tools" without naming them.
+2. Their strength we lack: upload an auditor's findings (a non-conformity list) and get drafts that answer each one. Backlog REQ: findings upload, each finding mapped to the document and section that answers it, with the Commission's indicator cited. It is the renewal and failed-audit case, not the first application.
+3. Their weakness we hold: nothing after download. No registers, no reminders, no auditor link, no audit-type call, no Commission text behind the answers, and a multi-sector engine with an NDIS skin. Keep leading with the audit-type result and the registers subscription.
+4. They are in the honest bracket (no guarantee, refund policy, GST stated); do not position against them on claims, position on depth and price.
