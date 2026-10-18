@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { reachResult } from "./helpers/questionnaire";
 
 /**
  * Live QA pass of release b340ee3 (product/qa/live-tests/2026-10-18-b340ee3,
@@ -42,5 +43,19 @@ test.describe("live QA b340ee3: the questionnaire's focus and words", () => {
     // A second empty-field submit focuses the summary again: it is the submit, not the count, that moves focus.
     await page.getByRole("button", { name: "Save and continue" }).click();
     await expect(alert).toBeFocused();
+  });
+
+  test("D2: Start again, then Keep, and focus is back on the Start again button", async ({
+    page,
+  }) => {
+    await reachResult(page);
+    const startAgain = page.getByTestId("clear-draft");
+    await startAgain.focus();
+    await page.keyboard.press("Enter");
+    const keep = page.getByRole("button", { name: "Keep" });
+    await expect(keep).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.getByTestId("clear-draft")).toBeFocused();
+    await expect(page.getByTestId("clear-draft-confirm")).toHaveCount(0);
   });
 });
