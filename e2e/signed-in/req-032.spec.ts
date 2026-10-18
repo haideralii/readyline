@@ -48,19 +48,21 @@ const CASES: Case[] = [
     notifyBy: "2026-04-13",
     bracket: "(Good Friday and Easter Monday do not count)",
   },
+  // D-2961: a past date, since the form refuses one after today; Labour Day (9 March 2026) is
+  // Victoria's alone, so it is skipped for VIC and counted for {NSW, VIC}.
   {
     label: "nsw-vic",
     states: ["NSW", "VIC"],
-    occurred: "2026-10-30",
-    notifyBy: "2026-11-06",
+    occurred: "2026-03-06",
+    notifyBy: "2026-03-13",
     bracket: null,
   },
   {
     label: "vic",
     states: ["VIC"],
-    occurred: "2026-10-30",
-    notifyBy: "2026-11-09",
-    bracket: "(Melbourne Cup Day does not count)",
+    occurred: "2026-03-06",
+    notifyBy: "2026-03-16",
+    bracket: "(Labour Day does not count)",
   },
 ];
 
