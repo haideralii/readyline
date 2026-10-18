@@ -2,7 +2,10 @@ import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SampleDocument } from "@/components/sample-document";
+import { StartHereSheetView } from "@/components/start-here-sheet";
+import { sheetLines } from "@/lib/generator/start-here";
 import { HOME_COPY as C } from "@/lib/home-copy";
+import { SAMPLE_START_HERE } from "@/lib/sample-start-here";
 
 export const metadata: Metadata = {
   title: "Sample document",
@@ -14,7 +17,9 @@ export const metadata: Metadata = {
  * The sample document's own page (REQ-025 FR-12): the full sample with its
  * download button, moved off the home page so that page fits a phone. The
  * home page keeps a card and two links; the hero's "See a sample document"
- * lands here.
+ * lands here. Under the document, the Start here sheet the sole-trader
+ * reference case gets with its documents (REQ-031 FR-3; D-2888, D-2896),
+ * read-only, so a provider sees the list before paying.
  */
 export default function SamplePage() {
   return (
@@ -30,7 +35,18 @@ export default function SamplePage() {
       <h1 className="mt-2">{C.sampleHeading}</h1>
       <p className="text-ink mt-3 leading-7">{C.samplePageLead}</p>
       <div className="mt-6">
-        <SampleDocument level={2} />
+        <SampleDocument
+          level={2}
+          moreText={[C.sampleSheetLine, ...sheetLines(SAMPLE_START_HERE)].join(
+            "\n",
+          )}
+        />
+      </div>
+      <div className="mt-10" data-testid="sample-start-here">
+        <p className="text-slate text-sm" data-testid="sample-start-here-line">
+          {C.sampleSheetLine}
+        </p>
+        <StartHereSheetView sheet={SAMPLE_START_HERE} setId={null} level={2} />
       </div>
       <p className="mt-8">
         <Link href="/start" className="btn-primary" data-testid="sample-cta">

@@ -34,6 +34,8 @@ import { documentControlForAccount } from "@/server/registers/document-control-q
 import { registerOverview } from "@/server/registers/queries";
 import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
+import { latestRegisterChangeAt } from "@/server/registers/what-changed-queries";
+import { whatChangedReading } from "@/lib/path/renewal";
 import {
   lastSelfCheck,
   openSelfCheckFindings,
@@ -96,6 +98,7 @@ export default async function AuditDayPage({
     period,
     workers,
     ownershipChangeOn,
+    latestChangeAt,
   ] = await Promise.all([
     listChecklistItems(supabase, viewer.account.id),
     listDraftedDocumentTypeIds(supabase, viewer.account.id),
@@ -120,6 +123,8 @@ export default async function AuditDayPage({
     ),
     // REQ-023 FR-2, FR-4 (Session D): the change-of-ownership row and item read the changes register.
     latestOwnershipChangeOn(supabase, viewer.account.id),
+    // REQ-031 FR-5 (D-2890): the newest register change, for the what-changed link's words.
+    latestRegisterChangeAt(supabase, viewer.account.id),
   ]);
   const peopleLine = workerStatesLine(workers, todaySydney());
   // REQ-023 FR-5: the period the pack link carries, "This registration period"
@@ -285,7 +290,18 @@ export default async function AuditDayPage({
           >
             {period.last_audit_on
               ? "What changed since the last audit"
-              : "What changed in this registration period"}
+              : "What changed in this registration period"}{" "}
+            {/* REQ-031 FR-5 (D-2890): the renewal step's words, so the link says whether it has been read. */}
+            <span data-testid="audit-day-what-changed-state">
+              (
+              {
+                whatChangedReading(
+                  period.what_changed_read_at ?? null,
+                  latestChangeAt,
+                ).state
+              }
+              )
+            </span>
           </Link>
         </p>
       ) : null}

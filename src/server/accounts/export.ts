@@ -55,9 +55,18 @@ export type AccountExport = {
   registrationPeriods: Record<string, unknown>[];
   /** REQ-024 FR-6c: the worker tables, as stored, each a CSV in the zip. */
   workerTables: Record<WorkerExportTable, Record<string, unknown>[]>;
-  /** REQ-029 SR-5: the details typed once (key, value, when), and every document version's adoption snapshot. */
+  /** REQ-030 D-2898, REQ-029 SR-5: the account's own facts that fill the documents (key, value, when). */
   accountFacts: Record<string, unknown>[];
+  /** REQ-029 SR-5: every document version's adoption snapshot (approver and day). */
   documentVersions: Record<string, unknown>[];
+  /** REQ-030 D-2898: the reviews of changed documents (REQ-024). */
+  documentChangeReviews: Record<string, unknown>[];
+  /** REQ-030 D-2898: the policies circulated to workers, by code and date. */
+  policyCirculations: Record<string, unknown>[];
+  /** REQ-030 D-2898: the purchase records the privacy page says we keep. */
+  purchases: Record<string, unknown>[];
+  subscriptions: Record<string, unknown>[];
+  entitlements: Record<string, unknown>[];
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -81,8 +90,13 @@ export async function buildAccountExport(
     checklist,
     audit,
     periods,
-    accountFacts,
+    facts,
     documentVersions,
+    changeReviews,
+    circulations,
+    purchases,
+    subscriptions,
+    entitlements,
     ...workers
   ] = await Promise.all([
     supabase
@@ -112,12 +126,15 @@ export async function buildAccountExport(
       )
       .eq("account_id", accountId)
       .order("period_starts_on", { ascending: true }),
-    // REQ-029 SR-5 (D-2859): the facts and the snapshots the downloads fill from.
+    // REQ-030 FR-5 (D-2898): the six tables the PO moved into the export,
+    // read with the owner's session under RLS like everything above;
+    // ids that only join rows on the server stay out.
     supabase
       .from("account_facts")
       .select("key, value, created_at, updated_at")
       .eq("account_id", accountId)
       .order("key", { ascending: true }),
+    // REQ-029 SR-5 (D-2859): the snapshots the downloads fill from.
     supabase
       .from("document_versions")
       .select(
@@ -125,6 +142,37 @@ export async function buildAccountExport(
       )
       .eq("account_id", accountId)
       .order("created_at", { ascending: true }),
+    supabase
+      .from("document_change_reviews")
+      .select(
+        "document_type_id, change_id, reviewed_on, reviewer_ref, note, created_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("policy_circulations")
+      .select("document_type_id, circulated_on, worker_refs, how, created_at")
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("purchases")
+      .select(
+        "stripe_checkout_session_id, stripe_payment_intent_id, amount_cents, currency, status, receipt_url, created_at, refunded_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("subscriptions")
+      .select(
+        "stripe_subscription_id, status, current_period_end, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("entitlements")
+      .select("kind, assessment_id, granted_at, revoked_at")
+      .eq("account_id", accountId)
+      .order("granted_at", { ascending: true }),
     ...WORKER_EXPORT_TABLES.map((table) =>
       supabase
         .from(table)
@@ -162,9 +210,14 @@ export async function buildAccountExport(
     auditLog: audit.data ?? [],
     registrationPeriods: periods.data ?? [],
     workerTables,
-    accountFacts: (accountFacts.data as Record<string, unknown>[] | null) ?? [],
+    accountFacts: facts.data ?? [],
     documentVersions:
       (documentVersions.data as Record<string, unknown>[] | null) ?? [],
+    documentChangeReviews: changeReviews.data ?? [],
+    policyCirculations: circulations.data ?? [],
+    purchases: purchases.data ?? [],
+    subscriptions: subscriptions.data ?? [],
+    entitlements: entitlements.data ?? [],
   };
 }
 
@@ -178,7 +231,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the details you typed once for your documents, each document version's approver and adoption day, and the audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the facts that fill your documents, each document version's approver and adoption day, document change reviews, policy circulations, purchases, subscriptions, entitlements and audit log as JSON.",
     "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",
