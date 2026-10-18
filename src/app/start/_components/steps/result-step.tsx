@@ -25,11 +25,24 @@ import { stepHref } from "@/lib/questionnaire/navigation";
 import { ANSWERS_VERSION } from "@/lib/questionnaire/steps";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import {
+  GROUPS_LABEL,
+  MID_TERM_APPLIES,
+  MID_TERM_HEADING,
+  MID_TERM_NONE,
+  MODULES_HEADING,
+  REGISTERS_LEGEND,
+  RESULT_SCOPE_SENTENCE,
+  midTermLine,
+  resultPreparedLine,
+} from "@/lib/questionnaire/result-text";
+import {
   deriveResult,
   type DeriveResultResponse,
   type ResultChanges,
 } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
+import { ResultEmailForm } from "./result-email-form";
+import { ResultPrint, todayWords } from "./result-print";
 import {
   HAVE_TAG,
   SOLE_TRADER_LINE,
@@ -37,6 +50,7 @@ import {
   UNCONFIRMED_SOURCE_HEDGE,
   haveCounts,
   haveLegend,
+  RESULT_PRINT_BUTTON,
 } from "./result-copy";
 
 /**
@@ -61,7 +75,7 @@ export function ResultStep({
   /** Batch 47 item 1: the server page passes `subscriptionAvailable()`; off, the page says the one off-state sentence. */
   subscriptionOffered?: boolean;
 }) {
-  const { answers, mode, contactEmail } = useQuestionnaire();
+  const { answers, mode, contactEmail, userEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -132,6 +146,7 @@ export function ResultStep({
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
       contactEmail={contactEmail}
+      userEmail={userEmail}
       changes={response.changes}
     />
   );
@@ -311,19 +326,11 @@ function termsPresent(r: QuestionnaireResult, legend: string): string[] {
   return findGlossaryTerms(text).filter((id) => id !== inline);
 }
 
-const GROUPS_LABEL = "Registration groups in scope";
 const MODULE_STANDARDS_SUMMARY = "The standards in this module";
 const SIL_EXCLUDED_TEXT =
   "The service you described is not supported independent living under the Commission's definition. Class 0138 and the SIL module are not in your result.";
 const RP_ASSUMED_TEXT =
   "You were not sure about restrictive practices, and at least one of your answers to the three helper questions pointed to yes, so we included the implementing behaviour support plans module. Change the answer on the restrictive practices step and the module drops out.";
-const MODULES_HEADING = "Practice Standards modules that apply";
-const MID_TERM_HEADING = "Mid-term audit";
-const MID_TERM_APPLIES =
-  "Applies: about N months after registration, against the provider governance and operational management standards. Start preparing from month N.";
-const MID_TERM_NONE = "Does not apply.";
-const REGISTERS_LEGEND =
-  "Your pack includes a template for every register below; the subscription keeps them for you. An auditor samples them at the mid-term audit and at renewal.";
 const WHAT_NEXT_TEXT =
   "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already bought the pack.";
 
@@ -332,6 +339,7 @@ function ResultView({
   checklistTotal,
   signedIn,
   contactEmail,
+  userEmail,
   subscriptionOffered,
   changes,
 }: {
@@ -340,6 +348,8 @@ function ResultView({
   checklistTotal: number;
   signedIn: boolean;
   contactEmail: string | null;
+  /** REQ-031 FR-1: the signed-in owner's address, pre-filled in the email form; null signed out. */
+  userEmail: string | null;
   /** REQ-023 FR-11: how the result differs from the latest completed assessment, for a signed-in owner with a ready set. */
   changes?: ResultChanges;
 }) {
@@ -367,11 +377,11 @@ function ResultView({
 
   return (
     <div
-      className="min-h-screen lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8"
+      className="min-h-screen lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-8 print:min-h-0"
       data-testid="result"
     >
       {/* REQ-028 FR-6: columns 1 to 5 sticky (the card, then the glossary directly under it, D-2701); 6 to 12 the sections. */}
-      <div className="lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <div className="lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto print:hidden">
         {/* FR-4: the first screen is one card: the answer, one sentence, the counts, the line, one button. */}
         <section
           aria-labelledby="summary-heading"
@@ -384,9 +394,16 @@ function ResultView({
           </h2>
           {/* Batch 42 item 6 (D-549), REQ-025 FR-13: what the word means, from the glossary, in one line under the heading. */}
           <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
-            {glossarySentence(`${pathwayWord}-audit`)}
+            {glossarySentence(`${pathwayWord}-audit`)}{" "}
+            {/* REQ-031 D-2895, D-2887: the scope sentence, in the same line block so the card keeps its shape. */}
+            <span
+              className="text-slate mt-0.5 block text-xs leading-4"
+              data-testid="result-scope"
+            >
+              {RESULT_SCOPE_SENTENCE}
+            </span>
           </p>
-          <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
+          <ul className="mt-1 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
             {r.groups.map((g) => (
               <li
                 key={g.code}
@@ -405,7 +422,7 @@ function ResultView({
             five lines (28 px from sm up) and the button ends inside the screen
             again with every word kept. */}
           <ul
-            className="mt-2 space-y-1 text-base leading-6 sm:mt-3 sm:leading-7"
+            className="mt-2 space-y-1 text-base leading-6 sm:mt-2"
             data-testid="summary-list"
           >
             <li className="tabular-nums" data-testid="summary-documents">
@@ -416,7 +433,7 @@ function ResultView({
             <li data-testid="checklist-count-line">{lines.checklist}</li>
           </ul>
           {/* REQ-013 batch 36 item 3: two segments (have / still to do); the sentence is the pack line (REQ-025 FR-3). */}
-          <div className="mt-2 sm:mt-3">
+          <div className="mt-2 sm:mt-2">
             <ReadyLine
               counts={readyLineCounts(counts)}
               sentence={lines.pack}
@@ -426,7 +443,12 @@ function ResultView({
           {/* REQ-028 FR-6, D-2805 (D-2707 restored): one primary button whose label says where it goes, one text
             link with no figure; the checklist link lives in the documents section; the "Next:" line is gone. */}
           <div data-testid="checklist-teaser">
-            <div className="mt-3 flex flex-col gap-3 sm:mt-4 sm:flex-row sm:items-center">
+            {/* REQ-031 D-2895: the scope sentence joined the card (two lines from sm), so the groups, the list, the
+              ready line and this row each give up 4 px from sm and the button ends inside the first screen again
+              (REQ-015 FR-4; the run read 731 of 720 with the sentence inline). #116's run then read 735 on the
+              1280x720 desktop, so the sentence is its own small tight line under the meaning (text-xs, 16 px leading),
+              the list keeps its phone leading from sm (24 px) and this row sits 4 px higher again. */}
+            <div className="mt-3 flex flex-col gap-3 sm:mt-2 sm:flex-row sm:items-center">
               <Link
                 href={
                   signedIn
@@ -447,6 +469,13 @@ function ResultView({
               </Link>
             </div>
           </div>
+          {/* REQ-031 D-2895, D-2887: the closing line the print carries, on the screen too. */}
+          <p
+            className="text-slate mt-3 text-xs leading-5"
+            data-testid="result-prepared"
+          >
+            {resultPreparedLine(todayWords())}
+          </p>
           {/* FR-6: "Change my answers" and "Start again" as small links in the card's footer (the phone exception that
             returns the row under the stepper to the fold; batch 48 item 2's confirm kept). */}
           <div
@@ -460,6 +489,15 @@ function ResultView({
             >
               Change my answers
             </Link>
+            {/* REQ-031 FR-2 (AC-6): the browser's own print, so "save as PDF" is one tap; no server PDF. */}
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex min-h-11 items-center underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
+              data-testid="result-print-button"
+            >
+              {RESULT_PRINT_BUTTON}
+            </button>
             <ConfirmButton
               label="Start again"
               question="Clear your answers and start again? Your result goes with them."
@@ -527,13 +565,15 @@ function ResultView({
             </div>
           ) : null}
         </section>
+        {/* REQ-031 FR-1: the result in hand, under the card; the owner's address pre-filled. */}
+        <ResultEmailForm prefill={signedIn ? userEmail : null} />
 
         {/* REQ-027 D-2701, D-2711: the one disclosure for the words on this page, under the card and inside no other
  disclosure, listing the terms present at render minus the audit kind the heading already explains. */}
         <GlossaryTerms ids={present} where="result" className="mt-2" />
       </div>
 
-      <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-0">
+      <div className="mt-6 space-y-6 lg:col-span-7 lg:mt-0 print:hidden">
         {/* FR-5: three disclosures with counts in their summaries, closed under lg, open at lg on a first visit (D-2813). */}
         <Disclosure
           id="why"
@@ -623,15 +663,7 @@ function ResultView({
           </ul>
           <h3 className="mt-5">{MID_TERM_HEADING}</h3>
           <p className="mt-1 text-sm leading-6" data-testid="mid-term">
-            {r.midTermAudit.applies
-              ? MID_TERM_APPLIES.replace(
-                  "about N months",
-                  `about ${r.midTermAudit.monthsAfterRegistration} months`,
-                ).replace(
-                  "month N.",
-                  `month ${r.midTermAudit.prepareFromMonth}.`,
-                )
-              : `${MID_TERM_NONE} ${r.midTermAudit.exemptReason ?? ""}`}
+            {midTermLine(r)}
           </p>
         </Disclosure>
 
@@ -830,6 +862,13 @@ function ResultView({
           We answer product and process questions, not legal ones.
         </p>
       </div>
+      {/* REQ-031 FR-2 (D-2887, D-2895): the print view, from the same result; the screen hides, this shows. */}
+      <ResultPrint
+        r={r}
+        lines={lines}
+        pathwayWord={pathwayWord}
+        today={todayWords()}
+      />
     </div>
   );
 }

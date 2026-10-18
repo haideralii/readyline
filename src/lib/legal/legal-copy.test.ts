@@ -104,6 +104,8 @@ describe("product/legal copy (REQ-008)", () => {
       "we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
       "Readyline has not registered a choice to be covered by the Privacy Act; what this page promises is our own undertaking to you, and the Australian Consumer Law holds us to it.",
       "The owner decides and tells you the outcome in writing.",
+      // REQ-031 D-2886 (AC-7), verbatim.
+      "If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.",
       // REQ-029 FR-13 (D-2858), verbatim.
       "Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.",
     ],

@@ -44,6 +44,8 @@ type QuestionnaireContext = {
   mode: "local" | "server";
   /** The public contact address for the result page's question line (REQ-013 FR-9), or null until CONTACT_EMAIL is set. */
   contactEmail: string | null;
+  /** REQ-031 FR-1: the signed-in owner's own address, pre-filled in "Email me my result"; null signed out. */
+  userEmail: string | null;
   /** A signed-in owner's business details, so step 1 starts filled in (batch 23 item 3, D-1307); null when signed out. */
   accountPrefill: AccountPrefill | null;
   answers: Answers;
@@ -68,6 +70,7 @@ export function QuestionnaireProvider({
   store,
   mode = "local",
   contactEmail = null,
+  userEmail = null,
   accountPrefill = null,
   children,
 }: {
@@ -76,6 +79,7 @@ export function QuestionnaireProvider({
   /** Signed-in owners keep the draft on the server (REQ-004); otherwise on this device. */
   mode?: "local" | "server";
   contactEmail?: string | null;
+  userEmail?: string | null;
   accountPrefill?: AccountPrefill | null;
   children: ReactNode;
 }) {
@@ -179,6 +183,7 @@ export function QuestionnaireProvider({
       ready,
       mode,
       contactEmail,
+      userEmail,
       accountPrefill,
       answers,
       currentStep,
@@ -193,6 +198,7 @@ export function QuestionnaireProvider({
       ready,
       mode,
       contactEmail,
+      userEmail,
       accountPrefill,
       answers,
       currentStep,
