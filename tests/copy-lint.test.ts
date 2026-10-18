@@ -179,6 +179,8 @@ const COPY_MODULES = [
   "src/app/start/_components/steps/practices-copy.ts",
   // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend and the tags (the "Next:" line went with REQ-028 D-2805).
   "src/app/start/_components/steps/result-copy.ts",
+  // REQ-031 FR-1, FR-2: the result's words shared by the screen, the print and the email.
+  "src/lib/questionnaire/result-text.ts",
   // REQ-023 Session C: the renewal path's step titles, states, actions and the Commission's practice lines.
   "src/lib/path/renewal.ts",
   // REQ-029 FR-12: the "Your details" page's words.
@@ -583,6 +585,9 @@ const GLOSSARY_PAGES = [
   "src/app/start/_components/steps/workforce-step.tsx",
   "src/app/start/_components/steps/existing-step.tsx",
   "src/app/start/_components/steps/result-step.tsx",
+  // REQ-031 FR-1, FR-2: the result page's email form and its print view.
+  "src/app/start/_components/steps/result-email-form.tsx",
+  "src/app/start/_components/steps/result-print.tsx",
   "src/app/checklist/page.tsx",
   "src/app/checklist/checklist-view.tsx",
   "src/app/checklist/loading.tsx",
@@ -643,6 +648,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/app/start/_components/steps/practices-copy.ts":
     "src/app/start/_components/steps/practices-step.tsx",
   "src/app/start/_components/steps/result-copy.ts":
+    "src/app/start/_components/steps/result-step.tsx",
+  "src/lib/questionnaire/result-text.ts":
     "src/app/start/_components/steps/result-step.tsx",
   // REQ-023 Session C: rendered on the signed-in renewal path, outside D-2710's list.
   "src/lib/path/renewal.ts": null,

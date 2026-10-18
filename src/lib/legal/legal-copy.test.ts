@@ -109,6 +109,8 @@ describe("product/legal copy (REQ-008)", () => {
       "GitHub, in the United States, keeps a weekly encrypted copy of our database for up to 90 days; only the owner holds the key that opens it, and each copy is deleted after 90 days.",
       "Sentry receives reports of errors on our servers, with email addresses and free text removed before they leave Australia, and stores them in the United States.",
       "An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted.",
+      // REQ-031 D-2886 (AC-7), verbatim.
+      "If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.",
       // REQ-029 FR-13 (D-2858), verbatim.
       "Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.",
     ],
