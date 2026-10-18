@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { renderDocx } from "@/lib/generator/render-docx";
 import { MemoryRateLimiter } from "@/lib/ops/health";
-import { SAMPLE_DOCUMENT, SAMPLE_FILE_NAME } from "@/lib/sample-document";
+import { SAMPLE_FILE_NAME, sampleModelForFiles } from "@/lib/sample-document";
 import { parseInput, strictObject } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -30,7 +30,8 @@ export async function GET(request: Request) {
       status: 429,
       headers: { "Retry-After": "60" },
     });
-  cached ??= await renderDocx(SAMPLE_DOCUMENT);
+  // REQ-034 FR-4 (D-2947): the sample's footer on every page.
+  cached ??= await renderDocx(sampleModelForFiles());
   return new NextResponse(new Uint8Array(cached), {
     status: 200,
     headers: {

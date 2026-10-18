@@ -34,6 +34,7 @@ const PAGES = [
   "/terms",
   "/refunds",
   "/ai",
+  "/trust",
   ...GUIDES,
 ];
 

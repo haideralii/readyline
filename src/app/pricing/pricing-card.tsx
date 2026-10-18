@@ -19,6 +19,7 @@ export function PricingCard({
   priceTestId,
   priceNote,
   priceLine,
+  underPrice,
   bodyTestId,
   bullets,
   bulletsTestId,
@@ -32,6 +33,8 @@ export function PricingCard({
   headingId: string;
   /** The figure, or null when the card shows priceLine instead. */
   price: string | null;
+  /** REQ-034 FR-3, FR-6: lines that sit right under the price, before the bullets. */
+  underPrice?: ReactNode;
   priceTestId: string;
   /** The words beside the figure. */
   priceNote?: string;
@@ -74,6 +77,7 @@ export function PricingCard({
         ) : (
           priceLine
         )}
+        {underPrice}
         {bullets?.length ? (
           <ul
             className="text-ink mt-2 list-disc pl-5 leading-7"

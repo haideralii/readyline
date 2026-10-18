@@ -169,6 +169,8 @@ const COPY_MODULES = [
   "src/lib/questionnaire/schema.ts",
   "src/lib/questionnaire/result.ts",
   "src/lib/legal/nav.ts",
+  "src/lib/trust/answers.ts",
+  "src/lib/sample-pack-lists.ts",
   "src/lib/payments/copy.ts",
   "src/lib/payments/documents-copy.ts",
   "src/server/payments/messages.ts",
@@ -563,6 +565,7 @@ function lintMarkdown(file: string, findings: Finding[]) {
 
 /** D-2710: the public pages, the questionnaire, the result page, the checklist and /path/adopt/[group]. */
 const GLOSSARY_PAGES = [
+  "src/app/trust/page.tsx",
   "src/app/page.tsx",
   "src/app/sample/page.tsx",
   "src/app/pricing/page.tsx",
@@ -644,6 +647,8 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
     "src/app/start/_components/steps/result-step.tsx",
   "src/lib/legal/nav.ts": null,
   "src/lib/payments/copy.ts": "src/app/pricing/page.tsx",
+  "src/lib/trust/answers.ts": "src/app/trust/page.tsx",
+  "src/lib/sample-pack-lists.ts": "src/app/sample/page.tsx",
   "src/lib/payments/documents-copy.ts": null,
   "src/server/payments/messages.ts": null,
   "src/lib/generation/writing-state.ts": null,
