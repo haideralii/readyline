@@ -51,13 +51,21 @@ async function docxText(page: Page, setId: string, typeId: string) {
   expect(r.status(), `${typeId} download`).toBe(200);
   expect(r.headers()["cache-control"]).toContain("no-store");
   const files = unzipSync(new Uint8Array(await r.body()));
-  return (
+  const xml =
     strFromU8(files["word/document.xml"]) +
     Object.keys(files)
       .filter((f) => /^word\/footer\d*\.xml$/.test(f))
       .map((f) => strFromU8(files[f]))
-      .join("")
-  );
+      .join("");
+  // The renderer tints a bracketed blank in its own run (S-8), so one sentence is split across
+  // <w:t> elements: each paragraph's texts are joined before any assertion (#112's third run).
+  return (xml.match(/<w:p[ >][\s\S]*?<\/w:p>/g) ?? [])
+    .map((para) =>
+      (para.match(/<w:t(?: [^>]*)?>[^<]*<\/w:t>/g) ?? [])
+        .map((run) => run.replace(/<[^>]+>/g, ""))
+        .join(""),
+    )
+    .join("\n");
 }
 
 test.describe("REQ-029 Session A: fill at download", () => {
