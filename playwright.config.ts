@@ -79,6 +79,8 @@ export default defineConfig({
       // Batch 47 item 1: STRIPE_FAKE=0 in the environment starts the server with no
       // Stripe at all, the state production shows until the Prices exist.
       STRIPE_FAKE: process.env.STRIPE_FAKE ?? "1",
+      // REQ-033 Session B: the redraft's model answers from the request in the e2e (no fixture, no spend).
+      GENERATION_FAKE: process.env.GENERATION_FAKE ?? "1",
       STRIPE_WEBHOOK_SECRET: "",
       // The job route and the webhook's hand-on need the cron secret the spec also sends.
       CRON_SECRET: e2eCronSecret(),

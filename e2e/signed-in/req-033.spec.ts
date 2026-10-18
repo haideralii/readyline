@@ -92,6 +92,25 @@ test.describe("bring your audit findings (REQ-033)", () => {
       version: "1",
       generatedAt: "2026-10-14",
     });
+    // Session B (AC-B1 to AC-B3): the tailored sections carry words, as a generated
+    // version would, so the redraft has a current text to keep and to add to.
+    const drafted = {
+      ...model,
+      sections: model.sections.map((sec) =>
+        sec.mode === "tailored"
+          ? {
+              ...sec,
+              status: "generated" as const,
+              blocks: [
+                {
+                  type: "paragraph" as const,
+                  text: `Sunrise Supports, a sole trader in New South Wales, keeps this ${sec.heading.toLowerCase()} in writing and reads it with every worker. We record what we do and keep the record for 7 years.`,
+                },
+              ],
+            }
+          : sec,
+      ),
+    };
     const ins = await tenant.admin.from("document_versions").insert({
       version_set_id: setId,
       account_id: tenant.accountId,
@@ -99,7 +118,7 @@ test.describe("bring your audit findings (REQ-033)", () => {
       version: 1,
       status: "ready",
       storage_path: `${tenant.accountId}/${setId}/${INCIDENT_TYPE}.v1.docx`,
-      model,
+      model: drafted,
     });
     if (ins.error) throw ins.error;
   });
@@ -265,5 +284,132 @@ test.describe("bring your audit findings (REQ-033)", () => {
     const names = Object.keys(unzipSync(new Uint8Array(await pack.body())));
     const csv = names.find((n) => /^findings/.test(n));
     expect(csv, names.join(", ")).toBeTruthy();
+  });
+
+  test("Session B AC-B1 to AC-B3, AC-B8, AC-B9: the redraft shown beside the current text, accepted into version 2 awaiting adoption, then adopted; the register line says why it has no button", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await signInContext(context, tenant, baseURL!);
+    await page.goto("/registers/findings");
+    await page
+      .getByTestId("findings-list")
+      .getByRole("link", { name: /FND-0001/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/registers\/findings\/[0-9a-f-]{36}$/);
+    const findingUrl = page.url();
+    // AC-B8: the register line has no button and says why.
+    await expect(page.getByTestId("finding-no-redraft").first()).toContainText(
+      "This is a register",
+    );
+    const link = page.getByTestId("finding-redraft-link").first();
+    await expect(link).toContainText("Redraft this section with the finding");
+    await link.click();
+    await expect(page).toHaveURL(
+      new RegExp(`/registers/findings/[0-9a-f-]{36}/redraft/${INCIDENT_TYPE}$`),
+    );
+    await expect(page.getByTestId("redraft-intro")).toContainText(
+      "Your auditor decides whether the finding is closed.",
+    );
+    await expect(page.getByTestId("redraft-finding")).toContainText(
+      "no record of the Commission being notified",
+    );
+    // AC-B9: the page before and after the redraft, both widths.
+    await axeAt(page, 1280, "redraft page");
+    await axeAt(page, 360, "redraft page");
+    // AC-B1: the redraft beside the current text; nothing stored yet.
+    await page.getByTestId("redraft-draft").click();
+    await expect(page.getByTestId("redraft-review")).toBeVisible({
+      timeout: 60_000,
+    });
+    await expect(page.getByTestId("redraft-current")).toContainText(
+      "Sunrise Supports",
+    );
+    await expect(page.getByTestId("redraft-proposed")).toContainText(
+      "how to raise a concern when supports begin",
+    );
+    await expect(page.getByTestId("redraft-changed").first()).toBeVisible();
+    const before = await tenant.admin
+      .from("document_versions")
+      .select("version")
+      .eq("account_id", tenant.accountId)
+      .eq("document_type_id", INCIDENT_TYPE);
+    expect(before.data).toHaveLength(1);
+    await axeAt(page, 1280, "redraft review");
+    await axeAt(page, 360, "redraft review");
+    // AC-B2: "Use this redraft" makes version 2, unadopted, with its change-log row and the links.
+    await page.getByTestId("redraft-use").click();
+    await expect(page).toHaveURL(
+      new RegExp(`/documents/${setId}/${INCIDENT_TYPE}`),
+      {
+        timeout: 60_000,
+      },
+    );
+    const versions = await tenant.admin
+      .from("document_versions")
+      .select("id, version, adopted_on, model")
+      .eq("account_id", tenant.accountId)
+      .eq("document_type_id", INCIDENT_TYPE)
+      .order("version", { ascending: false });
+    expect(versions.data).toHaveLength(2);
+    const v2 = versions.data![0] as {
+      id: string;
+      version: number;
+      adopted_on: string | null;
+      model: {
+        sections: {
+          id: string;
+          blocks: { type: string; rows?: string[][] }[];
+        }[];
+      };
+    };
+    expect(v2.version).toBe(2);
+    expect(v2.adopted_on).toBeNull();
+    const changeLog = v2.model.sections.find((x) => x.id === "change-log")!;
+    const rows = changeLog.blocks.find((b) => b.type === "table")!.rows!;
+    expect(rows.at(-1)![2]).toMatch(
+      /redrafted after audit finding FND-0001; approved by \[role\]$/,
+    );
+    const finding = await tenant.admin
+      .from("findings")
+      .select("redraft_version_id, redraft_section_id, improvement_id")
+      .eq("account_id", tenant.accountId)
+      .eq("reference", "FND-0001")
+      .single();
+    expect(finding.data!.redraft_version_id).toBe(v2.id);
+    expect(finding.data!.redraft_section_id).not.toBe("");
+    const improvement = await tenant.admin
+      .from("improvements")
+      .select("changed")
+      .eq("id", finding.data!.improvement_id as string)
+      .single();
+    expect(improvement.data!.changed).toMatch(/redrafted \(version 2\)\.$/);
+    const audit = await tenant.admin
+      .from("audit_log")
+      .select("action, target")
+      .eq("account_id", tenant.accountId)
+      .eq("action", "documents.redrafted");
+    expect(audit.data).toHaveLength(1);
+    expect((audit.data![0] as { target: string }).target).toBe(
+      `${INCIDENT_TYPE}:2:FND-0001`,
+    );
+    await page.goto(findingUrl);
+    await expect(page.getByTestId("finding-redraft-state")).toContainText(
+      "version 2, awaiting adoption",
+    );
+    // AC-B3: adoption through the existing function fills the snapshot and the line reads adopted.
+    const adopt = await tenant.admin.rpc("adopt_document_version", {
+      p_account: tenant.accountId,
+      p_version: v2.id,
+      p_adopted_on: "2026-10-01",
+    });
+    expect(adopt.error).toBeNull();
+    await page.reload();
+    await expect(page.getByTestId("finding-redraft-state")).toContainText(
+      "version 2, adopted 2026-10-01",
+    );
+    await axeAt(page, 360, "finding row after the redraft");
   });
 });
