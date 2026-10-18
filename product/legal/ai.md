@@ -1,6 +1,6 @@
 ---
 title: How Readyline uses AI
-updated: 2026-10-16
+updated: 2026-10-19
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -9,7 +9,7 @@ status: draft (plain-language draft by the product owner; to be checked by a law
 
 ## What is written by people and what is drafted by AI
 
-Every document Readyline produces has two kinds of text.
+Every document Readyline produces has two kinds of text. Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).
 
 Fixed text is written and reviewed by people. It holds the parts that must be exact: the Commission's standards and quality indicators, the reportable incident rules and timeframes, definitions, register layouts, and the review sections. Fixed text is the same for every provider and does not come from an AI model.
 

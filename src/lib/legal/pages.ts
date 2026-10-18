@@ -9,6 +9,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
+import { slugify } from "@/lib/text/slug";
 import { isLegalSlug, LEGAL_SLUGS, type LegalSlug } from "./nav";
 
 export { isLegalSlug, LEGAL_SLUGS, type LegalSlug };
@@ -182,6 +183,24 @@ const MONTHS = [
 export function formatUpdated(updated: string): string {
   const [y, m, d] = updated.split("-").map(Number);
   return `${d} ${MONTHS[m - 1]} ${y}`;
+}
+
+/**
+ * REQ-034 FR-1: the id the renderer gives a "## " heading (`slugify` of its
+ * numbered text), found by the heading's own words, so a link into a section
+ * follows the numbering rather than typing it. Null when no heading has
+ * those words.
+ */
+export function legalHeadingId(
+  markdown: string,
+  heading: string,
+): string | null {
+  for (const m of markdown.matchAll(/^## (.+?)\s*$/gm)) {
+    const text = m[1];
+    if (text === heading || text.replace(/^\d+(?:\.\d+)*\s+/, "") === heading)
+      return slugify(text);
+  }
+  return null;
 }
 
 /** The sentence shown while a page is a draft, taken from the status line's brackets. */

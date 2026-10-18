@@ -24,6 +24,20 @@ describe("pricing page copy (REQ-007 AC-4, business rules)", () => {
     expect(all).toMatch(/No instalments, no interest, no late fees/);
   });
 
+  // REQ-034 FR-6, AC-6 (D-2948): the three plain lines, verbatim, and clean of claims.
+  it("carries the three plain lines under the pack's price, word for word", () => {
+    expect(PRICING_COPY.plainLines).toEqual([
+      "One price for every document in your pack.",
+      "No credits, no expiry: your documents are yours to keep and edit.",
+      "No subscription is needed to use what you bought; the registers are a separate subscription you can cancel at any time.",
+    ]);
+    for (const l of PRICING_COPY.plainLines)
+      expect(findProhibitedClaims(l), l).toEqual([]);
+    expect(PRICING_COPY.trustLink).toBe(
+      "Where your data lives and who can see it",
+    );
+  });
+
   it("reads the refund promise from product/legal/refunds.md, word for word", () => {
     const raw = readFileSync("product/legal/refunds.md", "utf8");
     const body = raw.replace(/^---[\s\S]*?\n---\n?/, "");

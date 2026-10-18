@@ -8,6 +8,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { pinnedFacts, TRUST_ROWS } from "@/lib/trust/answers";
 import { readability } from "@/lib/text/readability";
 import { contactEmail } from "./config";
 import {
@@ -117,6 +118,8 @@ describe("product/legal copy (REQ-008)", () => {
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
       "so it sits with your privacy commitments, where an auditor would look for it.",
+      // REQ-034 FR-3: the first paragraph links the trust page.
+      "Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).",
     ],
     about: [
       "Readyline tells you which audit type and standards the Rules point to for your answers",
@@ -155,7 +158,8 @@ describe("product/legal copy (REQ-008)", () => {
     terms: "2026-10-18",
     refunds: "2026-10-16",
     privacy: "2026-10-18",
-    ai: "2026-10-16",
+    // REQ-034 FR-3: the trust link moved the AI page to 19 October 2026.
+    ai: "2026-10-19",
     about: "2026-10-16",
   };
   it("product/legal/privacy.md: the reminders sentence is the subscription's, which can be turned off (REQ-023 finding 38)", () => {
@@ -174,5 +178,70 @@ describe("product/legal copy (REQ-008)", () => {
       );
     }
     expect(true).toBe(true);
+  });
+});
+
+// REQ-034 FR-1, AC-2 (D-2945): the trust page restates the privacy policy; every
+// answer is pinned here and tied to the policy's sentences it derives from, so a
+// change to the page without the policy, or the policy without the page, fails.
+describe("the trust page's pins to the privacy policy (REQ-034 AC-2, D-2945)", () => {
+  const body = loadLegalPage("privacy").body;
+  const ANSWERS: Record<string, readonly string[]> = {
+    "where-stored": ["In Sydney, Australia, on Supabase's servers."],
+    "who-processes": [
+      "Vercel runs the website, in Sydney where we can choose and otherwise in the United States.",
+      "Anthropic drafts your documents from your answers, in the United States.",
+      "Stripe takes payments, in the United States and elsewhere.",
+      "GitHub keeps a weekly encrypted backup copy in the United States for up to 90 days.",
+      "Sentry receives error reports, with email addresses and free text removed, in the United States.",
+      "An email provider sends service emails.",
+    ],
+    participants: [
+      "Never. Readyline is for your business information only.",
+      "The forms warn you, and refuse a name or an NDIS number where they can tell.",
+    ],
+    training: [
+      "No. Anthropic does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}.",
+    ],
+    retention: [
+      "While your account is open.",
+      "If you delete it, we remove your documents, answers and notes within 30 days.",
+      "We keep only the purchase records the tax law requires, for as long as it requires.",
+      "An encrypted backup copy may hold your data for up to 90 days after that.",
+    ],
+    export: [
+      "Yes, from your account page, at any time.",
+      "The file holds your account, answers, checklist, registers with the worker tables, and audit log.",
+    ],
+    "who-signs-in": [
+      "You, the workers you invite, and an auditor through a time-limited link you share.",
+      "Each account sees its own data only, enforced in the database.",
+    ],
+    breach: [
+      "If a breach happens that is likely to cause serious harm, we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
+    ],
+  };
+
+  it("every source sentence is in product/legal/privacy.md verbatim", () => {
+    for (const r of TRUST_ROWS)
+      for (const s of r.sources) expect(body, `${r.id}: ${s}`).toContain(s);
+  });
+
+  it("every answer reads as pinned here, and its places and numbers are in its sources", () => {
+    expect(Object.keys(ANSWERS).sort()).toEqual(
+      TRUST_ROWS.map((r) => r.id).sort(),
+    );
+    for (const r of TRUST_ROWS) {
+      expect(r.answer, r.id).toEqual(ANSWERS[r.id]);
+      const sources = r.sources.join(" ");
+      for (const fact of pinnedFacts(r.answer))
+        expect(sources, `${r.id}: ${fact}`).toContain(fact);
+    }
+  });
+
+  it("the breach row quotes the policy's sentence as it stands (D-2950)", () => {
+    const breach = TRUST_ROWS.find((r) => r.id === "breach")!;
+    expect(breach.sources).toEqual(breach.answer);
+    expect(body).toContain(breach.answer[0]);
   });
 });

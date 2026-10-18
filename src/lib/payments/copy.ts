@@ -96,6 +96,14 @@ export const PRICING_COPY = {
   subscriptionOff: SUBSCRIPTION_OFF,
   /** CLAUDE.md 5: said under the subscription in both states, since it holds whether or not it can be bought today. */
   noCredit: "No instalments, no interest, no late fees.",
+  /** REQ-034 FR-6 (D-2948): what one fixed price rules out, under the pack's price; our own terms, no comparison. */
+  plainLines: [
+    "One price for every document in your pack.",
+    "No credits, no expiry: your documents are yours to keep and edit.",
+    "No subscription is needed to use what you bought; the registers are a separate subscription you can cancel at any time.",
+  ],
+  /** REQ-034 FR-3: the trust page, under the price. */
+  trustLink: "Where your data lives and who can see it",
   buy: "Buy the document pack",
   signInToBuy: "Sign in to buy",
   signInNote:

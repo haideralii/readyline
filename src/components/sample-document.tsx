@@ -1,6 +1,10 @@
 import type { DocumentModel } from "@/lib/generator/document-model";
 import type { Block } from "@/lib/generator/section-schema";
-import { SAMPLE_DOCUMENT, SAMPLE_DOWNLOAD_PATH } from "@/lib/sample-document";
+import {
+  SAMPLE_DOCUMENT,
+  SAMPLE_DOWNLOAD_PATH,
+  SAMPLE_PDF_PATH,
+} from "@/lib/sample-document";
 import { HOME_COPY as C } from "@/lib/home-copy";
 import { findGlossaryTerms } from "@/lib/copy-lint/glossary";
 import { DataTable } from "./data-table";
@@ -77,7 +81,6 @@ const MODE_LABEL = {
   tailored: "Drafted from the answers",
   fixed: "Fixed text, the same for every provider",
 } as const;
-const DOWNLOAD_LABEL = "Download this sample as a Word file";
 
 function sampleLine(doc: DocumentModel, tailored: number): string {
   return `Sample: ${doc.facts.tradingName} (a fictional sole trader, household tasks, New South Wales, verification audit). Generated ${doc.generatedAt}; ${tailored} of ${doc.sections.length} sections drafted from the answers, the rest fixed text.`;
@@ -113,7 +116,9 @@ function samplePresent(
       C.samplePageLead,
       sampleLine(doc, tailored),
       doc.title,
-      DOWNLOAD_LABEL,
+      C.sampleFilesLine,
+      C.sampleDownloadWord,
+      C.sampleDownloadPdf,
       MODE_LABEL.tailored,
       MODE_LABEL.fixed,
       ...doc.sections.flatMap((s) => [
@@ -200,13 +205,27 @@ export function SampleDocument({
           {callout.text}
         </p>
       ) : null}
-      <p className="mt-3">
+      {/* REQ-034 FR-4 (D-2947): the two files side by side, the line above them saying what the sample is. */}
+      <p
+        className="text-slate mt-3 text-sm leading-6"
+        data-testid="sample-files-line"
+      >
+        {C.sampleFilesLine}
+      </p>
+      <p className="mt-2 flex flex-wrap gap-2" data-testid="sample-files">
         <a
           href={SAMPLE_DOWNLOAD_PATH}
           className="btn-secondary text-sm"
           data-testid="sample-download"
         >
-          {DOWNLOAD_LABEL}
+          {C.sampleDownloadWord}
+        </a>
+        <a
+          href={SAMPLE_PDF_PATH}
+          className="btn-secondary text-sm"
+          data-testid="sample-download-pdf"
+        >
+          {C.sampleDownloadPdf}
         </a>
       </p>
       <ol className="mt-6 space-y-5">
