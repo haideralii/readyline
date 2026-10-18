@@ -237,7 +237,10 @@ jobs:
         run: |
           test -n "$DB_URL" || { echo "FAIL SUPABASE_DB_URL is empty: supabase status -o env did not give DB_URL" >&2; exit 1; }
           psql "$DB_URL" -Atc "select version()"
-          psql "$DB_URL" -Atc "select count(*) from auth.users" | sed 's/^/auth.users rows before the dump: /'
+          # The counts the restore must give back (PO, 18 Oct 18:50): auth.users and public.accounts.
+          before=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows before the dump: $before"
+          echo "ROWS_BEFORE=$before" >> "$GITHUB_ENV"
 
       - name: Backup and restore rehearsal, the dump (scripts/ops/backup.sh)
         env:
@@ -259,6 +262,14 @@ jobs:
           IN: /tmp/rehearsal.sql.gpg
           SKIP_AUDIT: "1"
         run: scripts/ops/restore-rehearsal.sh
+
+      - name: Backup and restore rehearsal, the counts after the restore match the counts before
+        env:
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+        run: |
+          after=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows after the restore: $after (before the dump: $ROWS_BEFORE)"
+          test "$after" = "$ROWS_BEFORE" || { echo "FAIL the restored stack does not hold what was dumped" >&2; exit 1; }
 
       - name: Backup and restore rehearsal, the integration suite on the restored stack
         run: npm run test:integration

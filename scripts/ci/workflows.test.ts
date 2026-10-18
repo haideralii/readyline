@@ -190,9 +190,15 @@ describe("the restore rehearsal in CI (REQ-030 AC-3, SR-5)", () => {
     const suite = at(
       "the integration suite on the restored stack\n        run: npm run test:integration",
     );
+    // The counts before the dump and after the restore must match (PO, 18 Oct
+    // 18:50): the suite alone would pass on an empty migrated stack.
+    const counts = at("the counts after the restore match the counts before");
+    expect(ci).toContain('echo "ROWS_BEFORE=$before" >> "$GITHUB_ENV"');
+    expect(ci).toContain('test "$after" = "$ROWS_BEFORE"');
     expect(dump).toBeLessThan(reset);
     expect(reset).toBeLessThan(restore);
-    expect(restore).toBeLessThan(suite);
+    expect(restore).toBeLessThan(counts);
+    expect(counts).toBeLessThan(suite);
     expect(ci.split("npm run test:integration").length - 1).toBe(2);
     expect(ci).not.toMatch(/secrets\.BACKUP_PASSPHRASE/);
   });
