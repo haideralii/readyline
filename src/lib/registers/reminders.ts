@@ -100,6 +100,8 @@ export type ReminderInput = {
   }[];
   /** The moment the rules run (ISO), for the hour-based rules; defaults to the end of `today`. */
   now?: string;
+  /** REQ-032 FR-2: the account's states, whose public holidays the business-day windows skip (none without them). */
+  states?: readonly string[];
 };
 
 /** A draft report nudges the owner again once this many hours have passed since it came in (PO edit to FR-5). */
@@ -204,7 +206,11 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   for (const c of input.complaints) {
     if (c.acknowledged_on) continue;
     if (c.status === "resolved" || c.status === "withdrawn") continue;
-    const by = addBusinessDays(c.received_on, COMPLAINT_ACK_BUSINESS_DAYS);
+    const by = addBusinessDays(
+      c.received_on,
+      COMPLAINT_ACK_BUSINESS_DAYS,
+      input.states ?? [],
+    );
     push("complaint-unacknowledged", "complaints", c.id, by, by);
   }
 
@@ -253,13 +259,21 @@ export function dueReminders(input: ReminderInput): ReminderDue[] {
   // days is the warning and the one at 20 is the deadline (D-902); an unheld or assessed role sends nothing.
   for (const r of input.riskAssessedRoles ?? []) {
     if (!r.held || r.assessed_on || !r.first_held_on) continue;
-    const due = addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_BUSINESS_DAYS);
+    const due = addBusinessDays(
+      r.first_held_on,
+      ROLE_ASSESSMENT_BUSINESS_DAYS,
+      input.states ?? [],
+    );
     push(
       "role-assessment-due",
       "risk_assessed_roles",
       r.id,
       due,
-      addBusinessDays(r.first_held_on, ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS),
+      addBusinessDays(
+        r.first_held_on,
+        ROLE_ASSESSMENT_WARNING_BUSINESS_DAYS,
+        input.states ?? [],
+      ),
     );
     push("role-assessment-due", "risk_assessed_roles", r.id, due, due);
   }

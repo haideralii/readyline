@@ -6,6 +6,7 @@ import { HOME_COPY, heroHeadline, homeStrings } from "./home-copy";
 
 describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
   it("passes the prohibited-claims lint and names no superlative or testimonial", () => {
+    // REQ-012 FR-4a (D-2905, D-2941): no hold; "audit-ready" left the copy.
     for (const s of homeStrings())
       expect(findProhibitedClaims(s), s).toEqual([]);
     const all = homeStrings().join("\n");

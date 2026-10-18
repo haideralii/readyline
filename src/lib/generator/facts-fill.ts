@@ -51,7 +51,8 @@ const KNOWN: Record<string, Omit<FactQuestion, "key" | "blank">> = {
   },
   period: {
     question: "How long do you keep records?",
-    example: "Most providers write 7 years.",
+    example:
+      "The Rules require 7 years for incident and complaint records; 7 years is the usual answer for everything else.",
     topic: "business",
     kind: "text",
   },

@@ -108,6 +108,7 @@ describe("registration-group pages (REQ-011 batch 31, D-1105)", () => {
       for (const s of strings) {
         for (const v of lintText(s, { block: true }))
           findings.push(`${p.code}: ${v.rule}: ${v.detail}`);
+        // REQ-012 FR-4a (D-2942): no hold; the rule names claims against anyone.
         for (const c of findProhibitedClaims(s))
           findings.push(`${p.code}: claim ${JSON.stringify(c)}`);
       }

@@ -44,6 +44,8 @@ export async function createTenant(input: {
   tradingName: string;
   answers: Record<string, unknown>;
   withAccount?: boolean;
+  /** REQ-032: the account's states (NSW alone when not given). */
+  states?: string[];
 }): Promise<TestTenant> {
   const { url, publishableKey } = env();
   const admin = adminClient();
@@ -73,7 +75,7 @@ export async function createTenant(input: {
   const rpc = await client.rpc("create_account", {
     p_trading_name: input.tradingName,
     p_business_structure: "sole-trader",
-    p_states: ["NSW"],
+    p_states: input.states ?? ["NSW"],
     p_abn: null,
   });
   if (rpc.error) throw rpc.error;

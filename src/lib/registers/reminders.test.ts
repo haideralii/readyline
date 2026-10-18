@@ -402,3 +402,30 @@ describe("reminder rules (REQ-009 FR-3)", () => {
       );
   });
 });
+
+describe("REQ-032 FR-2: the business-day windows skip the account's public holidays", () => {
+  const received = (today: string, states?: readonly string[]) =>
+    dueReminders({
+      today,
+      account: { id: "acc" },
+      incidents: [],
+      complaints: [
+        {
+          id: "c-easter",
+          status: "open",
+          received_on: "2026-04-02",
+          acknowledged_on: null,
+        },
+      ],
+      workerChecks: [],
+      policyReviews: [],
+      ...(states ? { states } : {}),
+    }).find((r) => r.kind === "complaint-unacknowledged");
+
+  it("a complaint received on Thursday 2 April 2026 is due Monday 6 April with no state, Wednesday 8 April for NSW (Good Friday and Easter Monday skipped)", () => {
+    expect(received("2026-04-06")?.due_on).toBe("2026-04-06");
+    expect(received("2026-04-06", ["NSW"])).toBeUndefined();
+    expect(received("2026-04-08", ["NSW"])?.due_on).toBe("2026-04-08");
+    expect(received("2026-04-08", ["NSW", "VIC"])?.due_on).toBe("2026-04-08");
+  });
+});

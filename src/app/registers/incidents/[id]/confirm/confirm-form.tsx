@@ -97,7 +97,7 @@ export function ConfirmReportForm({
         <p className="text-ink mt-1 mb-4 text-sm leading-6">
           {suggested
             ? "This category is reportable when it happened in connection with your supports. You decide; the Commission's rules apply."
-            : "This category is not usually reportable. Tick the box if you decide it is."}
+            : "This category is not on the NDIS Act's list of reportable incidents. Tick the box if you decide it is."}
         </p>
         <CheckboxField
           id="reportable"

@@ -32,8 +32,8 @@ const PRICING_TERMS = [
 
 /**
  * The pricing page (REQ-007 FR-1): the two offers as halves of equal weight
- * (batch 45 item 9, D-2001), the subscription first as what keeps a provider
- * audit-ready, the pack second as where they start, no bundling and no
+ * (batch 45 item 9, D-2001), the subscription first as what keeps a provider's
+ * evidence current (D-2941), the pack second as where they start, no bundling and no
  * discount; then what the pack is and is not, the refund promise from
  * refunds.md, the AI disclosure, and the links the law and the house rules
  * require. Works signed out; a signed-in owner with a complete questionnaire

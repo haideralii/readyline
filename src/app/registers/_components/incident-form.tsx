@@ -15,6 +15,7 @@ import {
   INCIDENT_STATUS_LABELS,
   SEVERITY_LABELS,
 } from "@/lib/registers/labels";
+import { notifyByBracket } from "@/lib/registers/notify-by-line";
 import { incidentNotifyBy } from "@/lib/registers/status";
 import {
   INCIDENT_CATEGORIES,
@@ -61,11 +62,14 @@ export function IncidentFormView({
   id,
   initial,
   afterSave,
+  states = [],
 }: {
   id?: string;
   initial?: IncidentFormValues;
   /** REQ-020 FR-4: where a worker lands after saving (the owner lands on the row). */
   afterSave?: string;
+  /** REQ-032 FR-2: the account's states, so the preview skips the same public holidays the row will (FR-5). */
+  states?: readonly string[];
 }) {
   const router = useRouter();
   const [v, setV] = useState<IncidentFormValues>(
@@ -115,7 +119,21 @@ export function IncidentFormView({
     v.category &&
     v.severity &&
     /^\d{4}-\d{2}-\d{2}$/.test(clockFrom)
-      ? incidentNotifyBy(clockFrom, v.category, true, v.severity)
+      ? incidentNotifyBy(clockFrom, v.category, true, v.severity, states)
+      : null;
+  // REQ-032 FR-5: the holidays that moved a five-business-day date, as the row will show them.
+  const notifyBracket =
+    notifyBy && v.category && v.severity
+      ? notifyByBracket(
+          {
+            occurred_on: clockFrom,
+            category: v.category,
+            severity: v.severity,
+            reportable: true,
+            notify_by: notifyBy,
+          },
+          states,
+        )
       : null;
 
   async function onSubmit(e: React.FormEvent) {
@@ -238,7 +256,8 @@ export function IncidentFormView({
           role="status"
           data-testid="notify-by"
         >
-          Notify the Commission by <strong>{notifyBy}</strong>.
+          Notify the Commission by <strong>{notifyBy}</strong>
+          {notifyBracket ? ` ${notifyBracket}` : ""}.
         </p>
       ) : null}
       {v.reportable ? (

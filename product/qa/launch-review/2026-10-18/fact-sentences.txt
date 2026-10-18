@@ -1,0 +1,107 @@
+found (104):
+src/lib/home-copy.ts:59 | instrument | Every module, standard and audit rule comes from the NDIS Quality and Safeguards Commission's published Practice Standards and registration pages, with a link to the source on your result.
+src/lib/home-copy.ts:81 | instrument | Practice Standards module
+src/lib/checklist/derive.ts:406 | instrument | Registration needs an audit against the Practice Standards by an approved quality auditor from the Commission's list.
+src/lib/payments/documents-copy.ts:22 | number | Come back in about 20 minutes and your documents will be here.
+src/lib/questionnaire/result-text.ts:10 | instrument | Practice Standards modules that apply
+src/lib/registers/period.ts:280 | number | 1 entry has no date in this column and is always shown.
+src/lib/registers/worker-steps.ts:15 | instrument | Read the NDIS Code of Conduct acknowledgement from your manager's pack and acknowledge it.
+src/lib/registers/worker-steps.ts:17 | instrument | Read the Code of Conduct, incident, complaints, privacy and safeguarding policies and acknowledge each one.
+src/app/admin/mfa/page.tsx:24 | number | Scan the code with an authenticator app, then enter the 6-digit code it shows.
+src/app/dev/stripe-checkout/[id]/page.tsx:59 | number | mt-4 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-base
+src/app/guides/page.tsx:20 | number | Registration groups: which audit and which documents each of the 38 classes needs
+src/app/guides/registration-groups/page.tsx:21 | number,instrument | All 38 NDIS registration groups under everyday headings, with the audit type, the Practice Standards modules and the documents each one needs, generated from the Commission's published tables.
+src/app/guides/registration-groups/[slug]/page.tsx:77 | instrument | Practice Standards modules
+src/app/guides/registration-groups/[slug]/page.tsx:79 | instrument | Drafted from your questionnaire answers for your review, as Word files, with a Practice Standards self-assessment.
+src/app/layout.tsx:48 | instrument | Tailored policies, a Practice Standards self-assessment and a readiness checklist for sole-trader and small NDIS providers preparing for registration.
+src/app/path/audit-day/check/page.tsx:154 | number | Every no becomes a row in your improvement register with a date 30 days out.
+src/app/path/audit-day/page.tsx:247 | instrument | Your registration dates, from your certificate, the Rules and the Act
+src/app/pricing/page.tsx:67 | instrument | Practice Standards self-assessment
+src/app/registers/incidents/[id]/confirm/confirm-form.tsx:100 | instrument | This category is not on the NDIS Act's list of reportable incidents.
+src/app/registers/staff-matrix/export/page.tsx:16 | instrument | Worker files and the two Rules lists
+src/app/registers/_components/exception-panel.tsx:615 | number | State whose Part 4 section applied
+src/app/registers/_components/exception-panel.tsx:626 | number,date | QLD: about three years from the card held at 31 January 2021, unverified until the yellow card's term is read.
+src/app/registers/_components/import-form.tsx:53 | number | The file is over 1 MB.
+src/app/start/page.tsx:8 | instrument | Answer a few questions about your supports and workforce to see which NDIS Practice Standards modules apply, which audit you face and what documents you will need.
+src/app/start/_components/start-intro.tsx:90 | number | Step 1 starts with your account's business details.
+src/app/start/_components/stepper.tsx:99 | number | border-line bg-surface inline-flex min-h-11 cursor-pointer list-none items-center rounded-md border px-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden
+src/app/start/_components/steps/result-step.tsx:331 | number | Class 0138 and the SIL module are not in your result.
+src/app/start/_components/steps/supports-step.tsx:50 | number | Supported independent living question 1
+src/app/start/_components/steps/supports-step.tsx:52 | number | Supported independent living question 2
+src/app/start/_components/steps/supports-step.tsx:415 | number | min-h-11 cursor-pointer list-none font-medium [&::-webkit-details-marker]:hidden
+src/app/start/_components/steps/workforce-step.tsx:157 | number | For a sole trader that is you: 1.
+data/readyline-content/audit-types.json:0 | hedge | Usually the quicker audit, and usually the cheaper one, because there is no site visit.
+data/readyline-content/audit-types.json:0 | number | Followed by a mid-term audit about 18 months after registration.
+data/readyline-content/document-sets.json:0 | instrument | First-pass mapping from Practice Standards modules to the documents and registers a provider will need.
+data/readyline-content/document-sets.json:0 | number | REQ-005 refines it.
+data/readyline-content/document-types.json:0 | instrument | The NDIS Code of Conduct
+data/readyline-content/document-types.json:0 | number | Chunked into tables of 20 rows.
+data/readyline-content/document-types.json:0 | instrument | the NDIS Code of Conduct applies to every provider and worker
+data/readyline-content/document-types.json:0 | number,instrument | the Privacy Act 1988 and the NDIS Code of Conduct require us to respect the privacy of the people we support
+data/readyline-content/document-types.json:0 | instrument | NDIS Code of Conduct acknowledgement
+data/readyline-content/document-types.json:0 | instrument | Records that each worker and key person has read the NDIS Code of Conduct and understands what it means in this business.
+data/readyline-content/document-types.json:0 | number,date,instrument | the Commission's 2026 position on AI use by providers expects every provider to govern its use of AI
+data/readyline-content/document-types.json:0 | number,date,instrument | the Commission's 2026 position on AI use by providers expects participant information to be de-identified before any AI use
+data/readyline-content/modules.json:0 | instrument | Plain-English, one-sentence descriptions of each Practice Standards module for the questionnaire result page.
+data/readyline-content/modules.json:0 | number,date | Standards, from 1 July 2026, for managing and delivering supported independent living packages: decision-making, safeguarding, practice governance and tenancy arrangements.
+data/readyline-content/start-here.json:0 | instrument | A Rules requirement with a register.
+data/readyline-content/start-here.json:0 | number,date | Required since the 2021 changes.
+content/guides/ndis-registration-cost.md:14 | number,date | NDIS registration cost in 2026-27: what a small provider really pays
+content/guides/ndis-registration-cost.md:29 | number,dollar | About AUD 900 to 1,800.
+content/guides/ndis-registration-cost.md:30 | number,dollar | About AUD 2,800 to 12,000 and more.
+content/guides/ndis-registration-cost.md:31 | number,dollar | AUD 65 to 1,960 for a one-off pack.
+content/guides/ndis-registration-cost.md:32 | number,dollar | AUD 2,500 to 8,000 over 2 to 4 weeks.
+content/guides/ndis-registration-cost.md:32 | number,date | Consultants' own pages read on 13 October 2026.
+content/guides/ndis-registration-cost.md:33 | number,dollar | AUD 59 to 899 a month, or AUD 695 to 1,500 a year.
+content/guides/ndis-registration-cost.md:43 | number | Certified providers pay for a second, smaller audit about 18 months in.
+content/guides/ndis-registration-cost.md:51 | number,dollar | Paying a consultant AUD 2,500 or more for documents when the groups only need verification.
+content/guides/registers-an-auditor-asks-for.md:31 | instrument | What the Rules and the Practice Standards require is marked.
+content/guides/registers-an-auditor-asks-for.md:33 | instrument | Two records the Rules require you to keep
+content/guides/registers-an-auditor-asks-for.md:37 | number,date,instrument | The Incident Management and Reportable Incidents Rules 2018 require an incident management system with records of incidents and of what you did.
+content/guides/registers-an-auditor-asks-for.md:37 | instrument | Reportable incidents must be notified to the Commission within the Rules' time frames..
+content/guides/registers-an-auditor-asks-for.md:38 | number,date,instrument | The Complaints Management and Resolution Rules 2018 require a complaints management and resolution system with records of complaints and how they were dealt with..
+content/guides/registers-an-auditor-asks-for.md:40 | instrument | The records the Practice Standards expect
+content/guides/registers-an-auditor-asks-for.md:54 | instrument | These are not named in the Rules, but auditors ask for them because they show the system is alive.
+content/guides/registers-an-auditor-asks-for.md:82 | instrument | The Rules require an incident register and a complaints register.
+content/guides/registers-an-auditor-asks-for.md:82 | instrument | The Practice Standards that apply to you decide the rest.
+content/guides/registers-an-auditor-asks-for.md:94 | number,date,instrument | An incident that the Incident Management and Reportable Incidents Rules 2018 say must be notified to the Commission, within the time frames the Rules set.
+content/guides/what-happens-at-an-ndis-audit.md:41 | number,time | Two stages: a desktop audit of your evidence, then an onsite audit within 3 months..
+content/guides/what-happens-at-an-ndis-audit.md:42 | number | Certified providers, at 18 months into the registration period.
+content/guides/what-happens-at-an-ndis-audit.md:52 | number | For a certification audit, stage 1 is a desktop audit.
+content/guides/what-happens-at-an-ndis-audit.md:52 | hedge | The auditor asks for information and evidence against every module that applies to your groups, usually off site.
+content/guides/what-happens-at-an-ndis-audit.md:54 | number | Stage 2 is the onsite audit.
+content/guides/what-happens-at-an-ndis-audit.md:62 | hedge | Participant interviews are a key part of a certification audit.
+content/guides/what-happens-at-an-ndis-audit.md:75 | number,instrument | 2: conforms with the NDIS Practice Standards
+content/guides/what-happens-at-an-ndis-audit.md:79 | number | A major non-conformity gives you 3 months to fix the issue, and your registration does not progress until it is fixed.
+content/guides/what-happens-at-an-ndis-audit.md:83 | number,time | The final report goes to the Commission within 14 days of a verification audit, or 28 days of a certification or mid-term audit.
+content/guides/what-happens-at-an-ndis-audit.md:93 | number,date,dollar | Quotes for a sole support coordinator's renewal ranged from about AUD 5,000 to 7,000 in 2026.
+content/guides/what-happens-at-an-ndis-audit.md:123 | number,time | Within 14 days of a verification audit, and within 28 days of a certification or mid-term audit.
+content/guides/what-happens-at-an-ndis-audit.md:127 | number | It applies to certified providers at 18 months, and the Commission's own timeline has you preparing from 12 months after your registration date.
+content/guides/which-ndis-audit.md:26 | instrument | An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
+content/guides/which-ndis-audit.md:32 | number | Stage 1 is a desktop audit of your evidence against the core module and any supplementary modules your groups add.
+content/guides/which-ndis-audit.md:33 | number,time | Stage 2 is an onsite audit within 3 months of stage 1: the auditor visits your business and talks to your workers and to some participants.
+content/guides/which-ndis-audit.md:58 | number | A major non-conformity gives you 3 months to fix it, and your registration does not progress until you have.
+content/guides/which-ndis-audit.md:60 | number,time | The auditor sends the report to the Commission within 14 days of a verification audit, or within 28 days of a certification or mid-term audit.
+content/guides/which-ndis-audit.md:64 | number | If your audit is certification, the Commission requires a mid-term audit about 18 months after registration.
+content/guides/which-ndis-audit.md:66 | number | The Commission says to start preparing 12 months after your registration date.
+content/guides/which-ndis-audit.md:72 | number,date | The Commission's reform hub confirms the first wave: supported independent living and platform providers must register from 1 July 2026.
+content/guides/which-ndis-audit.md:74 | number,date | Providers of higher-risk activities such as personal care are reported to be next, from 1 July 2027, with every in-scope provider registered by December 2030.
+content/guides/which-ndis-audit.md:76 | number,date | UNVERIFIED: the 2027 and 2030 dates come from our market research of 13 October 2026, not yet from a Commission page we hold a copy of.
+content/guides/which-ndis-audit.md:94 | number | Certified providers also have the mid-term audit at about 18 months.
+content/guides/which-ndis-audit.md:109 | instrument | NDIS Practice Standards and Quality Indicators
+product/legal/about.md:12 | instrument | Registering as an NDIS provider means passing an audit against the NDIS Practice Standards.
+product/legal/about.md:14 | instrument | Readyline tells you which audit type and standards the Rules point to for your answers, drafts the documents to fit your answers, and shows you what is still missing.
+product/legal/ai.md:26 | number | Each tailored section is checked by software before you see it: it must be about your business facts only, use plain words at about a Year 8 reading level, use the Commission's terms, avoid claims such as "guaranteed" or "audit-proof", and refer to the fixed sections for legal timeframes rather than restating them.
+product/legal/privacy.md:23 | instrument | We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself.
+product/legal/privacy.md:52 | number,time | If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires.
+product/legal/privacy.md:52 | number | An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted.
+product/legal/privacy.md:65 | instrument | The Privacy Act
+product/legal/privacy.md:67 | number,instrument | Some small businesses are not covered by the Privacy Act 1988.
+product/legal/refunds.md:16 | number,time | You can have a full refund within 14 days of buying the pack if you have not downloaded any of the documents.
+product/legal/refunds.md:32 | number,hedge | Banks usually take 5 to 10 business days to show it.
+product/legal/terms.md:24 | number | You must be at least 18 and buying for a business.
+product/legal/terms.md:46 | number | We give at least 30 days' notice of changes to prices or terms that affect a subscription.
+product/legal/terms.md:46 | number | Documents you have already bought stay available for download for at least 12 months after purchase.
+product/legal/terms.md:50 | number | For any other claim, and where the law allows, our liability to you is limited to the amount you paid Readyline in the 12 months before the claim.
+
+facts: 115 sentence(s) in 40 file(s), 104 distinct

@@ -140,6 +140,15 @@ describe("every action is pinned by commit SHA with its version, or keeps its ta
     }
   });
 
+  it("Dependabot is configured for npm in two groups and for the actions, weekly (D-2902, D-2939)", () => {
+    const d = readFileSync(".github/dependabot.yml", "utf8");
+    expect(d).toContain("package-ecosystem: npm");
+    expect(d).toContain("package-ecosystem: github-actions");
+    expect(d).toContain("dependency-type: production");
+    expect(d).toContain("dependency-type: development");
+    expect((d.match(/interval: weekly/g) ?? []).length).toBe(2);
+  });
+
   it("the e2e job runs the headers check against the production build before the specs (REQ-012 FR-1d, AC-2)", () => {
     const ci = readFileSync(".github/workflows/ci.yml", "utf8");
     const step = ci.indexOf(

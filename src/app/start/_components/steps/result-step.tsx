@@ -777,7 +777,7 @@ function ResultView({
           data-testid="result-two-halves"
         >
           <div>
-            <dt className="font-semibold">What keeps you audit-ready</dt>
+            <dt className="font-semibold">What keeps your evidence current</dt>
             {subscriptionOffered ? (
               <dd className="text-ink">
                 The registers and reminders, a monthly subscription that keeps

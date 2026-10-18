@@ -32,8 +32,13 @@ started=$(date +%s)
 # Data only: the schema comes from the migrations on a restore (restore-rehearsal.sh applies
 # them first), so the copy carries rows, not objects, and restores onto any migrated stack.
 # `-t 'public.*'` selects every table in public; `-t auth.users` adds the sign-in users.
+# D-2952: a reference table the migrations seed in full is not backup data; its rows
+# come back with the schema, and a dump of them collides with the seed on the restore
+# (#119's public_holidays_pkey on 2026-01-01, NSW). One exclusion per seeded table,
+# the list pinned in scripts/ops/backup.test.ts.
 pg_dump "$DB_URL" -Fc --data-only --no-owner --no-privileges \
   -t 'public.*' -t 'auth.users' \
+  --exclude-table-data=public.public_holidays \
   | gpg --symmetric --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
       --cipher-algo AES256 -o "$OUT" 3<<<"$BACKUP_PASSPHRASE"
 finished=$(date +%s)

@@ -49,7 +49,7 @@ export const DETAILS_FIELDS: Record<string, { label: string; help: string }> = {
   },
   period: {
     label: "How long you keep records",
-    help: "Most providers write 7 years.",
+    help: "The Rules require 7 years for incident and complaint records; 7 years is the usual answer for everything else.",
   },
   location: {
     label: "Where you keep your records",

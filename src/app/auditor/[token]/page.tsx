@@ -35,6 +35,10 @@ import {
   resolveAuditorToken,
 } from "@/server/registers/auditor-links";
 import { currentPeriod } from "@/server/registers/registration-queries";
+import {
+  notifyByWords,
+  type NotifyByRow,
+} from "@/lib/registers/notify-by-line";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -137,6 +141,14 @@ export default async function AuditorPage({
   );
   await recordAuditorOpen(admin, link, address, "opened", period);
   const view = await collectAuditView(admin, link.accountId, period);
+  // REQ-032 FR-5: the incident register's notify-by cell carries the holidays that moved it, as the owner's does.
+  const statesRow = await admin
+    .from("accounts")
+    .select("states")
+    .eq("id", link.accountId)
+    .maybeSingle();
+  const states =
+    (statesRow.data as { states: string[] | null } | null)?.states ?? [];
   const date = new Date().toISOString().slice(0, 10);
   const basePath = `/auditor/${token}`;
   return (
@@ -244,7 +256,13 @@ export default async function AuditorPage({
             <DataTable
               label={t.title}
               columns={[...t.columns]}
-              rows={t.rows.map((r) => t.columns.map((c) => cell(r[c])))}
+              rows={t.rows.map((r) =>
+                t.columns.map((c) =>
+                  t.id === "incidents" && c === "notify_by"
+                    ? notifyByWords(r as unknown as NotifyByRow, states)
+                    : cell(r[c]),
+                ),
+              )}
             />
           ) : (
             <p className="text-slate mt-2 text-sm">

@@ -30,6 +30,24 @@ describe("findProhibitedClaims", () => {
       "Readyline is an NDIS registered provider",
       "self-described-registered-provider",
     ],
+    // REQ-012 FR-4a (D-2905, D-2906): promises and comparisons.
+    ["With Readyline you will be fully compliant", "compliant-promise"],
+    ["Our pack keeps you compliant with the standards", "compliant-promise"],
+    ["Certified documents for your audit", "certified-claim"],
+    ["Readyline certifies your policies", "certified-claim"],
+    ["The subscription keeps you audit-ready", "audit-ready-promise"],
+    ["Audit-ready in 10 minutes", "audit-ready-promise"],
+    ["Our checklist ensures you pass", "ensures-you"],
+    ["With these policies you will pass the audit", "will-pass"],
+    ["Ready to register in a week", "ready-to-register"],
+    ["A free pack for every new provider", "free-with-fee"],
+    ["Start your free trial today", "free-with-fee"],
+    ["Free for $0 a month", "free-with-fee"],
+    ["Cheaper than a consultant", "comparative"],
+    ["The cheapest way to register", "comparative"],
+    ["The only tool built for small providers", "comparative"],
+    ["Australia's leading registration tool", "comparative"],
+    ["Unlike other providers, we read the Rules", "comparative"],
   ])("flags %j as %s", (text, rule) => {
     const findings = findProhibitedClaims(text);
     expect(findings.map((f) => f.rule)).toContain(rule);
@@ -42,6 +60,19 @@ describe("findProhibitedClaims", () => {
     "Verification audit vs certification audit: which applies to you?",
     "Not affiliated with the NDIS Quality and Safeguards Commission.",
     "Your auditor decides the outcome; we help you prepare.",
+    // REQ-012 FR-4a: the descriptive sentence each D-2905 and D-2906 rule must let through.
+    "A compliant provider is one the Commission has found to meet the standards.",
+    "Certified providers have a mid-term audit about 18 months in.",
+    "The certification audit includes a site visit.",
+    "The registers and the reminders are what an auditor asks for.",
+    "Using Readyline does not mean you will pass an audit or be registered.",
+    "You register through the Commission's portal.",
+    "The questionnaire is free. The document pack is one fixed price.",
+    "The verification audit is the quicker of the two.",
+    // D-2942: a comparison between the two audit kinds, with its reason.
+    "Usually the quicker audit, and usually the cheaper one, because there is no site visit.",
+    "I am the only worker and the only key personnel.",
+    "The leading cause of a finding is a missing register.",
   ])("allows descriptive wording: %j", (text) => {
     expect(findProhibitedClaims(text)).toEqual([]);
   });

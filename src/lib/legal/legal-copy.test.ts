@@ -8,6 +8,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { BUSINESS_DAY_SENTENCE } from "@/lib/generator/fixed-extras";
 import { pinnedFacts, TRUST_ROWS } from "@/lib/trust/answers";
 import { readability } from "@/lib/text/readability";
 import { contactEmail } from "./config";
@@ -183,6 +184,15 @@ describe("product/legal copy (REQ-008)", () => {
       );
     }
     expect(true).toBe(true);
+  });
+});
+
+describe("REQ-032 FR-7 (D-2919): the business-day sentence in the documents' fixed text", () => {
+  it("is the Acts Interpretation Act s 2B meaning in plain words, verbatim, with no claim", () => {
+    expect(BUSINESS_DAY_SENTENCE).toBe(
+      "A business day is not a Saturday, a Sunday or a public holiday in the state where we work.",
+    );
+    expect(findProhibitedClaims(BUSINESS_DAY_SENTENCE)).toEqual([]);
   });
 });
 

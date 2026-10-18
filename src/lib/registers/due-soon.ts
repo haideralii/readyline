@@ -7,19 +7,21 @@
  * checks expiring, then policy reviews due, then the stored reminders for
  * everything else (registration dates, the audit-day registers).
  */
+import { notifyByWords, type NotifyByRow } from "./notify-by-line";
+
 export type DueSoonInput = {
   /** ISO date, the account's today. */
   today: string;
   /** Days ahead, inclusive. */
   days: number;
-  incidents: readonly {
+  incidents: readonly ({
     id: string;
     reference: string;
-    reportable: boolean;
-    notify_by: string | null;
     reportable_notified_on: string | null;
     status: string;
-  }[];
+  } & NotifyByRow)[];
+  /** REQ-032 FR-2: the account's states, for the holidays that moved a notify-by date (FR-5). */
+  states?: readonly string[];
   clearances: readonly {
     id: string;
     worker_ref: string;
@@ -74,7 +76,7 @@ export function dueSoonLines(input: DueSoonInput): DueSoonLine[] {
     if (!inWindow(i.notify_by)) continue;
     out.push({
       id: `incident:${i.id}`,
-      line: `Notify the Commission about incident ${i.reference} by ${i.notify_by}.`,
+      line: `Notify the Commission about incident ${i.reference} by ${notifyByWords(i, input.states ?? [])}.`,
       dueOn: i.notify_by,
       sent: false,
     });

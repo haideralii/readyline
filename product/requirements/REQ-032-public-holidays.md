@@ -1,0 +1,83 @@
+# REQ-032: Public holidays in the business-day count
+
+Status: ready for Session A (PO, 18 Oct 2026 20:20; lawyer's and NDIS expert's reads applied as D-2914 to D-2921, D-2222)
+Phase: 6   Priority: should   Owner: Dev (one session, Dev-1)
+
+## Why (user and business outcome)
+
+- Every statutory window Readyline counts in business days skips Saturday and Sunday only; public holidays are not modelled (REQ-009, D-2244 "said, not built"; `add_business_days` in SQL and `addBusinessDays` in `src/lib/registers/status.ts`). The provider sees a notify-by date that can be a day or two early around Easter, Christmas and a state holiday, and the reminder email fires the same day. Early is the safe side, but a provider who plans a Commission report around a wrong date loses trust in every date we show.
+- The Rules read "business day" with the Acts Interpretation Act 1901 s 2B meaning: a day that is not a Saturday, a Sunday or a public holiday in the place concerned (lawyer, D-2914; Dev verifies the section against legislation.gov.au and records the read date).
+
+## Scope
+
+In: the 5-business-day windows (Incident Rules ss 20 and 21: the unauthorised restrictive practice notification, the 5-day full report line), the complaint acknowledgement at 2 business days (our own number, REQ-009), the Worker Screening Rules s 17(2)(b) 20-day and 10-day lines (REQ-024 FR-6a), the reminders job, the register status views and the auditor's view, the incident register's "notify by" text, the generated documents' fixed timeframe sentences where they name a date rule.
+
+Out: the 24-hour windows (calendar time, unchanged); any time-of-day; substituted holidays we cannot source; local (council) holidays; the questionnaire; the price.
+
+## Functional requirements
+
+- **FR-1 Holiday table.** A fixture `data/public-holidays/<year>.json` for 2026 and 2027 from the Australian Government's machine-readable public holidays dataset on data.gov.au (CC BY 4.0), one row per holiday with date, jurisdiction (NSW, VIC, QLD, SA, WA, TAS, ACT, NT) and name, plus `source.json` with the dataset URL, licence and the date Dev read it. A unit test pins the row count per jurisdiction and year and a handful of known dates (1 January, 26 January, Good Friday, 25 December, and one state-only day per state). The same rows go into a table `public.public_holidays (holiday_date date, jurisdiction text, name text)` by migration, seeded by the migration from the fixture, read-only to `authenticated` (revoke-then-grant, D-2245), so SQL and TypeScript count the same days (NDIS expert, D-2915).
+- **FR-2 The place concerned.** The holidays that count are those of the account's `states`. With one state, that state's holidays. With more than one, a day counts as a holiday only when it is a holiday in every one of those states (national days and shared days), so the date we show is never later than the true date in any of them (lawyer, D-2916: the safe side when the place is unclear). With no state recorded, weekends only, as today.
+- **FR-3 One function.** `add_business_days(p_date, p_days, p_states text[])` in SQL and `addBusinessDays(date, days, states)` in TypeScript, both skipping weekends and the FR-2 holidays; the two-argument forms stay as thin wrappers that pass no states, so nothing else changes until the caller passes them. A unit test and an integration test assert the two give the same answer for every day of 2026 and 2027 for NSW alone, for `{NSW, VIC}` and for no state.
+- **FR-4 Callers.** `incident_notify_by`, the status views, `reminders.ts` and the register pages pass the account's states. A row's notify-by date is computed when the row is saved and recomputed by the reminders job each run from the same inputs, so a holiday added to the table moves the date (D-2917: the date is derived, never stored as the truth).
+- **FR-5 What the provider sees.** Where a window landed on a public holiday, the date line adds, in brackets, the holiday that moved it: "notify by Monday 13 April 2026 (Good Friday and Easter Monday do not count)". One sentence, no second line. The auditor's view carries the same date and the same bracket.
+- **FR-6 The year runs out.** For a date past the last year in the table, the count falls back to weekends only and the line reads "(public holidays after 2027 are not yet counted)". A unit test in `workflows.test.ts` or the NDIS-watch list fails from 1 October of the last year in the table, so the next year is added before it is needed (D-2918).
+- **FR-7 Documents.** The fixed timeframe sentences in `fixed-extras.ts` that say "within 5 business days" gain, once per document where the first such sentence appears, the Acts Interpretation Act meaning in plain words: "A business day is not a Saturday, a Sunday or a public holiday in the state where we work." No other wording changes (D-2919).
+
+## Security and privacy
+
+- SR-1 The table holds no account data; RLS select for `authenticated` and `service_role` only; no insert, update or delete except by migration.
+- SR-2 The fixture is data, not instructions: the loader validates each row's date and jurisdiction against the closed list and refuses the file otherwise.
+
+## Acceptance criteria
+
+- AC-1 An unauthorised restrictive practice recorded on Thursday 2 April 2026 by an NSW account shows notify by Monday 13 April 2026 (Good Friday 3 April and Easter Monday 6 April do not count), with the FR-5 bracket; the same row for a `{NSW, WA}` account shows the same date (both days are national); a `{NSW, VIC}` account recorded on Friday 30 October 2026 shows Friday 6 November 2026 (Melbourne Cup Day is Victoria's alone, so it counts as a business day under FR-2), where a VIC-only account shows Monday 9 November (e2e, desktop and Android).
+- AC-2 FR-3 parity test green for both years and three state sets.
+- AC-3 The reminders integration test's expected dates updated for the fixtures that cross a holiday; count of reminders unchanged.
+- AC-4 FR-6 fallback line appears for a date in 2028; the year-runs-out test fails when the clock is set to 1 October 2027.
+- AC-5 `legal-copy.test.ts` pins the FR-7 sentence; docx render of the incident management policy carries it once.
+- AC-6 `npm run check` green; a11y spec unchanged.
+
+## Lawyer's read (D-2914, D-2916, D-2919, D-2920)
+
+Business day is defined in the Acts Interpretation Act 1901 s 2B and applies to the Rules as legislative instruments (Legislation Act 2003 s 13) unless the Rules define it otherwise; Dev checks the Incident Rules and the Worker Screening Rules for their own definition before building and records the result in `standards.meta.json`. "The place concerned" is not defined further; counting a holiday only when it is one in every state the provider works in gives a date that is never later than the law's in any of those states (D-2916). The FR-7 sentence states the definition without quoting the Act, which is not legal advice (D-2919). D-2920: nothing in this REQ changes a 24-hour window; "24 hours" stays calendar time, and the incident form's help text stays as it is.
+
+## NDIS expert's read (D-2915, D-2917, D-2918, D-2921)
+
+An auditor checks a notification against the Commission's own calendar; a provider whose register shows a date later than the Commission's would be late, so the safe-side rule (D-2916) and the derived date (D-2917) are the right shape. The dataset on data.gov.au is the one government source that covers all eight jurisdictions in one file; it is published a year ahead, so the 1 October check (D-2918) leaves three months. D-2921: the bracket in FR-5 names the holiday because an auditor asked "why the 13th" should see the reason on the row, not in a help page.
+
+## Dev response
+
+Dev-1, 18 Oct 2026, on `req-032-session-a` from `next` 5d6cea7. D-2914 to D-2921 read first. Two findings change the build before it starts; everything else is as the REQ says.
+
+**D-2914, the definition, verified first.** Acts Interpretation Act 1901 s 2B, Compilation No. 39 of 28 March 2026 (legislation.gov.au C1901A00002, read 18 Oct 2026): "business day means a day that is not a Saturday, a Sunday or a public holiday in the place concerned." Neither set of Rules defines the term itself: the Incident Management and Reportable Incidents Rules 2018 (F2018L00633) define only "Act" in s 4 and use "business days" in s 21(2)(b) ("given within 5 business days after the provider became aware that the reportable incident occurred"); the Practice Standards—Worker Screening Rules 2018 (F2018L00887, compilation F2021C00788) define twenty-six terms in s 5, none of them business day, and use it in s 17(2)(b) ("within 20 business days of the new risk assessed role being identified"). So s 2B applies through the Legislation Act 2003 s 13, as the lawyer read it; recorded in `standards.meta.json` with the three read dates at commit 1.
+
+**Finding 1, the dataset (FR-1).** The data.gov.au "Australian Public Holidays Dates Machine Readable Dataset" is retired. Its record (CKAN `package_show`, read 18 Oct 2026) is titled "[INACTIVE]", says "The Department of the Prime Minister and Cabinet is no longer maintaining this dataset and no further updates will be released", runs 2019-01-01 to 2025-12-31, is licensed CC BY 3.0 AU (not 4.0), and points readers to the eight state and territory government pages. There is no national file for 2026 or 2027. Options:
+
+1. **(a) Build the fixture from the eight government pages** PM&C names, one jurisdiction at a time, each row carrying its page's URL and the read date in `source.json` (one source entry per jurisdiction, licence line as each site states it: Crown copyright of the state, no CC statement on NSW, QLD, WA, ACT or NT; the dates themselves are facts). All eight pages publish 2026 and 2027 (read 18 Oct 2026; WA's page says 2028 follows "when confirmed"). **Recommended.**
+2. (b) The dataset's combined 2021 to 2025 file alone: nothing for the years we need; out.
+3. (c) A third-party holidays API: a live dependency and a licence to read for a table of forty rows a year; out.
+
+**Finding 2, the generated column (FR-4).** `incidents.notify_by` is a generated column over `incident_notify_by(...)`, which Postgres requires to be immutable over the row alone; it cannot read `accounts.states` or a holiday table. FR-4 wants the date computed at save and recomputed by the job. Options:
+
+1. **(a) A plain `notify_by` column set by a trigger** (`before insert or update of occurred_on, aware_on, category, reportable, severity on incidents`) that joins the account's states and `public_holidays`, plus `recompute_incident_notify_by(p_account uuid)` the reminders job calls once per account each run, so a holiday added to the table moves the date (D-2917). The status views and every reader keep the column name. **Recommended.**
+2. (b) Compute in the views at read time: the auditor's view, the CSVs and the job would each join the holiday table; three places to drift.
+3. (c) Keep the generated column and apply the holidays in TypeScript only: SQL and TypeScript would disagree, which FR-3 forbids.
+
+**What counts as a holiday (FR-1, FR-2), the Dev's reading for the PO to confirm.** Statewide whole-day holidays only: national days, state days, and the additional or substitute days each government declares (NSW, QLD, WA, ACT, NT and TAS name them; SA's "additional public holiday" for Proclamation Day; VIC's "additional public holiday" for a weekend Christmas or Boxing Day). Left out, with the reason in `source.json`: part-day holidays (SA, NT and QLD Christmas Eve and SA and NT New Year's Eve, 6 or 7 pm to midnight: not a day); regional days (Brisbane's Royal Queensland Show, WA's Karratha and Port Hedland King's Birthday, NT's five show days, Tasmania's Table 2 regional days: the REQ's "local" exclusion); Tasmania's Easter Tuesday and Launceston and Devonport Cups ("generally Tasmanian Public Service only"); the NSW Bank Holiday (the page says it is "not a declared public holiday"). Two rows are UNVERIFIED and will be marked so in the fixture: Victoria's Friday before the AFL Grand Final 2027 ("Subject to AFL schedule", the page says; I add it when published, so a VIC count across late September 2027 can read one business day short until then), and Easter Saturday in Queensland, which the page lists as "The day after Good Friday" in its holiday table (I count it). Anzac Day on a weekend: NSW, WA and ACT list an additional Monday (27 April 2026; 26 April 2027), QLD and NT move it to Monday 26 April 2027, VIC, SA and TAS do not; the table carries what each page says.
+
+**FR-2 and FR-3 as I read them.** `addBusinessDays(date, days, states)` counts a day as a holiday only when it is in the table for every state in `states` (an empty list: weekends only); the two-argument forms stay and pass `[]`. The SQL twin is `add_business_days(p_date, p_days, p_states text[])` over the same table with the two-argument wrapper kept. The parity test walks every day of 2026 and 2027 for NSW, {NSW, VIC} and none, through the owner's client against the migration's function.
+
+**FR-5 and FR-6 words.** The bracket names the holidays skipped in that count, in date order, joined with "and", and the sentence the REQ gives; with no holiday skipped, no bracket. Past the table's last year the count is weekends only and the bracket reads the REQ's "(public holidays after 2027 are not yet counted)". The year-runs-out test lives in `src/lib/registers/public-holidays.test.ts` (the REQ allows a place other than `workflows.test.ts`, which checks a workflow file) and fails when `todaySydney()` is on or after 1 October of the table's last year.
+
+**FR-7.** The sentence once per document, after the first "within 5 business days" sentence in `fixed-extras.ts`'s incident procedure, pinned by `legal-copy.test.ts`'s fixed list and by the incident policy's render test.
+
+**Session plan (four commits).** (1) `data/public-holidays/2026.json`, `2027.json`, `source.json`, the loader with SR-2's checks, `addBusinessDays` with states, the fixture tests (row counts per jurisdiction and year; 1 January, 26 January, Good Friday, 25 December; one state-only day each: NSW Labour Day 5 Oct 2026, VIC Melbourne Cup 3 Nov 2026, QLD Labour Day 4 May 2026, SA Adelaide Cup 9 Mar 2026, WA Western Australia Day 1 Jun 2026, TAS Eight Hours Day 9 Mar 2026, ACT Canberra Day 9 Mar 2026, NT Picnic Day 3 Aug 2026), `standards.meta.json`'s note. (2) The migration: the table with its grants (revoke then grant select, D-2245), the seed generated from the fixture by `scripts/holidays/seed.mjs` so the two cannot drift (a test compares), `add_business_days` with states and the wrapper, `incident_notify_by` with states, the trigger, the recompute function; the integration parity test (AC-2). (3) The callers: the trigger carries the row's save; the reminders job recomputes per account and passes states to the complaint and role lines; the incident register, the audit-day forms and the auditor's view carry FR-5's bracket from one helper; FR-6's fallback; AC-3's fixture dates. (4) FR-7's sentence and its tests; the AC-1 e2e (NSW Thursday 2 April 2026 to Monday 13 April with "Good Friday and Easter Monday do not count"; {NSW, WA} the same; {NSW, VIC} Friday 30 October 2026 to Friday 6 November; VIC alone to Monday 9 November) on desktop and Android.
+
+**Hours.** 9 to 11: the data 2 (eight pages, forty-odd rows a year, each checked twice), the SQL 2 to 3 (the trigger and the recompute need the integration suite), the callers and the bracket 2, the documents 1, the e2e and the fixtures 2.
+
+**Questions (none blocks the start; I build on the recommendations).** (1) Option (a) for the dataset, with the eight pages as the source. (2) Option (a) for the column. (3) The holiday reading above (statewide whole days; part-days, regional and public-service-only days out; the two UNVERIFIED rows). (4) AC-1's NSW case reads 13 April: Thursday 2 April plus five business days skipping Friday 3 and Monday 6 April is Monday 13 April (7, 8, 9, 10 then 13), agreed; the {NSW, VIC} case on Friday 30 October: Melbourne Cup Tuesday 3 November is Victoria's alone, so it counts as a business day and the date is Friday 6 November, agreed; VIC alone skips it and reads Monday 9 November, agreed.
+
+## Delivery evidence
+
+(Dev appends: branch, commits, test counts, screenshots of AC-1 on desktop and Android.)

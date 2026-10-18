@@ -49,7 +49,7 @@ These are named or implied by the quality indicators for the standards that appl
 | Risk register               | Risk management: risks to participants, workers and the business are identified, rated, treated and reviewed on a date.                                            | Readyline's corporate risks register, started with the nine areas auditors look for, each rated and reviewed on a date; the risk register template in your pack stays as the paper copy.                                                                                                                                  |
 | Insurance certificates      | Risk management: current professional indemnity, public liability and, where you employ, workers compensation.                                                     | Readyline's insurances and vehicles register holds each policy's insurer, number and expiry with a reminder before it lapses; the certificates stay in your own folder.                                                                                                                                                   |
 
-## The records auditors ask for in practice
+## Records auditors often ask for (sector practice, not a rule)
 
 These are not named in the Rules, but auditors ask for them because they show the system is alive. Keep them simple; a page each is enough for a small provider.
 

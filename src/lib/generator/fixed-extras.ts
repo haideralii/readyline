@@ -53,6 +53,15 @@ export const COMMISSION_CONTACT_STRINGS: readonly string[] = [
   "ndiscommission.gov.au",
 ];
 
+/**
+ * REQ-032 FR-7 (D-2919): the Acts Interpretation Act 1901 s 2B meaning in
+ * plain words, once in each document whose fixed text counts five business
+ * days (the incident policy's escalation table, the safeguarding policy's
+ * restrictive-practice position), after the first such sentence.
+ */
+export const BUSINESS_DAY_SENTENCE =
+  "A business day is not a Saturday, a Sunday or a public holiday in the state where we work.";
+
 export const FIXED_EXTRAS: Record<string, Extra> = {
   "risk-register": () => [
     {
@@ -279,6 +288,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
         "The owner reviews what led to it within 5 business days and records what we change in the improvement register.",
       ],
     },
+    { type: "paragraph", text: BUSINESS_DAY_SENTENCE },
     {
       type: "paragraph",
       text: "The owner reviews this position every 12 months and whenever a participant's needs change in a way that could lead to a restrictive practice.",
@@ -326,6 +336,7 @@ export const FIXED_EXTRAS: Record<string, Extra> = {
         ],
       ],
     },
+    { type: "paragraph", text: BUSINESS_DAY_SENTENCE },
   ],
   "reportable-incidents": () => [
     {

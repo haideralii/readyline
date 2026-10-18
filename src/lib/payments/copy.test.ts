@@ -7,9 +7,9 @@ import { refundPromise, sectionParagraphs } from "./refund-promise";
 
 describe("pricing page copy (REQ-007 AC-4, business rules)", () => {
   it("passes the prohibited-claims lint on every string, refund promise included", () => {
-    for (const s of [...pricingStrings(), ...refundPromise()]) {
+    // REQ-012 FR-4a (D-2905, D-2941): no hold; "audit-ready" left the copy.
+    for (const s of [...pricingStrings(), ...refundPromise()])
       expect(findProhibitedClaims(s), s).toEqual([]);
-    }
   });
 
   it("carries the AI disclosure and the not-legal-advice line, and names no urgency or scarcity", () => {

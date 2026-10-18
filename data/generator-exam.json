@@ -399,8 +399,8 @@
       },
       "mapsTo": "lint: terminology (names)",
       "source": {
-        "title": "NDIS Commission, approved quality auditors",
-        "url": "https://www.ndiscommission.gov.au/providers/registered-ndis-providers/approved-quality-auditors"
+        "title": "NDIS Commission, information for approved quality auditors",
+        "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/information-quality-auditors"
       },
       "mustPass": true
     },
@@ -415,8 +415,8 @@
       },
       "mapsTo": "lint: terminology (names)",
       "source": {
-        "title": "NDIS Commission, approved quality auditors",
-        "url": "https://www.ndiscommission.gov.au/providers/registered-ndis-providers/approved-quality-auditors"
+        "title": "NDIS Commission, information for approved quality auditors",
+        "url": "https://www.ndiscommission.gov.au/provider-registration/apply-registration/information-quality-auditors"
       },
       "mustPass": true
     },

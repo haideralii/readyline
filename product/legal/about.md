@@ -31,4 +31,4 @@ Your account and your documents live in Sydney. The model that drafts the docume
 
 ## Contact
 
-Email us at the contact address in the footer. One person reads every message, usually within two business days.
+Email us at the contact address in the footer. One person reads every message and replies within two business days.

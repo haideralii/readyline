@@ -8,10 +8,10 @@
 import { z } from "zod";
 import { strictObject, text } from "@/lib/validation";
 import {
-  HARM_SEVERITIES,
-  RESTRICTIVE_PRACTICE_BUSINESS_DAYS,
-  addBusinessDays,
-} from "./status";
+  addBusinessDaysDetailed,
+  businessDaysBracket,
+} from "./public-holidays";
+import { HARM_SEVERITIES, RESTRICTIVE_PRACTICE_BUSINESS_DAYS } from "./status";
 import {
   INCIDENT_CATEGORIES,
   INCIDENT_CATEGORIES_24H,
@@ -158,6 +158,8 @@ export function isReportableCategory(category: IncidentCategory): boolean {
 export function awareSentence(
   awareAt: Date,
   kind?: { category: IncidentCategory; severity: IncidentSeverity },
+  /** REQ-032 FR-2: the account's states, whose public holidays the five days skip (FR-5 names them). */
+  states: readonly string[] = [],
 ): string {
   const fmt = new Intl.DateTimeFormat("en-AU", {
     timeZone: "Australia/Sydney",
@@ -179,17 +181,19 @@ export function awareSentence(
       month: "2-digit",
       day: "2-digit",
     }).format(awareAt);
+    const count = addBusinessDaysDetailed(
+      awareOn,
+      RESTRICTIVE_PRACTICE_BUSINESS_DAYS,
+      states,
+    );
     const by = new Intl.DateTimeFormat("en-AU", {
       timeZone: "UTC",
       day: "numeric",
       month: "long",
       year: "numeric",
-    }).format(
-      new Date(
-        `${addBusinessDays(awareOn, RESTRICTIVE_PRACTICE_BUSINESS_DAYS)}T00:00:00Z`,
-      ),
-    );
-    return `${reported}; if this is a reportable incident the Commission must be told by ${by} (five business days, for an unauthorised restrictive practice that caused no harm; 24 hours if it did).`;
+    }).format(new Date(`${count.date}T00:00:00Z`));
+    const moved = businessDaysBracket(count);
+    return `${reported}; if this is a reportable incident the Commission must be told by ${by} (five business days, for an unauthorised restrictive practice that caused no harm${moved ? `; ${moved.slice(1, -1)}` : ""}; 24 hours if it did).`;
   }
   const by = new Date(awareAt.getTime() + AWARE_HOURS * 3_600_000);
   return `${reported}; if this is a reportable incident the Commission must be told by ${fmt.format(by).replace(" at ", ", ")}.`;
