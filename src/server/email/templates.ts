@@ -7,6 +7,21 @@ import { BRAND } from "@/lib/brand";
 import { TIMELINE_FIXED_SENTENCE } from "@/lib/registers/timeline";
 import { REPORT_WINDOW_WORDS } from "@/lib/registers/worker";
 import type { EmailMessage } from "./provider";
+import { glossarySentence } from "@/lib/questionnaire/content";
+import { readinessCounts, summaryLines } from "@/lib/questionnaire/readiness";
+import type { QuestionnaireResult } from "@/lib/questionnaire/result";
+import {
+  GROUPS_LABEL,
+  MID_TERM_HEADING,
+  MODULES_HEADING,
+  REGISTERS_SAMPLED_SENTENCE,
+  RESULT_EMAIL_FIRST_LINE,
+  RESULT_SCOPE_SENTENCE,
+  auditHeading,
+  midTermLine,
+  resultEmailSubject,
+  resultPreparedLine,
+} from "@/lib/questionnaire/result-text";
 import { WORKER_FIRST_STEPS } from "@/lib/registers/worker-steps";
 
 const SIGN_OFF = `${BRAND} provides general information and document templates for your own review; it is not legal advice.`;
@@ -186,6 +201,78 @@ export function testEmail(input: { to: string }): EmailMessage {
       "Nothing else was sent and no account is involved.",
       "",
       SIGN_OFF,
+    ].join("\n"),
+  };
+}
+
+/**
+ * REQ-031 FR-1 (D-2884, D-2885, D-2893, D-2894, D-2895, D-2897): the
+ * questionnaire result, sent once to the address typed on the result page.
+ * The result and nothing else: no price, no offer, no follow-up; the sources
+ * by short name without a URL (a template may not link off site); two
+ * on-site next steps; the link back; the footer with the business and the
+ * contact address. The audit kind's glossary sentence is the one glossary
+ * line (question 1 (a)).
+ */
+export function resultEmail(input: {
+  to: string;
+  result: QuestionnaireResult;
+  checklistTotal: number;
+  signedIn: boolean;
+  origin: string;
+  /** Today in Sydney, for the "Prepared ... on <date>" line. */
+  today: Date;
+  /** CONTACT_EMAIL when set; the footer names it after the business. */
+  contact: string | null;
+  accountId?: string | null;
+}): EmailMessage {
+  const r = input.result;
+  const lines = summaryLines(readinessCounts(r), input.checklistTotal);
+  const nextSteps = input.signedIn
+    ? [`Go to your next step: ${input.origin}/path/before-you-buy`]
+    : [
+        `Sign in to get ready: ${input.origin}/sign-in?next=/path/before-you-buy`,
+      ];
+  const back = input.signedIn
+    ? `See your result: ${input.origin}/start/result`
+    : `Your result is not saved on our side. To see it again, start the questionnaire: ${input.origin}/start`;
+  return {
+    to: input.to,
+    template: "result",
+    accountId: input.accountId ?? null,
+    subject: resultEmailSubject(r.pathway),
+    text: [
+      RESULT_EMAIL_FIRST_LINE,
+      "",
+      auditHeading(r),
+      glossarySentence(`${r.pathway}-audit`),
+      RESULT_SCOPE_SENTENCE,
+      "",
+      `${GROUPS_LABEL}:`,
+      ...r.groups.map((g) => `- ${g.name} (${g.code})`),
+      "",
+      lines.documents,
+      `${lines.registers}. ${REGISTERS_SAMPLED_SENTENCE}`,
+      lines.checklist,
+      "",
+      `${MODULES_HEADING}:`,
+      ...r.modules.map(
+        (m) =>
+          `- ${m.name} (${m.standardCount} ${m.standardCount === 1 ? "standard" : "standards"})`,
+      ),
+      "",
+      `${MID_TERM_HEADING}: ${midTermLine(r)}`,
+      "",
+      "Why this result:",
+      ...r.reasons.map((x) => `- ${x.text} Source: ${x.source.title}.`),
+      "",
+      ...nextSteps,
+      `Open your checklist: ${input.origin}/checklist`,
+      back,
+      "",
+      resultPreparedLine(formatDateAu(input.today)),
+      SIGN_OFF,
+      ...(input.contact ? [`${BRAND}. Contact: ${input.contact}`] : [BRAND]),
     ].join("\n"),
   };
 }
