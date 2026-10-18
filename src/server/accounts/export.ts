@@ -55,6 +55,9 @@ export type AccountExport = {
   registrationPeriods: Record<string, unknown>[];
   /** REQ-024 FR-6c: the worker tables, as stored, each a CSV in the zip. */
   workerTables: Record<WorkerExportTable, Record<string, unknown>[]>;
+  /** REQ-029 SR-5: the details typed once (key, value, when), and every document version's adoption snapshot. */
+  accountFacts: Record<string, unknown>[];
+  documentVersions: Record<string, unknown>[];
 };
 
 /** Returns null when the account is not visible to this session (not a member, or deleted). */
@@ -72,43 +75,64 @@ export async function buildAccountExport(
     .maybeSingle();
   if (account.error || !account.data) return null;
 
-  const [memberships, draft, checklist, audit, periods, ...workers] =
-    await Promise.all([
+  const [
+    memberships,
+    draft,
+    checklist,
+    audit,
+    periods,
+    accountFacts,
+    documentVersions,
+    ...workers
+  ] = await Promise.all([
+    supabase
+      .from("memberships")
+      .select("user_id, role, created_at")
+      .eq("account_id", accountId),
+    supabase
+      .from("questionnaire_drafts")
+      .select("answers, answers_version, current_step, updated_at")
+      .eq("account_id", accountId)
+      .maybeSingle(),
+    supabase
+      .from("checklist_items")
+      .select("item_id, status, note, updated_at")
+      .eq("account_id", accountId)
+      .order("item_id", { ascending: true }),
+    supabase
+      .from("audit_log")
+      .select("id, actor_user_id, action, target, at")
+      .eq("account_id", accountId)
+      .order("at", { ascending: true }),
+    // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
+    supabase
+      .from("registration_periods")
+      .select(
+        "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
+      )
+      .eq("account_id", accountId)
+      .order("period_starts_on", { ascending: true }),
+    // REQ-029 SR-5 (D-2859): the facts and the snapshots the downloads fill from.
+    supabase
+      .from("account_facts")
+      .select("key, value, created_at, updated_at")
+      .eq("account_id", accountId)
+      .order("key", { ascending: true }),
+    supabase
+      .from("document_versions")
+      .select(
+        "version_set_id, document_type_id, version, status, adopted_on, approver_name, approver_role, created_at",
+      )
+      .eq("account_id", accountId)
+      .order("created_at", { ascending: true }),
+    ...WORKER_EXPORT_TABLES.map((table) =>
       supabase
-        .from("memberships")
-        .select("user_id, role, created_at")
-        .eq("account_id", accountId),
-      supabase
-        .from("questionnaire_drafts")
-        .select("answers, answers_version, current_step, updated_at")
+        .from(table)
+        .select("*")
         .eq("account_id", accountId)
-        .maybeSingle(),
-      supabase
-        .from("checklist_items")
-        .select("item_id, status, note, updated_at")
-        .eq("account_id", accountId)
-        .order("item_id", { ascending: true }),
-      supabase
-        .from("audit_log")
-        .select("id, actor_user_id, action, target, at")
-        .eq("account_id", accountId)
-        .order("at", { ascending: true }),
-      // REQ-023 FR-2 (finding 66): the registration periods, dates as typed.
-      supabase
-        .from("registration_periods")
-        .select(
-          "id, period_starts_on, period_ends_on, audit_type, midterm_applies, midterm_exempt_reason, midterm_start_by_override, midterm_override_source, last_audit_on, midterm_audit_on, created_at, updated_at",
-        )
-        .eq("account_id", accountId)
-        .order("period_starts_on", { ascending: true }),
-      ...WORKER_EXPORT_TABLES.map((table) =>
-        supabase
-          .from(table)
-          .select("*")
-          .eq("account_id", accountId)
-          .order("created_at", { ascending: true }),
-      ),
-    ]);
+        .order("created_at", { ascending: true }),
+    ),
+  ]);
   // The items and ticks are keyed by their checklist; the export names the worker.
   const workerTables = Object.fromEntries(
     WORKER_EXPORT_TABLES.map((table, i) => [
@@ -138,6 +162,9 @@ export async function buildAccountExport(
     auditLog: audit.data ?? [],
     registrationPeriods: periods.data ?? [],
     workerTables,
+    accountFacts: (accountFacts.data as Record<string, unknown>[] | null) ?? [],
+    documentVersions:
+      (documentVersions.data as Record<string, unknown>[] | null) ?? [],
   };
 }
 
@@ -151,7 +178,7 @@ export function buildExportZip(data: AccountExport): Uint8Array {
     "",
     `Exported at ${data.exportedAt}.`,
     "Files:",
-    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables and audit log as JSON.",
+    "  account.json: your business details, memberships, questionnaire draft, readiness checklist statuses and notes, registration periods, the worker tables, the details you typed once for your documents, each document version's approver and adoption day, and the audit log as JSON.",
     "  registers/<table>.csv: the worker tables (staff matrix, onboarding checklists, items and ticks, worker checks, risk assessed roles, screening exceptions) as CSV, codes and numbers as you typed them.",
     "",
     "This export holds your provider business data only. It never contains participant information,",

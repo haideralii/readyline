@@ -67,6 +67,31 @@ const FactInput = strictObject({
 });
 const ClearInput = strictObject({ key: FactKey });
 
+/**
+ * REQ-029 question 1 (b), D-2859: the stored zip and summary carry the values,
+ * so a save rebuilds them for the newest ready set; a rebuild that fails leaves
+ * the save standing and is logged, never shown as a failed save.
+ */
+async function rebuildNewestSet(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  accountId: string,
+): Promise<void> {
+  try {
+    const newest = await latestReadySet(supabase, accountId);
+    if (!newest.setId) return;
+    const admin = createSupabaseAdminClient();
+    const set = await getVersionSet(admin, newest.setId);
+    if (!set) return;
+    const facts = await loadFacts(supabase, accountId);
+    await rerenderSetWithFacts({ admin, set, facts });
+  } catch (e) {
+    log.warn("path.details.rebuild-failed", {
+      accountId,
+      name: e instanceof Error ? e.name : "unknown",
+    });
+  }
+}
+
 /** REQ-029 SR-3: the audit line carries the key, never the value. */
 async function auditDetail(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
@@ -127,6 +152,7 @@ export async function saveFactAction(
     DETAILS_SAVED_ACTION,
     parsed.data.key,
   );
+  await rebuildNewestSet(supabase, viewer.account.id);
   return { ok: true };
 }
 
@@ -161,6 +187,7 @@ export async function clearFactAction(
     DETAILS_CLEARED_ACTION,
     parsed.data.key,
   );
+  await rebuildNewestSet(supabase, viewer.account.id);
   return { ok: true };
 }
 

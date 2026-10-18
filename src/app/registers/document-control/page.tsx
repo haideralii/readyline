@@ -1,3 +1,4 @@
+import { formatDateAu } from "@/lib/generator/fixed-text";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -101,6 +102,15 @@ export default async function DocumentControlPage() {
                     ["Adopted on", r.adopted_on ?? "Not yet"],
                     ["By", r.adopted_by || "Not yet"],
                     ["Next review", r.next_review_on ?? "Not yet"],
+                    // REQ-029 D-2856: the contact detail changed after adoption; the version did not move.
+                    ...(r.contact_updated_on
+                      ? [
+                          [
+                            "Contact details",
+                            `updated on ${formatDateAu(r.contact_updated_on)}`,
+                          ] as [string, string],
+                        ]
+                      : []),
                     [
                       "Circulated",
                       r.circulated

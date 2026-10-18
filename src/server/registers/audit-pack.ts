@@ -97,6 +97,8 @@ export const DOCUMENT_CONTROL_COLUMNS = [
   "circulated_on",
   "circulated_workers",
   "state",
+  // REQ-029 D-2856: the day the contact detail changed after adoption, or empty.
+  "contact_updated_on",
 ] as const;
 
 /**
