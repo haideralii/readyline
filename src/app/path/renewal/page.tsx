@@ -13,6 +13,7 @@ import { getViewer } from "@/server/accounts/queries";
 import { listPolicyReviews } from "@/server/registers/queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { lastRehearsal } from "@/server/registers/self-check-queries";
+import { latestRegisterChangeAt } from "@/server/registers/what-changed-queries";
 import { todaySydney } from "@/server/registers/worker-onboarding";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -36,10 +37,12 @@ export default async function RenewalPage({
   const supabase = await createSupabaseServerClient();
   const accountId = viewer.account.id;
   const today = todaySydney();
-  const [period, reviews, rehearsal] = await Promise.all([
+  const [period, reviews, rehearsal, latestChangeAt] = await Promise.all([
     currentPeriod(supabase, accountId),
     listPolicyReviews(supabase, accountId),
     lastRehearsal(supabase, accountId),
+    // REQ-031 FR-5 (D-2890): the newest register change, against the period's reading.
+    latestRegisterChangeAt(supabase, accountId),
   ]);
   const documentsDue = period
     ? reviews.filter(
@@ -50,7 +53,14 @@ export default async function RenewalPage({
     period && rehearsal && rehearsal.walked_on >= period.period_starts_on
       ? rehearsal.walked_on
       : null;
-  const steps = renewalSteps({ period, documentsDue, rehearsedOn, today });
+  const steps = renewalSteps({
+    period,
+    documentsDue,
+    rehearsedOn,
+    today,
+    whatChangedReadAt: period?.what_changed_read_at ?? null,
+    latestChangeAt,
+  });
   const next = renewalNext(steps);
   const windowOpen = period ? today >= renewalWindowOpens(period) : false;
   return (
