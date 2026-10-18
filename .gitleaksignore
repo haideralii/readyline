@@ -1,7 +1,17 @@
 # gitleaks fingerprint allow-list (REQ-002). Add entries only for confirmed
-# false positives, one comment line each: commit:file:rule:line.
+# false positives, one comment line each: commit:file:rule:line. The secret
+# scan runs over the whole history (secrets.yml checks out with fetch-depth 0),
+# so a line that later gained an inline `gitleaks:allow` marker still needs its
+# fingerprint for the commits before the marker; that is what both entries are.
+# Reviewed 18 Oct 2026 (REQ-012 FR-1g): both lines re-read at their commits, the
+# same test constant, no secret; kept. The inline markers in force today are in
+# e2e/helpers/env.ts, playwright.config.ts and .github/workflows/ci.yml, each a
+# fixture value built from words and a digit run for the e2e server.
 
 # e2e/helpers/env.ts: the e2e CRON_SECRET fallback, a test constant built at runtime
 # from the words "e2e", "cron", "secret" and a digit run; not a secret (PO batch 21).
+# The commit of 12 Oct 2026 (REQ-007 Session C) carries the line before its marker.
 dfa050bd13b48e5473d32bdd246b95e923bd6038:e2e/helpers/env.ts:generic-api-key:31
+# e2e/helpers/env.ts: the same line in the commit of 12 Oct 2026 (REQ-006 Session B),
+# before its marker; the same test constant, not a secret.
 3a48546e8748d15a422a96185c187dc6d18ba3b0:e2e/helpers/env.ts:generic-api-key:31
