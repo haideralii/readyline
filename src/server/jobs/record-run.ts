@@ -8,7 +8,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { log } from "@/lib/logging/logger";
 
-export type JobName = "purge" | "generate" | "reminders";
+/** REQ-030 FR-3 and FR-2 (D-2867, D-2866): the uptime check and the backup record their runs the same way. */
+export type JobName = "purge" | "generate" | "reminders" | "uptime" | "backup";
 
 export function jobRunAction(job: JobName): string {
   return `jobs.${job}.ran`;
