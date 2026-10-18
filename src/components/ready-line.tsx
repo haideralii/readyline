@@ -10,7 +10,7 @@
  * progress-line.tsx. An SVG whose geometry is attributes, not inline
  * styles, so the nonce-only CSP holds. The visual is decorative; the
  * sentence beneath carries the numbers for everyone, in the caller's words
- * (REQ-025 FR-3's pack sentence on the result, "N of 15 registers started"
+ * (REQ-025 FR-3's pack sentence on the result, "N of 16 registers started"
  * on the index; second pass 35).
  */
 export type ReadyLineCounts = {

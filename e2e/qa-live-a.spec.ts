@@ -73,4 +73,39 @@ test.describe("live QA b340ee3: the questionnaire's focus and words", () => {
       await expect(link).toHaveAttribute("target", "_blank");
     }
   });
+
+  test("the result's pack sentence, the way back from a step, the cleared open-sections key, and the pack card's heading", async ({
+    page,
+  }) => {
+    await reachResult(page);
+    const whatNext = page.getByTestId("what-next");
+    await expect(whatNext).toContainText("if you already bought the pack");
+    await expect(whatNext).not.toContainText("already have one");
+    // The way back to the result from a step while one exists.
+    await page.getByTestId("change-answers").click();
+    await expect(page).toHaveURL(/\/start\/business$/);
+    const back = page.getByTestId("back-to-result");
+    await expect(back).toBeVisible();
+    await back.click();
+    await expect(page).toHaveURL(/\/start\/result$/);
+    // "Start again" clears the open-sections memory with the draft.
+    await page.evaluate(() =>
+      localStorage.setItem("readyline.result.open", JSON.stringify(["why"])),
+    );
+    await page.getByTestId("clear-draft").click();
+    await page.getByTestId("clear-draft-yes").click();
+    await expect(page).toHaveURL(/\/start$/);
+    expect(
+      await page.evaluate(() => localStorage.getItem("readyline.result.open")),
+    ).toBeNull();
+    // A fresh visitor with no result sees no way back.
+    await page.goto("/start/business");
+    await formLive(page);
+    await expect(page.getByTestId("back-to-result")).toHaveCount(0);
+    // The pack card is named for what it is.
+    await page.goto("/pricing");
+    await expect(
+      page.getByTestId("pricing-pack").getByRole("heading", { level: 2 }),
+    ).toHaveText("Document pack");
+  });
 });

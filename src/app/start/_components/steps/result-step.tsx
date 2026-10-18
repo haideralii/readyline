@@ -325,7 +325,7 @@ const MID_TERM_NONE = "Does not apply.";
 const REGISTERS_LEGEND =
   "Your pack includes a template for every register below; the subscription keeps them for you. An auditor samples them at the mid-term audit and at renewal.";
 const WHAT_NEXT_TEXT =
-  "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already have one.";
+  "drafts these documents as a one-off pack; the registers follow as a subscription. Go to your documents if you already bought the pack.";
 
 function ResultView({
   result,
@@ -468,6 +468,12 @@ function ResultView({
               // QA pass F7 (D-2269): the intro is the page "Start again" lands on; the provider's
               // `clearing` flag holds the result step's guard back while the answers empty.
               onConfirm={() => {
+                // Live QA (report A): the open-sections memory goes with the draft.
+                try {
+                  localStorage.removeItem(OPEN_KEY);
+                } catch {
+                  // Storage blocked: nothing was kept.
+                }
                 void clearDraft();
                 router.push("/start");
               }}
@@ -791,7 +797,7 @@ function ResultView({
             <Link href="/documents" className="underline underline-offset-2">
               Go to your documents
             </Link>{" "}
-            if you already have one.
+            if you already bought the pack.
           </p>
         </section>
 
