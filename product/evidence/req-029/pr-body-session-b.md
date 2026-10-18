@@ -1,6 +1,6 @@
 # REQ-029 Session B: the fill in the zip, the sheet, the register's line, the once-rendered auditor pack, the older sets
 
-PR into `next`, branch `req-029-session-b` stacked on `req-029-session-a` (414cbf0; D-2827), with `next` 3e62b88 merged before the push. Dev-1, 18 Oct 2026. Head: a8bbe3a.
+PR into `next`, branch `req-029-session-b` stacked on `req-029-session-a` (merged into `next` as #112, 5d6cea7), with `next` 5d6cea7 merged before the push (D-2827). Dev-1, 18 Oct 2026. Head: aab3e57 (the tree of 1c6fb4c, which `npm run check` passed: 1,360 tests).
 
 ## What this PR does
 
