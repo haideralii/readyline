@@ -36,7 +36,8 @@ describe("the gitleaks exemptions are justified (REQ-012 FR-1g)", () => {
     expect(entries.length).toBeGreaterThan(0);
     for (const { l, i } of entries) {
       const [, file, rule] = l.split(":");
-      expect(file, l).toMatch(/\.(ts|tsx|mjs|yml|json|md)$/);
+      // A fingerprint may point at this allow-list itself (a comment that once carried a literal).
+      expect(file, l).toMatch(/\.(ts|tsx|mjs|yml|json|md)$|^\.gitleaksignore$/);
       expect(rule, l).toMatch(/^[a-z-]+$/);
       // The nearest comment block above the entry names the file and a reason.
       let j = i - 1;
