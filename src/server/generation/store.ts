@@ -40,6 +40,9 @@ export type DocumentVersionRow = {
   created_at: string;
   /** REQ-024 A0 (D-2427): the Sydney day this version was adopted, written by `adopt_document_version` alone; null until then. */
   adopted_on?: string | null;
+  /** REQ-029 D-2855: the approver's name and role as the account held them on the adoption day, written by `adopt_document_version` alone and never updated; null until adoption. */
+  approver_name?: string | null;
+  approver_role?: string | null;
 };
 
 export type GenerationLogRow = {

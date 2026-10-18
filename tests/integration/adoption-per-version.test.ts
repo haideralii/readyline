@@ -134,6 +134,7 @@ describe.skipIf(!enabled)(
     let admin: SupabaseClient;
     let owner: Person;
     let other: Person;
+    let fresh: Person;
     let gone: Person;
     let member: Person;
     let worker: Person;
@@ -237,6 +238,8 @@ describe.skipIf(!enabled)(
       });
       owner = await signUp(admin, env.url, env.publishableKey, "owner", true);
       other = await signUp(admin, env.url, env.publishableKey, "other", true);
+      // REQ-029: an account of its own for the snapshot case, so the backfill case's second account is untouched.
+      fresh = await signUp(admin, env.url, env.publishableKey, "fresh", true);
       gone = await signUp(admin, env.url, env.publishableKey, "gone", true);
       member = await signUp(
         admin,
@@ -291,6 +294,16 @@ describe.skipIf(!enabled)(
         false,
       );
       setId = await insertSet(owner.accountId, owner.userId);
+      // REQ-029 D-2855: the function snapshots the approver from the account's
+      // facts and refuses without a name, so the owner has one from the start.
+      const seeded = await admin.from("account_facts").upsert(
+        [
+          { account_id: owner.accountId, key: "name", value: "Jane Citizen" },
+          { account_id: owner.accountId, key: "role", value: "Owner" },
+        ],
+        { onConflict: "account_id,key" },
+      );
+      if (seeded.error) throw seeded.error;
       versionIds[typeA] = await insertVersion(
         owner.accountId,
         setId,
@@ -340,10 +353,15 @@ describe.skipIf(!enabled)(
       expect(r.data).toBe(today);
       const v = await admin
         .from("document_versions")
-        .select("adopted_on")
+        .select("adopted_on, approver_name, approver_role")
         .eq("id", versionIds[typeA])
         .single();
-      expect(v.data?.adopted_on).toBe(today);
+      // REQ-029 D-2855: the approver is snapshotted from the account's facts that day.
+      expect(v.data).toEqual({
+        adopted_on: today,
+        approver_name: "Jane Citizen",
+        approver_role: "Owner",
+      });
       const pr = await admin
         .from("policy_reviews")
         .select("title, adopted_on, last_reviewed_on, review_cycle_months")
@@ -568,10 +586,15 @@ describe.skipIf(!enabled)(
       expect(carried).toBe("2026-10-01");
       const v3 = await admin
         .from("document_versions")
-        .select("adopted_on")
+        .select("adopted_on, approver_name, approver_role")
         .eq("id", versionIds[`${typeA}-v3`])
         .single();
-      expect(v3.data?.adopted_on).toBe("2026-10-01");
+      // REQ-029 D-2855: a carried adoption copies the earlier version's approver, not today's facts.
+      expect(v3.data).toEqual({
+        adopted_on: "2026-10-01",
+        approver_name: "Jane Citizen",
+        approver_role: "Owner",
+      });
       expect((await listAdoptedDates(admin, owner.accountId)).get(typeA)).toBe(
         "2026-10-01",
       );
@@ -605,6 +628,69 @@ describe.skipIf(!enabled)(
       });
       expect(own.error).toBeNull();
       expect(own.data).toBe(today);
+    });
+
+    it("REQ-029 D-2855: no name refuses with P0004, the snapshot is fixed in place, and a re-approval's version takes the new role while the earlier keeps its own", async () => {
+      const freshSet = await insertSet(fresh.accountId, fresh.userId);
+      const v1 = await insertVersion(
+        fresh.accountId,
+        freshSet,
+        typeA,
+        1,
+        false,
+      );
+      const refused = await fresh.client.rpc("adopt_document_version", {
+        p_account: fresh.accountId,
+        p_version: v1,
+      });
+      expect(refused.error?.code).toBe("P0004");
+      const facts = await admin.from("account_facts").upsert(
+        [
+          { account_id: fresh.accountId, key: "name", value: "Sam Worker" },
+          { account_id: fresh.accountId, key: "role", value: "Owner" },
+        ],
+        { onConflict: "account_id,key" },
+      );
+      expect(facts.error).toBeNull();
+      const ok = await fresh.client.rpc("adopt_document_version", {
+        p_account: fresh.accountId,
+        p_version: v1,
+      });
+      expect(ok.error).toBeNull();
+      // Fixed in place: not even the service role moves a written snapshot (42501).
+      const moved = await admin
+        .from("document_versions")
+        .update({ approver_name: "Someone Else" })
+        .eq("id", v1);
+      expect(moved.error?.code).toBe("42501");
+      // FR-6: the role changes on the account; the re-approved version carries it, the earlier keeps "Owner".
+      await admin
+        .from("account_facts")
+        .upsert(
+          { account_id: fresh.accountId, key: "role", value: "Director" },
+          { onConflict: "account_id,key" },
+        );
+      const v2 = await insertVersion(
+        fresh.accountId,
+        freshSet,
+        typeA,
+        2,
+        false,
+      );
+      const again = await fresh.client.rpc("adopt_document_version", {
+        p_account: fresh.accountId,
+        p_version: v2,
+      });
+      expect(again.error).toBeNull();
+      const both = await admin
+        .from("document_versions")
+        .select("version, approver_name, approver_role")
+        .in("id", [v1, v2])
+        .order("version");
+      expect(both.data).toEqual([
+        { version: 1, approver_name: "Sam Worker", approver_role: "Owner" },
+        { version: 2, approver_name: "Sam Worker", approver_role: "Director" },
+      ]);
     });
 
     it("the backfill takes the seeded row's date onto the latest version, ignores a titled second row, caps a future date at today, and the row then reads adopted (D-2432)", async () => {
