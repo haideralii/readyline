@@ -15,6 +15,11 @@ import {
   isAccountFactKey,
   questionsFor,
   remainingBlanks,
+  applyLiveFacts,
+  detailsQuestionsFor,
+  isFactValueAllowed,
+  liveFacts,
+  openFormBlanks,
 } from "./facts-fill";
 import { loadReferenceCases } from "./reference-cases";
 
@@ -76,7 +81,7 @@ describe("account facts stay off the Finish form (D-541 as amended, batch 37)", 
     ]);
   });
 
-  it("the three fixed blanks fill from the account facts: approver, approval date, change-log author", () => {
+  it("the fill primitive still fills the three fixed blanks when given name, role and date (the adoption fill uses it, D-2855)", () => {
     const filled = applyFacts(governance, {
       name: "Jane Citizen",
       role: "Owner",
@@ -162,5 +167,133 @@ describe("facts-fill (REQ-017 FR-2, D-1702)", () => {
 
   it("never changes a model when there are no facts", () => {
     expect(applyFacts(governance, {})).toBe(governance);
+  });
+});
+
+describe("REQ-029: the live fill, the participant rule and the fact-aware count (FR-3, FR-7, FR-10; D-2855)", () => {
+  const facts = {
+    name: "Jane Citizen",
+    role: "Owner",
+    date: "14 October 2026",
+    "phone-or-email": "0400 000 000",
+    "other-tool": "Deputy",
+    "allowed-use": "Rostering",
+    limits: "Participant notes",
+    period: "7 years",
+  };
+
+  it("the live facts are every saved fact but the approver's name and role and the date", () => {
+    expect(Object.keys(liveFacts(facts)).sort()).toEqual([
+      "allowed-use",
+      "limits",
+      "other-tool",
+      "period",
+      "phone-or-email",
+    ]);
+    expect(liveFacts({ name: "x", "phone-or-email": "  " })).toEqual({});
+  });
+
+  it("the live fill leaves the Approver row, the date and the change-log author bracketed and fills the contact and appendix blanks", () => {
+    const live = applyLiveFacts(governance, facts);
+    const text = JSON.stringify(live);
+    expect(text).toContain("[name], [role]");
+    expect(text).toContain("[date]");
+    expect(text).not.toContain("Jane Citizen");
+    expect(text).not.toContain("[phone or email]");
+    const kept = collectBlanks(live).map((b) => b.blank);
+    expect(kept).toContain("[name]");
+    expect(kept).not.toContain("[phone or email]");
+  });
+
+  it("FR-7: a [name] in the same sentence as [participant reference] is never the owner's; one in another sentence is", () => {
+    const agreement =
+      "This agreement is between Sunrise Supports (the provider) and [participant reference] (the participant), or their representative [name]. It is signed by [name], [role].";
+    const filled = fillText(agreement, { name: "Jane Citizen", role: "Owner" });
+    expect(filled).toContain("or their representative [name].");
+    expect(filled).toContain("It is signed by Jane Citizen, Owner.");
+    expect(
+      fillText("[name] is reached on [phone or email].", {
+        name: "Jane Citizen",
+        "phone-or-email": "0400 000 000",
+      }),
+    ).toBe("Jane Citizen is reached on 0400 000 000.");
+  });
+
+  it("FR-10: a form blank is open until the facts hold its key, whatever the stored text says", () => {
+    // The stored text keeps every bracket from REQ-029 on, so the count reads the facts.
+    const blanks = [
+      { blank: "[phone or email]" },
+      { blank: "[name]" },
+      { blank: "[other tool]" },
+      { blank: "[phone or email]" },
+      { blank: "[Signature]" },
+    ];
+    const none = openFormBlanks(blanks, {});
+    expect(none.map((b) => b.blank)).toEqual([
+      "[phone or email]",
+      "[other tool]",
+      "[phone or email]",
+    ]);
+    expect(
+      openFormBlanks(blanks, { "phone-or-email": "0400 000 000" }).map(
+        (b) => b.blank,
+      ),
+    ).toEqual(["[other tool]"]);
+    expect(openFormBlanks(blanks, { "phone-or-email": "   " })).toHaveLength(3);
+    expect(
+      openFormBlanks(blanks, {
+        "phone-or-email": "0400 000 000",
+        "other-tool": "None",
+      }),
+    ).toEqual([]);
+  });
+});
+
+describe("REQ-029 FR-1, SR-6: the details page's questions and the value rule", () => {
+  it("asks every key the set uses once, name and role first and always, never the date, in FR-1's order then reading order", () => {
+    const blanks = [
+      "[period]",
+      "[phone or email]",
+      "[name]",
+      "[date]",
+      "[other tool]",
+      "[allowed use]",
+      "[limits]",
+      "[role]",
+      "[owner role]",
+      "[fax number]",
+      "[phone or email]",
+    ].map((blank) => ({
+      typeId: "x",
+      title: "x",
+      sectionNumber: "1",
+      sectionHeading: "h",
+      blank,
+    }));
+    expect(detailsQuestionsFor(blanks).map((q) => q.key)).toEqual([
+      "name",
+      "role",
+      "phone-or-email",
+      "period",
+      "other-tool",
+      "allowed-use",
+      "limits",
+      "fax-number",
+    ]);
+    // A set with no name or role blank still asks for the approver (FR-5).
+    expect(detailsQuestionsFor([]).map((q) => q.key)).toEqual(["name", "role"]);
+  });
+
+  it("refuses square brackets and control characters, so a value is never read as a blank", () => {
+    expect(isFactValueAllowed("Jane Citizen")).toBe(true);
+    expect(isFactValueAllowed("0400 000 000")).toBe(true);
+    expect(isFactValueAllowed("[name]")).toBe(false);
+    expect(isFactValueAllowed("Jane ] Citizen")).toBe(false);
+    expect(isFactValueAllowed("line" + String.fromCharCode(10) + "break")).toBe(
+      false,
+    );
+    expect(isFactValueAllowed("tab" + String.fromCharCode(9) + "here")).toBe(
+      false,
+    );
   });
 });

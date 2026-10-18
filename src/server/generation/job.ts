@@ -16,7 +16,6 @@ import {
   type ResolvedSection,
 } from "@/lib/generator/document-model";
 import { buildProviderFacts } from "@/lib/generator/facts";
-import { applyFacts } from "@/lib/generator/facts-fill";
 import {
   insertDivision3Plan,
   WORKER_SCREENING_PROCEDURE_ID,
@@ -474,16 +473,13 @@ export async function runGenerationTick(input: {
           );
           lastSectionMs = now().getTime() - sectionStarted;
         }
-        // REQ-017 AC-2: facts the provider gave on an earlier pack fill this one's blanks too.
-        model = applyFacts(
-          {
-            ...skeleton,
-            sections: skeleton.sections.map(
-              (s) => progress.sections[s.id] ?? s,
-            ),
-          },
-          ctx.facts,
-        );
+        // REQ-029 FR-2 (D-2855): the stored model keeps its brackets; every
+        // fact fills at read time (`filledForRead`), never into a stored
+        // version, so a changed phone number is a download, not 16 versions.
+        model = {
+          ...skeleton,
+          sections: skeleton.sections.map((s) => progress.sections[s.id] ?? s),
+        };
         // REQ-024 A2 (FR-4a; D-2424, D-2428): the worker screening procedure
         // gains the Division 3 plan with the participant risk register as it
         // stands when the pack is drafted, taken once per run by the store

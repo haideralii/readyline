@@ -11,6 +11,7 @@
  * twice change nothing, so a later re-render adds no document version.
  */
 import type { DocumentModel, ResolvedSection } from "./document-model";
+import { applyFacts, applyLiveFacts } from "./facts-fill";
 import { formatDateAu } from "./fixed-text";
 import type { Block } from "./section-schema";
 
@@ -19,6 +20,14 @@ export type Adoption = {
   adoptedOn: string;
   /** The register's next review date, YYYY-MM-DD. */
   nextReviewOn: string;
+  /**
+   * REQ-029 D-2855: the approver's name and role as the version's snapshot
+   * holds them (`document_versions.approver_name`, `approver_role`); null
+   * for a version adopted before the snapshot existed, whose text already
+   * carries the values (FR-9), so nothing is filled.
+   */
+  approverName?: string | null;
+  approverRole?: string | null;
 };
 
 /** The control table's row labels the adoption writes (`fixed-text.ts`, "document-control"). */
@@ -88,5 +97,76 @@ export function applyAdoption(
       return { ...s, blocks: s.blocks.map((b) => reviewBlock(b, next)) };
     return s;
   });
-  return { ...model, reviewDueAt: adoption.nextReviewOn, sections };
+  const dated = { ...model, reviewDueAt: adoption.nextReviewOn, sections };
+  // REQ-029 D-2855: the four fixed blanks (the Approver row, "[date]", the
+  // responsibilities "[role]", the change log's "[name]") fill from the
+  // snapshot, through the same fill the facts use, so FR-7's participant
+  // rule holds here too. A version without a snapshot keeps its brackets.
+  const name = adoption.approverName?.trim();
+  if (!name) return dated;
+  const role = adoption.approverRole?.trim();
+  return applyFacts(dated, {
+    name,
+    ...(role ? { role } : {}),
+    date: approved,
+  });
+}
+
+/**
+ * REQ-029 FR-8 (D-2857): the Provider cell of the control table is written at
+ * generation as "Trading name (ABN 12 345 678 901)"; only its ABN part is
+ * rebuilt from the account at download. The trading name is never rebuilt
+ * (a changed name is content and takes a new version). With no ABN on the
+ * account the cell keeps the name alone.
+ */
+export const PROVIDER_LABEL = "Provider";
+const ABN_PART = /\s*\(ABN [^)]*\)\s*$/;
+
+export function applyProviderAbn(
+  model: DocumentModel,
+  abn: string | null,
+): DocumentModel {
+  const sections: ResolvedSection[] = model.sections.map((s) => {
+    if (s.id !== "document-control") return s;
+    return {
+      ...s,
+      blocks: s.blocks.map((b) =>
+        b.type !== "table"
+          ? b
+          : {
+              ...b,
+              rows: b.rows.map((r) => {
+                if (r[0] !== PROVIDER_LABEL || typeof r[1] !== "string")
+                  return r;
+                const name = r[1].replace(ABN_PART, "").trim();
+                return [
+                  r[0],
+                  abn ? `${name} (ABN ${abn})` : name,
+                  ...r.slice(2),
+                ];
+              }),
+            },
+      ),
+    };
+  });
+  return { ...model, sections };
+}
+
+/**
+ * REQ-029 FR-3: the two fills, one renderer. Every download and every page
+ * renders the stored model through the live fill (contact and AI-appendix
+ * answers), the adoption fill (the snapshot, when the version is adopted)
+ * and the ABN rebuild; the stored model is never changed by it.
+ */
+export function fillForRead(
+  model: DocumentModel,
+  input: {
+    facts: Readonly<Record<string, string>>;
+    adoption: Adoption | null;
+    abn: string | null;
+  },
+): DocumentModel {
+  const live = applyLiveFacts(model, input.facts);
+  const adopted = input.adoption ? applyAdoption(live, input.adoption) : live;
+  return applyProviderAbn(adopted, input.abn);
 }
