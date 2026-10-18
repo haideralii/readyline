@@ -167,6 +167,8 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   delegations: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   insurance_items: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   improvements: ["DELETE", "INSERT", "SELECT", "UPDATE"],
+  // REQ-033 FR-3 (D-2932): the audit findings register and its view.
+  findings: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   staff_matrix: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   onboarding_checklists: ["DELETE", "INSERT", "SELECT", "UPDATE"],
   hazards: ["DELETE", "INSERT", "SELECT", "UPDATE"],
@@ -204,6 +206,7 @@ const AUTHENTICATED_TABLE_GRANTS: Record<string, readonly string[]> = {
   conflicts_of_interest_status: ["SELECT"],
   insurance_items_status: ["SELECT"],
   improvements_status: ["SELECT"],
+  findings_status: ["SELECT"],
   staff_matrix_status: ["SELECT"],
   onboarding_checklists_status: ["SELECT"],
   hazards_status: ["SELECT"],
