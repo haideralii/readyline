@@ -82,9 +82,10 @@ test.describe("REQ-027 A2: the result page", () => {
       inline: await resultInlineTerm(page),
     });
     expect(present.length).toBeGreaterThan(1);
-    // D-2701: directly under the card, inside no other disclosure.
+    // D-2701: under the card, inside no other disclosure (after it, not its next sibling: REQ-031 D-2895's
+    // sentence sits between on the screen; the DOM order is this spec's, not the REQ's).
     await expect(
-      page.locator('[data-testid="summary"] + [data-testid="glossary-terms"]'),
+      page.locator('[data-testid="summary"] ~ [data-testid="glossary-terms"]'),
     ).toHaveCount(1);
 
     // AC-4, D-2707: the line's words, under the primary action, naming the heading auth/callback sends a new account to.
