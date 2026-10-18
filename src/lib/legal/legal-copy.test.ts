@@ -118,6 +118,8 @@ describe("product/legal copy (REQ-008)", () => {
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
       "so it sits with your privacy commitments, where an auditor would look for it.",
+      // REQ-034 FR-3: the first paragraph links the trust page.
+      "Where your data goes, and who can see it, is answered on one page: [where your data lives](/trust).",
     ],
     about: [
       "Readyline tells you which audit type and standards the Rules point to for your answers",
@@ -156,7 +158,8 @@ describe("product/legal copy (REQ-008)", () => {
     terms: "2026-10-18",
     refunds: "2026-10-16",
     privacy: "2026-10-18",
-    ai: "2026-10-16",
+    // REQ-034 FR-3: the trust link moved the AI page to 19 October 2026.
+    ai: "2026-10-19",
     about: "2026-10-16",
   };
   it("product/legal/privacy.md: the reminders sentence is the subscription's, which can be turned off (REQ-023 finding 38)", () => {

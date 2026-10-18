@@ -65,6 +65,9 @@ export const HOME_COPY = {
     {
       title: "No participant data",
       text: `${BRAND} never asks for participants' names, NDIS numbers or health details, and the forms warn you not to enter them. Nothing you type about a participant is ever sent to an AI model.`,
+      // REQ-034 FR-3 (D-2946): the card's words stay; the longer answer is one link away.
+      href: "/trust",
+      linkLabel: "Where your data lives",
     },
     {
       title: "Independent",
