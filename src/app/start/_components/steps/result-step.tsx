@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ConfirmButton } from "@/components/confirm-button";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { BRAND, GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { Disclosure as SharedDisclosure } from "@/components/disclosure";
 import { ReadyLine } from "@/components/ready-line";
 import { Tag, type TagVariant } from "@/components/tag";
@@ -32,7 +32,6 @@ import {
   MODULES_HEADING,
   REGISTERS_LEGEND,
   RESULT_SCOPE_SENTENCE,
-  auditHeading,
   midTermLine,
   resultPreparedLine,
 } from "@/lib/questionnaire/result-text";
@@ -43,6 +42,7 @@ import {
 } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
 import { ResultEmailForm } from "./result-email-form";
+import { ResultPrint, todayWords } from "./result-print";
 import {
   HAVE_TAG,
   SOLE_TRADER_LINE,
@@ -149,82 +149,6 @@ export function ResultStep({
       userEmail={userEmail}
       changes={response.changes}
     />
-  );
-}
-
-/** Today in Sydney, in words, for the closing line (client-side, after the result has mounted). */
-function todayWords(): string {
-  return new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
-}
-
-/**
- * REQ-031 FR-2 (D-2887, D-2895): the print view, hidden on screen, from the
- * same result object: the audit kind and its meaning, the scope sentence,
- * the groups, the three counts, the modules with their standard counts, the
- * mid-term line, the reasons with their sources' short names, the
- * general-information line and the closing line with today's date. Every
- * word here is on the screen too (the e2e checks each text node).
- */
-function ResultPrint({
-  r,
-  lines,
-  pathwayWord,
-  today,
-}: {
-  r: QuestionnaireResult;
-  lines: ReturnType<typeof summaryLines>;
-  pathwayWord: string;
-  today: string;
-}) {
-  return (
-    <section
-      aria-hidden="true"
-      className="hidden text-sm leading-5 print:block"
-      data-testid="result-print"
-    >
-      <h2 className="">{auditHeading(r)}</h2>
-      <p className="mt-1">{glossarySentence(`${pathwayWord}-audit`)}</p>
-      <p className="mt-1">{RESULT_SCOPE_SENTENCE}</p>
-      <h3 className="mt-3">{GROUPS_LABEL}</h3>
-      <ul className="mt-1 list-disc pl-5">
-        {r.groups.map((g) => (
-          <li key={g.code}>
-            {g.name} {g.code}
-          </li>
-        ))}
-      </ul>
-      <ul className="mt-3">
-        <li>{lines.documents}</li>
-        <li>{lines.registers}</li>
-        <li>{lines.checklist}</li>
-      </ul>
-      <h3 className="mt-3">{MODULES_HEADING}</h3>
-      <ul className="mt-1 list-disc pl-5">
-        {r.modules.map((m) => (
-          <li key={m.id}>
-            {m.name}: {m.standardCount}{" "}
-            {m.standardCount === 1 ? "standard" : "standards"}
-          </li>
-        ))}
-      </ul>
-      <h3 className="mt-3">{MID_TERM_HEADING}</h3>
-      <p className="mt-1">{midTermLine(r)}</p>
-      <h3 className="mt-3">Why this result</h3>
-      <ul className="mt-1 list-disc pl-5">
-        {r.reasons.map((x, i) => (
-          <li key={`${x.rule}-${i}`}>
-            {x.text} Source: {x.source.title}.
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3">{GENERAL_INFORMATION_STATEMENT}</p>
-      <p className="mt-1">{resultPreparedLine(today)}</p>
-    </section>
   );
 }
 
