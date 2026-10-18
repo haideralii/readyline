@@ -54,8 +54,13 @@ test.describe("REQ-031: print or save as PDF", () => {
       year: "numeric",
     }).format(new Date());
 
+    // A4 wide and the printable height (less 10 mm top and bottom): scrollHeight never reads below
+    // the viewport, so a viewport of the printable height makes "fits" read as "no overflow".
     if (testInfo.project.name === "desktop-chromium")
-      await page.setViewportSize({ width: 794, height: 1123 });
+      await page.setViewportSize({
+        width: 794,
+        height: A4_HEIGHT_PX - 2 * MARGIN_PX,
+      });
     await page.emulateMedia({ media: "print" });
     const print = page.getByTestId("result-print");
     await expect(print).toBeVisible();
@@ -99,6 +104,10 @@ test.describe("REQ-031: print or save as PDF", () => {
         () => document.documentElement.scrollHeight,
       );
       expect(height).toBeLessThanOrEqual(A4_HEIGHT_PX - 2 * MARGIN_PX);
+      const bottom = await print.evaluate((el) =>
+        Math.round(el.getBoundingClientRect().bottom + window.scrollY),
+      );
+      expect(bottom).toBeLessThanOrEqual(A4_HEIGHT_PX - 2 * MARGIN_PX);
       // Question 3 (c): the PDF the browser makes has one page.
       const pdf = await page.pdf({ format: "A4" });
       const pages = (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) ?? [])
@@ -106,7 +115,7 @@ test.describe("REQ-031: print or save as PDF", () => {
       expect(pages).toBe(1);
       testInfo.annotations.push({
         type: "print",
-        description: `height ${height} px, ${pages} page`,
+        description: `height ${height} px, print block ends at ${bottom} px, ${pages} page`,
       });
     }
   });
