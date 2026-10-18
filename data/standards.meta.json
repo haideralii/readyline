@@ -1808,7 +1808,7 @@
     },
     {
       "code": "0136",
-      "name": "Group and centrebased activities",
+      "name": "Group and centre-based activities",
       "auditType": "certification",
       "moduleIds": [],
       "requiresCore": true,

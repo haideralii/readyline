@@ -2,6 +2,8 @@ import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import { notFoundMetadata } from "@/lib/page-titles";
 import { DataTable } from "@/components/data-table";
 import { PeriodSelector } from "@/components/period-selector";
 import { GENERAL_INFORMATION_STATEMENT } from "@/lib/brand";
@@ -37,11 +39,26 @@ import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export const metadata: Metadata = {
-  title: "Shared audit view",
-  robots: { index: false, follow: false },
-};
 export const dynamic = "force-dynamic";
+
+/** One lookup per request, shared by the title and the page (React cache). */
+const auditorLinkFor = cache(async (token: string) =>
+  resolveAuditorToken(createSupabaseAdminClient(), token),
+);
+
+/** QA live b340ee3, B #57: the title follows `notFound()`. */
+export async function generateMetadata({
+  params,
+}: PageProps<"/auditor/[token]">): Promise<Metadata> {
+  const { token } = await params;
+  const known = await auditorLinkFor(token).then(
+    (link) => link !== null,
+    () => false,
+  );
+  return known
+    ? { title: "Shared audit view", robots: { index: false, follow: false } }
+    : notFoundMetadata;
+}
 
 /**
  * The signed-out read-only view behind an auditor link (REQ-020 FR-2, FR-3,
@@ -93,7 +110,7 @@ export default async function AuditorPage({
     if (e instanceof SupabaseEnvError) notFound();
     throw e;
   }
-  const link = await resolveAuditorToken(admin, token);
+  const link = await auditorLinkFor(token);
   if (!link) notFound();
   const h = await headers();
   const address = h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;

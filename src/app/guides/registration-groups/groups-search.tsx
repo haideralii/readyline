@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 /**
  * The index of the 38 groups under the everyday headings (REQ-011 batch 31
@@ -37,6 +37,7 @@ function matches(g: IndexGroup, query: string): boolean {
 
 export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
   const [query, setQuery] = useState("");
+  const box = useRef<HTMLInputElement>(null);
   const shown = useMemo(
     () =>
       categories
@@ -55,6 +56,7 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
         SIL)
       </label>
       <input
+        ref={box}
         id="groups-search"
         type="search"
         inputMode="search"
@@ -104,8 +106,24 @@ export function GroupsSearch({ categories }: { categories: IndexCategory[] }) {
         </section>
       ))}
       {total === 0 ? (
-        <p className="mt-6 text-sm" role="status">
-          No matches. Try another word, or clear the search to see every group.
+        <p
+          className="mt-6 text-sm"
+          role="status"
+          data-testid="groups-no-matches"
+        >
+          No matches. Try another word, or{" "}
+          <button
+            type="button"
+            className="inline-flex min-h-11 items-center underline underline-offset-4"
+            data-testid="groups-clear"
+            onClick={() => {
+              setQuery("");
+              box.current?.focus();
+            }}
+          >
+            clear the search
+          </button>{" "}
+          to see every group.
         </p>
       ) : null}
     </div>

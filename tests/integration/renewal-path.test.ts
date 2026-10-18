@@ -8,8 +8,12 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { selfCheckOffer } from "@/lib/registers/self-check";
+import { lastSelfCheck } from "@/server/registers/self-check-queries";
 import { hasSupabaseEnv, readSupabaseAdminEnv } from "@/server/supabase/env";
+
+vi.mock("server-only", () => ({}));
 
 const enabled = hasSupabaseEnv();
 
@@ -152,6 +156,35 @@ describe.skipIf(!enabled)("the renewal path's rows (REQ-023 Session C)", () => {
       audit_booked_on: "2028-11-20",
       auditor_business_name: "Quality & Co. Pty Ltd (Audits)",
     });
+  });
+
+  it("FR-8: a rehearsal never counts as the quarter's walk or moves the offer (PO acceptance read, 18 Oct 2026 (1))", async () => {
+    const before = await lastSelfCheck(a.client, a.accountId);
+    expect(before).toBeNull();
+    const rehearsal = await a.client.from("self_checks").insert({
+      account_id: a.accountId,
+      walked_on: "2028-09-19",
+      walked_by_ref: "owner",
+      findings: 3,
+      answers: {},
+      created_by: a.userId,
+      mode: "rehearsal",
+      period_from: "2026-03-01",
+      period_to: "2028-09-19",
+    });
+    expect(rehearsal.error).toBeNull();
+    // The last walk is still none, so the audit-day offer still reads "never walked".
+    expect(await lastSelfCheck(a.client, a.accountId)).toBeNull();
+    const offer = selfCheckOffer({
+      lastWalkedOn: null,
+      lastFindings: 0,
+      openFindings: 0,
+      today: "2028-09-20",
+    });
+    expect(offer.due).toBe(true);
+    expect(offer.line).toBe(
+      "You have not checked your systems yet. It takes about ten minutes.",
+    );
   });
 
   it("FR-8: a rehearsal row carries its period, a walk carries none, and the mode is one of two", async () => {

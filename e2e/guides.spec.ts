@@ -256,6 +256,18 @@ test.describe("guides (REQ-011)", () => {
     await checkWidths(page, "registration groups index");
     await axeClean(page, "registration groups index");
     await shot(page, "groups-index", testInfo.project.name);
+    // REQ-028 FR-15 (QA live b340ee3, report B): no matches, and "clear the search" is the control
+    // that empties the box, returns the full list and puts focus back in the box.
+    await page.getByLabel(/Search by what you do/).fill("zzzz");
+    await expect(page.getByTestId("groups-no-matches")).toContainText(
+      "No matches.",
+    );
+    await page.getByTestId("groups-clear").click();
+    await expect(page.getByTestId("groups-count")).toHaveText(
+      "38 registration groups.",
+    );
+    await expect(page.getByLabel(/Search by what you do/)).toHaveValue("");
+    await expect(page.getByLabel(/Search by what you do/)).toBeFocused();
   });
 
   test("a group page: audit with its rule and source, modules, documents, price, FAQ data, CTA with the group ticked", async ({

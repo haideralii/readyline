@@ -8,7 +8,7 @@ owner: po
 shortAnswer: "There is no Commission application fee; you pay the auditor you choose. | A verification audit costs less than a certification audit, which includes a site visit. | Documents and consultants are the other costs; the calculator below gives your own number."
 glossary:
   [verification-audit, certification-audit, mid-term-audit, registration-group]
-status: draft (Dev first draft, 13 Oct 2026; every figure carries its source and date; the PO checks the UNVERIFIED lines)
+status: published (every figure checked in REQ-027's pass against the Sources section, 18 Oct 2026; no UNVERIFIED line remains)
 ---
 
 # NDIS registration cost in 2026-27: what a small provider really pays
