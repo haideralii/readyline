@@ -201,7 +201,9 @@ test.describe("bring your audit findings (REQ-033)", () => {
     await page.getByTestId("finding-addressed-on").fill("2026-10-02");
     await page.getByTestId("finding-addressed-role").fill("Owner");
     await page.getByTestId("finding-address").click();
-    await expect(page.getByText("Addressed 2 October 2026")).toBeVisible();
+    await expect(
+      page.getByText("Addressed 2 October 2026").locator("visible=true"),
+    ).toBeVisible();
     const improvement = await tenant.admin
       .from("improvements")
       .select("done_on, source_kind")
@@ -215,7 +217,9 @@ test.describe("bring your audit findings (REQ-033)", () => {
     await page.getByTestId("finding-verified-on").fill("2026-10-09");
     await page.getByTestId("finding-verify").click();
     await expect(
-      page.getByText("Verified by the auditor 9 October 2026"),
+      page
+        .getByText("Verified by the auditor 9 October 2026")
+        .locator("visible=true"),
     ).toBeVisible();
     await expect(page.getByTestId("finding-actions")).toHaveCount(0);
     // AC-4's other direction: closing the improvement row from its own
@@ -232,14 +236,18 @@ test.describe("bring your audit findings (REQ-033)", () => {
       .getByTestId("audit-day-form-improvements")
       .getByRole("button", { name: "Save changes" })
       .click();
-    await expect(page.getByText("Done 2026-10-05").first()).toBeVisible();
+    await expect(
+      page.getByText("Done 2026-10-05").locator("visible=true"),
+    ).toBeVisible();
     await page.goto("/registers/findings");
     await page
       .getByTestId("findings-list")
       .getByRole("link", { name: /FND-0002/ })
       .first()
       .click();
-    await expect(page.getByText("Addressed 5 October 2026")).toBeVisible();
+    await expect(
+      page.getByText("Addressed 5 October 2026").locator("visible=true"),
+    ).toBeVisible();
     await page.goto("/path/audit-day");
     await expect(page.getByTestId("audit-day-findings")).toContainText(
       "Findings from your last audit: 1 open, 1 addressed, 1 verified by the auditor",
