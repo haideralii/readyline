@@ -583,6 +583,8 @@ const GLOSSARY_PAGES = [
   "src/app/start/_components/steps/workforce-step.tsx",
   "src/app/start/_components/steps/existing-step.tsx",
   "src/app/start/_components/steps/result-step.tsx",
+  // REQ-031 FR-1: the result page's email form.
+  "src/app/start/_components/steps/result-email-form.tsx",
   "src/app/checklist/page.tsx",
   "src/app/checklist/checklist-view.tsx",
   "src/app/checklist/loading.tsx",

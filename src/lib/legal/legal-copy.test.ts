@@ -101,6 +101,8 @@ describe("product/legal copy (REQ-008)", () => {
       "we tell you, and the Office of the Australian Information Commissioner where the law requires it.",
       "Readyline has not registered a choice to be covered by the Privacy Act; what this page promises is our own undertaking to you, and the Australian Consumer Law holds us to it.",
       "The owner decides and tells you the outcome in writing.",
+      // REQ-031 D-2886 (AC-7), verbatim.
+      "If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.",
     ],
     ai: [
       "train its models under its commercial terms, as read on {{vendor-terms-date}}.",
@@ -139,7 +141,7 @@ describe("product/legal copy (REQ-008)", () => {
   const UPDATED: Record<LegalSlug, string> = {
     terms: "2026-10-16",
     refunds: "2026-10-16",
-    privacy: "2026-10-17",
+    privacy: "2026-10-18",
     ai: "2026-10-16",
     about: "2026-10-16",
   };

@@ -39,6 +39,7 @@ import {
   type ResultChanges,
 } from "../../actions";
 import { useQuestionnaire } from "../questionnaire-provider";
+import { ResultEmailForm } from "./result-email-form";
 import {
   HAVE_TAG,
   SOLE_TRADER_LINE,
@@ -70,7 +71,7 @@ export function ResultStep({
   /** Batch 47 item 1: the server page passes `subscriptionAvailable()`; off, the page says the one off-state sentence. */
   subscriptionOffered?: boolean;
 }) {
-  const { answers, mode, contactEmail } = useQuestionnaire();
+  const { answers, mode, contactEmail, userEmail } = useQuestionnaire();
   const key = useMemo(() => JSON.stringify(answers), [answers]);
   const [fetched, setFetched] = useState<Fetch>({
     key: "",
@@ -141,6 +142,7 @@ export function ResultStep({
       checklistTotal={response.checklistTotal}
       signedIn={mode === "server"}
       contactEmail={contactEmail}
+      userEmail={userEmail}
       changes={response.changes}
     />
   );
@@ -333,6 +335,7 @@ function ResultView({
   checklistTotal,
   signedIn,
   contactEmail,
+  userEmail,
   subscriptionOffered,
   changes,
 }: {
@@ -341,6 +344,8 @@ function ResultView({
   checklistTotal: number;
   signedIn: boolean;
   contactEmail: string | null;
+  /** REQ-031 FR-1: the signed-in owner's address, pre-filled in the email form; null signed out. */
+  userEmail: string | null;
   /** REQ-023 FR-11: how the result differs from the latest completed assessment, for a signed-in owner with a ready set. */
   changes?: ResultChanges;
 }) {
@@ -528,6 +533,8 @@ function ResultView({
             </div>
           ) : null}
         </section>
+        {/* REQ-031 FR-1: the result in hand, under the card; the owner's address pre-filled. */}
+        <ResultEmailForm prefill={signedIn ? userEmail : null} />
 
         {/* REQ-027 D-2701, D-2711: the one disclosure for the words on this page, under the card and inside no other
  disclosure, listing the terms present at render minus the audit kind the heading already explains. */}
