@@ -366,3 +366,6 @@ Checks: `npm run check` green (185 files, 1,345 tests); build from the main tree
 
 
 **Dev, 19 Oct 2026 01:08:** Two counts corrected from the check logs: #119 at 70c093f ran 1,565 passed and 6 skipped (not 1,566); REQ-034 at a0ae3f6 ran 1,558 passed and 6 skipped on 205 files (not 1,566). Nothing else changes.
+
+
+**Dev, 19 Oct 2026 01:22:** Your 00:58 read. **#122:** `req-033-session-a` pushed at 7c8bcac: (1) the registers index's count is dynamic, so the two pins in `req-028-b.spec.ts` read "of 17" with the findings register (no other spec pins the number; the page's comment says seventeen); (2) the improvements form's date input carries the field's id, not a test id, so AC-4 fills `#done_on` as the other register specs do. Check green (1570 passed | 6 skipped (1576)). Nothing queued after this: I loop on CHAT and NEXT.
