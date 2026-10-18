@@ -4,6 +4,7 @@
  * and account settings (FR-5). Validation is the REQ-003 business schema on
  * the client and again in the server action.
  */
+import { DETAILS_REAPPROVAL_LINE } from "@/lib/path/details-copy";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
@@ -253,7 +254,12 @@ export function AccountForm({
       <Field
         id="ownerName"
         label={`${LABELS.ownerName} (optional)`}
-        help="Goes on the approval line of every document, for example Jane Citizen."
+        help={
+          <>
+            Goes on the approval line of every document, for example Jane
+            Citizen. {DETAILS_REAPPROVAL_LINE}
+          </>
+        }
         errors={errorsFor(errors, "name")}
       >
         {(describedBy, invalid) => (
@@ -272,7 +278,7 @@ export function AccountForm({
       <Field
         id="ownerRole"
         label={`${LABELS.ownerRole} (optional)`}
-        help="For example Owner, or Director."
+        help={<>For example Owner, or Director. {DETAILS_REAPPROVAL_LINE}</>}
         errors={errorsFor(errors, "role")}
       >
         {(describedBy, invalid) => (

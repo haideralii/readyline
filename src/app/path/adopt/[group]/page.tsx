@@ -8,8 +8,8 @@ import { documentTypeById } from "@/lib/generator/catalogue";
 import { groupSlug, orderDocuments } from "@/lib/generator/set-order";
 import {
   ADOPT_NEEDS_NAME,
-  ADOPT_NEEDS_NAME_HREF,
   ADOPT_NEEDS_NAME_LINK,
+  detailsHref,
 } from "@/lib/path/adopt-copy";
 import { getViewer } from "@/server/accounts/queries";
 import { loadFacts } from "@/server/path/facts";
@@ -120,7 +120,7 @@ export default async function AdoptGroupPage({
         >
           {ADOPT_NEEDS_NAME}{" "}
           <Link
-            href={ADOPT_NEEDS_NAME_HREF}
+            href={detailsHref(setId)}
             className="underline underline-offset-2"
             data-testid="adopt-needs-name-link"
           >

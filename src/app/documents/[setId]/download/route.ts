@@ -17,9 +17,9 @@ import { DOCX_TYPE } from "@/server/generation/run";
 import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { renderStartHere } from "@/server/generation/start-here";
 import { startHereForSet } from "@/server/generation/start-here-set";
+import { filledForRead, readFillInputs } from "@/server/generation/read-fill";
 import { isOwnedPath, signedDownloadUrl } from "@/server/generation/storage";
 import { isSetLocked } from "@/server/payments/queries";
-import { isDocumentAdopted as isAdopted } from "@/server/registers/queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 
@@ -57,7 +57,7 @@ export async function GET(
   if (await isSetLocked(supabase, set.id))
     return new NextResponse("Not found", { status: 404 });
 
-  let path = `${set.account_id}/${set.id}/${query.data.file}`;
+  const path = `${set.account_id}/${set.id}/${query.data.file}`;
   // REQ-026 FR-1, FR-5: the Start here sheet is rendered fresh from the set's
   // models on every download, so a blank filled since the zip reads done.
   if (query.data.file === START_HERE_FILE) {
@@ -79,21 +79,23 @@ export async function GET(
     const typeId = query.data.file.replace(/(\.v\d+)?\.docx$/i, "");
     const doc = docs.find((d) => d.document_type_id === typeId);
     if (!doc) return new NextResponse("Not found", { status: 404 });
-    // REQ-016 D-058: once the provider has adopted the document (checklist
-    // Done sets the policy review's adopted date), it is served without the
-    // draft footer mark and the section marks, rendered from the stored model.
-    if (await isAdopted(supabase, viewer.account.id, typeId)) {
-      const bytes = await renderDocx(doc.model, { adopted: true });
-      return new NextResponse(new Uint8Array(bytes), {
-        status: 200,
-        headers: {
-          "Content-Type": DOCX_TYPE,
-          "Content-Disposition": `attachment; filename="${query.data.file}"`,
-          "Cache-Control": "no-store",
-        },
-      });
-    }
-    path = doc.storage_path;
+    // REQ-029 FR-3 (D-2855): every document renders on request from the
+    // stored model through the two fills (the live facts, the adoption
+    // snapshot) and the ABN rebuild; an adopted version is served without
+    // the draft footer mark and the section marks (REQ-016 D-058), a draft
+    // keeps them and its bracketed blanks (FR-4). Never cached (SR-4).
+    const inputs = await readFillInputs(supabase, viewer.account.id);
+    const bytes = await renderDocx(filledForRead(doc, inputs), {
+      adopted: Boolean(doc.adopted_on),
+    });
+    return new NextResponse(new Uint8Array(bytes), {
+      status: 200,
+      headers: {
+        "Content-Type": DOCX_TYPE,
+        "Content-Disposition": `attachment; filename="${query.data.file}"`,
+        "Cache-Control": "no-store",
+      },
+    });
   }
   if (!isOwnedPath(path, viewer.account.id))
     return new NextResponse("Not found", { status: 404 });
