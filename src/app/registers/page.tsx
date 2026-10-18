@@ -35,6 +35,8 @@ type Row = {
 
 /** The REQ-018 registers you add to as things happen, in the order an auditor follows them. */
 const AUDIT_DAY_AS_THINGS_HAPPEN: AuditDaySlug[] = [
+  // REQ-033 FR-3: the findings from the last audit, the first thing an auditor asks about.
+  "findings",
   "improvements",
   "decisions",
   "onboarding",
