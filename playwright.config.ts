@@ -51,8 +51,11 @@ export default defineConfig({
       use: { ...devices["iPhone 17 Pro"] },
       // Backlog 1 (D-1508): the accessibility pass runs on all three projects;
       // batch 45 item 28: so does the setup form a new customer submits.
+      // QA live b340ee3, batch C (1) (PO 18 Oct 2026 12:20): the nine flows report D found on
+      // desktop and Android alone join: the subscription states, REQ-023 B, C and D, the REQ-028
+      // register pages and account nav, and the magic-link spec; D-2207 no longer keeps REQ-023 off WebKit.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|magic-link-any-device|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision|subscription|req-023-b|req-023-c|req-023-d|req-028-b|req-028-c))\.spec\.ts$/,
     },
   ],
   webServer: {

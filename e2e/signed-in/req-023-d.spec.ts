@@ -17,7 +17,7 @@ import {
 import { checkWidths } from "../helpers/width";
 
 /**
- * REQ-023 Session D on desktop and Android (D-2207), AC-6: the result page's
+ * REQ-023 Session D on the three projects (D-2207 lifted for WebKit, PO 18 Oct 2026 12:20), AC-6: the result page's
  * two prompts (the groups changed, a state added) for an owner with a ready
  * set, with no row written; the changes register's states as the view
  * computes them (overdue, to notify, notified, told, form not confirmed) through
