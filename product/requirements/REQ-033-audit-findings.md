@@ -119,3 +119,44 @@ Walked against the branch, one line per AC: pass, the proof, or the gap and what
 | AC-6 | pass | `findings-map.test.ts` "AC-6": a standard no document carries reads D-2933's line; an unmapped finding has no line; `finding-answers.tsx` renders the line with the link to the documents page. | |
 | AC-7 | pass | `legal-copy.test.ts`: the privacy bullet (findings in the provider's words; the uploaded report not kept, logged or sent) under "What we collect" and the AI sentence (a finding's words to the model after the participant check; the report never) pinned verbatim, the AI page's `updated` 2026-10-18. FR-7's two sentences are pinned verbatim in `findings.test.ts` "FR-7" (the register's intro), with no button reading resolve, clear or pass. | FR-7's words are the register's, not a legal page's, so their pin sits in `findings.test.ts`; say if you want them in `legal-copy.test.ts` as well. |
 | AC-8 | pass, one gap closed | `npm run check` green at 827fd88 (209 files, 1,570 tests); **gap:** axe ran on the list and the row, not on the new page; closed at 827fd88: `req-033.spec.ts` runs axe serious/critical and the sideways-scroll check on `/registers/findings/import` with its candidates showing, at 1280 and at 360, and on the list and the row. | |
+
+
+## Session C (Dev-2): the plain-language summary's review state
+
+Status: ready for Session C (PO, 19 Oct 2026 04:55; D-2959's item, with the lawyer's and NDIS expert's reads as D-2977 to D-2982, D-2222). Branch `req-033-session-c` from `req-033-session-b` 4f872ef (D-031 stacking; rebase onto `next` once #125 is in). One short session.
+
+### Why
+
+Five document types open with "In plain words", the summary a participant reads on their own (REQ-016 S-4). Session B replaces one section of a document with the finding as context; the living-policies path replaces a sentence when the NDIS watch applies a change. Neither touches the summary, so the document a participant reads can promise one thing in plain words and another in section 5. An auditor who interviews participants finds that gap first (NDIS expert, D-2979).
+
+### Functional requirements
+
+- **FR-C1 The state.** When any path replaces or re-generates a tailored section of a document whose outline carries `plain-language-summary` (Session B's redraft; the living-policies one-section re-generate where it exists; nothing else), the new version's document control row takes the state `summary-review` with the line "In plain words may be out of date: section N <heading> changed on <date>". The state is on the control register row and the document's page; it never changes the document's adoption state (D-2977). A document without the summary section never takes it (D-2977).
+- **FR-C2 Two ways out.** On the document's page, under the summary: "Redraft the summary" (owner; one model request through Session B's builder with the changed section's new text as the context instead of a finding, the summary's own brief, the Year 6 readability gate the generator already applies to this section, the same limiter and quota; accepted into a new unadopted version with the change-log row "In plain words redrafted after section N changed; approved by [role]") or "The summary is still right" (owner or the role Session B lets approve; records the day and the role as a change-log row "In plain words confirmed after section N changed"; no model call). Either clears the state (D-2978).
+- **FR-C3 The Easy Read place.** The fixed section "Easy Read version" takes no state; while `summary-review` is set, the page shows one line under it: "If you keep an Easy Read version, check it too." (D-2980).
+- **FR-C4 Where it shows.** The control register's filter gains the state; the audit-day page's documents card counts "1 summary to check"; the auditor's view shows the state's line on the document row as the other states (D-2981).
+- **FR-C5 Words.** No "compliant", "closed" or "resolved"; the state's label is "Summary to check". Pinned.
+
+### Acceptance criteria
+
+- AC-C1 A Session B redraft of a section in a participant-facing document sets `summary-review` on the new version's row with the line; a redraft in a document without the summary does not (unit on the version function, e2e on the row).
+- AC-C2 "The summary is still right" clears the state and writes the change-log row with the role and day (e2e, integration for the member's refusal).
+- AC-C3 "Redraft the summary" under the fake mode produces the new unadopted version with the summary replaced, the change-log row and the state cleared; the readability gate runs on the reply (unit with a reply above Year 6 refused, e2e for the walk).
+- AC-C4 The control register filter, the audit-day count and the auditor's view carry the state (e2e).
+- AC-C5 `npm run check` green; the a11y spec covers the document page with the state at 360 and 1280.
+
+### Lawyer's read (D-2977, D-2978, D-2980)
+
+The summary is the part of the policy a participant relies on; a summary that contradicts the policy is the misleading document, whatever the policy says, so the state must follow every path that changes the policy's substance and must be visible wherever the document's state is read (D-2977). The way out is the provider's act, recorded with a role and a day; Readyline never clears the state on its own and never sends the summary to the model without the owner's click (D-2978). The Easy Read version is the provider's own document outside Readyline, so the line asks, and asserts nothing about it (D-2980).
+
+### NDIS expert's read (D-2979, D-2981, D-2982)
+
+The Core module's rights standard asks that participants get information in the language, mode of communication and terms they are most likely to understand; auditors check it by asking participants what they were told and reading what they were given, so the plain-words summary is evidence in its own right and must match the policy it summarises (D-2979). The state belongs on the control register and the auditor's view, because that is where the auditor reads a document's standing (D-2981). D-2982: the summary's redraft keeps Session B's rule that the policy text never names the audit or the finding; the change-log row is the record.
+
+### Dev response
+
+(Dev-2 answers here: which paths replace a section today, the state's storage, questions.)
+
+### Delivery evidence (Session C)
+
+(Dev appends.)
