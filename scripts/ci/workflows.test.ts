@@ -163,6 +163,15 @@ describe("the restore rehearsal in CI (REQ-030 AC-3, SR-5)", () => {
     // or pg_dump stops at once on the version mismatch (#115's first red).
     const client = ci.indexOf("postgresql-client-17");
     expect(client).toBeGreaterThan(-1);
+    // ...and first on PATH for the later steps, in both workflows, or the
+    // runner's wrapper still runs its own 16 (#115 at 7f37b36).
+    for (const text of [
+      ci,
+      readFileSync(".github/workflows/backup.yml", "utf8"),
+    ])
+      expect(text).toContain(
+        'echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"',
+      );
     expect(client).toBeLessThan(
       ci.indexOf("Backup and restore rehearsal (REQ-030 FR-2, AC-3)"),
     );

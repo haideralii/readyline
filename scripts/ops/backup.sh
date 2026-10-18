@@ -24,6 +24,10 @@ if [ "${#BACKUP_PASSPHRASE}" -lt 24 ]; then
   exit 2
 fi
 
+# Which client ran: the dump must not be older than the server (the 17 client is
+# first on PATH in both workflows; #115 at 7f37b36 showed the runner's 16 otherwise).
+pg_dump --version
+
 started=$(date +%s)
 # Data only: the schema comes from the migrations on a restore (restore-rehearsal.sh applies
 # them first), so the copy carries rows, not objects, and restores onto any migrated stack.

@@ -18,6 +18,7 @@ set -euo pipefail
 : "${BACKUP_PASSPHRASE:?BACKUP_PASSPHRASE is not set}"
 : "${IN:?IN is not set (the .sql.gpg file)}"
 
+pg_restore --version
 bytes=$(stat -c %s "$IN")
 started=$(date +%s)
 gpg --decrypt --batch --quiet --pinentry-mode loopback --passphrase-fd 3 "$IN" 3<<<"$BACKUP_PASSPHRASE" \
