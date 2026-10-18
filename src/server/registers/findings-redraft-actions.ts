@@ -47,6 +47,7 @@ import {
   REDRAFT_UNAVAILABLE,
   redraftTrailLine,
 } from "@/lib/registers/findings-redraft";
+import { summaryCheckFor } from "@/lib/registers/summary-check";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { parseInput, strictObject } from "@/lib/validation";
 import { getViewer } from "@/server/accounts/queries";
@@ -362,11 +363,12 @@ export async function acceptRedraftAction(
     return { ok: false, message: REDRAFT_REFUSED_MESSAGE };
   }
   const version = ctx.latest.version + 1;
+  const today = sydneyDay();
   const model = redraftModel(ctx.latest.model, {
     sectionId: ctx.sectionId,
     blocks: reading.blocks,
     version,
-    today: sydneyDay(),
+    today,
     reference: row.reference,
     previous:
       ctx.latest.adopted_on && ctx.latest.approver_name
@@ -388,6 +390,8 @@ export async function acceptRedraftAction(
     new Uint8Array(await renderDocx(model)),
     DOCX_TYPE,
   );
+  // REQ-033 Session C FR-C1 (D-2977): a redrafted section leaves the plain-words summary to check.
+  const summary = summaryCheckFor(ctx.type, ctx.sectionId, today);
   const inserted = await store.insertDocumentVersion({
     version_set_id: ctx.setId,
     account_id: accountId,
@@ -396,6 +400,8 @@ export async function acceptRedraftAction(
     status: documentStatus(model).status,
     storage_path: path,
     model,
+    summary_check_section_id: summary?.sectionId ?? null,
+    summary_check_on: summary?.on ?? null,
   });
   const updated = await supabase
     .from("findings")

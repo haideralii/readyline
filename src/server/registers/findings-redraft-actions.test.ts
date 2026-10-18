@@ -447,6 +447,17 @@ describe("acceptRedraftAction (FR-B5, FR-B6, SR-B4, AC-B2)", () => {
     expect(r).toEqual({ ok: false, message: REDRAFT_REFUSED_MESSAGE });
   });
 
+  it("leaves the plain-words summary to check on the new version (REQ-033 Session C AC-C1, D-2977)", async () => {
+    const r = await acceptRedraftAction({ ...target, blocks: goodBlocks() });
+    expect(r.ok).toBe(true);
+    expect(storedVersions[0]).toMatchObject({
+      summary_check_section_id: "scope",
+    });
+    expect(String(storedVersions[0].summary_check_on)).toMatch(
+      /^\d{4}-\d{2}-\d{2}$/,
+    );
+  });
+
   it("leaves the earlier change-log rows bracketed when the earlier version was never adopted", async () => {
     storedVersions = [
       {

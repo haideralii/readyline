@@ -366,5 +366,36 @@ describe("generateDocumentSet", () => {
         );
     }
     expect(store.objects.has(next.storage_path)).toBe(true);
+    // REQ-033 Session C AC-C1 (D-2977): the governance policy carries no plain-words summary, so no state.
+    expect(next.summary_check_section_id ?? null).toBeNull();
+    expect(next.summary_check_on ?? null).toBeNull();
+
+    // A participant-facing document: the re-generated section leaves the summary to check.
+    const complaints = store.documents.find(
+      (d) => d.document_type_id === "complaints-management-policy-and-register",
+    )!;
+    const again = await regenerateSection({
+      store,
+      client: new SectionAwareFake([
+        JSON.stringify({
+          sectionId: "__SECTION__",
+          usedFacts: ["tradingName"],
+          blocks: [
+            {
+              type: "paragraph",
+              text: "A fresh purpose paragraph for the complaints policy.",
+            },
+          ],
+        }),
+      ]),
+      modelId: "fake",
+      dataset,
+      current: complaints,
+      result: c.result,
+      sectionId: "purpose",
+      today: "2026-10-19",
+    });
+    expect(again.next.summary_check_section_id).toBe("purpose");
+    expect(again.next.summary_check_on).toBe("2026-10-19");
   });
 });

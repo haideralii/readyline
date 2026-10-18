@@ -34,6 +34,8 @@ import type { QuestionnaireAnswers } from "@/lib/questionnaire/schema";
 import type { QuestionnaireResult } from "@/lib/questionnaire/result";
 import type { StandardsDataset } from "@/lib/standards/schema";
 import { START_HERE_FILE } from "@/lib/generator/start-here";
+import { sydneyDay } from "@/lib/metrics/counters";
+import { summaryCheckFor } from "@/lib/registers/summary-check";
 import { renderStartHere, startHereFromRows } from "./start-here";
 import { objectPath } from "./storage";
 import type {
@@ -399,6 +401,8 @@ export async function regenerateSection(input: {
   current: DocumentVersionRow;
   result: QuestionnaireResult;
   sectionId: string;
+  /** The Sydney day for the summary's state (REQ-033 Session C); today when absent. */
+  today?: string;
 }): Promise<{ next: DocumentVersionRow; outcome: "generated" | "fallback" }> {
   const type = documentTypeById(input.current.document_type_id);
   if (!type)
@@ -438,6 +442,12 @@ export async function regenerateSection(input: {
     })),
   );
   const { status } = documentStatus(model);
+  // REQ-033 Session C FR-C1 (D-2977): a re-generated section leaves the plain-words summary to check.
+  const summary = summaryCheckFor(
+    type,
+    input.sectionId,
+    input.today ?? sydneyDay(),
+  );
   const next = await input.store.insertDocumentVersion({
     version_set_id: input.current.version_set_id,
     account_id: input.current.account_id,
@@ -446,6 +456,8 @@ export async function regenerateSection(input: {
     status,
     storage_path: path,
     model,
+    summary_check_section_id: summary?.sectionId ?? null,
+    summary_check_on: summary?.on ?? null,
   });
   const outcome =
     model.sections.find((s) => s.id === input.sectionId)?.status === "generated"
