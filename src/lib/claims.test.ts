@@ -44,6 +44,9 @@ describe("findProhibitedClaims", () => {
     ["Start your free trial today", "free-with-fee"],
     ["Free for $0 a month", "free-with-fee"],
     ["Cheaper than a consultant", "comparative"],
+    ["The cheapest way to register", "comparative"],
+    ["The only tool built for small providers", "comparative"],
+    ["Australia's leading registration tool", "comparative"],
     ["Unlike other providers, we read the Rules", "comparative"],
   ])("flags %j as %s", (text, rule) => {
     const findings = findProhibitedClaims(text);
@@ -66,6 +69,10 @@ describe("findProhibitedClaims", () => {
     "You register through the Commission's portal.",
     "The questionnaire is free. The document pack is one fixed price.",
     "The verification audit is the quicker of the two.",
+    // D-2942: a comparison between the two audit kinds, with its reason.
+    "Usually the quicker audit, and usually the cheaper one, because there is no site visit.",
+    "I am the only worker and the only key personnel.",
+    "The leading cause of a finding is a missing register.",
   ])("allows descriptive wording: %j", (text) => {
     expect(findProhibitedClaims(text)).toEqual([]);
   });

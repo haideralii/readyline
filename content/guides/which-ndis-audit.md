@@ -25,7 +25,7 @@ You do not choose. An auditor does not choose either. The list below is the Comm
 
 **Verification** is a desk audit. An approved auditor reads your documents against the verification module of the Practice Standards: human resource management, incident management, complaints management and risk management.
 
-Nobody visits you, and nobody speaks to the people you support. It is the quicker and usually the cheaper audit.
+Nobody visits you, and nobody speaks to the people you support. Usually the quicker audit, and usually the cheaper one, because there is no site visit.
 
 **Certification** is a full audit in two stages.
 

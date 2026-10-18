@@ -109,10 +109,16 @@ export const PROHIBITED_CLAIM_RULES: readonly Rule[] = [
       /\bfree\b[^.!?]{0,40}\b(?:pack|subscription|trial)\b|\b(?:pack|subscription|trial)\b[^.!?]{0,40}\bfree\b|\bfree\b[^.!?]{0,40}\$\s?\d|\$\s?\d[\d,.]*[^.!?]{0,40}\bfree\b/gi,
     why: '"Free" within reach of a price or a paid product reads as a free paid product (ACL 29(1)(i)).',
   },
-  // REQ-012 FR-4a (D-2906, L2): comparative claims against other providers.
+  // REQ-012 FR-4a (D-2906, L2; D-2942): comparative claims for Readyline
+  // against anyone. A comparison between the two audit kinds ("usually the
+  // cheaper one") is a fact about the Commission's process and passes. "The
+  // only" and "leading" are read with the noun they claim about (a tool, a
+  // provider, a service): the generator's lint reuses these rules on the
+  // model's replies, where a sole trader writes "I am the only worker".
   {
     id: "comparative",
-    pattern: /\b(?:cheaper|cheapest|better\s+than|unlike\s+other)\b/gi,
+    pattern:
+      /\b(?:cheaper\s+than|cheapest|better\s+than|unlike\s+other|the\s+only\s+(?:tool|platform|product|service|software|app|system|provider|company|way)|(?:market|industry|australia'?s|the|a)[\s-]+leading\s+(?:\w+\s+)?(?:tool|platform|product|service|software|app|system|provider|company|compliance))\b/gi,
     why: "A comparative claim needs a substantiated comparison we do not make.",
   },
 ];

@@ -81,12 +81,8 @@ describe("readyline content files", () => {
       ...documentSetsContent.always.map(documentTitle),
       ...documentSetsContent.registers.map((r) => r.title),
     ].join("\n");
-    // REQ-012 FR-4a: the verification audit's "quicker and cheaper audit" (audit-types.json) is a D-2222 wording decision for the PO, held here by name until it is made (product/qa/launch-review/2026-10-18/claims-and-sources.md lists it).
-    expect(
-      findProhibitedClaims(text).filter(
-        (c) => !(c.rule === "comparative" && c.match === "cheaper"),
-      ),
-    ).toEqual([]);
+    // REQ-012 FR-4a (D-2942): no hold; the rule names claims against anyone.
+    expect(findProhibitedClaims(text)).toEqual([]);
   });
 
   it("documentTitle humanises ids and keeps acronyms", () => {

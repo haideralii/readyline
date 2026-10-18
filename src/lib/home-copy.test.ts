@@ -6,18 +6,9 @@ import { HOME_COPY, heroHeadline, homeStrings } from "./home-copy";
 
 describe("home page copy (REQ-013 FR-8; CLAUDE.md 4.3)", () => {
   it("passes the prohibited-claims lint and names no superlative or testimonial", () => {
-    // REQ-012 FR-4a (D-2905): "keeps you audit-ready" is the PO's own wording from
-    // D-2001 and the one hit the new audit-ready-promise rule finds in the public
-    // copy; it is held here by name until the PO's D-2222 ruling (reword or keep),
-    // listed in product/qa/launch-review/2026-10-18/claims-and-sources.md.
-    const pendingD2222 = (f: { rule: string; match: string }) =>
-      f.rule === "audit-ready-promise" &&
-      /keeps you audit-ready/i.test(f.match);
+    // REQ-012 FR-4a (D-2905, D-2941): no hold; "audit-ready" left the copy.
     for (const s of homeStrings())
-      expect(
-        findProhibitedClaims(s).filter((f) => !pendingD2222(f)),
-        s,
-      ).toEqual([]);
+      expect(findProhibitedClaims(s), s).toEqual([]);
     const all = homeStrings().join("\n");
     expect(all).not.toMatch(
       /market[- ]leading|best|#1|number one|trusted by|customers say|testimonial|guarantee/i,

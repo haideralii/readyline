@@ -108,10 +108,8 @@ describe("registration-group pages (REQ-011 batch 31, D-1105)", () => {
       for (const s of strings) {
         for (const v of lintText(s, { block: true }))
           findings.push(`${p.code}: ${v.rule}: ${v.detail}`);
-        // REQ-012 FR-4a: the verification audit's "quicker and cheaper audit" (data/readyline-content/audit-types.json; a comparison of the two audit kinds, not of providers) is a D-2222 wording decision for the PO, held here by name until it is made (product/qa/launch-review/2026-10-18/claims-and-sources.md lists it).
-        for (const c of findProhibitedClaims(s).filter(
-          (c) => !(c.rule === "comparative" && c.match === "cheaper"),
-        ))
+        // REQ-012 FR-4a (D-2942): no hold; the rule names claims against anyone.
+        for (const c of findProhibitedClaims(s))
           findings.push(`${p.code}: claim ${JSON.stringify(c)}`);
       }
     }

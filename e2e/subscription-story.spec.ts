@@ -38,7 +38,7 @@ test.describe("one subscription story, on (batch 47 item 1)", () => {
     await expect(page.getByRole("main")).not.toContainText(/when available/i);
   });
 
-  test("the result page names the subscription as what keeps you audit-ready", async ({
+  test("the result page names the subscription as what keeps your evidence current", async ({
     page,
   }) => {
     await reachResult(page);

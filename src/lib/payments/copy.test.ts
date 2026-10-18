@@ -7,19 +7,9 @@ import { refundPromise, sectionParagraphs } from "./refund-promise";
 
 describe("pricing page copy (REQ-007 AC-4, business rules)", () => {
   it("passes the prohibited-claims lint on every string, refund promise included", () => {
-    // REQ-012 FR-4a: "keeps you audit-ready" (D-2001's wording, shared with the home page) is a D-2222 wording decision for the PO, held here by name until it is made (product/qa/launch-review/2026-10-18/claims-and-sources.md lists it).
-    for (const s of [...pricingStrings(), ...refundPromise()]) {
-      expect(
-        findProhibitedClaims(s).filter(
-          (f) =>
-            !(
-              f.rule === "audit-ready-promise" &&
-              /keeps you audit-ready/i.test(f.match)
-            ),
-        ),
-        s,
-      ).toEqual([]);
-    }
+    // REQ-012 FR-4a (D-2905, D-2941): no hold; "audit-ready" left the copy.
+    for (const s of [...pricingStrings(), ...refundPromise()])
+      expect(findProhibitedClaims(s), s).toEqual([]);
   });
 
   it("carries the AI disclosure and the not-legal-advice line, and names no urgency or scarcity", () => {
