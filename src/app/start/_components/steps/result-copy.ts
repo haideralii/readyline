@@ -63,3 +63,24 @@ export const SOLE_TRADER_SOURCE = {
 /** The result page's hedge for an unconfirmed source (`result-step.tsx`'s reasons convention). */
 export const UNCONFIRMED_SOURCE_HEDGE =
   "Check this against the Commission's page before you rely on it.";
+
+/** REQ-031 FR-1 (D-2891): "Email me my result", under the card. */
+export const RESULT_EMAIL_LABEL = "Email me my result";
+export const RESULT_EMAIL_BUTTON = "Send it";
+export const RESULT_EMAIL_BUSY = "Sending…";
+export const RESULT_EMAIL_PRIVACY_LINE =
+  "We send your result to this address once and do not keep the address.";
+export const RESULT_EMAIL_PRIVACY_LINK = "Privacy policy";
+export const RESULT_EMAIL_SENT = (address: string) => `Sent to ${address}`;
+export const RESULT_EMAIL_NOT_SENT = "Not sent, try again";
+export const RESULT_EMAIL_HOUR =
+  "You already asked for this result in the last hour";
+/** SR-2: the connection's limit, a sentence and never a count. */
+export const RESULT_EMAIL_IP_HOUR =
+  "Several results were sent from your connection in the last hour; try again later";
+export const RESULT_EMAIL_INVALID = "Enter the email address to send it to";
+export const RESULT_EMAIL_ANSWERS_INVALID =
+  "Not sent: your answers did not pass our checks. Go back and review each step";
+
+/** REQ-031 FR-2: the print button beside "Change my answers". */
+export const RESULT_PRINT_BUTTON = "Print or save as PDF";
