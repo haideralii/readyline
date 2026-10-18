@@ -486,13 +486,13 @@ const RULES: Rule[] = [
           return {
             state: "set",
             sentence:
-              "A Stripe webhook endpoint points at this site's /api/stripe/webhook.",
+              "A Stripe webhook endpoint points at this host's /api/stripe/webhook.",
           };
         case "missing":
           return {
             state: "unset",
             sentence:
-              "No webhook endpoint in Stripe points at this site; add one in Stripe, Developers, Webhooks (LAUNCH.md).",
+              "No webhook endpoint in Stripe points at the host this page was served on; after the domain move add or edit it in Stripe, Developers, Webhooks (LAUNCH.md).",
           };
         case "unverified":
           return {
