@@ -11,6 +11,7 @@ import type { DocumentModel } from "@/lib/generator/document-model";
 import { renderDocx } from "@/lib/generator/render-docx";
 import {
   buildStartHere,
+  isTemplateSet,
   startHereModel,
   type StartHereSheet,
 } from "@/lib/generator/start-here";
@@ -25,6 +26,8 @@ export function startHereFromRows(input: {
   adopted: ReadonlySet<string>;
   subscribed: boolean;
   summaryVersion: string;
+  /** REQ-029 FR-10: the account's facts; the lines read done by them on a template set. */
+  facts?: Readonly<Record<string, string>>;
 }): StartHereBuilt | null {
   const firstById = new Map(input.first.map((d) => [d.document_type_id, d]));
   const documents = input.latest.map((d) => ({
@@ -36,6 +39,8 @@ export function startHereFromRows(input: {
   const facts = input.latest[0]?.model.facts;
   if (!facts) return null;
   const sheet = buildStartHere({
+    facts: input.facts ?? {},
+    templateSet: isTemplateSet(input.latest.map((d) => d.model)),
     tradingName: facts.tradingName,
     pathway: facts.pathway,
     result: input.set.derived_result,

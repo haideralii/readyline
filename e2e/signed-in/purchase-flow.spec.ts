@@ -214,10 +214,10 @@ test.describe("purchase flow in fake Stripe mode (REQ-007 AC-1)", () => {
     if (await page.getByTestId("finish-link").count()) {
       await page.getByTestId("finish-link").click();
       await expect(
-        page.getByRole("heading", { level: 1, name: "Finish your pack" }),
+        page.getByRole("heading", { level: 1, name: "Your details" }),
       ).toBeVisible();
-      // REQ-017 step 4: the finish page is one form (a question at a time on
-      // a phone, grouped on desktop); the per-document rows of REQ-016 are gone.
+      // REQ-017 step 4, as REQ-029 FR-1 reads it: "Your details" is one page
+      // with every fact once; the per-document rows of REQ-016 are gone.
       await expect(page.getByTestId("finish-form")).toBeVisible();
       await checkWidths(page, "finish your pack");
       await shot(page, "finish-pack", project);

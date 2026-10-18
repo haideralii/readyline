@@ -1,3 +1,5 @@
+import { linkPackPrefix } from "@/lib/registers/link-pack";
+import { removePrefix } from "@/server/generation/storage";
 import "server-only";
 /**
  * The auditor link's server side (REQ-020 FR-2, SR-1, SR-2, D-2230): the
@@ -158,6 +160,18 @@ export async function purgeOldAuditorLinks(
   admin: SupabaseClient,
   now = new Date(),
 ): Promise<number> {
+  // REQ-029 FR-11 (D-2863): the stored packs of the links about to go.
+  const cutoff = purgeCutoff(now);
+  const ended = await admin
+    .from("auditor_links")
+    .select("id, account_id")
+    .or(`expires_at.lt.${cutoff},revoked_at.lt.${cutoff}`)
+    .limit(1000);
+  for (const row of (ended.data as
+    { id: string; account_id: string }[] | null) ?? [])
+    await removePrefix(admin, linkPackPrefix(row.account_id, row.id)).catch(
+      () => 0,
+    );
   return purgeEnded(
     admin,
     "auditor_links",

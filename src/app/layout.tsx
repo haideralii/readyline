@@ -61,7 +61,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="bg-paper text-ink flex min-h-full flex-col">
         <a
           href="#main-content"
-          className="focus:bg-ink focus:text-paper sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:px-3 focus:py-2 focus:outline-2"
+          // REQ-031 FR-2 (AC-5): no link in print, the skip link included.
+          className="focus:bg-ink focus:text-paper sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:px-3 focus:py-2 focus:outline-2 print:hidden"
         >
           Skip to main content
         </a>

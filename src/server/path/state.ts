@@ -10,7 +10,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { checklistPeriod, deriveChecklist } from "@/lib/checklist/derive";
 import { mergeChecklist } from "@/lib/checklist/state";
 import { collectBlanks } from "@/lib/generator/blanks";
-import { formBlanks } from "@/lib/generator/facts-fill";
+import { openFormBlanks } from "@/lib/generator/facts-fill";
 import { orderDocuments } from "@/lib/generator/set-order";
 import {
   EMPTY_PATH_STATE,
@@ -43,6 +43,7 @@ import {
   listPurchases,
 } from "@/server/payments/queries";
 import type { DocumentVersionRow } from "@/server/generation/store";
+import { loadFacts } from "./facts";
 
 export type PathContext = {
   state: PathState;
@@ -136,8 +137,16 @@ export async function listAdoptedDates(
  * form and the set page, so the strip leaves "finish" when the form has
  * nothing left to ask.
  */
-export function openBlanks(documents: readonly DocumentVersionRow[]): number {
-  return formBlanks(documents.flatMap((d) => collectBlanks(d.model))).length;
+export function openBlanks(
+  documents: readonly DocumentVersionRow[],
+  facts: Readonly<Record<string, string>>,
+): number {
+  // REQ-029 FR-10 (D-2855): the stored text keeps its brackets; a blank is
+  // open until `account_facts` holds its key.
+  return openFormBlanks(
+    documents.flatMap((d) => collectBlanks(d.model)),
+    facts,
+  ).length;
 }
 
 /** Groups of the set (in audit order) with at least one document not yet adopted. */
@@ -186,7 +195,10 @@ export async function loadPathContext(
   state.readySetId = set.id;
   const latest = await listLatestDocuments(supabase, set.id);
   const documents = orderDocuments(latest).flatMap((g) => g.documents);
-  state.blanksLeft = openBlanks(documents);
+  state.blanksLeft = openBlanks(
+    documents,
+    await loadFacts(supabase, accountId),
+  );
   const adopted = await listAdoptedTypeIds(supabase, accountId);
   state.groupsToAdopt = groupsLeftToAdopt(documents, adopted);
 

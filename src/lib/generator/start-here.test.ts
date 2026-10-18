@@ -30,7 +30,9 @@ import {
   compressNumbers,
   countsLine,
   sheetBlanks,
+  isTemplateSet,
   sheetLines,
+  TICK,
   startHereModel,
   type StartHereInput,
 } from "./start-here";
@@ -234,5 +236,104 @@ describe("the Start here sheet (REQ-026)", () => {
       "1, 3 to 5, 8, 10, 11",
     );
     expect(compressNumbers([])).toBe("");
+  });
+
+  it("REQ-031 AC-9 (FR-4; D-2889): section 5 holds exactly three steps, the checklist, the audit day, then the systems check", () => {
+    const { input } = pack("verification-sole-trader");
+    const sheet = buildStartHere(input);
+    expect(sheet.next).toEqual([
+      { text: "Tick off your readiness checklist", href: "/checklist" },
+      {
+        text: "See what the auditor asks for on the day",
+        href: "/path/audit-day",
+      },
+      {
+        text: "Check your systems before the audit",
+        href: "/path/audit-day/check",
+      },
+    ]);
+    // The Word file's section 5 carries the same three, in order.
+    const model = startHereModel(sheet, input.documents[0].original.facts);
+    const five = model.sections.find((s) => s.number === "5")!;
+    const items = five.blocks.flatMap((b) =>
+      b.type === "steps" ? b.items : [],
+    );
+    expect(items).toEqual(sheet.next.map((n) => `${n.text}: ${n.href}`));
+  });
+});
+
+describe("REQ-029 FR-4, FR-9, FR-10 (D-2854, D-2855, D-2861): the sheet reads the facts on a template set and the text on an older one", () => {
+  const typeId = "privacy-and-information-management-policy";
+
+  it("a template set: a Fill in line is done when the facts hold its key, an open one says where to fill it in, and the approver and date lines fill on adoption", () => {
+    const { input, models } = pack("verification-sole-trader");
+    expect(isTemplateSet([...models.values()])).toBe(true);
+    const sheet = buildStartHere({
+      ...input,
+      templateSet: true,
+      facts: { "other-tool": "Deputy", "allowed-use": "Rostering" },
+    });
+    const privacy = sheet.documents.find((d) => d.typeId === typeId)!;
+    expect(privacy.fillIn.map((l) => l.done)).toEqual([true, true, false]);
+    expect(privacy.fillIn[2].note).toBe("Fill this in on your details page");
+    expect(privacy.fillIn[0].note).toBeNull();
+    expect(privacy.fillsOnAdoption.map((l) => l.blank)).toEqual([
+      "[name]",
+      "[role]",
+      "[date]",
+    ]);
+    for (const l of privacy.fillsOnAdoption) {
+      expect(l.done).toBe(false);
+      expect(l.note).toBe("Fills in when you adopt this document");
+    }
+    const lines = sheetLines(sheet);
+    expect(lines).toContain(`${TICK}Fill in: ${privacy.fillIn[0].text}`);
+    expect(lines).toContain(
+      `${BOX}Fill in: ${privacy.fillIn[2].text}. Fill this in on your details page.`,
+    );
+    expect(lines).toContain(
+      `${BOX}Approval line: [date]. Fills in when you adopt this document.`,
+    );
+    // The top count is the set page's: the open form blanks, deduped per section and blank.
+    expect(sheet.counts.toFill - sheet.counts.done).toBe(
+      sheet.documents.flatMap((d) => d.fillIn).filter((l) => !l.done).length,
+    );
+    // Adopted, the approver and date lines read done and the note goes.
+    const adopted = buildStartHere({
+      ...input,
+      templateSet: true,
+      facts: {},
+      documents: input.documents.map((d) =>
+        d.typeId === typeId ? { ...d, adopted: true } : d,
+      ),
+    });
+    const after = adopted.documents.find((d) => d.typeId === typeId)!;
+    expect(after.fillsOnAdoption.every((l) => l.done && l.note === null)).toBe(
+      true,
+    );
+    expect(sheetLines(adopted)).toContain(`${TICK}Approval line: [date]`);
+  });
+
+  it("an older set: the text carries the values, so a line is done when its blank is gone and no approver line is listed", () => {
+    const { input, models } = pack("verification-sole-trader");
+    const filled = applyFacts(models.get(typeId)!, {
+      name: "Jane Citizen",
+      role: "Owner",
+      date: "14 October 2026",
+      "other-tool": "Microsoft 365",
+    });
+    expect(isTemplateSet([filled])).toBe(false);
+    const sheet = buildStartHere({
+      ...input,
+      templateSet: false,
+      facts: { "allowed-use": "ignored on an older set" },
+      documents: input.documents.map((d) =>
+        d.typeId === typeId ? { ...d, latest: filled } : d,
+      ),
+    });
+    const privacy = sheet.documents.find((d) => d.typeId === typeId)!;
+    expect(privacy.fillIn.map((l) => l.done)).toEqual([true, false, false]);
+    expect(privacy.fillsOnAdoption).toEqual([]);
+    expect(privacy.fillIn[1].note).toBe("Fill this in on your details page");
   });
 });

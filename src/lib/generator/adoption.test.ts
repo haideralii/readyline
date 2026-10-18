@@ -14,6 +14,8 @@ import {
   adoptionsByType,
   applyAdoption,
   type Adoption,
+  applyProviderAbn,
+  fillForRead,
 } from "./adoption";
 import { documentTypeById } from "./catalogue";
 import { buildSkeleton, type DocumentModel } from "./document-model";
@@ -164,5 +166,83 @@ describe("the control table after adoption (retro 018-021 finding 3)", () => {
         "15 October 2027",
       );
     }
+  });
+});
+
+describe("REQ-029: the adoption snapshot fills the four fixed blanks; a draft keeps them (FR-3, FR-4, FR-5; D-2854, D-2855)", () => {
+  const template = skeleton("governance-policy");
+  const snapshot = {
+    adoptedOn: "2026-10-18",
+    nextReviewOn: "2027-10-18",
+    approverName: "Jane Citizen",
+    approverRole: "Owner",
+  };
+  const cells = (m: DocumentModel, sectionId: string) =>
+    m.sections
+      .find((s) => s.id === sectionId)!
+      .blocks.flatMap((b) => (b.type === "table" ? b.rows : []));
+
+  it("fills the Approver row, the approval date, the responsibilities role and the change-log author from the snapshot alone", () => {
+    const adopted = applyAdoption(template, snapshot);
+    expect(controlCell(adopted, "Approver")).toBe("Jane Citizen, Owner");
+    expect(controlCell(adopted, APPROVAL_DATE_LABEL)).toBe("18 October 2026");
+    expect(controlCell(adopted, NEXT_REVIEW_LABEL)).toBe("18 October 2027");
+    expect(cells(adopted, "change-log")[0]?.at(-1)).toBe("Jane Citizen");
+    const roles = adopted.sections
+      .flatMap((s) => s.blocks)
+      .flatMap((b) => (b.type === "table" ? b.rows : []))
+      .map((r) => r[0]);
+    expect(roles).toContain("Owner");
+    expect(JSON.stringify(adopted)).not.toMatch(/\[name\]|\[role\]|\[date\]/);
+    // The template is untouched.
+    expect(JSON.stringify(template)).toContain("[name], [role]");
+  });
+
+  it("a snapshot without a role leaves [role] as a visible blank beside the name (FR-4)", () => {
+    const adopted = applyAdoption(template, {
+      ...snapshot,
+      approverRole: null,
+    });
+    expect(controlCell(adopted, "Approver")).toBe("Jane Citizen, [role]");
+  });
+
+  it("a version adopted before the snapshot existed fills no name: its text already carries the values (FR-9)", () => {
+    const dated = applyAdoption(template, {
+      adoptedOn: "2026-10-18",
+      nextReviewOn: "2027-10-18",
+    });
+    expect(controlCell(dated, "Approver")).toBe("[name], [role]");
+    expect(controlCell(dated, APPROVAL_DATE_LABEL)).toBe("18 October 2026");
+  });
+
+  it("FR-8: only the ABN part of the Provider cell rebuilds; the trading name stays; no ABN leaves the name alone", () => {
+    const withAbn = applyProviderAbn(template, "51 824 753 556");
+    const provider = controlCell(withAbn, "Provider") ?? "";
+    expect(provider).toMatch(/ \(ABN 51 824 753 556\)$/);
+    const name = provider.replace(/ \(ABN .*\)$/, "");
+    expect(
+      controlCell(applyProviderAbn(withAbn, "11 111 111 111"), "Provider"),
+    ).toBe(`${name} (ABN 11 111 111 111)`);
+    expect(controlCell(applyProviderAbn(withAbn, null), "Provider")).toBe(name);
+  });
+
+  it("fillForRead on a draft fills the contact blank and keeps the approver's; on an adopted version it fills both", () => {
+    const facts = {
+      name: "Someone Else",
+      role: "Director",
+      "phone-or-email": "0400 000 000",
+    };
+    const draft = fillForRead(template, { facts, adoption: null, abn: null });
+    expect(JSON.stringify(draft)).not.toContain("[phone or email]");
+    expect(controlCell(draft, "Approver")).toBe("[name], [role]");
+    expect(JSON.stringify(draft)).not.toContain("Someone Else");
+    const adopted = fillForRead(template, {
+      facts,
+      adoption: snapshot,
+      abn: "51 824 753 556",
+    });
+    expect(controlCell(adopted, "Approver")).toBe("Jane Citizen, Owner");
+    expect(JSON.stringify(adopted)).not.toContain("Someone Else");
+    expect(controlCell(adopted, "Provider")).toContain("(ABN 51 824 753 556)");
   });
 });

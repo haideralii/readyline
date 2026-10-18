@@ -28,37 +28,98 @@ import { countEvent } from "@/server/metrics/counters";
 import { latestOwnershipChangeOn } from "@/server/registers/commission-changes-queries";
 import { currentPeriod } from "@/server/registers/registration-queries";
 import { markAdopted, seedPolicyReviews } from "@/server/registers/seed";
+import { needsReapproval, reapprovalModel } from "@/lib/generator/reapproval";
+import { renderDocx } from "@/lib/generator/render-docx";
+import { sydneyDay } from "@/lib/metrics/counters";
+import { DOCX_TYPE, documentStatus } from "@/server/generation/run";
+import { objectPath } from "@/server/generation/storage";
+import { SupabaseGenerationStore } from "@/server/generation/store";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import {
   ADOPT_NEEDS_NAME,
-  ADOPT_NEEDS_NAME_HREF,
   ADOPT_NEEDS_NAME_LINK,
+  detailsHref,
   NOT_CURRENT_PACK,
 } from "@/lib/path/adopt-copy";
 import { latestReadySet } from "@/server/checklist/queries";
 import { loadFacts, saveFact } from "./facts";
+import { isFactValueAllowed } from "@/lib/generator/facts-fill";
+import {
+  DETAILS_CLEARED_ACTION,
+  DETAILS_REAPPROVED_ACTION,
+  DETAILS_REFUSED,
+  DETAILS_SAVED_ACTION,
+  DETAILS_SAVE_FAILED,
+  DETAILS_TOO_LONG,
+} from "@/lib/path/details-copy";
 import { loadQuestionnaire } from "./state";
 
 export type PathActionResult =
   | { ok: true; blanksLeft?: number; changed?: number }
   | { ok: false; message: string; href?: string; hrefLabel?: string };
 
+const FactKey = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/);
 const FactInput = strictObject({
-  key: z.string().regex(/^[a-z][a-z0-9-]{0,39}$/),
+  key: FactKey,
   value: z.string().trim().min(1).max(200),
 });
+const ClearInput = strictObject({ key: FactKey });
+
+/**
+ * REQ-029 question 1 (b), D-2859: the stored zip and summary carry the values,
+ * so a save rebuilds them for the newest ready set; a rebuild that fails leaves
+ * the save standing and is logged, never shown as a failed save.
+ */
+async function rebuildNewestSet(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  accountId: string,
+): Promise<void> {
+  try {
+    const newest = await latestReadySet(supabase, accountId);
+    if (!newest.setId) return;
+    const admin = createSupabaseAdminClient();
+    const set = await getVersionSet(admin, newest.setId);
+    if (!set) return;
+    const facts = await loadFacts(supabase, accountId);
+    await rerenderSetWithFacts({ admin, set, facts });
+  } catch (e) {
+    log.warn("path.details.rebuild-failed", {
+      accountId,
+      name: e instanceof Error ? e.name : "unknown",
+    });
+  }
+}
+
+/** REQ-029 SR-3: the audit line carries the key, never the value. */
+async function auditDetail(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  accountId: string,
+  userId: string,
+  action: string,
+  key: string,
+) {
+  const audit = await supabase.from("audit_log").insert({
+    account_id: accountId,
+    actor_user_id: userId,
+    action,
+    target: key,
+  });
+  if (audit.error)
+    log.warn("audit.write.failed", { action, code: audit.error.code });
+}
 
 export async function saveFactAction(
   input: unknown,
 ): Promise<PathActionResult> {
+  // REQ-029 SR-6: square brackets and control characters are refused in
+  // words, so a value is never read as a blank; the length rule stays.
+  const raw = (input as { value?: unknown } | null)?.value;
+  if (typeof raw === "string" && !isFactValueAllowed(raw))
+    return { ok: false, message: DETAILS_REFUSED };
   const parsed = parseInput(FactInput, input);
-  if (!parsed.ok)
-    return {
-      ok: false,
-      message: "A few words are enough; up to 200 characters.",
-    };
+  if (!parsed.ok) return { ok: false, message: DETAILS_TOO_LONG };
   const viewer = await getViewer();
   if (!viewer?.account || viewer.deleted)
     return { ok: false, message: "Sign in to save your answers." };
@@ -74,15 +135,159 @@ export async function saveFactAction(
       accountId: viewer.account.id,
       code: r.code,
     });
-    return {
-      ok: false,
-      message: "We could not save that just now. Try again.",
-    };
+    return { ok: false, message: DETAILS_SAVE_FAILED };
   }
+  // The account form writes the role under both keys (D-1704); the details page keeps them in step.
+  if (parsed.data.key === "role")
+    await saveFact(
+      supabase,
+      viewer.account.id,
+      "owner-role",
+      parsed.data.value,
+    );
+  await auditDetail(
+    supabase,
+    viewer.account.id,
+    viewer.user.id,
+    DETAILS_SAVED_ACTION,
+    parsed.data.key,
+  );
+  await rebuildNewestSet(supabase, viewer.account.id);
+  return { ok: true };
+}
+
+/** REQ-029 FR-4: a cleared field deletes its row, so the blank shows again in every file. */
+export async function clearFactAction(
+  input: unknown,
+): Promise<PathActionResult> {
+  const parsed = parseInput(ClearInput, input);
+  if (!parsed.ok) return { ok: false, message: DETAILS_SAVE_FAILED };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to save your answers." };
+  const supabase = await createSupabaseServerClient();
+  const keys =
+    parsed.data.key === "role" ? ["role", "owner-role"] : [parsed.data.key];
+  const r = await supabase
+    .from("account_facts")
+    .delete()
+    .eq("account_id", viewer.account.id)
+    .in("key", keys);
+  if (r.error) {
+    log.warn("path.fact.clear-failed", {
+      accountId: viewer.account.id,
+      code: r.error.code,
+    });
+    return { ok: false, message: DETAILS_SAVE_FAILED };
+  }
+  await auditDetail(
+    supabase,
+    viewer.account.id,
+    viewer.user.id,
+    DETAILS_CLEARED_ACTION,
+    parsed.data.key,
+  );
+  await rebuildNewestSet(supabase, viewer.account.id);
   return { ok: true };
 }
 
 const SetInput = strictObject({ setId: z.string().uuid() });
+
+/**
+ * REQ-029 FR-6 (D-2855): a changed name or role behind an adopted document
+ * is a re-approval. Each adopted latest version whose snapshot differs from
+ * the account's facts gets a new version (the same template with the
+ * version moved and a change-log row that reads "Approver changed to
+ * [role]; re-approved", the earlier rows fixed to the earlier approver),
+ * adopted at once through `adopt_document_version`, which takes today's
+ * snapshot; one audit line per document, the type and the version, never
+ * a value. A changed phone or email never comes here (the next download
+ * carries it).
+ */
+export async function reapproveAction(
+  input: unknown,
+): Promise<PathActionResult & { reapproved?: number }> {
+  const parsed = parseInput(SetInput, input);
+  if (!parsed.ok) return { ok: false, message: "That set was not found." };
+  const viewer = await getViewer();
+  if (!viewer?.account || viewer.deleted)
+    return { ok: false, message: "Sign in to re-approve your documents." };
+  const accountId = viewer.account.id;
+  const supabase = await createSupabaseServerClient();
+  const set = await getVersionSet(supabase, parsed.data.setId);
+  if (!set || set.account_id !== accountId || set.status !== "ready")
+    return { ok: false, message: "That set was not found." };
+  const facts = await loadFacts(supabase, accountId);
+  if (!facts.name?.trim())
+    return {
+      ok: false,
+      message: ADOPT_NEEDS_NAME,
+      href: detailsHref(set.id),
+      hrefLabel: ADOPT_NEEDS_NAME_LINK,
+    };
+  const newest = await latestReadySet(supabase, accountId);
+  if (newest.setId !== set.id) return { ok: false, message: NOT_CURRENT_PACK };
+  const admin = createSupabaseAdminClient();
+  const store = new SupabaseGenerationStore(admin);
+  const today = sydneyDay();
+  let reapproved = 0;
+  for (const d of await listLatestDocuments(supabase, set.id)) {
+    if (!needsReapproval(d, facts)) continue;
+    const version = d.version + 1;
+    const model = reapprovalModel(d.model, {
+      version,
+      today,
+      previous: {
+        name: d.approver_name ?? "",
+        role: d.approver_role ?? null,
+      },
+    });
+    const path = objectPath(
+      accountId,
+      set.id,
+      `${d.document_type_id}.v${version}.docx`,
+    );
+    await store.putObject(
+      path,
+      new Uint8Array(await renderDocx(model)),
+      DOCX_TYPE,
+    );
+    await store.insertDocumentVersion({
+      version_set_id: set.id,
+      account_id: accountId,
+      document_type_id: d.document_type_id,
+      version,
+      status: documentStatus(model).status,
+      storage_path: path,
+      model,
+    });
+    const day = await markAdopted(admin, accountId, d.document_type_id, set.id);
+    if (!day) {
+      log.warn("path.reapprove.not-adopted", {
+        accountId,
+        versionSetId: set.id,
+        documentTypeId: d.document_type_id,
+        version,
+      });
+      continue;
+    }
+    const audit = await admin.from("audit_log").insert({
+      account_id: accountId,
+      actor_user_id: viewer.user.id,
+      action: DETAILS_REAPPROVED_ACTION,
+      target: `${d.document_type_id}:${version}`,
+    });
+    if (audit.error)
+      log.warn("audit.write.failed", {
+        action: DETAILS_REAPPROVED_ACTION,
+        code: audit.error.code,
+      });
+    reapproved += 1;
+  }
+  if (reapproved > 0) await refreshSetSummary(admin, set.id);
+  log.info("path.reapproved", { accountId, versionSetId: set.id, reapproved });
+  return { ok: true, reapproved };
+}
 
 /** Re-renders the set with every saved fact filled in (FR-2 "re-render on finish"). */
 export async function finishPackAction(
@@ -171,32 +376,24 @@ export async function adoptGroupAction(
   // Batch 47 item 3 (D-2211): a document with a fact blank the Finish form can
   // still fill is not adopted; the signed copy's own marks (signature, date
   // reported) are not blanks here, so they never block adoption.
-  const open = openBlanks(docs);
+  const facts = await loadFacts(supabase, accountId);
+  const open = openBlanks(docs, facts);
   if (open > 0)
     return {
       ok: false,
       message: `Finish your pack first: ${open} ${open === 1 ? "blank is" : "blanks are"} still open.`,
     };
   // Retro finding 114 (D-2244): adoption is approval by a named person on a
-  // date, so it waits for the account's name fact; the register's "by whom"
-  // then carries it.
-  const facts = await loadFacts(supabase, accountId);
+  // date, so it waits for the account's name fact; REQ-029 D-2855: the
+  // function snapshots that name and role onto the version, and the
+  // register's "by whom" reads the snapshot.
   if (!facts.name?.trim())
     return {
       ok: false,
       message: ADOPT_NEEDS_NAME,
-      href: ADOPT_NEEDS_NAME_HREF,
+      href: detailsHref(set.id),
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
-
-  // REQ-024 A0 (D-2437): the adoption day itself is written in Sydney by
-  // `adopt_document_version`; only the words for the date fact are made here.
-  const todayWords = new Intl.DateTimeFormat("en-AU", {
-    timeZone: "Australia/Sydney",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date());
 
   // The policy review register exists from the first adoption on (REQ-009
   // FR-7). Its rows are written with the admin client (D-1706): the table's
@@ -206,10 +403,8 @@ export async function adoptGroupAction(
   // proven to be the account's above, and the writes carry its id.
   const admin = createSupabaseAdminClient();
   await seedPolicyReviews(admin, accountId);
-  if (!facts.date) {
-    const r = await saveFact(supabase, accountId, "date", todayWords);
-    if (r.ok) facts.date = todayWords;
-  }
+  // REQ-029 D-2854: the approval date is never a fact; it is the version's
+  // `adopted_on`, written in Sydney by `adopt_document_version`.
 
   // QA pass F1 (17 Oct 2026, D-2269): the set must be the account's newest
   // ready set, the rule `adopt_document_version` holds, said here in plain
@@ -232,8 +427,9 @@ export async function adoptGroupAction(
   // read, as `adoptDocumentVersionAction` reads it; the checklist and the
   // circulation rows are written only once every document of the group is
   // adopted, so a refusal or a throw in the re-render leaves nothing ticked.
+  // REQ-029 D-2855: no re-render before the adoption; the stored model is
+  // the template, and the snapshot fills it at read time.
   const adoptedBefore = await listAdoptedDates(admin, accountId);
-  const out = await rerenderSetWithFacts({ admin, set, facts });
   const own = new Set(group.documents.map((d) => d.document_type_id));
   const notAdopted: string[] = [];
   for (const d of await listLatestDocuments(admin, set.id)) {
@@ -314,7 +510,8 @@ export async function adoptGroupAction(
     group: parsed.data.group,
     documents: group.documents.length,
   });
-  return { ok: true, changed: out.changed, blanksLeft: out.blanksLeft };
+  // REQ-029 D-2855: no version moved; the gate above proved no blank is open.
+  return { ok: true, changed: 0, blanksLeft: 0 };
 }
 
 const ReadoptInput = strictObject({
@@ -346,7 +543,7 @@ export async function adoptDocumentVersionAction(
     return {
       ok: false,
       message: ADOPT_NEEDS_NAME,
-      href: ADOPT_NEEDS_NAME_HREF,
+      href: detailsHref(set.id),
       hrefLabel: ADOPT_NEEDS_NAME_LINK,
     };
   const admin = createSupabaseAdminClient();

@@ -1,6 +1,6 @@
 ---
 title: Terms of use
-updated: 2026-10-16
+updated: 2026-10-18
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -27,7 +27,7 @@ You must be at least 18 and buying for a business.
 
 The document pack is a one-off purchase. The price is shown before you pay, in Australian dollars, with GST shown where it applies. There are no hidden fees. We do not offer instalments, buy-now-pay-later, or credit, and we never charge interest or late fees.
 
-{{subscription-off}} The registers subscription is charged in advance for each period. You can cancel at any time and keep access until the end of the paid period. If a payment fails, access pauses until it is paid; nothing extra is charged. When the payment goes through, access resumes and the paused period is covered by it. While access is paused, your account export, including your worker records, stays available.
+{{subscription-off}} The registers subscription is charged in advance for each period. You can cancel at any time and keep access until the end of the paid period. If a payment fails, access pauses until it is paid; nothing extra is charged. When the payment goes through, access resumes and the paused period is covered by it. While access is paused, your account export, including your worker records, stays available. Your registers and exports are yours to keep; download them and keep them with your own files for as long as the NDIS rules require, because Readyline is not your record-keeping system and a restore from our backup can lose up to a week of entries.
 
 Refunds are described on the Refunds page, which forms part of these terms.
 
@@ -39,7 +39,7 @@ You own the documents Readyline produces for you. You can edit, copy and use the
 
 Do not enter personal, health or disability information about NDIS participants into Readyline. Do not use Readyline to produce documents for a business you do not run or represent. Do not try to break, overload or reverse-engineer the service. We may suspend an account that breaks these rules, and we will tell you why. A suspended account keeps its export, and you can email us to have the decision looked at again.
 
-When you share a link to your registers or your audit pack, you share your records with whoever you send it to, exactly as you typed them; that is your disclosure, so check them for names before you share.
+When you share a link to your registers or your audit pack, you share your records and the name, role and contact details on your account with whoever you send it to, exactly as you typed them; that is your disclosure, so check them for names before you share.
 
 ## Availability and changes
 

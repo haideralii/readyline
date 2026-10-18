@@ -82,7 +82,8 @@ test.describe("REQ-025 Session A", () => {
     // FR-13: the audit kind's meaning under the heading, from the glossary.
     const card = page.getByTestId("summary");
     await expect(card).toContainText("Your audit: certification");
-    await expect(card.getByTestId("audit-kind")).toHaveText(
+    // REQ-031 D-2895: the line carries D-2895's scope sentence after the meaning.
+    await expect(card.getByTestId("audit-kind")).toContainText(
       "The fuller audit: the auditor visits and talks to you, your workers and participants.",
     );
 

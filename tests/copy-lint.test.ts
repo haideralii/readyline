@@ -179,8 +179,12 @@ const COPY_MODULES = [
   "src/app/start/_components/steps/practices-copy.ts",
   // REQ-027 A2 (FR-3a, FR-3b): the result page's own copy, the legend and the tags (the "Next:" line went with REQ-028 D-2805).
   "src/app/start/_components/steps/result-copy.ts",
+  // REQ-031 FR-1, FR-2: the result's words shared by the screen, the print and the email.
+  "src/lib/questionnaire/result-text.ts",
   // REQ-023 Session C: the renewal path's step titles, states, actions and the Commission's practice lines.
   "src/lib/path/renewal.ts",
+  // REQ-029 FR-12: the "Your details" page's words.
+  "src/lib/path/details-copy.ts",
   // D-2849 (PO acceptance read, 18 Oct 2026 (4)): every module whose strings a customer reads joins the lint.
   // REQ-023 B, C and D: the period selector's words, the "what changed" sheet, the changes register, the self-check.
   "src/lib/registers/period.ts",
@@ -581,6 +585,9 @@ const GLOSSARY_PAGES = [
   "src/app/start/_components/steps/workforce-step.tsx",
   "src/app/start/_components/steps/existing-step.tsx",
   "src/app/start/_components/steps/result-step.tsx",
+  // REQ-031 FR-1, FR-2: the result page's email form and its print view.
+  "src/app/start/_components/steps/result-email-form.tsx",
+  "src/app/start/_components/steps/result-print.tsx",
   "src/app/checklist/page.tsx",
   "src/app/checklist/checklist-view.tsx",
   "src/app/checklist/loading.tsx",
@@ -599,6 +606,9 @@ const GLOSSARY_PAGES = [
  */
 const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
   "src/components/sample-document.tsx": "src/app/sample/page.tsx",
+  // REQ-031 FR-3 (D-2888): the Start here sheet renders on /sample (the computed route, D-2267) and on the
+  // documents pages outside the list; its own words carry "adopt", whose meaning the sheet gives in section 1.
+  "src/components/start-here-sheet.tsx": "src/app/sample/page.tsx",
   "src/components/trust-blocks.tsx": "src/app/page.tsx",
   "src/app/guides/registration-groups/groups-search.tsx":
     "src/app/guides/registration-groups/page.tsx",
@@ -642,8 +652,12 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
     "src/app/start/_components/steps/practices-step.tsx",
   "src/app/start/_components/steps/result-copy.ts":
     "src/app/start/_components/steps/result-step.tsx",
+  "src/lib/questionnaire/result-text.ts":
+    "src/app/start/_components/steps/result-step.tsx",
   // REQ-023 Session C: rendered on the signed-in renewal path, outside D-2710's list.
   "src/lib/path/renewal.ts": null,
+  // REQ-029: rendered on the signed-in details page.
+  "src/lib/path/details-copy.ts": null,
   // D-2849: the eight modules render on signed-in pages or in email, outside D-2710's list.
   "src/lib/registers/period.ts": null,
   "src/lib/registers/what-changed.ts": null,
@@ -685,6 +699,8 @@ const GLOSSARY_OUTSIDE_LIST_PREFIXES = [
 const GLOSSARY_OUTSIDE_LIST = [
   "src/app/layout.tsx",
   "src/app/not-found.tsx",
+  // REQ-030 FR-1: the page-level error boundary, one plain line and the reference; no glossary term.
+  "src/app/error.tsx",
   "src/app/guides/[slug]/cost-calculator.tsx",
   "src/components/confirm-button.tsx",
   "src/components/data-table.tsx",

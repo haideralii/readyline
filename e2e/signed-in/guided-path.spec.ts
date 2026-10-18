@@ -227,7 +227,7 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     );
     await page.goto("/documents");
 
-    // Step 4: finish your pack, one question at a time on a phone, grouped on desktop.
+    // Step 4: "Your details" (REQ-029 FR-1): one page, every fact once, saved as each field loses focus.
     await expectStep(page, "finish");
     // FR-4: the same in a fresh browser.
     await resumesAt(
@@ -243,9 +243,8 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await checkWidths(page, "finish your pack");
     await pagePass(page, "finish your pack");
     await shot(page, "finish-pack", project);
-    // The owner's name, role and the approval date are account facts (D-541
-    // as amended, batch 37), so the form never asks for them; the keys stay
-    // here only so an older page would still be answered.
+    // REQ-029 FR-1: the name and the role are asked here (and on the account
+    // page, the same rows); the approval date is never asked (D-2854).
     const answersByKey: Record<string, string> = {
       name: "Jane Citizen",
       role: "Owner",
@@ -414,15 +413,16 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
       /^Download .+ \(\.docx\)$/,
     );
     await page.getByTestId("set-list").getByRole("link").first().click();
-    // The control table renders twice (batch 36's data table: cards on a
-    // phone, a table from sm up) and the hidden copy comes first in the DOM,
-    // so the assertion takes the copy this viewport shows.
+    // REQ-029 D-2854 (AC-3): a draft keeps its brackets until adoption; the
+    // control table renders twice (batch 36's data table: cards on a phone, a
+    // table from sm up), so the assertion takes the copy this viewport shows.
     await expect(
-      page.getByText("Jane Citizen").filter({ visible: true }).first(),
+      page.getByText("[name], [role]").filter({ visible: true }).first(),
     ).toBeVisible();
+    await expect(page.getByText("Jane Citizen")).toHaveCount(0);
 
-    // REQ-026 AC-2: after Finish every "Fill in" line reads done and the count
-    // says so; the adopt lines wait for step 5.
+    // REQ-026 AC-2, REQ-029 Session B (FR-10): after Finish every "Fill in" line
+    // reads done by the facts and the count says so; the adopt lines wait for step 5.
     await page.goto("/documents");
     await page.getByTestId("open-set").click();
     await page.getByTestId("start-here-link").click();
@@ -515,6 +515,12 @@ test.describe("the guided path, result to audit day (REQ-017)", () => {
     await expect(page.getByTestId("set-summary")).toContainText(
       "No blanks to fill in",
     );
+    // REQ-029 D-2855 (AC-4): adopted, the document page shows the approver from the snapshot.
+    await page.getByTestId("set-list").getByRole("link").first().click();
+    await expect(
+      page.getByText("Jane Citizen").filter({ visible: true }).first(),
+    ).toBeVisible();
+    await page.goBack();
     // REQ-026 FR-4: adoption ticks every document's Adopt line on the sheet.
     await page.getByTestId("start-here-link").click();
     for (const line of await page.getByTestId("sheet-adopt").all())

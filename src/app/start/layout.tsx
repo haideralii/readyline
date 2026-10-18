@@ -15,6 +15,7 @@ export default async function StartLayout({ children }: LayoutProps<"/start">) {
       groups={groups}
       mode={mode}
       contactEmail={contactEmail()}
+      userEmail={viewer?.account ? (viewer.user.email ?? null) : null}
       accountPrefill={
         viewer?.account
           ? {

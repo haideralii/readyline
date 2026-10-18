@@ -25,14 +25,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
+
+      - name: The lockfile is what npm ci installed from; the tree is clean (REQ-012 FR-2)
+        run: |
+          git diff --exit-code -- package-lock.json
+          test -z "$(git status --porcelain)" || { git status --porcelain; echo "FAIL npm ci changed the tree" >&2; exit 1; }
 
       - name: Production dependencies have no high or critical advisories (REQ-002 AC-1)
         run: npm audit --omit=dev --audit-level=high
@@ -58,7 +63,7 @@ jobs:
 
       - name: Upload the generator exam report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: generator-exam
           path: out/generator-exam/
@@ -75,7 +80,7 @@ jobs:
 
       - name: Upload the docx lint report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: docx-lint-report
           path: out/docx-lint-report.txt
@@ -85,6 +90,24 @@ jobs:
       - run: npm run build
       - name: Supabase secret key is absent from the client bundle (REQ-004 AC-8)
         run: node scripts/ci/check-client-bundle.mjs
+
+      # REQ-012 FR-1d (AC-2): the production build on its own port, every route class
+      # compared with the expected-values table in scripts/ops/check-headers-lib.mjs
+      # (HSTS, nosniff, referrer, permissions, frame options, no X-Powered-By, the nonce
+      # CSP with Checkout on the purchase page alone). Same fixture values the Playwright
+      # web server uses; the server is stopped when the check has run.
+      - name: Security headers on every route class (REQ-012 FR-1d, AC-2)
+        env:
+          PORT: "3200"
+          STRIPE_FAKE: "1"
+          PACK_PRICE_AUD_CENTS: "39900"
+          SUBSCRIPTION_PRICE_AUD_CENTS: "3900"
+          HASH_PEPPER: e2e-hash-pepper-0123456789abcdef # gitleaks:allow
+          CRON_SECRET: e2e-cron-secret-0123456789abcdef # gitleaks:allow
+        run: |
+          npm run start > /tmp/headers-server.log 2>&1 &
+          node scripts/ops/check-headers.mjs --base http://localhost:3200 --wait 90 --json out/headers.json
+          kill %1
 
       - name: Install Playwright (Chromium and WebKit, REQ-015 FR-16a)
         run: npx playwright install --with-deps chromium webkit
@@ -117,7 +140,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: playwright-report/
@@ -133,9 +156,9 @@ jobs:
     timeout-minutes: 20
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -156,7 +179,7 @@ jobs:
 
       - name: Upload the Lighthouse budget report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lighthouse-budget
           path: out/lighthouse-budget.txt
@@ -172,20 +195,19 @@ jobs:
     # Batch 45b item 2: the signed-in suites now run the guided path to the end on three projects; run 595 was cut at 20 minutes.
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
 
       - run: npm ci
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
-          # Pinned (D-038): 'latest' asks the GitHub API anonymously and shared runners hit the rate limit.
+          # Pinned (D-038): a fixed CLI version, so every run installs the same binary; v3 installs from npm (REQ-012 FR-2).
           version: 2.120.0
-          github-token: ${{ github.token }}
 
       - name: Start the local stack and apply supabase/migrations
         run: supabase start -x studio,imgproxy,logflare,vector
@@ -201,6 +223,77 @@ jobs:
           echo "SUPABASE_DB_URL=${DB_URL}" >> "$GITHUB_ENV"
 
       - name: Row-level security and tenancy tests
+        run: npm run test:integration
+
+      # REQ-030 FR-2, AC-3 (D-2866): the restore rehearsal. The seeded stack is dumped and
+      # encrypted under a fixture passphrase (the production one never enters CI, SR-5), the
+      # plaintext never touching disk (SR-2); the stack is reset to a fresh one with the
+      # migrations applied, the copy is restored into it, and the integration suite runs again
+      # on the restored stack. The size and the seconds are in the log (the evidence).
+      # The runner image ships the PostgreSQL 16 client and the stack is major 17
+      # (supabase/config.toml); pg_dump refuses a server newer than itself, so the
+      # rehearsal needs the 17 client, installed as backup.yml installs it.
+      - name: PostgreSQL 17 client (the stack's major; the dump must not be older)
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+          # The runner's /usr/bin/pg_dump is postgresql-common's wrapper, which picks the
+          # runner's own 16 cluster even with the 17 client installed (#115 at 7f37b36);
+          # the 17 binaries go first on PATH for every later step.
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/17/bin/pg_dump --version
+          /usr/lib/postgresql/17/bin/pg_restore --version
+
+      # One step per command, so the jobs API (public) names the one that fails and
+      # the first step proves the database URL reaches the stack before any dump.
+      - name: Backup and restore rehearsal (REQ-030 FR-2, AC-3), the connection
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: |
+          test -n "$DB_URL" || { echo "FAIL SUPABASE_DB_URL is empty: supabase status -o env did not give DB_URL" >&2; exit 1; }
+          psql "$DB_URL" -Atc "select version()"
+          # The counts the restore must give back (PO, 18 Oct 18:50): auth.users and public.accounts.
+          before=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows before the dump: $before"
+          echo "ROWS_BEFORE=$before" >> "$GITHUB_ENV"
+
+      - name: Backup and restore rehearsal, the dump (scripts/ops/backup.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/backup.sh
+
+      - name: Backup and restore rehearsal, a fresh stack (migrations applied, no seed)
+        run: supabase db reset --local --no-seed
+
+      - name: Backup and restore rehearsal, the restore (scripts/ops/restore-rehearsal.sh)
+        env:
+          BACKUP_PASSPHRASE: rehearsal-fixture-passphrase-0123456789 # gitleaks:allow
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+          OUT: /tmp/rehearsal.sql.gpg
+          IN: /tmp/rehearsal.sql.gpg
+          SKIP_AUDIT: "1"
+        run: scripts/ops/restore-rehearsal.sh
+
+      - name: Backup and restore rehearsal, the counts after the restore match the counts before
+        env:
+          DB_URL: ${{ env.SUPABASE_DB_URL }}
+        run: |
+          after=$(psql "$DB_URL" -Atc "select (select count(*) from auth.users) || ' users, ' || (select count(*) from public.accounts) || ' accounts'")
+          echo "rows after the restore: $after (before the dump: $ROWS_BEFORE)"
+          test "$after" = "$ROWS_BEFORE" || { echo "FAIL the restored stack does not hold what was dumped" >&2; exit 1; }
+
+      - name: Backup and restore rehearsal, the integration suite on the restored stack
         run: npm run test:integration
 
       - name: Build for the signed-in end-to-end run
@@ -219,7 +312,7 @@ jobs:
 
       - name: Upload the signed-in Lighthouse budget report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: lighthouse-budget-signed-in
           path: out/lighthouse-budget.txt
@@ -242,7 +335,7 @@ jobs:
 
       - name: Upload the signed-in screenshots (REQ evidence)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: signed-in-screenshots
           path: product/evidence/
@@ -251,7 +344,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report-signed-in
           path: playwright-report/
@@ -270,9 +363,9 @@ jobs:
       contains(github.event.pull_request.title, 'REQ-005') ||
       github.event.pull_request.head.ref == 'req-005-generator'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -314,7 +407,7 @@ jobs:
           DOCX_REPORT: "1"
 
       - name: Upload the skeleton sets for the PO
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: skeleton-document-sets
           path: out/skeletons/

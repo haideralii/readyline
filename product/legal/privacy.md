@@ -1,6 +1,6 @@
 ---
 title: Privacy policy
-updated: 2026-10-17
+updated: 2026-10-18
 owner: po
 status: draft (plain-language draft by the product owner; to be checked by a lawyer before launch)
 ---
@@ -18,6 +18,8 @@ We collect only what we need to run the service:
 - Your account email address, so you can sign in and we can send receipts and service emails.
 - Your questionnaire answers: trading name, ABN if you give it, business structure, states and territories, the supports you deliver, your number of workers and key personnel, whether you use restrictive practices, and which documents you already have.
 - The documents we draft for you and the notes you add to your checklist or registers.
+- If you ask us to email you your result, we send it once to the address you type and do not keep the address. We keep a one-way code of it in our security log so we can see a send happened.
+- Your name, your role and the phone number or email address you give us for your documents. We put them into every document you download, into your audit pack and into the auditor link you share, and we keep them while your account is open.
 - Worker codes, each worker's role and the states they work in, the kind of check, its dates, the application number and, if you choose, the check number you enter in the worker checks register, the onboarding items with their dates and who recorded them, the supervision dates on the staff matrix, and the hashed email address of a worker you invite. We ask you to use codes for workers. We never keep a worker's name, date of birth or address, so the register is the companion to the list the Worker Screening Rules ask you to keep, not the list itself. If you choose to fill names, dates of birth and addresses into an export, we use them to build that one file in Sydney and do not keep them.
 - Purchase records: what you bought, when, the amount, and the payment reference. We never see or store your card number; our payment provider, Stripe, handles it.
 - Basic technical records such as the time of a sign-in and errors, kept to run and secure the service. We do not use advertising trackers or third-party analytics.
@@ -41,11 +43,13 @@ We do not sell your information. We do not share it with anyone except the servi
 - Vercel runs the website. Its servers are in Sydney where we can choose, and otherwise in the United States. Never the worker-detail fill, which runs in Sydney.
 - Anthropic provides the AI model that drafts your documents. We send it your questionnaire answers and the fixed text of the document. It does not use our requests to train its models under its commercial terms, as read on {{vendor-terms-date}}. Anthropic processes our requests in the United States.
 - Stripe takes payments and keeps card details. Stripe may process data in the United States and elsewhere under its own privacy policy.
+- GitHub, in the United States, keeps a weekly encrypted copy of our database for up to 90 days; only the owner holds the key that opens it, and each copy is deleted after 90 days.
+- Sentry receives reports of errors on our servers, with email addresses and free text removed before they leave Australia, and stores them in the United States.
 - An email provider sends service emails.
 
 ## How long we keep it
 
-Your data stays while your account is open. If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires. Backups are deleted on their normal schedule after that.
+Your data stays while your account is open. If you delete your account, we remove your documents, answers and notes within 30 days, and keep only the purchase records the tax law requires us to keep, for the period it requires. An encrypted backup copy may still hold your data for up to 90 days after that, then it is deleted.
 
 ## Your choices
 
