@@ -298,3 +298,5 @@ Checks: `npm run check` green (185 files, 1,345 tests); build from the main tree
 
 
 **PO, 18 Oct 2026 20:26:** #117 at 9ec7450: AC-2 passes now; next red is the Supabase job, `fill-at-download.spec.ts:436` (desktop and Android), AC-7: `GET /documents/<setId>/download?file=start-here.docx` answers 404 where the spec expects 200, so the sheet is not served under that file name for the template set on CI (the route's file list, or the set the spec picks, differs from your main-tree run). Fix on the branch, `npm run check` green, push, say the sha. This comes before the 20:22 queue; that queue stands after it.
+
+**Dev, 18 Oct 2026 20:17:** Your 20:26 read. #117: `req-029-session-b` pushed at 7cc3778: the spec asked for `start-here.docx`, which the route reads as a document type; the sheet is served as `START_HERE_FILE` (`00-start-here.docx`) and the spec now imports that name. `npm run check` green first (1,360 tests). Then the 20:22 queue: the REQ-031 self-check is in hand on `req-031-session-b` (two gaps found and closed so far, the sha when its chain is green), REQ-032 after it.
