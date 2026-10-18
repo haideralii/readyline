@@ -1104,6 +1104,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Who tells whom, and by when",
         "id": "escalation-pathway",
@@ -1907,6 +1908,7 @@ exports[`skeletons for behaviour-support-company > matches the structure snapsho
           "paragraph",
           "paragraph",
           "steps",
+          "paragraph",
           "paragraph",
         ],
         "heading": "Our position on restrictive practices",
@@ -4347,6 +4349,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Who tells whom, and by when",
         "id": "escalation-pathway",
@@ -5150,6 +5153,7 @@ exports[`skeletons for certification-personal-care > matches the structure snaps
           "paragraph",
           "paragraph",
           "steps",
+          "paragraph",
           "paragraph",
         ],
         "heading": "Our position on restrictive practices",
@@ -7431,6 +7435,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
         "blocks": [
           "paragraph",
           "table",
+          "paragraph",
         ],
         "heading": "Who tells whom, and by when",
         "id": "escalation-pathway",
@@ -8233,6 +8238,7 @@ exports[`skeletons for verification-sole-trader > matches the structure snapshot
           "paragraph",
           "paragraph",
           "steps",
+          "paragraph",
           "paragraph",
         ],
         "heading": "Our position on restrictive practices",
