@@ -356,3 +356,16 @@ describe("product/ops/LAUNCH.md (REQ-022 FR-4)", () => {
     expect(md).toContain("page updated in the last 90 days");
   });
 });
+
+describe("the test-email row (D-2839)", () => {
+  it("is set with the send's Sydney day and time once a test email was sent, and never expires", async () => {
+    const { launchRows, sydneyDateTime } = await import("./launch");
+    const f = facts();
+    f.email.lastTestSendAt = "2026-10-01T04:04:00Z";
+    f.now = new Date("2026-10-18T00:00:00Z");
+    const row = launchRows(f).find((r) => r.id === "email-test-send")!;
+    expect(row.state).toBe("set");
+    expect(row.sentence).toBe("Test email sent 1 October 2026, 3:04 pm.");
+    expect(sydneyDateTime("not a date")).toBe("not a date");
+  });
+});
