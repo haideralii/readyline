@@ -417,6 +417,34 @@ describe.skipIf(!enabled)("REQ-024 B: the worker's own steps", () => {
       p_items: [{ id: "Robert'); drop", owner_role: "both" }],
     });
     expect(bad.error?.code).toBe("42501");
+    // D-2840: a regex-valid id outside the closed list is refused too, and nothing of the list is written.
+    const unknown = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [
+        { id: "w5-induction", owner_role: "owner" },
+        { id: "w99-made-up", owner_role: "both" },
+      ],
+    });
+    expect(unknown.error?.code).toBe("42501");
+    const none = await stranger.client
+      .from("onboarding_items")
+      .select("item_id")
+      .eq("checklist_id", first.data as string)
+      .eq("item_id", "w99-made-up");
+    expect(none.data ?? []).toEqual([]);
+    // D-2840: the caller's owner_role is ignored; the owner's own setting per item stands (w1-clearance is the owner's).
+    const forged = await stranger.client.rpc("worker_ensure_items", {
+      p_account: owner.accountId,
+      p_items: [{ id: "w10-other-checks", owner_role: "worker" }],
+    });
+    expect(forged.error).toBeNull();
+    const role = await stranger.client
+      .from("onboarding_items")
+      .select("owner_role")
+      .eq("checklist_id", first.data as string)
+      .eq("item_id", "w10-other-checks")
+      .single();
+    expect(role.data?.owner_role).toBe("owner");
     // The worker's date on the made W-4 row goes through worker_update_item as before.
     const w4 = rows.data!.find((r) => r.item_id === "w4-orientation-module")!;
     void w4;
