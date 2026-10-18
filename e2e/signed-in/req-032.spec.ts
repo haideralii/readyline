@@ -83,10 +83,13 @@ async function recordAndRead(page: Page, c: Case) {
   await expect(page.getByTestId("notify-by")).toContainText(words);
   await page.getByTestId("register-submit").click();
   await expect(page.getByTestId("register-saved")).toBeVisible();
-  // The row's fact, whatever today's date makes of its status.
+  // The row's fact, whatever today's date makes of its status. The label and the
+  // value are separate elements (no space between them in the joined text), so each
+  // is asserted alone (#119's run).
   await expect(page.getByTestId("incident-facts")).toContainText(
-    `Notify the Commission by ${words}`,
+    "Notify the Commission by",
   );
+  await expect(page.getByTestId("incident-facts")).toContainText(words);
   if (c.bracket === null) {
     await expect(page.getByTestId("incident-facts")).not.toContainText(
       "do not count",
