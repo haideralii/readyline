@@ -37,7 +37,10 @@ async function fetchOnce(url) {
   const res = await fetch(url, {
     redirect: "manual",
     headers: {
-      "user-agent": "readyline-source-links/1 (+https://readyline.com.au)",
+      // A browser-like agent: some government sites answer only those; the check is read-only either way.
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 readyline-source-links/1",
+      accept: "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.8",
     },
     signal: AbortSignal.timeout(20_000),
   });

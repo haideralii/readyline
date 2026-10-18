@@ -84,6 +84,6 @@ Prices here are as the sellers show them, mostly excluding GST. Our own price is
 ## Sources
 
 - [Provider+: how much does NDIS provider registration cost in 2026](https://www.providerplus.com.au/post/how-much-does-ndis-provider-registration-cost-in-2026) (third party; audit ranges)
-- [NDIS Quality and Safeguards Commission: registration groups (classes of support)](https://www.ndiscommission.gov.au/providers/registered-ndis-providers/registration-groups-or-classes-support)
-- [NDIS Quality and Safeguards Commission: approved quality auditors](https://www.ndiscommission.gov.au/providers/registered-ndis-providers/approved-quality-auditors)
+- [NDIS Quality and Safeguards Commission: registration groups (classes of support)](https://www.ndiscommission.gov.au/provider-registration/apply-registration/registration-groups-or-classes-support)
+- [NDIS Quality and Safeguards Commission: find an approved quality auditor](https://www.ndiscommission.gov.au/provider-registration/apply-registration/find-auditor)
 - Readyline market research, 13 October 2026 (template pack, consultant and software prices as shown on the sellers' pages that day)

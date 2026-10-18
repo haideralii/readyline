@@ -60,6 +60,7 @@ export async function checkLinks(urls, fetchOnce) {
     let finalUrl = url;
     let status = 0;
     let hops = 0;
+    let error = null;
     try {
       let r = await fetchOnce(url);
       status = r.status;
@@ -71,7 +72,8 @@ export async function checkLinks(urls, fetchOnce) {
       }
     } catch (e) {
       status = -1;
-      finalUrl = `${url} (${String(e).slice(0, 60)})`;
+      const cause = e && typeof e === "object" && "cause" in e ? e.cause : null;
+      error = `${String(e).slice(0, 80)}${cause ? ` / ${String(cause).slice(0, 80)}` : ""}`;
     }
     results.push({
       url: stripQuery(url),
@@ -80,6 +82,7 @@ export async function checkLinks(urls, fetchOnce) {
       hops,
       where,
       ok: status === 200,
+      error,
     });
   }
   return results;
@@ -101,7 +104,7 @@ export function report(results) {
   const lines = [];
   for (const r of [...bad, ...results.filter((r) => r.ok)])
     lines.push(
-      `${r.ok ? "ok  " : "FAIL"} ${r.status === -1 ? "ERR" : r.status} ${r.url}${r.hops ? ` -> ${r.finalUrl}` : ""} (${r.where.join(", ")})`,
+      `${r.ok ? "ok  " : "FAIL"} ${r.status === -1 ? "ERR" : r.status} ${r.url}${r.hops ? ` -> ${r.finalUrl}` : ""} (${r.where.join(", ")})${r.error ? ` ${r.error}` : ""}`,
     );
   lines.push(
     bad.length === 0
