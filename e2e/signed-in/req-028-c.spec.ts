@@ -56,7 +56,11 @@ test.describe("REQ-028 Session C: the account page's in-page nav (FR-11)", () =>
       return;
     }
     await expect(nav).toBeVisible();
-    await expect(nav.getByRole("link")).toHaveCount(10);
+    // D-2836: "Reminder emails" joined the page and its nav (#109's first run), so eleven sections.
+    await expect(nav.getByRole("link")).toHaveCount(11);
+    await expect(
+      nav.getByRole("link", { name: "Reminder emails" }),
+    ).toBeVisible();
     const shell = (await page.locator('[data-shell="page"]').boundingBox())!;
     const col = (shell.width - 64 - 11 * 32) / 12;
     const nb = (await page.getByTestId("account-nav").boundingBox())!;

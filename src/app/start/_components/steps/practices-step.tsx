@@ -71,6 +71,8 @@ export function PracticesStepForm() {
       : {},
   );
   const [errors, setErrors] = useState<FieldErrors>({});
+  // Live QA D1: the submit count the error summary focuses on.
+  const [attempt, setAttempt] = useState(0);
   // REQ-028 FR-3 (AC-3): a field that carries an error is re-validated on
   // change and its message, summary entry and aria-invalid go when it passes.
   const clear = async (name: string, values: unknown) =>
@@ -89,6 +91,7 @@ export function PracticesStepForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setAttempt((a) => a + 1);
     const values: Record<string, unknown> = { restrictivePractices: value };
     if (value === "not-sure") {
       if (!helperComplete) {
@@ -118,7 +121,7 @@ export function PracticesStepForm() {
 
   return (
     <form onSubmit={onSubmit} noValidate className="step-form">
-      <ErrorSummary errors={errors} labels={LABELS} />
+      <ErrorSummary errors={errors} labels={LABELS} attempt={attempt} />
       {/* REQ-027 FR-3, D-2701: the words on this step, above its first paragraph. */}
       <GlossaryTerms ids={STEP_TERMS} where="page" className="step-side mb-4" />
 
