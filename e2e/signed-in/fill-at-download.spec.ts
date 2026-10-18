@@ -175,7 +175,7 @@ test.describe("REQ-029 Session A: fill at download", () => {
       await expect(page.getByTestId("details-fields")).toBeEnabled();
       const ids = await page
         .getByTestId("finish-form")
-        .locator('[data-testid^="fact-"][data-testid$=""]')
+        .locator('[data-testid^="fact-"]')
         .evaluateAll((els) =>
           els
             .map((e) => e.getAttribute("data-testid") ?? "")
