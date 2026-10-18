@@ -70,7 +70,8 @@ export function SignInForm({ next }: { next?: string }) {
             describedBy={describedBy}
             invalid={invalid}
             autoComplete="email"
-            inputMode="text"
+            inputMode="email"
+            type="email"
             maxLength={254}
           />
         )}

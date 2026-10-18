@@ -70,13 +70,15 @@ export function TextInput(props: {
   describedBy?: string;
   invalid: boolean;
   autoComplete?: string;
-  inputMode?: "text" | "numeric" | "search";
+  inputMode?: "text" | "numeric" | "search" | "email";
   maxLength?: number;
+  /** Live QA (report B, PO 12:08): the sign-in field is an email field on the shared control; text otherwise. */
+  type?: "text" | "email";
 }) {
-  const { onChange, describedBy, invalid, ...rest } = props;
+  const { onChange, describedBy, invalid, type = "text", ...rest } = props;
   return (
     <input
-      type="text"
+      type={type}
       {...rest}
       onChange={(e) => onChange(e.target.value)}
       aria-describedby={describedBy}
