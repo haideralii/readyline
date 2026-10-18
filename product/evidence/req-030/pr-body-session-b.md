@@ -17,6 +17,6 @@ Branch `req-030-session-b`, stacked on Session A; PR to `next`. Dev-2, 18 Oct 20
 
 ## For the PO
 
-- The hosted restore may need the tables' owner or `--superuser` for `--disable-triggers` (UNVERIFIED), said in DEPLOY.md section 11 and the script.
+- The restore follows Supabase's own guide (`set session_replication_role = replica`, one psql transaction) after `pg_restore --disable-triggers` was refused on the local stack (not a superuser); the first hosted restore is the proof that `postgres` may set it there too, as the guide says (DEPLOY.md section 11).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

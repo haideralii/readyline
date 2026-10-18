@@ -25,7 +25,7 @@ Read as the PO would, with `product/qa/review-checklist.md` and the definition o
 - D-2898 (FR-5): the six export tables' integration assertions (`session-c.test.ts`) have not run anywhere yet, since this tree has no Docker; #115's Supabase job on 70b52ec is their first run. Accept only on that job's green.
 - AC-4 and SR-3: `backup.yml` runs under `contents: read` and uploads the encrypted copy as an artifact, so anyone with read access to the repository's Actions can download the ciphertext; the passphrase protects it (AES-256), which the REQ accepted, but the evidence should say so in one sentence under "Said, not built" so the PO reads it as a decision and not an oversight.
 - FR-7 and AC-11: the privacy page's content changed in three places while `updated` stayed, by the PO's D-2870 to D-2877; the line is right against the AC, but the lawyer's question 5.8 should also ask whether a content change without a date change is acceptable practice for an APP 1 policy. One line in `questions-for-the-lawyer.md`.
-- `restore-rehearsal.sh` with `--disable-triggers` on the hosted project is UNVERIFIED and said; the one thing not said is what the operator does when it fails midway (`--exit-on-error` leaves a part-filled stack). Fix: section 11 of DEPLOY.md gains the line "reset and restore again; never restore over a part-filled stack".
+- `restore-rehearsal.sh` with `--disable-triggers` on the hosted project was UNVERIFIED and said; CI then refused it on the local stack too (#115 at dea7a21), and the first version could leave a part-filled stack on a midway failure. Both closed the same evening: the restore is one psql transaction under `session_replication_role = replica`, Supabase's own pattern; a failure rolls back.
 
 ## What I would accept
 

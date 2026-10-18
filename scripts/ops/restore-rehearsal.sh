@@ -7,11 +7,16 @@
 #
 #   DB_URL=postgresql://... BACKUP_PASSPHRASE=... IN=readyline-2026-10-18.sql.gpg scripts/ops/restore-rehearsal.sh
 #
-# `--disable-triggers` lets the rows land in any order under the foreign keys
-# and the row-level policies' triggers; it needs a superuser or the table
-# owner, which the local stack's `postgres` role is. On the hosted project the
-# `postgres` role is not a superuser (UNVERIFIED): if a hosted restore refuses,
-# run it as the owner of each table or with `--superuser`, DEPLOY.md section 11.
+# The rows land in any order under the foreign keys because the session runs
+# with `session_replication_role = replica`, which is how Supabase's own
+# restore guide loads a data dump (psql --command 'SET session_replication_role
+# = replica' --file data.sql, as the project's `postgres` user): Supabase lets
+# `postgres` set it although it is not a superuser. `pg_restore
+# --disable-triggers` was the first version and refused at once on the local
+# stack (#115 at dea7a21): DISABLE TRIGGER ALL on a table with foreign keys
+# needs a superuser, which `postgres` is not, locally or hosted. So pg_restore
+# writes the archive out as SQL (`-f -`) and psql runs it in one session and
+# one transaction, so a failure leaves the stack as it was, never part-filled.
 set -euo pipefail
 
 : "${DB_URL:?DB_URL is not set}"
@@ -21,8 +26,10 @@ set -euo pipefail
 pg_restore --version
 bytes=$(stat -c %s "$IN")
 started=$(date +%s)
-gpg --decrypt --batch --quiet --pinentry-mode loopback --passphrase-fd 3 "$IN" 3<<<"$BACKUP_PASSPHRASE" \
-  | pg_restore --data-only --disable-triggers --no-owner --no-privileges \
-      --exit-on-error -d "$DB_URL"
+{
+  echo "set session_replication_role = replica;"
+  gpg --decrypt --batch --quiet --pinentry-mode loopback --passphrase-fd 3 "$IN" 3<<<"$BACKUP_PASSPHRASE" \
+    | pg_restore --data-only --no-owner --no-privileges -f -
+} | psql "$DB_URL" --single-transaction -v ON_ERROR_STOP=1 -q -o /dev/null
 finished=$(date +%s)
 echo "restore: ${bytes} bytes restored in $((finished - started)) seconds"
