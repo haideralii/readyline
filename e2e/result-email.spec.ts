@@ -96,7 +96,8 @@ test.describe("REQ-031: email me my result", () => {
     await field.fill(address);
     await page.getByTestId("result-email-send").click();
     const reply = page.getByTestId("result-email-message");
-    await expect(reply).toHaveText(`Sent to ${address}`);
+    // The server derives and sends; a dev server compiles the action first.
+    await expect(reply).toHaveText(`Sent to ${address}`, { timeout: 30_000 });
 
     const sent = captured(address);
     expect(sent).toHaveLength(1);
@@ -139,6 +140,7 @@ test.describe("REQ-031: email me my result", () => {
     await page.getByTestId("result-email-send").click();
     await expect(reply).toHaveText(
       "You already asked for this result in the last hour",
+      { timeout: 30_000 },
     );
     expect(captured(address)).toHaveLength(1);
   });

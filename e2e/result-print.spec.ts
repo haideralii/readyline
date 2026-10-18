@@ -42,7 +42,8 @@ test.describe("REQ-031: print or save as PDF", () => {
   }, testInfo) => {
     await reachResult(page);
     await openResultSections(page);
-    const screenText = (await page.getByTestId("result").innerText()).replace(
+    // The whole screen: the footer carries the general-information statement the print view repeats.
+    const screenText = (await page.locator("body").innerText()).replace(
       /\s+/g,
       " ",
     );

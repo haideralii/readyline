@@ -396,14 +396,11 @@ function ResultView({
           <p className="text-ink mt-1 text-sm" data-testid="audit-kind">
             {glossarySentence(`${pathwayWord}-audit`)}{" "}
             {/* REQ-031 D-2895, D-2887: the scope sentence, in the same line block so the card keeps its shape. */}
-            <span
-              className="text-slate block text-xs leading-5"
-              data-testid="result-scope"
-            >
+            <span className="text-slate" data-testid="result-scope">
               {RESULT_SCOPE_SENTENCE}
             </span>
           </p>
-          <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
+          <ul className="mt-1 flex flex-wrap gap-1.5" aria-label={GROUPS_LABEL}>
             {r.groups.map((g) => (
               <li
                 key={g.code}
@@ -422,7 +419,7 @@ function ResultView({
             five lines (28 px from sm up) and the button ends inside the screen
             again with every word kept. */}
           <ul
-            className="mt-2 space-y-1 text-base leading-6 sm:mt-3 sm:leading-7"
+            className="mt-2 space-y-1 text-base leading-6 sm:mt-2 sm:leading-7"
             data-testid="summary-list"
           >
             <li className="tabular-nums" data-testid="summary-documents">
@@ -433,7 +430,7 @@ function ResultView({
             <li data-testid="checklist-count-line">{lines.checklist}</li>
           </ul>
           {/* REQ-013 batch 36 item 3: two segments (have / still to do); the sentence is the pack line (REQ-025 FR-3). */}
-          <div className="mt-2 sm:mt-3">
+          <div className="mt-2 sm:mt-2">
             <ReadyLine
               counts={readyLineCounts(counts)}
               sentence={lines.pack}
@@ -443,8 +440,9 @@ function ResultView({
           {/* REQ-028 FR-6, D-2805 (D-2707 restored): one primary button whose label says where it goes, one text
             link with no figure; the checklist link lives in the documents section; the "Next:" line is gone. */}
           <div data-testid="checklist-teaser">
-            {/* REQ-031 D-2895: the scope sentence joined the card, so the row sits 4 px higher from sm and the button
-              ends inside the first screen again (REQ-015 FR-4; run read 731 of 720). */}
+            {/* REQ-031 D-2895: the scope sentence joined the card (two lines from sm), so the groups, the list, the
+              ready line and this row each give up 4 px from sm and the button ends inside the first screen again
+              (REQ-015 FR-4; the run read 731 of 720 with the sentence inline). */}
             <div className="mt-3 flex flex-col gap-3 sm:mt-3 sm:flex-row sm:items-center">
               <Link
                 href={
