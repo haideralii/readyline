@@ -31,7 +31,7 @@ Out: the 24-hour windows (calendar time, unchanged); any time-of-day; substitute
 
 ## Acceptance criteria
 
-- AC-1 An unauthorised restrictive practice recorded on Thursday 2 April 2026 by an NSW account shows notify by Monday 13 April 2026 (Good Friday 3 April and Easter Monday 6 April do not count), with the FR-5 bracket; the same row for a `{NSW, WA}` account shows the same date (both days are national); a `{NSW, VIC}` account recorded on Friday 30 October 2026 shows Friday 6 November 2026 (Melbourne Cup Day is Victoria's alone, so it counts as a business day under FR-2), where a VIC-only account shows Monday 9 November (e2e, desktop and Android).
+- AC-1 An unauthorised restrictive practice recorded on Thursday 2 April 2026 by an NSW account shows notify by Monday 13 April 2026 (Good Friday 3 April and Easter Monday 6 April do not count), with the FR-5 bracket; the same row for a `{NSW, WA}` account shows the same date (both days are national); a `{NSW, VIC}` account recorded on Friday 6 March 2026 shows Friday 13 March 2026 (Labour Day, Monday 9 March, is Victoria's alone, so it counts as a business day under FR-2), where a VIC-only account shows Monday 16 March (e2e, desktop and Android). (D-2961, PO 19 Oct 02:06: the case moved from October 2026 to March 2026 because the spec records the incident on the runner's clock and the form refuses a future date.)
 - AC-2 FR-3 parity test green for both years and three state sets.
 - AC-3 The reminders integration test's expected dates updated for the fixtures that cross a holiday; count of reminders unchanged.
 - AC-4 FR-6 fallback line appears for a date in 2028; the year-runs-out test fails when the clock is set to 1 October 2027.
