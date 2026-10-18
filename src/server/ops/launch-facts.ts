@@ -25,7 +25,7 @@ import {
   createEmailProvider,
   smtpMissing,
 } from "@/server/email/provider";
-import { jobRunAction, type JobName } from "@/server/jobs/record-run";
+import { jobRunAction } from "@/server/jobs/record-run";
 import { createStripeClient } from "@/server/payments/stripe";
 
 export const TEST_SEND_ACTION = "email.test-sent";
@@ -225,7 +225,7 @@ export async function gatherLaunchFacts(input: {
   }
 
   const jobs = {} as LaunchFacts["jobs"];
-  for (const job of ["purge", "generate", "reminders"] as JobName[])
+  for (const job of ["purge", "generate", "reminders", "uptime"] as const)
     jobs[job] = await lastAuditAt(input.admin, jobRunAction(job));
 
   let legal: LaunchFacts["legal"] = [];

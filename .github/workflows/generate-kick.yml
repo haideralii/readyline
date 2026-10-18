@@ -17,7 +17,9 @@ name: Kick paid generation
 # Minutes: a scheduled run with nothing to do makes one call and ends, so
 # the schedule costs about 1,440 runner minutes a month against GitHub's
 # 2,000 free for a private repository; a dispatched run costs only while a
-# pack is generating.
+# pack is generating. REQ-030 FR-3 (D-2867): the uptime step rides inside
+# the same minute (two fetches, seconds), so the check costs nothing more;
+# a separate thirty-minute workflow would have cost another 1,440.
 #
 # Needs: repository variable PROD_URL (https://<domain>, no trailing slash)
 # and repository secret CRON_SECRET (the same value as the Vercel variable;
@@ -45,6 +47,8 @@ concurrency:
 
 permissions:
   contents: read
+  # REQ-030 FR-3 (D-2867, SR-3): the uptime step opens and closes the "Site down" issue.
+  issues: write
 
 jobs:
   kick:
@@ -56,6 +60,36 @@ jobs:
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       KICK_MAX_SECONDS: "1200"
     steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ops
+          sparse-checkout-cone-mode: false
+
+      # REQ-030 FR-3 (D-2867): the uptime check, ahead of the gate, needing PROD_URL alone. Its
+      # two-strike memory is one small file carried between runs by the Actions cache (the probe
+      # has no other memory when the site is down); it reports to /api/jobs/uptime when
+      # CRON_SECRET is set and opens or closes the "Site down <date>" issue with GITHUB_TOKEN.
+      - name: Restore the uptime check's state
+        if: env.PROD_URL != ''
+        uses: actions/cache/restore@v4
+        with:
+          path: .uptime-state.json
+          key: uptime-state-${{ github.run_id }}
+          restore-keys: uptime-state-
+
+      - name: Uptime check on PROD_URL (REQ-030 FR-3)
+        if: env.PROD_URL != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ops/uptime.mjs
+
+      - name: Save the uptime check's state
+        if: env.PROD_URL != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .uptime-state.json
+          key: uptime-state-${{ github.run_id }}
+
       - name: Check that the variable and the secret exist
         id: gate
         run: |
@@ -66,12 +100,6 @@ jobs:
             echo "::add-mask::$CRON_SECRET"
             echo "ready=true" >> "$GITHUB_OUTPUT"
           fi
-
-      - uses: actions/checkout@v4
-        if: steps.gate.outputs.ready == 'true'
-        with:
-          sparse-checkout: scripts/ops
-          sparse-checkout-cone-mode: false
 
       - name: Kick the generation route until it reports nothing more to do
         if: steps.gate.outputs.ready == 'true'
