@@ -435,11 +435,15 @@ test.describe("REQ-029 Session A: fill at download", () => {
         `/documents/${setId}/download?file=${START_HERE_FILE}`,
       );
       expect(r.status()).toBe(200);
-      const xml = strFromU8(
-        unzipSync(new Uint8Array(await r.body()))["word/document.xml"],
+      // The renderer tints a bracketed blank in its own run, so the paragraphs' texts are joined
+      // before asserting, as the type downloads are (#117's AC-7, the cause of #112's AC-3).
+      const sheet = await docxText(
+        page,
+        setId,
+        START_HERE_FILE.replace(/\.docx$/, ""),
       );
-      expect(xml).toContain("Fills in when you adopt this document");
-      expect(xml).toContain("Approval line: [date]");
+      expect(sheet).toContain("Fills in when you adopt this document");
+      expect(sheet).toContain("Approval line: [date]");
     });
 
     await test.step("AC-9: the older set still downloads 'Jane Citizen' after the name changed, and its page says why", async () => {
