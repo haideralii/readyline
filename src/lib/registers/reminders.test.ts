@@ -303,6 +303,22 @@ describe("reminder rules (REQ-009 FR-3)", () => {
         dueReminders(base({ period: { ...p, subscriptionCancelled: true } })),
       ).toEqual([]);
     });
+    // REQ-023 FR-7 and FR-3 (finding 83; PO acceptance read, 18 Oct 2026 (3)): the last call reads the
+    // application date on the period row through applicationInsideWindow, with nothing passed by the job.
+    it("an application recorded inside the s 73K window stops the last call; one from before the window does not", () => {
+      const ends = addDays(TODAY, 14);
+      const p = period(addMonths(ends, -36), ends);
+      const inside = {
+        period: { ...p.period, application_submitted_on: addMonths(ends, -3) },
+      };
+      expect(kinds(dueReminders(base({ period: inside })))).toEqual([]);
+      const outside = {
+        period: { ...p.period, application_submitted_on: addMonths(ends, -9) },
+      };
+      expect(kinds(dueReminders(base({ period: outside })))).toEqual([
+        `renewal-last-call@${TODAY}`,
+      ]);
+    });
     it("no period, no registration reminders", () => {
       expect(dueReminders(base({}))).toEqual([]);
     });
