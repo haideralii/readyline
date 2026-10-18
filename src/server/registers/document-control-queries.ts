@@ -14,7 +14,7 @@ import {
   type DocumentControlRow,
 } from "@/lib/registers/document-control";
 import { listLatestDocuments } from "@/server/generation/queries";
-import { loadFacts } from "@/server/path/facts";
+import { loadFactUpdatedAt, loadFacts } from "@/server/path/facts";
 
 function todaySydney(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -30,41 +30,50 @@ export async function documentControlForSet(
   accountId: string,
   setId: string,
 ): Promise<DocumentControlRow[]> {
-  const [docs, reviews, circulations, facts, changeReviews, olderAdopted] =
-    await Promise.all([
-      listLatestDocuments(supabase, setId),
-      supabase
-        .from("policy_reviews")
-        .select(
-          "document_type_id, adopted_on, review_cycle_months, last_reviewed_on, next_review_on",
-        )
-        .eq("account_id", accountId)
-        // REQ-024 A0 (finding 232): the seeded row alone, so a titled second
-        // row for the same type can never supply the next review date.
-        .eq("title", "")
-        .limit(500),
-      supabase
-        .from("policy_circulations")
-        .select("document_type_id, circulated_on, worker_refs")
-        .eq("account_id", accountId)
-        .limit(2000),
-      loadFacts(supabase, accountId),
-      // Backlog 8: the checks the owner has recorded against rule changes.
-      supabase
-        .from("document_change_reviews")
-        .select("document_type_id, change_id")
-        .eq("account_id", accountId)
-        .limit(2000),
-      // REQ-024 A0 (D-2436): any adopted version of each type, in any set,
-      // over the partial index, for the "new version to adopt" state.
-      supabase
-        .from("document_versions")
-        .select("document_type_id, adopted_on")
-        .eq("account_id", accountId)
-        .not("adopted_on", "is", null)
-        .order("adopted_on", { ascending: false })
-        .limit(2000),
-    ]);
+  const [
+    docs,
+    reviews,
+    circulations,
+    facts,
+    changeReviews,
+    olderAdopted,
+    contactUpdatedAt,
+  ] = await Promise.all([
+    listLatestDocuments(supabase, setId),
+    supabase
+      .from("policy_reviews")
+      .select(
+        "document_type_id, adopted_on, review_cycle_months, last_reviewed_on, next_review_on",
+      )
+      .eq("account_id", accountId)
+      // REQ-024 A0 (finding 232): the seeded row alone, so a titled second
+      // row for the same type can never supply the next review date.
+      .eq("title", "")
+      .limit(500),
+    supabase
+      .from("policy_circulations")
+      .select("document_type_id, circulated_on, worker_refs")
+      .eq("account_id", accountId)
+      .limit(2000),
+    loadFacts(supabase, accountId),
+    // Backlog 8: the checks the owner has recorded against rule changes.
+    supabase
+      .from("document_change_reviews")
+      .select("document_type_id, change_id")
+      .eq("account_id", accountId)
+      .limit(2000),
+    // REQ-024 A0 (D-2436): any adopted version of each type, in any set,
+    // over the partial index, for the "new version to adopt" state.
+    supabase
+      .from("document_versions")
+      .select("document_type_id, adopted_on")
+      .eq("account_id", accountId)
+      .not("adopted_on", "is", null)
+      .order("adopted_on", { ascending: false })
+      .limit(2000),
+    // REQ-029 D-2856: the one live key the register names when it changes.
+    loadFactUpdatedAt(supabase, accountId, "phone-or-email"),
+  ]);
   const olderByType = new Map<string, string>();
   for (const row of (olderAdopted.data as
     { document_type_id: string; adopted_on: string }[] | null) ?? [])
@@ -110,6 +119,7 @@ export async function documentControlForSet(
           | null) ?? [],
       adoptedByRole: facts.role ?? null,
       adoptedByName: facts.name ?? null,
+      contactUpdatedAt,
     },
     todaySydney(),
   );

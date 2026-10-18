@@ -1,5 +1,5 @@
 {
-  "note": "The Start here sheet's own words (REQ-026 FR-2; D-2220): how long each document takes, why the first documents come first, what each register is for and which pack document carries its template, and the next steps. Dev draft of 15 October 2026 for the product owner to edit (FR-2.1 says the estimates are PO text); NOT NDIS Quality and Safeguards Commission text. Minutes are reading-and-filling time for one person who knows their business.",
+  "note": "The Start here sheet's own words (REQ-026 FR-2; D-2220): how long each document takes, why the first documents come first, what each register is for and which pack document carries its template, and the next steps. Dev draft of 15 October 2026 for the product owner to edit (FR-2.1 says the estimates are PO text); NOT NDIS Quality and Safeguards Commission text. Minutes are reading-and-filling time for one person who knows their business. REQ-029 FR-4 (18 Oct 2026): fillOpenLine and fillAdoptionLine are the words on an open Fill in line and on the approver and date lines of a template set.",
   "author": "readyline",
   "status": "draft",
   "draftedBy": "dev",
@@ -88,7 +88,10 @@
     ]
   },
   "next": [
-    { "text": "Tick off your readiness checklist", "href": "/checklist" },
+    {
+      "text": "Tick off your readiness checklist",
+      "href": "/checklist"
+    },
     {
       "text": "See what the auditor asks for on the day",
       "href": "/path/audit-day"
@@ -97,5 +100,7 @@
       "text": "Check your systems before the audit",
       "href": "/path/audit-day/check"
     }
-  ]
+  ],
+  "fillOpenLine": "Fill this in on your details page",
+  "fillAdoptionLine": "Fills in when you adopt this document"
 }
