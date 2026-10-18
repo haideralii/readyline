@@ -53,8 +53,7 @@ export function ResultPrint({
       <h2 className="">{auditHeading(r)}</h2>
       <p className="mt-1">{glossarySentence(`${pathwayWord}-audit`)}</p>
       <p className="mt-1">{RESULT_SCOPE_SENTENCE}</p>
-      <h3 className="mt-3">{GROUPS_LABEL}</h3>
-      <ul className="mt-1 list-disc pl-5">
+      <ul className="mt-3 list-disc pl-5" aria-label={GROUPS_LABEL}>
         {r.groups.map((g) => (
           <li key={g.code}>
             {g.name} {g.code}
@@ -70,8 +69,7 @@ export function ResultPrint({
       <ul className="mt-1 list-disc pl-5">
         {r.modules.map((m) => (
           <li key={m.id}>
-            {m.name}: {m.standardCount}{" "}
-            {m.standardCount === 1 ? "standard" : "standards"}
+            {m.name} ({m.standardCount} standards)
           </li>
         ))}
       </ul>
@@ -81,7 +79,7 @@ export function ResultPrint({
       <ul className="mt-1 list-disc pl-5">
         {r.reasons.map((x, i) => (
           <li key={`${x.rule}-${i}`}>
-            {x.text} Source: {x.source.title}.
+            {x.text} <span className="text-slate">{x.source.title}</span>
           </li>
         ))}
       </ul>

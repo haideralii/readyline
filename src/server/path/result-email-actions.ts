@@ -39,6 +39,8 @@ import { loadServerDraft } from "@/server/accounts/actions";
 import { getViewer } from "@/server/accounts/queries";
 import { clientIp } from "@/server/auth/paths";
 import { hitRateLimit } from "@/server/auth/rate-limit";
+import { MemoryRateLimiter } from "@/lib/ops/health";
+import { SupabaseEnvError } from "@/server/supabase/env";
 import { createEmailProvider } from "@/server/email/provider";
 import { resultEmail } from "@/server/email/templates";
 
@@ -47,6 +49,29 @@ export type SendResultEmailResponse =
   | { ok: false; message: string; limited?: true };
 
 const Address = z.string().trim().toLowerCase().email().max(254);
+
+// Without a database (no Supabase variables: the public e2e job, a local run) the
+// limiter is this instance's memory with the same limits, as the derive action's is.
+const memoryAddress = new MemoryRateLimiter(
+  RESULT_EMAIL_LIMITS.perAddress.limit,
+  RESULT_EMAIL_LIMITS.perAddress.windowSeconds * 1000,
+);
+const memoryIp = new MemoryRateLimiter(
+  RESULT_EMAIL_LIMITS.perIp.limit,
+  RESULT_EMAIL_LIMITS.perIp.windowSeconds * 1000,
+);
+async function allowed(
+  key: string,
+  limit: { limit: number; windowSeconds: number },
+  memory: MemoryRateLimiter,
+): Promise<boolean> {
+  try {
+    return await hitRateLimit(key, limit);
+  } catch (e) {
+    if (e instanceof SupabaseEnvError) return memory.allow(key);
+    throw e;
+  }
+}
 
 export async function sendResultEmailAction(
   input: unknown,
@@ -85,18 +110,20 @@ export async function sendResultEmailAction(
   // D-2883, question 2 (a): the address bucket first, then the connection's.
   const hashed = emailHash(address);
   if (
-    !(await hitRateLimit(
+    !(await allowed(
       resultEmailAddressKey(hashed),
       RESULT_EMAIL_LIMITS.perAddress,
+      memoryAddress,
     ))
   )
     return { ok: false, limited: true, message: RESULT_EMAIL_HOUR };
   const ip = clientIp(await headers());
   if (
     ip &&
-    !(await hitRateLimit(
+    !(await allowed(
       resultEmailIpKey(hashAddress(ip)),
       RESULT_EMAIL_LIMITS.perIp,
+      memoryIp,
     ))
   )
     return { ok: false, limited: true, message: RESULT_EMAIL_IP_HOUR };
