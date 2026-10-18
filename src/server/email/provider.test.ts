@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 // D-2837: the transport's options are read from nodemailer's factory, so the timeouts are asserted, not assumed.
-const createTransport = vi.fn(() => ({ sendMail: vi.fn() }));
+const createTransport = vi.fn((options: unknown) => ({
+  sendMail: vi.fn(),
+  options,
+}));
 vi.mock("nodemailer", () => ({
   default: { createTransport: (o: unknown) => createTransport(o) },
 }));
@@ -136,7 +139,10 @@ describe("the SMTP transport's timeouts (D-2837)", () => {
       null,
     );
     expect(createTransport).toHaveBeenCalledTimes(1);
-    const options = createTransport.mock.calls[0][0] as Record<string, unknown>;
+    const options = createTransport.mock.calls[0]?.[0] as Record<
+      string,
+      unknown
+    >;
     expect(options).toMatchObject({
       host: "smtp.example.test",
       port: 587,

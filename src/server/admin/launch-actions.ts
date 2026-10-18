@@ -10,14 +10,15 @@
 import { createEmailProvider } from "@/server/email/provider";
 import { testEmail } from "@/server/email/templates";
 import { readAdminContext, writeAdminAudit } from "@/server/admin/access";
-import { TEST_SEND_ACTION } from "@/server/ops/launch-facts";
+import {
+  TEST_FAILED_ACTION,
+  TEST_SEND_ACTION,
+} from "@/server/ops/launch-facts";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { log } from "@/lib/logging/logger";
 import { parseInput, strictObject } from "@/lib/validation";
 
 const TEST_SEND_MIN_SECONDS = 60;
-/** D-2841: a failed attempt is audited too, so the one-a-minute limit holds for a failing provider as well. */
-export const TEST_FAILED_ACTION = "email.test-failed";
 
 /** The error's code or class name, never its message, which a server response can fill with host and account names. */
 function errorKind(e: unknown): string {

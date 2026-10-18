@@ -29,6 +29,8 @@ import { jobRunAction, type JobName } from "@/server/jobs/record-run";
 import { createStripeClient } from "@/server/payments/stripe";
 
 export const TEST_SEND_ACTION = "email.test-sent";
+/** D-2841: a failed attempt is audited too, so the one-a-minute limit holds for a failing provider as well. */
+export const TEST_FAILED_ACTION = "email.test-failed";
 
 const DNS_TIMEOUT_MS = 2_500;
 
