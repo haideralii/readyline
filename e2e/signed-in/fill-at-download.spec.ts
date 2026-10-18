@@ -1,6 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { strFromU8, unzipSync } from "fflate";
 import { readFileSync } from "node:fs";
+import { START_HERE_FILE } from "@/lib/generator/start-here";
 import { getStandardsDataset } from "@/lib/standards/dataset";
 import { documentTypeById } from "@/lib/generator/catalogue";
 import {
@@ -431,7 +432,7 @@ test.describe("REQ-029 Session A: fill at download", () => {
       );
       // The Word sheet carries the same lines.
       const r = await page.request.get(
-        `/documents/${setId}/download?file=start-here.docx`,
+        `/documents/${setId}/download?file=${START_HERE_FILE}`,
       );
       expect(r.status()).toBe(200);
       const xml = strFromU8(
