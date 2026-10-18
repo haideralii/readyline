@@ -18,7 +18,7 @@ import {
 import { checkWidths } from "../helpers/width";
 
 /**
- * REQ-023 Session B on desktop and Android (D-2207): the period filter on a
+ * REQ-023 Session B on the three projects (D-2207 lifted for WebKit, PO 18 Oct 2026 12:20): the period filter on a
  * register, its export and the audit pack (AC-3), "what changed since the
  * last audit" on the screen and in the pack's sheet (AC-4), the proxy's 400
  * for a malformed period on a page and on the auditor link (AC-9), the

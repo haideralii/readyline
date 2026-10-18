@@ -10,7 +10,7 @@
  * fieldset with a legend, so a screen reader announces the question and then
  * the human label of each option.
  */
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { numberText } from "@/lib/questionnaire/number-text";
 
 export type FieldErrors = Record<string, string[]>;
@@ -70,13 +70,15 @@ export function TextInput(props: {
   describedBy?: string;
   invalid: boolean;
   autoComplete?: string;
-  inputMode?: "text" | "numeric" | "search";
+  inputMode?: "text" | "numeric" | "search" | "email";
   maxLength?: number;
+  /** Live QA (report B, PO 12:08): the sign-in field is an email field on the shared control; text otherwise. */
+  type?: "text" | "email";
 }) {
-  const { onChange, describedBy, invalid, ...rest } = props;
+  const { onChange, describedBy, invalid, type = "text", ...rest } = props;
   return (
     <input
-      type="text"
+      type={type}
       {...rest}
       onChange={(e) => onChange(e.target.value)}
       aria-describedby={describedBy}
@@ -248,7 +250,7 @@ export function RadioGroup<V extends string>({
   const errorId = errors.length ? `${name}-error` : undefined;
   return (
     <fieldset
-      className="mb-6"
+      className="mb-6 min-w-0"
       aria-describedby={
         [helpId, errorId].filter(Boolean).join(" ") || undefined
       }
@@ -312,7 +314,7 @@ export function CheckboxGroup<V extends string>({
     );
   return (
     <fieldset
-      className="mb-6"
+      className="mb-6 min-w-0"
       aria-describedby={
         [helpId, errorId].filter(Boolean).join(" ") || undefined
       }
@@ -365,15 +367,29 @@ export function CheckboxGroup<V extends string>({
 export function ErrorSummary({
   errors,
   labels,
+  attempt = 0,
 }: {
   errors: FieldErrors;
   labels: Record<string, string>;
+  /** The step's submit count: focus moves to the summary on the submit that produced it and on no other change (live QA D1). */
+  attempt?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const entries = Object.entries(errors).filter(([, msgs]) => msgs.length > 0);
+  const hasEntries = entries.length > 0;
+  // Live QA pass of b340ee3, D1: an effect on the entry count re-ran every
+  // time a field's error cleared and pulled focus back to the alert mid-word
+  // ("Sunrise Supports" left "S" in the field). Focus moves once per submit
+  // attempt, at the render in which that attempt's errors are on the page
+  // (the step's parse is async, so they arrive a render after the count
+  // rises), and never again for the same attempt: a shrink of the list
+  // changes nothing about focus.
+  const focusedFor = useRef(0);
   useEffect(() => {
-    if (entries.length) ref.current?.focus();
-  }, [entries.length]);
+    if (!hasEntries || attempt === 0 || focusedFor.current === attempt) return;
+    focusedFor.current = attempt;
+    ref.current?.focus();
+  }, [attempt, hasEntries]);
   if (!entries.length) return null;
   return (
     <div
@@ -473,5 +489,39 @@ export function ParticipantDataWarning() {
       address or health details. Describe your services in general terms; use a
       reference code such as P-014 if you must refer to a person.
     </span>
+  );
+}
+
+/** How long the loading state may stand before the page says something about it. */
+export const LOADING_NOTE_AFTER_MS = 5_000;
+export const LOADING_NOTE_TEXT =
+  "Still loading. Reload the page if this stays.";
+
+/**
+ * Live QA pass of b340ee3, D8: twice in about twenty fresh loads a step
+ * stayed in its disabled loading fieldset past 20 s with nothing on the
+ * page saying why (unconfirmed, likely the test proxy). Rather than hunt
+ * it, the loading state gets a line after five seconds, so nobody is left
+ * with a dead form and no word. Unmounts with the loading state.
+ */
+export function LoadingNote({
+  afterMs = LOADING_NOTE_AFTER_MS,
+}: {
+  afterMs?: number;
+}) {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const id = window.setTimeout(() => setShown(true), afterMs);
+    return () => window.clearTimeout(id);
+  }, [afterMs]);
+  if (!shown) return null;
+  return (
+    <p
+      role="status"
+      className="text-slate mt-4 text-sm leading-6"
+      data-testid="loading-note"
+    >
+      {LOADING_NOTE_TEXT}
+    </p>
   );
 }

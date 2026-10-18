@@ -72,7 +72,13 @@ async function main() {
     fail("health", "not JSON");
   }
   if (body.ok !== true) fail("health", "ok is not true");
-  ok("health", `${body.deployment}, ${body.region}`);
+  // REQ-022 FR-9, AC-5: the health route reports the domain, so the record names the host it ran against.
+  if (
+    typeof body.siteUrl !== "string" ||
+    body.siteUrl.replace(/\/$/, "") !== base
+  )
+    fail("health", `siteUrl is not ${base}`);
+  ok("health", `${body.deployment}, ${body.region}, ${body.siteUrl}`);
 
   const home = await get(`${base}/`);
   if (home.status !== 200) fail("csp", `home status ${home.status}`);

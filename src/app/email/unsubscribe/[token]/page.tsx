@@ -2,17 +2,39 @@ import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { UNSUBSCRIBE_TOKEN_PATTERN } from "@/lib/email/unsubscribe-token";
 import { BRAND } from "@/lib/brand";
+import { notFoundMetadata } from "@/lib/page-titles";
 import { unsubscribeByToken } from "@/server/email/reminder-settings";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 
-export const metadata: Metadata = {
-  title: "Reminder emails stopped",
-  robots: { index: false, follow: false },
-};
 export const dynamic = "force-dynamic";
+
+/** One lookup (and one write) per request, shared by the title and the page (React cache). */
+const unsubscribeOnce = cache(async (token: string) =>
+  unsubscribeByToken(createSupabaseAdminClient(), token),
+);
+
+/** QA live b340ee3, B #57: the title follows `notFound()`, so a bad token never shows this route's title after hydration. */
+export async function generateMetadata({
+  params,
+}: PageProps<"/email/unsubscribe/[token]">): Promise<Metadata> {
+  const { token } = await params;
+  const known =
+    UNSUBSCRIBE_TOKEN_PATTERN.test(token) &&
+    (await unsubscribeOnce(token).then(
+      (r) => r.ok,
+      () => false,
+    ));
+  return known
+    ? {
+        title: "Reminder emails stopped",
+        robots: { index: false, follow: false },
+      }
+    : notFoundMetadata;
+}
 
 /**
  * The one-click unsubscribe on a reminder email (REQ-022 FR-7, SR-6): the
@@ -29,7 +51,7 @@ export default async function UnsubscribePage({
   if (!UNSUBSCRIBE_TOKEN_PATTERN.test(token)) notFound();
   let result: Awaited<ReturnType<typeof unsubscribeByToken>>;
   try {
-    result = await unsubscribeByToken(createSupabaseAdminClient(), token);
+    result = await unsubscribeOnce(token);
   } catch (e) {
     if (e instanceof SupabaseEnvError) notFound();
     throw e;

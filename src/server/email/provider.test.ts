@@ -1,7 +1,18 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 vi.mock("server-only", () => ({}));
+// D-2837: the transport's options are read from nodemailer's factory, so the timeouts are asserted, not assumed.
+const createTransport = vi.fn((options: unknown) => ({
+  sendMail: vi.fn(),
+  options,
+}));
+vi.mock("nodemailer", () => ({
+  default: { createTransport: (o: unknown) => createTransport(o) },
+}));
 import {
   configuredEmailProvider,
   createEmailProvider,
@@ -112,5 +123,79 @@ describe("createEmailProvider (REQ-022 FR-5, D-2821)", () => {
     const p = new LogOnlyEmailProvider();
     await p.send({ to: "a@example.test", subject: "s", text: "t" });
     expect(p.sent).toHaveLength(1);
+  });
+});
+
+describe("the log provider's test-only outbox (QA live b340ee3, batch C (3))", () => {
+  it("appends one JSON line per message when EMAIL_OUTBOX_FILE is set, and writes nothing without it", async () => {
+    const file = join(
+      tmpdir(),
+      `readyline-outbox-${process.pid}-${Date.now()}.ndjson`,
+    );
+    const before = process.env.EMAIL_OUTBOX_FILE;
+    try {
+      delete process.env.EMAIL_OUTBOX_FILE;
+      const quiet = new LogOnlyEmailProvider();
+      await quiet.send({ to: "a@example.test", subject: "s", text: "t" });
+      expect(existsSync(file)).toBe(false);
+      process.env.EMAIL_OUTBOX_FILE = file;
+      const loud = new LogOnlyEmailProvider();
+      await loud.send({
+        to: "b@example.test",
+        subject: "Readyline: a register reminder",
+        text: "Reminders for X:\n\n- one",
+        template: "reminders",
+        accountId: "acc-1",
+      });
+      await loud.send({ to: "c@example.test", subject: "s2", text: "t2" });
+      const lines = readFileSync(file, "utf8").trim().split("\n");
+      expect(lines).toHaveLength(2);
+      const first = JSON.parse(lines[0]) as Record<string, unknown>;
+      expect(first).toMatchObject({
+        to: "b@example.test",
+        subject: "Readyline: a register reminder",
+        template: "reminders",
+        accountId: "acc-1",
+      });
+      expect(typeof first.at).toBe("string");
+    } finally {
+      if (before === undefined) delete process.env.EMAIL_OUTBOX_FILE;
+      else process.env.EMAIL_OUTBOX_FILE = before;
+      rmSync(file, { force: true });
+    }
+  });
+});
+
+describe("the SMTP transport's timeouts (D-2837)", () => {
+  it("connects and greets within 10 s and gives a socket 30 s, so a hung host never holds the job", async () => {
+    const { SMTP_TIMEOUTS, SmtpEmailProvider } = await import("./provider");
+    createTransport.mockClear();
+    new SmtpEmailProvider(
+      {
+        host: "smtp.example.test",
+        port: 587,
+        user: "u",
+        pass: "p",
+        from: "Readyline <no-reply@readyline.example>",
+        replyTo: null,
+      },
+      null,
+    );
+    expect(createTransport).toHaveBeenCalledTimes(1);
+    const options = createTransport.mock.calls[0]?.[0] as Record<
+      string,
+      unknown
+    >;
+    expect(options).toMatchObject({
+      host: "smtp.example.test",
+      port: 587,
+      secure: false,
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 30_000,
+    });
+    expect(SMTP_TIMEOUTS.socketTimeout).toBeGreaterThan(
+      SMTP_TIMEOUTS.connectionTimeout,
+    );
   });
 });

@@ -83,7 +83,7 @@ test.describe("REQ-025 Session A", () => {
     const card = page.getByTestId("summary");
     await expect(card).toContainText("Your audit: certification");
     await expect(card.getByTestId("audit-kind")).toHaveText(
-      "An approved auditor reads your documents, visits where you work and talks to people.",
+      "The fuller audit: the auditor visits and talks to you, your workers and participants.",
     );
 
     // AC-2, FR-3: the list's numbers equal what the page shows elsewhere.
@@ -156,7 +156,7 @@ test.describe("REQ-025 Session A", () => {
       ),
     ).toHaveCount(0);
 
-    // FR-5: each reason links to its source by title; "new tab" is said once.
+    // FR-5: each reason links to its source by title; live QA D7: the link's own name says it opens a new tab.
     const why = page.getByTestId("result-section-why");
     // REQ-028 D-2813: open at lg on a first visit, closed under it.
     if ((page.viewportSize()?.width ?? 0) >= 1024)
@@ -170,7 +170,8 @@ test.describe("REQ-025 Session A", () => {
     for (const reason of await reasons.all()) {
       const links = reason.getByRole("link");
       await expect(links).toHaveCount(1);
-      await expect(links).not.toContainText(/Source:|opens in a new tab/);
+      await expect(links).not.toContainText(/Source:/);
+      await expect(links).toContainText("(opens in a new tab)");
       await expect(links).toHaveAttribute("target", "_blank");
     }
     // FR-13: the words on this page, each with its meaning. REQ-027 D-2701 moved the disclosure
@@ -180,18 +181,15 @@ test.describe("REQ-025 Session A", () => {
       /^What these words mean \(\d+\)$/,
     );
     await glossary.locator("> summary").click();
-    // REQ-027 A1 (D-2709, D-2713): the shared component renders the meaning as a sentence, then `more`.
+    // REQ-027 A1 (D-2709); D-2852: the shared component renders each meaning as its one short sentence.
     const midTerm = glossary.getByTestId("glossary-mid-term-audit");
     await expect(midTerm).toContainText("mid-term audit");
-    await expect(midTerm).toContainText(
-      "A second audit that most certification providers must have.",
-    );
-    await expect(midTerm).toContainText(
-      "The Rules say it must begin within 18 months of your registration starting",
+    await expect(midTerm).toHaveText(
+      "mid-term audit: A second audit that most certification providers must have.",
     );
     await expect(
       glossary.getByTestId("glossary-practice-standards"),
-    ).toContainText("The quality rules in the law for registered providers.");
+    ).toContainText("The quality rules every registered provider must meet.");
     await checkWidths(page, "result (open)");
     expect(await axeSerious(page, "result (open)")).toEqual([]);
   });

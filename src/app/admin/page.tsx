@@ -1,16 +1,24 @@
 import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import { unverifiedChecklistItems } from "@/lib/checklist/confidence";
-import { requireAdmin, writeAdminAudit } from "@/server/admin/access";
+import {
+  readAdminContext,
+  requireAdmin,
+  writeAdminAudit,
+} from "@/server/admin/access";
+import { notFoundMetadata } from "@/lib/page-titles";
 import { RETENTION_DAYS } from "@/server/accounts/purge";
 import { COUNTER_EVENTS, COUNTER_LABELS } from "@/lib/metrics/counters";
 import { countersLast30Days } from "@/server/metrics/counters";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 
-export const metadata: Metadata = {
-  title: "Admin",
-  robots: { index: false, follow: false },
-};
+/** QA live b340ee3, B #57: signed out (or not an admin) the page is the 404 and so is its title. */
+export async function generateMetadata(): Promise<Metadata> {
+  const ctx = await readAdminContext();
+  return ctx
+    ? { title: "Admin", robots: { index: false, follow: false } }
+    : notFoundMetadata;
+}
 
 export default async function AdminPage() {
   const ctx = await requireAdmin();

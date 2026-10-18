@@ -87,7 +87,6 @@ export type LaunchFacts = {
 
 export const LEGAL_FRESH_DAYS = 90;
 export const JOB_WINDOW_HOURS = 26;
-export const TEST_SEND_WINDOW_HOURS = 24;
 
 type Verdict = { state: LaunchState; sentence: string };
 type Rule = {
@@ -174,6 +173,20 @@ function priceRow(
       sentence: `${centsName} differs from the Price's unit_amount; set it to the Price's amount or fix the Price.`,
     };
   return { state: "set", sentence: `${idName} matches ${centsName}.` };
+}
+
+/** A Sydney day and time in words for the switchboard's rows ("18 October 2026, 3:04 pm"). */
+export function sydneyDateTime(iso: string): string {
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return iso;
+  return new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Sydney",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(t));
 }
 
 function hoursSince(iso: string | null, now: Date): number | null {
@@ -416,20 +429,20 @@ const RULES: Rule[] = [
   {
     id: "email-test-send",
     group: "email",
-    name: "Test email in the last 24 hours",
-    judge: (f) => {
-      const h = hoursSince(f.email.lastTestSendAt, f.now);
-      return h !== null && h <= TEST_SEND_WINDOW_HOURS
+    // D-2839 (the acceptance read of REQ-022 B): the REQ asked for set with no expiry, shown with its date; the
+    // row read the last email.test-sent audit line and expired after 24 hours.
+    name: "Test email sent",
+    judge: (f) =>
+      f.email.lastTestSendAt
         ? {
             state: "set",
-            sentence: "A test email was sent from this page within 24 hours.",
+            sentence: `Test email sent ${sydneyDateTime(f.email.lastTestSendAt)}.`,
           }
         : {
             state: "unset",
             sentence:
               'Press "Send me a test email" (Session B) and confirm it arrived.',
-          };
-    },
+          },
   },
   {
     id: "site-url",
@@ -486,13 +499,13 @@ const RULES: Rule[] = [
           return {
             state: "set",
             sentence:
-              "A Stripe webhook endpoint points at this site's /api/stripe/webhook.",
+              "A Stripe webhook endpoint points at this host's /api/stripe/webhook.",
           };
         case "missing":
           return {
             state: "unset",
             sentence:
-              "No webhook endpoint in Stripe points at this site; add one in Stripe, Developers, Webhooks (LAUNCH.md).",
+              "No webhook endpoint in Stripe points at the host this page was served on; after the domain move add or edit it in Stripe, Developers, Webhooks (LAUNCH.md).",
           };
         case "unverified":
           return {

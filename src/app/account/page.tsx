@@ -44,6 +44,9 @@ import { RegistrationTimeline } from "./registration-timeline";
 import { BillingPortalButton, SubscribeButton } from "./subscribe-button";
 import { AuditorLinkPanel } from "./auditor-link";
 import { TeamPanel } from "./team";
+import { ReminderEmails } from "./reminder-emails";
+import { readReminderSettings } from "@/server/email/reminder-settings";
+import { formatLongDay } from "@/lib/registers/state-facts";
 import { latestAuditorLink, liveLink } from "@/server/registers/auditor-links";
 import {
   listInvitations,
@@ -137,6 +140,8 @@ export default async function AccountPage() {
   const pricing = readPricing();
   const subscriptionOffered = subscriptionAvailable();
   const auditorLink = liveLink(await latestAuditorLink(supabase, a.id));
+  // D-2836: the account's reminder row, under the owner's own policies.
+  const reminders = await readReminderSettings(supabase, a.id);
   // REQ-020 FR-4, FR-5: the team and the report link, read by code only.
   const [invitations, workers, reportLink] = await Promise.all([
     listInvitations(supabase, a.id),
@@ -173,6 +178,7 @@ export default async function AccountPage() {
                 text: "Share a read-only view with your auditor",
               },
               { id: "team-heading", text: "Your team" },
+              { id: "reminders-heading", text: "Reminder emails" },
               { id: "subscription-heading", text: "Registers subscription" },
               { id: "details-heading", text: "Business details" },
               { id: "session-heading", text: "Sessions" },
@@ -366,6 +372,25 @@ export default async function AccountPage() {
               reportLink={
                 reportLink
                   ? { id: reportLink.id, createdAt: reportLink.created_at }
+                  : null
+              }
+            />
+          </section>
+
+          {/* Live QA of b340ee3, D-2836: the control the unsubscribe page promises. */}
+          <section
+            aria-labelledby="reminders-heading"
+            className="mt-8"
+            data-testid="account-reminders"
+          >
+            <h2 id="reminders-heading" className="scroll-mt-24">
+              Reminder emails
+            </h2>
+            <ReminderEmails
+              doNotSend={reminders.doNotSend}
+              since={
+                reminders.since
+                  ? formatLongDay(reminders.since.slice(0, 10))
                   : null
               }
             />

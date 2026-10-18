@@ -49,6 +49,10 @@ describe("guides (REQ-011)", () => {
     // Batch 35 (NDIS watch item A12): the application-fee lines now carry the ABLIS citation and no marker.
     const cost = loadGuide("ndis-registration-cost");
     expect(cost.unverified.join("\n")).not.toMatch(/application/i);
+    // QA live b340ee3 (report B): the draft line goes, since every figure was verified in REQ-027's
+    // pass against the Sources section and no UNVERIFIED line remains on the page.
+    expect(cost.unverified).toEqual([]);
+    expect(cost.draft).toBe(false);
     expect(cost.markdown).toMatch(/No application fee/);
     expect(cost.faq.map((f) => f.answer).join("\n")).toMatch(
       /does not charge an application fee/,

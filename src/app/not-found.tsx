@@ -1,9 +1,10 @@
 import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
+import { NOT_FOUND_TITLE } from "@/lib/page-titles";
 import Link from "next/link";
 
 /** QA pass F9 (WCAG 2.4.2): the page's own title through the root layout's template, not the home page's. */
-export const metadata: Metadata = { title: "Page not found" };
+export const metadata: Metadata = { title: NOT_FOUND_TITLE };
 
 /**
  * The 404 page (batch 47 item 8): inside the site shell with the header and

@@ -10,6 +10,7 @@ import { join, relative } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { findProhibitedClaims } from "@/lib/claims";
+import { glossaryBracket } from "@/lib/questionnaire/content";
 import {
   GLOSSARY_ATTRIBUTION,
   GLOSSARY_BRACKET_TITLE,
@@ -180,6 +181,17 @@ const COPY_MODULES = [
   "src/app/start/_components/steps/result-copy.ts",
   // REQ-023 Session C: the renewal path's step titles, states, actions and the Commission's practice lines.
   "src/lib/path/renewal.ts",
+  // D-2849 (PO acceptance read, 18 Oct 2026 (4)): every module whose strings a customer reads joins the lint.
+  // REQ-023 B, C and D: the period selector's words, the "what changed" sheet, the changes register, the self-check.
+  "src/lib/registers/period.ts",
+  "src/lib/registers/what-changed.ts",
+  "src/lib/registers/commission-changes.ts",
+  "src/lib/registers/self-check.ts",
+  // REQ-022 and REQ-024: the reminder emails, the worker's steps, supervision and the worker-states line.
+  "src/server/email/templates.ts",
+  "src/lib/registers/worker-steps.ts",
+  "src/lib/registers/supervision.ts",
+  "src/lib/registers/worker-states-line.ts",
 ];
 const CONTENT_JSON_DIR = "data/readyline-content";
 
@@ -632,6 +644,15 @@ const GLOSSARY_RENDERED_THROUGH: Record<string, string | null> = {
     "src/app/start/_components/steps/result-step.tsx",
   // REQ-023 Session C: rendered on the signed-in renewal path, outside D-2710's list.
   "src/lib/path/renewal.ts": null,
+  // D-2849: the eight modules render on signed-in pages or in email, outside D-2710's list.
+  "src/lib/registers/period.ts": null,
+  "src/lib/registers/what-changed.ts": null,
+  "src/lib/registers/commission-changes.ts": null,
+  "src/lib/registers/self-check.ts": null,
+  "src/server/email/templates.ts": null,
+  "src/lib/registers/worker-steps.ts": null,
+  "src/lib/registers/supervision.ts": null,
+  "src/lib/registers/worker-states-line.ts": null,
 };
 
 /**
@@ -871,13 +892,14 @@ describe("glossary presence (REQ-027 FR-2)", () => {
       "term:adopt",
       "token:module",
     ]);
-    // One term, the module, whose bracket meaning holds "Practice Standards", and the term again outside the bracket.
+    // One term, the module, with its bracket and the term again outside the bracket.
     const oneTerm = `export function P() {\n  return <main><p>Each <GlossaryBracket id="module" /> is listed. A module can be long.</p></main>;\n}\n`;
     expect(
       glossaryFindings(extractTsxText(oneTerm, at), meaningWays(oneTerm, at)),
     ).toEqual([]);
+    // D-2852: the bracket is the glossary's own, so the strip of D-2714 still recognises it.
     const brackets = extractMarkdownText(
-      "---\nslug: x\n---\n\nEach module (a group of the Practice Standards rules on one topic) is listed. A module can be long.\n",
+      `---\nslug: x\n---\n\nEach ${glossaryBracket("module")} is listed. A module can be long.\n`,
     );
     expect(
       glossaryFindings(brackets, { ids: new Set(), tokens: [] }).map(

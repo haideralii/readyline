@@ -2,21 +2,47 @@ import { PageShell } from "@/components/page-shell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { cache } from "react";
 import {
   AUDITOR_TOKEN_PATTERN,
   hashAuditorToken,
 } from "@/lib/registers/auditor-link";
 import { INVITE_LINE } from "@/lib/registers/worker";
+import { notFoundMetadata } from "@/lib/page-titles";
 import { getViewer } from "@/server/accounts/queries";
 import { createSupabaseAdminClient } from "@/server/supabase/admin";
 import { SupabaseEnvError } from "@/server/supabase/env";
 import { AcceptInvitation } from "./accept";
 
-export const metadata: Metadata = {
-  title: "Your invitation",
-  robots: { index: false, follow: false },
-};
 export const dynamic = "force-dynamic";
+
+type InvitePreview = { trading_name: string; worker_ref: string };
+
+/** One lookup per request, shared by the title and the page (React cache). */
+const invitePreviewFor = cache(
+  async (token: string): Promise<InvitePreview | null> => {
+    const r = await createSupabaseAdminClient().rpc("invitation_preview", {
+      p_token_hash: hashAuditorToken(token),
+    });
+    return (r.data as InvitePreview[] | null)?.[0] ?? null;
+  },
+);
+
+/** QA live b340ee3, B #57: the title follows `notFound()`. */
+export async function generateMetadata({
+  params,
+}: PageProps<"/invite/[token]">): Promise<Metadata> {
+  const { token } = await params;
+  const known =
+    AUDITOR_TOKEN_PATTERN.test(token) &&
+    (await invitePreviewFor(token).then(
+      (p) => p !== null,
+      () => false,
+    ));
+  return known
+    ? { title: "Your invitation", robots: { index: false, follow: false } }
+    : notFoundMetadata;
+}
 
 /**
  * The invitation page (REQ-020 FR-4, FR-11): signed out, it says who invited
@@ -28,15 +54,9 @@ export default async function InvitePage({
 }: PageProps<"/invite/[token]">) {
   const { token } = await params;
   if (!AUDITOR_TOKEN_PATTERN.test(token)) notFound();
-  let preview: { trading_name: string; worker_ref: string } | null = null;
+  let preview: InvitePreview | null = null;
   try {
-    const admin = createSupabaseAdminClient();
-    const r = await admin.rpc("invitation_preview", {
-      p_token_hash: hashAuditorToken(token),
-    });
-    preview =
-      (r.data as { trading_name: string; worker_ref: string }[] | null)?.[0] ??
-      null;
+    preview = await invitePreviewFor(token);
   } catch (e) {
     if (e instanceof SupabaseEnvError) notFound();
     throw e;

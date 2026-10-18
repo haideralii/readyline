@@ -48,7 +48,15 @@ test.describe("magic link works on any device (REQ-004 FR-9)", () => {
       const requesting = await browser.newContext();
       const page1 = await requesting.newPage();
       await page1.goto("/sign-in?next=%2Faccount%2Fsetup");
-      await page1.getByLabel("Email address").fill(email);
+      // D-2853 (QA live b340ee3, batch C (1), the iphone project): WebKit took the typing before
+      // React had hydrated the controlled input and hydration emptied it. The form is now inert
+      // until hydrated, so the field is disabled until typing is safe, and what is typed stays.
+      const fields = page1.getByTestId("sign-in-fields");
+      await expect(fields).toBeEnabled();
+      const emailBox = page1.getByLabel("Email address");
+      await emailBox.fill(email);
+      await page1.waitForTimeout(300);
+      await expect(emailBox).toHaveValue(email);
       await page1
         .getByRole("button", { name: "Email me a sign-in link" })
         .click();

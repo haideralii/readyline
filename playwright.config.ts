@@ -51,8 +51,11 @@ export default defineConfig({
       use: { ...devices["iPhone 17 Pro"] },
       // Backlog 1 (D-1508): the accessibility pass runs on all three projects;
       // batch 45 item 28: so does the setup form a new customer submits.
+      // QA live b340ee3, batch C (1) (PO 18 Oct 2026 12:20): the nine flows report D found on
+      // desktop and Android alone join: the subscription states, REQ-023 B, C and D, the REQ-028
+      // register pages and account nav, and the magic-link spec; D-2207 no longer keeps REQ-023 off WebKit.
       testMatch:
-        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision))\.spec\.ts$/,
+        /(req-015-width|req-015-a11y|req-015-accessibility-pass|home-v2|home|req-013-p2|questionnaire|guides|writing-indicator|req-025|req-025-b|req-027|not-found|subscription-story|business-identity|signed-in[\\/](account-setup|checklist|purchase-flow|registers|guided-path|accessibility-pass|audit-day-registers|generation-off|admin-launch|records|audit-pack|team|worker-onboarding|worker-exception|worker-exports|worker-steps|worker-supervision|subscription|req-023-b|req-023-c|req-023-d|req-028-b|req-028-c|magic-link-any-device)|qa-live-a)\.spec\.ts$/,
     },
   ],
   webServer: {
@@ -79,10 +82,25 @@ export default defineConfig({
       STRIPE_WEBHOOK_SECRET: "",
       // The job route and the webhook's hand-on need the cron secret the spec also sends.
       CRON_SECRET: e2eCronSecret(),
+      // QA live b340ee3, batch C (3) and (4): the log provider's test-only outbox (one JSON line a
+      // message, read by e2e/signed-in/reminder-emails.spec.ts) and the pepper the unsubscribe
+      // token hangs off (REQ-022 SR-6); neither is set in production this way.
+      EMAIL_OUTBOX_FILE: ".e2e-outbox.ndjson",
+      HASH_PEPPER:
+        process.env.HASH_PEPPER ?? "e2e-hash-pepper-0123456789abcdef", // gitleaks:allow
       // The paid job replays the recorded sole-trader fixtures: never record, never live.
       GENERATION_RECORD: "",
       GENERATION_LIVE: "",
       ANTHROPIC_MODEL: "claude-sonnet-5-5",
+      // REQ-022 FR-13 (D-2289): the registered name and ABN reach the server only when the
+      // run sets them (CI's identity step; locally by exporting them), so the full run keeps
+      // the unset state the spec's other half asserts.
+      ...(process.env.BUSINESS_NAME
+        ? { BUSINESS_NAME: process.env.BUSINESS_NAME }
+        : {}),
+      ...(process.env.BUSINESS_ABN
+        ? { BUSINESS_ABN: process.env.BUSINESS_ABN }
+        : {}),
     },
   },
 });

@@ -33,6 +33,19 @@ describe("registration-group pages (REQ-011 batch 31, D-1105)", () => {
     expect(findGroupPage(dataset, "nope")).toBeNull();
   });
 
+  it("0136 reads centre-based while its published slug stays (QA live b340ee3, report B)", () => {
+    const group = pages.find((p) => p.code === "0136")!;
+    expect(group.name).toBe("Group and centre-based activities");
+    expect(group.slug).toBe("group-and-centrebased-activities");
+    expect(
+      findGroupPage(dataset, "group-and-centrebased-activities")?.code,
+    ).toBe("0136");
+    expect(
+      findGroupPage(dataset, "group-and-centre-based-activities"),
+    ).toBeNull();
+    expect(group.description).toMatch(/centre-based/);
+  });
+
   it("the audit type comes from the rules and agrees with the dataset's table", () => {
     for (const p of pages) {
       const g = dataset.registrationGroups.find((x) => x.code === p.code)!;
